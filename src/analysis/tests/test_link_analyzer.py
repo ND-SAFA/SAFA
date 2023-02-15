@@ -83,4 +83,6 @@ class TestLinkAnalyzer(BaseTest):
     def get_link_analyzer(self):
         a1 = Artifact("s1", self.a1_body)
         a2 = Artifact("t1", self.a2_body)
-        return LinkAnalyzer(TraceLink(a1, a2), ModelManager('bert-base-uncased'))
+        analyzer = LinkAnalyzer(TraceLink(a1, a2, is_true_link=True), 0.66, ModelManager('bert-base-uncased'))
+        self.assertLessEqual(abs(analyzer.diff_from_prediction_score - 0.34), 0.01)
+        return analyzer

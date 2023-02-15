@@ -43,6 +43,7 @@ class ResultsAnalyzer:
         """
         self.prediction_output = prediction_output
         self.model_manager = model_manager
+        self.link_analyzers = {}
         self.mis_predicted_links, self.correctly_predicted_links = self._get_mis_and_correctly_predicted_links(dataset)
 
     def analyze(self, common_words_threshold: float = LINK_COMMON_WORDS_THRESHOLD_DEFAULT) -> JobAnalysis:
@@ -103,7 +104,7 @@ class ResultsAnalyzer:
         link_collection_analysis: LinkCollectionAnalysis = {}
         for link in tqdm(links, desc="Categorizing predicted links"):
             link_categories = []
-            link_analyzer = LinkAnalyzer(link, self.model_manager)
+            link_analyzer = self.link_analyzers[link.id]
             analysis_counts = link_analyzer.get_category_counts()
             total_words = sum([wc.total() for wc in link_analyzer.word_counts])
             shares_common_words = analysis_counts.pop(LinkAnalyzer.COMMON_WORDS) >= total_words * common_words_threshold
@@ -139,4 +140,5 @@ class ResultsAnalyzer:
                     mis_predicted_links.false_positives.add(link)
             else:
                 correctly_predicted_links.add(link)
+            self.link_analyzers[link.id] = LinkAnalyzer(link, self.prediction_output.predictions[i], self.model_manager)
         return mis_predicted_links, correctly_predicted_links

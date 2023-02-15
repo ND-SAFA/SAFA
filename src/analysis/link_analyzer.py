@@ -28,6 +28,7 @@ class LinkAnalyzer:
     MISSPELLED_WORDS = "misspelled_words"
     SHARED_SYNONYMS_AND_ANTONYMS = "shared_synonyms_and_antonyms"
     OOV_WORDS = "oov_words"
+    DIFF_FROM_PREDICTION_SCORE = "difference_from_prediction_score"
 
     ARTIFACT_TOKENS = "artifact_tokens"
     ANALYSIS = "analysis"
@@ -35,7 +36,7 @@ class LinkAnalyzer:
 
     OUTPUT_FILENAME = "link_{}_analysis.json"
 
-    def __init__(self, link: TraceLink, model_manager: ModelManager = None):
+    def __init__(self, link: TraceLink, predicted_score: float, model_manager: ModelManager = None):
         """
          Initializes the analyzer for analysis of given link
         :param link: The link to analyze
@@ -44,6 +45,7 @@ class LinkAnalyzer:
         self.vocabs = [self.get_artifact_vocab(link.source), self.get_artifact_vocab(link.target)]
         self.word_counts = [WordCounter(vocab).filter_stop_words() for vocab in self.vocabs]
         self.model_manager = model_manager
+        self.diff_from_prediction_score = abs(predicted_score - self.link.get_label())
         self.__analysis: JobAnalysis = None
         self.__link_analysis: LinkMetrics = None
         self._lock = Lock()
@@ -71,7 +73,8 @@ class LinkAnalyzer:
             self.__link_analysis = {
                 self.ARTIFACT_TOKENS: [self.link.source.token, self.link.target.token],
                 self.LINK_TRUE_LABEL: self.link.get_label(),
-                self.ANALYSIS: analysis
+                self.ANALYSIS: analysis,
+                self.DIFF_FROM_PREDICTION_SCORE: self.diff_from_prediction_score
             }
         return self.__link_analysis
 

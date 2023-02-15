@@ -63,7 +63,3 @@ Cypress.Commands.add("createDocument", (props, save) => {
 
   cy.clickButton(DataCy.documentSaveButton);
 });
-
-Cypress.Commands.add("saveDocument", () => {
-  cy.clickButton(DataCy.documentSaveButton);
-});

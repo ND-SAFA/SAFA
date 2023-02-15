@@ -25,9 +25,7 @@ describe("Artifact Search", () => {
       cy.getCy(DataCy.artifactSearchItem).should("have.length", 1);
       cy.getCy(DataCy.artifactSearchCount).should("contain", 1);
 
-      cy.getCy(DataCy.artifactSearchNavInput)
-        .clear()
-        .inputText(DataCy.artifactSearchNavInput, "Design");
+      cy.inputText(DataCy.artifactSearchNavInput, "Design", true);
 
       cy.getCy(DataCy.artifactSearchItem).should("have.length", 14);
       cy.getCy(DataCy.artifactSearchCount).should("contain", 14);

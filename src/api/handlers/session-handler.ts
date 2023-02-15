@@ -1,5 +1,3 @@
-// import { datadogRum } from "@datadog/browser-rum";
-
 import {
   IOHandlerCallback,
   PasswordChangeSchema,
@@ -34,8 +32,6 @@ export async function handleLogin(user: UserPasswordSchema): Promise<void> {
   sessionStore.user = await getCurrentUser();
   sessionStore.updateSession(session);
 
-  // datadogRum.startSessionReplayRecording();
-
   await handleGetProjects({
     onComplete: async () => {
       if (goToPath === Routes.ARTIFACT) {
@@ -65,7 +61,6 @@ export async function handleLogout(sendLogoutRequest = false): Promise<void> {
   if (sendLogoutRequest) {
     await deleteSession();
   }
-  // datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -74,20 +69,6 @@ export async function handleLogout(sendLogoutRequest = false): Promise<void> {
  */
 export async function handleAuthentication(): Promise<void> {
   sessionStore.user = await getCurrentUser();
-
-  // datadogRum.init({
-  //   applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
-  //   clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
-  //   env: process.env.NODE_ENV || "",
-  //   site: "datadoghq.com",
-  //   service: "safa",
-  //   version: "1.0.0",
-  //   sampleRate: 100,
-  //   premiumSampleRate: 100,
-  //   trackInteractions: true,
-  //   defaultPrivacyLevel: "mask-user-input",
-  // });
-  // datadogRum.startSessionReplayRecording();
 
   await handleGetProjects({});
 }

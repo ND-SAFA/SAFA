@@ -16,12 +16,12 @@ describe("Artifacts", () => {
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
       cy.inputText(DataCy.artifactSaveNameInput, `New ${Math.random()}`);
-      cy.getCy(DataCy.artifactSaveBodyInput).clear();
+      cy.inputText(DataCy.artifactSaveBodyInput, "", true);
 
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
       cy.inputText(DataCy.artifactSaveBodyInput, "New Artifact");
-      cy.getCy(DataCy.artifactSaveTypeInput).clear();
+      cy.inputText(DataCy.artifactSaveTypeInput, "", true);
 
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 

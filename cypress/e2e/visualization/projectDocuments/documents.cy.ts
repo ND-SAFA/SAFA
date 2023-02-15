@@ -30,9 +30,7 @@ describe("Documents", () => {
         .should("be.disabled");
 
       // Assert that the document cannot have the same name as another.
-      cy.getCy(DataCy.documentNameInput)
-        .clear()
-        .inputText(DataCy.documentNameInput, name)
+      cy.inputText(DataCy.documentNameInput, name, true)
         .getCy(DataCy.documentSaveButton)
         .should("be.disabled");
     });
@@ -52,9 +50,12 @@ describe("Documents", () => {
     });
 
     it("Creates a document from artifact types", () => {
-      cy.createDocument({
-        includeTypes: "Req{downArrow}{enter}",
-      }).saveDocument();
+      cy.createDocument(
+        {
+          includeTypes: "Req{downArrow}{enter}",
+        },
+        true
+      );
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
@@ -116,7 +117,7 @@ describe("Documents", () => {
         .fillDocumentFields({
           includeChildTypes: "Des{downArrow}{enter}",
         })
-        .saveDocument();
+        .clickButton(DataCy.documentSaveButton);
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")

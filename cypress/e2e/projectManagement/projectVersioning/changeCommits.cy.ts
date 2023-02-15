@@ -50,10 +50,9 @@ describe("Change Commits", () => {
         .click()
         .clickButton(DataCy.selectedPanelEditButton);
 
-      cy.getCy(DataCy.artifactSaveNameInput)
-        .clear()
-        .inputText(DataCy.artifactSaveNameInput, changedName)
-        .clickButton(DataCy.artifactSaveSubmitButton);
+      cy.inputText(DataCy.artifactSaveNameInput, changedName, true).clickButton(
+        DataCy.artifactSaveSubmitButton
+      );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
@@ -68,7 +67,7 @@ describe("Change Commits", () => {
     });
 
     it.skip("Undoes changes to a trace link", () => {
-      cy.openApproveGeneratedTraceLinks();
+      cy.openTraceApproval();
 
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.filter(":visible").should("have.length", 10);

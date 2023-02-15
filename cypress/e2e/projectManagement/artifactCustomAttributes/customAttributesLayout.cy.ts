@@ -4,6 +4,6 @@ describe("Custom Attributes Layout", () => {
   });
 
   beforeEach(() => {
-    cy.initProjectVersion();
+    cy.initEmptyProject();
   });
 });

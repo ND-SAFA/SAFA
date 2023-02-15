@@ -1,5 +1,6 @@
 from data.hub.hub_descriptors.cchit_descriptor import CCHITDescriptor
 from data.hub.hub_descriptors.cm1_descriptor import CM1Descriptor
+from data.hub.hub_descriptors.drone_full_descriptor import DroneFullDescriptor
 from data.hub.hub_descriptors.drone_nl_descriptor import DroneNLDescriptor
 from data.hub.hub_descriptors.drone_pl_descriptor import DronePLDescriptor
 from data.hub.hub_descriptors.itrust_descriptor import ITrustDescriptor
@@ -14,5 +15,6 @@ class SupportedDatasets(SupportedEnum):
     TRAINCONTROLLER = TrainControllerDescriptor
     DRONE_PL = DronePLDescriptor
     DRONE_NL = DroneNLDescriptor
+    DRONE_FULL = DroneFullDescriptor
     ITRUST = ITrustDescriptor
     MIP = MipDescriptor

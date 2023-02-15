@@ -1,0 +1,20 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "EXPORT_DATASET",
+          "job_args": {
+          },
+          "trace_dataset_creator": {
+            "project_reader": {
+              "object_type": "HUB",
+              "name": "drone_full"
+            }
+          },
+          "export_path": "~/desktop/safa/datasets/safa/drone"
+        }
+      ]
+    }
+  ]
+}

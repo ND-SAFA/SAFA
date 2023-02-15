@@ -19,7 +19,8 @@ class JobSummaryMetrics(TypedDict):
     """
     The summary metrics for a job predictions.
     """
-    mis_predicted_n_per_category: Dict
+    false_positive_n_per_category: Dict
+    false_negative_n_per_category: Dict
     correctly_predicted_n_per_category: Dict
 
 
@@ -28,7 +29,8 @@ class JobAnalysis(TypedDict):
     The analysis of a job's predicted links.
     """
     summary: JobSummaryMetrics
-    mis_link_collection: LinkCollectionAnalysis
+    false_positive_collection: LinkCollectionAnalysis
+    false_negative_collection: LinkCollectionAnalysis
     correct_link_collection: LinkCollectionAnalysis
 
 

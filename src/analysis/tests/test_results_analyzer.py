@@ -13,7 +13,7 @@ from train.trace_output.trace_prediction_output import TracePredictionOutput
 
 
 class TestResultsAnalyzer(BaseTraceTest):
-    a1_body = "This is a really small artifact body to use as a test."
+    a1_body = "This is a really small artifact body to use as a test rationally."
     a2_body = "This is a really large artifct body to try out for funsies."
     a3_body = "Another 1.0 from Betito just for funsies and stuff!"
     a4_body = "Yet another because I need to write stuff for this test."
@@ -25,12 +25,14 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     ALL_LINKS = [TraceLink(A1, A2, True), TraceLink(A1, A3, False), TraceLink(A4, A2, False), TraceLink(A4, A3, True)]
 
-    EXPECTED_CATEGORIZATIONS = {ALL_LINKS[0].id: [LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS],
-                                ALL_LINKS[1].id: [],
-                                ALL_LINKS[2].id: [LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS],
+    EXPECTED_CATEGORIZATIONS = {ALL_LINKS[0].id: [LinkAnalyzer.SHARED_SYNONYMS, LinkAnalyzer.SHARED_ANTONYMS, LinkAnalyzer.OOV_WORDS],
+                                ALL_LINKS[1].id: [LinkAnalyzer.OOV_WORDS],
+                                ALL_LINKS[2].id: [LinkAnalyzer.SHARED_SYNONYMS],
                                 ALL_LINKS[3].id: [LinkAnalyzer.COMMON_WORDS]}
     MIS_PREDICTED_LINKS = ALL_LINKS[:2]
     CORRECTLY_PREDICTED_LINKS = ALL_LINKS[2:]
+    FALSE_NEGATIVE = ALL_LINKS[0]
+    FALSE_POSITIVE = ALL_LINKS[1]
 
     def test_intersection(self):
         analyzer1 = self.get_results_analyzer()
@@ -42,24 +44,32 @@ class TestResultsAnalyzer(BaseTraceTest):
     def test_analyze_and_save(self):
         analyzer = self.get_results_analyzer()
         job_analysis: JobAnalysis = analyzer.analyze(common_words_threshold=0.2)
-        for link_id, link_analysis in job_analysis["mis_link_collection"].items():
-            self.assertIn("categories", link_analysis)
-        self.assertIn(analyzer.MIS_PREDICTED_N_PER_CATEGORY, job_analysis["summary"])
-        self.assertIn(analyzer.CORRECTLY_PREDICTED_N_PER_CATEGORY, job_analysis["summary"])
+        for mis_prediction_collection_name in ["false_positive_collection", "false_negative_collection"]:
+            for link_id, link_analysis in job_analysis[mis_prediction_collection_name].items():
+                self.assertIn("categories", link_analysis)
+        self.assertIn("false_positive_n_per_category", job_analysis["summary"])
+        self.assertIn("false_negative_n_per_category", job_analysis["summary"])
+        self.assertIn("correctly_predicted_n_per_category", job_analysis["summary"])
 
         def add_to_expected_n_per_category(link_id, expected_n_per_category):
             for cat in self.EXPECTED_CATEGORIZATIONS[link_id]:
                 if cat not in expected_n_per_category:
                     expected_n_per_category[cat] = 0
-                expected_n_per_category[cat] = + 1
+                expected_n_per_category[cat] += 1
 
-        mis_predicted_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 2, LinkAnalyzer.OOV_WORDS: 2}
+        false_negative_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 1}
+        false_positive_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 1}
         for link in self.MIS_PREDICTED_LINKS:
-            self.assertIn(link.id, job_analysis["mis_link_collection"].keys())
-            add_to_expected_n_per_category(link.id, mis_predicted_expected_n_per_category)
-        self.assertDictEqual(mis_predicted_expected_n_per_category, job_analysis["summary"]["mis_predicted_n_per_category"])
+            if link.is_true_link:
+                self.assertIn(link.id, job_analysis["false_negative_collection"].keys())
+                add_to_expected_n_per_category(link.id, false_negative_expected_n_per_category)
+            else:
+                self.assertIn(link.id, job_analysis["false_positive_collection"].keys())
+                add_to_expected_n_per_category(link.id, false_positive_expected_n_per_category)
+        self.assertDictEqual(false_positive_expected_n_per_category, job_analysis["summary"]["false_positive_n_per_category"])
+        self.assertDictEqual(false_negative_expected_n_per_category, job_analysis["summary"]["false_negative_n_per_category"])
 
-        correctly_predicted_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 2, LinkAnalyzer.OOV_WORDS: 2}
+        correctly_predicted_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 2}
         for link in self.CORRECTLY_PREDICTED_LINKS:
             add_to_expected_n_per_category(link.id, correctly_predicted_expected_n_per_category)
         self.assertDictEqual(correctly_predicted_expected_n_per_category,
@@ -67,10 +77,10 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     def test_get_n_per_category(self):
         analyzer = self.get_results_analyzer()
-        expected_n_per_category = {LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS: 2, LinkAnalyzer.COMMON_WORDS: 1,
-                                   LinkAnalyzer.OOV_WORDS: 4, LinkAnalyzer.MISSPELLED_WORDS: 4}
+        expected_n_per_category = {LinkAnalyzer.SHARED_SYNONYMS: 2, LinkAnalyzer.SHARED_ANTONYMS: 1, LinkAnalyzer.COMMON_WORDS: 1,
+                                   LinkAnalyzer.OOV_WORDS: 2, LinkAnalyzer.MISSPELLED_WORDS: 4}
         categorizations: LinkCollectionAnalysis = {
-            link_id: LinkMetrics(categories=categories + [LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.OOV_WORDS])
+            link_id: LinkMetrics(categories=categories + [LinkAnalyzer.MISSPELLED_WORDS])
             for link_id, categories in self.EXPECTED_CATEGORIZATIONS.items()}
         n_per_category = analyzer._get_n_per_category(categorizations)
         self.assertDictEqual(expected_n_per_category, n_per_category)
@@ -80,12 +90,13 @@ class TestResultsAnalyzer(BaseTraceTest):
         link_categorizations = analyzer._analyze_link_collection(links=set(self.ALL_LINKS), common_words_threshold=0.2)
         self.assertEquals(len(link_categorizations), len(self.ALL_LINKS))
         for link_id, link_analysis in link_categorizations.items():
-            expected_categories = self.EXPECTED_CATEGORIZATIONS[link_id] + [LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.OOV_WORDS]
+            expected_categories = self.EXPECTED_CATEGORIZATIONS[link_id] + [LinkAnalyzer.MISSPELLED_WORDS]
             TestAssertions.assert_lists_have_the_same_vals(self, expected_categories, link_analysis["categories"])
 
     def test_get_mis_and_correctly_predicted_links(self):
         analyzer = self.get_results_analyzer()
-        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links, self.MIS_PREDICTED_LINKS)
+        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links.false_positives, [self.FALSE_POSITIVE])
+        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links.false_negatives, [self.FALSE_NEGATIVE])
         TestAssertions.assert_lists_have_the_same_vals(self, analyzer.correctly_predicted_links, self.CORRECTLY_PREDICTED_LINKS)
 
     def get_results_analyzer(self, mis_predicted_links=None):

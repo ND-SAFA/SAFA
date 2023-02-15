@@ -16,7 +16,7 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "thearod5/git-bert",
+                "thearod5/nl-bert",
                 "bert-base-uncased"
               ]
             }

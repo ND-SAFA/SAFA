@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from analysis.link_analyzer import LinkAnalyzer
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
@@ -9,12 +11,15 @@ from util.json_util import JsonUtil
 
 
 class TestLinkAnalyzer(BaseTest):
-    a1_body = "This is a really small artifact body to use as a test."
+    a1_body = "This is a really small artifact body to use as a test rationally."
     a2_body = "This is a really large artifct body to try out for funsies."
-    EXPECTED_OOV_WORDS = {"funsies": 1, "artifct": 1}
-    EXPECTED_ANALYSES = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS,
-                         LinkAnalyzer.OOV_WORDS]
-    EXPECTED_COUNTS = {name: 2 for name in EXPECTED_ANALYSES}
+    EXPECTED_MISSPELLED_WORDS = {"funsies": 1, "artifct": 1}
+    EXPECTED_OOV_WORDS = {"rationally": 1}
+    EXPECTED_ANALYSES = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_ANTONYMS,
+                         LinkAnalyzer.SHARED_SYNONYMS, LinkAnalyzer.OOV_WORDS]
+    EXPECTED_COUNTS = {name: 1 for name in EXPECTED_ANALYSES[2:]}
+    EXPECTED_COUNTS[LinkAnalyzer.COMMON_WORDS] = 2
+    EXPECTED_COUNTS[LinkAnalyzer.MISSPELLED_WORDS] = 2
 
     def test_get_analysis_counts(self):
         analyzer = self.get_link_analyzer()
@@ -35,9 +40,7 @@ class TestLinkAnalyzer(BaseTest):
         output_dict = JsonUtil.read_json_file(output_path)
         self.assertIn(analyzer.ARTIFACT_TOKENS, output_dict)
         self.assertIn(analyzer.ANALYSIS, output_dict)
-        expected_analyses = [analyzer.COMMON_WORDS, analyzer.MISSPELLED_WORDS, analyzer.SHARED_SYNONYMS_AND_ANTONYMS,
-                             analyzer.OOV_WORDS]
-        for analysis in expected_analyses:
+        for analysis in self.EXPECTED_ANALYSES:
             self.assertIn(analysis, output_dict[analyzer.ANALYSIS])
 
     def test_get_words_in_common(self):
@@ -48,18 +51,22 @@ class TestLinkAnalyzer(BaseTest):
     def test_get_misspelled_words(self):
         analyzer = self.get_link_analyzer()
         misspelled = analyzer.get_misspelled_words()
-        self.assertDictEqual(misspelled, self.EXPECTED_OOV_WORDS)
+        self.assertDictEqual(misspelled, self.EXPECTED_MISSPELLED_WORDS)
 
     def test_get_shared_synonyms_and_antonyms(self):
         analyzer = self.get_link_analyzer()
-        syn_and_ant = analyzer.get_shared_synonyms_and_antonyms()
-        self.assertIn('try', syn_and_ant)
-        self.assertIn('large', syn_and_ant)
+        shared_syns, shared_ants = analyzer.get_shared_synonyms_and_antonyms()
+        self.assertIn('test', shared_syns)
+        self.assertIn('try', shared_syns['test'])
+        self.assertIn("small", shared_ants)
+        self.assertIn('large', shared_ants['small'])
 
     def test_get_oov_vocab(self):
         analyzer = self.get_link_analyzer()
         oov = analyzer.get_oov_words()
-        self.assertDictEqual(oov, self.EXPECTED_OOV_WORDS)
+        expected_oov_words = deepcopy(self.EXPECTED_OOV_WORDS)
+        expected_oov_words.update(self.EXPECTED_MISSPELLED_WORDS)
+        self.assertDictEqual(oov, expected_oov_words)
 
     def test_get_artifact_vocab(self):
         analyzer = self.get_link_analyzer()
@@ -68,13 +75,9 @@ class TestLinkAnalyzer(BaseTest):
         expected_vocab = self.a1_body[:-1].lower().split()
         TestAssertions.assert_lists_have_the_same_vals(self, vocab, expected_vocab)
 
-    def test_get_synonyms_and_antonyms(self):
-        analyzer = self.get_link_analyzer()
-        synonyms, antonyms = analyzer._get_synonyms_and_antonyms(analyzer.word_counts[0])
-        self.assertIn("try_out", synonyms)
-        self.assertIn("large", antonyms)
-
     def get_link_analyzer(self):
         a1 = Artifact("s1", self.a1_body)
         a2 = Artifact("t1", self.a2_body)
-        return LinkAnalyzer(TraceLink(a1, a2), ModelManager('bert-base-uncased'))
+        analyzer = LinkAnalyzer(TraceLink(a1, a2, is_true_link=True), 0.66, ModelManager('bert-base-uncased'))
+        self.assertLessEqual(abs(analyzer.diff_from_prediction_score - 0.34), 0.01)
+        return analyzer

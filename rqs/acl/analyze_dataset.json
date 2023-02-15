@@ -8,10 +8,10 @@
           },
           "model_managers": [
             {
-              "model_path": "thearod5/git-bert"
+              "model_path": "thearod5/nl-bert"
             },
             {
-              "model_path": "prajjwal1/bert-medium"
+              "model_path": "bert-base-uncased"
             }
           ],
           "dataset_creator": {
@@ -22,7 +22,8 @@
                   "cm1",
                   "cchit",
                   "itrust",
-                  "drone",
+                  "drone_nl",
+                  "drone_pl",
                   "traincontroller"
                 ]
               }

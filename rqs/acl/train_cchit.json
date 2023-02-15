@@ -7,14 +7,19 @@
           "job_args": {
             "random_seed": {
               "*": [
+                812,
                 234,
-                12312,
-                6575
+                645
               ]
             }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": {
+              "*": [
+                "thearod5/nl-bert",
+                "bert-base-uncased"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 20,
@@ -36,7 +41,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "mip"
+                "name": "cchit"
               }
             },
             "val_dataset_creator": {

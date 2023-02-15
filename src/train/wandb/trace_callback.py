@@ -1,14 +1,10 @@
-import json
 import os
-from typing import Dict, Optional
 
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
 from train.trainer_args import TrainerArgs
 from train.wandb.Wandb import Wandb
-
-GROUP_EXCLUDE = ["random_seed"]
 
 
 class TraceCallback(WandbCallback):
@@ -30,7 +26,7 @@ class TraceCallback(WandbCallback):
         experimental_vars = Wandb.get_clean_vars(args.experimental_vars)
         if isinstance(experimental_vars, str):
             experimental_vars = {"name": experimental_vars}
-        group = self.get_group(experimental_vars)
+        group = Wandb.get_group(experimental_vars)
         if self._wandb.run is None:
             self._wandb.init(
                 project=project,
@@ -50,31 +46,3 @@ class TraceCallback(WandbCallback):
                 self._wandb.watch(
                     model, log=os.getenv("WANDB_WATCH", "gradients"), log_freq=max(100, args.logging_steps)
                 )
-
-    @staticmethod
-    def get_group(experimental_vars: Dict, delimiter="*") -> Optional[str]:
-        """
-        Returns the name of the group using priority of group properties.
-        :param experimental_vars: The experimental variables to find group for.
-        :param delimiter: The delimiter used to combine groups into identifier.
-        :return: Returns the first group property contained in experimental vars, None otherwise.
-        """
-        group = []
-        for k, v in experimental_vars.items():
-            if k in GROUP_EXCLUDE:
-                continue
-            group.append(json.dumps({TraceCallback.get_group_id(k): v}))
-        return None if len(group) == 0 else delimiter.join(group)  # no grouping if none exists, else return group
-
-    @staticmethod
-    def get_group_id(group_name: str):
-        """
-        :param group_name: The name whose id is returned.
-        :return: Returns the initials of group name.
-        """
-        if "_" in group_name:
-            group_parts = group_name.split("_")
-            group_parts = [g[0] for g in group_parts]
-        else:
-            group_parts = [group_name[0]]
-        return "".join(group_parts)

@@ -29,7 +29,10 @@
                   "*": [
                     "mip",
                     "cm1",
-                    "Drone"
+                    "drone_nl",
+                    "drone_pl",
+                    "itrust",
+                    "cchit"
                   ]
                 }
               }

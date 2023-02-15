@@ -14,7 +14,12 @@
             }
           },
           "model_manager": {
-            "model_path": "thearod5/tbert"
+            "model_path": {
+              "*": [
+                "thearod5/tbert",
+                "bert-base-uncased"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 20,

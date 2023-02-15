@@ -12,9 +12,10 @@ from util.json_util import JsonUtil
 
 class TestDatasetAnalyzer(BaseTest):
     a1_body = "Artifact body with no out_of_vocabulary words."
-    a2_body = "Here we introduce some unknown words like hvac and funsies."
+    a2_body = "Here we introduce some rationally unknown words like hvac and funsies."
     a3_body = "Another 1.0 from Betito just for funsies and more funsies!"
     EXPECTED_HIGH_FREQ_WORDS = ["words", "funsies"]
+    LENGTHEN_AMOUNT = 4
 
     def test_save(self):
         analyzer = self.get_dataset_analyzer(lengthen=True)
@@ -23,7 +24,9 @@ class TestDatasetAnalyzer(BaseTest):
         self.assertIn(DatasetAnalyzer.READABILITY_SCORE, output)
         self.assertIn(DatasetAnalyzer.HIGH_FREQUENCY_WORDS, output)
         self.assertIn(DatasetAnalyzer.LOW_FREQUENCY_WORDS, output)
+        self.assertIn(DatasetAnalyzer.MISSPELLED_WORDS, output)
         self.assertIn(DatasetAnalyzer.OOV_WORDS.format("bert-base-uncased"), output)
+        self.assertEquals(output[DatasetAnalyzer.OOV_WORDS.format("bert-base-uncased")], {"rationally": 1*self.LENGTHEN_AMOUNT})
         
     def test_get_readability_score(self):
         analyzer = self.get_dataset_analyzer(lengthen=True)
@@ -41,15 +44,21 @@ class TestDatasetAnalyzer(BaseTest):
 
     def test_get_high_frequency_word_counts(self):
         analyzer = self.get_dataset_analyzer()
-        expected_proportion = 0.35
+        expected_proportion = 0.34
         high_freq_words, proportion = analyzer.get_high_frequency_word_counts(0.1)
         TestAssertions.assert_lists_have_the_same_vals(self, self.EXPECTED_HIGH_FREQ_WORDS, high_freq_words)
         self.assertLessEqual(abs(proportion - expected_proportion), 0.01)
 
     def test_get_oov_words(self):
         analyzer = self.get_dataset_analyzer()
+        misspelled = analyzer.get_misspelled_words()
+        expected_misspelled_words = {"betito": 1, "hvac": 1, "funsies": 3}
+        self.assertDictEqual(misspelled, expected_misspelled_words)
+
+    def test_get_oov_words(self):
+        analyzer = self.get_dataset_analyzer()
         oov = analyzer.get_oov_words(analyzer.model_managers[0])
-        expected_oov_words = {"betito": 1, "hvac": 1, "funsies": 3}
+        expected_oov_words = {"betito": 1, "hvac": 1, "funsies": 3, "rationally": 1}
         self.assertDictEqual(oov, expected_oov_words)
 
     def test_get_vocab(self):
@@ -67,7 +76,7 @@ class TestDatasetAnalyzer(BaseTest):
         if lengthen:
             lengthened_artifact_bodies = []
             for a_bod in artifact_bodies:
-                a_bod_long = " ".join([a_bod for i in range(4)])
+                a_bod_long = " ".join([a_bod for i in range(self.LENGTHEN_AMOUNT)])
                 lengthened_artifact_bodies.append(a_bod_long)
             artifact_bodies = lengthened_artifact_bodies
 

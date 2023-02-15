@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Set, Tuple
 
 import nltk
 from nltk.corpus import wordnet as wn
-from spellchecker import SpellChecker
 
 from analysis import word_tools
 from analysis.word_tools import WordCounter
@@ -86,8 +85,8 @@ class LinkAnalyzer:
                 self.COMMON_WORDS: self.get_words_in_common(),
                 self.MISSPELLED_WORDS: self.get_misspelled_words(),
                 self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
-                self.OOV_WORDS: self.get_oov_words()
             }
+            self.__analysis[self.OOV_WORDS] = self.get_oov_words().difference(self.__analysis[self.MISSPELLED_WORDS])
         return self.__analysis
 
     def save(self, output_dir: str) -> str:
@@ -108,17 +107,6 @@ class LinkAnalyzer:
         """
         return self.word_counts[0].intersection(self.word_counts[1]).get_word_set()
 
-    def get_misspelled_words(self) -> WordCounter:
-        """
-        Gets the misspelled words from the artifacts
-        :return: The list of misspelled words
-        """
-        spell = SpellChecker()
-        misspelled = {}
-        for word_count in self.word_counts:
-            misspelled.update({word: word_count[word] for word in spell.unknown(list(word_count.get_word_set()))})
-        return WordCounter(misspelled)
-
     def get_shared_synonyms_and_antonyms(self) -> Tuple[Set[str], Set[str]]:
         """
         Gets the set of shared synonyms and antonyms between artifacts
@@ -128,6 +116,16 @@ class LinkAnalyzer:
         shared_synonyms = self.word_counts[1].intersection(synonyms).get_word_set()
         shared_antonyms = self.word_counts[1].intersection(antonyms).get_word_set()
         return shared_synonyms.union(shared_antonyms)
+
+    def get_misspelled_words(self) -> "WordCounter":
+        """
+        Gets the misspelled words from the artifacts
+        :return: The list of misspelled words
+        """
+        misspelled = WordCounter()
+        for word_count in self.word_counts:
+            misspelled.update(word_count.get_misspelled_words())
+        return misspelled
 
     def get_oov_words(self) -> "WordCounter":
         """

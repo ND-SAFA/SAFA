@@ -22,7 +22,8 @@
                   "cm1",
                   "cchit",
                   "itrust",
-                  "drone",
+                  "drone_nl",
+                  "drone_pl",
                   "traincontroller"
                 ]
               }

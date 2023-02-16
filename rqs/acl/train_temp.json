@@ -14,12 +14,7 @@
             }
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "thearod5/pl-bert",
-                "bert-base-uncased"
-              ]
-            }
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -41,7 +36,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone_pl"
+                "name": "itrust"
               }
             },
             "val_dataset_creator": {

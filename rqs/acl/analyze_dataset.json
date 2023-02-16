@@ -24,7 +24,8 @@
                   "itrust",
                   "drone_nl",
                   "drone_pl",
-                  "traincontroller"
+                  "traincontroller",
+                  "mip"
                 ]
               }
             }

@@ -88,7 +88,7 @@ EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator"
                             "trainer_dataset_manager", "trainer_args", "dataset_creator"]
 
 # -------------- ANALYSIS --------------
-HIGH_FREQ_THRESHOLD_DEFAULT = 0.1
+HIGH_FREQ_THRESHOLD_DEFAULT = 0.25
 LOW_FREQ_THRESHOLD_DEFAULT = 0.02
 LINK_COMMON_WORDS_THRESHOLD_DEFAULT = 0.01
 SAVE_LINK_ANALYSIS_DEFAULT = True

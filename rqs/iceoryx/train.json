@@ -8,18 +8,13 @@
             "random_seed": {
               "*": [
                 812,
-                234,
-                645
+                23,
+                123421
               ]
             }
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "thearod5/pl-bert",
-                "bert-base-uncased"
-              ]
-            }
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -36,23 +31,29 @@
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
-            "deterministic_id": 42,
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "HUB",
-                "name": "drone_pl"
-              }
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/iceoryx"
+              },
+              "remove_orphans": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.10
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.55
+              "val_percentage": {
+                "*": [
+                  0.3,
+                  0.5,
+                  0.7
+                ]
+              }
             },
             "augmenter": {
               "steps": [

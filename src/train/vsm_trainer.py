@@ -19,6 +19,7 @@ from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from util.override import overrides
+import time
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
@@ -48,8 +49,10 @@ class VSMTrainer(iTrainer):
         :return: The train output (not currently used)
         """
         train_dataset: TraceDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
+        start_time = time.perf_counter()
         self.train(train_dataset)
-        return TraceTrainOutput()
+        finish_time = time.perf_counter()
+        return TraceTrainOutput(training_time=finish_time - start_time)
 
     @overrides(iTrainer)
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,

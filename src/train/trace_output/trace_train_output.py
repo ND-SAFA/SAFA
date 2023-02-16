@@ -15,7 +15,7 @@ class TraceTrainOutput(AbstractTraceOutput):
     def __init__(self, global_step: Optional[int] = None, training_loss: Optional[float] = None,
                  train_output: Union[TrainOutput, "TraceTrainOutput"] = None, metrics: Optional[List[StageEval]] = None,
                  val_metrics: Optional[List[StageEval]] = None,
-                 prediction_output: TracePredictionOutput = None):
+                 prediction_output: TracePredictionOutput = None, training_time: float = None):
         """
         Provides wrapper method to convert output from default and custom training loop.
         :param train_output: The output of the training function.

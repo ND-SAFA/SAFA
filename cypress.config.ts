@@ -19,5 +19,4 @@ export default defineConfig({
       ],
     },
   ],
-  numTestsKeptInMemory: 0,
 });

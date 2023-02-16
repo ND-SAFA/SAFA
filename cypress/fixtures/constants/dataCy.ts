@@ -175,6 +175,7 @@ export enum DataCy {
   selectedPanelType = "text-selected-type",
   selectedPanelBody = "text-selected-body",
   selectedPanelBodyButton = "button-artifact-body",
+  selectedPanelCustomAttribute = "attribute-undefined",
   selectedPanelEditButton = "button-artifact-edit",
   selectedPanelDeleteButton = "button-artifact-delete",
 

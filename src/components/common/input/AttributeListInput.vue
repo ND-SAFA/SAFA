@@ -4,6 +4,7 @@
       <attribute-input
         :model="artifact.attributes || {}"
         :attribute="attribute"
+        :data-cy="`attribute-${attribute.name}`"
       />
     </template>
   </attribute-grid>

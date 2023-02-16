@@ -2,8 +2,13 @@
   <div>
     <v-row dense v-if="store.isCustom">
       <v-col cols="6">
-        <v-text-field filled label="Name" v-model="store.editedLayout.name"
-      /></v-col>
+        <v-text-field
+          filled
+          label="Name"
+          v-model="store.editedLayout.name"
+          data-cy="input-attribute-layout-name"
+        />
+      </v-col>
       <v-col cols="6">
         <artifact-type-input
           multiple
@@ -11,6 +16,7 @@
           v-model="store.editedLayout.artifactTypes"
           hint="The layout will only appear on these artifact types."
           :error-messages="store.typeErrors"
+          data-cy="input-attribute-layout-artifact-types"
       /></v-col>
     </v-row>
 
@@ -29,6 +35,7 @@
                 tooltip="Remove from layout"
                 color="error"
                 @click="handleDeleteAttribute(attribute)"
+                data-cy="button-attribute-layout-delete-attribute"
               />
             </flex-box>
           </v-card>
@@ -42,6 +49,7 @@
         text
         variant="delete"
         @click="handleDeleteLayout"
+        data-cy="button-attribute-layout-delete"
       >
         Delete
       </text-button>
@@ -50,6 +58,7 @@
         :disabled="!store.canSave"
         variant="save"
         @click="handleSave"
+        data-cy="button-attribute-layout-save"
       >
         Save
       </text-button>

@@ -10,6 +10,7 @@
           text
           variant="add"
           @click="handleAddLayout"
+          data-cy="button-attribute-layout-add"
         >
           Add Layout
         </text-button>

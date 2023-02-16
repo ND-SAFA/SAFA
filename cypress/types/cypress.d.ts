@@ -550,5 +550,14 @@ declare namespace Cypress {
      * @param customAttribute - The custom attribute definition to create.
      */
     createCustomAttribute(customAttribute): Chainable<void>;
+
+    /**
+     * Creates a new custom Layout.
+     * The custom attribute panel must be open and a custom attribute must be made
+     * before this is called.
+     *
+     * @param customLayout - The custom layout definition to create.
+     */
+    createCustomLayout(customLayout): Chainable<void>;
   }
 }

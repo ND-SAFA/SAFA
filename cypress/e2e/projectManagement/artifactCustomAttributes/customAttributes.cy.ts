@@ -37,7 +37,7 @@ describe("Custom Attributes", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
       cy.createCustomAttribute(customAttribute);
-      cy.clickButtonWithName("Test Label");
+      cy.clickButtonWithName(customAttribute.label);
       cy.inputText(DataCy.attributeLabelInput, "New Label", true);
       cy.clickButton(DataCy.attributeSaveButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");

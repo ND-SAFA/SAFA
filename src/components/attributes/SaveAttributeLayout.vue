@@ -25,7 +25,7 @@
                 <typography variant="caption" :value="attribute.key" />
               </div>
               <icon-button
-                icon-id="mdi-delete"
+                icon-variant="delete"
                 tooltip="Remove from layout"
                 color="error"
                 @click="handleDeleteAttribute(attribute)"

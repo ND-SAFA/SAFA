@@ -4,7 +4,7 @@
       <flex-box align="center">
         <icon-button
           small
-          :icon-id="data.isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          :icon-variant="data.isOpen ? 'group-open' : 'group-close'"
           :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
           @click="data.toggle"
         />
@@ -34,7 +34,7 @@
         />
         <icon-button
           small
-          icon-id="mdi-close"
+          icon-variant="cancel"
           tooltip="Remove Grouping"
           @click="data.remove"
         />

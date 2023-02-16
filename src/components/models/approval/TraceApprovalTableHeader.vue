@@ -29,8 +29,7 @@
     <template #bottom>
       <text-button
         text
-        color="error"
-        icon-id="mdi-close-circle-multiple-outline"
+        icon-variant="trace-decline-all"
         @click="handleDeclineAll"
       >
         Clear Unreviewed

@@ -16,7 +16,7 @@
           <typography :value="title" color="white" />
           <icon-button
             tooltip="Close"
-            icon-id="mdi-close"
+            icon-variant="cancel"
             color="white"
             data-cy="button-close"
             @click="$emit('close')"

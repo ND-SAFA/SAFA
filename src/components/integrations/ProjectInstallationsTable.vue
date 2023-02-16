@@ -18,7 +18,7 @@
         <text-button
           text
           color="primary"
-          icon-id="mdi-cached"
+          icon-variant="sync"
           @click="handleSync(item)"
         >
           Re-Sync Data
@@ -30,7 +30,7 @@
           <icon-button
             fab
             color="primary"
-            icon-id="mdi-plus"
+            icon-variant="add"
             tooltip="Import New Project"
             data-cy="button-integration-add"
             @click="modalOpen = true"

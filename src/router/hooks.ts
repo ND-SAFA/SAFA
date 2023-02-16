@@ -1,4 +1,3 @@
-import { useRoute, useRouter } from "vue-router";
 import { URLParameter } from "@/types";
 import { QueryParams, Routes } from "@/router/routes";
 import { router } from "@/router/router";

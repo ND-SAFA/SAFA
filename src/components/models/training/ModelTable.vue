@@ -31,7 +31,7 @@
       </template>
       <template #[`item.actions`]="{ item }">
         <icon-button
-          icon-id="mdi-share-variant"
+          icon-variant="share"
           tooltip="Share Model"
           @click="handleShare(item)"
         />

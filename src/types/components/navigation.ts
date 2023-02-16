@@ -1,4 +1,4 @@
-import { ArtifactSchema } from "@/types";
+import { ArtifactSchema, IconVariant } from "@/types";
 
 /**
  * Represents an item in an artifact search list.
@@ -19,7 +19,7 @@ export interface NavOption {
   /**
    * The option's icon id.
    */
-  icon: string;
+  icon: IconVariant;
   /**
    * If true, a divider will be displayed above this option.
    */

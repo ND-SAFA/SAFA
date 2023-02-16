@@ -23,7 +23,7 @@
         <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
           <icon-button
             v-if="canEdit(item.name)"
-            icon-id="mdi-dots-horizontal"
+            icon-variant="more"
             :tooltip="`Edit ${item.name}`"
             data-cy="button-document-select-edit"
           />

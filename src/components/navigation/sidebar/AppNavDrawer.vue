@@ -16,7 +16,7 @@
       <safa-icon style="width: 180px" />
       <icon-button
         large
-        icon-id="mdi-menu-open"
+        icon-variant="nav-toggle"
         tooltip="Close sidebar"
         :color="darkMode ? 'secondary' : 'primary'"
         data-cy="button-sidebar-close"
@@ -26,11 +26,11 @@
     <flex-box v-else justify="center" full-width t="2">
       <icon-button
         large
-        icon-id="mdi-menu-open"
+        icon-variant="nav-toggle"
         tooltip="Open sidebar"
         color="primary"
         data-cy="button-sidebar-open"
-        icon-style="transform: rotate(180deg)"
+        rotate="180"
         @click="sidebarOpen = true"
       />
     </flex-box>

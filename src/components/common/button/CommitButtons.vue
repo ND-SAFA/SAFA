@@ -6,7 +6,7 @@
         :key="definition.label"
         :color="color"
         :tooltip="definition.label"
-        :icon-id="definition.icon"
+        :icon-variant="definition.icon"
         :is-disabled="definition.isDisabled"
         :data-cy="definition.dataCy"
         @click="definition.handler"
@@ -29,7 +29,7 @@ import { redoCommit, undoCommit } from "@/api";
 import { FlexBox } from "@/components/common/layout";
 import IconButton from "./IconButton.vue";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     color?: string;
   }>(),
@@ -45,7 +45,7 @@ const buttons = computed(() => [
       undoCommit().then();
     },
     label: "Undo",
-    icon: "mdi-undo",
+    icon: "undo",
     isDisabled: !commitStore.canUndo,
     dataCy: "button-nav-undo",
   },
@@ -53,7 +53,7 @@ const buttons = computed(() => [
     type: ButtonType.ICON,
     handler: () => redoCommit().then(),
     label: "Redo",
-    icon: "mdi-redo",
+    icon: "redo",
     isDisabled: !commitStore.canRedo,
     dataCy: "button-nav-redo",
   },

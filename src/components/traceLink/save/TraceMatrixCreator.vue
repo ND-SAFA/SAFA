@@ -79,7 +79,7 @@ const props = defineProps<{
   modelValue: ArtifactLevelSchema[];
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:modelValue", value: ArtifactLevelSchema[]): void;
 }>();
 

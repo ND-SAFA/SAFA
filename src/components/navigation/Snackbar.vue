@@ -25,13 +25,13 @@
         <icon-button
           v-if="showAction"
           color="white"
-          icon-id="mdi-download"
+          icon-variant="download"
           tooltip="Update"
           @click="handleAction"
         />
         <icon-button
           color="white"
-          icon-id="mdi-close"
+          icon-variant="cancel"
           tooltip="Close"
           data-cy="button-snackbar-close"
           @click="showSnackbar = false"

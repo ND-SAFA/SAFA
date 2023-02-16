@@ -14,7 +14,12 @@
         variant="text"
         @click="emit('click')"
       >
-        <icon :id="iconId" :style="iconStyle" :variant="iconVariant" />
+        <icon
+          :id="iconId"
+          :style="iconStyle"
+          :variant="iconVariant"
+          :rotate="rotate"
+        />
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -47,6 +52,7 @@ const props = defineProps<{
   large?: boolean;
   isDisabled?: boolean;
   isHidden?: boolean;
+  rotate?: number;
 }>();
 
 const emit = defineEmits<{

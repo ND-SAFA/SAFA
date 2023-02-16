@@ -16,8 +16,9 @@
         :data-cy="dataCy"
       >
         <icon
-          v-if="iconId"
+          v-if="iconId || iconVariant"
           :id="iconId"
+          :variant="iconVariant"
           size="small"
           :color="artifactType ? 'primary' : ''"
         />
@@ -43,8 +44,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { ApprovalType } from "@/types";
+import { defineComponent, PropType } from "vue";
+import { ApprovalType, IconVariant } from "@/types";
 import {
   camelcaseToDisplay,
   getBackgroundColor,
@@ -69,6 +70,7 @@ export default defineComponent({
     },
     format: Boolean,
     icon: String,
+    iconVariant: String as PropType<IconVariant>,
     artifactType: Boolean,
     confidenceScore: Boolean,
     dataCy: String,

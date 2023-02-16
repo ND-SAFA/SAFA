@@ -1,4 +1,4 @@
-import { EmptyLambda } from "@/types";
+import { EmptyLambda, IconVariant } from "@/types";
 
 /**
  * Enumerates button types.
@@ -39,7 +39,7 @@ export interface BaseButtonDefinition {
 export interface IconDefinition extends BaseButtonDefinition {
   type: ButtonType.ICON;
   handler?: EmptyLambda;
-  icon?: string;
+  icon?: IconVariant;
 }
 
 /**

@@ -51,7 +51,10 @@ export default defineComponent({
       type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
-    showOnly: String as PropType<"source" | "target">,
+    showOnly: {
+      type: String as PropType<"source" | "target">,
+      default: undefined,
+    },
   },
   data() {
     return {

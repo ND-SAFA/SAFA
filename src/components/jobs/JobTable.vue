@@ -103,7 +103,7 @@
                 outlined
                 class="mr-1"
                 data-cy="button-job-log"
-                icon-id="mdi-post-outline"
+                icon-variant="logs"
                 @click="handleViewLogs(item)"
               >
                 View Logs
@@ -121,7 +121,7 @@
                 color="primary"
                 :disabled="!isCompleted(item.status)"
                 data-cy="button-open-job"
-                icon-id="mdi-family-tree"
+                icon-variant="view-tree"
                 @click="handleViewProject(item)"
               >
                 View Project

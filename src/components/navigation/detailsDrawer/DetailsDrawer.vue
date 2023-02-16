@@ -11,7 +11,7 @@
       <flex-box justify="space-between" align="center">
         <typography color="primary" el="h2" variant="subtitle" :value="title" />
         <icon-button
-          icon-id="mdi-close"
+          icon-variant="cancel"
           tooltip="Close panel"
           data-cy="button-close-details"
           @click="handleClose"

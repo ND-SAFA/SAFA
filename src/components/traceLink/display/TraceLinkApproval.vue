@@ -6,7 +6,7 @@
         text
         :loading="isUnreviewLoading"
         data-cy="button-trace-unreview"
-        icon-id="mdi-checkbox-blank-circle-outline"
+        icon-variant="trace-unreview"
         @click="handleUnreview"
       >
         Un-Review
@@ -15,9 +15,8 @@
         v-if="showApproved"
         text
         :loading="isApproveLoading"
-        color="primary"
         data-cy="button-trace-approve"
-        icon-id="mdi-check-circle-outline"
+        icon-variant="trace-approve"
         @click="handleApprove"
       >
         Approve
@@ -26,9 +25,8 @@
         v-if="showDeclined"
         text
         :loading="isDeclineLoading"
-        color="error"
         data-cy="button-trace-decline"
-        icon-id="mdi-close-circle-outline"
+        icon-variant="trace-decline"
         @click="handleDecline"
       >
         Decline

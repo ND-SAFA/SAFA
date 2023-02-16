@@ -15,14 +15,14 @@
           <div class="mb-2">
             <attribute-chip
               :value="artifacts"
-              icon="mdi-alpha-a-box-outline"
+              icon-variant="artifact"
               color="primary"
             />
           </div>
           <div class="mb-2">
             <attribute-chip
               :value="traceLinks"
-              icon="mdi-ray-start-arrow"
+              icon-variant="trace"
               color="primary"
             />
           </div>

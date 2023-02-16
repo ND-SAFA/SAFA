@@ -17,7 +17,7 @@
         v-if="!hasCredentials"
         color="primary"
         outlined
-        icon-id="mdi-transit-connection-variant"
+        icon-variant="integrate"
         @click="handleConnect"
       >
         Connect

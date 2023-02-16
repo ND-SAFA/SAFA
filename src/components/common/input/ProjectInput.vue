@@ -15,7 +15,7 @@
     <template #append>
       <icon-button
         small
-        icon-id="mdi-content-save-outline"
+        icon-variant="save"
         tooltip="Save Projects"
         data-cy="button-save-artifacts"
         @click="handleClose"

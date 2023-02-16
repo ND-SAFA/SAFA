@@ -51,11 +51,16 @@ const iconId = computed(() => {
     case "success":
       return "mdi-check-outline";
     case "artifact":
+      // "mdi-alpha-a-box-outline"
       return "mdi-application-array-outline";
     case "trace":
       return "mdi-ray-start-arrow";
     case "upload":
       return "mdi-folder-arrow-up-outline";
+    case "download":
+      return "mdi-download";
+    case "sync":
+      return "mdi-cloud-sync-outline";
     case "integrate":
       return "mdi-transit-connection-variant";
     case "warning":
@@ -68,6 +73,16 @@ const iconId = computed(() => {
       return "mdi-magnify";
     case "notification":
       return "mdi-bell-outline";
+    case "share":
+      return "mdi-share-variant";
+    case "logs":
+      return "mdi-post-outline";
+    case "more":
+      return "mdi-dots-horizontal";
+    case "undo":
+      return "mdi-undo";
+    case "redo":
+      return "mdi-redo";
     case "home-list":
       return "mdi-view-list";
     case "home-add":
@@ -76,6 +91,54 @@ const iconId = computed(() => {
       return "mdi-check-circle-outline";
     case "job-cancel":
       return "mdi-close-circle-outline";
+    case "trace-approve":
+      return "mdi-check-circle-outline";
+    case "trace-decline":
+      return "mdi-close-circle-outline";
+    case "trace-decline-all":
+      return "mdi-close-circle-multiple-outline";
+    case "trace-unreview":
+      return "mdi-checkbox-blank-circle-outline";
+    case "view-tim":
+      return "mdi-ballot";
+    case "view-tree":
+      return "mdi-family-tree";
+    case "view-table":
+      return "mdi-table-multiple";
+    case "view-delta":
+      return "mdi-compare";
+    case "graph-zoom-in":
+      return "mdi-magnify-plus-outline";
+    case "graph-zoom-out":
+      return "mdi-magnify-minus-outline";
+    case "graph-center":
+      return "mdi-graphql";
+    case "graph-refresh":
+      return "mdi-refresh";
+    case "nav-toggle":
+      return "mdi-menu-open";
+    case "nav-home":
+      return "mdi-home";
+    case "nav-create":
+      return "mdi-folder-plus";
+    case "nav-open":
+      return "mdi-list-box";
+    case "nav-uploads":
+      return "mdi-folder-upload";
+    case "nav-artifact":
+      return "mdi-family-tree";
+    case "nav-trace":
+      return "mdi-link-box";
+    case "nav-settings":
+      return "mdi-cog-box";
+    case "group-open":
+      return "mdi-chevron-up";
+    case "group-open-all":
+      return "mdi-arrow-expand-all";
+    case "group-close":
+      return "mdi-chevron-down";
+    case "group-close-all":
+      return "mdi-arrow-collapse-all";
     default:
       return "";
   }
@@ -89,10 +152,13 @@ const iconColor = computed(() => {
   switch (props.variant) {
     case "home-list":
     case "home-add":
+    case "trace-approve":
       return "primary";
     case "warning":
       return "secondary";
     case "error":
+    case "trace-decline":
+    case "trace-decline-all":
       return "error";
     default:
       return "";

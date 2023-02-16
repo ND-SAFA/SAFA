@@ -38,7 +38,7 @@
           <span @click.stop="">
             <icon-button
               class="ml-auto"
-              icon-id="mdi-plus"
+              icon-variant="add"
               tooltip="Add to layout"
               :is-disabled="isAttributeInLayout(attribute)"
               @click="handleAddToLayout(attribute)"

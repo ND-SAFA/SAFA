@@ -2,7 +2,7 @@
   <flex-box v-if="doDisplay" wrap b="2">
     <text-button
       text
-      icon-id="mdi-download"
+      icon-variant="download"
       data-cy="button-settings-download"
       @click="handleDownload"
     >

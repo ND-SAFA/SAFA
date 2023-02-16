@@ -12,7 +12,7 @@
         :key="definition.label"
         color="accent"
         :tooltip="definition.label"
-        :icon-id="definition.icon"
+        :icon-variant="definition.icon"
         :is-disabled="isButtonDisabled(definition)"
         :data-cy="definition.dataCy"
         @click="definition.handler"
@@ -43,26 +43,26 @@ const viewButtons: ButtonDefinition[] = [
     type: ButtonType.ICON,
     handler: () => cyZoomIn(),
     label: "Zoom In",
-    icon: "mdi-magnify-plus-outline",
+    icon: "graph-zoom-in",
   },
   {
     type: ButtonType.ICON,
     handler: () => cyZoomOut(),
     label: "Zoom Out",
-    icon: "mdi-magnify-minus-outline",
+    icon: "graph-zoom-out",
   },
   {
     type: ButtonType.ICON,
     handler: () => cyCenterNodes(true),
     label: "Center Graph",
-    icon: "mdi-graphql",
+    icon: "graph-center",
     dataCy: "button-nav-graph-center",
   },
   {
     type: ButtonType.ICON,
     handler: () => handleRegenerateLayout({}),
     label: "Regenerate Layout",
-    icon: "mdi-refresh",
+    icon: "graph-refresh",
   },
 ];
 

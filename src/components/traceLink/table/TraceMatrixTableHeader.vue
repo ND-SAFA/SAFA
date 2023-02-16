@@ -65,7 +65,7 @@ const props = defineProps<{
   rowTypes: string[];
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:searchText", text: string): void;
   (e: "update:sortBy", values: string[]): void;
   (e: "update:sortDesc", descending: boolean): void;

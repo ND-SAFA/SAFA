@@ -7,7 +7,7 @@
       :items="artifactTypes"
       data-cy="input-source-type"
     />
-    <v-icon class="mx-2 mt-5">mdi-arrow-right</v-icon>
+    <icon class="mx-2 mt-5" variant="trace" />
     <v-select
       v-model="target"
       filled
@@ -31,7 +31,7 @@
 import { defineComponent, PropType } from "vue";
 import { LinkSchema, TraceFile } from "@/types";
 import { logStore } from "@/hooks";
-import { FlexBox } from "@/components/common";
+import { FlexBox, Icon } from "@/components/common";
 
 /**
  * Trace file creator.
@@ -42,6 +42,7 @@ import { FlexBox } from "@/components/common";
 export default defineComponent({
   name: "TraceFileCreator",
   components: {
+    Icon,
     FlexBox,
   },
   props: {

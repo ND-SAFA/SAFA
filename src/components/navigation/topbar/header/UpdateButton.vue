@@ -1,10 +1,10 @@
 <template>
   <text-button
-    v-if="appStore.runUpdate"
+    v-if="runUpdate"
     text
     small
     color="accent"
-    icon-id="mdi-cloud-sync-outline"
+    icon-variant="sync"
     data-cy="button-nav-load-update"
     @click="handleClick"
   >
@@ -22,8 +22,11 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { appStore } from "@/hooks";
 import { TextButton } from "@/components/common";
+
+const runUpdate = computed(() => appStore.runUpdate);
 
 /**
  * Runs the current update.

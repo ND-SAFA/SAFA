@@ -46,34 +46,34 @@ const options = computed(() => {
   const items: NavOption[] = [
     {
       label: "Home",
-      icon: "mdi-home",
+      icon: "nav-home",
       path: Routes.HOME,
     },
     {
       label: "Create Project",
-      icon: "mdi-folder-plus",
+      icon: "nav-create",
       path: Routes.PROJECT_CREATOR,
     },
     {
       label: "Open Project",
-      icon: "mdi-list-box",
+      icon: "nav-open",
       path: Routes.MY_PROJECTS,
     },
     {
       label: "Project Uploads",
-      icon: "mdi-folder-upload",
+      icon: "nav-uploads",
       path: Routes.UPLOAD_STATUS,
     },
     {
       label: "Artifact View",
-      icon: "mdi-family-tree",
+      icon: "nav-artifact",
       disabled: hideProjectOptions.value,
       divider: true,
       path: { path: Routes.ARTIFACT, query },
     },
     {
       label: "Trace Prediction",
-      icon: "mdi-link-box",
+      icon: "nav-trace",
       disabled:
         hideProjectOptions.value ||
         !sessionStore.isEditor(projectStore.project),
@@ -81,7 +81,7 @@ const options = computed(() => {
     },
     {
       label: "Settings",
-      icon: "mdi-cog-box",
+      icon: "nav-settings",
       disabled: hideProjectOptions.value,
       path: { path: Routes.PROJECT_SETTINGS, query },
     },

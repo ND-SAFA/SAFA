@@ -5,7 +5,7 @@
       text
       color="accent"
       data-cy="button-nav-tim"
-      icon-id="mdi-ballot"
+      icon-variant="view-tim"
       @click="handleTimView"
     >
       TIM
@@ -16,7 +16,7 @@
       text
       color="accent"
       data-cy="button-nav-tree"
-      icon-id="mdi-family-tree"
+      icon-variant="view-tree"
       @click="handleTreeView"
     >
       Tree
@@ -26,7 +26,7 @@
       text
       color="accent"
       data-cy="button-nav-table"
-      icon-id="mdi-table-multiple"
+      icon-variant="view-table"
       @click="handleTableView"
     >
       Table
@@ -37,7 +37,7 @@
       text
       color="accent"
       data-cy="button-nav-delta"
-      icon-id="mdi-compare"
+      icon-variant="view-delta"
       @click="handleDeltaView"
     >
       Delta

@@ -5,7 +5,7 @@
       block
       large
       color="primary"
-      icon-id="mdi-source-branch"
+      icon-variant="view-delta"
       @click="handleChange"
     >
       Compare Versions

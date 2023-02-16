@@ -3,7 +3,7 @@
     <v-expansion-panel-title>
       <flex-box align="center">
         <v-progress-circular v-if="isLoading" indeterminate class="mr-2" />
-        <icon v-else :id="iconName" class="mr-1" :color="iconColor" />
+        <icon v-else :variant="iconVariant" class="mr-1" :color="iconColor" />
         <slot name="title" />
       </flex-box>
     </v-expansion-panel-title>
@@ -103,6 +103,7 @@ import {
   defineEmits,
   defineProps,
 } from "vue";
+import { IconVariant } from "@/types";
 import { logStore, useVModel } from "@/hooks";
 import {
   SwitchInput,
@@ -144,8 +145,10 @@ const isValid = computed(
     !props.showFileUploader
 );
 
-const iconName = computed(() => (isValid.value ? "mdi-check" : "mdi-close"));
 const iconColor = computed(() => (isValid.value ? "success" : "error"));
+const iconVariant = computed<IconVariant>(() =>
+  isValid.value ? "success" : "cancel"
+);
 
 /**
  * Emits a change when the panel is cleared.

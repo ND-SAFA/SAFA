@@ -154,3 +154,10 @@ class VSMTrainer(iTrainer):
         """
         metrics_manager = MetricsManager(trace_links=links, predicted_similarities=predictions)
         return metrics_manager.eval(metrics)
+
+    def cleanup(self) -> None:
+        """
+        Required by parent class, unused
+        :return: None
+        """
+        pass

@@ -20,6 +20,7 @@
             "precision"
           ],
           "trainer_dataset_manager": {
+            "deterministic_id": 42,
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {

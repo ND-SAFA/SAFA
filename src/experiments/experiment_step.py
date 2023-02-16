@@ -211,10 +211,11 @@ class ExperimentStep(BaseObject):
                 setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
-                setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
                 if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
                     setattr(job.trainer_dataset_manager, "output_dir", output_dir)
                     setattr(job.trainer_dataset_manager, "random_seed", job.job_args.random_seed)
+                if job.model_manager is not None:
+                    setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
             setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
 
     @staticmethod

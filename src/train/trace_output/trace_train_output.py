@@ -24,5 +24,6 @@ class TraceTrainOutput(AbstractTraceOutput):
         self.training_loss: Optional[float] = training_loss
         self.metrics: List[StageEval] = metrics
         self.val_metrics: List[StageEval] = val_metrics
+        self.training_time = training_time
         self.prediction_output = prediction_output
         super().__init__(hf_output=train_output)

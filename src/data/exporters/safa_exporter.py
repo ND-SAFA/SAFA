@@ -71,14 +71,14 @@ class SafaExporter:
         for _, row in self.trace_dataset_creator.layer_mapping_df.iterrows():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            matrix_name = f"{source_type}2{target_type}"
+            matrix_name = f"{target_type}2{source_type}"
             file_name = matrix_name + ".csv"
             export_file_path = os.path.join(self.export_path, file_name)
             trace_df = self.create_trace_df(source_type, target_type)
             self.trace_definitions[matrix_name] = {
                 "File": file_name,
-                "Source": source_type,
-                "Target": target_type
+                "Source": target_type,
+                "Target": source_type
             }
             trace_df.to_csv(export_file_path, index=False)
 
@@ -98,8 +98,8 @@ class SafaExporter:
                 trace_link: TraceLink = self.trace_dataset.links[trace_link_id]
                 if trace_link.is_true_link:
                     entries.append({
-                        StructuredKeys.Trace.SOURCE: source_id,
-                        StructuredKeys.Trace.TARGET: target_id
+                        StructuredKeys.Trace.TARGET: source_id,
+                        StructuredKeys.Trace.SOURCE: target_id
                     })
         return pd.DataFrame(entries)
 

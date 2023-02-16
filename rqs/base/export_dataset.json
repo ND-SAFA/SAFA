@@ -7,10 +7,11 @@
           "trace_dataset_creator": {
             "project_reader": {
               "object_type": "HUB",
-              "name": "drone_full"
-            }
+              "name": "cm1"
+            },
+            "remove_orphans": true
           },
-          "export_path": "~/desktop/safa/datasets/safa/drone"
+          "export_path": "~/desktop/safa/datasets/safa/cm1"
         }
       ]
     }

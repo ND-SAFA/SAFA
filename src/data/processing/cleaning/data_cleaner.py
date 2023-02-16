@@ -16,7 +16,7 @@ class DataCleaner(AbstractDataProcessor):
         :return: list of processed artifact content strings
         """
         processed = []
-        word_lists = [AbstractDataProcessingStep.get_word_list(content) if content else [] for content in tokens]
+        word_lists = [AbstractDataProcessingStep.get_word_list(content) for content in tokens]
         for word_list in word_lists:
             processed_word_list = word_list
             for step in self.ordered_steps:

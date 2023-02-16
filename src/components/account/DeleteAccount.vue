@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { handleDeleteAccount } from "@/api";
-import { PasswordField, Typography, PanelCard } from "@/components/common";
+import { PasswordInput, Typography, PanelCard } from "@/components/common";
 
 /**
  * Displays account deletion.
@@ -43,7 +43,7 @@ export default defineComponent({
   components: {
     PanelCard,
     Typography,
-    PasswordField,
+    PasswordField: PasswordInput,
   },
   data() {
     return {

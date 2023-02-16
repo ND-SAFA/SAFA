@@ -13,8 +13,8 @@ export default {
 
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
-import { useTheme } from "vuetify";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
+import { useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
 const props = defineProps<{
@@ -22,8 +22,7 @@ const props = defineProps<{
   count: number;
 }>();
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 
 const definition = computed<TimNodeCytoElement>(() => ({
   data: {

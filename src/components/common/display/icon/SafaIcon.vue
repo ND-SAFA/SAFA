@@ -25,8 +25,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineEmits, computed } from "vue";
-import { useTheme } from "vuetify";
+import { defineEmits } from "vue";
+import { useTheme } from "@/hooks";
 import iconLight from "@/assets/images/SAFA-primary.svg";
 import iconDark from "@/assets/images/SAFA-secondary.svg";
 
@@ -34,6 +34,5 @@ defineEmits<{
   (e: "click"): void;
 }>();
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 </script>

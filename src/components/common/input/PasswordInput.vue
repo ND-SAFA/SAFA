@@ -25,7 +25,7 @@
  * A generic password input.
  */
 export default {
-  name: "PasswordField",
+  name: "PasswordInput",
 };
 </script>
 

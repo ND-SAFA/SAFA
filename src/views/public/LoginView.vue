@@ -1,15 +1,14 @@
 <template>
   <card-page id="login-view">
     <template #form>
-      <v-text-field
+      <text-input
         v-model="email"
-        filled
         label="Email"
-        :error-messages="isError ? ['Invalid username or password'] : []"
+        :errors="isError ? ['Invalid username or password'] : []"
         data-cy="input-email"
-        @keydown.enter="handleLogin"
+        @enter="handleLogin"
       />
-      <password-field v-model="password" @enter="handleLogin" />
+      <password-input v-model="password" @enter="handleLogin" />
     </template>
 
     <template #actions>
@@ -67,7 +66,8 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
-import { CardPage, PasswordField, Typography, TextButton } from "@/components";
+import TextInput from "@/components/common/input/TextInput.vue";
+import { CardPage, PasswordInput, Typography, TextButton } from "@/components";
 
 const email = ref("");
 const password = ref("");

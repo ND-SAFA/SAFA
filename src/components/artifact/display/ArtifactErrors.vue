@@ -8,7 +8,7 @@
         value="Warnings"
         data-cy="artifact-table-panel-warnings-title"
       />
-      <v-icon color="secondary">mdi-hazard-lights</v-icon>
+      <icon variant="warning" />
     </flex-box>
 
     <v-divider />
@@ -34,6 +34,7 @@ import {
   FlexBox,
   ToggleList,
   PanelCard,
+  Icon,
 } from "@/components/common";
 
 /**
@@ -41,7 +42,7 @@ import {
  */
 export default defineComponent({
   name: "ArtifactErrors",
-  components: { PanelCard, ToggleList, FlexBox, Typography },
+  components: { Icon, PanelCard, ToggleList, FlexBox, Typography },
   computed: {
     /**
      * @return The selected artifact.

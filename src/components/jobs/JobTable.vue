@@ -53,18 +53,16 @@
             size="16"
             class="mx-1"
           />
-          <v-icon
+          <icon
             v-if="isCompleted(item.status)"
             :color="getStatusColor(item.status)"
-          >
-            mdi-check-circle-outline
-          </v-icon>
-          <v-icon
+            variant="job-complete"
+          />
+          <icon
             v-if="isCancelled(item.status)"
             :color="getStatusColor(item.status)"
-          >
-            mdi-close-circle-outline
-          </v-icon>
+            variant="job-cancel"
+          />
           <span class="ml-1">
             {{ formatStatus(item.status) }}
           </span>
@@ -163,15 +161,21 @@ import {
   handleLoadVersion,
   handleReloadJobs,
 } from "@/api";
-import { Typography, FlexBox, PanelCard, Modal } from "@/components/common";
-import TextButton from "@/components/common/button/TextButton.vue";
+import {
+  Typography,
+  FlexBox,
+  PanelCard,
+  Modal,
+  Icon,
+  TextButton,
+} from "@/components/common";
 
 /**
  * Renders a list of jobs.
  */
 export default defineComponent({
   name: "JobTable",
-  components: { TextButton, Modal, PanelCard, Typography, FlexBox },
+  components: { Icon, TextButton, Modal, PanelCard, Typography, FlexBox },
   props: {},
   data() {
     return {

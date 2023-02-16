@@ -17,15 +17,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useTheme } from "vuetify";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useTheme } from "@/hooks";
 import { Routes } from "@/router";
 import { HeaderBar } from "./header";
 import { GraphBar } from "./graph";
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 
 const currentRoute = useRoute();
 const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);

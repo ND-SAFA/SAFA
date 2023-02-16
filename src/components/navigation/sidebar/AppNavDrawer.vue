@@ -51,14 +51,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useTheme } from "vuetify";
-import { appStore } from "@/hooks";
+import { appStore, useTheme } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 
 const sidebarOpen = computed({
   get(): boolean {

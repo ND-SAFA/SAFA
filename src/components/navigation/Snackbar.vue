@@ -10,7 +10,7 @@
       justify="space-between"
       :data-cy="`snackbar-${messageType}`"
     >
-      <v-icon color="white"> {{ messageIcon }} </v-icon>
+      <icon color="white" :variant="iconVariant" />
       <typography color="white" align="center" x="2" :value="snackbarMessage" />
       <flex-box align="center">
         <text-button
@@ -39,7 +39,7 @@
       </flex-box>
     </flex-box>
 
-    <ServerErrorModal :is-open="appStore.isErrorDisplayOpen" :errors="errors" />
+    <ServerErrorModal :is-open="isErrorOpen" :errors="errors" />
   </v-snackbar>
 </template>
 
@@ -54,7 +54,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { MessageType, SnackbarMessage } from "@/types";
+import { IconVariant, MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import {
@@ -63,6 +63,7 @@ import {
   Typography,
   FlexBox,
   TextButton,
+  Icon,
 } from "@/components/common";
 
 const timeout = 5000;
@@ -73,6 +74,8 @@ const messageType = ref<MessageType>(MessageType.CLEAR);
 const errors = ref<string[]>([]);
 
 const hasErrors = computed(() => errors.value.length > 0);
+const isErrorOpen = computed(() => appStore.isErrorDisplayOpen);
+const showAction = computed(() => messageType.value === MessageType.UPDATE);
 
 const messageColor = computed(() => {
   switch (messageType.value) {
@@ -89,23 +92,18 @@ const messageColor = computed(() => {
   }
 });
 
-const messageIcon = computed(() => {
+const iconVariant = computed<IconVariant>(() => {
   switch (messageType.value) {
-    case MessageType.INFO:
-      return "mdi-alert-circle-outline";
     case MessageType.WARNING:
-      return "mdi-alert-outline";
+      return "warning";
     case MessageType.ERROR:
-      return "mdi-alert-octagon-outline";
+      return "error";
     case MessageType.SUCCESS:
-      return "mdi-check-outline";
+      return "success";
     default:
-      return "mdi-alert-circle-outline";
+      return "info";
   }
 });
-
-const showAction = computed(() => messageType.value === MessageType.UPDATE);
-
 /**
  * Displays a snackbar message.
  * @param message - The message to display.

@@ -69,8 +69,8 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults, defineProps } from "vue";
-import { useTheme } from "vuetify";
 import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
+import { useTheme } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
@@ -110,12 +110,11 @@ const props = withDefaults(
   }
 );
 
-const theme = useTheme();
+const { darkMode } = useTheme();
+
 const isExpanded = ref(
   props.defaultExpanded && String(props.value).length < 500
 );
-
-const darkMode = computed(() => theme.global.current.value.dark);
 
 const isExpandable = computed(() => props.variant === "expandable");
 

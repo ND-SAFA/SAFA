@@ -13,9 +13,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, defineProps } from "vue";
-import { useTheme } from "vuetify";
 import { ArtifactSchema, GraphElementType, GraphMode } from "@/types";
 import {
+  useTheme,
   deltaStore,
   selectionStore,
   subtreeStore,
@@ -29,8 +29,7 @@ const props = defineProps<{
   faded?: boolean;
 }>();
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 
 const definition = computed(() => {
   const { id, body, type, name, safetyCaseType, logicType } = props.artifact;

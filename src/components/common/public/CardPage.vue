@@ -29,12 +29,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useTheme } from "vuetify";
 import { computed } from "vue";
+import { useTheme } from "@/hooks";
 import { SafaIcon } from "@/components/common/display";
 
-const theme = useTheme();
-const darkMode = computed(() => theme.global.current.value.dark);
+const { darkMode } = useTheme();
 const className = computed(() =>
   darkMode.value ? "bg-neutral fill-height" : "bg-primary fill-height"
 );

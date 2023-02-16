@@ -5,11 +5,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from "vue";
-import { useTheme } from "vuetify";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, ArtifactDeltaState } from "@/types";
 import { capitalize, getBackgroundColor } from "@/util";
-import { deltaStore } from "@/hooks";
+import { deltaStore, useTheme } from "@/hooks";
 import { Typography } from "@/components/common";
 
 /**
@@ -47,8 +46,7 @@ export default defineComponent({
      * @return The color to display for this chip.
      */
     color(): string {
-      const theme = useTheme();
-      const darkMode = computed(() => theme.global.current.value.dark);
+      const { darkMode } = useTheme();
 
       return getBackgroundColor(this.deltaState, darkMode.value);
     },

@@ -5,35 +5,23 @@
     <switch-input
       label="Enable dark mode"
       :model-value="darkMode"
-      @input="toggleTheme"
+      @input="toggleDarkMode"
     />
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useTheme } from "vuetify";
-import { LocalStorageKeys } from "@/types";
+/**
+ * Injects the app theme.
+ */
+export default {
+  name: "ThemeController",
+};
+</script>
+
+<script setup lang="ts">
+import { useTheme } from "@/hooks";
 import { PanelCard, Typography, SwitchInput } from "@/components/common";
 
-/**
- * ThemeController
- */
-export default defineComponent({
-  name: "ThemeController",
-  components: { SwitchInput, PanelCard, Typography },
-  setup() {
-    const theme = useTheme();
-
-    return {
-      darkMode: theme.global.current.value.dark,
-      toggleTheme: () => {
-        const mode = theme.global.current.value.dark ? "light" : "dark";
-
-        theme.global.name.value = mode;
-        localStorage.setItem(LocalStorageKeys.darkMode, mode);
-      },
-    };
-  },
-});
+const { darkMode, toggleDarkMode } = useTheme();
 </script>

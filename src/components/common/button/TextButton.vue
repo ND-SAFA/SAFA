@@ -11,7 +11,12 @@
     :variant="buttonVariant"
     @click="emit('click')"
   >
-    <v-icon v-if="buttonIconId" class="mr-1">{{ buttonIconId }}</v-icon>
+    <icon
+      v-if="iconId || iconVariant"
+      :id="iconId"
+      :variant="iconVariant"
+      class="mr-1"
+    />
     <slot />
   </v-btn>
 </template>
@@ -27,6 +32,8 @@ export default {
 
 <script setup lang="ts">
 import { defineProps, defineEmits, computed } from "vue";
+import { IconVariant } from "@/types";
+import Icon from "@/components/common/display/icon/Icon.vue";
 
 const props = defineProps<{
   outlined?: boolean;
@@ -38,6 +45,7 @@ const props = defineProps<{
   loading?: boolean;
   color?: string;
   iconId?: string;
+  iconVariant?: IconVariant;
   value?: string;
   y?: string;
   x?: string;
@@ -49,25 +57,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "click"): void;
 }>();
-
-const buttonIconId = computed(() => {
-  switch (props.variant) {
-    case "add":
-      return "mdi-plus";
-    case "edit":
-      return "mdi-pencil";
-    case "save":
-      return "mdi-content-save";
-    case "delete":
-      return "mdi-delete";
-    case "cancel":
-      return "mdi-close";
-    case "artifact":
-      return "mdi-application-array-outline";
-    default:
-      return props.iconId;
-  }
-});
 
 const buttonColor = computed(() => {
   switch (props.variant) {

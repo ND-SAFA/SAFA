@@ -12,7 +12,7 @@
       <div v-if="!isSubmitted">
         <typography b="2" el="p" value="Please enter a new password." />
 
-        <password-field v-model="password" :errors="errors" />
+        <password-input v-model="password" :errors="errors" />
       </div>
 
       <typography
@@ -62,7 +62,7 @@ import { ref, onMounted, computed } from "vue";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { updatePassword } from "@/api";
 import TextButton from "@/components/common/button/TextButton.vue";
-import { CardPage, PasswordField, Typography } from "@/components";
+import { CardPage, PasswordInput, Typography } from "@/components";
 
 const token = ref("");
 const password = ref("");

@@ -13,7 +13,7 @@
 
     <v-list-item :to="accountPath" color="primary">
       <template #prepend>
-        <v-icon>mdi-account-circle</v-icon>
+        <icon variant="account" />
       </template>
       <v-list-item-title data-cy="page-account" class="py-3">
         <typography bold value="My Account" />
@@ -33,7 +33,7 @@ export default {
 
 <script setup lang="ts">
 import { Routes } from "@/router";
-import { Typography } from "@/components/common";
+import { Typography, Icon } from "@/components/common";
 import Notifications from "./Notifications.vue";
 
 const accountPath = Routes.ACCOUNT;

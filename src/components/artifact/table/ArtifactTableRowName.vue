@@ -1,12 +1,10 @@
 <template>
   <flex-box align="center">
-    <v-icon
+    <icon
       v-if="getHasWarnings(artifact)"
-      color="secondary"
+      variant="warning"
       data-cy="artifact-table-artifact-warning"
-    >
-      mdi-hazard-lights
-    </v-icon>
+    />
     <typography
       l="1"
       :value="artifact.name"
@@ -19,7 +17,7 @@
 import { defineComponent, PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { warningStore } from "@/hooks";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, Icon } from "@/components/common";
 
 /**
  * Displays the name of a row of artifacts.
@@ -27,6 +25,7 @@ import { Typography, FlexBox } from "@/components/common";
 export default defineComponent({
   name: "ArtifactTableRowName",
   components: {
+    Icon,
     FlexBox,
     Typography,
   },

@@ -11,7 +11,7 @@
       <v-col cols="6">
         <panel-card>
           <v-card-title class="d-flex">
-            <v-icon color="primary"> mdi-view-list </v-icon>
+            <icon variant="home-list" />
             <typography
               el="h2"
               l="2"
@@ -34,7 +34,7 @@
       <v-col cols="6">
         <panel-card>
           <v-card-title class="d-flex">
-            <v-icon color="primary"> mdi-folder-plus-outline </v-icon>
+            <icon variant="home-add" />
             <typography
               el="h2"
               l="2"
@@ -52,16 +52,17 @@
           </v-card-subtitle>
           <v-card-text>
             <div class="mx-auto width-min">
-              <text-button text @click="handleOpenStandard">
-                <v-icon>mdi-plus</v-icon>
+              <text-button text icon-variant="add" @click="handleOpenStandard">
                 Create New Project
               </text-button>
-              <text-button text @click="handleOpenBulk">
-                <v-icon>mdi-folder-arrow-up-outline</v-icon>
+              <text-button text icon-variant="upload" @click="handleOpenBulk">
                 Bulk Upload Project
               </text-button>
-              <text-button text @click="handleOpenImport">
-                <v-icon>mdi-transit-connection-variant</v-icon>
+              <text-button
+                text
+                icon-variant="integrate"
+                @click="handleOpenImport"
+              >
                 Import Jira/GitHub Project
               </text-button>
             </div>
@@ -90,6 +91,7 @@ import {
   Typography,
   PanelCard,
   TextButton,
+  Icon,
 } from "@/components";
 
 function handleOpenStandard() {

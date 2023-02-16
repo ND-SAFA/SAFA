@@ -16,11 +16,10 @@
           value=" Please enter your email to reset your password."
         />
 
-        <v-text-field
+        <text-input
           v-model="email"
-          filled
           label="Email"
-          :error-messages="isError ? ['Unable to reset password'] : []"
+          :errors="isError ? ['Unable to reset password'] : []"
         />
       </div>
 
@@ -72,6 +71,7 @@ import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createPasswordReset } from "@/api";
 import TextButton from "@/components/common/button/TextButton.vue";
+import TextInput from "@/components/common/input/TextInput.vue";
 import { CardPage, Typography } from "@/components";
 
 const email = ref("");

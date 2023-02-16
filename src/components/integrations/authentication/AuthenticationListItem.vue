@@ -1,9 +1,7 @@
 <template>
   <v-list-item :inactive="inactive || !hasCredentials" @click="handleClick">
     <v-list-item-icon style="align-self: center">
-      <v-icon v-if="!isLoading" :color="color">
-        mdi-transit-connection-variant
-      </v-icon>
+      <icon v-if="!isLoading" :color="color" variant="integrate" />
       <v-progress-circular v-else indeterminate />
     </v-list-item-icon>
     <v-list-item-title>
@@ -43,8 +41,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Typography, TextButton } from "@/components/common";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
+import { Typography, TextButton, FlexBox, Icon } from "@/components/common";
 
 /**
  * Displays a list item & buttons for authenticating an integration.
@@ -55,7 +52,7 @@ import FlexBox from "@/components/common/layout/FlexBox.vue";
  */
 export default defineComponent({
   name: "AuthenticationListItem",
-  components: { FlexBox, TextButton, Typography },
+  components: { Icon, FlexBox, TextButton, Typography },
   props: {
     hasCredentials: {
       type: Boolean,

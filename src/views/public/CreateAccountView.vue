@@ -14,15 +14,13 @@
           el="p"
           value="There are just a few key pieces of info we need to set up your account."
         />
-
-        <v-text-field
+        <text-input
           v-model="email"
-          filled
           label="Email"
-          :error-messages="isError ? ['Unable to create an account'] : []"
+          :errors="isError ? ['Unable to create an account'] : []"
           data-cy="input-new-email"
         />
-        <password-field v-model="password" data-cy="input-new-password" />
+        <password-input v-model="password" data-cy="input-new-password" />
       </div>
 
       <typography
@@ -75,8 +73,13 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createUser } from "@/api";
-import TextButton from "@/components/common/button/TextButton.vue";
-import { CardPage, PasswordField, Typography } from "@/components";
+import {
+  CardPage,
+  PasswordInput,
+  Typography,
+  TextInput,
+  TextButton,
+} from "@/components";
 
 const email = ref("");
 const password = ref("");

@@ -1,4 +1,4 @@
-export { default as PasswordField } from "./PasswordField.vue";
+export { default as PasswordInput } from "./PasswordInput.vue";
 export { default as ArtifactInput } from "./ArtifactInput.vue";
 export { default as ArtifactTypeInput } from "./ArtifactTypeInput.vue";
 export { default as TypeIconInput } from "./TypeIconInput.vue";
@@ -10,3 +10,4 @@ export { default as AttributeInput } from "./AttributeInput.vue";
 export { default as AttributeListInput } from "./AttributeListInput.vue";
 export { default as FileInput } from "./FileInput.vue";
 export { default as SwitchInput } from "./SwitchInput.vue";
+export { default as TextInput } from "./TextInput.vue";

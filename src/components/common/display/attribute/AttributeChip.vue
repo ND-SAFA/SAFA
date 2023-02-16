@@ -15,9 +15,12 @@
         :color="displayColor"
         :data-cy="dataCy"
       >
-        <v-icon v-if="iconId" small :color="artifactType ? 'primary' : ''">
-          {{ iconId }}
-        </v-icon>
+        <icon
+          v-if="iconId"
+          :id="iconId"
+          size="small"
+          :color="artifactType ? 'primary' : ''"
+        />
         <typography
           ellipsis
           inherit-color
@@ -40,8 +43,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import { useTheme } from "vuetify";
+import { defineComponent } from "vue";
 import { ApprovalType } from "@/types";
 import {
   camelcaseToDisplay,
@@ -49,8 +51,9 @@ import {
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
-import { typeOptionsStore } from "@/hooks";
+import { typeOptionsStore, useTheme } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
+import Icon from "@/components/common/display/icon/Icon.vue";
 import Typography from "../Typography.vue";
 
 /**
@@ -58,7 +61,7 @@ import Typography from "../Typography.vue";
  */
 export default defineComponent({
   name: "AttributeChip",
-  components: { FlexBox, Typography },
+  components: { Icon, FlexBox, Typography },
   props: {
     value: {
       type: String,
@@ -106,8 +109,7 @@ export default defineComponent({
      * @return The color to display for this chip.
      */
     displayColor(): string {
-      const theme = useTheme();
-      const darkMode = computed(() => theme.global.current.value.dark);
+      const { darkMode } = useTheme();
 
       if (this.color) {
         return this.color;

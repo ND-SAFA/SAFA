@@ -1,19 +1,20 @@
 <template>
-  <v-btn text @click="handleClick">
-    <v-icon left> mdi-arrow-left </v-icon>
+  <text-button text icon-variant="back" @click="handleClick">
     {{ text }}
-  </v-btn>
+  </text-button>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { getParams, navigateBack, navigateTo, Routes } from "@/router";
+import TextButton from "@/components/common/button/TextButton.vue";
 
 /**
  * A generic back button
  */
 export default defineComponent({
   name: "BackButton",
+  components: { TextButton },
   props: {
     text: {
       type: String,
@@ -41,5 +42,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped></style>

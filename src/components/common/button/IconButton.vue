@@ -14,7 +14,7 @@
         variant="text"
         @click="emit('click')"
       >
-        <v-icon :style="iconStyle">{{ iconId }}</v-icon>
+        <icon :id="iconId" :style="iconStyle" :variant="iconVariant" />
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -32,11 +32,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, defineProps, defineEmits } from "vue";
+import { IconVariant } from "@/types";
+import Icon from "@/components/common/display/icon/Icon.vue";
 
 const props = defineProps<{
   dataCy?: string;
   tooltip: string;
-  iconId: string;
+  iconId?: string;
+  iconVariant?: IconVariant;
   color?: string;
   iconStyle?: string;
   fab?: boolean;

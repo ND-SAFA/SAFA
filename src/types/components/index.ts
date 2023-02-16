@@ -8,3 +8,4 @@ export * from "./graph";
 export * from "./table";
 export * from "./models";
 export * from "./settings";
+export * from "./icons";

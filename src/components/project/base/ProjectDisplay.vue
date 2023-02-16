@@ -36,7 +36,7 @@
         >
           <attribute-chip artifact-type :value="direction[0]" />
           <flex-box wrap>
-            <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
+            <icon class="mx-1" variant="trace" />
             <div v-for="type in direction[1]" :key="type" class="mb-1">
               <attribute-chip artifact-type :value="type" />
             </div>
@@ -56,6 +56,7 @@ import {
   AttributeChip,
   Typography,
   FlexBox,
+  Icon,
 } from "@/components/common";
 
 /**
@@ -63,7 +64,7 @@ import {
  */
 export default defineComponent({
   name: "ProjectDisplay",
-  components: { FlexBox, PanelCard, AttributeChip, Typography },
+  components: { Icon, FlexBox, PanelCard, AttributeChip, Typography },
   computed: {
     /**
      * @return The current project.

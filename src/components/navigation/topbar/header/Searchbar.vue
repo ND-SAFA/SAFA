@@ -17,9 +17,7 @@
       data-cy="input-artifact-search-nav"
     >
       <template #prepend-inner>
-        <v-icon color="accent" class="input-no-icon-rotate">
-          mdi-magnify
-        </v-icon>
+        <icon color="accent" variant="search" class="input-no-icon-rotate" />
       </template>
       <template #prepend-item>
         <flex-box x="3">
@@ -57,7 +55,12 @@ import { computed, ref } from "vue";
 import { ArtifactSearchItem } from "@/types";
 import { filterArtifacts, objectToArray } from "@/util";
 import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
-import { ArtifactBodyDisplay, Typography, FlexBox } from "@/components/common";
+import {
+  ArtifactBodyDisplay,
+  Typography,
+  FlexBox,
+  Icon,
+} from "@/components/common";
 
 const queryText = ref<string | null>("");
 

@@ -8,7 +8,7 @@
     <panel-card class="mt-2">
       <flex-box wrap>
         <attribute-chip artifact-type :value="sourceType" />
-        <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
+        <icon class="mx-1" variant="trace" />
         <attribute-chip artifact-type :value="targetType" />
       </flex-box>
       <v-divider class="mt-1" />
@@ -32,6 +32,7 @@ import {
   Typography,
   FlexBox,
   TextButton,
+  Icon,
 } from "@/components/common";
 
 /**
@@ -40,6 +41,7 @@ import {
 export default defineComponent({
   name: "TraceMatrixPanel",
   components: {
+    Icon,
     FlexBox,
     PanelCard,
     AttributeChip,

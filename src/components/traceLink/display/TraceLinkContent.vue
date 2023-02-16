@@ -19,9 +19,7 @@
       </v-card-actions>
     </panel-card>
     <flex-box justify="center" b="4">
-      <v-icon large style="transform: rotate(270deg)">
-        mdi-ray-start-arrow
-      </v-icon>
+      <icon size="large" rotate="270" variant="trace" />
       <attribute-chip
         v-if="!!score"
         style="width: 200px"
@@ -38,7 +36,7 @@
       />
       <v-card-actions>
         <v-btn text data-cy="button-trace-source" @click="handleViewSource">
-          <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+          <icon class="mr-1" variant="trace" />
           View Artifact
         </v-btn>
       </v-card-actions>
@@ -56,6 +54,7 @@ import {
   AttributeChip,
   PanelCard,
   TextButton,
+  Icon,
 } from "@/components/common";
 
 /**
@@ -64,6 +63,7 @@ import {
 export default defineComponent({
   name: "TraceLinkContent",
   components: {
+    Icon,
     TextButton,
     PanelCard,
     FlexBox,

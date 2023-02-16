@@ -3,9 +3,7 @@
     <v-expansion-panel-title>
       <flex-box align="center">
         <v-progress-circular v-if="isLoading" indeterminate class="mr-2" />
-        <v-icon v-else class="mr-1" :color="iconColor">
-          {{ iconName }}
-        </v-icon>
+        <icon v-else :id="iconName" class="mr-1" :color="iconColor" />
         <slot name="title" />
       </flex-box>
     </v-expansion-panel-title>
@@ -59,7 +57,7 @@
               :value="errors.length === 0 ? 'No Errors' : 'Errors'"
             />
             <template #actions>
-              <v-icon color="error">mdi-alert-circle</v-icon>
+              <icon variant="error" />
             </template>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
@@ -111,6 +109,7 @@ import {
   FileInput,
   Typography,
   FlexBox,
+  Icon,
 } from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";

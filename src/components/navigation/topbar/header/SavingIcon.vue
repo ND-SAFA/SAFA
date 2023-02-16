@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip v-if="appStore.isSaving" bottom z-index="10000">
+  <v-tooltip v-if="isSaving" bottom z-index="10000">
     <template #activator="{ props }">
       <v-progress-circular
         v-bind="props"
@@ -7,7 +7,7 @@
         size="36"
         color="accent"
       >
-        <v-icon color="accent"> mdi-cloud-upload-outline </v-icon>
+        <icon color="accent" variant="saving" />
       </v-progress-circular>
     </template>
     <span>Saving...</span>
@@ -24,5 +24,9 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { appStore } from "@/hooks";
+import { Icon } from "@/components/common";
+
+const isSaving = computed(() => appStore.isSaving);
 </script>

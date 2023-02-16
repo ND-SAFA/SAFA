@@ -7,7 +7,7 @@
       @click.stop="handleClick"
     >
       <typography :value="source.name" />
-      <v-icon class="mx-1" :style="arrowStyle">mdi-ray-start-arrow</v-icon>
+      <icon class="mx-1" :rotate="isChild ? -180 : 0" variant="trace" />
       <typography :value="target.name" />
     </v-chip>
     <div v-else class="show-on-hover">
@@ -26,7 +26,7 @@
 import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
-import { Typography, IconButton } from "@/components/common";
+import { Typography, IconButton, Icon } from "@/components/common";
 
 /**
  * Renders a chip representing a trace link between two artifacts.
@@ -34,6 +34,7 @@ import { Typography, IconButton } from "@/components/common";
 export default defineComponent({
   name: "TraceMatrixChip",
   components: {
+    Icon,
     IconButton,
     Typography,
   },
@@ -65,12 +66,6 @@ export default defineComponent({
      */
     doDisplay(): boolean {
       return !!this.direction;
-    },
-    /**
-     * @return The style for the chip arrow.
-     */
-    arrowStyle(): string {
-      return this.isChild ? "transform: rotate(-180deg)" : "";
     },
     /**
      * @return The trace link between these artifacts.

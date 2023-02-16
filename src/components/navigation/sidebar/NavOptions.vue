@@ -9,7 +9,7 @@
           :data-cy="'button-nav-' + option.label"
         >
           <template #prepend>
-            <v-icon :icon="option.icon" />
+            <icon :id="option.icon" />
           </template>
           <v-list-item-title>
             <typography bold :value="option.label" />
@@ -34,7 +34,7 @@ import { computed } from "vue";
 import { NavOption } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
-import { Typography } from "@/components/common";
+import { Typography, Icon } from "@/components/common";
 
 const hideProjectOptions = computed(() => !projectStore.isProjectDefined);
 

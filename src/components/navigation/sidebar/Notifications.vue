@@ -15,7 +15,7 @@
           :model-value="newNotifications > 0"
           :content="newNotifications"
         >
-          <v-icon>mdi-bell-outline</v-icon>
+          <icon variant="notification" />
         </v-badge>
       </v-btn>
     </template>
@@ -48,7 +48,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { logStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import { Typography, Icon } from "@/components/common";
 
 const viewedMessages = ref(0);
 

@@ -13,7 +13,7 @@
       t="3"
       b="3"
     >
-      <safa-icon style="width: 180px" />
+      <safa-icon style="width: 180px !important" />
       <icon-button
         large
         icon-variant="nav-toggle"
@@ -23,7 +23,12 @@
         @click="sidebarOpen = false"
       />
     </flex-box>
-    <flex-box v-else justify="center" full-width t="2">
+    <flex-box
+      v-else
+      justify="center"
+      full-width
+      t="2"
+    >
       <icon-button
         large
         icon-variant="nav-toggle"

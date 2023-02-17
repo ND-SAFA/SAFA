@@ -2,10 +2,14 @@
 const fs = require("fs");
 
 module.exports = {
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ["vuetify", "quasar"],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
+    },
+    quasar: {
+      importStrategy: "kebab",
+      rtlSupport: false,
     },
   },
   lintOnSave: true,

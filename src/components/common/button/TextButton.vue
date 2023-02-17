@@ -1,14 +1,15 @@
 <template>
-  <v-btn
-    :disabled="disabled"
+  <q-btn
+    :disable="disabled"
     :size="buttonSize"
-    :block="block"
+    :outline="outlined"
+    :flat="text"
     :loading="loading"
     :color="buttonColor"
+    :text-color="textColor"
     :value="value"
     :class="buttonClassName"
     :data-cy="dataCy"
-    :variant="buttonVariant"
     @click="emit('click')"
   >
     <icon
@@ -18,7 +19,7 @@
       class="mr-1"
     />
     <slot />
-  </v-btn>
+  </q-btn>
 </template>
 
 <script lang="ts">
@@ -49,7 +50,7 @@ const props = defineProps<{
   value?: string;
   y?: string;
   x?: string;
-  classes?: string;
+  class?: string;
   variant?: "add" | "edit" | "save" | "delete" | "cancel" | "artifact";
   dataCy?: string;
 }>();
@@ -70,31 +71,26 @@ const buttonColor = computed(() => {
   }
 });
 
+const textColor = computed(() =>
+  props.color === "primary" ? "white" : "black"
+);
+
 const buttonClassName = computed(() => {
-  let classNames = props.classes || "";
+  let classNames = props.class || "";
 
   if (props.x) classNames += ` mx-${props.x}`;
   if (props.y) classNames += ` my-${props.y}`;
   if (props.color) classNames += ` text-${props.color}`;
+  if (props.block) classNames += ` full-width`;
 
   return classNames;
 });
 
-const buttonVariant = computed(() => {
-  if (props.outlined) {
-    return "outlined";
-  } else if (props.text) {
-    return "text";
-  } else {
-    return "elevated";
-  }
-});
-
 const buttonSize = computed(() => {
   if (props.large) {
-    return "large";
+    return "lg";
   } else if (props.small) {
-    return "small";
+    return "sm";
   } else {
     return undefined;
   }

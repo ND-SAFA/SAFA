@@ -4,7 +4,7 @@
       <text-input
         v-model="email"
         label="Email"
-        :errors="isError ? ['Invalid username or password'] : []"
+        :error-message="isError && 'Invalid username or password'"
         data-cy="input-email"
         @enter="handleLogin"
       />

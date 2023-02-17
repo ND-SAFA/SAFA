@@ -23,12 +23,7 @@
         Connect
       </text-button>
       <flex-box v-else column align="end">
-        <text-button
-          outlined
-          variant="add"
-          classes="mb-2"
-          @click="handleConnect"
-        >
+        <text-button outlined variant="add" class="mb-2" @click="handleConnect">
           Installation
         </text-button>
         <text-button outlined variant="delete" @click="handleDisconnect">

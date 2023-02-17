@@ -19,7 +19,7 @@
         <text-input
           v-model="email"
           label="Email"
-          :errors="isError ? ['Unable to reset password'] : []"
+          :error-message="isError && 'Unable to reset password'"
         />
       </div>
 

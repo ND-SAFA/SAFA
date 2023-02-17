@@ -1,6 +1,10 @@
 <template>
-  <v-icon :color="iconColor" :size="size" :style="iconStyle">
-    {{ iconId }}
+  <v-icon
+    :color="iconColor"
+    :size="size"
+    :style="iconStyle"
+  >
+    {{ iconId }} 
   </v-icon>
 </template>
 

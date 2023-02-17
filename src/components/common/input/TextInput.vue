@@ -1,11 +1,12 @@
 <template>
-  <v-text-field
+  <q-input
     v-model="model"
     filled
     :label="label"
     data-cy="input-password"
-    :error-messages="errors"
-    :error="errors && errors.length > 0"
+    :error-message="errorMessage || ''"
+    :error="showError"
+    :class="className"
     @keydown.enter="emit('enter')"
   />
 </template>
@@ -20,14 +21,25 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, withDefaults, computed } from "vue";
+import { SizeType } from "@/types";
 import { useVModel } from "@/hooks";
 
-const props = defineProps<{
-  modelValue: string;
-  label?: string;
-  errors?: string[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    label?: string;
+    errorMessage?: string | false;
+    b?: SizeType;
+    class?: string;
+  }>(),
+  {
+    b: "1",
+    label: "",
+    errorMessage: "",
+    class: "",
+  }
+);
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
@@ -35,4 +47,18 @@ const emit = defineEmits<{
 }>();
 
 const model = useVModel(props, "modelValue");
+
+const className = computed(() => {
+  if (props.class) {
+    return props.class;
+  } else if (props.b) {
+    return `mb-${props.b}`;
+  } else {
+    return "";
+  }
+});
+
+const showError = computed(
+  () => !!props.errorMessage && props.errorMessage.length > 0
+);
 </script>

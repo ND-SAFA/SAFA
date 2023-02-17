@@ -17,10 +17,13 @@
         <text-input
           v-model="email"
           label="Email"
-          :errors="isError ? ['Unable to create an account'] : []"
+          :error-message="isError && 'Unable to create an account'"
           data-cy="input-new-email"
         />
-        <password-input v-model="password" data-cy="input-new-password" />
+        <password-input
+          v-model="password"
+          data-cy="input-new-password"
+        />
       </div>
 
       <typography

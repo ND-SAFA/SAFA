@@ -7,7 +7,7 @@
     data-cy="input-password"
     :error-message="props.errorMessage || ''"
     :error="showError"
-    @keydown.enter="emit('enter')"
+    @keydown="handleKeydown"
   >
     <template #append>
       <q-icon
@@ -62,5 +62,14 @@ const showError = computed(
  */
 function handleToggle() {
   showPassword.value = !showPassword.value;
+}
+
+/**
+ * Emits an event when enter is clicked.
+ */
+function handleKeydown(e?: { key: string }) {
+  if (e?.key === "Enter") {
+    emit("enter");
+  }
 }
 </script>

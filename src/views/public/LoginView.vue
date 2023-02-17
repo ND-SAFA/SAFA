@@ -6,9 +6,9 @@
         label="Email"
         :error-message="isError && 'Invalid username or password'"
         data-cy="input-email"
-        @enter="handleLogin"
+        @enter="handleSubmit"
       />
-      <password-input v-model="password" @enter="handleLogin" />
+      <password-input v-model="password" @enter="handleSubmit" />
     </template>
 
     <template #actions>

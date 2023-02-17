@@ -7,7 +7,7 @@
     :error-message="errorMessage || ''"
     :error="showError"
     :class="className"
-    @keydown.enter="emit('enter')"
+    @keydown="handleKeydown"
   />
 </template>
 
@@ -61,4 +61,13 @@ const className = computed(() => {
 const showError = computed(
   () => !!props.errorMessage && props.errorMessage.length > 0
 );
+
+/**
+ * Emits an event when enter is clicked.
+ */
+function handleKeydown(e?: { key: string }) {
+  if (e?.key === "Enter") {
+    emit("enter");
+  }
+}
 </script>

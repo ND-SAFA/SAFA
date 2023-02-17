@@ -50,19 +50,19 @@ const style = computed(() =>
 );
 
 const className = computed(() => {
-  let classNames = `d-flex `;
+  let classNames = `flex `;
 
   if (props.align) classNames += ` align-${props.align}`;
   if (props.justify) classNames += ` justify-${props.justify}`;
   if (props.fullWidth) classNames += ` full-width`;
-  if (props.column) classNames += ` flex-column`;
-  if (props.wrap) classNames += ` flex-wrap`;
-  if (props.x) classNames += ` mx-${props.x}`;
-  if (props.l) classNames += ` ml-${props.l}`;
-  if (props.r) classNames += ` mr-${props.r}`;
-  if (props.y) classNames += ` my-${props.y}`;
-  if (props.t) classNames += ` mt-${props.t}`;
-  if (props.b) classNames += ` mb-${props.b}`;
+  if (props.column) classNames += ` column`;
+  if (props.wrap) classNames += ` wrap`;
+  if (props.x) classNames += ` q-mx-${props.x}`;
+  if (props.l) classNames += ` q-ml-${props.l}`;
+  if (props.r) classNames += ` q-mr-${props.r}`;
+  if (props.y) classNames += ` q-my-${props.y}`;
+  if (props.t) classNames += ` q-mt-${props.t}`;
+  if (props.b) classNames += ` q-mb-${props.b}`;
 
   return classNames;
 });

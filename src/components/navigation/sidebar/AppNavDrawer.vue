@@ -1,10 +1,5 @@
 <template>
-  <v-navigation-drawer
-    permanent
-    :rail="!sidebarOpen"
-    height="100%"
-    elevation="1"
-  >
+  <q-drawer show-if-above :mini="!sidebarOpen">
     <flex-box
       v-if="sidebarOpen"
       full-width
@@ -23,12 +18,7 @@
         @click="sidebarOpen = false"
       />
     </flex-box>
-    <flex-box
-      v-else
-      justify="center"
-      full-width
-      t="2"
-    >
+    <flex-box v-else justify="center" full-width t="2">
       <icon-button
         large
         icon-variant="nav-toggle"
@@ -40,9 +30,11 @@
       />
     </flex-box>
 
-    <nav-options />
-    <nav-account />
-  </v-navigation-drawer>
+    <q-scroll-area class="fit">
+      <nav-options />
+      <nav-account />
+    </q-scroll-area>
+  </q-drawer>
 </template>
 
 <script lang="ts">

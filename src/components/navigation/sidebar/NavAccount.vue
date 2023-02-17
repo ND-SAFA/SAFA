@@ -1,39 +1,24 @@
 <template>
-  <div
-    style="position: absolute; bottom: 0"
-    class="full-width"
-  >
-    <v-list-item>
-      <template #prepend>
+  <div style="position: absolute; bottom: 0" class="full-width">
+    <q-item>
+      <q-item-section avator>
         <notifications />
-      </template>
-      <v-list-item-title>
-        <typography
-          value="Notifications"
-          l="3"
-        />
-      </v-list-item-title>
-    </v-list-item>
+      </q-item-section>
+      <q-item-section>
+        <typography value="Notifications" l="3" />
+      </q-item-section>
+    </q-item>
 
-    <v-divider />
+    <q-separator />
 
-    <v-list-item
-      :to="accountPath"
-      color="primary"
-    >
-      <template #prepend>
+    <q-item clickable :to="accountPath" color="primary">
+      <q-item-section avatar>
         <icon variant="account" />
-      </template>
-      <v-list-item-title
-        data-cy="page-account"
-        class="py-3"
-      >
-        <typography
-          bold
-          value="My Account"
-        />
-      </v-list-item-title>
-    </v-list-item>
+      </q-item-section>
+      <q-item-section data-cy="page-account" class="py-3">
+        <typography bold value="My Account" />
+      </q-item-section>
+    </q-item>
   </div>
 </template>
 

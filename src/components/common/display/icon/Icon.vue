@@ -1,11 +1,5 @@
 <template>
-  <v-icon
-    :color="iconColor"
-    :size="size"
-    :style="iconStyle"
-  >
-    {{ iconId }} 
-  </v-icon>
+  <q-icon :color="iconColor" :size="size" :style="iconStyle" :name="iconId" />
 </template>
 
 <script lang="ts">
@@ -25,7 +19,7 @@ const props = defineProps<{
   variant?: IconVariant;
   color?: "primary" | "secondary" | "error" | "accent" | string;
   id?: string;
-  size?: "small" | "medium" | "large";
+  size?: "sm" | "md" | "lg";
   rotate?: number;
   style?: string;
 }>();

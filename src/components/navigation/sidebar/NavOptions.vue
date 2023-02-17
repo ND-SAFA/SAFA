@@ -1,29 +1,22 @@
 <template>
-  <v-list>
-    <v-item-group selected-class="nav-selected">
-      <template
-        v-for="option in options"
-        :key="option.label"
+  <q-list>
+    <template v-for="option in options" :key="option.label">
+      <q-separator v-if="option.divider" />
+      <q-item
+        clickable
+        :to="option.path"
+        color="primary"
+        :data-cy="'button-nav-' + option.label"
       >
-        <v-divider v-if="option.divider" />
-        <v-list-item
-          :to="option.path" 
-          color="primary"
-          :data-cy="'button-nav-' + option.label"
-        >
-          <template #prepend>
-            <icon :variant="option.icon" />
-          </template>
-          <v-list-item-title>
-            <typography
-              bold
-              :value="option.label"
-            />
-          </v-list-item-title>
-        </v-list-item>
-      </template>
-    </v-item-group>
-  </v-list>
+        <q-item-section avatar>
+          <icon :variant="option.icon" />
+        </q-item-section>
+        <q-item-section>
+          <typography bold :value="option.label" />
+        </q-item-section>
+      </q-item>
+    </template>
+  </q-list>
 </template>
 
 <script lang="ts">

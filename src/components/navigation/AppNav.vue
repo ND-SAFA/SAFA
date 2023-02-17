@@ -4,7 +4,7 @@
     <app-nav-bar v-if="isLoggedIn" />
     <details-drawer v-if="isLoggedIn" />
     <snackbar />
-    <app-confirm-modal :message="logStore.confirmation" />
+    <app-confirm-modal :message="confirmationMessage" />
   </div>
 </template>
 
@@ -27,4 +27,5 @@ import { DetailsDrawer } from "./detailsDrawer";
 import Snackbar from "./Snackbar.vue";
 
 const isLoggedIn = computed(() => sessionStore.doesSessionExist);
+const confirmationMessage = computed(() => logStore.confirmation);
 </script>

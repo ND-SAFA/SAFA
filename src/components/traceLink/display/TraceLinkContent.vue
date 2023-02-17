@@ -19,7 +19,7 @@
       </v-card-actions>
     </panel-card>
     <flex-box justify="center" b="4">
-      <icon size="large" rotate="270" variant="trace" />
+      <icon size="lg" rotate="270" variant="trace" />
       <attribute-chip
         v-if="!!score"
         style="width: 200px"

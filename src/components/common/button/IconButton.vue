@@ -1,29 +1,25 @@
 <template>
-  <v-tooltip bottom z-index="10000">
-    <template #activator="{ props }">
-      <v-btn
-        v-bind="props"
-        :color="color"
-        :icon="!fab"
-        :fab="fab"
-        :class="isDisabled ? 'disable-events' : ''"
-        :small="small"
-        :large="large"
-        :hidden="isHidden"
-        :data-cy="dataCy"
-        variant="text"
-        @click="emit('click')"
-      >
-        <icon
-          :id="iconId"
-          :style="iconStyle"
-          :variant="iconVariant"
-          :rotate="rotate"
-        />
-      </v-btn>
-    </template>
-    <span>{{ tooltip }}</span>
-  </v-tooltip>
+  <q-btn
+    :color="color"
+    :fab="fab"
+    :class="isDisabled ? 'disable-events' : ''"
+    :size="size"
+    :hidden="isHidden"
+    :data-cy="dataCy"
+    flat
+    :round="!fab"
+    @click="emit('click')"
+  >
+    <icon
+      :id="iconId"
+      :style="iconStyle"
+      :variant="iconVariant"
+      :rotate="rotate"
+    />
+    <q-tooltip>
+      {{ tooltip }}
+    </q-tooltip>
+  </q-btn>
 </template>
 
 <script lang="ts">
@@ -60,4 +56,14 @@ const emit = defineEmits<{
 }>();
 
 const isDisabled = computed(() => props.isDisabled || false);
+
+const size = computed(() => {
+  if (props.small) {
+    return "sm";
+  } else if (props.large) {
+    return "lg";
+  } else {
+    return "";
+  }
+});
 </script>

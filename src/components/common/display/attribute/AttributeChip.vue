@@ -19,7 +19,7 @@
           v-if="iconId || iconVariant"
           :id="iconId"
           :variant="iconVariant"
-          size="small"
+          size="sm"
           :color="artifactType ? 'primary' : ''"
         />
         <typography

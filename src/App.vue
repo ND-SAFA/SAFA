@@ -1,12 +1,12 @@
 <template>
   <q-layout>
+    <app-nav />
     <q-page-container>
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
         </keep-alive>
       </router-view>
-      <app-nav />
     </q-page-container>
   </q-layout>
 </template>

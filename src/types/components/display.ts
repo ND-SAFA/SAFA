@@ -67,7 +67,7 @@ export type AlignType = "start" | "center" | "end";
 /**
  * The methods of justifying.
  */
-export type JustifyType = AlignType | "space-between" | "space-around";
+export type JustifyType = AlignType | "between" | "around";
 
 /**
  * The possible increments for spacing.

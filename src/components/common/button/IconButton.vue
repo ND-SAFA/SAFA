@@ -1,22 +1,22 @@
 <template>
   <q-btn
-    :color="color"
-    :fab="fab"
-    :class="isDisabled ? 'disable-events' : ''"
+    :color="props.color"
+    :fab="props.fab"
+    :class="props.isDisabled ? 'disable-events' : ''"
     :size="size"
-    :hidden="isHidden"
-    :data-cy="dataCy"
+    :hidden="props.isHidden"
+    :data-cy="props.dataCy"
     flat
-    :round="!fab"
+    :round="!props.fab"
     @click="emit('click')"
   >
     <icon
-      :id="iconId"
-      :style="iconStyle"
-      :variant="iconVariant"
-      :rotate="rotate"
+      :id="props.iconId"
+      :style="props.iconStyle"
+      :variant="props.iconVariant"
+      :rotate="props.rotate"
     />
-    <q-tooltip>
+    <q-tooltip delay="200">
       {{ tooltip }}
     </q-tooltip>
   </q-btn>

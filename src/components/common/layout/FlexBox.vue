@@ -49,20 +49,38 @@ const style = computed(() =>
   props.maxWidth ? `max-width: ${props.maxWidth}px` : ""
 );
 
+const convertMargin = (value: SizeType) => {
+  switch (value) {
+    case "":
+      return "none";
+    case "1":
+      return "xs";
+    case "2":
+      return "sm";
+    case "3":
+      return "md";
+    case "4":
+      return "lg";
+    case "5":
+    default:
+      return "xl";
+  }
+};
+
 const className = computed(() => {
   let classNames = `flex `;
 
   if (props.align) classNames += ` align-${props.align}`;
   if (props.justify) classNames += ` justify-${props.justify}`;
-  if (props.fullWidth) classNames += ` full-width`;
+  if (props.fullWidth) classNames += ` fill-width`;
   if (props.column) classNames += ` column`;
   if (props.wrap) classNames += ` wrap`;
-  if (props.x) classNames += ` q-mx-${props.x}`;
-  if (props.l) classNames += ` q-ml-${props.l}`;
-  if (props.r) classNames += ` q-mr-${props.r}`;
-  if (props.y) classNames += ` q-my-${props.y}`;
-  if (props.t) classNames += ` q-mt-${props.t}`;
-  if (props.b) classNames += ` q-mb-${props.b}`;
+  if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
+  if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
+  if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
+  if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
+  if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
+  if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
 
   return classNames;
 });

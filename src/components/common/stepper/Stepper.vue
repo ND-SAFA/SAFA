@@ -6,7 +6,7 @@
   >
     <v-stepper
       v-model="currentStep"
-      class="full-width transparent-bg"
+      class="full-width bg-transparent"
       :alt-labels="!minimal"
       :elevation="minimal ? 0 : 1"
     >

@@ -50,8 +50,8 @@ export const lightPalette: Record<string, string> = {
 
   info: ThemeColors.primary,
   warning: ThemeColors.warning,
-  error: ThemeColors.error,
-  success: ThemeColors.added,
+  negative: ThemeColors.error,
+  positive: ThemeColors.added,
 
   text: ThemeColors.textLight,
   neutral: ThemeColors.white,
@@ -73,8 +73,8 @@ export const darkPalette: Record<string, string> = {
 
   info: ThemeColors.primary,
   warning: ThemeColors.warning,
-  error: ThemeColors.error,
-  success: ThemeColors.added,
+  negative: ThemeColors.error,
+  positive: ThemeColors.added,
 
   text: ThemeColors.textDark,
   neutral: ThemeColors.black,

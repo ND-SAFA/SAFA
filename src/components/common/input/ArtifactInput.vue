@@ -32,7 +32,7 @@
         v-if="index < 3"
         close
         small
-        class="primary-border neutral-bg"
+        class="bd-primary"
         @click:close="handleDelete(item)"
       >
         <typography :value="item.name" />

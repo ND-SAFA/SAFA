@@ -1,16 +1,15 @@
 <template>
-  <q-drawer show-if-above :mini="!sidebarOpen">
+  <q-drawer persistent :model-value="true" elevated :mini="!sidebarOpen">
     <flex-box
       v-if="sidebarOpen"
       full-width
-      justify="center"
+      justify="between"
       align="center"
-      t="3"
-      b="3"
+      x="3"
+      y="3"
     >
-      <safa-icon style="width: 180px !important" />
+      <safa-icon style="width: 200px !important" />
       <icon-button
-        large
         icon-variant="nav-toggle"
         tooltip="Close sidebar"
         :color="darkMode ? 'secondary' : 'primary'"
@@ -20,7 +19,6 @@
     </flex-box>
     <flex-box v-else justify="center" full-width t="2">
       <icon-button
-        large
         icon-variant="nav-toggle"
         tooltip="Open sidebar"
         color="primary"
@@ -30,10 +28,8 @@
       />
     </flex-box>
 
-    <q-scroll-area class="fit">
-      <nav-options />
-      <nav-account />
-    </q-scroll-area>
+    <nav-options />
+    <nav-account />
   </q-drawer>
 </template>
 

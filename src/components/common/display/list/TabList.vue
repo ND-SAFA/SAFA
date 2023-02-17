@@ -2,8 +2,8 @@
   <div>
     <flex-box class="width-fit" align="center">
       <slot name="before" />
-      <v-tabs v-model="model" class="transparent-bg">
-        <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
+      <v-tabs v-model="model" class="bg-transparent">
+        <v-tab v-for="{ name } in tabs" :key="name" class="bg-transparent">
           <typography :value="name" />
         </v-tab>
       </v-tabs>

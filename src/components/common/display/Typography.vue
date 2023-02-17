@@ -10,14 +10,9 @@
     >
       {{ value }}
     </div>
-    <v-btn
-      text
-      small
-      class="text--secondary"
-      @click.stop="isExpanded = !isExpanded"
-    >
+    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
-    </v-btn>
+    </q-btn>
   </div>
   <div v-else-if="variant === 'code'" style="width: 100%">
     <pre v-if="isExpanded" :class="className">{{ value }}</pre>
@@ -28,16 +23,10 @@
     >
       {{ value }}
     </div>
-    <v-btn
-      text
-      small
-      class="text--secondary"
-      @click.stop="isExpanded = !isExpanded"
-    >
+    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
-    </v-btn>
+    </q-btn>
   </div>
-  <!--  <pre v-else-if="variant === 'code'" :class="className">{{ value }}</pre>-->
   <span v-else-if="el === 'span'" :class="className">
     {{ value }}
   </span>
@@ -118,6 +107,24 @@ const isExpanded = ref(
 
 const isExpandable = computed(() => props.variant === "expandable");
 
+const convertMargin = (value: SizeType) => {
+  switch (value) {
+    case "":
+      return "none";
+    case "1":
+      return "xs";
+    case "2":
+      return "sm";
+    case "3":
+      return "md";
+    case "4":
+      return "lg";
+    case "5":
+    default:
+      return "xl";
+  }
+};
+
 const className = computed(() => {
   let classNames = ` text-${props.align}`;
 
@@ -128,12 +135,12 @@ const className = computed(() => {
   if (props.ellipsis) classNames += ` text-ellipsis`;
   if (props.secondary) classNames += ` text-secondary`;
   if (props.bold) classNames += ` font-weight-bold`;
-  if (props.x) classNames += ` q-mx-${props.x}`;
-  if (props.l) classNames += ` q-ml-${props.l}`;
-  if (props.r) classNames += ` q-mr-${props.r}`;
-  if (props.y) classNames += ` q-my-${props.y}`;
-  if (props.t) classNames += ` q-mt-${props.t}`;
-  if (props.b) classNames += ` q-mb-${props.b}`;
+  if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
+  if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
+  if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
+  if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
+  if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
+  if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
   if (props.wrap) classNames += " text-wrap";
 
   switch (props.variant) {

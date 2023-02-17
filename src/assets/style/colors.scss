@@ -1,3 +1,9 @@
+$color-primary: var(--q-primary);
+$color-secondary: var(--q-secondary);
+$color-positive: var(--q-positive);
+$color-negative: var(--q-negative);
+$color-warning: var(--q-warning);
+
 $color-accent: #FFD592;
 
 $background: rgb(var(--v-theme-background));
@@ -9,14 +15,26 @@ $primary: rgb(var(--v-theme-primary));
 $modifiedLight: rgb(var(--v-theme-modifiedLight));
 $removedLight: rgb(var(--v-theme-removedLight));
 
-.primary-border {
-  border: 1px solid $modifiedLight !important;
-}
-
-.error-border {
-  border-color: $removedLight !important;
-}
-
-.transparent-bg {
+.bg-transparent {
   background-color: transparent !important;
+}
+
+.bd-primary {
+  border: 1px solid $color-primary !important;
+}
+
+.bd-secondary {
+  border: 1px solid $color-secondary !important;
+}
+
+.bd-positive {
+  border: 1px solid $color-positive !important;
+}
+
+.bd-negative {
+  border: 1px solid $color-negative !important;
+}
+
+.bd-warning {
+  border: 1px solid $color-warning !important;
 }

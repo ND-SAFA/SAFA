@@ -1,10 +1,10 @@
 <template>
-  <v-app-bar clipped-right :color="darkMode ? '' : 'primary'">
-    <header-bar />
-    <template v-if="graphVisible" #extension>
-      <graph-bar />
-    </template>
-  </v-app-bar>
+  <q-header elevated :class="darkMode ? '' : 'bg-primary'">
+    <q-toolbar>
+      <header-bar />
+      <graph-bar v-if="graphVisible" />
+    </q-toolbar>
+  </q-header>
 </template>
 
 <script lang="ts">

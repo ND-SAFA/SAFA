@@ -3,6 +3,7 @@
     <template v-for="option in options" :key="option.label">
       <q-separator v-if="option.divider" />
       <q-item
+        v-ripple
         clickable
         :to="option.path"
         color="primary"

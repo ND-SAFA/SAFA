@@ -4,7 +4,7 @@
       v-for="(matrix, idx) in model"
       :key="idx"
       outlined
-      class="my-2 pa-2 primary-border"
+      class="my-2 pa-2 bd-primary"
     >
       <flex-box full-width align="center">
         <flex-box column full-width>

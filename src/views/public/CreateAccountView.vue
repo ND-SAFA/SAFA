@@ -5,7 +5,6 @@
         align="center"
         variant="title"
         el="h1"
-        class="mb-3"
         value="Welcome to SAFA!"
       />
 
@@ -20,10 +19,7 @@
           :error-message="isError && 'Unable to create an account'"
           data-cy="input-new-email"
         />
-        <password-input
-          v-model="password"
-          data-cy="input-new-password"
-        />
+        <password-input v-model="password" data-cy="input-new-password" />
       </div>
 
       <typography
@@ -45,13 +41,13 @@
         Create Account
       </text-button>
 
-      <span class="ml-auto text-right text-body-1">
+      <span class="q-ml-auto text-right">
         <typography value="Already have an account?" />
 
         <text-button
           text
           small
-          class="px-1"
+          class="q-px-sm"
           color="primary"
           data-cy="button-create-account-login"
           @click="handleLogin"

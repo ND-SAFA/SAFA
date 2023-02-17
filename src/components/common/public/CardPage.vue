@@ -1,21 +1,17 @@
 <template>
-  <v-main :class="className">
-    <v-container class="fill-height">
-      <v-card rounded elevation="2" class="mx-auto py-4 px-6" width="30em">
-        <v-card-title class="mx-auto width-max my-2">
+  <q-page :class="className">
+    <q-card flat bordered style="width: 30em" class="q-pa-sm">
+      <q-card-section class="q-pb-none">
+        <div class="q-mx-auto width-max q-mb-md">
           <safa-icon style="width: 14em" />
-        </v-card-title>
-
-        <v-form class="px-2">
-          <slot name="form" />
-        </v-form>
-
-        <v-card-actions>
-          <slot name="actions" />
-        </v-card-actions>
-      </v-card>
-    </v-container>
-  </v-main>
+        </div>
+        <slot name="form" />
+      </q-card-section>
+      <q-card-actions class="q-px-md">
+        <slot name="actions" />
+      </q-card-actions>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts">
@@ -35,6 +31,8 @@ import { SafaIcon } from "@/components/common/display";
 
 const { darkMode } = useTheme();
 const className = computed(() =>
-  darkMode.value ? "bg-neutral fill-height" : "bg-primary fill-height"
+  darkMode.value
+    ? "bg-neutral full-height row items-center justify-center"
+    : "bg-primary full-height row items-center justify-center"
 );
 </script>

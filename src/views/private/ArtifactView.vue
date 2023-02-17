@@ -3,7 +3,12 @@
     <project-tree />
     <artifact-fab />
 
-    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="my-4 mx-10">
+    <tab-list
+      v-if="isTableMode"
+      v-model="tab"
+      :tabs="tabs"
+      class="q-my-4 q-mx-10"
+    >
       <v-window-item key="1">
         <artifact-table />
       </v-window-item>

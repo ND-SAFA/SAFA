@@ -20,7 +20,7 @@
             />
           </v-card-title>
           <v-card-subtitle>
-            <v-divider class="mb-2" />
+            <v-divider class="q-mb-2" />
             <typography
               variant="small"
               value="Select an existing project and version to load."
@@ -43,7 +43,7 @@
             />
           </v-card-title>
           <v-card-subtitle>
-            <v-divider class="mb-2" />
+            <v-divider class="q-mb-2" />
             <typography
               wrap
               variant="small"
@@ -51,7 +51,7 @@
             />
           </v-card-subtitle>
           <v-card-text>
-            <div class="mx-auto width-min">
+            <div class="q-mx-auto width-min">
               <text-button text icon-variant="add" @click="handleOpenStandard">
                 Create New Project
               </text-button>

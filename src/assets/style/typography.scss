@@ -3,9 +3,8 @@
 $heading-font-family: "Source Sans Pro";
 $body-font-family: "Source Sans Pro";
 
-.v-application {
+#app {
   [class*="text-"] {
-    //color: $text;
     font-family: $body-font-family, sans-serif !important;
   }
   font-family: $body-font-family, sans-serif !important;

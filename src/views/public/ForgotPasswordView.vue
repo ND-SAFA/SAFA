@@ -5,7 +5,6 @@
         align="center"
         variant="title"
         el="h1"
-        class="mb-3"
         value="Forgot Password"
       />
 
@@ -42,14 +41,8 @@
         Reset Password
       </text-button>
 
-      <span class="ml-auto">
-        <text-button
-          text
-          small
-          class="px-1"
-          color="primary"
-          @click="handleLogin"
-        >
+      <span class="q-ml-auto">
+        <text-button text small color="primary" @click="handleLogin">
           Back To Login
         </text-button>
       </span>

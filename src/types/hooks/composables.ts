@@ -1,4 +1,4 @@
-import { ComputedRef } from "vue";
+import { WritableComputedRef } from "vue";
 
 /**
  * Defines a hook for using the app theme.
@@ -11,7 +11,7 @@ export interface ThemeHook<Theme> {
   /**
    * Whether the app is in dark mode.
    */
-  darkMode: ComputedRef<boolean>;
+  darkMode: WritableComputedRef<boolean>;
   /**
    * Toggles whether the theme is in dark mode.
    */

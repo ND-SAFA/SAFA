@@ -128,12 +128,12 @@ const className = computed(() => {
   if (props.ellipsis) classNames += ` text-ellipsis`;
   if (props.secondary) classNames += ` text-secondary`;
   if (props.bold) classNames += ` font-weight-bold`;
-  if (props.x) classNames += ` mx-${props.x}`;
-  if (props.l) classNames += ` ml-${props.l}`;
-  if (props.r) classNames += ` mr-${props.r}`;
-  if (props.y) classNames += ` my-${props.y}`;
-  if (props.t) classNames += ` mt-${props.t}`;
-  if (props.b) classNames += ` mb-${props.b}`;
+  if (props.x) classNames += ` q-mx-${props.x}`;
+  if (props.l) classNames += ` q-ml-${props.l}`;
+  if (props.r) classNames += ` q-mr-${props.r}`;
+  if (props.y) classNames += ` q-my-${props.y}`;
+  if (props.t) classNames += ` q-mt-${props.t}`;
+  if (props.b) classNames += ` q-mb-${props.b}`;
   if (props.wrap) classNames += " text-wrap";
 
   switch (props.variant) {
@@ -144,13 +144,13 @@ const className = computed(() => {
     case "subtitle":
       return "text-h5" + classNames;
     case "small":
-      return "text-subtitle-2" + classNames;
+      return "text-subtitle2" + classNames;
     case "caption":
-      return "text-caption text--secondary" + classNames;
+      return "text-caption" + classNames;
     case "code":
-      return "text-body-1 overflow-y-auto" + classNames;
+      return "text-body1 overflow-y-auto" + classNames;
     default:
-      return "text-body-1" + classNames;
+      return "text-body1" + classNames;
   }
 });
 </script>

@@ -14,7 +14,7 @@
     <template #actions>
       <text-button
         color="primary"
-        width="8em"
+        style="width: 8em"
         :disabled="password.length === 0"
         :loading="isLoading"
         data-cy="button-login"
@@ -23,29 +23,23 @@
         Login
       </text-button>
 
-      <div class="ml-auto text-right">
-        <span>
+      <div class="q-ml-auto text-right">
+        <div>
           <typography value="Dont have an account yet?" />
 
           <text-button
             text
             small
-            class="px-1"
+            class="q-pl-sm"
             color="primary"
             data-cy="button-create-account-redirect"
             @click="handleSignUp"
           >
             Sign Up
           </text-button>
-        </span>
+        </div>
 
-        <text-button
-          text
-          small
-          class="px-1"
-          color="primary"
-          @click="handleForgotPassword"
-        >
+        <text-button text small color="primary" @click="handleForgotPassword">
           Forgot Password
         </text-button>
       </div>

@@ -1,14 +1,14 @@
 <template>
-  <v-app>
-    <v-main class="primary-bg">
+  <q-layout>
+    <q-page-container>
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
         </keep-alive>
       </router-view>
-    </v-main>
-    <app-nav />
-  </v-app>
+      <app-nav />
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script lang="ts">

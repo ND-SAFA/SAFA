@@ -2,10 +2,10 @@
   <q-input
     v-model="model"
     filled
-    :label="label"
+    :label="props.label"
     :type="showPassword ? 'text' : 'password'"
     data-cy="input-password"
-    :error-message="errorMessage || ''"
+    :error-message="props.errorMessage || ''"
     :error="showError"
     @keydown.enter="emit('enter')"
   >

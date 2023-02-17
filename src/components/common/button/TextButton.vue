@@ -1,21 +1,20 @@
 <template>
   <q-btn
-    :disable="disabled"
+    :disable="props.disabled"
     :size="buttonSize"
-    :outline="outlined"
-    :flat="text"
-    :loading="loading"
+    :outline="props.outlined"
+    :flat="props.text"
+    :loading="props.loading"
     :color="buttonColor"
-    :text-color="textColor"
     :value="value"
     :class="buttonClassName"
-    :data-cy="dataCy"
+    :data-cy="props.dataCy"
     @click="emit('click')"
   >
     <icon
-      v-if="iconId || iconVariant"
-      :id="iconId"
-      :variant="iconVariant"
+      v-if="props.iconId || props.iconVariant"
+      :id="props.iconId"
+      :variant="props.iconVariant"
       class="mr-1"
     />
     <slot />
@@ -70,10 +69,6 @@ const buttonColor = computed(() => {
       return props.color;
   }
 });
-
-const textColor = computed(() =>
-  props.color === "primary" ? "white" : "black"
-);
 
 const buttonClassName = computed(() => {
   let classNames = props.class || "";

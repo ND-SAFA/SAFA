@@ -1,20 +1,33 @@
 import { computed } from "vue";
-import { useTheme as useVuetifyTheme, ThemeInstance } from "vuetify";
+import { setCssVar, useQuasar } from "quasar";
 import { LocalStorageKeys, ThemeHook } from "@/types";
+import { darkPalette, lightPalette } from "@/util";
 
-export function useTheme(): ThemeHook<ThemeInstance> {
-  const theme = useVuetifyTheme();
-  const darkMode = computed(() => theme.global.current.value.dark);
+export function useTheme(): ThemeHook<ReturnType<typeof useQuasar>> {
+  const $q = useQuasar();
+  const darkMode = computed({
+    get: () => $q.dark.isActive,
+    set: (dark) => $q.dark.set(dark),
+  });
+
+  function setTheme(): void {
+    const theme = darkMode.value ? darkPalette : lightPalette;
+
+    Object.entries(theme).forEach(([key, color]) => {
+      setCssVar(key, color);
+    });
+  }
 
   function toggleDarkMode(): void {
-    const mode = theme.global.current.value.dark ? "light" : "dark";
+    const mode = !darkMode.value;
 
-    theme.global.name.value = mode;
-    localStorage.setItem(LocalStorageKeys.darkMode, mode);
+    darkMode.value = mode;
+    localStorage.setItem(LocalStorageKeys.darkMode, String(mode));
+    setTheme();
   }
 
   return {
-    theme,
+    theme: $q,
     darkMode,
     toggleDarkMode,
   };

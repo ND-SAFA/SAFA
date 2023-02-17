@@ -41,6 +41,52 @@ export enum ThemeColors {
 }
 
 /**
+ * The colors used in light mode.
+ */
+export const lightPalette: Record<string, string> = {
+  primary: ThemeColors.primary,
+  secondary: ThemeColors.secondary,
+  accent: ThemeColors.accent,
+
+  info: ThemeColors.primary,
+  warning: ThemeColors.warning,
+  error: ThemeColors.error,
+  success: ThemeColors.added,
+
+  text: ThemeColors.textLight,
+  neutral: ThemeColors.white,
+  background: ThemeColors.backgroundLight,
+  selected: ThemeColors.selectedLight,
+
+  addedLight: ThemeColors.addedLight,
+  modifiedLight: ThemeColors.modifiedLight,
+  removedLight: ThemeColors.removedLight,
+};
+
+/**
+ * The colors used in dark mode.
+ */
+export const darkPalette: Record<string, string> = {
+  primary: ThemeColors.primaryDark,
+  secondary: ThemeColors.secondary,
+  accent: ThemeColors.accent,
+
+  info: ThemeColors.primary,
+  warning: ThemeColors.warning,
+  error: ThemeColors.error,
+  success: ThemeColors.added,
+
+  text: ThemeColors.textDark,
+  neutral: ThemeColors.black,
+  background: ThemeColors.backgroundDark,
+  selected: ThemeColors.selectedDark,
+
+  addedLight: ThemeColors.addedLight,
+  modifiedLight: ThemeColors.modifiedLight,
+  removedLight: ThemeColors.removedLight,
+};
+
+/**
  * Returns the background color for the given state.
  * @param state - The state to get the color for.
  * @param dark - Whether the app is in dark mode.

@@ -8,31 +8,35 @@
       :value="projectName"
       x="4"
     />
-    <v-select
+    <q-select
       v-if="isProjectDefined"
-      variant="outlined"
-      hide-details
-      density="compact"
+      v-model="version"
+      dense
+      outlined
+      dark
+      :options-dark="false"
       label="Version"
-      :value="version"
-      :items="versions"
-      item-value="versionId"
+      :options="versions"
+      option-value="versionId"
       style="width: 120px"
       class="nav-input"
-      @input="handleLoadVersion"
     >
-      <template #selection>
+      <template #selected>
         {{ versionToString(version) }}
       </template>
-      <template #item="{ item }">
-        {{ versionToString(item) }}
+      <template #option="{ opt, itemProps }">
+        <q-item v-bind="itemProps">
+          <q-item-section>
+            <typography :value="versionToString(opt)" />
+          </q-item-section>
+        </q-item>
       </template>
-      <template #append-item>
+      <template #after-options>
         <text-button text variant="add" @click="openCreateVersion = true">
           Add Version
         </text-button>
       </template>
-    </v-select>
+    </q-select>
 
     <version-creator
       :is-open="openCreateVersion"
@@ -65,11 +69,19 @@ const versions = ref<VersionSchema[]>([]);
 const openCreateVersion = ref(false);
 
 const project = computed(() => projectStore.project);
-const version = computed(() => projectStore.version);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);
 const projectName = computed(() =>
   isProjectDefined.value ? project.value.name : "No Project Selected"
 );
+
+const version = computed({
+  get: () => projectStore.version,
+  set(version: VersionSchema | undefined) {
+    if (!version) return;
+
+    handleLoadVersion(version.versionId);
+  },
+});
 
 /**
  * Loads the versions of the current project.

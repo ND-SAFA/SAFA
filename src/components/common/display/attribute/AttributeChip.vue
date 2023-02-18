@@ -1,50 +1,47 @@
 <template>
-  <v-tooltip
-    v-if="!confidenceScore"
-    bottom
-    z-index="12"
-    :disabled="text.length < 10"
+  <q-chip
+    v-if="!props.confidenceScore"
+    :class="chipClassName"
+    :outline="enumerated"
+    :color="displayColor"
+    :data-cy="props.dataCy"
+    style="max-width: 200px"
+    class="bg-white"
   >
-    <template #activator="{ props }">
-      <v-chip
-        v-bind="props"
-        small
-        style="max-width: 200px"
-        :class="chipBlassName"
-        :outlined="outlined"
-        :color="displayColor"
-        :data-cy="dataCy"
-      >
-        <icon
-          v-if="iconId || iconVariant"
-          :id="iconId"
-          :variant="iconVariant"
-          size="sm"
-          :color="artifactType ? 'primary' : ''"
-        />
-        <typography
-          ellipsis
-          inherit-color
-          :l="iconId ? '1' : '0'"
-          :value="text"
-        />
-      </v-chip>
-    </template>
-    <span>{{ text }}</span>
-  </v-tooltip>
+    <q-tooltip :hidden="text.length < 10">
+      {{ text }}
+    </q-tooltip>
+    <icon
+      v-if="iconId || props.iconVariant"
+      :id="iconId"
+      :variant="props.iconVariant"
+      size="sm"
+      :color="props.artifactType ? 'primary' : ''"
+    />
+    <typography ellipsis inherit-color :l="iconId ? '1' : '0'" :value="text" />
+  </q-chip>
   <flex-box v-else align="center">
-    <v-progress-linear
+    <q-linear-progress
+      rounded
       :value="progress"
       :color="displayColor"
-      height="20"
-      rounded
+      size="md"
     />
     <typography l="2" :value="progress + '%'" style="width: 50px" />
   </flex-box>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * Displays a generic chip that can render specific attributes.
+ */
+export default {
+  name: "AttributeChip",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, defineProps } from "vue";
 import { ApprovalType, IconVariant } from "@/types";
 import {
   camelcaseToDisplay,
@@ -57,92 +54,58 @@ import { FlexBox } from "@/components/common/layout";
 import Icon from "@/components/common/display/icon/Icon.vue";
 import Typography from "../Typography.vue";
 
-/**
- * Displays a generic chip that can render specific attributes.
- */
-export default defineComponent({
-  name: "AttributeChip",
-  components: { Icon, FlexBox, Typography },
-  props: {
-    value: {
-      type: String,
-      required: true,
-    },
-    format: Boolean,
-    icon: String,
-    iconVariant: String as PropType<IconVariant>,
-    artifactType: Boolean,
-    confidenceScore: Boolean,
-    dataCy: String,
-    color: String,
-  },
-  computed: {
-    /**
-     * @return Whether the value of this chip is enumerated.
-     */
-    enumerated(): boolean {
-      return this.value in ApprovalType;
-    },
-    /**
-     * @return The text of the chip.
-     */
-    text(): string {
-      if (this.confidenceScore) {
-        return this.value.slice(0, 4);
-      } else if (this.enumerated || this.value === this.value?.toUpperCase()) {
-        return uppercaseToDisplay(this.value || "");
-      } else if (this.format) {
-        return camelcaseToDisplay(this.value || "");
-      } else if (this.artifactType) {
-        return typeOptionsStore.getArtifactTypeDisplay(this.value || "");
-      } else {
-        return this.value || "";
-      }
-    },
-    /**
-     * @return The icon to display on this chip.
-     */
-    iconId(): string {
-      return this.artifactType
-        ? typeOptionsStore.getArtifactTypeIcon(this.value || "")
-        : this.icon || "";
-    },
-    /**
-     * @return The color to display for this chip.
-     */
-    displayColor(): string {
-      const { darkMode } = useTheme();
+const props = defineProps<{
+  value: string;
+  format?: boolean;
+  icon?: string;
+  iconVariant?: IconVariant;
+  artifactType?: boolean;
+  confidenceScore?: boolean;
+  dataCy?: string;
+  color?: string;
+}>();
 
-      if (this.color) {
-        return this.color;
-      } else if (this.confidenceScore) {
-        return getScoreColor(this.value || "");
-      } else if (this.enumerated) {
-        return getBackgroundColor(this.value || "", darkMode.value);
-      } else {
-        return "";
-      }
-    },
-    /**
-     * @return Whether the chip is outlined.
-     */
-    outlined(): boolean {
-      return this.enumerated;
-    },
-    /**
-     * @return Whether chip's class name
-     */
-    chipBlassName(): string {
-      return this.enumerated ? "mr-1 " : "mr-1 primary-border neutral-bg";
-    },
-    /**
-     * @return Thee current progress %.
-     */
-    progress(): number {
-      return Math.min(Math.ceil(parseFloat(this.text) * 100), 100);
-    },
-  },
+const { darkMode } = useTheme();
+
+const enumerated = computed(() => props.value in ApprovalType);
+
+const text = computed(() => {
+  if (props.confidenceScore) {
+    return props.value.slice(0, 4);
+  } else if (enumerated.value || props.value === props.value?.toUpperCase()) {
+    return uppercaseToDisplay(props.value || "");
+  } else if (props.format) {
+    return camelcaseToDisplay(props.value || "");
+  } else if (props.artifactType) {
+    return typeOptionsStore.getArtifactTypeDisplay(props.value);
+  } else {
+    return props.value;
+  }
 });
-</script>
 
-<style scoped></style>
+const progress = computed(() =>
+  Math.min(Math.ceil(parseFloat(text.value) * 100), 100)
+);
+
+const iconId = computed(() =>
+  props.artifactType
+    ? typeOptionsStore.getArtifactTypeIcon(props.value)
+    : props.icon || ""
+);
+
+const displayColor = computed(() => {
+  if (props.color) {
+    return props.color;
+  } else if (props.confidenceScore) {
+    return getScoreColor(props.value);
+  } else if (enumerated.value) {
+    return getBackgroundColor(props.value, darkMode.value);
+  } else {
+    return "";
+  }
+});
+
+const chipClassName = computed(() =>
+  enumerated.value ? "q-mr-sm" : "qmr-sm bd-primary bg-neutral"
+);
+</script>

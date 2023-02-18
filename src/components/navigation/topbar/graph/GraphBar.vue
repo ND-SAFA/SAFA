@@ -1,12 +1,12 @@
 <template>
-  <flex-box full-width justify="space-between" align="center" r="1">
+  <flex-box full-width justify="between" align="center" y="1">
     <flex-box align="center">
       <document-selector />
       <mode-buttons />
     </flex-box>
     <flex-box align="center">
       <graph-buttons />
-      <v-divider inset vertical class="text-accent mx-1 mb-2" />
+      <q-separator vertical inset color="accent" class="faded q-mx-sm" />
       <commit-buttons />
     </flex-box>
   </flex-box>

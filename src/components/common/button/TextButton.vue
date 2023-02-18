@@ -6,16 +6,15 @@
     :flat="props.text"
     :loading="props.loading"
     :color="buttonColor"
-    :value="value"
     :class="buttonClassName"
     :data-cy="props.dataCy"
     @click="emit('click')"
   >
     <icon
-      v-if="props.iconId || props.iconVariant"
+      v-if="props.iconId || props.variant"
       :id="props.iconId"
-      :variant="props.iconVariant"
-      class="mr-1"
+      :variant="props.variant"
+      class="q-mr-sm"
     />
     <slot />
   </q-btn>
@@ -45,12 +44,10 @@ const props = defineProps<{
   loading?: boolean;
   color?: string;
   iconId?: string;
-  iconVariant?: IconVariant;
-  value?: string;
   y?: string;
   x?: string;
   class?: string;
-  variant?: "add" | "edit" | "save" | "delete" | "cancel" | "artifact";
+  variant?: IconVariant;
   dataCy?: string;
 }>();
 

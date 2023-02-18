@@ -133,7 +133,7 @@ const className = computed(() => {
   if (props.inheritColor) classNames += ` inherit-color`;
   if (props.error) classNames += ` text-error`;
   if (props.ellipsis) classNames += ` text-ellipsis`;
-  if (props.secondary) classNames += ` text-secondary`;
+  if (props.secondary) classNames += ` text-grey`;
   if (props.bold) classNames += ` font-weight-bold`;
   if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
   if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;

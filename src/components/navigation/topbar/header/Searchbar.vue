@@ -1,44 +1,44 @@
 <template>
-  <v-form style="min-width: 200px; width: 30vw">
-    <v-autocomplete
-      v-model="value"
-      v-model:search-input="queryText"
-      variant="outlined"
-      density="compact"
-      hide-details
-      clearable
-      label="Search Artifacts"
-      color="accent"
-      :items="artifacts"
-      item-text="name"
-      item-value="id"
-      class="mx-1 mt-1 nav-input"
-      :filter="filter"
-      data-cy="input-artifact-search-nav"
-    >
-      <template #prepend-inner>
-        <icon color="accent" variant="search" class="input-no-icon-rotate" />
-      </template>
-      <template #prepend-item>
-        <flex-box x="3">
-          <v-spacer />
-          <typography
-            align="end"
-            variant="caption"
-            :value="matchText"
-            data-cy="text-artifact-search-count"
-          />
-        </flex-box>
-      </template>
-      <template #item="{ item }">
-        <artifact-body-display
-          display-title
-          :artifact="item"
-          data-cy="text-artifact-search-item"
+  <q-select
+    v-model="value"
+    dense
+    outlined
+    use-input
+    clearable
+    dark
+    :options-dark="false"
+    label="Search Artifacts"
+    style="min-width: 200px; width: 30vw"
+    class="q-ma-sm nav-input"
+    data-cy="input-artifact-search-nav"
+    :options="options"
+    option-label="name"
+    option-value="id"
+    @filter="filterOptions"
+  >
+    <template #prepend>
+      <icon variant="search" />
+    </template>
+    <template #before-options>
+      <flex-box x="3" t="1" justify="end">
+        <typography
+          align="end"
+          variant="caption"
+          :value="matchText"
+          data-cy="text-artifact-search-count"
         />
-      </template>
-    </v-autocomplete>
-  </v-form>
+      </flex-box>
+    </template>
+    <template #option="{ opt, itemProps }">
+      <artifact-body-display
+        v-bind="itemProps"
+        clickable
+        display-title
+        :artifact="opt"
+        data-cy="text-artifact-search-item"
+      />
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -51,10 +51,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { ArtifactSearchItem } from "@/types";
-import { filterArtifacts, objectToArray } from "@/util";
-import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
+import { computed, ref, watch } from "vue";
+import { ArtifactSchema } from "@/types";
+import { filterArtifacts } from "@/util";
+import { artifactStore, selectionStore } from "@/hooks";
 import {
   ArtifactBodyDisplay,
   Typography,
@@ -62,53 +62,45 @@ import {
   Icon,
 } from "@/components/common";
 
-const queryText = ref<string | null>("");
-
-/**
- * Filters what artifacts are currently visible.
- * @param artifact - The artifact item to filter.
- * @param queryText - The current query text.
- */
-function filter(artifact: ArtifactSearchItem, queryText: string | null) {
-  if (!queryText) {
-    return true;
-  } else if ("header" in artifact || "divider" in artifact) {
-    return false;
-  } else {
-    return filterArtifacts(artifact, queryText);
-  }
-}
+const options = ref(artifactStore.currentArtifacts);
 
 /**
  * Returns the display text for how many matches there are.
  */
 const matchText = computed(() => {
-  if (!queryText.value) return "";
-
-  const count = artifactStore.currentArtifacts.filter((artifact) =>
-    filter(artifact, queryText.value || "")
-  ).length;
+  const count = options.value.length;
 
   return count === 1 ? "1 Match" : `${count} Matches`;
 });
 
-const artifacts = computed(() =>
-  objectToArray(artifactStore.getArtifactsByType, ([type, artifacts]) => [
-    { header: typeOptionsStore.getArtifactTypeDisplay(type) },
-    ...artifacts,
-  ])
-);
-
 const value = computed({
   get() {
-    return selectionStore.selectedArtifact?.id;
+    return selectionStore.selectedArtifact;
   },
-  set(artifactId: string | undefined) {
-    if (artifactId) {
-      selectionStore.viewArtifactSubtree(artifactId);
+  set(artifact: ArtifactSchema | undefined) {
+    if (artifact) {
+      selectionStore.viewArtifactSubtree(artifact.id);
     } else {
       selectionStore.clearSelections();
     }
   },
 });
+
+function filterOptions(search: string, update: (fn: () => void) => void) {
+  console.log(search);
+  if (search === "") {
+    update(() => (options.value = artifactStore.currentArtifacts));
+  } else {
+    update(() => {
+      options.value = artifactStore.currentArtifacts.filter((artifact) =>
+        filterArtifacts(artifact, search)
+      );
+    });
+  }
+}
+
+watch(
+  () => artifactStore.currentArtifacts,
+  (artifacts) => (options.value = artifacts)
+);
 </script>

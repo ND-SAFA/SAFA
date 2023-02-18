@@ -75,6 +75,7 @@ const className = computed(() => {
   if (props.fullWidth) classNames += ` fill-width`;
   if (props.column) classNames += ` column`;
   if (props.wrap) classNames += ` wrap`;
+  if (props.wrap === false) classNames += ` nowrap`;
   if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
   if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
   if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;

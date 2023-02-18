@@ -1,34 +1,33 @@
 <template>
-  <q-drawer bordered side="right" :model-value="drawerOpen" :width="width">
-    <q-scroll-area class="fit">
-      <div class="q-pa-sm full-height bg-background">
-        <flex-box justify="space-between" align="center">
-          <typography
-            color="primary"
-            el="h2"
-            variant="subtitle"
-            :value="title"
-          />
-          <icon-button
-            icon-variant="cancel"
-            tooltip="Close panel"
-            data-cy="button-close-details"
-            @click="handleClose"
-          />
-        </flex-box>
-        <v-divider />
-        <delta-panel />
-        <document-panel />
-        <artifact-panel />
-        <artifact-body-panel />
-        <save-artifact-panel />
-        <trace-link-panel />
-        <save-trace-link-panel />
-        <generate-trace-link-panel />
-        <artifact-level-panel />
-        <trace-matrix-panel />
-      </div>
-    </q-scroll-area>
+  <q-drawer
+    bordered
+    side="right"
+    :model-value="drawerOpen"
+    breakpoint="0"
+    :width="width"
+  >
+    <div class="q-pa-sm full-height bg-background">
+      <flex-box justify="between" align="center">
+        <typography color="primary" variant="subtitle" :value="title" />
+        <icon-button
+          icon-variant="cancel"
+          tooltip="Close panel"
+          data-cy="button-close-details"
+          @click="handleClose"
+        />
+      </flex-box>
+      <q-separator />
+      <delta-panel />
+      <document-panel />
+      <artifact-panel />
+      <artifact-body-panel />
+      <save-artifact-panel />
+      <trace-link-panel />
+      <save-trace-link-panel />
+      <generate-trace-link-panel />
+      <artifact-level-panel />
+      <trace-matrix-panel />
+    </div>
   </q-drawer>
 </template>
 

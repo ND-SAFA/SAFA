@@ -1,16 +1,14 @@
 <template>
   <div class="full-width">
-    <flex-box full-width justify="space-between" align="center">
-      <flex-box align="center">
-        <searchbar v-if="graphVisible" />
-      </flex-box>
+    <flex-box full-width :wrap="false" justify="between" align="center">
+      <searchbar v-if="graphVisible" />
       <flex-box align="center">
         <update-button />
         <saving-icon />
         <app-version />
       </flex-box>
     </flex-box>
-    <v-divider v-if="graphVisible" class="text-accent mt-2" />
+    <q-separator v-if="graphVisible" color="accent" class="faded" />
     <loading-bar />
   </div>
 </template>

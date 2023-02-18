@@ -1,119 +1,59 @@
 <template>
-  <v-dialog
-    :value="isOpen"
-    :width="`${width}px`"
-    :retain-focus="false"
-    persistent
-  >
-    <v-card :class="`modal-${size}`" :data-cy="dataCy">
-      <v-card-title class="primary">
+  <q-dialog :model-value="props.isOpen" @close="emit('close')">
+    <q-card>
+      <q-card-section>
         <flex-box
           full-width
-          justify="space-between"
+          justify="between"
           align="center"
           data-cy="modal-title"
         >
-          <typography :value="title" color="white" />
+          <typography :value="props.title" />
           <icon-button
             tooltip="Close"
             icon-variant="cancel"
-            color="white"
             data-cy="button-close"
             @click="$emit('close')"
           />
         </flex-box>
-      </v-card-title>
-
-      <v-card-text>
-        <slot name="body" />
-      </v-card-text>
-
-      <v-divider />
-
-      <v-progress-linear v-if="isLoading" indeterminate color="secondary" />
-
-      <v-card-actions
-        v-if="actionsHeight > 0"
-        dense
-        :style="`height: ${actionsHeight}px`"
-      >
+        <q-separator />
+        <q-linear-progress v-if="props.isLoading" indeterminate />
+      </q-card-section>
+      <q-card-section>
+        <slot />
+      </q-card-section>
+      <q-card-actions v-if="props.actions" align="right">
+        <q-separator />
         <slot name="actions" />
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ModalSize } from "@/types";
+/**
+ * Displays a generic modal.
+ */
+export default {
+  name: "Modal",
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits } from "vue";
 import { Typography } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
 
-/**
- * Displays a generic modal.
- *
- * @emits `close` - On close.
- */
-export default defineComponent({
-  name: "Modal",
-  components: {
-    FlexBox,
-    Typography,
-    IconButton,
-  },
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    actionsHeight: {
-      type: Number,
-      required: false,
-      default: 50,
-    },
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    size: {
-      type: String as PropType<ModalSize>,
-      required: false,
-      default: "m",
-    },
-    dataCy: String,
-  },
-  computed: {
-    /**
-     * @return The modal width.
-     */
-    width(): number {
-      switch (this.size) {
-        case "xxs":
-          return 250;
-        case "xs":
-          return 300;
-        case "s":
-          return 400;
-        case "m":
-          return 600;
-        case "l":
-          return 800;
-        default:
-          return 400;
-      }
-    },
-  },
-});
-</script>
+const props = defineProps<{
+  title: string;
+  isOpen: boolean;
+  isLoading?: boolean;
+  dataCy?: string;
+  actions?: boolean;
+}>();
 
-<style scoped>
-html {
-  overflow: hidden !important;
-}
-</style>
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+</script>

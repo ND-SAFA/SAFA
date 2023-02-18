@@ -1,52 +1,58 @@
 <template>
-  <v-list-item-content style="max-width: 500px">
-    <v-list-item-title v-if="!!displayTitle">
-      <flex-box align="center" justify="space-between">
-        <typography :value="artifact.name" />
-        <attribute-chip artifact-type :value="artifactType" />
-      </flex-box>
-      <v-divider v-if="!!displayDivider" class="mt-1" />
-    </v-list-item-title>
-    <v-list-item-subtitle>
-      <typography
-        secondary
-        variant="expandable"
-        :value="artifact.body"
-        :default-expanded="!!displayDivider && !!displayTitle"
-      />
-    </v-list-item-subtitle>
-  </v-list-item-content>
+  <q-item
+    :clickable="props.clickable"
+    style="max-width: 500px"
+    @click="emit('click')"
+  >
+    <q-item-section>
+      <q-item-label>
+        <flex-box align="center" justify="between">
+          <typography :value="props.artifact.name" />
+          <attribute-chip artifact-type :value="artifactType" />
+        </flex-box>
+        <q-separator v-if="!!props.displayDivider" class="q-mt-sm" />
+      </q-item-label>
+      <q-item-label caption>
+        <typography
+          secondary
+          variant="expandable"
+          :value="props.artifact.body"
+          :default-expanded="!!props.displayDivider && !!props.displayTitle"
+        />
+      </q-item-label>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * Displays the body of an artifact that can be expanded.
+ */
+export default {
+  name: "ArtifactBodyDisplay",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, defineProps } from "vue";
 import { ArtifactSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import { AttributeChip } from "./attribute";
 import Typography from "./Typography.vue";
 
-/**
- * Displays the body of an artifact that can be expanded.
- */
-export default defineComponent({
-  name: "ArtifactBodyDisplay",
-  components: { AttributeChip, FlexBox, Typography },
-  props: {
-    artifact: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-    displayTitle: Boolean,
-    displayDivider: Boolean,
-  },
-  computed: {
-    /**
-     * Returns the display name for the artifact type.
-     */
-    artifactType(): string {
-      return typeOptionsStore.getArtifactTypeDisplay(this.artifact.type);
-    },
-  },
-});
+const props = defineProps<{
+  artifact: ArtifactSchema;
+  displayTitle?: boolean;
+  displayDivider?: boolean;
+  clickable?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
+
+const artifactType = computed(() =>
+  typeOptionsStore.getArtifactTypeDisplay(props.artifact.type)
+);
 </script>

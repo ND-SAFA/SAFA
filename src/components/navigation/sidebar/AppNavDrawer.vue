@@ -1,5 +1,11 @@
 <template>
-  <q-drawer persistent :model-value="true" elevated :mini="!sidebarOpen">
+  <q-drawer
+    persistent
+    :model-value="true"
+    elevated
+    breakpoint="0"
+    :mini="!sidebarOpen"
+  >
     <flex-box
       v-if="sidebarOpen"
       full-width

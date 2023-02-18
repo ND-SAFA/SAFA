@@ -2,13 +2,12 @@
   <text-button
     v-if="runUpdate"
     text
-    small
     color="accent"
-    icon-variant="sync"
+    variant="sync"
     data-cy="button-nav-load-update"
     @click="handleClick"
   >
-    Load Project Updates
+    Load Changes
   </text-button>
 </template>
 

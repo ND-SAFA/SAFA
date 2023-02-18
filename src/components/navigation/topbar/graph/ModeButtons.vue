@@ -1,48 +1,48 @@
 <template>
-  <v-btn-toggle multiple density="compact" :model-value="value">
+  <q-btn-group flat>
     <text-button
-      :value="options.tim"
-      text
+      :text="!value.includes(options.tim)"
+      :outlined="value.includes(options.tim)"
       color="accent"
       data-cy="button-nav-tim"
-      icon-variant="view-tim"
+      variant="view-tim"
       @click="handleTimView"
     >
       TIM
     </text-button>
     <text-button
       :disabled="isTreeDisabled"
-      :value="options.tree"
-      text
+      :text="!value.includes(options.tree)"
+      :outlined="value.includes(options.tree)"
       color="accent"
       data-cy="button-nav-tree"
-      icon-variant="view-tree"
+      variant="view-tree"
       @click="handleTreeView"
     >
       Tree
     </text-button>
     <text-button
-      :value="options.table"
-      text
+      :text="!value.includes(options.table)"
+      :outlined="value.includes(options.table)"
       color="accent"
       data-cy="button-nav-table"
-      icon-variant="view-table"
+      variant="view-table"
       @click="handleTableView"
     >
       Table
     </text-button>
     <text-button
       :disabled="isDeltaDisabled"
-      :value="options.delta"
-      text
+      :text="!value.includes(options.delta)"
+      :outlined="value.includes(options.delta)"
       color="accent"
       data-cy="button-nav-delta"
-      icon-variant="view-delta"
+      variant="view-delta"
       @click="handleDeltaView"
     >
       Delta
     </text-button>
-  </v-btn-toggle>
+  </q-btn-group>
 </template>
 
 <script lang="ts">

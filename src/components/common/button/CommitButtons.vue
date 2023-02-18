@@ -16,6 +16,9 @@
 </template>
 
 <script lang="ts">
+/**
+ * Renders buttons for undoing and redoing changes.
+ */
 export default {
   name: "CommitButtons",
 };

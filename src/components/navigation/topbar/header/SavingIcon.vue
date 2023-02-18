@@ -1,17 +1,13 @@
 <template>
-  <v-tooltip v-if="isSaving" bottom z-index="10000">
-    <template #activator="{ props }">
-      <v-progress-circular
-        v-bind="props"
-        indeterminate
-        size="36"
-        color="accent"
-      >
-        <icon color="accent" variant="saving" />
-      </v-progress-circular>
-    </template>
-    <span>Saving...</span>
-  </v-tooltip>
+  <div v-if="isSaving">
+    <q-circular-progress color="accent" indeterminate size="md" />
+    <icon
+      color="accent"
+      variant="saving"
+      style="position: relative; right: 23px"
+    />
+    <q-tooltip> Saving... </q-tooltip>
+  </div>
 </template>
 
 <script lang="ts">

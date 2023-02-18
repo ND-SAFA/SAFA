@@ -1,12 +1,10 @@
 <template>
-  <v-progress-linear
-    v-show="appStore.isLoading > 0"
+  <q-linear-progress
+    v-if="isLoading"
     rounded
-    height="5"
+    size="sm"
     indeterminate
-    absolute
-    bottom
-    color="secondary"
+    color="accent"
     data-cy="app-loading"
   />
 </template>
@@ -21,5 +19,8 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { appStore } from "@/hooks";
+
+const isLoading = computed(() => appStore.isLoading > 0);
 </script>

@@ -1,34 +1,25 @@
 .nav-input {
-  label {
-    color: white !important;
-  }
-
-  i {
-    position: relative;
-    bottom: 2px;
-  }
-
   fieldset, div, i {
     color: fade-out($color-accent, 0.2) !important;
+  }
+
+  .q-field__control:before {
+    border-color: fade-out($color-accent, 0.2) !important;
   }
 
   &:hover {
     fieldset, div, label, i {
       color: $color-accent !important;
     }
-  }
-}
 
-.nav-selected {
-  color: $primary !important;
+    .q-field__control:before {
+      border-color: $color-accent !important;
+    }
+  }
 }
 
 .nav-notifications {
   min-width: 300px;
   max-height: 40vh;
   overflow-y: scroll;
-}
-
-.v-tabs-bar, .v-window {
-  background-color: transparent !important;
 }

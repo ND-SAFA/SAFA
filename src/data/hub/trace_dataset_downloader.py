@@ -3,7 +3,7 @@ import os
 from datasets import DownloadConfig, DownloadManager
 
 from constants import CACHE_DIR_NAME, DATA_PATH_PARAM
-from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
+from data.hub.abstract_dataset_descriptor import AbstractHubId
 from data.hub.supported_datasets import SupportedDatasets
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from util.file_util import FileUtil
@@ -23,7 +23,7 @@ class TraceDatasetDownloader:
         :param config_kwargs: Additional parameters to builder configuration.
         """
         self.dataset_name = dataset_name
-        self.descriptor: AbstractDatasetDescriptor = SupportedDatasets.get_value(dataset_name)
+        self.descriptor: AbstractHubId = SupportedDatasets.get_value(dataset_name)
         super().__init__(**config_kwargs)  # calls _info where above is needed
         self.trace_dataset_creator = None
         self.project_path = None

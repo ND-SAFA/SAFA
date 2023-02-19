@@ -1,16 +1,16 @@
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
+from data.hub.abstract_dataset_descriptor import AbstractHubId
 from util.override import overrides
 
 
-class CCHITDescriptor(AbstractDatasetDescriptor):
+class CCHITHubId(AbstractHubId):
     """
     Describes the CCHIT project reader.
     """
 
     @classmethod
-    @overrides(AbstractDatasetDescriptor)
+    @overrides(AbstractHubId)
     def get_url(cls) -> str:
         """
         :return: Returns URL to CCHIT on the SAFA bucket containing defefinition file.
@@ -18,7 +18,7 @@ class CCHITDescriptor(AbstractDatasetDescriptor):
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/CCHIT.zip"
 
     @classmethod
-    @overrides(AbstractDatasetDescriptor)
+    @overrides(AbstractHubId)
     def get_definition(cls) -> Dict:
         """
         :return: Returns this project's structured project definition.

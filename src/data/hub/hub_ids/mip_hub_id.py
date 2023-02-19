@@ -1,9 +1,9 @@
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
+from data.hub.abstract_dataset_descriptor import AbstractHubId
 
 
-class MipDescriptor(AbstractDatasetDescriptor):
+class MipHubId(AbstractHubId):
     """
     Describes the medical infusion pump dataset.
     """

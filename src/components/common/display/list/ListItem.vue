@@ -10,8 +10,8 @@
     <q-tooltip v-if="!!props.tooltip">
       {{ itemTooltip }}
     </q-tooltip>
-    <q-item-section v-if="!!props.icon" avatar>
-      <icon v-if="typeof props.icon === 'string'" :variant="props.icon" />
+    <q-item-section v-if="!!props.icon || !!slots.icon" avatar>
+      <icon v-if="!!props.icon" :variant="props.icon" />
       <slot name="icon" />
     </q-item-section>
     <q-item-section>
@@ -20,12 +20,8 @@
         <slot />
         <q-separator v-if="!!props.divider" class="q-mt-sm" />
       </q-item-label>
-      <q-item-label v-if="!!props.subtitle" caption>
-        <typography
-          v-if="typeof props.subtitle === 'string'"
-          secondary
-          :value="props.subtitle"
-        />
+      <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
+        <typography v-if="!!props.subtitle" secondary :value="props.subtitle" />
         <slot name="subtitle" />
       </q-item-label>
     </q-item-section>
@@ -42,22 +38,24 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useSlots } from "vue";
 import { IconVariant, URLQuery } from "@/types";
 import Typography from "../Typography.vue";
 import { Icon } from "../icon";
 
 const props = defineProps<{
   title?: string;
-  subtitle?: true | string;
+  subtitle?: string;
   tooltip?: true | string;
-  icon?: true | IconVariant;
+  icon?: IconVariant;
   clickable?: boolean;
   to?: string | { path: string; query: URLQuery };
   color?: string;
   divider?: boolean;
   dataCy?: string;
 }>();
+
+const slots = useSlots();
 
 const itemClickable = computed(() => !!(props.clickable || props.to));
 

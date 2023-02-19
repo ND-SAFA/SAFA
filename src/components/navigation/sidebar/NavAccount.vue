@@ -1,6 +1,6 @@
 <template>
   <div style="position: absolute; bottom: 0" class="full-width">
-    <list-item icon to="" title="Notifications">
+    <list-item to="" title="Notifications">
       <template #icon>
         <notifications />
       </template>

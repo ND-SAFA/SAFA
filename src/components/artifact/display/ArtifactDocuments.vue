@@ -8,6 +8,7 @@
         <v-divider v-if="idx !== 0" />
         <list-item
           clickable
+          tooltip
           :title="doc.name"
           :subtitle="documentTypeName(doc.type)"
           @click="handleSwitchDocument(doc)"

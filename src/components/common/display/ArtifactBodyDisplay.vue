@@ -1,6 +1,5 @@
 <template>
   <list-item
-    subtitle
     :clickable="props.clickable"
     :divider="props.displayDivider"
     style="max-width: 500px"

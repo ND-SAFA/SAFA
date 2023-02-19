@@ -28,8 +28,8 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/iceoryx"
+                "object_type": "HUB",
+                "name": "iceoryx_pl"
               },
               "remove_orphans": true
             },

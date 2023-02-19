@@ -8,7 +8,12 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/pl-bert"
+            "model_path": {
+              "*": [
+                "thearod5/pl-bert",
+                "thearod5/nl-bert"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 5,

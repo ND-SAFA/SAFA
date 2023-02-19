@@ -25,7 +25,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineEmits } from "vue";
 import { useTheme } from "@/hooks";
 import iconLight from "@/assets/images/SAFA-primary.svg";
 import iconDark from "@/assets/images/SAFA-secondary.svg";

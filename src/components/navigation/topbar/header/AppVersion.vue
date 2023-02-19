@@ -25,11 +25,7 @@
         {{ versionToString(version) }}
       </template>
       <template #option="{ opt, itemProps }">
-        <q-item v-bind="itemProps">
-          <q-item-section>
-            <typography :value="versionToString(opt)" />
-          </q-item-section>
-        </q-item>
+        <list-item v-bind="itemProps" :title="versionToString(opt)" />
       </template>
       <template #after-options>
         <text-button text variant="add" @click="openCreateVersion = true">
@@ -62,7 +58,7 @@ import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
-import { Typography, FlexBox, TextButton } from "@/components/common";
+import { Typography, FlexBox, TextButton, ListItem } from "@/components/common";
 import { VersionCreator } from "@/components/project/selector";
 
 const versions = ref<VersionSchema[]>([]);

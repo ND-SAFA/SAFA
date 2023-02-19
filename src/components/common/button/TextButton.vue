@@ -30,7 +30,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from "vue";
+import { computed } from "vue";
 import { IconVariant } from "@/types";
 import Icon from "@/components/common/display/icon/Icon.vue";
 

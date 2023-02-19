@@ -40,7 +40,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, withDefaults, defineProps, defineEmits } from "vue";
+import { computed, ref, withDefaults } from "vue";
 import { typeOptionsStore, useVModel } from "@/hooks";
 import { IconButton } from "@/components/common/button";
 import { AttributeChip } from "@/components/common/display";

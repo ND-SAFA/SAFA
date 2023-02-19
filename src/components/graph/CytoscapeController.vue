@@ -20,7 +20,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, ref } from "vue";
+import { ref } from "vue";
 import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
 import { logStore } from "@/hooks";
 import { Cytoscape3 } from "./base";

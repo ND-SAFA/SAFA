@@ -64,7 +64,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from "vue";
 import { ArtifactLevelSchema } from "@/types";
 import { artifactStore, traceStore, useVModel } from "@/hooks";
 import {

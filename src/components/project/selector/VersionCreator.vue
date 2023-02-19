@@ -45,7 +45,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, defineProps, watch, defineEmits, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";

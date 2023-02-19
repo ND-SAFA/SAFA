@@ -67,7 +67,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, defineProps, defineEmits } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { AttributeSchema, AttributeLayoutSchema } from "@/types";
 import { attributeLayoutSaveStore } from "@/hooks";
 import { handleDeleteAttributeLayout, handleSaveAttributeLayout } from "@/api";

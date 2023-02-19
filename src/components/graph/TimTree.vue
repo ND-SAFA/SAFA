@@ -39,7 +39,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, defineProps, watch } from "vue";
+import { computed, watch } from "vue";
 import { TracePanel, ArtifactPanel } from "@/types";
 import { appStore, layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";

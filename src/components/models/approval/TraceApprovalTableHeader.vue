@@ -48,7 +48,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
 import { DataTableHeader, FlatTraceLink } from "@/types";
 import { approvalTypeOptions } from "@/util";
 import { useVModel } from "@/hooks";

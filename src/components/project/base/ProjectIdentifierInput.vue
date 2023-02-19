@@ -29,7 +29,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { withDefaults, defineProps, defineEmits } from "vue";
+import { withDefaults } from "vue";
 import { useVModel } from "@/hooks";
 
 const props = withDefaults(

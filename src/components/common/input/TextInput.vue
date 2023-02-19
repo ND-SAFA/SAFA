@@ -21,7 +21,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, withDefaults, computed } from "vue";
+import { withDefaults, computed } from "vue";
 import { SizeType } from "@/types";
 import { useVModel } from "@/hooks";
 

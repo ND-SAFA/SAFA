@@ -44,7 +44,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, defineProps, defineEmits } from "vue";
+import { computed, ref } from "vue";
 import {
   LinkSchema,
   ArtifactMap,

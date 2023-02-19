@@ -60,7 +60,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { withDefaults, defineProps, defineEmits, computed } from "vue";
+import { withDefaults, computed } from "vue";
 import { useVModel } from "@/hooks";
 import { Typography } from "@/components/common/display";
 

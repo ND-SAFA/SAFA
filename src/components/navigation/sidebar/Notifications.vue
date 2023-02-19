@@ -12,20 +12,15 @@
             value="There are no notifications in the current session."
           />
         </div>
-        <q-list v-else class="nav-notifications q-pa-md">
-          <q-item
-            v-for="(item, index) in notifications"
-            :key="index"
-            dense
-            class="q-px-none"
-          >
-            <q-item-section>
+        <list v-else :items="notifications" class="nav-notifications q-pa-md">
+          <template #item="{ item }">
+            <list-item dense class="q-px-none">
               <alert :type="item.type">
                 <typography :value="item.message" />
               </alert>
-            </q-item-section>
-          </q-item>
-        </q-list>
+            </list-item>
+          </template>
+        </list>
       </q-menu>
     </q-btn>
   </div>
@@ -43,7 +38,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { logStore } from "@/hooks";
-import { Typography, Icon, Alert } from "@/components/common";
+import { Typography, Icon, Alert, List, ListItem } from "@/components/common";
 
 const viewedMessages = ref(0);
 

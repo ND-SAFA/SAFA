@@ -12,7 +12,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
 import { useTheme } from "@/hooks";
 import { CyElement3 } from "../base";

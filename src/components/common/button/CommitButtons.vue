@@ -25,7 +25,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, withDefaults, defineProps } from "vue";
+import { computed, withDefaults } from "vue";
 import { ButtonType } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";

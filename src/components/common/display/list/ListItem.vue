@@ -1,56 +1,77 @@
 <template>
-  <v-tooltip bottom :disabled="tooltip.length < 20">
-    <template #activator="{ props }">
-      <v-list-item v-bind="props" :data-cy="dataCy" @click="handleClick">
-        <v-list-item-title>
-          <typography :value="item.title" data-cy="generic-list-item" />
-        </v-list-item-title>
-        <v-list-item-subtitle v-if="!!item.subtitle">
-          <typography secondary :value="item.subtitle" />
-        </v-list-item-subtitle>
+  <q-item
+    :clickable="itemClickable"
+    :v-ripple="!!props.to"
+    :to="props.to"
+    :color="color"
+    :data-cy="dataCy"
+    @click="emit('click')"
+  >
+    <q-tooltip v-if="!!props.tooltip">
+      {{ itemTooltip }}
+    </q-tooltip>
+    <q-item-section v-if="!!props.icon" avatar>
+      <icon v-if="typeof props.icon === 'string'" :variant="props.icon" />
+      <slot name="icon" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>
+        <typography v-if="!!props.title" :value="props.title" />
         <slot />
-      </v-list-item>
-    </template>
-    <span>
-      {{ tooltip }}
-    </span>
-  </v-tooltip>
+        <q-separator v-if="!!props.divider" class="q-mt-sm" />
+      </q-item-label>
+      <q-item-label v-if="!!props.subtitle" caption>
+        <typography
+          v-if="typeof props.subtitle === 'string'"
+          secondary
+          :value="props.subtitle"
+        />
+        <slot name="subtitle" />
+      </q-item-label>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ListItem } from "@/types";
-import Typography from "../Typography.vue";
-
 /**
  * Displays a generic list item.
- *
- * @emits `click` - On click.
  */
-export default defineComponent({
+export default {
   name: "ListItem",
-  components: { Typography },
-  props: {
-    item: {
-      type: Object as PropType<ListItem>,
-      required: true,
-    },
-    dataCy: String,
-  },
-  computed: {
-    tooltip(): string {
-      return this.item.subtitle
-        ? `${this.item.title} - ${this.item.subtitle}`
-        : this.item.title;
-    },
-  },
-  methods: {
-    /**
-     * Handles button clicks by emitting them.
-     */
-    handleClick() {
-      this.$emit("click");
-    },
-  },
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { IconVariant, URLQuery } from "@/types";
+import Typography from "../Typography.vue";
+import { Icon } from "../icon";
+
+const props = defineProps<{
+  title?: string;
+  subtitle?: true | string;
+  tooltip?: true | string;
+  icon?: true | IconVariant;
+  clickable?: boolean;
+  to?: string | { path: string; query: URLQuery };
+  color?: string;
+  divider?: boolean;
+  dataCy?: string;
+}>();
+
+const itemClickable = computed(() => !!(props.clickable || props.to));
+
+const itemTooltip = computed(() => {
+  if (typeof props.tooltip === "string") {
+    return props.tooltip;
+  } else if (props.tooltip === true) {
+    return props.subtitle ? `${props.title} - ${props.subtitle}` : props.title;
+  } else {
+    return undefined;
+  }
 });
+
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 </script>

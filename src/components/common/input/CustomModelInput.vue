@@ -28,7 +28,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from "vue";
+import { computed } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { Typography } from "@/components/common/display";

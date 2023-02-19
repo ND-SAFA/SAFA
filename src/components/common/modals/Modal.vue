@@ -40,7 +40,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
 import { Typography } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";

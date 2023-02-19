@@ -55,7 +55,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { ArtifactLevelSchema, TimJsonSchema } from "@/types";
 import { FileInput, FileFormatAlert } from "@/components/common";
 

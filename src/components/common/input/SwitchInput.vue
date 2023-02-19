@@ -12,8 +12,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
-
 import { useVModel } from "@/hooks";
 
 const props = defineProps<{

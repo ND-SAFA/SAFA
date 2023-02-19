@@ -57,7 +57,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, withDefaults, defineProps } from "vue";
+import { ref, computed, withDefaults } from "vue";
 import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
 import { useTheme } from "@/hooks";
 

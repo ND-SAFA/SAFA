@@ -42,7 +42,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineEmits, defineProps, onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { IdentifierSchema, VersionSchema } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";

@@ -34,7 +34,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed, watch } from "vue";
+import { computed, watch } from "vue";
 import { ThemeColors } from "@/util";
 import { Typography } from "@/components/common";
 

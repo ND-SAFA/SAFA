@@ -49,7 +49,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
 import { ArtifactSchema, DataTableHeader } from "@/types";
 import { typeOptionsStore, useVModel } from "@/hooks";
 import { TableHeader, FlexBox } from "@/components/common";

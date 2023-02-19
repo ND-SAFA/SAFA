@@ -1,23 +1,16 @@
 <template>
-  <q-list>
-    <template v-for="option in options" :key="option.label">
-      <q-separator v-if="option.divider" />
-      <q-item
-        v-ripple
-        clickable
-        :to="option.path"
+  <list :items="options">
+    <template #item="{ item }">
+      <q-separator v-if="item.divider" />
+      <list-item
+        :to="item.path"
         color="primary"
-        :data-cy="'button-nav-' + option.label"
-      >
-        <q-item-section avatar>
-          <icon :variant="option.icon" />
-        </q-item-section>
-        <q-item-section>
-          <typography bold :value="option.label" />
-        </q-item-section>
-      </q-item>
+        :data-cy="'button-nav-' + item.label"
+        :icon="item.icon"
+        :title="item.label"
+      />
     </template>
-  </q-list>
+  </list>
 </template>
 
 <script lang="ts">
@@ -34,7 +27,7 @@ import { computed } from "vue";
 import { NavOption } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
-import { Typography, Icon } from "@/components/common";
+import { List, ListItem } from "@/components/common";
 
 const hideProjectOptions = computed(() => !projectStore.isProjectDefined);
 

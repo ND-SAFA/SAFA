@@ -4,20 +4,6 @@
 export type StepState = [string, boolean];
 
 /**
- * Displays a generic list item.
- */
-export interface ListItem {
-  /**
-   * The title to display.
-   */
-  title: string;
-  /**
-   * The subtitle to display.
-   */
-  subtitle?: string;
-}
-
-/**
  * The variants of text that can be displayed.
  */
 export type TextType =

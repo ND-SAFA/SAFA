@@ -26,7 +26,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from "vue";
 import { SelectOption } from "@/types";
 import { useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";

@@ -7,7 +7,9 @@
       <template v-for="(doc, idx) in documents" :key="doc.documentId">
         <v-divider v-if="idx !== 0" />
         <list-item
-          :item="{ title: doc.name, subtitle: documentTypeName(doc.type) }"
+          clickable
+          :title="doc.name"
+          :subtitle="documentTypeName(doc.type)"
           @click="handleSwitchDocument(doc)"
         />
       </template>

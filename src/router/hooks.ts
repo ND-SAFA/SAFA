@@ -1,4 +1,4 @@
-import { URLParameter } from "@/types";
+import { URLParameter, URLQuery } from "@/types";
 import { QueryParams, Routes } from "@/router/routes";
 import { router } from "@/router/router";
 
@@ -11,7 +11,7 @@ import { router } from "@/router/router";
  */
 export async function navigateTo(
   route: Routes | string,
-  query: Record<string, null | string | (string | null)[]> = {}
+  query: URLQuery = {}
 ): Promise<void> {
   if (
     router.currentRoute.value.path === route &&
@@ -33,7 +33,7 @@ export function navigateBack(): void {
 /**
  * Return the app's query parameters.
  */
-export function getParams(): Record<string, null | string | (string | null)[]> {
+export function getParams(): URLQuery {
   return router.currentRoute.value.query;
 }
 

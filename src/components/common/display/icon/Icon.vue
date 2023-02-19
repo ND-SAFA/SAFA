@@ -1,5 +1,10 @@
 <template>
-  <q-icon :color="iconColor" :size="size" :style="iconStyle" :name="iconId" />
+  <q-icon
+    :color="iconColor"
+    :size="props.size"
+    :style="iconStyle"
+    :name="iconId"
+  />
 </template>
 
 <script lang="ts">
@@ -12,7 +17,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import { IconVariant } from "@/types";
 
 const props = defineProps<{

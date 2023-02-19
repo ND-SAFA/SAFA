@@ -42,7 +42,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, withDefaults, defineEmits, defineProps } from "vue";
+import { computed, ref, withDefaults } from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
 import { SwitchInput } from "@/components/common";

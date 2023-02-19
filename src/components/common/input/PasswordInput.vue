@@ -30,7 +30,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, withDefaults, ref, computed } from "vue";
+import { withDefaults, ref, computed } from "vue";
 import { useVModel } from "@/hooks";
 
 const props = withDefaults(

@@ -39,7 +39,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { ArtifactDeltaState, ArtifactSchema, DataTableHeader } from "@/types";
 import { deltaTypeOptions } from "@/util";
 import { deltaStore, useVModel } from "@/hooks";

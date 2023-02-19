@@ -28,7 +28,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed, ref } from "vue";
+import { computed, ref } from "vue";
 import { ArtifactLevelSchema, GenerationModelSchema } from "@/types";
 import { handleTrainModel } from "@/api";
 import { Typography } from "@/components/common";

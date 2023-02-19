@@ -1,5 +1,9 @@
 module.exports = {
   root: true,
+  globals: {
+    defineProps: "readonly",
+    defineEmits: "readonly",
+  },
   env: {
     node: true,
   },
@@ -20,6 +24,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "max-lines": ["warn", 300],
     "vue/no-mutating-props": 0,
+    "vue/script-setup-uses-vars": "error",
     "import/order": [
       "warn",
       {

@@ -6,7 +6,7 @@
 
 <script lang="ts">
 /**
- * Alert
+ * Displays a generic alert.
  */
 export default {
   name: "Alert",
@@ -14,7 +14,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import { MessageType } from "@/types";
 
 const props = defineProps<{

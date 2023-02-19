@@ -1,10 +1,10 @@
 .nav-input {
   fieldset, div, i {
-    color: fade-out($color-accent, 0.2) !important;
+    color: fade-out($color-accent, 0.1) !important;
   }
 
   .q-field__control:before {
-    border-color: fade-out($color-accent, 0.2) !important;
+    border-color: fade-out($color-accent, 0.1) !important;
   }
 
   &:hover {

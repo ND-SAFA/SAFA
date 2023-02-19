@@ -14,7 +14,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, withDefaults, defineProps } from "vue";
+import { computed, withDefaults } from "vue";
 import { JustifyType, SizeType, AlignType } from "@/types";
 
 const props = withDefaults(

@@ -61,7 +61,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 import { TrainingStepSchema } from "@/types";
 import { Typography, FlexBox } from "@/components/common";
 

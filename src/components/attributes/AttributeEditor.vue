@@ -16,13 +16,13 @@
       <text-button
         v-if="!createOpen"
         text
-        variant="add"
+        icon="add"
         data-cy="button-add-attribute"
         @click="createOpen = true"
       >
         Add Attribute
       </text-button>
-      <text-button v-else text variant="cancel" @click="createOpen = false">
+      <text-button v-else text icon="cancel" @click="createOpen = false">
         Cancel
       </text-button>
     </flex-box>
@@ -38,7 +38,7 @@
           <span @click.stop="">
             <icon-button
               class="ml-auto"
-              icon-variant="add"
+              icon="add"
               tooltip="Add to layout"
               :is-disabled="isAttributeInLayout(attribute)"
               @click="handleAddToLayout(attribute)"

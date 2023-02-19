@@ -16,7 +16,7 @@
     >
       <safa-icon style="width: 200px !important" />
       <icon-button
-        icon-variant="nav-toggle"
+        icon="nav-toggle"
         tooltip="Close sidebar"
         :color="darkMode ? 'secondary' : 'primary'"
         data-cy="button-sidebar-close"
@@ -25,7 +25,7 @@
     </flex-box>
     <flex-box v-else justify="center" full-width t="2">
       <icon-button
-        icon-variant="nav-toggle"
+        icon="nav-toggle"
         tooltip="Open sidebar"
         color="primary"
         data-cy="button-sidebar-open"

@@ -29,11 +29,7 @@
               v-for="(detail, detailIdx) in getMatrixDetails(matrix)"
               :key="detail"
               :value="detail"
-              :icon="
-                detailIdx < 2
-                  ? 'mdi-alpha-a-box-outline'
-                  : 'mdi-ray-start-arrow'
-              "
+              :icon="detailIdx < 2 ? 'artifact' : 'trace'"
             />
           </flex-box>
         </flex-box>
@@ -47,7 +43,7 @@
     </v-card>
 
     <flex-box justify="center">
-      <text-button text variant="add" @click="handleCreateMatrix">
+      <text-button text icon="add" @click="handleCreateMatrix">
         Add New Matrix
       </text-button>
     </flex-box>

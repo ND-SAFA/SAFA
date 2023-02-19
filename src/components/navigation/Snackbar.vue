@@ -16,22 +16,21 @@
         <text-button
           v-if="hasErrors"
           text
+          label="See Errors"
           color="white"
           class="ma-0"
           @click="handleSeeError"
-        >
-          See Errors
-        </text-button>
+        />
         <icon-button
           v-if="showAction"
           color="white"
-          icon-variant="download"
+          icon="download"
           tooltip="Update"
           @click="handleAction"
         />
         <icon-button
           color="white"
-          icon-variant="cancel"
+          icon="cancel"
           tooltip="Close"
           data-cy="button-snackbar-close"
           @click="showSnackbar = false"

@@ -17,16 +17,16 @@
         v-if="!hasCredentials"
         color="primary"
         outlined
-        icon-variant="integrate"
+        icon="integrate"
         @click="handleConnect"
       >
         Connect
       </text-button>
       <flex-box v-else column align="end">
-        <text-button outlined variant="add" class="mb-2" @click="handleConnect">
+        <text-button outlined icon="add" class="mb-2" @click="handleConnect">
           Installation
         </text-button>
-        <text-button outlined variant="delete" @click="handleDisconnect">
+        <text-button outlined icon="delete" @click="handleDisconnect">
           Disconnect
         </text-button>
       </flex-box>

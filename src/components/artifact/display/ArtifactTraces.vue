@@ -5,7 +5,7 @@
         <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
         <text-button
           text
-          variant="add"
+          icon="add"
           data-cy="button-artifact-link-parent"
           @click="handleLinkParent"
         >
@@ -52,7 +52,7 @@
         <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
         <text-button
           text
-          variant="add"
+          icon="add"
           data-cy="button-artifact-link-child"
           @click="handleLinkChild"
         >

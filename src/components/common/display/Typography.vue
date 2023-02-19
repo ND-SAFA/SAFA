@@ -73,6 +73,8 @@ const props = withDefaults(
     secondary?: boolean;
     bold?: boolean;
     wrap?: boolean;
+    small?: boolean;
+    large?: boolean;
     variant?: TextType;
     el?: ElementType;
     align?: TextAlignType;
@@ -130,18 +132,20 @@ const className = computed(() => {
 
   if (props.classes) classNames += ` ${props.classes}`;
   if (props.color && !darkMode.value) classNames += ` text-${props.color}`;
-  if (props.inheritColor) classNames += ` inherit-color`;
-  if (props.error) classNames += ` text-error`;
-  if (props.ellipsis) classNames += ` text-ellipsis`;
-  if (props.secondary) classNames += ` text-grey`;
-  if (props.bold) classNames += ` font-weight-bold`;
+  if (props.inheritColor) classNames += " inherit-color";
+  if (props.error) classNames += " text-error";
+  if (props.ellipsis) classNames += " text-ellipsis";
+  if (props.secondary) classNames += " text-grey";
+  if (props.bold) classNames += " font-weight-bold";
+  if (props.small) classNames += " text-sm";
+  if (props.small) classNames += " text-mg";
+  if (props.wrap) classNames += " text-wrap";
   if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
   if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
   if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
   if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
   if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
   if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
-  if (props.wrap) classNames += " text-wrap";
 
   switch (props.variant) {
     case "large":

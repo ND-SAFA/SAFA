@@ -4,7 +4,7 @@
       <icon-button
         color="accent"
         :tooltip="definition.label"
-        :icon-variant="definition.icon"
+        :icon="definition.icon"
         :is-disabled="isButtonDisabled(definition)"
         :data-cy="definition.dataCy"
         @click="definition.handler"

@@ -6,7 +6,7 @@
         text
         :loading="isUnreviewLoading"
         data-cy="button-trace-unreview"
-        icon-variant="trace-unreview"
+        icon="trace-unreview"
         @click="handleUnreview"
       >
         Un-Review
@@ -16,7 +16,7 @@
         text
         :loading="isApproveLoading"
         data-cy="button-trace-approve"
-        icon-variant="trace-approve"
+        icon="trace-approve"
         @click="handleApprove"
       >
         Approve
@@ -26,7 +26,7 @@
         text
         :loading="isDeclineLoading"
         data-cy="button-trace-decline"
-        icon-variant="trace-decline"
+        icon="trace-decline"
         @click="handleDecline"
       >
         Decline
@@ -36,7 +36,7 @@
       <v-divider v-if="showApproved || showDeclined" vertical />
       <text-button
         text
-        variant="delete"
+        icon="delete"
         data-cy="button-trace-delete"
         @click="handleDelete"
       >

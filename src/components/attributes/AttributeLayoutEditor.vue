@@ -8,7 +8,7 @@
         <text-button
           v-if="!createOpen"
           text
-          variant="add"
+          icon="add"
           @click="handleAddLayout"
         >
           Add Layout

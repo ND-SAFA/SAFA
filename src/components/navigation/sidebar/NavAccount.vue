@@ -6,7 +6,7 @@
       </template>
     </list-item>
 
-    <q-separator />
+    <separator />
 
     <list-item
       :to="Routes.ACCOUNT"
@@ -29,6 +29,6 @@ export default {
 
 <script setup lang="ts">
 import { Routes } from "@/router";
-import { ListItem } from "@/components/common";
+import { ListItem, Separator } from "@/components/common";
 import Notifications from "./Notifications.vue";
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <text-button text icon-variant="back" @click="handleClick">
+  <text-button text icon="back" @click="handleClick">
     {{ text }}
   </text-button>
 </template>

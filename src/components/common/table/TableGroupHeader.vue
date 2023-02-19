@@ -4,7 +4,7 @@
       <flex-box align="center">
         <icon-button
           small
-          :icon-variant="data.isOpen ? 'group-open' : 'group-close'"
+          :icon="data.isOpen ? 'group-open' : 'group-close'"
           :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
           @click="data.toggle"
         />
@@ -34,7 +34,7 @@
         />
         <icon-button
           small
-          icon-variant="cancel"
+          icon="cancel"
           tooltip="Remove Grouping"
           @click="data.remove"
         />

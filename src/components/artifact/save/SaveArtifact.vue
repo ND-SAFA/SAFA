@@ -6,7 +6,7 @@
       <text-button
         v-if="isUpdate"
         text
-        variant="delete"
+        icon="delete"
         data-cy="button-artifact-delete"
         @click="handleDelete"
       >
@@ -15,7 +15,7 @@
       <v-spacer />
       <text-button
         :disabled="!canSave"
-        variant="save"
+        icon="save"
         data-cy="button-artifact-save"
         @click="handleSubmit"
       >

@@ -1,13 +1,13 @@
 <template>
   <flex-box>
     <icon-button
-      icon-variant="edit"
+      icon="edit"
       :tooltip="`Edit '${artifact.name}'`"
       data-cy="button-artifact-edit-icon"
       @click="handleEdit(artifact)"
     />
     <icon-button
-      icon-variant="delete"
+      icon="delete"
       :tooltip="`Delete '${artifact.name}'`"
       data-cy="button-artifact-delete-icon"
       @click="handleDelete(artifact)"

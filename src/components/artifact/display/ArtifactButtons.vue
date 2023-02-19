@@ -2,7 +2,7 @@
   <flex-box v-if="doDisplay" t="2">
     <text-button
       text
-      variant="artifact"
+      icon="artifact"
       data-cy="button-artifact-body"
       @click="handleViewBody"
     >
@@ -10,7 +10,7 @@
     </text-button>
     <text-button
       text
-      variant="edit"
+      icon="edit"
       data-cy="button-artifact-edit"
       @click="handleEditArtifact"
     >
@@ -19,7 +19,7 @@
     <v-divider vertical />
     <text-button
       text
-      variant="delete"
+      icon="delete"
       data-cy="button-artifact-delete"
       @click="handleDeleteArtifact"
     >

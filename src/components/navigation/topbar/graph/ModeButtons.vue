@@ -1,47 +1,35 @@
 <template>
   <q-btn-group flat>
     <text-button
-      :text="!value.includes(options.tim)"
-      :outlined="value.includes(options.tim)"
-      color="accent"
+      v-bind="buttonProps(options.tim)"
+      label="TIM"
       data-cy="button-nav-tim"
-      variant="view-tim"
+      icon="view-tim"
       @click="handleTimView"
-    >
-      TIM
-    </text-button>
+    />
     <text-button
+      v-bind="buttonProps(options.tree)"
       :disabled="isTreeDisabled"
-      :text="!value.includes(options.tree)"
-      :outlined="value.includes(options.tree)"
-      color="accent"
+      label="Tree"
       data-cy="button-nav-tree"
-      variant="view-tree"
+      icon="view-tree"
       @click="handleTreeView"
-    >
-      Tree
-    </text-button>
+    />
     <text-button
-      :text="!value.includes(options.table)"
-      :outlined="value.includes(options.table)"
-      color="accent"
+      v-bind="buttonProps(options.table)"
+      label="Table"
       data-cy="button-nav-table"
-      variant="view-table"
+      icon="view-table"
       @click="handleTableView"
-    >
-      Table
-    </text-button>
+    />
     <text-button
+      v-bind="buttonProps(options.delta)"
       :disabled="isDeltaDisabled"
-      :text="!value.includes(options.delta)"
-      :outlined="value.includes(options.delta)"
-      color="accent"
+      label="Delta"
       data-cy="button-nav-delta"
-      variant="view-delta"
+      icon="view-delta"
       @click="handleDeltaView"
-    >
-      Delta
-    </text-button>
+    />
   </q-btn-group>
 </template>
 
@@ -71,6 +59,20 @@ const value = ref<GraphMode[]>([]);
 
 const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
 const isDeltaDisabled = computed(() => layoutStore.mode === GraphMode.tim);
+
+/**
+ * Returns props for a mode button.
+ * @param option - The mode button to get props for.
+ */
+function buttonProps(option: GraphMode) {
+  const selected = value.value.includes(option);
+
+  return {
+    text: !selected,
+    outlined: selected,
+    color: selected ? "secondary" : "accent",
+  };
+}
 
 /**
  * Updates the values of which buttons are highlighted.

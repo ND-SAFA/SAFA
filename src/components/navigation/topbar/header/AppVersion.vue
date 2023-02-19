@@ -28,9 +28,12 @@
         <list-item v-bind="itemProps" :title="versionToString(opt)" />
       </template>
       <template #after-options>
-        <text-button text variant="add" @click="openCreateVersion = true">
-          Add Version
-        </text-button>
+        <text-button
+          text
+          label="Add Version"
+          icon="add"
+          @click="openCreateVersion = true"
+        />
       </template>
     </q-select>
 

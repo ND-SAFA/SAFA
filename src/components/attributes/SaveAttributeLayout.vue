@@ -25,7 +25,7 @@
                 <typography variant="caption" :value="attribute.key" />
               </div>
               <icon-button
-                icon-variant="delete"
+                icon="delete"
                 tooltip="Remove from layout"
                 color="error"
                 @click="handleDeleteAttribute(attribute)"
@@ -40,17 +40,13 @@
       <text-button
         v-if="store.isCustom && store.isUpdate"
         text
-        variant="delete"
+        icon="delete"
         @click="handleDeleteLayout"
       >
         Delete
       </text-button>
       <v-spacer />
-      <text-button
-        :disabled="!store.canSave"
-        variant="save"
-        @click="handleSave"
-      >
+      <text-button :disabled="!store.canSave" icon="save" @click="handleSave">
         Save
       </text-button>
     </flex-box>

@@ -5,16 +5,18 @@
     :outline="props.outlined"
     :flat="props.text"
     :loading="props.loading"
+    :percentage="props.percentage"
     :color="buttonColor"
     :class="buttonClassName"
     :data-cy="props.dataCy"
     @click="emit('click')"
   >
-    <icon
-      v-if="props.iconId || props.variant"
-      :id="props.iconId"
-      :variant="props.variant"
-      class="q-mr-sm"
+    <icon v-if="props.icon" :variant="props.icon" class="q-mr-sm" />
+    <typography
+      v-if="!!props.label"
+      :value="props.label"
+      :small="props.small"
+      :large="props.large"
     />
     <slot />
   </q-btn>
@@ -33,6 +35,7 @@ export default {
 import { computed } from "vue";
 import { IconVariant } from "@/types";
 import Icon from "@/components/common/display/icon/Icon.vue";
+import Typography from "@/components/common/display/Typography.vue";
 
 const props = defineProps<{
   outlined?: boolean;
@@ -42,12 +45,13 @@ const props = defineProps<{
   small?: boolean;
   block?: boolean;
   loading?: boolean;
+  percentage?: number;
   color?: string;
-  iconId?: string;
   y?: string;
   x?: string;
   class?: string;
-  variant?: IconVariant;
+  icon?: IconVariant;
+  label?: string;
   dataCy?: string;
 }>();
 
@@ -56,7 +60,7 @@ const emit = defineEmits<{
 }>();
 
 const buttonColor = computed(() => {
-  switch (props.variant) {
+  switch (props.icon) {
     case "add":
     case "save":
       return "primary";

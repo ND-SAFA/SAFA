@@ -34,12 +34,11 @@
       <text-button
         v-if="!isCreated"
         color="primary"
+        label="Create"
         :disabled="password.length === 0"
         data-cy="button-create-account"
         @click="handleCreateAccount"
-      >
-        Create Account
-      </text-button>
+      />
 
       <span class="q-ml-auto text-right">
         <typography value="Already have an account?" />
@@ -47,13 +46,12 @@
         <text-button
           text
           small
+          label="Login"
           class="q-px-sm"
           color="primary"
           data-cy="button-create-account-login"
           @click="handleLogin"
-        >
-          Login
-        </text-button>
+        />
       </span>
     </template>
   </card-page>

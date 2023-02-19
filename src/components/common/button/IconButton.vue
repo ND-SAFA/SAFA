@@ -11,12 +11,11 @@
     @click="emit('click')"
   >
     <icon
-      :id="props.iconId"
       :style="props.iconStyle"
-      :variant="props.iconVariant"
+      :variant="props.icon"
       :rotate="props.rotate"
     />
-    <q-tooltip delay="200">
+    <q-tooltip :delay="200">
       {{ tooltip }}
     </q-tooltip>
   </q-btn>
@@ -39,8 +38,7 @@ import Icon from "@/components/common/display/icon/Icon.vue";
 const props = defineProps<{
   dataCy?: string;
   tooltip: string;
-  iconId?: string;
-  iconVariant?: IconVariant;
+  icon?: IconVariant;
   color?: string;
   iconStyle?: string;
   fab?: boolean;
@@ -54,8 +52,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "click"): void;
 }>();
-
-const isDisabled = computed(() => props.isDisabled || false);
 
 const size = computed(() => {
   if (props.small) {

@@ -18,7 +18,7 @@
       <q-item-label>
         <typography v-if="!!props.title" :value="props.title" />
         <slot />
-        <q-separator v-if="!!props.divider" class="q-mt-sm" />
+        <separator v-if="!!props.divider" t="1" />
       </q-item-label>
       <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
         <typography v-if="!!props.subtitle" secondary :value="props.subtitle" />
@@ -41,6 +41,7 @@ export default {
 import { computed, useSlots } from "vue";
 import { IconVariant, URLQuery } from "@/types";
 import Typography from "../Typography.vue";
+import Separator from "../Separator.vue";
 import { Icon } from "../icon";
 
 const props = defineProps<{

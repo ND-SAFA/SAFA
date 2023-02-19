@@ -103,14 +103,14 @@
                 outlined
                 class="mr-1"
                 data-cy="button-job-log"
-                icon-variant="logs"
+                icon="logs"
                 @click="handleViewLogs(item)"
               >
                 View Logs
               </text-button>
               <text-button
                 outlined
-                variant="delete"
+                icon="delete"
                 class="mr-1"
                 data-cy="button-delete-job"
                 @click="handleDeleteJob(item)"
@@ -121,7 +121,7 @@
                 color="primary"
                 :disabled="!isCompleted(item.status)"
                 data-cy="button-open-job"
-                icon-variant="view-tree"
+                icon="view-tree"
                 @click="handleViewProject(item)"
               >
                 View Project

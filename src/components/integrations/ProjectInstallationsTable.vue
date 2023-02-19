@@ -15,12 +15,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <text-button
-          text
-          color="primary"
-          icon-variant="sync"
-          @click="handleSync(item)"
-        >
+        <text-button text color="primary" icon="sync" @click="handleSync(item)">
           Re-Sync Data
         </text-button>
       </template>
@@ -30,7 +25,7 @@
           <icon-button
             fab
             color="primary"
-            icon-variant="add"
+            icon="add"
             tooltip="Import New Project"
             data-cy="button-integration-add"
             @click="modalOpen = true"

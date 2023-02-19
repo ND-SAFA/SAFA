@@ -15,16 +15,12 @@
           <div class="mb-2">
             <attribute-chip
               :value="artifacts"
-              icon-variant="artifact"
+              icon="artifact"
               color="primary"
             />
           </div>
           <div class="mb-2">
-            <attribute-chip
-              :value="traceLinks"
-              icon-variant="trace"
-              color="primary"
-            />
+            <attribute-chip :value="traceLinks" icon="trace" color="primary" />
           </div>
         </flex-box>
         <flex-box

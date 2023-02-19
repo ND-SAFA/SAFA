@@ -18,7 +18,7 @@
     <template #append>
       <icon-button
         small
-        icon-variant="save"
+        icon="save"
         tooltip="Save Types"
         data-cy="button-save-types"
         @click="handleClose"

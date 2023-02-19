@@ -6,7 +6,7 @@
         :key="definition.label"
         :color="color"
         :tooltip="definition.label"
-        :icon-variant="definition.icon"
+        :icon="definition.icon"
         :is-disabled="definition.isDisabled"
         :data-cy="definition.dataCy"
         @click="definition.handler"

@@ -10,13 +10,13 @@
       <flex-box justify="between" align="center">
         <typography color="primary" variant="subtitle" :value="title" />
         <icon-button
-          icon-variant="cancel"
+          icon="cancel"
           tooltip="Close panel"
           data-cy="button-close-details"
           @click="handleClose"
         />
       </flex-box>
-      <q-separator />
+      <separator />
       <delta-panel />
       <document-panel />
       <artifact-panel />
@@ -43,7 +43,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { appStore, selectionStore } from "@/hooks";
-import { IconButton, Typography, FlexBox } from "@/components/common";
+import {
+  IconButton,
+  Typography,
+  FlexBox,
+  Separator,
+} from "@/components/common";
 import { DeltaPanel } from "@/components/delta";
 import { DocumentPanel } from "@/components/document";
 import {

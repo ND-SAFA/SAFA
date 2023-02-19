@@ -5,7 +5,7 @@
       block
       large
       color="primary"
-      icon-variant="view-delta"
+      icon="view-delta"
       @click="handleChange"
     >
       Compare Versions
@@ -15,7 +15,7 @@
       block
       large
       outlined
-      variant="cancel"
+      icon="cancel"
       @click="handleChange"
     >
       Hide Delta View

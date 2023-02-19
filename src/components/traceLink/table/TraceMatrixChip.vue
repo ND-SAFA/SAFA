@@ -13,7 +13,7 @@
     <div v-else class="show-on-hover">
       <div class="width-fit" @click.stop>
         <icon-button
-          icon-variant="add"
+          icon="add"
           tooltip="Create trace link"
           @click="handleCreateLink"
         />

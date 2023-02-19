@@ -6,7 +6,7 @@
     </flex-box>
     <flex-box align="center">
       <graph-buttons />
-      <q-separator vertical inset color="accent" class="faded q-mx-sm" />
+      <separator vertical inset nav x="1" />
       <commit-buttons />
     </flex-box>
   </flex-box>
@@ -22,7 +22,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { FlexBox, CommitButtons } from "@/components/common";
+import { FlexBox, CommitButtons, Separator } from "@/components/common";
 import { DocumentSelector } from "@/components/document";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";

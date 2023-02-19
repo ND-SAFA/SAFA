@@ -12,11 +12,11 @@
       {{ text }}
     </q-tooltip>
     <icon
-      v-if="iconId || props.iconVariant"
+      v-if="iconId || props.icon"
       :id="iconId"
-      :variant="props.iconVariant"
+      :variant="props.icon"
+      :color="iconColor"
       size="sm"
-      :color="props.artifactType ? 'primary' : ''"
     />
     <typography ellipsis inherit-color :l="iconId ? '1' : '0'" :value="text" />
   </q-chip>
@@ -57,8 +57,7 @@ import Typography from "../Typography.vue";
 const props = defineProps<{
   value: string;
   format?: boolean;
-  icon?: string;
-  iconVariant?: IconVariant;
+  icon?: IconVariant;
   artifactType?: boolean;
   confidenceScore?: boolean;
   dataCy?: string;
@@ -88,9 +87,7 @@ const progress = computed(() =>
 );
 
 const iconId = computed(() =>
-  props.artifactType
-    ? typeOptionsStore.getArtifactTypeIcon(props.value)
-    : props.icon || ""
+  props.artifactType ? typeOptionsStore.getArtifactTypeIcon(props.value) : ""
 );
 
 const displayColor = computed(() => {
@@ -102,6 +99,14 @@ const displayColor = computed(() => {
     return getBackgroundColor(props.value, darkMode.value);
   } else {
     return "";
+  }
+});
+
+const iconColor = computed(() => {
+  if (props.artifactType) {
+    return "primary";
+  } else {
+    return displayColor.value;
   }
 });
 

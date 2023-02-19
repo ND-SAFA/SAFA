@@ -1,7 +1,7 @@
 <template>
   <div v-if="isOpen">
     <flex-box t="2">
-      <text-button text variant="artifact" @click="handleViewLevel">
+      <text-button text icon="artifact" @click="handleViewLevel">
         View In Tree
       </text-button>
     </flex-box>

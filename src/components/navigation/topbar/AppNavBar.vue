@@ -4,6 +4,7 @@
       <div class="full-width">
         <header-bar />
         <graph-bar v-if="graphVisible" />
+        <loading-bar />
       </div>
     </q-toolbar>
   </q-header>
@@ -23,7 +24,7 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useTheme } from "@/hooks";
 import { Routes } from "@/router";
-import { HeaderBar } from "./header";
+import { HeaderBar, LoadingBar } from "./header";
 import { GraphBar } from "./graph";
 
 const { darkMode } = useTheme();

@@ -35,7 +35,7 @@
         />
         <icon-button
           tooltip="Refresh"
-          icon-variant="graph-refresh"
+          icon="graph-refresh"
           data-cy="button-selector-reload"
           @click="$emit('refresh')"
         />
@@ -47,14 +47,14 @@
           <slot name="item.actions" :item="item" />
           <icon-button
             v-if="hasEdit"
-            icon-variant="edit"
+            icon="edit"
             tooltip="Edit"
             data-cy="button-selector-edit"
             @click="$emit('item:edit', item)"
           />
           <icon-button
             v-if="isDeleteEnabled(item)"
-            icon-variant="delete"
+            icon="delete"
             tooltip="Delete"
             data-cy="button-selector-delete"
             @click="$emit('item:delete', item)"
@@ -68,7 +68,7 @@
           v-if="!minimal && hasAdd"
           fab
           color="primary"
-          icon-variant="add"
+          icon="add"
           tooltip="Create"
           data-cy="button-selector-add"
           @click="$emit('item:add')"

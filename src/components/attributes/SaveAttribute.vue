@@ -60,7 +60,7 @@
         v-if="store.isUpdate"
         data-cy="button-delete-attribute"
         text
-        variant="delete"
+        icon="delete"
         @click="handleDelete"
       >
         Delete
@@ -69,7 +69,7 @@
       <text-button
         :disabled="!store.canSave"
         data-cy="button-save-attribute"
-        variant="save"
+        icon="save"
         @click="handleSave"
       >
         Save

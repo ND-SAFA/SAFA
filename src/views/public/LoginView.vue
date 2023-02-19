@@ -14,14 +14,13 @@
     <template #actions>
       <text-button
         color="primary"
+        label="Login"
         style="width: 8em"
         :disabled="password.length === 0"
         :loading="isLoading"
         data-cy="button-login"
         @click="handleSubmit"
-      >
-        Login
-      </text-button>
+      />
 
       <div class="q-ml-auto text-right">
         <div>
@@ -30,18 +29,21 @@
           <text-button
             text
             small
+            label="Sign Up"
             class="q-pl-sm"
             color="primary"
             data-cy="button-create-account-redirect"
             @click="handleSignUp"
-          >
-            Sign Up
-          </text-button>
+          />
         </div>
 
-        <text-button text small color="primary" @click="handleForgotPassword">
-          Forgot Password
-        </text-button>
+        <text-button
+          text
+          small
+          label="Forgot Password"
+          color="primary"
+          @click="handleForgotPassword"
+        />
       </div>
     </template>
   </card-page>

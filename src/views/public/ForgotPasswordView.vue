@@ -34,17 +34,20 @@
       <text-button
         v-if="!isSubmitted"
         color="primary"
+        label="Reset Password"
         :disabled="email.length === 0"
         :loading="isLoading"
         @click="handleReset"
-      >
-        Reset Password
-      </text-button>
+      />
 
       <span class="q-ml-auto">
-        <text-button text small color="primary" @click="handleLogin">
-          Back To Login
-        </text-button>
+        <text-button
+          text
+          small
+          label="Back To Login"
+          color="primary"
+          @click="handleLogin"
+        />
       </span>
     </template>
   </card-page>

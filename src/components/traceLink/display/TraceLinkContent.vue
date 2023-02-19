@@ -11,7 +11,7 @@
         <text-button
           text
           data-cy="button-trace-target"
-          variant="artifact"
+          icon="artifact"
           @click="handleViewTarget"
         >
           View Artifact

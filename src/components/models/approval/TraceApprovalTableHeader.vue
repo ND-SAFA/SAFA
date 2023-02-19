@@ -27,11 +27,7 @@
       </flex-box>
     </template>
     <template #bottom>
-      <text-button
-        text
-        icon-variant="trace-decline-all"
-        @click="handleDeclineAll"
-      >
+      <text-button text icon="trace-decline-all" @click="handleDeclineAll">
         Clear Unreviewed
       </text-button>
     </template>

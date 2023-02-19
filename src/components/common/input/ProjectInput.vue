@@ -15,7 +15,7 @@
     <template #append>
       <icon-button
         small
-        icon-variant="save"
+        icon="save"
         tooltip="Save Projects"
         data-cy="button-save-artifacts"
         @click="handleClose"

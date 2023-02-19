@@ -11,19 +11,19 @@
           <typography :value="props.title" />
           <icon-button
             tooltip="Close"
-            icon-variant="cancel"
+            icon="cancel"
             data-cy="button-close"
             @click="$emit('close')"
           />
         </flex-box>
-        <q-separator />
+        <separator />
         <q-linear-progress v-if="props.isLoading" indeterminate />
       </q-card-section>
       <q-card-section>
         <slot />
       </q-card-section>
       <q-card-actions v-if="props.actions" align="right">
-        <q-separator />
+        <separator />
         <slot name="actions" />
       </q-card-actions>
     </q-card>
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Typography } from "@/components/common/display";
+import { Typography, Separator } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
 

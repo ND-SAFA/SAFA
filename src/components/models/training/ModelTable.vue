@@ -31,7 +31,7 @@
       </template>
       <template #[`item.actions`]="{ item }">
         <icon-button
-          icon-variant="share"
+          icon="share"
           tooltip="Share Model"
           @click="handleShare(item)"
         />

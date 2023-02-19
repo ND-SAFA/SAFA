@@ -1,6 +1,6 @@
 <template>
   <div>
-    <text-button text y="2" variant="artifact" @click="handleViewArtifact">
+    <text-button text y="2" icon="artifact" @click="handleViewArtifact">
       View Artifact
     </text-button>
     <panel-card class="pb-4">

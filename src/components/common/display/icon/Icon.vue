@@ -54,8 +54,8 @@ const iconId = computed(() => {
     case "success":
       return "mdi-check-outline";
     case "artifact":
-      // "mdi-alpha-a-box-outline"
-      return "mdi-application-array-outline";
+      return "mdi-alpha-a-box-outline";
+    // return "mdi-application-array-outline";
     case "trace":
       return "mdi-ray-start-arrow";
     case "upload":

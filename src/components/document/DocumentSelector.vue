@@ -23,7 +23,7 @@
         <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
           <icon-button
             v-if="canEdit(item.name)"
-            icon-variant="more"
+            icon="more"
             :tooltip="`Edit ${item.name}`"
             data-cy="button-document-select-edit"
           />
@@ -36,7 +36,7 @@
         v-if="canEdit()"
         text
         block
-        variant="add"
+        icon="add"
         data-cy="button-document-select-create"
         @click="handleCreateOpen"
       >

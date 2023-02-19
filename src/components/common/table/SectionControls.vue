@@ -4,14 +4,14 @@
       small
       color="error"
       tooltip="Collapse All"
-      icon-variant="group-close-all"
+      icon="group-close-all"
       @click="$emit('close:all')"
     />
     <icon-button
       small
       color="primary"
       tooltip="Expand All"
-      icon-variant="group-open-all"
+      icon="group-open-all"
       @click="$emit('open:all')"
     />
   </flex-box>

@@ -52,17 +52,13 @@
           </v-card-subtitle>
           <v-card-text>
             <div class="q-mx-auto width-min">
-              <text-button text icon-variant="add" @click="handleOpenStandard">
+              <text-button text icon="add" @click="handleOpenStandard">
                 Create New Project
               </text-button>
-              <text-button text icon-variant="upload" @click="handleOpenBulk">
+              <text-button text icon="upload" @click="handleOpenBulk">
                 Bulk Upload Project
               </text-button>
-              <text-button
-                text
-                icon-variant="integrate"
-                @click="handleOpenImport"
-              >
+              <text-button text icon="integrate" @click="handleOpenImport">
                 Import Jira/GitHub Project
               </text-button>
             </div>

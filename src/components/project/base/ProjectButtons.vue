@@ -2,7 +2,7 @@
   <flex-box v-if="doDisplay" wrap b="2">
     <text-button
       text
-      icon-variant="download"
+      icon="download"
       data-cy="button-settings-download"
       @click="handleDownload"
     >
@@ -10,7 +10,7 @@
     </text-button>
     <text-button
       text
-      variant="edit"
+      icon="edit"
       data-cy="button-settings-edit"
       @click="handleEdit"
     >
@@ -19,7 +19,7 @@
     <v-divider vertical />
     <text-button
       text
-      variant="delete"
+      icon="delete"
       data-cy="button-settings-delete"
       @click="handleDelete"
     >

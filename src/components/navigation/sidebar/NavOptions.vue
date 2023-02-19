@@ -1,7 +1,7 @@
 <template>
   <list :items="options">
     <template #item="{ item }">
-      <q-separator v-if="item.divider" />
+      <separator v-if="item.divider" />
       <list-item
         :to="item.path"
         color="primary"
@@ -27,7 +27,7 @@ import { computed } from "vue";
 import { NavOption } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
-import { List, ListItem } from "@/components/common";
+import { List, ListItem, Separator } from "@/components/common";
 
 const hideProjectOptions = computed(() => !projectStore.isProjectDefined);
 

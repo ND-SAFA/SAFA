@@ -8,8 +8,7 @@
         <app-version />
       </flex-box>
     </flex-box>
-    <q-separator v-if="graphVisible" color="accent" class="faded" />
-    <loading-bar />
+    <separator v-if="graphVisible" nav />
   </div>
 </template>
 
@@ -26,12 +25,11 @@ export default {
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
-import { FlexBox } from "@/components/common";
+import { FlexBox, Separator } from "@/components/common";
 import Searchbar from "./Searchbar.vue";
 import AppVersion from "./AppVersion.vue";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
-import LoadingBar from "./LoadingBar.vue";
 
 const currentRoute = useRoute();
 const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);

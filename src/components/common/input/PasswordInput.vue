@@ -35,9 +35,18 @@ import { useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
+    /**
+     * The model value.
+     */
     modelValue: string;
-    label?: string;
+    /**
+     * An error message to display, if one exists.
+     */
     errorMessage?: string | false;
+    /**
+     * The label to display.
+     */
+    label?: string;
   }>(),
   {
     label: "Password",
@@ -46,7 +55,13 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
+  /**
+   * Called when the model is updated.
+   */
+  (e: "update:modelValue"): void;
+  /**
+   * Called when the enter button is pressed.
+   */
   (e: "enter"): void;
 }>();
 

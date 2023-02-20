@@ -7,7 +7,7 @@
         :color="color"
         :tooltip="definition.label"
         :icon="definition.icon"
-        :is-disabled="definition.isDisabled"
+        :disabled="definition.isDisabled"
         :data-cy="definition.dataCy"
         @click="definition.handler"
       />
@@ -26,7 +26,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
-import { ButtonType } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { FlexBox } from "@/components/common/layout";
@@ -34,7 +33,10 @@ import IconButton from "./IconButton.vue";
 
 withDefaults(
   defineProps<{
-    color?: string;
+    /**
+     * The color to render the component with.
+     */
+    color?: "primary" | "secondary" | "accent" | "error" | string;
   }>(),
   {
     color: "accent",
@@ -43,7 +45,6 @@ withDefaults(
 
 const buttons = computed(() => [
   {
-    type: ButtonType.ICON,
     handler: () => {
       undoCommit().then();
     },
@@ -53,7 +54,6 @@ const buttons = computed(() => [
     dataCy: "button-nav-undo",
   },
   {
-    type: ButtonType.ICON,
     handler: () => redoCommit().then(),
     label: "Redo",
     icon: "redo",

@@ -37,7 +37,7 @@
       v-if="isTreeMode"
       fab
       small
-      :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
+      :rotate="isCreateLinkEnabled ? 0 : -45"
       :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
       :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
       data-cy="button-fab-draw-trace"

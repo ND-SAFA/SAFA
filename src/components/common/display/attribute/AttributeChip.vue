@@ -55,13 +55,34 @@ import Icon from "@/components/common/display/icon/Icon.vue";
 import Typography from "../Typography.vue";
 
 const props = defineProps<{
+  /**
+   * The chip text.
+   */
   value: string;
+  /**
+   * If true, the chip text will be converted from "camelCase" to "Display Case".
+   */
   format?: boolean;
-  icon?: IconVariant;
+  /**
+   * Whether this chip is for an artifact type, customizing the display and icon.
+   */
   artifactType?: boolean;
+  /**
+   * Whether to render a confidence score instead of a chip.
+   */
   confidenceScore?: boolean;
+  /**
+   * The type of icon to render.
+   */
+  icon?: IconVariant;
+  /**
+   * The color to render the component with.
+   */
+  color?: "primary" | "secondary" | "accent" | "error" | string;
+  /**
+   * The testing selector to set.
+   */
   dataCy?: string;
-  color?: string;
 }>();
 
 const { darkMode } = useTheme();

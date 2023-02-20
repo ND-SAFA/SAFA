@@ -21,11 +21,29 @@ import { computed } from "vue";
 import { IconVariant } from "@/types";
 
 const props = defineProps<{
+  /**
+   * The icon variant to render.
+   */
   variant?: IconVariant;
-  color?: "primary" | "secondary" | "error" | "accent" | string;
+  /**
+   * The id of an icon, if not rendering a preset variant.
+   */
   id?: string;
+  /**
+   * The size of the icon.
+   */
   size?: "sm" | "md" | "lg";
+  /**
+   * How much to rotate the icon (in degrees).
+   */
   rotate?: number;
+  /**
+   * The color to render the component with.
+   */
+  color?: "primary" | "secondary" | "accent" | "error" | string;
+  /**
+   * The  style to include on the component.
+   */
   style?: string;
 }>();
 

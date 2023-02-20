@@ -18,6 +18,9 @@ import { computed } from "vue";
 import { MessageType } from "@/types";
 
 const props = defineProps<{
+  /**
+   * The type of alert to render.
+   */
   type: MessageType;
 }>();
 

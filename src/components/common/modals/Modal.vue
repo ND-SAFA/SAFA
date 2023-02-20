@@ -13,16 +13,16 @@
             tooltip="Close"
             icon="cancel"
             data-cy="button-close"
-            @click="$emit('close')"
+            @click="emit('close')"
           />
         </flex-box>
         <separator />
-        <q-linear-progress v-if="props.isLoading" indeterminate />
+        <q-linear-progress v-if="!!props.loading" indeterminate />
       </q-card-section>
       <q-card-section>
         <slot />
       </q-card-section>
-      <q-card-actions v-if="props.actions" align="right">
+      <q-card-actions v-if="!!slots.actions" align="right">
         <separator />
         <slot name="actions" />
       </q-card-actions>
@@ -40,19 +40,36 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { useSlots } from "vue";
 import { Typography, Separator } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
 
 const props = defineProps<{
+  /**
+   * The modal title.
+   */
   title: string;
+  /**
+   * Whether the modal is open.
+   */
   isOpen: boolean;
-  isLoading?: boolean;
+  /**
+   * Whether the component is loading.
+   */
+  loading?: string;
+  /**
+   * The testing selector to set.
+   */
   dataCy?: string;
-  actions?: boolean;
 }>();
 
 const emit = defineEmits<{
+  /**
+   * Called when closed.
+   */
   (e: "close"): void;
 }>();
+
+const slots = useSlots();
 </script>

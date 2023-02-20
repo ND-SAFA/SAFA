@@ -2,9 +2,9 @@
   <q-input
     v-model="model"
     filled
-    :label="label"
+    :label="props.label"
     data-cy="input-password"
-    :error-message="errorMessage || ''"
+    :error-message="props.errorMessage || ''"
     :error="showError"
     :class="className"
     @keydown="handleKeydown"
@@ -27,11 +27,26 @@ import { useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
+    /**
+     * The model value.
+     */
     modelValue: string;
-    label?: string;
+    /**
+     * An error message to display, if one exists.
+     */
     errorMessage?: string | false;
-    b?: SizeType;
+    /**
+     * The classnames to include on this component.
+     */
     class?: string;
+    /**
+     * The label to display.
+     */
+    label?: string;
+    /**
+     * The bottom margin.
+     */
+    b?: SizeType;
   }>(),
   {
     b: "1",
@@ -42,7 +57,13 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
+  /**
+   * Called when the model is updated.
+   */
+  (e: "update:modelValue"): void;
+  /**
+   * Called when the enter button is pressed.
+   */
   (e: "enter"): void;
 }>();
 

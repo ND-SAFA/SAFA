@@ -2,7 +2,7 @@
   <modal
     :title="`Current Version: ${versionName}`"
     :is-open="props.isOpen"
-    :is-loading="isLoading"
+    :loading="isLoading"
     data-cy="modal-version-create"
     @close="emit('close')"
   >

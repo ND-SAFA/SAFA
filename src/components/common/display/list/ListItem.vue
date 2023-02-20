@@ -45,15 +45,50 @@ import Separator from "../Separator.vue";
 import { Icon } from "../icon";
 
 const props = defineProps<{
+  /**
+   * The item title, instead of using the `default` slot.
+   */
   title?: string;
+  /**
+   * The icon subtitle, instead of using the `subtitle` slot.
+   */
   subtitle?: string;
+  /**
+   * The item tooltip.
+   * If set to true, a tooltip will be generated based on the title and subtitle.
+   */
   tooltip?: true | string;
-  icon?: IconVariant;
+  /**
+   * Whether the item is clickable. Automatically set if `to` is set.
+   */
   clickable?: boolean;
+  /**
+   * Where the list item navigates to when clicked.
+   */
   to?: string | { path: string; query: URLQuery };
-  color?: string;
+  /**
+   * Whether to render a divider between the title and subtitle.
+   */
   divider?: boolean;
+  /**
+   * The type of icon to render.
+   */
+  icon?: IconVariant;
+  /**
+   * The color to render the component with.
+   */
+  color?: "primary" | "secondary" | "accent" | "error" | string;
+  /**
+   * The testing selector to set.
+   */
   dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  /**
+   * Called when clicked.
+   */
+  (e: "click"): void;
 }>();
 
 const slots = useSlots();
@@ -69,8 +104,4 @@ const itemTooltip = computed(() => {
     return undefined;
   }
 });
-
-const emit = defineEmits<{
-  (e: "click"): void;
-}>();
 </script>

@@ -40,7 +40,7 @@
               class="ml-auto"
               icon="add"
               tooltip="Add to layout"
-              :is-disabled="isAttributeInLayout(attribute)"
+              :disabled="isAttributeInLayout(attribute)"
               @click="handleAddToLayout(attribute)"
             />
           </span>

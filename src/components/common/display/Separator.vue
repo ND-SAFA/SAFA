@@ -19,49 +19,63 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { SizeType } from "@/types";
+import { useMargins } from "@/hooks";
 
 const props = defineProps<{
-  x?: SizeType;
-  y?: SizeType;
-  l?: SizeType;
-  r?: SizeType;
-  t?: SizeType;
-  b?: SizeType;
+  /**
+   * Whether to render the separator vertically.
+   */
   vertical?: boolean;
-  class?: string;
+  /**
+   * Whether to pad the separator.
+   */
   inset?: boolean;
+  /**
+   * Whether to style to separator for the navigation bar.
+   */
   nav?: boolean;
-  color?: string;
+  /**
+   * The color to render the component with.
+   */
+  color?: "primary" | "secondary" | "accent" | "error" | string;
+  /**
+   * The x margin.
+   */
+  x?: SizeType;
+  /**
+   * The y margin.
+   */
+  y?: SizeType;
+  /**
+   * The left margin.
+   */
+  l?: SizeType;
+  /**
+   * The right margin.
+   */
+  r?: SizeType;
+  /**
+   * The top margin.
+   */
+  t?: SizeType;
+  /**
+   * The bottom margin.
+   */
+  b?: SizeType;
+  /**
+   * The classnames to include on this component.
+   */
+  class?: string;
 }>();
 
-const convertMargin = (value: SizeType) => {
-  switch (value) {
-    case "":
-      return "none";
-    case "1":
-      return "xs";
-    case "2":
-      return "sm";
-    case "3":
-      return "md";
-    case "4":
-      return "lg";
-    case "5":
-    default:
-      return "xl";
-  }
-};
+const marginClassName = useMargins(props);
 
 const className = computed(() => {
   let classNames = props.class || "";
 
+  classNames += ` ${marginClassName.value}`;
+
   if (props.nav) classNames += ` faded`;
-  if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
-  if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
-  if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
-  if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
-  if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
-  if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
 
   return classNames;
 });

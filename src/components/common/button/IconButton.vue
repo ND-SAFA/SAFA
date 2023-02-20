@@ -2,9 +2,8 @@
   <q-btn
     :color="props.color"
     :fab="props.fab"
-    :class="props.isDisabled ? 'disable-events' : ''"
+    :class="props.disabled ? 'disable-events' : ''"
     :size="size"
-    :hidden="props.isHidden"
     :data-cy="props.dataCy"
     flat
     :round="!props.fab"
@@ -36,20 +35,48 @@ import { IconVariant } from "@/types";
 import Icon from "@/components/common/display/icon/Icon.vue";
 
 const props = defineProps<{
-  dataCy?: string;
-  tooltip: string;
+  /**
+   * The type of icon to render.
+   */
   icon?: IconVariant;
-  color?: string;
-  iconStyle?: string;
+  /**
+   * The tooltip message to display on this button.
+   */
+  tooltip: string;
+  /**
+   * Whether to render this button as a fab.
+   */
   fab?: boolean;
-  small?: boolean;
-  large?: boolean;
-  isDisabled?: boolean;
-  isHidden?: boolean;
+  /**
+   * Rotates the icon on this button (in degrees).
+   */
   rotate?: number;
+  /**
+   * The color to render the component with.
+   */
+  color?: "primary" | "secondary" | "accent" | "error" | string;
+  /**
+   * Whether the component is disabled.
+   */
+  disabled?: string;
+  /**
+   * Renders a smaller component.
+   */
+  small?: boolean;
+  /**
+   * Renders a larger component.
+   */
+  large?: boolean;
+  /**
+   * The testing selector to set.
+   */
+  dataCy?: string;
 }>();
 
 const emit = defineEmits<{
+  /**
+   * Called when clicked.
+   */
   (e: "click"): void;
 }>();
 

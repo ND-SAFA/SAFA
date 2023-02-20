@@ -15,22 +15,60 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
-import { JustifyType, SizeType, AlignType } from "@/types";
+import { AlignType, JustifyType, SizeType } from "@/types";
+import { useMargins } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
+    /**
+     * How to align the content.
+     */
     align?: AlignType;
+    /**
+     * How to justify the content.
+     */
     justify?: JustifyType;
-    x?: SizeType;
-    y?: SizeType;
-    l?: SizeType;
-    r?: SizeType;
-    t?: SizeType;
-    b?: SizeType;
+    /**
+     * The max width to set (in pixels)
+     */
     maxWidth?: number;
+    /**
+     * Whether to expand to full width.
+     */
     fullWidth?: boolean;
+    /**
+     * Whether to render as a flex column instead of row.
+     */
     column?: boolean;
+    /**
+     * Whether to allow the items to wrap.
+     * @default Unset unless an explicit boolean true or false is set.
+     */
     wrap?: boolean;
+    /**
+     * The x margin.
+     */
+    x?: SizeType;
+    /**
+     * The y margin.
+     */
+    y?: SizeType;
+    /**
+     * The left margin.
+     */
+    l?: SizeType;
+    /**
+     * The right margin.
+     */
+    r?: SizeType;
+    /**
+     * The top margin.
+     */
+    t?: SizeType;
+    /**
+     * The bottom margin.
+     */
+    b?: SizeType;
   }>(),
   {
     align: "start",
@@ -45,43 +83,21 @@ const props = withDefaults(
   }
 );
 
+const marginClassName = useMargins(props);
+
 const style = computed(() =>
   props.maxWidth ? `max-width: ${props.maxWidth}px` : ""
 );
 
-const convertMargin = (value: SizeType) => {
-  switch (value) {
-    case "":
-      return "none";
-    case "1":
-      return "xs";
-    case "2":
-      return "sm";
-    case "3":
-      return "md";
-    case "4":
-      return "lg";
-    case "5":
-    default:
-      return "xl";
-  }
-};
-
 const className = computed(() => {
-  let classNames = `flex `;
+  let classNames = `flex ${marginClassName.value}`;
 
   if (props.align) classNames += ` align-${props.align}`;
   if (props.justify) classNames += ` justify-${props.justify}`;
-  if (props.fullWidth) classNames += ` fill-width`;
-  if (props.column) classNames += ` column`;
-  if (props.wrap) classNames += ` wrap`;
-  if (props.wrap === false) classNames += ` nowrap`;
-  if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
-  if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
-  if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
-  if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
-  if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
-  if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
+  if (props.fullWidth) classNames += " fill-width";
+  if (props.column) classNames += " column";
+  if (props.wrap) classNames += " wrap";
+  if (props.wrap === false) classNames += " nowrap";
 
   return classNames;
 });

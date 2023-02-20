@@ -17,6 +17,6 @@ export default {
 
 <script setup lang="ts">
 const props = defineProps<{
-  items: Record<string, unknown>;
+  items: Record<string, unknown>[];
 }>();
 </script>

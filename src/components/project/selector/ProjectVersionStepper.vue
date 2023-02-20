@@ -37,13 +37,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import {
-  OptionalProjectIdentifier,
-  OptionalProjectVersion,
-  StepState,
-  IdentifierSchema,
-  VersionSchema,
-} from "@/types";
+import { StepState, IdentifierSchema, VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
@@ -73,8 +67,8 @@ export default defineComponent({
         [SELECT_VERSION_DEFAULT_NAME, false],
       ] as StepState[],
       isLoading: false,
-      selectedProject: undefined as OptionalProjectIdentifier,
-      selectedVersion: undefined as OptionalProjectVersion,
+      selectedProject: undefined as IdentifierSchema | undefined,
+      selectedVersion: undefined as VersionSchema | undefined,
     };
   },
   computed: {

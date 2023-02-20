@@ -39,13 +39,28 @@ import { AttributeChip } from "./attribute";
 import Typography from "./Typography.vue";
 
 const props = defineProps<{
+  /**
+   * The artifact to display.
+   */
   artifact: ArtifactSchema;
+  /**
+   * Whether to display the title.
+   */
   displayTitle?: boolean;
+  /**
+   * Whether to display a divider between the content.
+   */
   displayDivider?: boolean;
+  /**
+   * Whether the content is clickable.
+   */
   clickable?: boolean;
 }>();
 
 const emit = defineEmits<{
+  /**
+   * Called when clicked.
+   */
   (e: "click"): void;
 }>();
 

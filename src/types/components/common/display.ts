@@ -63,3 +63,17 @@ export interface GridItemData {
   h: number;
   i: string;
 }
+
+/**
+ * Represents an option for a select menu.
+ */
+export interface SelectOption {
+  /**
+   * The iud of the option to use as a stored.
+   */
+  id: string;
+  /**
+   * The name of the option to display.
+   */
+  name: string;
+}

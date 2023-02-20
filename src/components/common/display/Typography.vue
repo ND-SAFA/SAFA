@@ -58,32 +58,105 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults } from "vue";
-import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
-import { useTheme } from "@/hooks";
+import { ElementType, SizeType, TextAlignType, TextType } from "@/types";
+import { useMargins, useTheme } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
+    /**
+     * The text value to display.
+     */
     value?: string | number;
-    classes?: string;
-    color?: string;
-    inheritColor?: boolean;
-    error?: boolean;
-    defaultExpanded?: boolean;
+    /**
+     * Whether to truncate text with an ellipsis.
+     */
     ellipsis?: boolean;
+
+    /**
+     * Whether to inherit color from the parent element.
+     */
+    inheritColor?: boolean;
+    /**
+     * Whether to color this text as an error.
+     */
+    error?: boolean;
+    /**
+     * Renders the text with a faded color.
+     */
     secondary?: boolean;
+    /**
+     * The color to render the component with.
+     */
+    color?: "primary" | "secondary" | "accent" | "error" | string;
+
+    /**
+     * Bolds the text.
+     */
     bold?: boolean;
+    /**
+     * Sets the text to wrap.
+     */
     wrap?: boolean;
-    small?: boolean;
-    large?: boolean;
+
+    /**
+     * The variant of text to render.
+     * @default `body`
+     */
     variant?: TextType;
+    /**
+     * The element to render the text on.
+     * @default `span`
+     */
     el?: ElementType;
+    /**
+     * How to align the text.
+     * @default `left`
+     */
     align?: TextAlignType;
+
+    /**
+     * For expandable variants, whether the content defaults to expanded.
+     */
+    defaultExpanded?: boolean;
+
+    /**
+     * Renders a smaller component.
+     */
+    small?: boolean;
+    /**
+     * Renders a larger component.
+     */
+    large?: boolean;
+
+    /**
+     * The x margin.
+     */
     x?: SizeType;
+    /**
+     * The y margin.
+     */
     y?: SizeType;
+    /**
+     * The left margin.
+     */
     l?: SizeType;
+    /**
+     * The right margin.
+     */
     r?: SizeType;
+    /**
+     * The top margin.
+     */
     t?: SizeType;
+    /**
+     * The bottom margin.
+     */
     b?: SizeType;
+
+    /**
+     * The classnames to include on this component.
+     */
+    class?: string;
   }>(),
   {
     value: "",
@@ -98,10 +171,12 @@ const props = withDefaults(
     r: "",
     t: "",
     b: "",
+    class: "",
   }
 );
 
 const { darkMode } = useTheme();
+const marginClassName = useMargins(props);
 
 const isExpanded = ref(
   props.defaultExpanded && String(props.value).length < 500
@@ -109,28 +184,12 @@ const isExpanded = ref(
 
 const isExpandable = computed(() => props.variant === "expandable");
 
-const convertMargin = (value: SizeType) => {
-  switch (value) {
-    case "":
-      return "none";
-    case "1":
-      return "xs";
-    case "2":
-      return "sm";
-    case "3":
-      return "md";
-    case "4":
-      return "lg";
-    case "5":
-    default:
-      return "xl";
-  }
-};
-
 const className = computed(() => {
-  let classNames = ` text-${props.align}`;
+  let classNames = props.class || "";
 
-  if (props.classes) classNames += ` ${props.classes}`;
+  classNames += ` ${marginClassName.value}`;
+
+  if (props.align) classNames += ` text-${props.align}`;
   if (props.color && !darkMode.value) classNames += ` text-${props.color}`;
   if (props.inheritColor) classNames += " inherit-color";
   if (props.error) classNames += " text-error";
@@ -140,28 +199,22 @@ const className = computed(() => {
   if (props.small) classNames += " text-sm";
   if (props.small) classNames += " text-mg";
   if (props.wrap) classNames += " text-wrap";
-  if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
-  if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
-  if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
-  if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
-  if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
-  if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
 
   switch (props.variant) {
     case "large":
-      return "text-h3" + classNames;
+      return "text-h3 " + classNames;
     case "title":
-      return "text-h4" + classNames;
+      return "text-h4 " + classNames;
     case "subtitle":
-      return "text-h5" + classNames;
+      return "text-h5 " + classNames;
     case "small":
-      return "text-subtitle2" + classNames;
+      return "text-subtitle2 " + classNames;
     case "caption":
-      return "text-caption" + classNames;
+      return "text-caption " + classNames;
     case "code":
-      return "text-body1 overflow-y-auto" + classNames;
+      return "text-body1 overflow-y-auto " + classNames;
     default:
-      return "text-body1" + classNames;
+      return "text-body1 " + classNames;
   }
 });
 </script>

@@ -7,6 +7,15 @@ class ListUtil:
     """
 
     @staticmethod
+    def flatten(list_: List[List]) -> List:
+        """
+        Flattens list of lists into single list.
+        :param list_: List containing lists as elements.
+        :return: List containing all sub-elements.
+        """
+        return [item for sublist in list_ for item in sublist]
+
+    @staticmethod
     def get_n_items_from_list(list_: List, n_items: int, iteration_num: int = None, init_index: int = None) -> Tuple[List, int]:
         """
         Returns the start and end index to get n items from a list starting from a initial index

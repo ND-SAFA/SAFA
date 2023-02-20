@@ -1,45 +1,5 @@
 <template>
-  <v-snackbar
-    v-model="showSnackbar"
-    :timeout="timeout"
-    :color="messageColor"
-    bottom
-  >
-    <flex-box
-      align="center"
-      justify="space-between"
-      :data-cy="`snackbar-${messageType}`"
-    >
-      <icon color="white" :variant="iconVariant" />
-      <typography color="white" align="center" x="2" :value="snackbarMessage" />
-      <flex-box align="center">
-        <text-button
-          v-if="hasErrors"
-          text
-          label="See Errors"
-          color="white"
-          class="ma-0"
-          @click="handleSeeError"
-        />
-        <icon-button
-          v-if="showAction"
-          color="white"
-          icon="download"
-          tooltip="Update"
-          @click="handleAction"
-        />
-        <icon-button
-          color="white"
-          icon="cancel"
-          tooltip="Close"
-          data-cy="button-snackbar-close"
-          @click="showSnackbar = false"
-        />
-      </flex-box>
-    </flex-box>
-
-    <ServerErrorModal :is-open="isErrorOpen" :errors="errors" />
-  </v-snackbar>
+  <server-error-modal :is-open="isErrorOpen" :errors="errors" />
 </template>
 
 <script lang="ts">
@@ -53,24 +13,18 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { IconVariant, MessageType, SnackbarMessage } from "@/types";
+import { useQuasar } from "quasar";
+import type { QNotifyCreateOptions } from "quasar";
+import { MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
-import {
-  ServerErrorModal,
-  IconButton,
-  Typography,
-  FlexBox,
-  TextButton,
-  Icon,
-} from "@/components/common";
+import { ServerErrorModal } from "@/components/common";
 
-const timeout = 5000;
-
-const showSnackbar = ref(false);
 const snackbarMessage = ref("");
 const messageType = ref<MessageType>(MessageType.CLEAR);
 const errors = ref<string[]>([]);
+
+const $q = useQuasar();
 
 const hasErrors = computed(() => errors.value.length > 0);
 const isErrorOpen = computed(() => appStore.isErrorDisplayOpen);
@@ -91,42 +45,42 @@ const messageColor = computed(() => {
   }
 });
 
-const iconVariant = computed<IconVariant>(() => {
-  switch (messageType.value) {
-    case MessageType.WARNING:
-      return "warning";
-    case MessageType.ERROR:
-      return "error";
-    case MessageType.SUCCESS:
-      return "success";
-    default:
-      return "info";
+function buildNotification(): QNotifyCreateOptions {
+  const actions: QNotifyCreateOptions["actions"] = [];
+
+  if (hasErrors.value) {
+    actions.push({
+      label: "See Errors",
+      color: "white",
+      handler: () => appStore.toggleErrorDisplay(),
+    });
   }
-});
+
+  if (showAction.value) {
+    actions.push({
+      label: "Update",
+      color: "white",
+      handler: () => appStore.loadAppChanges(),
+    });
+  }
+
+  return {
+    message: snackbarMessage.value,
+    color: messageColor.value,
+    actions: [],
+  };
+}
+
 /**
  * Displays a snackbar message.
  * @param message - The message to display.
  */
 function handleShowMessage(message: SnackbarMessage) {
-  showSnackbar.value = true;
   snackbarMessage.value = String(message.message);
   errors.value = message.errors || [];
   messageType.value = message.type;
-}
 
-/**
- * Opens the error display panel.
- */
-function handleSeeError(): void {
-  appStore.toggleErrorDisplay();
-}
-
-/**
- * Runs changes that are pending.
- */
-function handleAction(): void {
-  showSnackbar.value = false;
-  appStore.loadAppChanges();
+  $q.notify(buildNotification());
 }
 
 watch(

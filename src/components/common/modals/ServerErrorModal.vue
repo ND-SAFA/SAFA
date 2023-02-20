@@ -1,51 +1,46 @@
 <template>
-  <modal
-    title="Server Errors"
-    :is-open="isOpen"
-    :actions-height="0"
-    :is-loading="isLoading"
-    @close="handleClose"
-  >
-    <template #body>
-      <v-list disabled>
-        <v-list-item v-for="(error, errorIndex) in errors" :key="errorIndex">
-          <v-list-item-content class="pa-0">
-            <code style="word-break: break-all">
-              {{ error }}
-            </code>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </template>
+  <modal title="Server Errors" :is-open="isOpen" @close="handleClose">
+    <list :items="props.errors">
+      <template #item="{ item }">
+        <list-item>
+          <code style="word-break: break-all">
+            {{ item }}
+          </code>
+        </list-item>
+      </template>
+    </list>
   </modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { appStore } from "@/hooks";
-import Modal from "./Modal.vue";
-
 /**
  * Renders server errors.
  */
-export default defineComponent({
+export default {
   name: "ServerErrorModal",
-  components: {
-    Modal,
-  },
-  data() {
-    return {
-      isLoading: false,
-    };
-  },
-  props: {
-    isOpen: Boolean,
-    errors: Array as PropType<string[]>,
-  },
-  methods: {
-    handleClose() {
-      appStore.toggleErrorDisplay();
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import List from "@/components/common/display/list/List.vue";
+import ListItem from "@/components/common/display/list/ListItem.vue";
+import Modal from "./Modal.vue";
+
+const props = defineProps<{
+  /**
+   * The errors to display.
+   */
+  errors: string[];
+}>();
+
+const isOpen = computed(() => appStore.isErrorDisplayOpen);
+
+/**
+ * Closes the error display.
+ */
+function handleClose() {
+  appStore.toggleErrorDisplay();
+}
 </script>

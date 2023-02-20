@@ -1,12 +1,20 @@
 <template>
-  <v-container v-if="sessionStore.doesSessionExist" :class="className">
+  <q-page v-if="doDisplay" class="bg-background" :padding="!props.fullWindow">
     <slot />
-  </v-container>
-  <v-container v-else class="my-8">
-    <div class="mx-auto width-fit" style="margin-top: 40vh">
-      <v-progress-circular size="60" indeterminate />
+  </q-page>
+  <q-page v-else>
+    <div class="full-width" style="margin-top: 40vh">
+      <div class="q-mx-auto width-fit">
+        <q-circular-progress
+          rounded
+          indeterminate
+          size="60px"
+          :thickness="0.2"
+          color="primary"
+        />
+      </div>
     </div>
-  </v-container>
+  </q-page>
 </template>
 
 <script lang="ts">
@@ -26,7 +34,5 @@ const props = defineProps<{
   fullWindow?: boolean;
 }>();
 
-const className = computed(() =>
-  props.fullWindow ? "full-window-page primary-bg" : "primary-bg"
-);
+const doDisplay = computed(() => sessionStore.doesSessionExist);
 </script>

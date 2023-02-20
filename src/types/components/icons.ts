@@ -28,6 +28,7 @@ export type IconVariant =
   | "more"
   | "undo"
   | "redo"
+  | "logout"
   | "home-list"
   | "home-add"
   | "job-complete"

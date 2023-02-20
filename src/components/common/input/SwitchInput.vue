@@ -1,5 +1,7 @@
 <template>
-  <v-switch v-model="model" inset :label="label" class="mr-2" />
+  <q-toggle v-model="model">
+    <typography :value="label" />
+  </q-toggle>
 </template>
 
 <script lang="ts">
@@ -13,14 +15,15 @@ export default {
 
 <script setup lang="ts">
 import { useVModel } from "@/hooks";
+import Typography from "@/components/common/display/Typography.vue";
 
 const props = defineProps<{
   modelValue: boolean;
   label: string;
 }>();
 
-const emit = defineEmits<{
-  (e: "update:modelValue", value: string): void;
+defineEmits<{
+  (e: "update:modelValue", value: boolean): void;
 }>();
 
 const model = useVModel(props, "modelValue");

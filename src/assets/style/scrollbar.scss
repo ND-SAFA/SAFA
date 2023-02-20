@@ -1,22 +1,22 @@
 *::-webkit-scrollbar {
-  background: $neutral;
+  background: $color-neutral;
   width: 12px;
 }
 
 *::-webkit-scrollbar-track {
-  background: $neutral;        /* color of the tracking area */
+  background: $color-neutral;        /* color of the tracking area */
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: $primary;    /* color of the scroll thumb */
+  background-color: $color-primary;    /* color of the scroll thumb */
   border-radius: 20px;       /* roundness of the scroll thumb */
-  border: 3px solid $neutral;  /* creates padding around scroll thumb */
+  border: 3px solid $color-neutral;  /* creates padding around scroll thumb */
 
   &:hover {
-    background-color: $primary;
+    background-color: $color-primary;
   }
 }
 
 * {
-  scrollbar-color: $primary $neutral;   /* scroll thumb and track */
+  scrollbar-color: $color-primary $color-neutral;   /* scroll thumb and track */
 }

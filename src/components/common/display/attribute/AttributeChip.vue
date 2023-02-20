@@ -42,7 +42,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, IconVariant } from "@/types";
+import { ApprovalType, IconVariant, ThemeColor } from "@/types";
 import {
   camelcaseToDisplay,
   getBackgroundColor,
@@ -78,7 +78,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * The testing selector to set.
    */

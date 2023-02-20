@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated :class="darkMode ? '' : 'bg-primary'">
+  <q-header elevated :class="darkMode ? 'bg-background' : 'bg-primary'">
     <q-toolbar>
       <div class="full-width">
         <header-bar />

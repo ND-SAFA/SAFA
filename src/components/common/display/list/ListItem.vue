@@ -39,7 +39,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { IconVariant, URLQuery } from "@/types";
+import { IconVariant, ThemeColor, URLQuery } from "@/types";
 import Typography from "../Typography.vue";
 import Separator from "../Separator.vue";
 import { Icon } from "../icon";
@@ -77,7 +77,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * The testing selector to set.
    */

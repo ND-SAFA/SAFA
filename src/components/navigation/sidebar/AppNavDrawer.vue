@@ -27,7 +27,7 @@
       <icon-button
         icon="nav-toggle"
         tooltip="Open sidebar"
-        color="primary"
+        :color="darkMode ? 'secondary' : 'primary'"
         data-cy="button-sidebar-open"
         rotate="180"
         @click="sidebarOpen = true"

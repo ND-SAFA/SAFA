@@ -31,7 +31,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant } from "@/types";
+import { IconVariant, ThemeColor } from "@/types";
 import Icon from "@/components/common/display/icon/Icon.vue";
 
 const props = defineProps<{
@@ -54,7 +54,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * Whether the component is disabled.
    */

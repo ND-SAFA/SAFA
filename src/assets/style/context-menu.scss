@@ -8,24 +8,24 @@ $graph-border-radius: 8px;
   margin: 0;
   width: fit-content;
   border-radius: $graph-border-radius;
-  border: 1px solid $modifiedLight;
-  background-color: $background;
+  border: 1px solid $color-modified;
+  background-color: $color-background;
   height: fit-content;
 
   > button:hover {
     color: black;
-    background-color: $selected;
+    background-color: $color-selected;
   }
 
   > .cy-context-menus-cxt-menuitem {
     display: block;
-    background-color: $background;
+    background-color: $color-background;
     width: 100%;
     padding: 3px 20px;
     font-size: 12px;
     white-space: nowrap;
     text-align: left;
-    color: $text;
+    color: $color-text;
     border-radius: $graph-border-radius;
   }
 

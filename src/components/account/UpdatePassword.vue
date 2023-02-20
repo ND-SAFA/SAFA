@@ -1,86 +1,76 @@
 <template>
-  <panel-card>
-    <typography variant="subtitle" el="h2" value="Update Password" />
-    <v-divider class="mb-2" />
+  <panel-card title="Update Password">
     <typography
       el="p"
       value="Type in your current password and the new password you would like to set."
     />
-    <password-field
+    <password-input
       v-model="oldPassword"
       label="Current Password"
-      :errors="passwordErrors"
+      :errors="errorText"
       data-cy="input-current-password"
     />
-    <password-field
+    <password-input
       v-model="newPassword"
       label="New Password"
       data-cy="input-new-password"
     />
-    <v-card-actions>
-      <v-btn
-        :disabled="!oldPassword || !newPassword"
+    <template #actions>
+      <text-button
+        label="Update Password"
+        :disabled="isDisabled"
         outlined
         data-cy="button-update-password"
         @click="handleEditPassword"
-      >
-        Update Password
-      </v-btn>
-    </v-card-actions>
+      />
+    </template>
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { handleChangePassword } from "@/api";
-import { PasswordInput, Typography, PanelCard } from "@/components/common";
-
 /**
  * Allows for password updating.
  */
-export default defineComponent({
+export default {
   name: "MyAccountView",
-  components: {
-    PanelCard,
-    Typography,
-    PasswordField: PasswordInput,
-  },
-  data() {
-    return {
-      oldPassword: "",
-      newPassword: "",
-      passwordError: false,
-    };
-  },
-  computed: {
-    /**
-     * @return The current password errors.
-     */
-    passwordErrors(): string[] {
-      return this.passwordError ? ["Incorrect password"] : [];
-    },
-  },
-  methods: {
-    /**
-     * Handles a password edit.
-     */
-    handleEditPassword(): void {
-      this.passwordError = false;
+};
+</script>
 
-      handleChangePassword(
-        {
-          oldPassword: this.oldPassword,
-          newPassword: this.newPassword,
-        },
-        {
-          onSuccess: () => {
-            this.oldPassword = "";
-            this.newPassword = "";
-          },
-          onError: () => (this.passwordError = true),
-        }
-      );
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { handleChangePassword } from "@/api";
+import {
+  PasswordInput,
+  Typography,
+  PanelCard,
+  TextButton,
+} from "@/components/common";
+
+const oldPassword = ref("");
+const newPassword = ref("");
+const error = ref(false);
+
+const errorText = computed(() => error.value && "Incorrect password");
+const isDisabled = computed(() => !oldPassword.value || !newPassword.value);
+
+/**
+ * Handles a password edit.
+ */
+function handleEditPassword(): void {
+  error.value = false;
+
+  handleChangePassword(
+    {
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value,
     },
-  },
-});
+    {
+      onSuccess: () => {
+        oldPassword.value = "";
+        newPassword.value = "";
+      },
+      onError: () => (error.value = true),
+    }
+  );
+}
 </script>

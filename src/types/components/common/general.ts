@@ -29,3 +29,11 @@ export interface MarginProps {
    */
   b?: SizeType;
 }
+
+export type ThemeColor =
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "positive"
+  | "negative"
+  | string;

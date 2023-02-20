@@ -26,6 +26,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
+import { ThemeColor } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { FlexBox } from "@/components/common/layout";
@@ -36,7 +37,7 @@ withDefaults(
     /**
      * The color to render the component with.
      */
-    color?: "primary" | "secondary" | "accent" | "error" | string;
+    color?: ThemeColor;
   }>(),
   {
     color: "accent",

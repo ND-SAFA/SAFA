@@ -1,22 +1,27 @@
 $color-primary: var(--q-primary);
 $color-secondary: var(--q-secondary);
+$color-accent: var(--q-accent);
+
+$color-info: var(--q-info);
 $color-positive: var(--q-positive);
 $color-negative: var(--q-negative);
 $color-warning: var(--q-warning);
 
-$color-accent: #FFD592;
+$color-text: var(--q-text);
+$color-neutral: var(--q-neutral);
+$color-background: var(--q-background);
+$color-selected: var(--q-selected);
 
-$background: rgb(var(--v-theme-background));
-$selected: rgb(var(--v-theme-selected));
-$text: rgb(var(--v-theme-text));
-$neutral: rgb(var(--v-theme-neutral));
-$primary: rgb(var(--v-theme-primary));
-
-$modifiedLight: rgb(var(--v-theme-modifiedLight));
-$removedLight: rgb(var(--v-theme-removedLight));
+$color-added: var(--q-addedLight);
+$color-modified: var(--q-modifiedLight);
+$color-removed: var(--q-removedLight);
 
 .bg-transparent {
   background-color: transparent !important;
+}
+
+.bg-background {
+  background-color: $color-background !important;
 }
 
 .bd-primary {

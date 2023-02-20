@@ -58,7 +58,13 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults } from "vue";
-import { ElementType, SizeType, TextAlignType, TextType } from "@/types";
+import {
+  ElementType,
+  SizeType,
+  TextAlignType,
+  TextType,
+  ThemeColor,
+} from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
 const props = withDefaults(
@@ -87,7 +93,7 @@ const props = withDefaults(
     /**
      * The color to render the component with.
      */
-    color?: "primary" | "secondary" | "accent" | "error" | string;
+    color?: ThemeColor;
 
     /**
      * Bolds the text.

@@ -1,11 +1,9 @@
 <template>
-  <panel-card>
-    <typography variant="subtitle" el="h2" value="Theme" />
-    <v-divider class="mb-2" />
+  <panel-card title="Theme">
     <switch-input
       label="Enable dark mode"
       :model-value="darkMode"
-      @input="toggleDarkMode"
+      @update:model-value="toggleDarkMode"
     />
   </panel-card>
 </template>
@@ -21,7 +19,7 @@ export default {
 
 <script setup lang="ts">
 import { useTheme } from "@/hooks";
-import { PanelCard, Typography, SwitchInput } from "@/components/common";
+import { PanelCard, SwitchInput } from "@/components/common";
 
 const { darkMode, toggleDarkMode } = useTheme();
 </script>

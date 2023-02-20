@@ -33,7 +33,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant, SizeType } from "@/types";
+import { IconVariant, SizeType, ThemeColor } from "@/types";
 import { useMargins } from "@/hooks";
 import Icon from "@/components/common/display/icon/Icon.vue";
 import Typography from "@/components/common/display/Typography.vue";
@@ -62,7 +62,7 @@ const props = defineProps<{
   /**
    * Whether the component is disabled.
    */
-  disabled?: string;
+  disabled?: boolean;
   /**
    * Renders a smaller component.
    */
@@ -78,7 +78,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * The type of icon to render.
    */

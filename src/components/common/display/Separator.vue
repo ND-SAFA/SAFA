@@ -18,7 +18,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { SizeType } from "@/types";
+import { SizeType, ThemeColor } from "@/types";
 import { useMargins } from "@/hooks";
 
 const props = defineProps<{
@@ -37,7 +37,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * The x margin.
    */

@@ -18,7 +18,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant } from "@/types";
+import { IconVariant, ThemeColor } from "@/types";
 
 const props = defineProps<{
   /**
@@ -40,7 +40,7 @@ const props = defineProps<{
   /**
    * The color to render the component with.
    */
-  color?: "primary" | "secondary" | "accent" | "error" | string;
+  color?: ThemeColor;
   /**
    * The  style to include on the component.
    */
@@ -104,6 +104,8 @@ const iconId = computed(() => {
       return "mdi-undo";
     case "redo":
       return "mdi-redo";
+    case "logout":
+      return "mdi-logout-variant";
     case "home-list":
       return "mdi-view-list";
     case "home-add":

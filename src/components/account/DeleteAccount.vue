@@ -1,63 +1,52 @@
 <template>
-  <panel-card color="error">
-    <typography
-      variant="subtitle"
-      el="h2"
-      value="Delete Account"
-      color="error"
-    />
-    <v-divider class="mb-2" />
+  <panel-card color="negative" title="Delete Account">
     <typography
       el="p"
       value="Type in your current password to delete your account."
     />
-    <password-field
-      v-model="deletePassword"
+    <password-input
+      v-model="password"
       label="Password"
       data-cy="input-delete-password"
     />
-    <v-card-actions>
-      <v-btn
+    <template #actions>
+      <text-button
+        label="Delete My Account"
         outlined
-        color="error"
-        :disabled="!deletePassword"
+        color="negative"
+        :disabled="!password"
         data-cy="button-delete-my-account"
-        @click="handleDeleteAccount"
-      >
-        Delete my account
-      </v-btn>
-    </v-card-actions>
+        @click="handleSubmit"
+      />
+    </template>
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { handleDeleteAccount } from "@/api";
-import { PasswordInput, Typography, PanelCard } from "@/components/common";
-
 /**
  * Displays account deletion.
  */
-export default defineComponent({
+export default {
   name: "DeleteAccount",
-  components: {
-    PanelCard,
-    Typography,
-    PasswordField: PasswordInput,
-  },
-  data() {
-    return {
-      deletePassword: "",
-      passwordError: false,
-    };
-  },
-  methods: {
-    /**
-     * Handles account deletion.
-     */
-    handleDeleteAccount(): void {
-      handleDeleteAccount(this.deletePassword);
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { handleDeleteAccount } from "@/api";
+import {
+  PasswordInput,
+  Typography,
+  PanelCard,
+  TextButton,
+} from "@/components/common";
+
+const password = ref("");
+
+/**
+ * Handles account deletion.
+ */
+function handleSubmit(): void {
+  handleDeleteAccount(password.value);
+}
 </script>

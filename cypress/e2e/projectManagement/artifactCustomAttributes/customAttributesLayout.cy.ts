@@ -60,7 +60,6 @@ describe("Custom Attributes Layout", () => {
 
       // Verify that the layout was deleted
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      //cy.clickButtonWithName(customLayout.name).should("not.exist");  This does not work because for some reason the element is not truly deleted from the page
     });
   });
 

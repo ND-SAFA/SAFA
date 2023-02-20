@@ -26,7 +26,6 @@ describe("Custom Attributes Values", () => {
         .find("input")
         .type("Test Value");
 
-      //cy.inputText(DataCy.selectedPanelCustomAttribute, "Test Value", true);
       cy.clickButton(DataCy.artifactSaveSubmitButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
@@ -58,7 +57,6 @@ describe("Custom Attributes Values", () => {
     });
   });
 
-  // TODO: Implement these tests once I figure out how to import/export custom attributes
   describe.skip("I can import artifact custom attribute from CSV or JSON", () => {
     it("Imports custom attributes from CSV and verifies that elements are present", () => {});
     it("Imports custom attributes from JSON and verifies that elements are present", () => {});

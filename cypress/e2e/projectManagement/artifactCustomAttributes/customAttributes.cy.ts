@@ -9,7 +9,6 @@ describe("Custom Attributes", () => {
   });
 
   describe("I can add a custom attribute to my project", () => {
-    // TODO: Add a custom attribute to the project
     it("Adds a custom attribute to the project", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
@@ -18,10 +17,6 @@ describe("Custom Attributes", () => {
       // Fill in the form for the attribute
       cy.inputText(DataCy.attributeKeyInput, customAttribute.key);
       cy.inputText(DataCy.attributeLabelInput, customAttribute.label);
-
-      // This selector is disabled in the css from any key or mouse input
-      // cy.getCy(DataCy.attributeTypeInput).click().type("{downArrow}{enter}");
-
       cy.inputText(DataCy.attributeMinInput, customAttribute.min);
       cy.inputText(DataCy.attributeMaxInput, customAttribute.max);
       cy.clickButton(DataCy.attributeSaveButton);
@@ -60,9 +55,7 @@ describe("Custom Attributes", () => {
     });
   });
 
-  describe.skip("I can generate FMEA attributes for traced artifact children", () => {
-    // TODO: Add this test once FMEA attributes are implemented
-  });
+  describe.skip("I can generate FMEA attributes for traced artifact children", () => {});
 
   describe("I cannot change the key or data type of a custom attribute", () => {
     it("Creates a custom attribute and checks that the key and data type are disabled", () => {

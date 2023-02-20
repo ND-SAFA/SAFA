@@ -4,7 +4,6 @@
     :item-count="2"
     empty-message=""
   >
-    <under-construction-alert />
     <jira-authentication :inactive="inactive" @click="$emit('input', 'Jira')" />
     <git-hub-authentication
       :inactive="inactive"
@@ -15,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { StepperListStep, UnderConstructionAlert } from "@/components/common";
+import { StepperListStep } from "@/components/common";
 import JiraAuthentication from "./JiraAuthentication.vue";
 import GitHubAuthentication from "./GitHubAuthentication.vue";
 
@@ -30,7 +29,6 @@ export default defineComponent({
     GitHubAuthentication,
     JiraAuthentication,
     StepperListStep,
-    UnderConstructionAlert,
   },
   props: {
     inactive: Boolean,

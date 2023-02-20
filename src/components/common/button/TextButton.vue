@@ -143,7 +143,7 @@ const buttonColor = computed(() => {
     case "save":
       return "primary";
     case "delete":
-      return "error";
+      return "negative";
     default:
       return props.color;
   }

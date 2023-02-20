@@ -1,5 +1,10 @@
 <template>
-  <q-page v-if="doDisplay" class="bg-background" :padding="!props.fullWindow">
+  <q-page
+    v-if="doDisplay"
+    class="bg-background"
+    :padding="!props.fullWindow"
+    :style-fn="() => style"
+  >
     <slot />
   </q-page>
   <q-page v-else>
@@ -35,4 +40,7 @@ const props = defineProps<{
 }>();
 
 const doDisplay = computed(() => sessionStore.doesSessionExist);
+const style = computed(() =>
+  props.fullWindow ? "" : "padding-left: 10vw; padding-right: 10vw"
+);
 </script>

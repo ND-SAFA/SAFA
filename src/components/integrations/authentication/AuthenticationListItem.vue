@@ -1,95 +1,64 @@
 <template>
-  <v-list-item :inactive="inactive || !hasCredentials" @click="handleClick">
-    <v-list-item-icon style="align-self: center">
-      <icon v-if="!isLoading" :color="color" variant="integrate" />
-      <v-progress-circular v-else indeterminate />
-    </v-list-item-icon>
-    <v-list-item-title>
-      <typography variant="subtitle" :value="title" />
-      <typography
-        el="div"
-        :value="hasCredentials ? 'Connected' : 'Not Connected'"
-        :color="color"
-      />
-    </v-list-item-title>
-    <v-list-item-action style="min-width: unset">
+  <list-item
+    :clickable="clickable"
+    :color="color"
+    :title="props.title"
+    :subtitle="props.hasCredentials ? 'Connected' : 'Not Connected'"
+    @click="emit('click')"
+  >
+    <template #icon>
+      <icon v-if="!props.loading" :color="color" variant="integrate" />
+      <q-circular-progress v-else indeterminate />
+    </template>
+    <template #actions>
       <text-button
-        v-if="!hasCredentials"
+        v-if="!props.hasCredentials"
         color="primary"
         outlined
         icon="integrate"
-        @click="handleConnect"
+        @click="emit('connect')"
       >
         Connect
       </text-button>
       <flex-box v-else column align="end">
-        <text-button outlined icon="add" class="mb-2" @click="handleConnect">
+        <text-button outlined icon="add" b="2" @click="emit('connect')">
           Installation
         </text-button>
-        <text-button outlined icon="delete" @click="handleDisconnect">
+        <text-button outlined icon="delete" @click="emit('disconnect')">
           Disconnect
         </text-button>
       </flex-box>
-    </v-list-item-action>
-  </v-list-item>
+    </template>
+  </list-item>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Typography, TextButton, FlexBox, Icon } from "@/components/common";
-
 /**
  * Displays a list item & buttons for authenticating an integration.
- *
- * @emits `select` - On list item select.
- * @emits `connect` - On connect button click.
- * @emits `disconnect` - On disconnect button click.
  */
-export default defineComponent({
+export default {
   name: "AuthenticationListItem",
-  components: { Icon, FlexBox, TextButton, Typography },
-  props: {
-    hasCredentials: {
-      type: Boolean,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    inactive: Boolean,
-  },
-  computed: {
-    /**
-     * @return The color to render based on whether this source is connected.
-     */
-    color(): string {
-      return this.hasCredentials ? "success" : "grey";
-    },
-  },
-  methods: {
-    /**
-     * Opens the authentication window.
-     */
-    handleClick(): void {
-      this.$emit("click");
-    },
-    /**
-     * Opens the authentication window.
-     */
-    handleConnect(): void {
-      this.$emit("connect");
-    },
-    /**
-     * Disconnects the integration source
-     */
-    handleDisconnect(): void {
-      this.$emit("disconnect");
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { TextButton, FlexBox, Icon } from "@/components/common";
+import ListItem from "@/components/common/display/list/ListItem.vue";
+
+const props = defineProps<{
+  hasCredentials: boolean;
+  loading?: boolean;
+  title: string;
+  inactive?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "click"): void;
+  (e: "connect"): void;
+  (e: "disconnect"): void;
+}>();
+
+const color = computed(() => (props.hasCredentials ? "positive" : "grey"));
+const clickable = computed(() => !props.inactive && props.hasCredentials);
 </script>

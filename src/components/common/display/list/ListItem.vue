@@ -25,6 +25,9 @@
         <slot name="subtitle" />
       </q-item-label>
     </q-item-section>
+    <q-item-section v-if="!!slots.actions">
+      <slot name="actions" />
+    </q-item-section>
   </q-item>
 </template>
 

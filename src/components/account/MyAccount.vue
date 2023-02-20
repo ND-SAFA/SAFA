@@ -27,7 +27,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+/**
+ * Displays information on the current user.
+ */
+export default {
+  name: "MyAccount",
+};
+</script>
+
+<script setup lang="ts">
 import { handleLogout } from "@/api";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import Separator from "@/components/common/display/Separator.vue";
@@ -37,29 +45,7 @@ import DeleteAccount from "./DeleteAccount.vue";
 import UpdatePassword from "./UpdatePassword.vue";
 import ThemeController from "./ThemeController.vue";
 
-/**
- * Displays information on the current user.
- */
-export default defineComponent({
-  name: "MyAccount",
-  components: {
-    Separator,
-    TextButton,
-    ThemeController,
-    ExternalLinks,
-    IntegrationsAccounts,
-    FlexBox,
-    Typography,
-    DeleteAccount,
-    UpdatePassword,
-  },
-  methods: {
-    /**
-     * Logs the current user out.
-     */
-    handleLogout(): void {
-      handleLogout(true);
-    },
-  },
-});
+function handleLogoutClick() {
+  handleLogout(true);
+}
 </script>

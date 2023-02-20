@@ -1,22 +1,23 @@
 <template>
-  <panel-card>
-    <authentication-selector inactive />
+  <panel-card title="Integration Sources">
+    <jira-authentication inactive />
+    <git-hub-authentication inactive />
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { AuthenticationSelector } from "@/components/integrations";
-import { PanelCard } from "@/components/common";
-
 /**
  * IntegrationsAccounts.
  */
-export default defineComponent({
+export default {
   name: "IntegrationsAccounts",
-  components: {
-    PanelCard,
-    AuthenticationSelector,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import {
+  JiraAuthentication,
+  GitHubAuthentication,
+} from "@/components/integrations";
+import { PanelCard } from "@/components/common";
 </script>

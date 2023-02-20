@@ -283,8 +283,10 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         for _, row in artifact_df.iterrows():
             TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
 
+        artifact_type_summary = []
         for artifact_type, artifact_ids in artifact_type_2_id.items():
-            logger.info(f"{artifact_type.title()}: {len(artifact_ids)}")
+            artifact_type_summary.append(f"[{artifact_type.title()}: {len(artifact_ids)}]")
+        logger.info(",".join(artifact_type_summary))
         return artifact_type_2_id, id_2_artifact
 
     @staticmethod

@@ -20,6 +20,8 @@ from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
+from datasets import Dataset
+import torch
 
 
 class TraceDataset(AbstractDataset):
@@ -40,12 +42,35 @@ class TraceDataset(AbstractDataset):
         self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
+    def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
+        """
+        Converts trace links in data to Huggingface (HF) dataset.
+        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :return: A HF dataset.
+        """
+
+        def encode(batch) -> Dict:
+            """
+            Encodes the batch.
+            """
+            features = model_generator.get_feature(text=batch[CSVKeys.SOURCE],
+                                                   text_pair=batch[CSVKeys.TARGET],
+                                                   return_token_type_ids=True,
+                                                   add_special_tokens=True)
+            features[DataKey.LABELS_KEY] = torch.as_tensor(batch[CSVKeys.LABEL])
+            return features
+
+        hf_dataset = Dataset.from_pandas(self.to_dataframe())
+        hf_dataset.set_transform(encode)
+        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
+        return hf_dataset
+
     def to_trainer_dataset(self, model_generator: ModelManager, n_threads=10) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :param n_threads: The number of threads to use to calculate link features.
-        :return: A data used by the HF trainer.
+        :return: A data used by the trace trainer.
         """
         feature_entries = {}
 

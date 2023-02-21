@@ -50,6 +50,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
+        self.trainer_args.remove_unused_columns = False
         callbacks = [TraceCallback()]
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
@@ -65,7 +66,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         """
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
         self.model = self.model_manager.get_model()
-        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
@@ -79,7 +80,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: THe prediction output
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
+        self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         eval_metrics, metrics_manager = self._compute_trace_metrics(output, dataset_role)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
@@ -136,5 +137,5 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param dataset_role: The role of the dataset to return.
         :return: Dataset at dataset role if it exists.
         """
-        return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(
+        return self.trainer_dataset_manager[dataset_role].to_hf_dataset(
             self.model_manager) if dataset_role in self.trainer_dataset_manager else None

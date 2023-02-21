@@ -7,18 +7,17 @@
       @submit="handleSubmit"
     >
       <template #1>
-        <project-selector
-          :is-open="isProjectStep"
-          @selected="selectProject"
-          @unselected="unselectProject"
+        <project-selector-table
+          :open="isProjectStep"
+          @selected="handleProjectSelect"
         />
       </template>
       <template #2>
         <version-selector
           :is-open="isVersionStep"
           :project="selectedProject"
-          @selected="selectVersion"
-          @unselected="unselectVersion"
+          @selected="handleVersionSelect"
+          @unselected="handleVersionSelect"
         />
       </template>
     </stepper>
@@ -41,7 +40,7 @@ import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
-import ProjectSelector from "./ProjectSelector.vue";
+import ProjectSelectorTable from "@/components/project/selector/ProjectSelectorTable.vue";
 import VersionSelector from "./VersionSelector.vue";
 
 const defaultProjectStep = (): StepperStep => ({
@@ -85,50 +84,41 @@ function handleClear() {
 
 /**
  * Selects a project.
- * @param project - The project to select.
- * @param goToNextStep - If true, the step will be incremented.
+ * @param project - The project to select, or an empty selection.
  */
-function selectProject(project: IdentifierSchema, goToNextStep = false) {
+function handleProjectSelect(project: IdentifierSchema | undefined) {
   selectedProject.value = project;
-  unselectVersion();
 
-  steps.value[0] = {
-    title: project.name,
-    done: true,
-  };
+  if (project) {
+    currentStep.value++;
+    steps.value[0] = {
+      title: project.name,
+      done: true,
+    };
+  } else {
+    steps.value = [defaultProjectStep(), defaultVersionStep()];
+  }
 
-  if (goToNextStep) currentStep.value++;
-}
-
-/**
- * Deselects a project.
- */
-function unselectProject() {
-  selectedProject.value = undefined;
-  steps.value = [defaultProjectStep(), defaultVersionStep()];
+  handleVersionSelect(undefined);
 }
 
 /**
  * Selects a version.
- * @param version - The version to select.
+ * @param version - The version to select, or an empty selection.
  */
-function selectVersion(version: VersionSchema) {
+function handleVersionSelect(version: VersionSchema | undefined) {
   selectedVersion.value = version;
 
-  steps.value[1] = {
-    title: versionToString(version),
-    done: true,
-  };
+  if (version) {
+    steps.value[1] = {
+      title: versionToString(version),
+      done: true,
+    };
 
-  handleSubmit();
-}
-
-/**
- * Deselects a version.
- */
-function unselectVersion() {
-  selectedVersion.value = undefined;
-  steps.value[1] = defaultVersionStep();
+    handleSubmit();
+  } else {
+    steps.value[1] = defaultVersionStep();
+  }
 }
 
 /**

@@ -8,7 +8,7 @@
     <q-step
       v-for="(step, idx) in props.steps"
       :key="step.title"
-      :name="idx"
+      :name="idx + 1"
       :title="step.title"
       :done="step.done"
       :caption="step.caption"

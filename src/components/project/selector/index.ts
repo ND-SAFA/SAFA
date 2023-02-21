@@ -1,3 +1,5 @@
+export { default as ProjectSelectorTable } from "./ProjectSelectorTable.vue";
+
 export { default as VersionSelector } from "./VersionSelector.vue";
 export { default as VersionCreator } from "./VersionCreator.vue";
 export { default as MiniProjectVersionStepper } from "./MiniProjectVersionStepper.vue";

@@ -18,7 +18,7 @@ from data.github.gartifacts.gartifact_type import GArtifactType
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
-from data.github.github_constants import ARTIFACT_PATH, CLONE_PATH, COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, PULL_ARTIFACT_FILE
+from data.github.github_constants import COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, PULL_ARTIFACT_FILE
 from util.logging.logger_manager import logger
 
 
@@ -28,12 +28,12 @@ class RepositoryDownloader:
     """
     REPO_TEMPLATE = "https://github.com/{}.git"
 
-    def __init__(self, token: str, repository_name: str, clone_dir: str = CLONE_PATH):
+    def __init__(self, token: str, repository_name: str, clone_dir: str):
         self.token = token
         self.repository_name = repository_name
         self.clone_dir = clone_dir
 
-    def download_repository(self, output_dir: str = ARTIFACT_PATH, load: bool = False):
+    def download_repository(self, output_dir: str, load: bool = False):
         """
         Extracts issues, pulls, and commits from repository and saves them in output directory.
         :param output_dir: The path to the directory to save repository artifacts.

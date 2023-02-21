@@ -32,7 +32,7 @@ class GArtifactSet(Generic[T]):
         self.artifacts = artifacts
         self.artifact_ids = [artifact.get_id() for artifact in artifacts]
 
-    def export(self, output_file_path: str, columns: List[str] = None, dataset_type: str = "NL"):
+    def export(self, output_file_path: str, columns: List[str] = None, dataset_type: str = "NL") -> None:
         """
         Exports the id and body of the artifacts in the set.
         :param output_file_path: The path of the file to write to.
@@ -108,7 +108,7 @@ class GArtifactSet(Generic[T]):
         """
         return artifact_id in self.artifact_ids
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         :return: Returns the number of artifacts contained in set.
         """

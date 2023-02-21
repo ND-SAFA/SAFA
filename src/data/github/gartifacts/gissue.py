@@ -7,11 +7,14 @@ from nltk import word_tokenize
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.github_utils import GithubUtils
+from util.date_time_util import DateTimeUtil
 from util.override import overrides
 
 
 class GIssue(AbstractGithubArtifact):
+    """
+    GithubArtifact representing issue in repository.
+    """
     VALID_ARTIFACT_TYPES = [GArtifactType.PULL, GArtifactType.ISSUE]
 
     def __init__(self,
@@ -59,7 +62,7 @@ class GIssue(AbstractGithubArtifact):
         return self.issue_id
 
     @overrides(AbstractGithubArtifact)
-    def to_dict(self):
+    def to_dict(self) -> Dict:
         """
         Returns the state dictionary of GIssue.
         :return: Dictionary containing current state of GIssue.
@@ -85,8 +88,8 @@ class GIssue(AbstractGithubArtifact):
                       row["title"],
                       row["body"],
                       row["comments"],
-                      GithubUtils.read_datetime(row["closed_at"]),
-                      GithubUtils.read_datetime(row["created_at"]))
+                      DateTimeUtil.read_datetime(row["closed_at"]),
+                      DateTimeUtil.read_datetime(row["created_at"]))
 
     @staticmethod
     def parse(issue: Issue) -> "Issue":

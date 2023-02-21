@@ -5,11 +5,16 @@ from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
 from data.github.gartifacts.gcommit import GCommit
 from data.github.github_constants import COMMIT_ARTIFACT_FILE, \
-    COMMIT_DIFF_ARTIFACT_FILE, GENERIC_COMMIT_HEADERS, ISSUE_ARTIFACT_FILE, \
-    MIN_WORD_LENGTH, PULL_ARTIFACT_FILE
+    COMMIT_DIFF_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, \
+    PULL_ARTIFACT_FILE
 from data.github.gtraces.glink_processor import GLinkProcessor
 from data.github.gtraces.glink_store import GLinkStore
 from data.github.repository_downloader import logger
+
+GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
+                          "Revert.*of.*",
+                          "Merge branch.*of.*"]
+MIN_WORD_LENGTH = 5
 
 
 class GithubRepositoryExtracter:

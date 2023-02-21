@@ -13,7 +13,7 @@ class DownloadRepositoryJob(AbstractJob):
     and their corresponding trace links from them.
     """
 
-    def __init__(self, job_args: JobArgs, repo_name: str, repo_path: str, output_path: str, load: bool = False):
+    def __init__(self, job_args: JobArgs, repo_name: str, repo_path: str, clone_path: str, output_path: str, load: bool = False):
         """
         Constructs downloader for repo.
         :param repo_name: The GitHub repository ID.
@@ -22,6 +22,7 @@ class DownloadRepositoryJob(AbstractJob):
         super().__init__(job_args)
         self.repo_name = repo_name
         self.repo_path = repo_path
+        self.clone_path = clone_path
         self.output_path = output_path
         self.load = load
         self.token = os.environ.get("GITHUB_KEY")
@@ -30,7 +31,7 @@ class DownloadRepositoryJob(AbstractJob):
         assert self.output_path is not None, f"Output path is none."
 
     def _run(self) -> JobResult:
-        repository_downloader = RepositoryDownloader(self.token, self.repo_name)
+        repository_downloader = RepositoryDownloader(self.token, self.repo_name, self.clone_path)
         repository_downloader.download_repository(self.repo_path, self.load)
 
         repo_path = os.path.join(self.repo_path, self.repo_name)

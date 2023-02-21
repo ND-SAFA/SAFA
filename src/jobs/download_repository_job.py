@@ -16,6 +16,9 @@ class DownloadRepositoryJob(AbstractJob):
     def __init__(self, job_args: JobArgs, repo_name: str, repo_path: str, clone_path: str, output_path: str, load: bool = False):
         """
         Constructs downloader for repo.
+        TODO: Add docs
+        TODO: Convert params to object
+        TODO: Rename rep_path to artifact_path
         :param repo_name: The GitHub repository ID.
         :param output_path: Path to save repository entities to.
         """

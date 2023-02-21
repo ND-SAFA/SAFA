@@ -6,19 +6,23 @@ create doc string to source code relationship
 import calendar
 import os
 import time
-from typing import Callable
+from typing import Callable, Tuple
 
 import git as local_git
 from github import Github, Repository
 from github.Issue import Issue
 from tqdm import tqdm
 
+from data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
 from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
+from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
-from data.github.github_constants import COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, PULL_ARTIFACT_FILE
+from data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, \
+    PULL_ARTIFACT_FILE
+from data.github.gtraces.glink import GLink
 from util.logging.logger_manager import logger
 
 
@@ -32,6 +36,7 @@ class RepositoryDownloader:
         self.token = token
         self.repository_name = repository_name
         self.clone_dir = clone_dir
+        self.clone_path = os.path.join(clone_dir, repository_name)
 
     def download_repository(self, output_dir: str, load: bool = False):
         """
@@ -54,7 +59,7 @@ class RepositoryDownloader:
         issues = self.load_or_parse(issue_file_path, lambda: self.parse_issues(git, github_repo), load)
         pull_requests = self.load_or_parse(pull_request_file_path, lambda: self.parse_pulls(git, github_repo), load)
         commits = self.load_or_parse(commit_file_path, lambda: self.parse_commits(local_repo), load)
-
+        code_artifacts, code_links = self.download_code_artifacts(output_path)
         return issues, pull_requests, commits
 
     @staticmethod
@@ -106,6 +111,24 @@ class RepositoryDownloader:
             pulls.append(GPull.parse(pr))
         return GArtifactSet(pulls, GArtifactType.PULL)
 
+    def download_code_artifacts(self, output_path: str) -> Tuple[GArtifactSet[GCodeFile], GArtifactSet[GLink]]:
+        """
+        Find and parse code artifacts in project.
+        :return: None
+        """
+        code_export_path = os.path.join(output_path, CODE_ARTIFACT_FILE)
+        code2code_export_path = os.path.join(output_path, CODE2CODE_ARTIFACT_FILE)
+        cpp_creator = CPPToHeaderLinkCreator.from_dir_path(self.clone_path)
+        code_artifacts, code_links = cpp_creator.create_links()
+
+        code_artifact_set = GArtifactSet(list(code_artifacts.values()), GArtifactType.CODE)
+        link_artifact_set = GArtifactSet(list(code_links.values()), GArtifactType.LINK)
+
+        code_artifact_set.export(code_export_path)
+        link_artifact_set.export(code2code_export_path)
+        
+        return code_artifact_set, link_artifact_set
+
     @staticmethod
     def parse_commits(repo: Repository) -> GArtifactSet[GCommit]:
         """
@@ -123,15 +146,14 @@ class RepositoryDownloader:
         return GArtifactSet(commits, GArtifactType.COMMIT)
 
     @staticmethod
-    def __clone_repository(repository_name: str, clone_dir: str):
+    def __clone_repository(repository_name: str, clone_path: str):
         """
         Clones specified repository into clone directory.
         :param repository_name: The name of the repository to clone (e.g. org/name)
-        :param clone_dir: The path to the directory to store clone in.
+        :param clone_path: The path to the directory containing cloned repo.
         :return: None
         """
         repo_url = RepositoryDownloader.REPO_TEMPLATE.format(repository_name)
-        clone_path = os.path.join(clone_dir, repository_name)
         if not os.path.exists(clone_path):
             logger.info("Clone {}...".format(repository_name))
             local_git.Repo.clone_from(repo_url, clone_path)
@@ -150,7 +172,7 @@ class RepositoryDownloader:
         github_instance.get_user()
         self.wait_for_rate_limit(github_instance)
         repo = github_instance.get_repo(self.repository_name)
-        local_repo = self.__clone_repository(self.repository_name, self.clone_dir)
+        local_repo = self.__clone_repository(self.repository_name, self.clone_path)
         return github_instance, repo, local_repo
 
     @staticmethod

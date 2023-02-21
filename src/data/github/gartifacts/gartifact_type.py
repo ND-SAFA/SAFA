@@ -9,3 +9,4 @@ class GArtifactType(SupportedEnum):
     COMMIT = "commit"
     LINK = "link"
     PULL = "pull"
+    CODE = "code"

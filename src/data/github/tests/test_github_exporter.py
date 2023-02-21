@@ -25,6 +25,12 @@ class TestGithubExporter(BaseTest):
         self.assert_df_length(os.path.join(TEST_OUTPUT_DIR, "commit2pull.csv"), 1)
         self.assert_df_length(os.path.join(TEST_OUTPUT_DIR, "pull2issue.csv"), 1)
 
-    def assert_df_length(self, file_path: str, n_items: int):
+    def assert_df_length(self, file_path: str, n_items: int) -> None:
+        """
+        Asserts that data frame at file path contains the number of items.
+        :param file_path: Path to data frame file.
+        :param n_items: The expected number of items.
+        :return: None
+        """
         df = pd.read_csv(file_path)
         self.assertEqual(n_items, len(df))

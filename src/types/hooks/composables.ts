@@ -14,6 +14,8 @@ export interface ThemeHook<Theme> {
   darkMode: WritableComputedRef<boolean>;
   /**
    * Toggles whether the theme is in dark mode.
+   * @param dark - The explicit mode to set.
+   *        If none is given, the current mode is toggled.
    */
-  toggleDarkMode(): void;
+  toggleDarkMode(dark?: boolean): void;
 }

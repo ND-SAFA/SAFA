@@ -1,8 +1,10 @@
-import { computed, ComputedRef } from "vue";
+import { ComputedRef } from "vue";
 import { MarginProps, SizeType } from "@/types";
+import { useClasses } from "./useClasses";
 
-const convertMargin = (value: SizeType) => {
+const convertMargin = (value?: SizeType) => {
   switch (value) {
+    case undefined:
     case "":
       return "none";
     case "1":
@@ -22,19 +24,20 @@ const convertMargin = (value: SizeType) => {
 /**
  * Creates a classname based on margin props.
  * @param props - The margins to include.
+ * @param classes - Additional classes to include besides the margins classes.
  * @return The computed class name.
  */
-export function useMargins(props: MarginProps): ComputedRef<string> {
-  return computed(() => {
-    let classNames = "";
-
-    if (props.x) classNames += ` q-mx-${convertMargin(props.x)}`;
-    if (props.l) classNames += ` q-ml-${convertMargin(props.l)}`;
-    if (props.r) classNames += ` q-mr-${convertMargin(props.r)}`;
-    if (props.y) classNames += ` q-my-${convertMargin(props.y)}`;
-    if (props.t) classNames += ` q-mt-${convertMargin(props.t)}`;
-    if (props.b) classNames += ` q-mb-${convertMargin(props.b)}`;
-
-    return classNames;
-  });
+export function useMargins<T extends MarginProps>(
+  props: T,
+  classes: [keyof T | boolean, string | undefined][] = []
+): ComputedRef<string> {
+  return useClasses(props, [
+    ["x", ` q-mx-${convertMargin(props.x)}`],
+    ["y", ` q-my-${convertMargin(props.y)}`],
+    ["l", ` q-ml-${convertMargin(props.l)}`],
+    ["r", ` q-mr-${convertMargin(props.r)}`],
+    ["t", ` q-mt-${convertMargin(props.t)}`],
+    ["b", ` q-mb-${convertMargin(props.b)}`],
+    ...classes,
+  ]);
 }

@@ -124,18 +124,11 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const marginClassName = useMargins(props);
-
-const buttonClassName = computed(() => {
-  let classNames = props.class || "";
-
-  classNames += ` ${marginClassName.value}`;
-
-  if (props.color) classNames += ` text-${props.color}`;
-  if (props.block) classNames += ` full-width`;
-
-  return classNames;
-});
+const buttonClassName = useMargins(props, [
+  ["color", `text-${props.color}`],
+  ["block", "full-width"],
+  ["class", props.class],
+]);
 
 const buttonColor = computed(() => {
   switch (props.icon) {

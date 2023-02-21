@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lff">
+  <q-layout view="lHh Lpr lff" class="bg-background">
     <app-nav />
     <q-page-container>
       <router-view v-slot="{ Component }">
@@ -21,7 +21,19 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
+import { LocalStorageKeys } from "@/types";
+import { useTheme } from "@/hooks";
 import { AppNav } from "@/components";
+
+const { toggleDarkMode } = useTheme();
+
+onMounted(() => {
+  const storedDarkMode =
+    localStorage.getItem(LocalStorageKeys.darkMode) === "true";
+
+  toggleDarkMode(storedDarkMode);
+});
 </script>
 
 <style lang="scss">

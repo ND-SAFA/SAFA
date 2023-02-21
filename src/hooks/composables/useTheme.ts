@@ -5,6 +5,7 @@ import { darkPalette, lightPalette } from "@/util";
 
 export function useTheme(): ThemeHook<ReturnType<typeof useQuasar>> {
   const $q = useQuasar();
+
   const darkMode = computed({
     get: () => $q.dark.isActive,
     set: (dark) => $q.dark.set(dark),
@@ -18,8 +19,10 @@ export function useTheme(): ThemeHook<ReturnType<typeof useQuasar>> {
     });
   }
 
-  function toggleDarkMode(): void {
-    const mode = !darkMode.value;
+  function toggleDarkMode(mode?: boolean): void {
+    if (mode === undefined) {
+      mode = !darkMode.value;
+    }
 
     darkMode.value = mode;
     localStorage.setItem(LocalStorageKeys.darkMode, String(mode));

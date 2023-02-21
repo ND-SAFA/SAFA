@@ -182,45 +182,31 @@ const props = withDefaults(
 );
 
 const { darkMode } = useTheme();
-const marginClassName = useMargins(props);
+
+const className = useMargins(props, [
+  [props.variant === "large", "text-h3"],
+  [props.variant === "title", "text-h4"],
+  [props.variant === "subtitle", "text-h5"],
+  [props.variant === "small", "text-subtitle2"],
+  [props.variant === "caption", "text-caption"],
+  [props.variant === "code", "text-body1 overflow-y-auto"],
+  [props.variant === "body" || props.variant === "expandable", "text-body1"],
+  ["align", `text-${props.align}`],
+  [!!props.color && !darkMode.value, `text-${props.color}`],
+  ["inheritColor", "inherit-color"],
+  ["error", "text-negative"],
+  ["ellipsis", "text-ellipsis"],
+  ["secondary", "text-grey"],
+  ["bold", "font-weight-bold"],
+  ["small", "text-sm"],
+  ["large", "text-lg"],
+  ["wrap", "text-wrap"],
+  ["class", props.class],
+]);
 
 const isExpanded = ref(
   props.defaultExpanded && String(props.value).length < 500
 );
 
 const isExpandable = computed(() => props.variant === "expandable");
-
-const className = computed(() => {
-  let classNames = props.class || "";
-
-  classNames += ` ${marginClassName.value}`;
-
-  if (props.align) classNames += ` text-${props.align}`;
-  if (props.color && !darkMode.value) classNames += ` text-${props.color}`;
-  if (props.inheritColor) classNames += " inherit-color";
-  if (props.error) classNames += " text-error";
-  if (props.ellipsis) classNames += " text-ellipsis";
-  if (props.secondary) classNames += " text-grey";
-  if (props.bold) classNames += " font-weight-bold";
-  if (props.small) classNames += " text-sm";
-  if (props.small) classNames += " text-mg";
-  if (props.wrap) classNames += " text-wrap";
-
-  switch (props.variant) {
-    case "large":
-      return "text-h3 " + classNames;
-    case "title":
-      return "text-h4 " + classNames;
-    case "subtitle":
-      return "text-h5 " + classNames;
-    case "small":
-      return "text-subtitle2 " + classNames;
-    case "caption":
-      return "text-caption " + classNames;
-    case "code":
-      return "text-body1 overflow-y-auto " + classNames;
-    default:
-      return "text-body1 " + classNames;
-  }
-});
 </script>

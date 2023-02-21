@@ -83,22 +83,17 @@ const props = withDefaults(
   }
 );
 
-const marginClassName = useMargins(props);
+const className = useMargins(props, [
+  [true, "flex"],
+  ["align", `align-${props.align}`],
+  ["justify", `justify-${props.justify}`],
+  ["fullWidth", "fill-width"],
+  ["column", "column"],
+  ["wrap", "wrap"],
+  [props.wrap === false, "nowrap"],
+]);
 
 const style = computed(() =>
   props.maxWidth ? `max-width: ${props.maxWidth}px` : ""
 );
-
-const className = computed(() => {
-  let classNames = `flex ${marginClassName.value}`;
-
-  if (props.align) classNames += ` align-${props.align}`;
-  if (props.justify) classNames += ` justify-${props.justify}`;
-  if (props.fullWidth) classNames += " fill-width";
-  if (props.column) classNames += " column";
-  if (props.wrap) classNames += " wrap";
-  if (props.wrap === false) classNames += " nowrap";
-
-  return classNames;
-});
 </script>

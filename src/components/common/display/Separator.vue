@@ -68,17 +68,10 @@ const props = defineProps<{
   class?: string;
 }>();
 
-const marginClassName = useMargins(props);
-
-const className = computed(() => {
-  let classNames = props.class || "";
-
-  classNames += ` ${marginClassName.value}`;
-
-  if (props.nav) classNames += ` faded`;
-
-  return classNames;
-});
+const className = useMargins(props, [
+  ["nav", "faded"],
+  ["class", props.class],
+]);
 
 const separatorColor = computed(() => {
   if (props.color) {

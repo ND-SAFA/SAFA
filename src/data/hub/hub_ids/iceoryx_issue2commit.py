@@ -28,9 +28,6 @@ class IceoryxIssue2CommitDiff(AbstractHubId):
                 "Issue": {
                     "path": "issue.csv"
                 },
-                "Pull": {
-                    "path": "pull.csv"
-                },
                 "Commit Diff": {
                     "path": "commit_diff.csv"
                 }
@@ -40,11 +37,6 @@ class IceoryxIssue2CommitDiff(AbstractHubId):
                     "source": "Commit Diff",
                     "target": "Issue",
                     "path": "commit_diff2issue.csv"
-                }
-                , "commit_diff2pull": {
-                    "source": "Commit Diff",
-                    "target": "Pull",
-                    "path": "commit_diff2pull.csv"
                 }
             },
             "overrides": {

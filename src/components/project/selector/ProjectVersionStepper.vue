@@ -1,168 +1,147 @@
 <template>
-  <v-container>
-    <typography t="4" el="h1" variant="title" value="Open Project" />
-    <v-divider />
-    <typography el="p" y="2" value="Select a project and version to load." />
+  <panel-card>
     <stepper
       v-model="currentStep"
       :steps="steps"
-      :is-open="true"
-      title="Select Project"
-      :is-loading="isLoading"
-      size="l"
       data-cy="project-version-stepper"
       @submit="handleSubmit"
     >
-      <template #items>
-        <v-stepper-content step="1">
-          <project-selector
-            :is-open="projectSelectorIsOpen"
-            @selected="selectProject"
-            @unselected="unselectProject"
-          />
-        </v-stepper-content>
-
-        <v-stepper-content step="2">
-          <version-selector
-            :is-open="versionSelectorIsOpen"
-            :project="selectedProject"
-            @selected="selectVersion"
-            @unselected="unselectVersion"
-          />
-        </v-stepper-content>
+      <template #1>
+        <project-selector
+          :is-open="isProjectStep"
+          @selected="selectProject"
+          @unselected="unselectProject"
+        />
+      </template>
+      <template #2>
+        <version-selector
+          :is-open="isVersionStep"
+          :project="selectedProject"
+          @selected="selectVersion"
+          @unselected="unselectVersion"
+        />
       </template>
     </stepper>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { StepState, IdentifierSchema, VersionSchema } from "@/types";
-import { versionToString } from "@/util";
-import { projectStore } from "@/hooks";
-import { handleLoadVersion } from "@/api";
-import { Stepper, Typography } from "@/components/common";
-import ProjectSelector from "./ProjectSelector.vue";
-import VersionSelector from "./VersionSelector.vue";
-
-const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
-const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
-
 /**
  * Presents a stepper in a modal for selecting a project and version.
  */
-export default defineComponent({
+export default {
   name: "ProjectVersionStepper",
-  components: {
-    Stepper,
-    ProjectSelector,
-    VersionSelector,
-    Typography,
-  },
-  data() {
-    return {
-      currentStep: 1,
-      steps: [
-        [SELECT_PROJECT_DEFAULT_NAME, false],
-        [SELECT_VERSION_DEFAULT_NAME, false],
-      ] as StepState[],
-      isLoading: false,
-      selectedProject: undefined as IdentifierSchema | undefined,
-      selectedVersion: undefined as VersionSchema | undefined,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether the current step is done.
-     */
-    isStepDone(): boolean {
-      return this.currentStep === 2
-        ? this.selectedVersion !== undefined
-        : this.selectedProject !== undefined;
-    },
-    /**
-     * @return Whether the selector is open to the project page.
-     */
-    projectSelectorIsOpen(): boolean {
-      return this.currentStep === 1;
-    },
-    /**
-     * @return Whether the selector is open to the version page.
-     */
-    versionSelectorIsOpen(): boolean {
-      return this.currentStep === 2;
-    },
-  },
-  methods: {
-    /**
-     * Clears all modal data.
-     */
-    clearData() {
-      this.selectedProject = projectStore.project;
-      this.selectedVersion = undefined;
-      this.currentStep = 1;
+};
+</script>
 
-      if (this.selectedProject?.name) {
-        this.steps[0] = [this.selectedProject.name, true];
-      } else {
-        this.steps[0] = [SELECT_PROJECT_DEFAULT_NAME, false];
-      }
-    },
-    /**
-     * Closes the modal.
-     */
-    handleClose() {
-      this.selectedProject = undefined;
-      this.selectedVersion = undefined;
-    },
-    /**
-     * Selects a project.
-     * @param project - The project to select
-     * @param goToNextStep - If true, the step will be incremented.
-     */
-    selectProject(project: IdentifierSchema, goToNextStep = false) {
-      this.selectedProject = project;
-      this.unselectVersion();
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { StepperStep, IdentifierSchema, VersionSchema } from "@/types";
+import { versionToString } from "@/util";
+import { projectStore } from "@/hooks";
+import { handleLoadVersion } from "@/api";
+import { Stepper, PanelCard } from "@/components/common";
+import ProjectSelector from "./ProjectSelector.vue";
+import VersionSelector from "./VersionSelector.vue";
 
-      this.steps[0] = [project.name, true];
-
-      if (goToNextStep) this.currentStep++;
-    },
-    /**
-     * Deselects a project.
-     */
-    unselectProject() {
-      this.selectedProject = undefined;
-      this.steps[0] = [SELECT_PROJECT_DEFAULT_NAME, false];
-    },
-    /**
-     * Selects a version.
-     * @param version - The version to select.
-     */
-    selectVersion(version: VersionSchema) {
-      this.selectedVersion = version;
-      this.steps[1] = [versionToString(version), true];
-      this.handleSubmit();
-    },
-    /**
-     * Deselects a version.
-     */
-    unselectVersion() {
-      this.selectedVersion = undefined;
-      this.steps[1] = [SELECT_VERSION_DEFAULT_NAME, false];
-    },
-    /**
-     * Loads the selected project.
-     */
-    async handleSubmit(): Promise<void> {
-      if (!this.selectedProject || !this.selectedVersion) return;
-
-      this.isLoading = true;
-
-      await handleLoadVersion(this.selectedVersion.versionId);
-
-      this.isLoading = false;
-    },
-  },
+const defaultProjectStep = (): StepperStep => ({
+  title: "Select a Project",
+  done: false,
 });
+const defaultVersionStep = (): StepperStep => ({
+  title: "Select a Version",
+  done: false,
+});
+
+const loading = ref(false);
+const currentStep = ref(1);
+const steps = ref([defaultProjectStep(), defaultVersionStep()]);
+const selectedProject = ref<IdentifierSchema | undefined>(undefined);
+const selectedVersion = ref<VersionSchema | undefined>(undefined);
+
+const isProjectStep = computed(() => currentStep.value === 1);
+const isVersionStep = computed(() => currentStep.value === 2);
+
+/**
+ * Clears all modal data.
+ */
+function handleClear() {
+  const isProjectDefined = projectStore.isProjectDefined;
+
+  selectedProject.value = isProjectDefined ? projectStore.project : undefined;
+  selectedVersion.value = undefined;
+  currentStep.value = 1;
+
+  steps.value = [
+    isProjectDefined
+      ? {
+          title: projectStore.project.name,
+          done: true,
+        }
+      : defaultProjectStep(),
+    defaultVersionStep(),
+  ];
+}
+
+/**
+ * Selects a project.
+ * @param project - The project to select.
+ * @param goToNextStep - If true, the step will be incremented.
+ */
+function selectProject(project: IdentifierSchema, goToNextStep = false) {
+  selectedProject.value = project;
+  unselectVersion();
+
+  steps.value[0] = {
+    title: project.name,
+    done: true,
+  };
+
+  if (goToNextStep) currentStep.value++;
+}
+
+/**
+ * Deselects a project.
+ */
+function unselectProject() {
+  selectedProject.value = undefined;
+  steps.value = [defaultProjectStep(), defaultVersionStep()];
+}
+
+/**
+ * Selects a version.
+ * @param version - The version to select.
+ */
+function selectVersion(version: VersionSchema) {
+  selectedVersion.value = version;
+
+  steps.value[1] = {
+    title: versionToString(version),
+    done: true,
+  };
+
+  handleSubmit();
+}
+
+/**
+ * Deselects a version.
+ */
+function unselectVersion() {
+  selectedVersion.value = undefined;
+  steps.value[1] = defaultVersionStep();
+}
+
+/**
+ * Loads the selected project.
+ */
+async function handleSubmit(): Promise<void> {
+  if (!selectedProject.value || !selectedVersion.value) return;
+
+  loading.value = true;
+
+  await handleLoadVersion(selectedVersion.value.versionId);
+
+  loading.value = false;
+  handleClear();
+}
 </script>

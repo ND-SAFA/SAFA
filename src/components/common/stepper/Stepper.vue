@@ -1,53 +1,46 @@
 <template>
-  <v-card
-    :outlined="!minimal"
-    :style="minimal ? 'box-shadow: none' : ''"
-    :class="minimal ? '' : 'primary-border'"
+  <q-stepper
+    v-model="currentStep"
+    flat
+    class="full-width bg-transparent"
+    :alternative-labels="minimal"
   >
-    <v-stepper
-      v-model="currentStep"
-      class="full-width bg-transparent"
-      :alt-labels="!minimal"
-      :elevation="minimal ? 0 : 1"
+    <q-step
+      v-for="(step, idx) in props.steps"
+      :key="step.title"
+      :name="idx"
+      :title="step.title"
+      :done="step.done"
+      :caption="step.caption"
     >
-      <v-stepper-header :style="minimal ? 'box-shadow: none' : ''">
-        <template v-for="(stepName, stepIndex) in stepNames" :key="stepIndex">
-          <v-stepper-step
-            :complete="currentStep > stepIndex + 1"
-            :step="stepIndex + 1"
-            :editable="steps[stepIndex][1]"
-          >
-            <typography :value="stepName" class="width-max" el="div" />
-          </v-stepper-step>
-          <v-divider v-if="stepIndex < stepNames.length - 1" />
-        </template>
-      </v-stepper-header>
+      <slot :name="idx + 1" />
+    </q-step>
 
-      <v-stepper-items>
-        <slot name="items" />
-        <v-container v-if="!hideContinue">
-          <v-btn
+    <template #navigation>
+      <q-stepper-navigation>
+        <slot name="actions" />
+        <flex-box full-width align="end">
+          <text-button
             color="primary"
             :outlined="currentStep !== steps.length"
             :disabled="!isStepDone"
             data-cy="button-stepper-continue"
+            :label="continueText"
             @click="onStepForward"
-          >
-            {{ continueText }}
-          </v-btn>
-          <v-btn
+          />
+          <text-button
             text
-            :disabled="currentStep === 1"
             color="primary"
+            :disabled="currentStep === 1"
             data-cy="button-stepper-back"
+            label="Back"
+            class="q-ml-sm"
             @click="onStepBack"
-          >
-            Go Back
-          </v-btn>
-        </v-container>
-      </v-stepper-items>
-    </v-stepper>
-  </v-card>
+          />
+        </flex-box>
+      </q-stepper-navigation>
+    </template>
+  </q-stepper>
 </template>
 
 <script lang="ts">
@@ -60,35 +53,37 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { withDefaults, computed } from "vue";
+import { computed } from "vue";
+import { StepperStep } from "@/types";
 import { useVModel } from "@/hooks";
-import { Typography } from "@/components/common/display";
+import TextButton from "@/components/common/button/TextButton.vue";
+import FlexBox from "@/components/common/layout/FlexBox.vue";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The current step number.
-     */
-    modelValue: number;
-    steps: [string, boolean][];
-    submitText?: string;
-    minimal?: boolean;
-    hideContinue?: boolean;
-  }>(),
-  {
-    submitText: "Submit",
-  }
-);
+const props = defineProps<{
+  /**
+   * The current step number.
+   */
+  modelValue: number;
+  /**
+   * The steps to render.
+   * A slot will be created for each step, named by their 1-based index.
+   */
+  steps: StepperStep[];
+  /**
+   * Whether to render the stepper content in a condensed format.
+   */
+  minimal?: boolean;
+}>();
 
 const emit = defineEmits<{
   (e: "submit"): void;
 }>();
 
-const isStepDone = computed(() => props.steps[props.modelValue - 1][1]);
-const stepNames = computed(() => props.steps.map((s) => s[0]));
 const currentStep = useVModel(props, "modelValue");
+
+const isStepDone = computed(() => props.steps[props.modelValue - 1].done);
 const continueText = computed(() =>
-  currentStep.value === props.steps.length ? props.submitText : "Continue"
+  currentStep.value === props.steps.length ? "Submit" : "Continue"
 );
 
 /**

@@ -1,5 +1,8 @@
 <template>
-  <private-page>
+  <private-page
+    title="Open Project"
+    subtitle="Select a project and version to load."
+  >
     <project-version-stepper />
   </private-page>
 </template>

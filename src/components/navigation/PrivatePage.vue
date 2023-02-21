@@ -2,15 +2,15 @@
   <q-page v-if="doDisplay" :padding="!props.fullWindow">
     <div class="q-mx-auto" :style="style">
       <flex-box v-if="!!props.title" justify="between" align="center">
-        <typography el="h1" variant="title" value="My Account" />
+        <typography el="h1" variant="title" :value="props.title" />
         <slot name="actions" />
       </flex-box>
-      <separator v-if="!!props.title" b="4" />
+      <separator v-if="!!props.title" b="2" />
       <typography
         v-if="!!props.subtitle"
         el="p"
-        y="2"
-        value="Create a project using one of the following methods."
+        b="2"
+        :value="props.subtitle"
       />
       <slot />
     </div>

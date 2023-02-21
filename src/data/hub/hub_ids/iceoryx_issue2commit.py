@@ -40,8 +40,8 @@ class IceoryxIssue2CommitDiff(AbstractHubId):
                 }
             },
             "overrides": {
-                "allowed_orphans": 252,
+                "allowed_orphans": 295,
                 "allowed_missing_sources": 1519,
-                "allowed_missing_targets": 2
+                "allowed_missing_targets": 15
             }
         }

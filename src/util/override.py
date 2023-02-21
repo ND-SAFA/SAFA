@@ -6,6 +6,11 @@ def overrides(interface_class):
     """
 
     def overrider(method):
+        """
+        Asserts that method being overridden is contained in parent class.
+        :param method: The method to check existence for.
+        :return: Method.
+        """
         assert (method.__name__ in dir(interface_class))
         return method
 

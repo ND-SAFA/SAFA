@@ -73,7 +73,7 @@ class RepositoryDownloader:
             artifact_set = GArtifactSet.load(data_file_path)
         else:
             artifact_set = artifact_set_creator()
-            artifact_set.save(data_file_path)
+            artifact_set.export(data_file_path)
         print("Done!")
         return artifact_set
 

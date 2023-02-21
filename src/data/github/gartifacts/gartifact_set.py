@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Generic, List, Tuple, Type, TypeVar
+from typing import Generic, List, Tuple, Type, TypeVar
 
 import pandas as pd
 
@@ -22,13 +22,17 @@ class GArtifactSet(Generic[T]):
     TYPE_PARAM = "type"
     ARTIFACT_PARAM = "artifacts"
 
-    def __init__(self, artifacts: List[T], artifact_type: GArtifactType) -> object:
+    def __init__(self, artifacts: List[T], artifact_type: GArtifactType):
+        """
+        Initializes artifact containing given artifacts.
+        :param artifacts: The github artifacts.
+        :param artifact_type: The type of github artifacts given.
+        """
         self.artifact_type = artifact_type
         self.artifacts = artifacts
         self.artifact_ids = [artifact.get_id() for artifact in artifacts]
-        self.id2artifact = self.__create_id2artifact(self.artifact_ids, self.artifacts)
 
-    def save(self, output_file_path: str, columns: List[str] = None, dataset_type: str = "NL"):
+    def export(self, output_file_path: str, columns: List[str] = None, dataset_type: str = "NL"):
         """
         Exports the id and body of the artifacts in the set.
         :param output_file_path: The path of the file to write to.
@@ -65,16 +69,26 @@ class GArtifactSet(Generic[T]):
 
     @staticmethod
     def __read_data_file(artifact_file_path: str) -> Tuple[List[T], GArtifactType]:
+        """
+        Reads data file artifact type and its corresponding artifacts.
+        :param artifact_file_path: The path to the artifact data file.
+        :return: Tuple containing Github artifacts and their corresponding artifact type.
+        """
         with open(artifact_file_path) as data_file:
             file_content = json.loads(data_file.read())
             artifact_type_key = file_content[GArtifactSet.TYPE_PARAM].upper()
             artifact_type = GArtifactType[artifact_type_key]
             artifacts = file_content[GArtifactSet.ARTIFACT_PARAM]
-            abstract_artifact_class = GArtifactSet.__get_builder_for_type(artifact_type)
+            abstract_artifact_class = GArtifactSet.__get_constructor_for_type(artifact_type)
             return [abstract_artifact_class.read(row) for row in artifacts], artifact_type
 
     @staticmethod
-    def __get_builder_for_type(artifact_type: GArtifactType) -> Type[AbstractGithubArtifact]:
+    def __get_constructor_for_type(artifact_type: GArtifactType) -> Type[AbstractGithubArtifact]:
+        """
+        Returns the constructor of the artifact for given type.
+        :param artifact_type: The type of artifact to create.
+        :return: Class constructor for given type.
+        """
         if artifact_type == GArtifactType.LINK:
             return GLink
         if artifact_type == GArtifactType.COMMIT:
@@ -86,19 +100,16 @@ class GArtifactSet(Generic[T]):
         else:
             raise Exception("Unknown artifact type: " + artifact_type.value)
 
-    @staticmethod
-    def __create_id2artifact(artifact_ids: List[str], artifacts: List[T]) -> Dict[str, T]:
-        id2artifact = {}
-        assert len(artifact_ids) == len(artifacts)
-        for i, a_id in enumerate(artifact_ids):
-            id2artifact[a_id] = artifacts[i]
-        return id2artifact
-
-    def __getitem__(self, artifact_id: str) -> T:
-        return self.id2artifact[artifact_id]
-
-    def __contains__(self, item):
-        return item in self.artifact_ids
+    def __contains__(self, artifact_id: str) -> bool:
+        """
+        Return whether artifact id contained in set.
+        :param artifact_id: The artifact id to check for inclusion.
+        :return: True is contained, false otherwise.
+        """
+        return artifact_id in self.artifact_ids
 
     def __len__(self):
+        """
+        :return: Returns the number of artifacts contained in set.
+        """
         return len(self.artifacts)

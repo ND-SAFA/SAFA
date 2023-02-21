@@ -3,11 +3,15 @@ from typing import Callable, Dict, List, Union
 from git import Commit
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
+from util.override import overrides
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 
 
 class GCommit(AbstractGithubArtifact):
+    """
+    Represents a commit in a repository.
+    """
 
     def __init__(self, commit_id: str, content: str, diffs: List[str], files: List[str],
                  commit_time: str):
@@ -25,12 +29,14 @@ class GCommit(AbstractGithubArtifact):
         self.files = files
         self.commit_time = commit_time
 
+    @overrides(AbstractGithubArtifact)
     def get_id(self) -> str:
         """
         :return: Returns the SHA of the commit.
         """
         return self.commit_id
 
+    @overrides(AbstractGithubArtifact)
     def export(self, dataset_type: str = "NL") -> Union[Dict, None]:
         """
         Exports commit for saving.
@@ -39,7 +45,11 @@ class GCommit(AbstractGithubArtifact):
         body = "\n".join(self.diffs) if dataset_type == "PL" else self.content
         return {"id": self.commit_id, "content": body}
 
-    def to_dict(self):
+    @overrides(AbstractGithubArtifact)
+    def to_dict(self) -> Dict:
+        """
+        :return: Returns the state dictionary associated with commit.
+        """
         return {
             "commit_id": self.commit_id,
             "summary": self.content,
@@ -50,6 +60,11 @@ class GCommit(AbstractGithubArtifact):
 
     @staticmethod
     def parse_commit(commit: Commit) -> "GCommit":
+        """
+        Parses GCommit from git commit.
+        :param commit: The commit from local repository.
+        :return: Constructed GCommit.
+        """
         id = commit.hexsha
         content = commit.message
         create_time = commit.committed_datetime
@@ -80,12 +95,23 @@ class GCommit(AbstractGithubArtifact):
         return list(differs)
 
     @staticmethod
-    def read(row: Dict) -> "Commit":
+    @overrides(AbstractGithubArtifact)
+    def read(row: Dict) -> "GCommit":
+        """
+        Create commit from state stored on disk.
+        :param row: Row in data frame.
+        :return: Constructed GCommit.
+        """
         return GCommit(commit_id=row["commit_id"],
                        content=row["summary"],
                        diffs=row["diff"],
                        files=row["files"],
                        commit_time=row['commit_time'])
 
-    def clean(self, cleaner: Callable[[str], str]):
+    def clean_content(self, cleaner: Callable[[str], str]) -> None:
+        """
+        Cleans content of commit.
+        :param cleaner: The cleaning function return cleaned string.
+        :return: None
+        """
         self.content = cleaner(self.content)

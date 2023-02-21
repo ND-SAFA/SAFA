@@ -1,6 +1,7 @@
 from typing import Dict, Union
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
+from util.override import overrides
 
 
 class GLink(AbstractGithubArtifact):
@@ -9,21 +10,46 @@ class GLink(AbstractGithubArtifact):
     """
 
     def __init__(self, source: str, target: str):
+        """
+        Creates links between source and target artifact ids.
+        :param source: The source artifact id.
+        :param target: The target artifact id.
+        """
         self.source = source
         self.target = target
 
+    @overrides(AbstractGithubArtifact)
     def export(self, **kwargs) -> Union[Dict, None]:
+        """
+        Returns DataFrame entity of link for exporting.
+        :param kwargs: Additional arguments to customize exporting. None used currently.
+        :return: Dictionary to be used as data frame entry.
+        """
         return {"source": self.source, "target": self.target}
 
+    @overrides(AbstractGithubArtifact)
     def get_id(self) -> str:
+        """
+        :return: Returns the trace link id between source and target.
+        """
         return str(self.source) + "~" + str(self.target)
 
-    @staticmethod
-    def read(row: Dict) -> "GLink":
-        return GLink(row["source_id"], row["target_id"])
-
+    @overrides(AbstractGithubArtifact)
     def to_dict(self) -> Dict:
+        """
+        :return: Returns the dictionary used to write state to disk.
+        """
         return {
             "source_id": self.source,
             "target_id": self.target
         }
+
+    @staticmethod
+    @overrides(AbstractGithubArtifact)
+    def read(row: Dict) -> "GLink":
+        """
+        Creates GLink from entry written to disk.
+        :param row: The row of the data frame to initialize from.
+        :return: Constructed GLink.
+        """
+        return GLink(row["source_id"], row["target_id"])

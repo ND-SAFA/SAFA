@@ -60,8 +60,8 @@ class TraceDataset(AbstractDataset):
             features[DataKey.LABELS_KEY] = torch.as_tensor(batch[CSVKeys.LABEL])
             return features
 
-        hf_dataset = Dataset.from_pandas(self.to_dataframe())
-        hf_dataset.set_transform(encode, columns=[CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL])
+        hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
+        hf_dataset.set_transform(encode)
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
@@ -90,19 +90,21 @@ class TraceDataset(AbstractDataset):
         logger.info(f"Trace links after processing: {len(project_links)}")
         return [feature_entries[link.id] for link in project_links]
 
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
         for link in self.links.values():
-            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
-                                         link.get_label()]
+            row = [link.source.token, link.target.token, link.get_label()] if not include_ids else \
+                [link.source.id, link.source.token, link.target.id, link.target.token, link.get_label()]
+            link_ids_to_rows[link.id] = row
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
-        return pd.DataFrame(data,
-                            columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
-                                     CSVKeys.LABEL])
+        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
+                                                                                        CSVKeys.TARGET_ID, CSVKeys.TARGET,
+                                                                                        CSVKeys.LABEL]
+        return pd.DataFrame(data, columns=cols)
 
     def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                             is_true_link: bool) -> int:

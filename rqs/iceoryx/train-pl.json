@@ -5,16 +5,10 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                23,
-                123421
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/nl-bert"
+            "model_path": "thearod5/pl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 1,

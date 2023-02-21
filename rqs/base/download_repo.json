@@ -1,0 +1,17 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "DOWNLOAD_REPO",
+          "job_args": {
+          },
+          "repo_name": "eclipse-iceoryx/iceoryx",
+          "load": true,
+          "repo_path": "~/desktop/safa/repos",
+          "output_path": "~/desktop/safa/datasets/iceoryx"
+        }
+      ]
+    }
+  ]
+}

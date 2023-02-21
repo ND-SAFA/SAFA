@@ -4,6 +4,7 @@ from jobs.analyze_dataset_job import AnalyzeDatasetJob
 from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.create_model_job import CreateModelJob
 from jobs.delete_model_job import DeleteModelJob
+from jobs.download_repository_job import DownloadRepositoryJob
 from jobs.export_artifacts_job import ExportArtifactsJob
 from jobs.gan_train_job import GanTrainJob
 from jobs.mlm_pre_train_job import MLMPreTrainJob
@@ -26,3 +27,4 @@ class SupportedJobType(Enum):
     TRAIN = TrainJob
     VSM = VSMJob
     DATASET_ANALYSIS = AnalyzeDatasetJob
+    DOWNLOAD_REPO = DownloadRepositoryJob

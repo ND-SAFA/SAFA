@@ -1,13 +1,13 @@
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
 
 from git import Commit
 
-from data.github.entities.abstract_github_artifact import AbstractGithubArtifact
+from data.github.abstract_github_entity import AbstractGithubArtifact
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 
 
-class Commit(AbstractGithubArtifact):
+class GCommit(AbstractGithubArtifact):
 
     def __init__(self, commit_id: str, content: str, diffs: List[str], files: List[str],
                  commit_time: str):
@@ -36,9 +36,7 @@ class Commit(AbstractGithubArtifact):
         Exports commit for saving.
         :return:
         """
-        body = self.content
-        if dataset_type == "PL":
-            body += " " + "\n".join(self.diffs)
+        body = "\n".join(self.diffs) if dataset_type == "PL" else self.content
         return {"id": self.commit_id, "content": body}
 
     def to_dict(self):
@@ -51,17 +49,17 @@ class Commit(AbstractGithubArtifact):
         }
 
     @staticmethod
-    def parse_commit(commit: Commit) -> "Commit":
+    def parse_commit(commit: Commit) -> "GCommit":
         id = commit.hexsha
         content = commit.message
         create_time = commit.committed_datetime
-        commit_diff = Commit.get_commit_diff(commit)
+        commit_diff = GCommit.get_commit_diff(commit)
         files = list(commit.stats.files)
-        return Commit(commit_id=id,
-                      content=content,
-                      diffs=list(commit_diff),
-                      files=files,
-                      commit_time=create_time)
+        return GCommit(commit_id=id,
+                       content=content,
+                       diffs=list(commit_diff),
+                       files=files,
+                       commit_time=create_time)
 
     @staticmethod
     def get_commit_diff(commit: Commit) -> List[str]:
@@ -83,8 +81,11 @@ class Commit(AbstractGithubArtifact):
 
     @staticmethod
     def read(row: Dict) -> "Commit":
-        return Commit(commit_id=row["commit_id"],
-                      content=row["summary"],
-                      diffs=row["diff"],
-                      files=row["files"],
-                      commit_time=row['commit_time'])
+        return GCommit(commit_id=row["commit_id"],
+                       content=row["summary"],
+                       diffs=row["diff"],
+                       files=row["files"],
+                       commit_time=row['commit_time'])
+
+    def clean(self, cleaner: Callable[[str], str]):
+        self.content = cleaner(self.content)

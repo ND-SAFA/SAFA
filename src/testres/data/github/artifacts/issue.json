@@ -1,0 +1,23 @@
+{
+  "type": "issue",
+  "artifacts": [
+    {
+      "id": "1",
+      "title": "This is the first issue.",
+      "body": "First issue body.",
+      "comments": [
+        "This is an issue comment relating it to #2"
+      ],
+      "closed_at": "2022-04-02 00:43:31",
+      "created_at": null
+    },
+    {
+      "id": "2",
+      "title": "This is the second issue.",
+      "body": "This is the second issue body.",
+      "comments": [],
+      "closed_at": null,
+      "created_at": null
+    }
+  ]
+}

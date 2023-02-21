@@ -4,7 +4,6 @@ extract trace links between commits and issues
 create doc string to source code relationship
 """
 import calendar
-import logging
 import os
 import time
 from typing import Callable
@@ -14,13 +13,13 @@ from github import Github, Repository
 from github.Issue import Issue
 from tqdm import tqdm
 
-from data.github.entities.commit import Commit
-from data.github.entities.github_artifact_type import GithubArtifactType
-from data.github.entities.github_pull import GithubPull
-from data.github.entities.repository_artifact_set import RepositoryArtifactSet
+from data.github.gartifacts.gartifact_set import GArtifactSet
+from data.github.gartifacts.gartifact_type import GArtifactType
+from data.github.gartifacts.gcommit import GCommit
+from data.github.gartifacts.gissue import GIssue
+from data.github.gartifacts.gpull import GPull
 from data.github.github_constants import ARTIFACT_PATH, CLONE_PATH, COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, PULL_ARTIFACT_FILE
-
-logger = logging.getLogger(__name__)
+from util.logging.logger_manager import logger
 
 
 class RepositoryDownloader:
@@ -60,8 +59,8 @@ class RepositoryDownloader:
 
     @staticmethod
     def load_or_parse(data_file_path: str,
-                      artifact_set_creator: Callable[[], RepositoryArtifactSet],
-                      load: bool) -> RepositoryArtifactSet:
+                      artifact_set_creator: Callable[[], GArtifactSet],
+                      load: bool) -> GArtifactSet:
         """
         Loads or parses artifact set at data file path.
         :param data_file_path: The path to the data file to load.
@@ -71,14 +70,14 @@ class RepositoryDownloader:
         """
         print("Loading artifacts: ", data_file_path)
         if load:
-            artifact_set = RepositoryArtifactSet.load(data_file_path)
+            artifact_set = GArtifactSet.load(data_file_path)
         else:
             artifact_set = artifact_set_creator()
             artifact_set.save(data_file_path)
         print("Done!")
         return artifact_set
 
-    def parse_issues(self, github_instance, repo: Repository) -> RepositoryArtifactSet[Issue]:
+    def parse_issues(self, github_instance, repo: Repository) -> GArtifactSet[Issue]:
         """
         Extracts issues at given repository.
         :param github_instance: The instance of the github API.
@@ -90,11 +89,11 @@ class RepositoryDownloader:
             if issue.pull_request is not None:
                 continue
             self.wait_for_rate_limit(github_instance)
-            issue_artifacts.append(Issue.parse(issue))
+            issue_artifacts.append(GIssue.parse(issue))
 
-        return RepositoryArtifactSet(issue_artifacts, GithubArtifactType.ISSUE)
+        return GArtifactSet(issue_artifacts, GArtifactType.ISSUE)
 
-    def parse_pulls(self, github_instance, repo: Repository) -> RepositoryArtifactSet[Issue]:
+    def parse_pulls(self, github_instance, repo: Repository) -> GArtifactSet[Issue]:
         """
         Extracts pull requests at given repository.
         :param github_instance: The instance of the github API.
@@ -104,11 +103,11 @@ class RepositoryDownloader:
         pulls = []
         for pr in tqdm(repo.get_pulls(state="all"), desc="Scraping pulls"):
             self.wait_for_rate_limit(github_instance)
-            pulls.append(GithubPull.parse(pr))
-        return RepositoryArtifactSet(pulls, GithubArtifactType.PULL_REQUEST)
+            pulls.append(GPull.parse(pr))
+        return GArtifactSet(pulls, GArtifactType.PULL)
 
     @staticmethod
-    def parse_commits(repo: Repository) -> RepositoryArtifactSet[Commit]:
+    def parse_commits(repo: Repository) -> GArtifactSet[GCommit]:
         """
         Extracts commits from given local repository.
         :param repo: The repository to gather commits from.
@@ -117,11 +116,11 @@ class RepositoryDownloader:
         commits = []
         for commit in tqdm(repo.iter_commits(), desc="Parsing commits from repository."):
             try:
-                commits.append(Commit.parse_commit(commit))
+                commits.append(GCommit.parse_commit(commit))
             except Exception as e:
                 print(e)
                 print("Commit failed: ", commit.hexsha)
-        return RepositoryArtifactSet(commits, GithubArtifactType.COMMIT)
+        return GArtifactSet(commits, GArtifactType.COMMIT)
 
     @staticmethod
     def __clone_repository(repository_name: str, clone_dir: str):

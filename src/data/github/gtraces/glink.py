@@ -1,9 +1,9 @@
 from typing import Dict, Union
 
-from data.github.entities.abstract_github_artifact import AbstractGithubArtifact
+from data.github.abstract_github_entity import AbstractGithubArtifact
 
 
-class Link(AbstractGithubArtifact):
+class GLink(AbstractGithubArtifact):
     """
     Represent link between repository artifacts.
     """
@@ -19,8 +19,8 @@ class Link(AbstractGithubArtifact):
         return str(self.source) + "~" + str(self.target)
 
     @staticmethod
-    def read(row: Dict) -> "Link":
-        return Link(row["source_id"], row["target_id"])
+    def read(row: Dict) -> "GLink":
+        return GLink(row["source_id"], row["target_id"])
 
     def to_dict(self) -> Dict:
         return {

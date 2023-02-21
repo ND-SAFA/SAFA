@@ -5,13 +5,13 @@ from typing import Dict, List, Union
 from github import Issue
 from nltk import word_tokenize
 
-from data.github.entities.abstract_github_artifact import AbstractGithubArtifact
-from data.github.entities.github_artifact_type import GithubArtifactType
+from data.github.abstract_github_entity import AbstractGithubArtifact
+from data.github.gartifacts.gartifact_type import GArtifactType
 from data.github.github_utils import GithubUtils
 
 
-class GithubIssue(AbstractGithubArtifact):
-    VALID_ARTIFACT_TYPES = [GithubArtifactType.PULL_REQUEST, GithubArtifactType.ISSUE]
+class GIssue(AbstractGithubArtifact):
+    VALID_ARTIFACT_TYPES = [GArtifactType.PULL, GArtifactType.ISSUE]
 
     def __init__(self,
                  issue_id: str,
@@ -41,21 +41,21 @@ class GithubIssue(AbstractGithubArtifact):
     @staticmethod
     def parse(issue: Issue) -> "Issue":
         comments = [comment.body for comment in issue.get_comments()]
-        return GithubIssue(issue.number,
-                           issue.title,
-                           issue.body,
-                           comments,
-                           issue.created_at,
-                           issue.closed_at)
+        return GIssue(issue.number,
+                      issue.title,
+                      issue.body,
+                      comments,
+                      issue.created_at,
+                      issue.closed_at)
 
     @staticmethod
     def read(row: Dict) -> "Issue":
-        return GithubIssue(row["id"],
-                           row["title"],
-                           row["body"],
-                           row["comments"],
-                           GithubUtils.read_datetime(row["closed_at"]),
-                           GithubUtils.read_datetime(row["created_at"]))
+        return GIssue(row["id"],
+                      row["title"],
+                      row["body"],
+                      row["comments"],
+                      GithubUtils.read_datetime(row["closed_at"]),
+                      GithubUtils.read_datetime(row["created_at"]))
 
     def to_dict(self):
         return {

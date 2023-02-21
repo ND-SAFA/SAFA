@@ -16,7 +16,13 @@
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 1,
+            "evaluation_strategy": "steps",
+            "save_strategy": "steps",
+            "logging_strategy": "steps",
+            "save_steps": 1,
+            "eval_steps": 1,
+            "logging_steps": 1,
+            "num_train_epochs": 3,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
@@ -40,17 +46,12 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.15
+              "val_percentage": 0.30
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": {
-                "*": [
-                  0.3,
-                  0.7
-                ]
-              }
+              "val_percentage": 0.50
             },
             "augmenter": {
               "steps": [

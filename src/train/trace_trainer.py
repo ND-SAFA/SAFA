@@ -1,9 +1,10 @@
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
 from datasets import Dataset
 from transformers.trainer import Trainer
+from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
@@ -63,12 +64,13 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-
+        self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
+        self.compute_metrics = None  # Turn off since prediction uses custom logic surrounding computing metrics.
         return TraceTrainOutput(train_output=train_output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
@@ -80,10 +82,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         dataset = self.trainer_dataset_manager[dataset_role]
         self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
-        n_predictions, n_expected = len(output.predictions), len(dataset)
-        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
-        metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
-        eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        eval_metrics, metrics_manager = self._compute_trace_metrics(output, dataset_role)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
@@ -107,6 +106,30 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset[0]:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
+
+    def _compute_validation_metrics(self, output: PredictionOutput, dataset_role: DatasetRole = DatasetRole.VAL) -> Dict:
+        """
+        Callback that allows Trainer to compute trace metrics on validation set.
+        :param output:The prediction output on a trace dataset.
+        :return: Trace metrics associated with prediction.
+        """
+        trace_metrics, _ = self._compute_trace_metrics(output, dataset_role=dataset_role)
+        return trace_metrics
+
+    def _compute_trace_metrics(self, output: PredictionOutput, dataset_role: DatasetRole) -> Tuple[Dict, MetricsManager]:
+        """
+        Computes the traces metric on given trace output using trace information from dataset role.
+        :param output: The output of a prediction on a trace dataset.
+        :param dataset_role: The role of the trace dataset being predicted (used for source-target labels).
+        :return: Trace metrics and metrics manager used to calculate them.
+        """
+        dataset = self.trainer_dataset_manager[dataset_role]
+        n_predictions, n_expected = len(output.predictions), len(self.eval_dataset)
+        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
+        assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
+        metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
+        trace_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        return trace_metrics, metrics_manager
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         """

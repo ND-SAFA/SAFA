@@ -8,6 +8,14 @@ from util.base_object import BaseObject
 class AbstractDataset(BaseObject):
 
     @abstractmethod
+    def to_hf_dataset(self, model_generator: ModelManager) -> Any:
+        """
+        Converts data to a Huggingface (HF) Dataset.
+        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :return: A data in a HF Dataset.
+        """
+
+    @abstractmethod
     def to_trainer_dataset(self, model_generator: ModelManager) -> Any:
         """
         Converts data to that used by Huggingface (HF) trainer.

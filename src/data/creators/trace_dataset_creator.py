@@ -241,6 +241,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             title = f"Generating negative links between {source_type} -> {target_type}"
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         trace_dataset.shuffle_link_ids()
+        logger.info(f"Finished shuffling dataset.")
 
     @staticmethod
     def _filter_unreferenced_traces(artifact_df: pd.DataFrame, trace_df: pd.DataFrame, max_missing_sources: int,

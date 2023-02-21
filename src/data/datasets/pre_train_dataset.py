@@ -50,7 +50,7 @@ class PreTrainDataset(AbstractDataset):
             return {"input_ids": chunks}
 
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
-        dataset = dataset.map(tokenize_and_chunk, batched=True, remove_columns=["text"])
+        dataset = dataset.map(tokenize_and_chunk, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
         return dataset["train"]
 
     def save(self, output_dir: str, filename: str) -> str:

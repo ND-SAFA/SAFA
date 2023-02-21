@@ -5,6 +5,8 @@ from copy import deepcopy
 from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
+import torch
+from datasets import Dataset
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
@@ -20,8 +22,6 @@ from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
-from datasets import Dataset
-import torch
 
 
 class TraceDataset(AbstractDataset):
@@ -61,7 +61,7 @@ class TraceDataset(AbstractDataset):
             return features
 
         hf_dataset = Dataset.from_pandas(self.to_dataframe())
-        hf_dataset.set_transform(encode)
+        hf_dataset.set_transform(encode, columns=[CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL])
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 

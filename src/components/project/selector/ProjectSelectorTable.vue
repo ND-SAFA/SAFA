@@ -21,7 +21,11 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IdentifierSchema, TableColumn } from "@/types";
+import {
+  IdentifierSchema,
+  projectExpandedColumns,
+  projectNameColumn,
+} from "@/types";
 import { projectStore } from "@/hooks";
 import { handleGetProjects } from "@/api";
 import { SelectorTable } from "@/components/common";
@@ -60,37 +64,12 @@ const selectedItems = computed({
   },
 });
 
-const nameColumn: TableColumn<IdentifierSchema> = {
-  name: "name",
-  label: "Name",
-  sortable: true,
-  field: (row) => row.name,
-};
-
-const expandedColumns: TableColumn<IdentifierSchema>[] = [
-  {
-    name: "description",
-    label: "Description",
-    sortable: false,
-    field: (row) => row.description,
-  },
-  {
-    name: "owner",
-    label: "Owner",
-    sortable: false,
-    field: (row) => row.owner,
-  },
-  {
-    name: "actions",
-    label: "Actions",
-    sortable: false,
-    field: () => "",
-  },
-];
-
 const columns = computed(() =>
-  props.minimal ? [nameColumn] : [nameColumn, ...expandedColumns]
+  props.minimal
+    ? [projectNameColumn]
+    : [projectNameColumn, ...projectExpandedColumns]
 );
+
 const rows = computed(() => projectStore.allProjects);
 
 /**

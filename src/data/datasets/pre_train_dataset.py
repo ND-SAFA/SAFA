@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import Any
 
 from datasets import load_dataset
 from torch.utils.data import Dataset
@@ -20,6 +21,14 @@ class PreTrainDataset(AbstractDataset):
         self.training_file_path = training_file_path
         self.block_size = block_size
         self.kwargs = kwargs
+
+    def to_hf_dataset(self, model_generator: ModelManager) -> Any:
+        """
+        Converts data to a Huggingface (HF) Dataset.
+        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :return: A data in a HF Dataset.
+        """
+        return self.to_trainer_dataset(model_generator)
 
     def to_trainer_dataset(self, model_manager: ModelManager) -> Dataset:
         """

@@ -1,6 +1,6 @@
 <template>
-  <q-dialog :model-value="props.isOpen" @close="emit('close')">
-    <q-card>
+  <q-dialog :model-value="props.open" @close="emit('close')">
+    <q-card :style="style">
       <q-card-section>
         <flex-box
           full-width
@@ -18,6 +18,13 @@
         </flex-box>
         <separator />
         <q-linear-progress v-if="!!props.loading" indeterminate />
+        <typography
+          v-if="!!props.subtitle"
+          t="2"
+          b="0"
+          el="p"
+          :value="props.subtitle"
+        />
       </q-card-section>
       <q-card-section>
         <slot />
@@ -40,7 +47,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useSlots } from "vue";
+import { computed, useSlots } from "vue";
 import { Typography, Separator } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
@@ -51,13 +58,21 @@ const props = defineProps<{
    */
   title: string;
   /**
+   * The modal subtitle.
+   */
+  subtitle?: string;
+  /**
    * Whether the modal is open.
    */
-  isOpen: boolean;
+  open: boolean;
   /**
    * Whether the component is loading.
    */
-  loading?: string;
+  loading?: boolean;
+  /**
+   * A fixed width size to set for the modal.
+   */
+  size?: "sm" | "md" | "lg";
   /**
    * The testing selector to set.
    */
@@ -72,4 +87,17 @@ const emit = defineEmits<{
 }>();
 
 const slots = useSlots();
+
+const style = computed(() => {
+  switch (props.size) {
+    case "sm":
+      return "width: 400px";
+    case "md":
+      return "width: 600px";
+    case "lg":
+      return "width: 800px";
+    default:
+      return "";
+  }
+});
 </script>

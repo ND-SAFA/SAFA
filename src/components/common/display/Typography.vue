@@ -183,7 +183,7 @@ const props = withDefaults(
 
 const { darkMode } = useTheme();
 
-const className = useMargins(props, [
+const className = useMargins(props, () => [
   [props.variant === "large", "text-h3"],
   [props.variant === "title", "text-h4"],
   [props.variant === "subtitle", "text-h5"],

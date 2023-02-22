@@ -38,7 +38,7 @@
     </q-select>
 
     <version-creator
-      :is-open="openCreateVersion"
+      :open="openCreateVersion"
       :project="project"
       @close="openCreateVersion = false"
       @create="handleVersionCreated"

@@ -74,7 +74,7 @@ const props = defineProps<{
   /**
    * Whether the component is loading.
    */
-  loading?: string;
+  loading?: boolean;
   /**
    * The color to render the component with.
    */
@@ -124,7 +124,7 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const buttonClassName = useMargins(props, [
+const buttonClassName = useMargins(props, () => [
   ["color", `text-${props.color}`],
   ["block", "full-width"],
   ["class", props.class],

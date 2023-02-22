@@ -21,7 +21,7 @@
   >
     <template #addItemDialogue>
       <version-creator
-        :is-open="addVersionDialogue"
+        :open="addVersionDialogue"
         :project="project"
         @close="handleCreatorClose"
         @create="handleVersionCreated"

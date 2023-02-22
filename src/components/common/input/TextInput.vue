@@ -7,6 +7,7 @@
     :error-message="props.errorMessage || ''"
     :error="showError"
     :class="className"
+    :hint="props.hint"
     @keydown="handleKeydown"
   />
 </template>
@@ -23,7 +24,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults, computed } from "vue";
 import { SizeType } from "@/types";
-import { useVModel } from "@/hooks";
+import { useMargins, useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
@@ -47,12 +48,30 @@ const props = withDefaults(
      * The bottom margin.
      */
     b?: SizeType;
+    /**
+     * A hint to display below the input.
+     */
+    hint?: string;
+    type?:
+      | "text"
+      | "password"
+      | "textarea"
+      | "email"
+      | "search"
+      | "tel"
+      | "file"
+      | "number"
+      | "url"
+      | "time"
+      | "date";
   }>(),
   {
     b: "1",
     label: "",
     errorMessage: "",
     class: "",
+    hint: undefined,
+    type: "text",
   }
 );
 
@@ -69,15 +88,7 @@ const emit = defineEmits<{
 
 const model = useVModel(props, "modelValue");
 
-const className = computed(() => {
-  if (props.class) {
-    return props.class;
-  } else if (props.b) {
-    return `mb-${props.b}`;
-  } else {
-    return "";
-  }
-});
+const className = useMargins(props, () => [[!!props.class, props.class]]);
 
 const showError = computed(
   () => !!props.errorMessage && props.errorMessage.length > 0

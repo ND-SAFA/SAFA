@@ -1,22 +1,18 @@
 <template>
-  <v-container style="max-width: 40em">
-    <v-text-field
-      v-model="name"
-      filled
+  <div style="max-width: 40em">
+    <text-input
+      v-model="nameText"
       label="Project Name"
-      :data-cy="dataCyName"
       hint="Required"
-      persistent-hint
+      :data-cy="props.dataCyName"
     />
-    <v-textarea
-      v-model="description"
-      filled
-      hide-details
+    <text-input
+      v-model="descriptionText"
+      type="textarea"
       label="Project Description"
-      rows="3"
-      :data-cy="dataCyDescription"
+      :data-cy="props.dataCyDescription"
     />
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,6 +27,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults } from "vue";
 import { useVModel } from "@/hooks";
+import TextInput from "@/components/common/input/TextInput.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -45,11 +42,11 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:name", name: string): void;
   (e: "update:description", description: string): void;
 }>();
 
-const name = useVModel(props, "name");
-const description = useVModel(props, "description");
+const nameText = useVModel(props, "name");
+const descriptionText = useVModel(props, "description");
 </script>

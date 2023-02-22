@@ -9,12 +9,12 @@ import { computed, ComputedRef } from "vue";
  */
 export function useClasses<T>(
   props: T,
-  classes: [keyof T | boolean, string | undefined][]
+  classes: () => [keyof T | boolean, string | undefined][]
 ): ComputedRef<string> {
   return computed(() => {
     const classNames: string[] = [];
 
-    classes.forEach(([key, value]) => {
+    classes().forEach(([key, value]) => {
       const keyIsValid = typeof key === "string" ? !!props[key] : key;
 
       if (!keyIsValid || !value) return;

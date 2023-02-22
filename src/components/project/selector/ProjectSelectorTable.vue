@@ -10,17 +10,22 @@
     row-key="projectId"
     item-name="Project"
     @refresh="handleReload"
+    @row:add="handleOpenAdd"
+    @row:edit="handleOpenEdit"
+    @row:delete="handleOpenDelete"
   >
-    <project-identifier-modal
-      :open="saveOpen"
-      @save="handleConfirmSave"
-      @close="saveOpen = false"
-    />
-    <confirm-project-delete
-      :open="deleteOpen"
-      @confirm="handleConfirmDelete"
-      @cancel="deleteOpen = false"
-    />
+    <template #bottom>
+      <confirm-project-delete
+        :open="deleteOpen"
+        @close="deleteOpen = false"
+        @confirm="handleConfirmDelete"
+      />
+      <project-identifier-modal
+        :open="saveOpen"
+        @close="saveOpen = false"
+        @save="handleConfirmSave"
+      />
+    </template>
   </selector-table>
 </template>
 
@@ -38,11 +43,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IdentifierSchema } from "@/types";
 import { identifierSaveStore, projectStore } from "@/hooks";
-import {
-  handleDeleteProject,
-  handleGetProjects,
-  handleSaveProject,
-} from "@/api";
+import { handleGetProjects } from "@/api";
 import { SelectorTable } from "@/components/common";
 import sessionStore from "@/hooks/core/useSession";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
@@ -142,29 +143,15 @@ function handleOpenDelete(project: IdentifierSchema) {
  * Attempts to delete a project, and closes the delete modal.
  */
 function handleConfirmDelete() {
-  loading.value = true;
-
-  handleDeleteProject({
-    onSuccess: () => {
-      deleteOpen.value = false;
-      selectedItems.value = [];
-    },
-    onComplete: () => (loading.value = false),
-  });
+  deleteOpen.value = false;
+  selectedItems.value = [];
 }
 
 /**
  * Attempts to save a project.
  */
 function handleConfirmSave() {
-  loading.value = true;
-
-  handleSaveProject({
-    onSuccess: (project) => {
-      saveOpen.value = false;
-    },
-    onComplete: () => (loading.value = false),
-  });
+  saveOpen.value = false;
 }
 
 /**

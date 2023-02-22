@@ -10,8 +10,6 @@
     :custom-cells="['actions']"
     @row-click="handleRowClick"
   >
-    <slot />
-
     <template #selection>
       <div />
     </template>
@@ -68,6 +66,7 @@
           @click="$emit('row:add')"
         />
       </div>
+      <slot name="bottom" />
     </template>
   </data-table>
 </template>

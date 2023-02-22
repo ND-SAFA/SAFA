@@ -14,7 +14,7 @@
       align="center"
       x="3"
       y="3"
-      style="height: 40px"
+      style="height: 40px; padding-left: 5px; padding-right: 5px"
     >
       <safa-icon style="width: 200px !important" />
       <icon-button

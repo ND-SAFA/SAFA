@@ -32,9 +32,9 @@
       @save="handleSave"
     />
     <confirm-project-delete
-      :is-open="isDeleteOpen"
+      :open="isDeleteOpen"
+      @close="isDeleteOpen = false"
       @confirm="handleConfirmDeleteProject"
-      @cancel="isDeleteOpen = false"
     />
   </flex-box>
 </template>
@@ -42,11 +42,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import {
-  handleSaveProject,
-  handleDownloadProjectCSV,
-  handleDeleteProject,
-} from "@/api";
+import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
 import { FlexBox, TextButton } from "@/components/common";
 import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -123,15 +119,8 @@ export default defineComponent({
      * Attempts to delete a project, and closes the delete modal.
      */
     handleConfirmDeleteProject() {
-      this.isLoading = true;
-
-      handleDeleteProject({
-        onSuccess: () => {
-          this.isDeleteOpen = false;
-          this.$emit("unselected");
-        },
-        onComplete: () => (this.isLoading = false),
-      });
+      this.isDeleteOpen = false;
+      this.$emit("unselected");
     },
   },
 });

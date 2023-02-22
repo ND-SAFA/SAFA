@@ -1,7 +1,7 @@
 <template>
   <modal
     :title="`Current Version: ${versionName}`"
-    :is-open="props.isOpen"
+    :open="props.open"
     :loading="isLoading"
     data-cy="modal-version-create"
     @close="emit('close')"
@@ -53,7 +53,7 @@ import { Modal, TextButton } from "@/components/common";
 import FlexBox from "@/components/common/layout/FlexBox.vue";
 
 const props = defineProps<{
-  isOpen: boolean;
+  open: boolean;
   project?: IdentifierSchema;
 }>();
 

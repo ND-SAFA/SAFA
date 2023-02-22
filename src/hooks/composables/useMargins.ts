@@ -27,17 +27,17 @@ const convertMargin = (value?: SizeType) => {
  * @param classes - Additional classes to include besides the margins classes.
  * @return The computed class name.
  */
-export function useMargins<T extends MarginProps>(
+export function useMargins<T extends Partial<MarginProps>>(
   props: T,
-  classes: [keyof T | boolean, string | undefined][] = []
+  classes: () => [keyof T | boolean, string | undefined][] = () => []
 ): ComputedRef<string> {
-  return useClasses(props, [
+  return useClasses(props, () => [
     ["x", ` q-mx-${convertMargin(props.x)}`],
     ["y", ` q-my-${convertMargin(props.y)}`],
     ["l", ` q-ml-${convertMargin(props.l)}`],
     ["r", ` q-mr-${convertMargin(props.r)}`],
     ["t", ` q-mt-${convertMargin(props.t)}`],
     ["b", ` q-mb-${convertMargin(props.b)}`],
-    ...classes,
+    ...classes(),
   ]);
 }

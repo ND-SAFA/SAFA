@@ -68,7 +68,7 @@ const props = defineProps<{
   class?: string;
 }>();
 
-const className = useMargins(props, [
+const className = useMargins(props, () => [
   ["nav", "faded"],
   ["class", props.class],
 ]);

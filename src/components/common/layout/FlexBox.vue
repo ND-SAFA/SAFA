@@ -83,7 +83,7 @@ const props = withDefaults(
   }
 );
 
-const className = useMargins(props, [
+const className = useMargins(props, () => [
   [true, "flex"],
   ["align", `align-${props.align}`],
   ["justify", `justify-${props.justify}`],

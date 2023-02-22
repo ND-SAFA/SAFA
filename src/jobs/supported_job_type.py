@@ -6,6 +6,7 @@ from jobs.create_model_job import CreateModelJob
 from jobs.delete_model_job import DeleteModelJob
 from jobs.download_repository_job import DownloadRepositoryJob
 from jobs.export_artifacts_job import ExportArtifactsJob
+from jobs.export_dataset_job import ExportDatasetJob
 from jobs.gan_train_job import GanTrainJob
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.predict_job import PredictJob
@@ -15,6 +16,7 @@ from jobs.vsm_job import VSMJob
 
 
 class SupportedJobType(Enum):
+    EXPORT_DATASET = ExportDatasetJob
     EXPORT_ARTIFACTS = ExportArtifactsJob
     PUSH_MODEL = PushModelJob
     CREATE_DATASETS = CreateDatasetsJob

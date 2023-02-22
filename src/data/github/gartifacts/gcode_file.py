@@ -21,7 +21,7 @@ class GCodeFile(AbstractGithubArtifact):
         self.content = FileUtil.read_file(self.file_path)
 
     @overrides(AbstractGithubArtifact)
-    def export(self, **kwargs) -> Union[Dict, None]:
+    def as_dataframe_entry(self, **kwargs) -> Union[Dict, None]:
         """
         Exports state as dictionary.
         :param kwargs: Additional parameters for exporting artifact.
@@ -30,15 +30,15 @@ class GCodeFile(AbstractGithubArtifact):
         return {"id": self.get_id(), "content": self.content}
 
     @overrides(AbstractGithubArtifact)
-    def to_dict(self) -> Dict:
+    def get_state_dict(self) -> Dict:
         """
         :return: Returns the state dictionary of the code artifact.
         """
-        return {**self.export(), "file_path": self.file_path, "base_path": self.base_path}
+        return {**self.as_dataframe_entry(), "file_path": self.file_path, "base_path": self.base_path}
 
     @staticmethod
     @overrides(AbstractGithubArtifact)
-    def read(state_dict: Dict) -> "GCodeFile":
+    def from_state_dict(state_dict: Dict) -> "GCodeFile":
         """
         Creates GCodeFile from state dictionary.
         :param state_dict: The state dictionary of github code artifact.

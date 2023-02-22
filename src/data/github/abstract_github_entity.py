@@ -8,7 +8,7 @@ class AbstractGithubArtifact(ABC):
     """
 
     @abstractmethod
-    def to_dict(self) -> Dict:
+    def get_state_dict(self) -> Dict:
         """
         Returns the dictionary containing artifact id and content.
         :return: Dataframe entry as dictionary.
@@ -17,16 +17,16 @@ class AbstractGithubArtifact(ABC):
 
     @staticmethod
     @abstractmethod
-    def read(row: Dict) -> "AbstractGithubArtifact":
+    def from_state_dict(state_dict: Dict) -> "AbstractGithubArtifact":
         """
         Reads DataFrame row as artifact.
-        :param row: The row in the dataframe.
+        :param state_dict: The row in the dataframe.
         :return: The constructed artifact.
         """
         pass
 
     @abstractmethod
-    def export(self, **kwargs) -> Union[Dict, None]:
+    def as_dataframe_entry(self, **kwargs) -> Union[Dict, None]:
         """
         Exports artifact id and content.
         :param kwargs: Additional parameters for customizing what content to include.
@@ -45,4 +45,4 @@ class AbstractGithubArtifact(ABC):
         """
         :return: Returns artifact as export dictionary.
         """
-        return str(self.to_dict())
+        return str(self.get_state_dict())

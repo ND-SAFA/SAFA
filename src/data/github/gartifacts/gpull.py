@@ -51,7 +51,7 @@ class GPull(GIssue):
                      commits)
 
     @staticmethod
-    def read(state_dict: Dict) -> "PullRequest":
+    def from_state_dict(state_dict: Dict) -> "PullRequest":
         """
         Constructs pull request from state dictionary.
         :param state_dict: Dictionary containing saved state of pull request.
@@ -65,7 +65,7 @@ class GPull(GIssue):
                      DateTimeUtil.read_datetime(state_dict["created_at"]),
                      state_dict["commits"])
 
-    def to_dict(self):
+    def get_state_dict(self):
         """
         :return: Returns the state dictionary of pull request.
         """

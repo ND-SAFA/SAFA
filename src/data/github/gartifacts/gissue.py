@@ -41,7 +41,7 @@ class GIssue(AbstractGithubArtifact):
         self.close_time = close_time
 
     @overrides(AbstractGithubArtifact)
-    def export(self, **kwargs) -> Union[Dict, None]:
+    def as_dataframe_entry(self, **kwargs) -> Union[Dict, None]:
         """
         Returns dictionary entry for exporting issue.
         :param kwargs: Additional parameters for modifying export process.
@@ -62,7 +62,7 @@ class GIssue(AbstractGithubArtifact):
         return self.issue_id
 
     @overrides(AbstractGithubArtifact)
-    def to_dict(self) -> Dict:
+    def get_state_dict(self) -> Dict:
         """
         Returns the state dictionary of GIssue.
         :return: Dictionary containing current state of GIssue.
@@ -78,18 +78,18 @@ class GIssue(AbstractGithubArtifact):
 
     @staticmethod
     @overrides(AbstractGithubArtifact)
-    def read(row: Dict) -> "Issue":
+    def from_state_dict(state_dict: Dict) -> "Issue":
         """
         Reads state dictionary and constructs issue from it.
-        :param row: The state dictionary of GIssue.
+        :param state_dict: The state dictionary of GIssue.
         :return: Constructed GIssue.
         """
-        return GIssue(row["id"],
-                      row["title"],
-                      row["body"],
-                      row["comments"],
-                      DateTimeUtil.read_datetime(row["closed_at"]),
-                      DateTimeUtil.read_datetime(row["created_at"]))
+        return GIssue(state_dict["id"],
+                      state_dict["title"],
+                      state_dict["body"],
+                      state_dict["comments"],
+                      DateTimeUtil.read_datetime(state_dict["closed_at"]),
+                      DateTimeUtil.read_datetime(state_dict["created_at"]))
 
     @staticmethod
     def parse(issue: Issue) -> "Issue":

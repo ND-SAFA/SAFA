@@ -100,7 +100,7 @@ class GArtifactSet(Generic[T]):
             artifact_type = GArtifactType[artifact_type_key]
             artifacts = file_content[GArtifactSet.ARTIFACT_PARAM]
             abstract_artifact_class = GArtifactSet.__get_constructor_for_type(artifact_type)
-            return [abstract_artifact_class.read(row) for row in artifacts], artifact_type
+            return [abstract_artifact_class.from_state_dict(row) for row in artifacts], artifact_type
 
     @staticmethod
     def __get_constructor_for_type(artifact_type: GArtifactType) -> Type[AbstractGithubArtifact]:

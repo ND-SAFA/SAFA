@@ -19,7 +19,7 @@ class GLink(AbstractGithubArtifact):
         self.target = target
 
     @overrides(AbstractGithubArtifact)
-    def export(self, **kwargs) -> Union[Dict, None]:
+    def as_dataframe_entry(self, **kwargs) -> Union[Dict, None]:
         """
         Returns DataFrame entity of link for exporting.
         :param kwargs: Additional arguments to customize exporting. None used currently.
@@ -35,7 +35,7 @@ class GLink(AbstractGithubArtifact):
         return str(self.source) + "~" + str(self.target)
 
     @overrides(AbstractGithubArtifact)
-    def to_dict(self) -> Dict:
+    def get_state_dict(self) -> Dict:
         """
         :return: Returns the dictionary used to write state to disk.
         """
@@ -46,10 +46,10 @@ class GLink(AbstractGithubArtifact):
 
     @staticmethod
     @overrides(AbstractGithubArtifact)
-    def read(row: Dict) -> "GLink":
+    def from_state_dict(state_dict: Dict) -> "GLink":
         """
         Creates GLink from entry written to disk.
-        :param row: The row of the data frame to initialize from.
+        :param state_dict: The row of the data frame to initialize from.
         :return: Constructed GLink.
         """
-        return GLink(row["source_id"], row["target_id"])
+        return GLink(state_dict["source_id"], state_dict["target_id"])

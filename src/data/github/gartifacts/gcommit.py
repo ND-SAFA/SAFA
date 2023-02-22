@@ -37,7 +37,7 @@ class GCommit(AbstractGithubArtifact):
         return self.commit_id
 
     @overrides(AbstractGithubArtifact)
-    def export(self, dataset_type: str = "NL") -> Union[Dict, None]:
+    def as_dataframe_entry(self, dataset_type: str = "NL") -> Union[Dict, None]:
         """
         Exports commit for saving.
         :return:
@@ -46,7 +46,7 @@ class GCommit(AbstractGithubArtifact):
         return {"id": self.commit_id, "content": body}
 
     @overrides(AbstractGithubArtifact)
-    def to_dict(self) -> Dict:
+    def get_state_dict(self) -> Dict:
         """
         :return: Returns the state dictionary associated with commit.
         """
@@ -96,17 +96,17 @@ class GCommit(AbstractGithubArtifact):
 
     @staticmethod
     @overrides(AbstractGithubArtifact)
-    def read(row: Dict) -> "GCommit":
+    def from_state_dict(state_dict: Dict) -> "GCommit":
         """
         Create commit from state stored on disk.
-        :param row: Row in data frame.
+        :param state_dict: Row in data frame.
         :return: Constructed GCommit.
         """
-        return GCommit(commit_id=row["commit_id"],
-                       content=row["summary"],
-                       diffs=row["diff"],
-                       files=row["files"],
-                       commit_time=row['commit_time'])
+        return GCommit(commit_id=state_dict["commit_id"],
+                       content=state_dict["summary"],
+                       diffs=state_dict["diff"],
+                       files=state_dict["files"],
+                       commit_time=state_dict['commit_time'])
 
     def clean_content(self, cleaner: Callable[[str], str]) -> None:
         """

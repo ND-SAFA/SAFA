@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import math
 
@@ -14,21 +14,19 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
     source queries in validation set.
     """
 
-    @staticmethod
     @overrides(AbstractTraceSplitStrategy)
-    def create_split(dataset: TraceDataset, percent_split: float, slice_num: int) -> TraceDataset:
+    def create_split(self, dataset: TraceDataset) -> Tuple[TraceDataset, TraceDataset]:
         """
         Creates a new trace data from the slice defined by the percent split.
         :param dataset: The trace dataset to split.
-        :param percent_split: The percentage of links included in second slice.
-        :param slice_num: Whether to return first or second slice.
         :return: the dataset split
         """
         links = SourceSplitStrategy.create_trace_link_array_by_source(dataset)
-        first_slice_links, second_slice_links = AbstractTraceSplitStrategy.split_data(links, percent_split, shuffle=False)
-        slice_links = first_slice_links if slice_num == 1 else second_slice_links
-        slice_link_ids = [t.id for t in slice_links]
-        return AbstractTraceSplitStrategy.create_dataset_slice(dataset, slice_link_ids)
+        first_slice_links, second_slice_links = AbstractTraceSplitStrategy.split_data(links, self.percent_of_split_dataset,
+                                                                                      shuffle=False)
+        slice1 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t.id for t in first_slice_links])
+        slice2 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t.id for t in second_slice_links])
+        return slice1, slice2
 
     @staticmethod
     def create_trace_link_array_by_source(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \

@@ -1,5 +1,7 @@
 import os
 
+from typing import List, Tuple
+
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.readers.pre_train_project_reader import PreTrainProjectReader
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
@@ -13,18 +15,29 @@ class PreTrainSplitStrategy(AbstractSplitStrategy):
 
     SPLIT_DIR_NAME = "split_{}"
 
-    @staticmethod
-    def create_split(dataset: PreTrainDataset, percent_split: float, slice_num: int) -> PreTrainDataset:
+    def create_split(self, dataset: PreTrainDataset) -> Tuple[PreTrainDataset, PreTrainDataset]:
         """
         Creates the split of the pretraining dataset
         :param dataset: The dataset to split.
-        :type percent_split: The percentage of the dataset contained in the second split.
-        :type slice_num: The slice number to return.
         :return: PreTrainDataset containing slice of data.
         """
         file_contents = FileUtil.read_file(dataset.training_file_path).split(PreTrainProjectReader.DELIMINATOR)
-        split_contents = AbstractSplitStrategy.split_data(file_contents, percent_split)[slice_num - 1]
+        content1, content2 = AbstractSplitStrategy.split_data(file_contents, self.percent_of_split_dataset)
         base_dir, filename = FileUtil.split_base_path_and_filename(dataset.training_file_path)
-        new_training_path = os.path.join(base_dir, PreTrainSplitStrategy.SPLIT_DIR_NAME.format(slice_num), filename)
-        FileUtil.write(PreTrainProjectReader.DELIMINATOR.join(split_contents), new_training_path)
-        return PreTrainDataset(training_file_path=new_training_path, block_size=dataset.block_size, **dataset.kwargs)
+        splits = []
+        for i, content in enumerate([content1, content2]):
+            split_path = PreTrainSplitStrategy.make_split_training_path(base_dir, i, filename)
+            FileUtil.write(PreTrainProjectReader.DELIMINATOR.join(content), split_path)
+            splits.append(PreTrainDataset(training_file_path=split_path, block_size=dataset.block_size, **dataset.kwargs))
+        return splits[0], splits[1]
+
+    @staticmethod
+    def make_split_training_path(base_dir: str, split_num: int, filename: str) -> str:
+        """
+        Constructs the training path for the new split
+        :param base_dir: The base path to the directory to save splits
+        :param split_num: The number corresponding with this split
+        :param filename: The name of the file to save the data in
+        :return: The training path for the split
+        """
+        return os.path.join(base_dir, PreTrainSplitStrategy.SPLIT_DIR_NAME.format(split_num), filename)

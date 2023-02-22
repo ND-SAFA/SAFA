@@ -57,9 +57,9 @@ class IceoryxHubId(AbstractHubId, ABC):
             },
             "traces": {
                 "code2issue": {
-                    "source": "Code",
-                    "target": "Issue",
-                    "path": "code2issue.csv"
+                    "source": "Issue",
+                    "target": "Code",
+                    "path": "issue2code.csv"
                 }
             },
             "overrides": {

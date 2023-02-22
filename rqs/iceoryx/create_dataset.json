@@ -10,8 +10,8 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "HUB",
-                "name": "iceoryx_code2issue"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/iceoryx"
               }
             },
             "eval_dataset_creator": {

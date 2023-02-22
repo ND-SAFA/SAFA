@@ -121,7 +121,7 @@ class RepositoryExporter:
         trace_instructions["commit_diff2issue.csv"] = {
             **trace_instructions["commit2issue.csv"]}  # copy commit2issue for commit_diff2issue
         entity_instructions.update(trace_instructions)
-        entity_instructions["code2issue.csv"] = {
+        entity_instructions["issue2code.csv"] = {
             "obj": self.create_issue_2_code(),
             "col_id": "trace"
         }
@@ -157,7 +157,7 @@ class RepositoryExporter:
                 for extension in ALLOWED_CODE_EXTENSIONS:
                     if f.endswith(extension):
                         f = self.clean_file_path(f)
-                        glinks.append(GLink(f, commit2issue_link.target))
+                        glinks.append(GLink(commit2issue_link.target, f))
         return GArtifactSet(glinks, GArtifactType.LINK)
 
     def clean_file_path(self, file_path: str):

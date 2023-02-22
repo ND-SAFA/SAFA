@@ -15,12 +15,11 @@
         />
       </template>
       <template #2>
-        <version-selector
+        <version-selector-table
           :minimal="props.minimal"
-          :is-open="isVersionStep"
+          :open="isVersionStep"
           :project="selectedProject"
           @selected="handleVersionSelect"
-          @unselected="handleVersionSelect"
         />
       </template>
     </stepper>
@@ -44,7 +43,7 @@ import { projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
 import ProjectSelectorTable from "./ProjectSelectorTable.vue";
-import VersionSelector from "./VersionSelector.vue";
+import VersionSelectorTable from "./VersionSelectorTable.vue";
 
 const props = defineProps<{
   /**

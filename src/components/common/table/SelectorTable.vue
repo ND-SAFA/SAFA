@@ -6,6 +6,7 @@
     :row-key="rowKey"
     :rows-per-page="5"
     :dense="props.minimal"
+    :loading="props.loading"
     selection="single"
     data-cy="generic-selector-table"
     :custom-cells="['actions']"
@@ -36,7 +37,7 @@
 
     <template #body-cell-actions="{ row }">
       <q-td @click.stop="">
-        <flex-box>
+        <flex-box justify="end">
           <slot name="cell-actions" :row="row" />
           <icon-button
             v-if="isEditEnabled(row)"
@@ -57,16 +58,14 @@
     </template>
 
     <template v-if="!props.minimal && props.addable" #bottom>
-      <div style="position: relative; bottom: 40px; height: 10px">
-        <icon-button
-          fab
-          color="primary"
-          icon="add"
-          :tooltip="addLabel"
-          data-cy="button-selector-add"
-          @click="$emit('row:add')"
-        />
-      </div>
+      <icon-button
+        fab
+        color="primary"
+        icon="add"
+        :tooltip="addLabel"
+        data-cy="button-selector-add"
+        @click="$emit('row:add')"
+      />
       <slot name="bottom" />
     </template>
   </data-table>

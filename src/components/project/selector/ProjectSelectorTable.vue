@@ -43,10 +43,9 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IdentifierSchema } from "@/types";
-import { identifierSaveStore, projectStore } from "@/hooks";
+import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import { handleGetProjects } from "@/api";
 import { SelectorTable } from "@/components/common";
-import sessionStore from "@/hooks/core/useSession";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 import { projectExpandedColumns, projectNameColumn } from "./headers";
 
@@ -72,7 +71,7 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const loading = ref(false);
+const loading = ref(true);
 const saveOpen = ref(false);
 const deleteOpen = ref(false);
 
@@ -141,7 +140,7 @@ function handleOpenDelete(project: IdentifierSchema) {
 }
 
 /**
- * Attempts to delete a project, and closes the delete modal.
+ * Closes the delete project modal.
  */
 function handleConfirmDelete() {
   deleteOpen.value = false;
@@ -149,7 +148,7 @@ function handleConfirmDelete() {
 }
 
 /**
- * Attempts to save a project.
+ * Closes the save project modal.
  */
 function handleConfirmSave() {
   saveOpen.value = false;

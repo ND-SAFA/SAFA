@@ -6,6 +6,7 @@ import {
   QueryParams,
   Routes,
   routesWithRequiredProject,
+  router,
 } from "@/router";
 import {
   getProjectVersion,
@@ -14,8 +15,8 @@ import {
 } from "@/api";
 
 /**
- * Load the given project version of given Id. Navigates to the artifact
- * tree page in order to show the new project.
+ * Load the given project version.
+ * Navigates to the artifact view page to show the loaded project.
  *
  * @param versionId - The id of the version to retrieve and load.
  * @param document - The document to start with viewing.
@@ -26,13 +27,14 @@ export async function handleLoadVersion(
   document?: DocumentSchema,
   doNavigate = true
 ): Promise<void> {
-  const currentRoute = useRoute();
-
   appStore.onLoadStart();
   sessionStore.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
-    if (!doNavigate || routesWithRequiredProject.includes(currentRoute.path))
+    if (
+      !doNavigate ||
+      routesWithRequiredProject.includes(router.currentRoute.value.path)
+    )
       return;
 
     await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });

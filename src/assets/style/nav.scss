@@ -1,22 +1,22 @@
-.nav-input {
-  fieldset, div, i {
-    color: fade-out($accent, 0.1) !important;
-  }
-
-  .q-field__control:before {
-    border-color: fade-out($accent, 0.1) !important;
-  }
-
-  &:hover {
-    fieldset, div, label, i {
-      color: $accent !important;
-    }
-
-    .q-field__control:before {
-      border-color: $accent !important;
-    }
-  }
-}
+//.nav-input {
+//  fieldset, div, i {
+//    color: fade-out($color-accent, 0.1) !important;
+//  }
+//
+//  .q-field__control:before {
+//    border-color: fade-out($color-accent, 0.1) !important;
+//  }
+//
+//  &:hover {
+//    fieldset, div, label, i {
+//      color: $color-accent !important;
+//    }
+//
+//    .q-field__control:before {
+//      border-color: $color-accent !important;
+//    }
+//  }
+//}
 
 .nav-notifications {
   min-width: 300px;

@@ -40,9 +40,9 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_combo"
+                "name": "iceoryx_base"
               },
-              "remove_orphans": true
+              "remove_orphans": false
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

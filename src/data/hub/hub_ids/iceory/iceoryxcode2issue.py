@@ -5,7 +5,7 @@ from data.hub.hub_ids.iceory.abstract_iceoryx_hub_id import IceoryxHubId
 from util.override import overrides
 
 
-class IceoryxCombo(IceoryxHubId):
+class IceoryxCode2Issue(IceoryxHubId):
     """
     Identifier iceoryx open source project.
     """
@@ -21,27 +21,20 @@ class IceoryxCombo(IceoryxHubId):
                 "Issue": {
                     "path": "issue.csv"
                 },
-                "Commit Diff": {
-                    "path": "commit_diff.csv"
-                },
                 "Code": {
                     "path": "code.csv"
                 }
             },
             "traces": {
-                "commit_diff2issue": {
-                    "source": "Commit Diff",
-                    "target": "Issue",
-                    "path": "commit_diff2issue.csv"
-                },
-                "code2code": {
+                "code2issue": {
                     "source": "Code",
-                    "target": "Code",
-                    "path": "code2code.csv"
+                    "target": "Issue",
+                    "path": "code2issue.csv"
                 }
             },
             "overrides": {
-                "allowed_orphans": 523,
-                "allowed_missing_targets": 2
+                "allowed_orphans": 506,
+                "allowed_missing_sources": 8347,
+                "allowed_missing_targets": 5
             }
         }

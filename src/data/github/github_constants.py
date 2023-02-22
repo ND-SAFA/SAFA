@@ -9,3 +9,5 @@ COMMIT2ISSUE_ARTIFACT_FILE = "commit2issue.json"
 COMMIT2PULL_ARTIFACT_FILE = "commit2pull.json"
 PULL2ISSUE_ARTIFACT_FILE = "pull2issue.json"
 CODE2CODE_ARTIFACT_FILE = "code2code.json"
+# Parsing
+ALLOWED_CODE_EXTENSIONS = [".c", ".java", ".cs", ".py", ".cpp", ".hpp", ".PHP", ".swift", ".vb"]

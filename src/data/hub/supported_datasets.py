@@ -2,8 +2,8 @@ from data.hub.hub_ids.cchit_hub_id import CCHITHubId
 from data.hub.hub_ids.cm1_hub_id import CM1HubId
 from data.hub.hub_ids.drone_hub_id import DroneNLHubId
 from data.hub.hub_ids.drone_pl_hub_id import DronePLHubId
-from data.hub.hub_ids.iceory.iceoryx_issue2commit import IceoryxBase
-from data.hub.hub_ids.iceory.iceoryxcombo import IceoryxCombo
+from data.hub.hub_ids.iceory.iceoryx_base import IceoryxBase
+from data.hub.hub_ids.iceory.iceoryxcode2issue import IceoryxCode2Issue
 from data.hub.hub_ids.itrust_hub_id import ITrustHubId
 from data.hub.hub_ids.mip_hub_id import MipHubId
 from data.hub.hub_ids.train_controller_hub_id import TrainControllerHubId
@@ -19,4 +19,4 @@ class SupportedDatasets(SupportedEnum):
     ITRUST = ITrustHubId
     MIP = MipHubId
     ICEORYX_BASE = IceoryxBase
-    ICEORYX_COMBO = IceoryxCombo
+    ICEORYX_CODE2ISSUE = IceoryxCode2Issue

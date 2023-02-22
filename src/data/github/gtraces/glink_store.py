@@ -34,9 +34,18 @@ class GLinkStore:
         for source_type in self.store.keys():
             for target_type, links in self.store[source_type].items():
                 file_name = f"{source_type.name.lower()}2{target_type.name.lower()}.csv"
-                artifact_set = GArtifactSet(links, GArtifactType.LINK)
-                artifact_sets[file_name] = artifact_set
+                artifact_sets[file_name] = self.get_artifact_set(source_type, target_type)
         return artifact_sets
+
+    def get_artifact_set(self, source_type: GArtifactType, target_type: GArtifactType):
+        """
+        Returns artifact set containing links between source and target types.
+        :param source_type: The source type of artifacts.
+        :param target_type: The target type of artifacts.
+        :return: Artifact set containing trace links between source and target types.
+        """
+        links = self.store[source_type][target_type]
+        return GArtifactSet(links, GArtifactType.LINK)
 
     def add_artifact_links(self,
                            issues: GArtifactSet[GIssue],

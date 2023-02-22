@@ -16,10 +16,12 @@ from tqdm import tqdm
 from data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
 from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
+from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
-from data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, \
+from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
+    ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
 from util.logging.logger_manager import logger
 
@@ -35,6 +37,7 @@ class RepositoryDownloader:
         self.repository_name = repository_name
         self.clone_dir = clone_dir
         self.clone_path = os.path.join(clone_dir, repository_name)
+        self.base_path = os.path.join(self.clone_dir, self.repository_name)
 
     def download_repository(self, output_dir: str, load: bool = False) -> None:
         """
@@ -47,6 +50,8 @@ class RepositoryDownloader:
         issue_file_path = os.path.join(output_path, ISSUE_ARTIFACT_FILE)
         commit_file_path = os.path.join(output_path, COMMIT_ARTIFACT_FILE)
         pull_request_file_path = os.path.join(output_path, PULL_ARTIFACT_FILE)
+        code_export_path = os.path.join(output_path, CODE_ARTIFACT_FILE)
+        code2code_export_path = os.path.join(output_path, CODE2CODE_ARTIFACT_FILE)
 
         # A. Create output directory
         if not os.path.isdir(output_path):
@@ -57,27 +62,28 @@ class RepositoryDownloader:
         self.load_or_retrieve(issue_file_path, lambda: self.parse_issues(git, github_repo), load)
         self.load_or_retrieve(pull_request_file_path, lambda: self.parse_pulls(git, github_repo), load)
         self.load_or_retrieve(commit_file_path, lambda: self.parse_commits(local_repo), load)
-        self.load_or_retrieve(commit_file_path, lambda: self.download_code_artifacts(output_path), load)
-        self.download_code_artifacts(output_path)
+        self.load_or_retrieve(code_export_path, lambda: self.read_code_files(), False)
+        self.load_or_retrieve(code2code_export_path, lambda: self.extract_code_links(), False)
 
     @staticmethod
-    def load_or_retrieve(data_file_path: str,
+    def load_or_retrieve(data_file_path: Union[str, List[str]],
                          artifact_set_creator: Callable[[], Union[GArtifactSet, List[GArtifactSet]]],
-                         load: bool) -> GArtifactSet:
+                         load: bool) -> List[GArtifactSet]:
         """
-        Loads or parses artifact set at data file path.
+        Loads artifact set or parses artifact set at data file path.
         :param data_file_path: The path to the data file to load.
         :param artifact_set_creator: Callable representing the parsing of an artifact set
         :param load: If true, loads data in data file. Otherwise, calls artifact_set_creator
         :return: Loaded or parsed ArtifactSet
         """
+        data_file_paths = data_file_path if isinstance(data_file_path, list) else [data_file_path]
         if load:
-            artifact_sets = GArtifactSet.load(data_file_path)
+            artifact_sets = [GArtifactSet.load(p) for p in data_file_paths]
         else:
             artifact_sets = artifact_set_creator()
             artifact_sets = artifact_sets if isinstance(artifact_sets, list) else [artifact_sets]
-            for artifact_set in artifact_sets:
-                artifact_set.save(data_file_path)
+            for artifact_set, export_path in zip(artifact_sets, data_file_paths):
+                artifact_set.save(export_path)
         return artifact_sets
 
     def parse_issues(self, github_instance, repo: Repository) -> GArtifactSet[Issue]:
@@ -109,23 +115,28 @@ class RepositoryDownloader:
             pulls.append(GPull.parse(pr))
         return GArtifactSet(pulls, GArtifactType.PULL)
 
-    def download_code_artifacts(self, output_path: str) -> List[GArtifactSet]:
+    def extract_code_links(self) -> GArtifactSet:
         """
         Find and parse code artifacts in project.
         :return: List containing code artifact set along with set of trace links between code modules.
         """
-        code_export_path = os.path.join(output_path, CODE_ARTIFACT_FILE)
-        code2code_export_path = os.path.join(output_path, CODE2CODE_ARTIFACT_FILE)
-        cpp_creator = CPPToHeaderLinkCreator.from_dir_path(self.clone_path, self.clone_dir)
+
+        cpp_creator = CPPToHeaderLinkCreator.from_dir_path(self.clone_path, self.base_path)
         code_artifacts, code_links = cpp_creator.create_links()
 
-        code_artifact_set = GArtifactSet(list(code_artifacts.values()), GArtifactType.CODE)
         link_artifact_set = GArtifactSet(list(code_links.values()), GArtifactType.LINK)
 
-        code_artifact_set.save(code_export_path)
-        link_artifact_set.save(code2code_export_path)
+        return link_artifact_set
 
-        return [code_artifact_set, link_artifact_set]
+    def read_code_files(self) -> GArtifactSet[GCodeFile]:
+        code_artifacts = []
+        for subdir, dirs, files in os.walk(self.clone_path):
+            for f in files:
+                for code_ext in ALLOWED_CODE_EXTENSIONS:
+                    if f.endswith(code_ext):
+                        file_path = os.path.join(subdir, f)
+                        code_artifacts.append(GCodeFile(file_path, self.base_path))
+        return GArtifactSet(code_artifacts, GArtifactType.CODE)
 
     @staticmethod
     def parse_commits(repo: Repository) -> GArtifactSet[GCommit]:

@@ -18,6 +18,7 @@
           "trainer_args": {
             "num_train_epochs": 1,
             "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 16,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -31,8 +32,8 @@
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",
-            "save_steps": 10,
-            "eval_steps": 10,
+            "save_steps": 20,
+            "eval_steps": 20,
             "logging_steps": 5
           },
           "trainer_dataset_manager": {

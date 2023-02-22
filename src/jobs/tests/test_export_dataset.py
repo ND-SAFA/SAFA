@@ -7,7 +7,10 @@ from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 
 
-class TestCreateDatasetsJob(BaseJobTest):
+class TestExportDatasetJob(BaseJobTest):
+    """
+    Tests ability to export dataset as SAFA.
+    """
     job_definition = {
         "trace_dataset_creator": {
             **ObjectCreator.dataset_creator_definition
@@ -16,17 +19,29 @@ class TestCreateDatasetsJob(BaseJobTest):
     }
 
     def test_run_success(self):
+        """
+        Tests that run completes successfully.
+        """
         self._test_run_success()
 
     def _assert_success(self, _: CreateDatasetsJob, job_result: JobResult):
+        """
+        Tests that output contains dataset output path.
+        """
         self.assertIn(JobResult.SAVED_DATASET_PATHS, job_result)
         self.assertGreater(len(job_result[JobResult.SAVED_DATASET_PATHS]), 0)
 
     def test_run_failure(self):
+        """
+        Tests that job error is propagated.
+        """
         job = self._get_job(**{"trace_dataset_creator": {"object_type": "HUB", "name": "NOT_EXISTS"}})
         job.run()
         self.assert_output_on_failure(self._load_job_output(job))
 
     def _get_job(self, **kwargs) -> AbstractJob:
+        """
+        Constructs job for testing.
+        """
         definition = {**kwargs, **self.job_definition}
         return ObjectCreator.create(ExportDatasetJob, override=True, **definition)

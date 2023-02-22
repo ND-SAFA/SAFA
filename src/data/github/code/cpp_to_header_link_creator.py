@@ -10,6 +10,9 @@ LINKS_TYPE = Dict[str, GLink]
 
 
 class CPPToHeaderLinkCreator:
+    """
+    Constructs links between .cpp files and their header files (.hpp).
+    """
     CPP_FOLDER_NAME = "source"
     HEADER_FOLDER_NAME = "include"
     HEADER_EXT = "hpp"

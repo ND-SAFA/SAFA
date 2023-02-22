@@ -33,6 +33,12 @@ class RepositoryDownloader:
     REPO_TEMPLATE = "https://github.com/{}.git"
 
     def __init__(self, token: str, repository_name: str, clone_dir: str):
+        """
+        Initializes downloader with API token targeting given repository.
+        :param token: The API token used for authentication.
+        :param repository_name: The name of the github repository.
+        :param clone_dir: Path to directory to store repository clone.
+        """
         self.token = token
         self.repository_name = repository_name
         self.clone_dir = clone_dir
@@ -129,6 +135,10 @@ class RepositoryDownloader:
         return link_artifact_set
 
     def read_code_files(self) -> GArtifactSet[GCodeFile]:
+        """
+        Reads all code files in clone.
+        :return: GArtifacSet containing all code files.
+        """
         code_artifacts = []
         for subdir, dirs, files in os.walk(self.clone_path):
             for f in files:
@@ -137,6 +147,18 @@ class RepositoryDownloader:
                         file_path = os.path.join(subdir, f)
                         code_artifacts.append(GCodeFile(file_path, self.base_path))
         return GArtifactSet(code_artifacts, GArtifactType.CODE)
+
+    def __get_repo(self) -> Repository:
+        """
+        Returns github instance for user along with reference to defined repository and its clone.
+        :return: github instance, repository, and cloned repository
+        """
+        github_instance = Github(login_or_token=self.token)
+        github_instance.get_user()
+        self.wait_for_rate_limit(github_instance)
+        repo = github_instance.get_repo(self.repository_name)
+        local_repo = self.__clone_repository(self.repository_name, self.clone_path)
+        return github_instance, repo, local_repo
 
     @staticmethod
     def parse_commits(repo: Repository) -> GArtifactSet[GCommit]:
@@ -171,18 +193,6 @@ class RepositoryDownloader:
             logger.info("Skip clone project as it already exist...")
         local_repo = local_git.Repo(clone_path)
         return local_repo
-
-    def __get_repo(self) -> Repository:
-        """
-        Returns github instance for user along with reference to defined repository and its clone.
-        :return: github instance, repository, and cloned repository
-        """
-        github_instance = Github(login_or_token=self.token)
-        github_instance.get_user()
-        self.wait_for_rate_limit(github_instance)
-        repo = github_instance.get_repo(self.repository_name)
-        local_repo = self.__clone_repository(self.repository_name, self.clone_path)
-        return github_instance, repo, local_repo
 
     @staticmethod
     def wait_for_rate_limit(github_instance: Github):

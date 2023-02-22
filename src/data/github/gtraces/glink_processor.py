@@ -8,6 +8,10 @@ class GLinkProcessor:
     """
 
     def __init__(self, glink_store: GLinkStore):
+        """
+        Constructor processor for link store.
+        :param glink_store: Store containing links to process.
+        """
         self.glink_store = glink_store
 
     def get_linked_artifact_ids(self):

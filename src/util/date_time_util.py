@@ -9,10 +9,11 @@ class DateTimeUtil:
     """
 
     @staticmethod
-    def read_datetime(query: str):
+    def read_datetime(datetime_str: str, format: str = DATETIME_FORMAT):
         """
-
-        :param query:
-        :return:
+        Reads datetime string.
+        :param datetime_str: The string defining date time.
+        :param format: The format the string is in.
+        :return: DateTime object.
         """
-        return None if query == "None" or query is None else datetime.strptime(query, DATETIME_FORMAT)
+        return None if datetime_str == "None" or datetime_str is None else datetime.strptime(datetime_str, format)

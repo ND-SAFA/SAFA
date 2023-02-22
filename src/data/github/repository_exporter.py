@@ -122,7 +122,7 @@ class RepositoryExporter:
             **trace_instructions["commit2issue.csv"]}  # copy commit2issue for commit_diff2issue
         entity_instructions.update(trace_instructions)
         entity_instructions["issue2code.csv"] = {
-            "obj": self.create_issue_2_code(),
+            "obj": self.__create_issue_2_code(),
             "col_id": "trace"
         }
 
@@ -142,8 +142,11 @@ class RepositoryExporter:
         artifact_file_path = os.path.join(self.repo_path, artifact_file_name)
         return GArtifactSet.load(artifact_file_path)
 
-    def create_issue_2_code(self):
-
+    def __create_issue_2_code(self):
+        """
+        Creates trace links between issues and code through the commits implementing issue.
+        :return: GArtifactSet containing links.
+        """
         commit2issue = self.glink_store.get_artifact_set(GArtifactType.COMMIT, GArtifactType.ISSUE)
         commit2files = {}
         for c in self.commits.artifacts:
@@ -156,11 +159,17 @@ class RepositoryExporter:
             for f in files:
                 for extension in ALLOWED_CODE_EXTENSIONS:
                     if f.endswith(extension):
-                        f = self.clean_file_path(f)
+                        f = self.__calculate_file_path(f)
                         glinks.append(GLink(commit2issue_link.target, f))
         return GArtifactSet(glinks, GArtifactType.LINK)
 
-    def clean_file_path(self, file_path: str):
+    @staticmethod
+    def __calculate_file_path(file_path: str):
+        """
+        Will calculate the file path if the path defines moving a file.
+        :param file_path: The file path possibly containing move of file command.
+        :return: Path to the latest movement of the path.
+        """
         if "=>" in file_path:
             if "{" not in file_path:
                 return file_path.split("=>")[1]

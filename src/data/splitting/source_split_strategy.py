@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 import math
 
@@ -24,32 +24,11 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
         :param slice_num: Whether to return first or second slice.
         :return: the dataset split
         """
-        first_slice_links, second_slice_links = SourceSplitStrategy.create_source_splits(dataset, percent_split)
+        links = SourceSplitStrategy.create_trace_link_array_by_source(dataset)
+        first_slice_links, second_slice_links = AbstractTraceSplitStrategy.split_data(links, percent_split, shuffle=False)
         slice_links = first_slice_links if slice_num == 1 else second_slice_links
         slice_link_ids = [t.id for t in slice_links]
         return AbstractTraceSplitStrategy.create_dataset_slice(dataset, slice_link_ids)
-
-    @staticmethod
-    def create_source_splits(trace_dataset: TraceDataset, percent_split) \
-            -> Tuple[List[TraceLink], List[TraceLink]]:
-        """
-        Creates an array of trace links constructed by contiguously placing trace links
-        associated with a source artifact. Note, source artifacts are randomly selected.
-        :param trace_dataset: The dataset whose trace links are put in array.
-        :param percent_split: Percentage of source artifacts to include in second split.
-        :return: Array of trace links.
-        """
-        source_names = trace_dataset.trace_matrix.source_ids
-        slice_1_names, slice_2_names = AbstractTraceSplitStrategy.split_data(source_names, percent_split=percent_split)
-
-        def create_slice(artifact_names):
-            slice = []
-            for source_name in artifact_names:
-                source_links = trace_dataset.trace_matrix.query_matrix[source_name].links
-                slice.extend(source_links)
-            return slice
-
-        return create_slice(slice_1_names), create_slice(slice_2_names)
 
     @staticmethod
     def create_trace_link_array_by_source(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \

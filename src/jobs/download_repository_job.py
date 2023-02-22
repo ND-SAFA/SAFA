@@ -35,6 +35,10 @@ class DownloadRepositoryJob(AbstractJob):
         assert self.output_path is not None, f"Output path is none."
 
     def _run(self) -> JobResult:
+        """
+        Downloads or loads repository issues, pulls, and commits exporting processed artifacts to output path.
+        :return: JobResult containing empty message.
+        """
         repository_downloader = RepositoryDownloader(self.token, self.repo_name, self.clone_path)
         repository_downloader.download_repository(self.artifact_store_path, self.load)
 

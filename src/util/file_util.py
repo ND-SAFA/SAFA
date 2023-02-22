@@ -158,7 +158,9 @@ class FileUtil:
         :param kwargs: Additional parameters
         :return: The list of directories at the path
         """
-        return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), add_base_path=True, **kwargs)
+        function_kwargs = {"add_base_path": True}
+        function_kwargs.update(kwargs)
+        return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), **function_kwargs)
 
     @staticmethod
     def ls_filter(base_path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:

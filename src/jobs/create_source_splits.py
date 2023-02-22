@@ -44,7 +44,8 @@ class CreateSourceSplits(AbstractJob):
         trace_dataset = self.trace_dataset_creator.create()
         self.artifacts_df = self.trace_dataset_creator.artifact_df
         self.layer_mapping_df = self.trace_dataset_creator.layer_mapping_df
-        assert self.artifact_type in self.artifacts_df[StructuredKeys.Artifact.LAYER_ID].unique()
+        types_defined = list(self.artifacts_df[StructuredKeys.Artifact.LAYER_ID].unique())
+        assert self.artifact_type in types_defined, f"{self.artifact_type} is not in: {types_defined}"
 
         target_artifacts = self.artifacts_df[self.artifacts_df[StructuredKeys.Artifact.LAYER_ID] == self.artifact_type]
         target_ids = list(target_artifacts[StructuredKeys.Artifact.ID])
@@ -56,7 +57,7 @@ class CreateSourceSplits(AbstractJob):
         type_artifact_ids = target_ids + val_ids + test_ids
 
         self.create_splits(split_id_batches, trace_dataset, type_artifact_ids)
-        
+
         return JobResult.from_dict({"status": "ok"})
 
     def create_splits(self, split_artifact_id_batches, trace_dataset, type_artifact_ids) -> None:

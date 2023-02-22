@@ -60,7 +60,7 @@ class GArtifactSet(Generic[T]):
         """
         df_values = []
         for artifact in self.artifacts:
-            entry = artifact.export(dataset_type=dataset_type)
+            entry = artifact.as_dataframe_entry(dataset_type=dataset_type)
             if entry is None:
                 continue
             df_values.append(entry)

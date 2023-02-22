@@ -27,6 +27,14 @@ class SafaExporter:
         self.id_2_artifact = None
 
     def export(self, export_path, links: Dict[int, TraceLink], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
+        """
+        Exports entities as a project in the safa format.
+        :param export_path: Path to export project to.
+        :param links: Links present in the project.
+        :param artifact_df: DataFrame containing artifacts.
+        :param layer_mapping_df: DataFrame containing trace queries in project.
+        :return: None
+        """
         self.artifact_type_2_id, self.id_2_artifact = TraceDatasetCreator.create_artifact_maps(artifact_df)
         self.create_artifact_definitions(layer_mapping_df, export_path)
         self.create_trace_definitions(links, layer_mapping_df, export_path)

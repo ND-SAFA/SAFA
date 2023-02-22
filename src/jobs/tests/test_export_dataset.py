@@ -43,5 +43,5 @@ class TestExportDatasetJob(BaseJobTest):
         """
         Constructs job for testing.
         """
-        definition = {**kwargs, **self.job_definition}
+        definition = {**kwargs, **self.job_definition, "job_args": {"output_dir": TEST_OUTPUT_DIR}}
         return ObjectCreator.create(ExportDatasetJob, override=True, **definition)

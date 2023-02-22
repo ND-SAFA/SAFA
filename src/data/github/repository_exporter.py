@@ -118,8 +118,8 @@ class RepositoryExporter:
             "obj": artifact_set,
             "col_id": "trace"
         } for file_name, artifact_set in trace_artifact_sets.items()}
-        trace_instructions["commit_diff2issue.csv"] = {
-            **trace_instructions["commit2issue.csv"]}  # copy commit2issue for commit_diff2issue
+        if "commit2issue.csv" in entity_instructions:  # copy commit2issue for commit_diff2issue
+            trace_instructions["commit_diff2issue.csv"] = {**trace_instructions["commit2issue.csv"]}
         entity_instructions.update(trace_instructions)
         entity_instructions["issue2code.csv"] = {
             "obj": self.__create_issue_2_code(),

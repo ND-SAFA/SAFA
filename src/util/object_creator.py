@@ -6,6 +6,7 @@ from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreato
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
+from data.readers.api_project_reader import ApiProjectReader
 from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
@@ -36,15 +37,17 @@ class ObjectCreator:
         "metrics": ["f", "map"]
     }
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
-
+    api_project_reader = {
+        "api_definition": {
+            "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
+            "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
+            "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+        }
+    }
     dataset_creator_definition = {
         "project_reader": {
             TypedDefinitionVariable.OBJECT_TYPE_KEY: "API",
-            "api_definition": {
-                "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
-                "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
-                "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
-            },
+            **api_project_reader,
             "overrides": {
                 "ALLOWED_ORPHANS": 2
             }
@@ -120,9 +123,10 @@ class ObjectCreator:
         ModelManager: model_manager_definition,
         MLMPreTrainDatasetCreator: pretrain_dataset_definition,
         ExperimentStep: experiment_train_step_definition,
-        Experiment: experiment_definition
+        Experiment: experiment_definition,
+        ApiProjectReader: api_project_reader
     }
-   
+
     @staticmethod
     def create(class_type: Type[ObjectType], override=False, **kwargs) -> ObjectType:
         """

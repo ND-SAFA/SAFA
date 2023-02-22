@@ -5,15 +5,11 @@
     :class="props.disabled ? 'disable-events' : ''"
     :size="size"
     :data-cy="props.dataCy"
-    flat
+    :flat="!props.fab"
     :round="!props.fab"
     @click="emit('click')"
   >
-    <icon
-      :style="props.iconStyle"
-      :variant="props.icon"
-      :rotate="props.rotate"
-    />
+    <icon :variant="props.icon" :rotate="props.rotate" />
     <q-tooltip :delay="200">
       {{ tooltip }}
     </q-tooltip>

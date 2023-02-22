@@ -46,7 +46,7 @@
  * Artifact search bar.
  */
 export default {
-  name: "Searchbar",
+  name: "ProjectSearchbar",
 };
 </script>
 

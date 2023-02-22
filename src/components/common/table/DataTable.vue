@@ -1,44 +1,43 @@
 <template>
-  <q-table
-    v-model:expanded="expandedRows"
-    v-model:selected="selectedRows"
-    v-model:visible-columns="visibleCols"
-    flat
-    :loading="props.loading"
-    :columns="props.columns"
-    :filter="props.filterText"
-    :filter-method="props.filter"
-    :rows="props.rows"
-    :row-key="props.rowKey"
-    :pagination="pagination"
-    :selection="props.selection"
-    :column-sort-order="props.sortOrder"
-    :sort-method="props.sort"
-    :data-cy="props.dataCy"
-    @row-click="(e, r, i) => emit('row-click', e, r, i)"
-  >
-    <slot />
+  <div>
+    <q-table
+      v-model:expanded="expandedRows"
+      v-model:selected="selectedRows"
+      v-model:visible-columns="visibleCols"
+      v-model:pagination="pagination"
+      flat
+      :loading="props.loading"
+      :columns="props.columns"
+      :filter="props.filterText"
+      :filter-method="props.filter"
+      :rows="props.rows"
+      :row-key="props.rowKey"
+      :selection="props.selection"
+      :column-sort-order="props.sortOrder"
+      :sort-method="props.sort"
+      :data-cy="props.dataCy"
+      @row-click="(e, r, i) => emit('row-click', e, r, i)"
+    >
+      <slot />
 
-    <template v-if="slots.header" #top>
-      <slot name="top" />
-    </template>
+      <template v-if="slots.top" #top>
+        <slot name="top" />
+      </template>
 
-    <template v-if="slots.selection" #body-selection="scope">
-      <slot name="selection" v-bind="scope" />
-    </template>
+      <template v-if="slots.selection" #body-selection="scope">
+        <slot name="selection" v-bind="scope" />
+      </template>
 
-    <template v-if="slots.item" #item="scope">
-      <slot name="item" v-bind="scope" />
-    </template>
+      <template v-if="slots.item" #item="scope">
+        <slot name="item" v-bind="scope" />
+      </template>
 
-    <template v-for="name in customCellSlots" #[`body-cell-${name}`]="scope">
-      <slot :name="`cell-${name}`" v-bind="scope" />
-    </template>
-
-    <template v-if="slots.bottom" #bottom>
-      <slot name="bottom" />
-    </template>
-  </q-table>
+      <template v-for="name in customCellSlots" #[name]="scope">
+        <slot :name="name" v-bind="scope" />
+      </template>
+    </q-table>
+    <slot name="bottom" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -51,7 +50,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, useSlots } from "vue";
+import { computed, ref, useSlots, watch } from "vue";
 import { TableColumn } from "@/types";
 import { useVModel } from "@/hooks";
 
@@ -101,6 +100,10 @@ const props = defineProps<{
    */
   filter?: (rows: Record<string, unknown>[]) => Record<string, unknown>[];
   /**
+   * Which attribute to sort by.
+   */
+  sortBy?: string;
+  /**
    * Whether to sort  `ad` (ascending-descending) or `da` (descending-ascending).
    */
   sortOrder?: "ad" | "da";
@@ -116,9 +119,9 @@ const props = defineProps<{
     desc: boolean
   ) => Record<string, unknown>[];
   /**
-   * If true, cells can be customized through the slot `cell-[name]`.
+   * Any cells can be customized through the slot `body-cell-[name]`.
    */
-  customCells?: boolean;
+  customCells?: string[];
   /**
    * The testing selector to set on this table.
    */
@@ -144,14 +147,29 @@ const visibleCols = useVModel(props, "visibleColumns");
 const expandedRows = useVModel(props, "expanded");
 
 const customCellSlots = computed(() =>
-  props.customCells ? props.columns.map(({ name }) => name) : []
+  props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
 );
 
-const pagination = computed(() => ({
-  sortBy: "name",
-  descending: false,
-  rowsPerPage: props.rowsPerPage,
+const pagination = ref({
+  sortBy: props.sortBy,
+  descending: props.sortOrder === "da",
+  rowsPerPage: props.rowsPerPage || 20,
   page: 1,
   rowsNumber: props.rows.length,
-}));
+});
+
+watch(
+  () => props.sortBy,
+  (sortBy) => (pagination.value.sortBy = sortBy)
+);
+
+watch(
+  () => props.rows.length,
+  (rows) => (pagination.value.rowsNumber = rows)
+);
+
+watch(
+  () => props.sortBy,
+  (desc) => (pagination.value.descending = desc === "da")
+);
 </script>

@@ -88,7 +88,6 @@ import { defineComponent, PropType } from "vue";
 import { DataTableHeader } from "@/types";
 import { FlexBox } from "@/components/common/layout";
 import { IconButton } from "@/components/common/button";
-import DataTable from "./DataTable.vue";
 
 /**
  * Displays a generic selector.
@@ -101,7 +100,7 @@ import DataTable from "./DataTable.vue";
  */
 export default defineComponent({
   name: "TableSelector",
-  components: { FlexBox, IconButton, DataTable },
+  components: { FlexBox, IconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

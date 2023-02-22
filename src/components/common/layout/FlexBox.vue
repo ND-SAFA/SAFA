@@ -87,7 +87,7 @@ const className = useMargins(props, [
   [true, "flex"],
   ["align", `align-${props.align}`],
   ["justify", `justify-${props.justify}`],
-  ["fullWidth", "fill-width"],
+  ["fullWidth", "full-width"],
   ["column", "column"],
   ["wrap", "wrap"],
   [props.wrap === false, "nowrap"],

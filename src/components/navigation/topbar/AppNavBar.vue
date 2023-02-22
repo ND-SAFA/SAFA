@@ -1,6 +1,6 @@
 <template>
   <q-header elevated :class="darkMode ? 'bg-background' : 'bg-primary'">
-    <q-toolbar>
+    <q-toolbar style="min-height: 70px">
       <div class="full-width">
         <header-bar />
         <graph-bar v-if="graphVisible" />

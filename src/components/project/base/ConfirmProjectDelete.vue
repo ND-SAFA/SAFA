@@ -1,6 +1,5 @@
 <template>
   <modal
-    size="md"
     :is-open="isOpen"
     title="Delete Project"
     data-cy="modal-project-delete"

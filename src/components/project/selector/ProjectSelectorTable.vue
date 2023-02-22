@@ -1,11 +1,26 @@
 <template>
   <selector-table
     v-model:selected="selectedItems"
+    addable
+    editable
+    :deletable="isDeletable"
     :loading="loading"
     :columns="columns"
     :rows="rows"
     row-key="projectId"
+    item-name="Project"
+    @refresh="handleReload"
   >
+    <project-identifier-modal
+      :open="saveOpen"
+      @save="handleConfirmSave"
+      @close="saveOpen = false"
+    />
+    <confirm-project-delete
+      :open="deleteOpen"
+      @confirm="handleConfirmDelete"
+      @cancel="deleteOpen = false"
+    />
   </selector-table>
 </template>
 
@@ -21,14 +36,17 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { IdentifierSchema } from "@/types";
+import { identifierSaveStore, projectStore } from "@/hooks";
 import {
-  IdentifierSchema,
-  projectExpandedColumns,
-  projectNameColumn,
-} from "@/types";
-import { projectStore } from "@/hooks";
-import { handleGetProjects } from "@/api";
+  handleDeleteProject,
+  handleGetProjects,
+  handleSaveProject,
+} from "@/api";
 import { SelectorTable } from "@/components/common";
+import sessionStore from "@/hooks/core/useSession";
+import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
+import { projectExpandedColumns, projectNameColumn } from "./headers";
 
 const props = defineProps<{
   /**
@@ -53,6 +71,8 @@ const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const loading = ref(false);
+const saveOpen = ref(false);
+const deleteOpen = ref(false);
 
 const selectedItems = computed({
   get() {
@@ -79,6 +99,70 @@ function handleReload() {
   loading.value = true;
 
   handleGetProjects({
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Returns whether a project is deletable.
+ * @param project - The project to check.
+ * @return Whether it can be deleted.
+ */
+function isDeletable(project: IdentifierSchema): boolean {
+  return sessionStore.isAdmin(project);
+}
+
+/**
+ * Opens the add project modal.
+ */
+function handleOpenAdd() {
+  identifierSaveStore.baseIdentifier = undefined;
+  saveOpen.value = true;
+}
+
+/**
+ * Opens the edit project modal.
+ * @param project - The project to edit.
+ */
+function handleOpenEdit(project: IdentifierSchema) {
+  identifierSaveStore.baseIdentifier = project;
+  saveOpen.value = true;
+}
+
+/**
+ * Opens the delete project modal.
+ * @param project - The project to delete.
+ */
+function handleOpenDelete(project: IdentifierSchema) {
+  identifierSaveStore.baseIdentifier = project;
+  deleteOpen.value = true;
+}
+
+/**
+ * Attempts to delete a project, and closes the delete modal.
+ */
+function handleConfirmDelete() {
+  loading.value = true;
+
+  handleDeleteProject({
+    onSuccess: () => {
+      deleteOpen.value = false;
+      selectedItems.value = [];
+    },
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Attempts to save a project.
+ */
+function handleConfirmSave() {
+  loading.value = true;
+
+  handleSaveProject({
+    onSuccess: (project) => {
+      saveOpen.value = false;
+    },
     onComplete: () => (loading.value = false),
   });
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="full-width">
     <flex-box full-width :wrap="false" justify="between" align="center">
-      <searchbar v-if="graphVisible" />
+      <project-searchbar v-if="graphVisible" />
       <flex-box align="center">
         <update-button />
         <saving-icon />
@@ -26,7 +26,7 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
-import Searchbar from "./Searchbar.vue";
+import ProjectSearchbar from "./ProjectSearchbar.vue";
 import AppVersion from "./AppVersion.vue";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";

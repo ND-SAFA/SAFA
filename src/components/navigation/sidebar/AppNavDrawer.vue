@@ -4,6 +4,7 @@
     :model-value="true"
     elevated
     breakpoint="0"
+    width="280"
     :mini="!sidebarOpen"
   >
     <flex-box
@@ -13,6 +14,7 @@
       align="center"
       x="3"
       y="3"
+      style="height: 40px"
     >
       <safa-icon style="width: 200px !important" />
       <icon-button
@@ -23,7 +25,14 @@
         @click="sidebarOpen = false"
       />
     </flex-box>
-    <flex-box v-else justify="center" full-width t="2">
+    <flex-box
+      v-else
+      justify="center"
+      align="center"
+      full-width
+      y="3"
+      style="height: 40px"
+    >
       <icon-button
         icon="nav-toggle"
         tooltip="Open sidebar"
@@ -49,7 +58,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { appStore, useTheme } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
@@ -64,5 +73,11 @@ const sidebarOpen = computed({
   set() {
     appStore.toggleAppPanel();
   },
+});
+
+onMounted(() => {
+  if (window.innerWidth < 1000) {
+    appStore.toggleAppPanel();
+  }
 });
 </script>

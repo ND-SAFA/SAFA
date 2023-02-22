@@ -1,6 +1,7 @@
 <template>
   <selector-table
     v-model:selected="selectedItems"
+    :minimal="props.minimal"
     addable
     editable
     :deletable="isDeletable"

@@ -6,6 +6,7 @@
       v-model:visible-columns="visibleCols"
       v-model:pagination="pagination"
       flat
+      :dense="props.dense"
       :loading="props.loading"
       :columns="props.columns"
       :filter="props.filterText"
@@ -122,6 +123,10 @@ const props = defineProps<{
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
   customCells?: string[];
+  /**
+   * Whether to display densely.
+   */
+  dense?: boolean;
   /**
    * The testing selector to set on this table.
    */

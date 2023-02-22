@@ -1,19 +1,22 @@
 <template>
-  <panel-card>
+  <panel-card :color="panelColor">
     <stepper
       v-model="currentStep"
       :steps="steps"
+      :minimal="props.minimal"
       data-cy="project-version-stepper"
       @submit="handleSubmit"
     >
       <template #1>
         <project-selector-table
+          :minimal="props.minimal"
           :open="isProjectStep"
           @selected="handleProjectSelect"
         />
       </template>
       <template #2>
         <version-selector
+          :minimal="props.minimal"
           :is-open="isVersionStep"
           :project="selectedProject"
           @selected="handleVersionSelect"
@@ -40,8 +43,15 @@ import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
-import ProjectSelectorTable from "@/components/project/selector/ProjectSelectorTable.vue";
+import ProjectSelectorTable from "./ProjectSelectorTable.vue";
 import VersionSelector from "./VersionSelector.vue";
+
+const props = defineProps<{
+  /**
+   * Whether to display minimal information.
+   */
+  minimal?: boolean;
+}>();
 
 const defaultProjectStep = (): StepperStep => ({
   title: "Select a Project",
@@ -60,6 +70,7 @@ const selectedVersion = ref<VersionSchema | undefined>(undefined);
 
 const isProjectStep = computed(() => currentStep.value === 1);
 const isVersionStep = computed(() => currentStep.value === 2);
+const panelColor = computed(() => (props.minimal ? "transparent" : "primary"));
 
 /**
  * Clears all modal data.

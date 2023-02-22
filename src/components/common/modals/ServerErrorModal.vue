@@ -1,5 +1,5 @@
 <template>
-  <modal title="Server Errors" :is-open="isOpen" @close="handleClose">
+  <modal title="Server Errors" :open="open" @close="handleClose">
     <list :items="props.errors">
       <template #item="{ item }">
         <list-item>
@@ -35,7 +35,7 @@ const props = defineProps<{
   errors: string[];
 }>();
 
-const isOpen = computed(() => appStore.isErrorDisplayOpen);
+const open = computed(() => appStore.isErrorDisplayOpen);
 
 /**
  * Closes the error display.

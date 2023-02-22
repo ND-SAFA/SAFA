@@ -5,6 +5,7 @@
     :rows="props.rows"
     :row-key="rowKey"
     :rows-per-page="5"
+    :dense="props.minimal"
     selection="single"
     data-cy="generic-selector-table"
     :custom-cells="['actions']"
@@ -126,6 +127,10 @@ const props = defineProps<{
    * Whether these rows are deletable.
    */
   deletable?: boolean | ((row: Record<string, unknown>) => boolean);
+  /**
+   * Whether to display minimal information.
+   */
+  minimal?: boolean;
 }>();
 
 const emit = defineEmits<{

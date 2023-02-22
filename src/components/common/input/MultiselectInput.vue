@@ -1,23 +1,27 @@
 <template>
-  <q-input
+  <q-select
     v-model="model"
+    multiple
     filled
+    use-chips
+    use-input
     :label="props.label"
+    :options="props.options"
+    :option-label="props.optionsLabel"
     :data-cy="props.dataCy"
     :error-message="props.errorMessage || ''"
     :error="showError"
     :class="className"
     :hint="props.hint"
-    @keydown="handleKeydown"
   />
 </template>
 
 <script lang="ts">
 /**
- * A generic text input.
+ * A generic multiselect input.
  */
 export default {
-  name: "TextInput",
+  name: "MultiselectInput",
 };
 </script>
 
@@ -31,7 +35,15 @@ const props = withDefaults(
     /**
      * The model value.
      */
-    modelValue: string;
+    modelValue: unknown[];
+    /**
+     * The options to select from.
+     */
+    options: unknown[];
+    /**
+     * Returns the display name of an option.
+     */
+    optionsLabel?: (option: unknown) => string;
     /**
      * An error message to display, if one exists.
      */
@@ -52,18 +64,6 @@ const props = withDefaults(
      * A hint to display below the input.
      */
     hint?: string;
-    type?:
-      | "text"
-      | "password"
-      | "textarea"
-      | "email"
-      | "search"
-      | "tel"
-      | "file"
-      | "number"
-      | "url"
-      | "time"
-      | "date";
     /**
      * A testing selector.
      */
@@ -75,7 +75,6 @@ const props = withDefaults(
     errorMessage: "",
     class: "",
     hint: undefined,
-    type: "text",
     dataCy: undefined,
   }
 );
@@ -85,10 +84,6 @@ const emit = defineEmits<{
    * Called when the model is updated.
    */
   (e: "update:modelValue"): void;
-  /**
-   * Called when the enter button is pressed.
-   */
-  (e: "enter"): void;
 }>();
 
 const model = useVModel(props, "modelValue");
@@ -98,13 +93,4 @@ const className = useMargins(props, () => [[!!props.class, props.class]]);
 const showError = computed(
   () => !!props.errorMessage && props.errorMessage.length > 0
 );
-
-/**
- * Emits an event when enter is clicked.
- */
-function handleKeydown(e?: { key: string }) {
-  if (e?.key === "Enter") {
-    emit("enter");
-  }
-}
 </script>

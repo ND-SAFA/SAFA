@@ -106,6 +106,8 @@ const iconId = computed(() => {
       return "mdi-redo";
     case "logout":
       return "mdi-logout-variant";
+    case "file":
+      return "mdi-paperclip";
     case "home-list":
       return "mdi-view-list";
     case "home-add":

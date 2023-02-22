@@ -7,65 +7,51 @@
       variant="large"
       value="Welcome to SAFA!"
     />
-    <v-row>
-      <v-col cols="6">
-        <panel-card>
-          <v-card-title class="d-flex">
-            <icon variant="home-list" />
-            <typography
-              el="h2"
-              l="2"
-              variant="subtitle"
-              value="Load Existing Project"
-            />
-          </v-card-title>
-          <v-card-subtitle>
-            <v-divider class="q-mb-2" />
-            <typography
-              variant="small"
-              value="Select an existing project and version to load."
-            />
-          </v-card-subtitle>
-          <v-card-text>
-            <mini-project-version-stepper />
-          </v-card-text>
+    <div class="row">
+      <div class="col q-mr-md">
+        <panel-card title="Load Existing Project" icon="home-list">
+          <typography
+            variant="small"
+            value="Select an existing project and version to load."
+          />
+          <project-version-stepper minimal />
         </panel-card>
-      </v-col>
-      <v-col cols="6">
-        <panel-card>
-          <v-card-title class="d-flex">
-            <icon variant="home-add" />
-            <typography
-              el="h2"
-              l="2"
-              variant="subtitle"
-              value="Create New Project"
-            />
-          </v-card-title>
-          <v-card-subtitle>
-            <v-divider class="q-mb-2" />
-            <typography
-              wrap
-              variant="small"
-              value="Chose which data source you would like to create a project from."
-            />
-          </v-card-subtitle>
-          <v-card-text>
-            <div class="q-mx-auto width-min">
-              <text-button text icon="add" @click="handleOpenStandard">
-                Create New Project
-              </text-button>
-              <text-button text icon="upload" @click="handleOpenBulk">
-                Bulk Upload Project
-              </text-button>
-              <text-button text icon="integrate" @click="handleOpenImport">
-                Import Jira/GitHub Project
-              </text-button>
-            </div>
-          </v-card-text>
+      </div>
+      <div class="col">
+        <panel-card title="Create New Project" icon="home-add">
+          <typography
+            variant="small"
+            value="Chose which data source you would like to create a project from."
+          />
+          <flex-box column align="start" t="2">
+            <text-button
+              text
+              icon="add"
+              color="primary"
+              @click="handleOpenStandard"
+            >
+              Create New Project
+            </text-button>
+            <text-button
+              text
+              icon="upload"
+              color="primary"
+              @click="handleOpenBulk"
+            >
+              Bulk Upload Project
+            </text-button>
+            <text-button
+              text
+              icon="integrate"
+              color="primary"
+              @click="handleOpenImport"
+            >
+              Import Jira/GitHub Project
+            </text-button>
+          </flex-box>
         </panel-card>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
   </private-page>
 </template>
 
@@ -83,11 +69,11 @@ import { CreatorTabTypes } from "@/types";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PrivatePage,
-  MiniProjectVersionStepper,
+  FlexBox,
   Typography,
   PanelCard,
   TextButton,
-  Icon,
+  ProjectVersionStepper,
 } from "@/components";
 
 function handleOpenStandard() {

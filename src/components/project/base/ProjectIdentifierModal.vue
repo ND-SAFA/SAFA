@@ -1,6 +1,6 @@
 <template>
   <modal
-    size="sm"
+    size="md"
     :loading="loading"
     :open="props.open"
     :title="modalTitle"

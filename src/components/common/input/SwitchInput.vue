@@ -1,6 +1,6 @@
 <template>
   <q-toggle v-model="model">
-    <typography :value="label" />
+    <typography :value="props.label" />
   </q-toggle>
 </template>
 

@@ -1,23 +1,30 @@
 <template>
-  <v-alert outlined dense border="left" color="primary">
+  <alert>
     <typography
       color="primary"
       value="The format of files can be found here:"
     />
-    <v-btn text link color="primary" @click="handleOpenWiki">SAFA WIKI</v-btn>
-  </v-alert>
+    <text-button
+      text
+      label="SAFA WIKI"
+      color="primary"
+      @click="handleOpenWiki"
+    />
+  </alert>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import TextButton from "@/components/common/button/TextButton.vue";
 import Typography from "../Typography.vue";
+import Alert from "./Alert.vue";
 
 /**
  * An alert that details the required format of upload files.
  */
 export default defineComponent({
   name: "FileFormatAlert",
-  components: { Typography },
+  components: { TextButton, Alert, Typography },
   methods: {
     /**
      * Opens the SAFA WIKI docs.

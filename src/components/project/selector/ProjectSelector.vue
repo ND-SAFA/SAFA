@@ -110,7 +110,7 @@ export default defineComponent({
      * @return All deletable project indexes for the current user.
      */
     deletableProjects(): number[] {
-      return projectStore.deletableProjects;
+      return [];
     },
   },
   watch: {

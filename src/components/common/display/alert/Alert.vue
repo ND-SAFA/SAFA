@@ -21,7 +21,7 @@ const props = defineProps<{
   /**
    * The type of alert to render.
    */
-  type: MessageType;
+  type?: MessageType;
 }>();
 
 const className = computed(() => {

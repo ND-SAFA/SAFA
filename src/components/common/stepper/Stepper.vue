@@ -17,7 +17,7 @@
     </q-step>
 
     <template #navigation>
-      <q-stepper-navigation>
+      <q-stepper-navigation :style="minimalStyle">
         <slot name="actions" />
         <flex-box full-width align="end">
           <text-button
@@ -84,6 +84,9 @@ const currentStep = useVModel(props, "modelValue");
 const isStepDone = computed(() => props.steps[props.modelValue - 1].done);
 const continueText = computed(() =>
   currentStep.value === props.steps.length ? "Submit" : "Continue"
+);
+const minimalStyle = computed(() =>
+  props.minimal ? "padding: 0 !important" : ""
 );
 
 /**

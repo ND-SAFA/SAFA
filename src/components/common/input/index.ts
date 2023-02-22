@@ -12,3 +12,4 @@ export { default as FileInput } from "./FileInput.vue";
 export { default as SwitchInput } from "./SwitchInput.vue";
 export { default as TextInput } from "./TextInput.vue";
 export { default as Searchbar } from "./Searchbar.vue";
+export { default as MultiselectInput } from "./MultiselectInput.vue";

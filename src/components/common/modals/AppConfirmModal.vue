@@ -1,10 +1,5 @@
 <template>
-  <modal
-    size="xs"
-    :is-open="isOpen"
-    :title="message.title"
-    @close="handleClose"
-  >
+  <modal size="sm" :open="isOpen" :title="message.title" @close="handleClose">
     <typography y="2" el="p" :value="message.body" />
     <template #actions>
       <text-button

@@ -3,10 +3,10 @@
     <project-identifier-input
       v-model:name="identifier.name"
       v-model:description="identifier.description"
-      :data-cy-name="dataCyName"
-      :data-cy-description="dataCyDescription"
+      :data-cy-name="props.dataCyName"
+      :data-cy-description="props.dataCyDescription"
     />
-    <v-container style="max-width: 40em">
+    <div style="max-width: 40em">
       <switch-input
         v-model="emptyFiles"
         class="mt-0"
@@ -18,17 +18,16 @@
         v-model="selectedFiles"
         data-cy="input-files-bulk"
       />
-      <v-btn
+      <text-button
         block
+        label="Create Project From Files"
         color="primary"
-        :disabled="isDisabled"
-        :loading="isLoading"
+        :disabled="disabled"
+        :loading="loading"
         data-cy="button-create-project"
         @click="handleCreate"
-      >
-        Create Project From Files
-      </v-btn>
-    </v-container>
+      />
+    </div>
   </div>
 </template>
 
@@ -45,7 +44,7 @@ export default {
 import { computed, ref, withDefaults } from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
-import { SwitchInput } from "@/components/common";
+import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
@@ -65,12 +64,12 @@ const emit = defineEmits<{
 }>();
 
 const selectedFiles = ref<File[]>([]);
-const isLoading = ref(false);
+const loading = ref(false);
 const emptyFiles = ref(false);
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
-const isDisabled = computed(() => {
+const disabled = computed(() => {
   const isNameInvalid = identifier.value.name.length === 0;
 
   if (emptyFiles.value) {
@@ -88,16 +87,16 @@ const isDisabled = computed(() => {
  * Attempts to save the project.
  */
 async function handleCreate() {
-  isLoading.value = true;
+  loading.value = true;
 
   handleBulkImportProject(identifier.value, selectedFiles.value, {
     onSuccess: () => {
       selectedFiles.value = [];
-      isLoading.value = false;
+      loading.value = false;
       emit("submit");
     },
     onError: () => {
-      isLoading.value = false;
+      loading.value = false;
     },
   });
 }

@@ -5,6 +5,7 @@ import pandas as pd
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from data.github.gartifacts.gartifact_type import GArtifactType
+from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
@@ -32,6 +33,22 @@ class GArtifactSet(Generic[T]):
         self.artifact_type = artifact_type
         self.artifacts = artifacts
         self.artifact_ids = [artifact.get_id() for artifact in artifacts]
+
+    def save(self, output_file_path: str):
+        """
+        Saves list of artifacts to a file.
+        :param output_file_path: The path to the file to save to.
+        :return: None
+        """
+        values = [artifact.to_dict() for artifact in self.artifacts]
+        file_content = {
+            GArtifactSet.TYPE_PARAM: self.artifact_type.value,
+            GArtifactSet.ARTIFACT_PARAM: values
+        }
+
+        with open(output_file_path, mode="w") as output_file:
+            output_file.write(json.dumps(file_content, indent=4))
+        logger.info(f"Saved entities to: {output_file_path}")
 
     def export(self, output_file_path: str, columns: List[str] = None, dataset_type: str = "NL") -> None:
         """
@@ -66,6 +83,7 @@ class GArtifactSet(Generic[T]):
         :param data_file_path: The path to the data file.
         :return: Artifact set with loaded artifacts.
         """
+        logger.info(f"Loading artifacts: {data_file_path}")
         artifacts, artifact_type = GArtifactSet.__read_data_file(data_file_path)
         return GArtifactSet(artifacts, artifact_type)
 
@@ -99,6 +117,8 @@ class GArtifactSet(Generic[T]):
             return GIssue
         if artifact_type == GArtifactType.PULL:
             return GPull
+        if artifact_type == GArtifactType.CODE:
+            return GCodeFile
         else:
             raise Exception("Unknown artifact type: " + artifact_type.value)
 

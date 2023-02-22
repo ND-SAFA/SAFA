@@ -8,7 +8,12 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/pl-bert"
+            "model_path": {
+              "*": [
+                "thearod5/nl-bert",
+                "thearod5/pl-bert"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 1,
@@ -26,27 +31,27 @@
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",
-            "save_steps": 100,
-            "eval_steps": 100,
-            "logging_steps": 10
+            "save_steps": 10,
+            "eval_steps": 10,
+            "logging_steps": 5
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_i2cd"
+                "name": "iceoryx_combo"
               },
               "remove_orphans": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
+              "split_strategy": "SPLIT_BY_SOURCE",
               "val_percentage": 0.20
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
+              "split_strategy": "SPLIT_BY_SOURCE",
               "val_percentage": 0.5
             },
             "augmenter": {

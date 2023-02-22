@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from data.github.github_repository_exporter import GithubRepositoryExtracter
+from data.github.repository_exporter import RepositoryExporter
 from testres.base_test import BaseTest
 from testres.paths.paths import GITHUB_REPO_ARTIFACTS_DIR, TEST_OUTPUT_DIR
 
@@ -16,7 +16,7 @@ class TestGithubExporter(BaseTest):
         """
         Tests that all files are exported and have expected number of entities.
         """
-        exporter = GithubRepositoryExtracter(GITHUB_REPO_ARTIFACTS_DIR)
+        exporter = RepositoryExporter(GITHUB_REPO_ARTIFACTS_DIR)
         exporter.extract(TEST_OUTPUT_DIR)
         self.assert_df_length(os.path.join(TEST_OUTPUT_DIR, "issue.csv"), 2)
         self.assert_df_length(os.path.join(TEST_OUTPUT_DIR, "pull.csv"), 1)

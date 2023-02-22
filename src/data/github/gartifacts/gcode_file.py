@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Union
+from typing import Callable, Dict, Union
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from util.file_util import FileUtil
@@ -34,7 +34,7 @@ class GCodeFile(AbstractGithubArtifact):
         """
         :return: Returns the state dictionary of the code artifact.
         """
-        return {**self.export(), "file_path": self.get_id(), "base_path": self.base_path}
+        return {**self.export(), "file_path": self.file_path, "base_path": self.base_path}
 
     @staticmethod
     @overrides(AbstractGithubArtifact)
@@ -53,3 +53,11 @@ class GCodeFile(AbstractGithubArtifact):
         :return: Path to code file.
         """
         return os.path.relpath(self.file_path, self.base_path)
+
+    def clean_content(self, cleaner: Callable[[str], str]) -> None:
+        """
+        Cleans content of commit.
+        :param cleaner: The cleaning function return cleaned string.
+        :return: None
+        """
+        self.content = cleaner(self.content)

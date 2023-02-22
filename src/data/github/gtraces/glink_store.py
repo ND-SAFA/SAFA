@@ -1,4 +1,3 @@
-import os
 from typing import Callable, Dict, List, Union
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
@@ -9,7 +8,6 @@ from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
 from data.github.gtraces.glink import GLink
 from data.github.gtraces.glink_finder import GLinkTarget, LinkFinder
-from data.github.repository_downloader import logger
 
 SearchFunction = Callable[[Union[GCommit, GIssue, GPull]], List[GLinkTarget]]
 
@@ -27,27 +25,18 @@ class GLinkStore:
         """
         self.store = {}
 
-    def get_source_types(self) -> List[GArtifactType]:
+    def create_artifact_sets(self) -> Dict[str, GArtifactSet[GLink]]:
         """
-        :return: Returns source artifacts containing links.
-        """
-        return list(self.store.keys())
-
-    def save(self, output_path: str, **save_kwargs) -> None:
-        """
-        Saves store to disk.
-        :param output_path: The path to output directory.
-        :param save_kwargs: kwargs passed to artifact set save function.
+        Creates artifacts sets for each trace query in store.
         :return: None
         """
-        logger.info("Exporting trace links...")
+        artifact_sets = {}
         for source_type in self.store.keys():
             for target_type, links in self.store[source_type].items():
                 file_name = f"{source_type.name.lower()}2{target_type.name.lower()}.csv"
                 artifact_set = GArtifactSet(links, GArtifactType.LINK)
-                export_path = os.path.join(output_path, file_name)
-                artifact_set.export(export_path, columns=["source", "target"], **save_kwargs)
-                logger.info(f"Exported {file_name} ({len(artifact_set)}).")
+                artifact_sets[file_name] = artifact_set
+        return artifact_sets
 
     def add_artifact_links(self,
                            issues: GArtifactSet[GIssue],
@@ -60,13 +49,18 @@ class GLinkStore:
         :param commits: List of commits.
         :return: None
         """
+        self.add_artifacts_links(issues.artifacts, LinkFinder.search_issue_links, GArtifactType.ISSUE)
+        self.add_artifacts_links(pulls.artifacts, LinkFinder.search_issue_links, GArtifactType.PULL)
+        self.add_commits_to_pr(pulls.artifacts)
+        self.add_artifacts_links(commits.artifacts, lambda commit: LinkFinder.search_links(commit.content), GArtifactType.COMMIT)
 
-        self._add_artifacts_links(issues.artifacts, LinkFinder.search_issue_links, GArtifactType.ISSUE)
-        self._add_artifacts_links(pulls.artifacts, LinkFinder.search_issue_links, GArtifactType.PULL)
-        self._add_commits_to_pr(pulls.artifacts)
-        self._add_artifacts_links(commits.artifacts, lambda commit: LinkFinder.search_links(commit.content), GArtifactType.COMMIT)
+    def get_source_types(self) -> List[GArtifactType]:
+        """
+        :return: Returns source artifacts containing links.
+        """
+        return list(self.store.keys())
 
-    def _add_commits_to_pr(self, pulls: List[GPull]) -> None:
+    def add_commits_to_pr(self, pulls: List[GPull]) -> None:
         """
         Adds links between commits and pull requests in the right direction (commit -> pull).
         :param pulls: The pull request containing links to commits.
@@ -76,10 +70,10 @@ class GLinkStore:
             for c in pull.commits:
                 self.add_link(GArtifactType.COMMIT, GArtifactType.PULL, GLink(c, pull.get_id()))
 
-    def _add_artifacts_links(self,
-                             artifacts: List[AbstractGithubArtifact],
-                             search_function: SearchFunction,
-                             source_type: GArtifactType) -> None:
+    def add_artifacts_links(self,
+                            artifacts: List[AbstractGithubArtifact],
+                            search_function: SearchFunction,
+                            source_type: GArtifactType) -> None:
         """
         Searches and adds links found in artifact content to store.
         :param artifacts: The artifacts to search for links in.

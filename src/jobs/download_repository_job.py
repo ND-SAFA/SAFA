@@ -1,7 +1,7 @@
 import os
 
-from data.github.github_repository_exporter import GithubRepositoryExtracter
 from data.github.repository_downloader import RepositoryDownloader
+from data.github.repository_exporter import RepositoryExporter
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
@@ -38,6 +38,6 @@ class DownloadRepositoryJob(AbstractJob):
         repository_downloader.download_repository(self.repo_path, self.load)
 
         repo_path = os.path.join(self.repo_path, self.repo_name)
-        repository_extracter = GithubRepositoryExtracter(repo_path)
+        repository_extracter = RepositoryExporter(repo_path)
         repository_extracter.extract(self.output_path)
         return JobResult.from_dict({"output_path": self.output_path})

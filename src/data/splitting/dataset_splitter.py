@@ -64,7 +64,8 @@ class DatasetSplitter:
         slices = dataset_splitter._create_slices(total_percent_to_split, strategies[0])
         splits.extend(slices)
         updated_percent_splits = [percent_split / total_percent_to_split for percent_split in percent_splits]
-        return self._split_multiple_helper(updated_percent_splits, splits, strategies[1:])
+        all_slices = self._split_multiple_helper(updated_percent_splits, splits, strategies[1:])
+        return all_slices
 
     def _create_slices(self, second_percent_split: float, strategy: Union[str, SupportedSplitStrategy]):
         """

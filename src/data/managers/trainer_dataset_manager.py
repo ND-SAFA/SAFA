@@ -58,7 +58,8 @@ class TrainerDatasetManager(BaseObject):
         datasets = self.get_datasets() if not self._datasets else self._datasets
         for dataset_role in DatasetRole:
             if dataset_role in datasets and datasets[dataset_role] is not None:
-                output_path = datasets[dataset_role].save(output_dir, self._get_dataset_filename(dataset_role))
+                dataset = datasets[dataset_role]
+                output_path = dataset.save(output_dir, self._get_dataset_filename(dataset_role))
                 output_paths.append(output_path)
         return output_paths
 

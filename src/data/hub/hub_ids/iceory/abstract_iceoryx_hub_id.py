@@ -27,7 +27,8 @@ class IceoryxHubId(AbstractHubId, ABC):
         """
         :return: Returns URL to CCHIT on the SAFA bucket containing definition file.
         """
-        return "https://safa-datasets-open.s3.amazonaws.com/datasets/iceoryx_splits.zip"
+        # return "https://safa-datasets-open.s3.amazonaws.com/datasets/iceoryx_splits.zip"
+        return os.path.expanduser("~/desktop/safa/datasets/iceoryx_splits.zip")
 
     @classmethod
     def get_project_reader(cls) -> Type[AbstractProjectReader]:
@@ -36,6 +37,12 @@ class IceoryxHubId(AbstractHubId, ABC):
         """
 
         def constructor(project_path: str, **kwargs):
+            """
+            Wraps project path with CSV file path.
+            :param project_path: Path to directory containing data file.
+            :param kwargs: Additional arguments passed to constructor.
+            :return: CSVProjectReader
+            """
             return CsvProjectReader(os.path.join(project_path, cls.get_file_name()), **kwargs)
 
         return constructor

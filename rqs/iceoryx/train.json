@@ -45,9 +45,11 @@
               }
             },
             "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.25
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_val"
+              }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",

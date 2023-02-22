@@ -4,6 +4,7 @@ from data.hub.hub_ids.drone_hub_id import DroneNLHubId
 from data.hub.hub_ids.drone_pl_hub_id import DronePLHubId
 from data.hub.hub_ids.iceory.iceoryx_eval import IceoryxEval
 from data.hub.hub_ids.iceory.iceoryx_train import IceoryxTrain
+from data.hub.hub_ids.iceory.iceoryx_val import IceoryxVal
 from data.hub.hub_ids.itrust_hub_id import ITrustHubId
 from data.hub.hub_ids.mip_hub_id import MipHubId
 from data.hub.hub_ids.train_controller_hub_id import TrainControllerHubId
@@ -19,4 +20,5 @@ class SupportedDatasets(SupportedEnum):
     ITRUST = ITrustHubId
     MIP = MipHubId
     ICEORYX_TRAIN = IceoryxTrain
+    ICEORYX_VAL = IceoryxVal
     ICEORYX_EVAL = IceoryxEval

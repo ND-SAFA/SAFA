@@ -1,8 +1,9 @@
 import enum
-import math
 from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List
+
+import math
 
 from util.base_object import BaseObject
 
@@ -41,7 +42,7 @@ class AbstractDataProcessingStep(BaseObject, ABC):
         :param content: the content as a string
         :return: the list of words in the content
         """
-        return content.split()
+        return content.split() if isinstance(content, str) else []
 
     @staticmethod
     def reconstruct_content(word_list: List[str]) -> str:

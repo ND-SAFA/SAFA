@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict
 
 
-class AbstractDatasetDescriptor(ABC):
+class AbstractHubId(ABC):
     """
     Interface for definition where to download a dataset and how to read it.
     """

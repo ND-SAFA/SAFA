@@ -32,10 +32,10 @@ class TrainerArgs(TrainingArguments, BaseObject):
     save_steps = SAVE_STEPS_DEFAULT
     eval_steps: int = EVAL_STEPS_DEFAULT
     logging_steps = LOGGING_STEPS_DEFAULT
+    metric_for_best_model: str = METRIC_FOR_BEST_MODEL_DEFAULT
     greater_is_better: bool = GREATER_IS_BETTER_DEFAULT
     save_total_limit: int = SAVE_TOTAL_LIMIT_DEFAULT
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
-    metric_for_best_model: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = ["map", "f"]
     do_eval: bool = True
     place_model_on_device: bool = True

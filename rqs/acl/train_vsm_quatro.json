@@ -25,16 +25,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": {
-                  "*": [
-                    "mip",
-                    "cm1",
-                    "drone_nl",
-                    "drone_pl",
-                    "itrust",
-                    "cchit"
-                  ]
-                }
+                "name": "itrust"
               }
             },
             "val_dataset_creator": {

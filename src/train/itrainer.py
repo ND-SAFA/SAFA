@@ -22,3 +22,10 @@ class iTrainer:
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :return: THe prediction output
         """
+
+    @abstractmethod
+    def cleanup(self) -> None:
+        """
+        performs any necessary cleanup at the end of the job
+        :return: None
+        """

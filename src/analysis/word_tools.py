@@ -6,7 +6,7 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 from data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from data.tree.trace_link import TraceLink
+from spellchecker import SpellChecker
 import nltk
 from nltk.corpus import stopwords
 
@@ -84,6 +84,17 @@ class WordCounter(Counter):
         intersecting_words = self.get_word_set().intersection(other)
         return WordCounter({word: self[word] + other[word] for word in intersecting_words})
 
+    def difference(self, other: Union["WordCounter", Set[str]]) -> "WordCounter":
+        """
+        Gets the words that are in this set but not the others
+        :param other: The other word counter or a set of words
+        :return: The difference for the set of words
+        """
+        if not isinstance(other, WordCounter):
+            other = WordCounter(other)
+        difference = self.get_word_set().difference(other.get_word_set())
+        return WordCounter({word: self[word] for word in difference})
+
     def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """
         Gets all the OOV words from the words
@@ -94,3 +105,12 @@ class WordCounter(Counter):
         vocab = self.get_word_set()
         oov_words = vocab.difference(model_vocab)
         return WordCounter.from_dict({word: self[word] for word in oov_words})
+
+    def get_misspelled_words(self) -> "WordCounter":
+        """
+        Gets the misspelled words from the artifacts
+        :return: The list of misspelled words
+        """
+        spell = SpellChecker()
+        return WordCounter({word: self[word] for word in spell.unknown(list(self.get_word_set()))})
+

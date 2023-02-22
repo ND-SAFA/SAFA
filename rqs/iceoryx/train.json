@@ -8,22 +8,18 @@
             "random_seed": {
               "*": [
                 812,
-                23
+                23,
+                123421
               ]
             }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
-            "evaluation_strategy": "steps",
-            "save_strategy": "steps",
-            "logging_strategy": "steps",
-            "save_steps": 1,
-            "eval_steps": 1,
-            "logging_steps": 1,
-            "num_train_epochs": 3,
-            "gradient_accumulation_steps": 1,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -32,7 +28,6 @@
               "precision"
             ],
             "skip_save": false,
-            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
@@ -40,18 +35,25 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
-              }
+                "project_path": "[DATA_PATH]/iceoryx"
+              },
+              "remove_orphans": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": {
+                "*": [
+                  0.3,
+                  0.5,
+                  0.7
+                ]
+              }
             },
             "augmenter": {
               "steps": [

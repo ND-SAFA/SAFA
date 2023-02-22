@@ -5,25 +5,23 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
+            "random_seed": 812
+          },
+          "model_manager": {
+            "model_path": {
               "*": [
-                812,
-                23
+                "thearod5/pl-bert",
+                "thearod5/nl-bert"
               ]
             }
           },
-          "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
-          },
           "trainer_args": {
-            "evaluation_strategy": "steps",
-            "save_strategy": "steps",
-            "logging_strategy": "steps",
-            "save_steps": 1,
-            "eval_steps": 1,
-            "logging_steps": 1,
-            "num_train_epochs": 3,
-            "gradient_accumulation_steps": 1,
+            "logging_steps": 100,
+            "eval_steps": 100,
+            "save_steps": 100,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -32,21 +30,21 @@
               "precision"
             ],
             "skip_save": false,
-            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
-              }
+                "object_type": "HUB",
+                "name": "iceoryx_pl"
+              },
+              "remove_orphans": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": 0.20
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",

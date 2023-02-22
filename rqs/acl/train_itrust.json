@@ -8,22 +8,18 @@
             "random_seed": {
               "*": [
                 812,
-                23
+                234,
+                645
               ]
             }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "evaluation_strategy": "steps",
-            "save_strategy": "steps",
-            "logging_strategy": "steps",
-            "save_steps": 1,
-            "eval_steps": 1,
-            "logging_steps": 1,
-            "num_train_epochs": 3,
-            "gradient_accumulation_steps": 1,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -32,26 +28,26 @@
               "precision"
             ],
             "skip_save": false,
-            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
+            "deterministic_id": 42,
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
+                "object_type": "HUB",
+                "name": "itrust"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": 0.10
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.55
             },
             "augmenter": {
               "steps": [

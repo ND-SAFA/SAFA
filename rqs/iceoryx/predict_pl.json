@@ -3,15 +3,18 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "PREDICT",
           "job_args": {
-            "random_seed": 234
+            "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/tbert"
+            "model_path": "/root/output/iceoryx-train_pl/experiment_0/step_0/mp=pl-bert/models/checkpoint-2815"
           },
           "trainer_args": {
-            "num_train_epochs": 20,
+            "logging_steps": 100,
+            "eval_steps": 100,
+            "save_steps": 100,
+            "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
@@ -25,23 +28,23 @@
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
-            "deterministic_id": 42,
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone_pl"
-              }
+                "name": "iceoryx_pl"
+              },
+              "remove_orphans": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.10
+              "val_percentage": 0.20
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.55
+              "val_percentage": 0.50
             },
             "augmenter": {
               "steps": [

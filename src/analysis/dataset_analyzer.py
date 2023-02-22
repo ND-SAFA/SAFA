@@ -23,7 +23,9 @@ class DatasetAnalyzer:
     READABILITY_SCORE = "readability_score"
     HIGH_FREQUENCY_WORDS = "high_freq_words"
     LOW_FREQUENCY_WORDS = "low_freq_words"
+    MISSPELLED_WORDS = "misspelled_words"
     OOV_WORDS = "oov_words_with_model_{}"
+    VOCAB_LENGTH = "vocab_length"
 
     OUTPUT_FILENAME = "dataset_analysis_output.json"
 
@@ -45,12 +47,15 @@ class DatasetAnalyzer:
         """
         if self.__analysis is None:
             self.__analysis = {
+                self.VOCAB_LENGTH: len(self.vocab),
                 self.READABILITY_SCORE: self.get_readability_score(),
                 self.HIGH_FREQUENCY_WORDS: self.get_high_frequency_word_counts(),
                 self.LOW_FREQUENCY_WORDS: self.get_low_frequency_word_counts(),
+                self.MISSPELLED_WORDS: self.get_misspelled_words()
             }
             for model in self.model_managers:
-                self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model)
+                self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model).difference(
+                    self.__analysis[self.MISSPELLED_WORDS])
         return self.__analysis
 
     def analyze_and_save(self, output_dir: str) -> str:
@@ -64,7 +69,7 @@ class DatasetAnalyzer:
         FileUtil.write(analysis, output_file_path)
         return output_file_path
 
-    def get_readability_score(self) -> float:
+    def get_readability_score(self) -> Tuple[float, float]:
         """
         Gets the readability score of the dataset
         :return: The readability score and grade level of the dataset
@@ -72,7 +77,8 @@ class DatasetAnalyzer:
         try:
             r = Readability(" ".join(self.vocab))
             fk = r.flesch_kincaid()
-            return fk.score
+            dc = r.dale_chall()
+            return fk.score, dc.score
         except ReadabilityException as e:
             logger.warning("Unable to get readability score; %s" % e)
             return -1
@@ -98,6 +104,13 @@ class DatasetAnalyzer:
         low_frequency_counts = self.word_counts.filter(
             lambda _, count: count <= min(total_words * threshold, 1))
         return low_frequency_counts, low_frequency_counts.total() / total_words
+
+    def get_misspelled_words(self) -> "WordCounter":
+        """
+        Gets the misspelled words from the dataset
+        :return: The list of misspelled words
+        """
+        return self.word_counts.get_misspelled_words()
 
     def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """

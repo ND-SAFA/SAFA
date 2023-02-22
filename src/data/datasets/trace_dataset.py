@@ -20,6 +20,8 @@ from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
+from datasets import Dataset
+import torch
 
 
 class TraceDataset(AbstractDataset):
@@ -40,12 +42,35 @@ class TraceDataset(AbstractDataset):
         self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
+    def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
+        """
+        Converts trace links in data to Huggingface (HF) dataset.
+        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :return: A HF dataset.
+        """
+
+        def encode(batch) -> Dict:
+            """
+            Encodes the batch.
+            """
+            features = model_generator.get_feature(text=batch[CSVKeys.SOURCE],
+                                                   text_pair=batch[CSVKeys.TARGET],
+                                                   return_token_type_ids=True,
+                                                   add_special_tokens=True)
+            features[DataKey.LABELS_KEY] = torch.as_tensor(batch[CSVKeys.LABEL])
+            return features
+
+        hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
+        hf_dataset.set_transform(encode)
+        logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
+        return hf_dataset
+
     def to_trainer_dataset(self, model_generator: ModelManager, n_threads=100) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :param n_threads: The number of threads to use to calculate link features.
-        :return: A data used by the HF trainer.
+        :return: A data used by the trace trainer.
         """
         feature_entries = {}
 
@@ -65,19 +90,21 @@ class TraceDataset(AbstractDataset):
         logger.info(f"Trace links after processing: {len(project_links)}")
         return [feature_entries[link.id] for link in project_links]
 
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(self, include_ids: bool = True) -> pd.DataFrame:
         """
         Converts trace links in data to dataframe format.
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
         for link in self.links.values():
-            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
-                                         link.get_label()]
+            row = [link.source.token, link.target.token, link.get_label()] if not include_ids else \
+                [link.source.id, link.source.token, link.target.id, link.target.token, link.get_label()]
+            link_ids_to_rows[link.id] = row
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
-        return pd.DataFrame(data,
-                            columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
-                                     CSVKeys.LABEL])
+        cols = [CSVKeys.SOURCE, CSVKeys.TARGET, CSVKeys.LABEL] if not include_ids else [CSVKeys.SOURCE_ID, CSVKeys.SOURCE,
+                                                                                        CSVKeys.TARGET_ID, CSVKeys.TARGET,
+                                                                                        CSVKeys.LABEL]
+        return pd.DataFrame(data, columns=cols)
 
     def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                             is_true_link: bool) -> int:

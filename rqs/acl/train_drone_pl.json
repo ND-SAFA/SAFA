@@ -7,17 +7,22 @@
           "job_args": {
             "random_seed": {
               "*": [
+                812,
                 234,
-                12312,
-                6575
+                645
               ]
             }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": {
+              "*": [
+                "thearod5/pl-bert",
+                "bert-base-uncased"
+              ]
+            }
           },
           "trainer_args": {
-            "num_train_epochs": 20,
+            "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
@@ -36,7 +41,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "mip"
+                "name": "drone_pl"
               }
             },
             "val_dataset_creator": {

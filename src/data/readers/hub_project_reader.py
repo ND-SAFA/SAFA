@@ -2,9 +2,9 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from data.hub.supported_datasets import SupportedDatasets
 from data.hub.trace_dataset_downloader import TraceDatasetDownloader
 from data.readers.abstract_project_reader import AbstractProjectReader
-from data.readers.structured_project_reader import StructuredProjectReader
 
 
 class HubProjectReader(AbstractProjectReader):
@@ -26,9 +26,10 @@ class HubProjectReader(AbstractProjectReader):
         """
         :return: Reads the dataframes of the project.
         """
-        downloader = TraceDatasetDownloader(self.project_name)
+        descriptor = SupportedDatasets.get_value(self.project_name)
+        downloader = TraceDatasetDownloader(descriptor)
         project_path = downloader.download()
-        self.project_reader = StructuredProjectReader(project_path, **self.kwargs)
+        self.project_reader = descriptor.get_project_reader()(project_path, **self.kwargs)
         return self.project_reader.read_project()
 
     def get_project_name(self) -> str:

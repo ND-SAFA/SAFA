@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, Type
+
+from data.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.structured_project_reader import StructuredProjectReader
 
 
 class AbstractHubId(ABC):
@@ -20,3 +23,10 @@ class AbstractHubId(ABC):
         """
         :return: Returns project definition for structured project reader.
         """
+
+    @staticmethod
+    def get_project_reader() -> Type[AbstractProjectReader]:
+        """
+        :return: Returns the project reader for hub project.s
+        """
+        return StructuredProjectReader

@@ -4,7 +4,6 @@ from datasets import DownloadConfig, DownloadManager
 
 from constants import CACHE_DIR_NAME, DATA_PATH_PARAM
 from data.hub.abstract_dataset_descriptor import AbstractHubId
-from data.hub.supported_datasets import SupportedDatasets
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
@@ -15,15 +14,14 @@ class TraceDatasetDownloader:
     Responsible for downloading and loading files for supported dataset.
     """
 
-    def __init__(self, dataset_name: str, **config_kwargs):
+    def __init__(self, descriptor: AbstractHubId, **config_kwargs):
         """
         Initializes adapter for dataset specified in descriptor and converts it to a trace dataset.
-        :param dataset_name: The name of the dataset to download and prepare.
+        :param descriptor: The name of the dataset to download and prepare.
         :param creator_arguments: Kwargs passed to dataset creator.
         :param config_kwargs: Additional parameters to builder configuration.
         """
-        self.dataset_name = dataset_name
-        self.descriptor: AbstractHubId = SupportedDatasets.get_value(dataset_name)
+        self.descriptor: AbstractHubId = descriptor
         super().__init__(**config_kwargs)  # calls _info where above is needed
         self.trace_dataset_creator = None
         self.project_path = None

@@ -40,19 +40,20 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_code2issue"
-              },
-              "remove_orphans": false
+                "name": "iceoryx_train"
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.20
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.25
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.5
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_eval"
+              }
             },
             "augmenter": {
               "steps": [

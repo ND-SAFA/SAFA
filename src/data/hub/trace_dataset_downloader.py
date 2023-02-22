@@ -29,6 +29,7 @@ class TraceDatasetDownloader:
     def download(self) -> str:
         """
         Downloads or reads cache for dataset.
+        TODO: Check to see if works with multiple datasets using same url
         :return: Returns path to dataset.
         """
         if self.project_path is None:

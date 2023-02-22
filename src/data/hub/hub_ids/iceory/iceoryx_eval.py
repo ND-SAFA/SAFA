@@ -7,8 +7,8 @@ class IceoryxEval(IceoryxHubId):
     """
 
     @staticmethod
-    def get_file_name() -> str:
+    def get_stage_name() -> str:
         """
         :return: Returns the name of the eval data file.
         """
-        return "eval.csv"
+        return "eval"

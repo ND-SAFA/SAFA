@@ -16,34 +16,29 @@ class SafaExporter:
     Exports trace dataset as a SAFA one.
     """
 
-    def __init__(self, trace_dataset_creator: TraceDatasetCreator, export_path: str):
+    def __init__(self):
         """
         Initializes exporter for given trace dataset.
         :param trace_dataset_creator: The creator responsible for creating trace dataset.
         """
-        self.trace_dataset_creator = trace_dataset_creator
-        self.export_path = export_path
         self.artifact_definitions = {}
         self.trace_definitions = {}
-        self.trace_dataset = None
         self.artifact_type_2_id = None
         self.id_2_artifact = None
 
-    def export(self):
-        self.trace_dataset = self.trace_dataset_creator.create()
-        self.artifact_type_2_id, self.id_2_artifact = self.trace_dataset_creator.create_artifact_maps(
-            self.trace_dataset_creator.artifact_df)
-        self.create_artifact_definitions()
-        self.create_trace_definitions()
-        self.create_tim()
+    def export(self, export_path, links: Dict[int, TraceLink], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
+        self.artifact_type_2_id, self.id_2_artifact = TraceDatasetCreator.create_artifact_maps(artifact_df)
+        self.create_artifact_definitions(layer_mapping_df, export_path)
+        self.create_trace_definitions(links, layer_mapping_df, export_path)
+        self.create_tim(export_path)
 
-    def create_artifact_definitions(self) -> None:
+    def create_artifact_definitions(self, layer_mapping_df: pd.DataFrame, export_path: str) -> None:
         """
         Creates dataframe for each artifact grouped by type.
         :return: None
         """
         artifact_types = set()
-        for _, row in self.trace_dataset_creator.layer_mapping_df.iterrows():
+        for _, row in layer_mapping_df.iterrows():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             artifact_types.update({source_type, target_type})
@@ -57,24 +52,26 @@ class SafaExporter:
                     StructuredKeys.Artifact.BODY: artifact.token,
                 })
             file_name = artifact_type + ".csv"
-            export_path = os.path.join(self.export_path, file_name)
-            pd.DataFrame(entries).to_csv(export_path, index=False)
+            local_export_path = os.path.join(export_path, file_name)
+            pd.DataFrame(entries).to_csv(local_export_path, index=False)
             self.artifact_definitions[artifact_type] = {
                 SafaKeys.FILE: file_name
             }
 
-    def create_trace_definitions(self) -> None:
+    def create_trace_definitions(self, links: Dict[int, TraceLink], layer_mapping_df: pd.DataFrame, export_path: str) -> None:
         """
         Create trace definition between each layer in trace creator.
+        :param links: The trace links to save.
+        :param layer_mapping_df: DataFrame mapping trace queries in project.
         :return: None
         """
-        for _, row in self.trace_dataset_creator.layer_mapping_df.iterrows():
+        for _, row in layer_mapping_df.iterrows():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             matrix_name = f"{target_type}2{source_type}"
             file_name = matrix_name + ".csv"
-            export_file_path = os.path.join(self.export_path, file_name)
-            trace_df = self.create_trace_df(source_type, target_type)
+            export_file_path = os.path.join(export_path, file_name)
+            trace_df = self.create_trace_df(links, source_type, target_type)
             self.trace_definitions[matrix_name] = {
                 "File": file_name,
                 "Source": target_type,
@@ -82,9 +79,10 @@ class SafaExporter:
             }
             trace_df.to_csv(export_file_path, index=False)
 
-    def create_trace_df(self, source_type, target_type) -> pd.DataFrame:
+    def create_trace_df(self, links: Dict[int, TraceLink], source_type, target_type) -> pd.DataFrame:
         """
         Creates data frame containing positive traces between source and target types.
+        :param links: The links to save.
         :param source_type: The name of the source type.
         :param target_type: The name of the target type.
         :return: DataFrame with positive links.
@@ -95,7 +93,7 @@ class SafaExporter:
         for source_id in source_artifact_ids:
             for target_id in target_artifact_ids:
                 trace_link_id = TraceLink.generate_link_id(source_id, target_id)
-                trace_link: TraceLink = self.trace_dataset.links[trace_link_id]
+                trace_link: TraceLink = links[trace_link_id]
                 if trace_link.is_true_link:
                     entries.append({
                         StructuredKeys.Trace.TARGET: source_id,
@@ -103,7 +101,7 @@ class SafaExporter:
                     })
         return pd.DataFrame(entries)
 
-    def create_tim(self) -> None:
+    def create_tim(self, export_path) -> None:
         """
         Writes TIM file to export path.
         :return: None
@@ -114,5 +112,5 @@ class SafaExporter:
             },
             **self.trace_definitions
         }
-        export_path = os.path.join(self.export_path, "tim.json")
+        export_path = os.path.join(export_path, "tim.json")
         FileUtil.write(tim_definition, export_path)

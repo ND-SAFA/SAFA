@@ -7,8 +7,8 @@ class IceoryxTrain(IceoryxHubId):
     """
 
     @staticmethod
-    def get_file_name() -> str:
+    def get_stage_name() -> str:
         """
         :return: Returns the name of the training data file.
         """
-        return "train.csv"
+        return "train"

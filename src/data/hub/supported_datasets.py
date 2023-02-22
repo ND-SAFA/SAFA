@@ -2,6 +2,7 @@ from data.hub.hub_ids.cchit_hub_id import CCHITHubId
 from data.hub.hub_ids.cm1_hub_id import CM1HubId
 from data.hub.hub_ids.drone_hub_id import DroneNLHubId
 from data.hub.hub_ids.drone_pl_hub_id import DronePLHubId
+from data.hub.hub_ids.iceory.iceoryx_code import IceoryxCode
 from data.hub.hub_ids.iceory.iceoryx_eval import IceoryxEval
 from data.hub.hub_ids.iceory.iceoryx_train import IceoryxTrain
 from data.hub.hub_ids.iceory.iceoryx_val import IceoryxVal
@@ -22,3 +23,4 @@ class SupportedDatasets(SupportedEnum):
     ICEORYX_TRAIN = IceoryxTrain
     ICEORYX_VAL = IceoryxVal
     ICEORYX_EVAL = IceoryxEval
+    ICEORYX_CODE = IceoryxCode

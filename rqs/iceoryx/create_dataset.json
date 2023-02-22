@@ -3,35 +3,18 @@
     {
       "jobs": [
         {
-          "object_type": "CREATE_DATASETS",
+          "object_type": "CREATE_SOURCE_SPLITS",
           "job_args": {
           },
-          "trainer_dataset_manager": {
-            "train_dataset_creator": {
-              "object_type": "TRACE",
+          "export_path": "~/desktop/safa/datasets/iceoryx_splits",
+          "trace_dataset_creator": {
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "~/desktop/safa/datasets/iceoryx"
               }
-            },
-            "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.10
-            },
-            "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.30
-            },
-            "augmenter": {
-              "steps": [
-                {
-                  "object_type": "RESAMPLE"
-                }
-              ]
-            }
-          }
+          },
+          "splits": [0.10, 0.30],
+          "artifact_type": "Issue"
         }
       ]
     }

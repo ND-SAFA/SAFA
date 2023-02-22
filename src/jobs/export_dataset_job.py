@@ -8,6 +8,9 @@ from jobs.components.job_result import JobResult
 
 
 class ExportDatasetJob(AbstractJob):
+    """
+    Converts any format of trace dataset creator to SAFA format.
+    """
 
     def __init__(self, trace_dataset_creator: TraceDatasetCreator, export_path: str):
         """
@@ -24,6 +27,6 @@ class ExportDatasetJob(AbstractJob):
         :return: job results including location of saved data
         """
         os.makedirs(self.export_path, exist_ok=True)
-        safa_exporter = SafaExporter(self.trace_dataset_creator, self.export_path)
-        safa_exporter.export()
+        safa_exporter = SafaExporter(self.trace_dataset_creator)
+        safa_exporter.export(self.export_path)
         return JobResult.from_dict({"status": 0, "msg": f"Project exported to:{safa_exporter.export_path}"})

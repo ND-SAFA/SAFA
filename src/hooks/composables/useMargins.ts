@@ -4,9 +4,6 @@ import { useClasses } from "./useClasses";
 
 const convertMargin = (value?: SizeType) => {
   switch (value) {
-    case undefined:
-    case "":
-      return "none";
     case "1":
       return "xs";
     case "2":

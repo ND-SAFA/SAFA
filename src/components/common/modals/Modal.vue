@@ -21,12 +21,12 @@
         <typography
           v-if="!!props.subtitle"
           t="2"
-          b="0"
+          b=""
           el="p"
           :value="props.subtitle"
         />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if="!!slots.default">
         <slot />
       </q-card-section>
       <q-card-actions v-if="!!slots.actions" align="right">

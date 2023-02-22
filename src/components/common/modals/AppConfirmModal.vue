@@ -1,6 +1,11 @@
 <template>
-  <modal size="sm" :open="isOpen" :title="message.title" @close="handleClose">
-    <typography y="2" el="p" :value="message.body" />
+  <modal
+    size="sm"
+    :open="isOpen"
+    :title="message.title"
+    :subtitle="message.body"
+    @close="handleClose"
+  >
     <template #actions>
       <text-button
         label="Confirm"

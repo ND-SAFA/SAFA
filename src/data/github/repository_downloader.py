@@ -118,7 +118,7 @@ class RepositoryDownloader:
         """
         code_export_path = os.path.join(output_path, CODE_ARTIFACT_FILE)
         code2code_export_path = os.path.join(output_path, CODE2CODE_ARTIFACT_FILE)
-        cpp_creator = CPPToHeaderLinkCreator.from_dir_path(self.clone_path)
+        cpp_creator = CPPToHeaderLinkCreator.from_dir_path(self.clone_path, self.clone_dir)
         code_artifacts, code_links = cpp_creator.create_links()
 
         code_artifact_set = GArtifactSet(list(code_artifacts.values()), GArtifactType.CODE)
@@ -126,7 +126,7 @@ class RepositoryDownloader:
 
         code_artifact_set.export(code_export_path)
         link_artifact_set.export(code2code_export_path)
-        
+
         return code_artifact_set, link_artifact_set
 
     @staticmethod

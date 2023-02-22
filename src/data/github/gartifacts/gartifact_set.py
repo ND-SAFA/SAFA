@@ -9,6 +9,7 @@ from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
 from data.github.gtraces.glink import GLink
+from util.logging.logger_manager import logger
 
 T = TypeVar('T', bound="AbstractArtifact")
 
@@ -47,6 +48,7 @@ class GArtifactSet(Generic[T]):
                 continue
             df_values.append(entry)
         pd.DataFrame(df_values, columns=columns).to_csv(output_file_path, index=False)
+        logger.info(f"{output_file_path}: {len(self)}")
 
     def filter(self, artifact_ids: List[str]) -> "GArtifactSet":
         """

@@ -14,12 +14,13 @@ class CPPToHeaderLinkCreator:
     HEADER_FOLDER_NAME = "include"
     HEADER_EXT = "hpp"
 
-    def __init__(self, cpp_file_paths: List[str]):
+    def __init__(self, cpp_file_paths: List[str], base_path: str):
         """
         Responsible for linking CPP files to their header file
         :param cpp_file_paths: A list of cpp file paths to create links for
         """
         self.cpp_file_paths = cpp_file_paths
+        self.base_path = base_path
         self._artifacts: ARTIFACTS_TYPE = {}
         self._links: LINKS_TYPE = {}
 
@@ -33,8 +34,8 @@ class CPPToHeaderLinkCreator:
                 try:
                     header_path = self._get_header_path(cpp_file_path)
                     assert header_path is not None, "No header exists for the file."
-                    cpp_file = GCodeFile(cpp_file_path)
-                    hpp_file = GCodeFile(header_path)
+                    cpp_file = GCodeFile(cpp_file_path, self.base_path)
+                    hpp_file = GCodeFile(header_path, self.base_path)
                     self._add_artifact_to_dict(cpp_file, self._artifacts)
                     self._add_artifact_to_dict(hpp_file, self._artifacts)
                     self._add_artifact_to_dict(GLink(cpp_file.get_id(), hpp_file.get_id()), self._links)
@@ -44,14 +45,15 @@ class CPPToHeaderLinkCreator:
         return self._artifacts, self._links
 
     @staticmethod
-    def from_dir_path(dir_path: str) -> "CPPToHeaderLinkCreator":
+    def from_dir_path(dir_path: str, base_path: str) -> "CPPToHeaderLinkCreator":
         """
         Creates a link creator from all the cpp files in a directory
         :param dir_path: The path to the directory containing cpp files
+        :param base_path: The base path to remove from dir_path for use in code IDs.
         :return A link creator from all the cpp files in a directory
         """
         cpp_files = CPPToHeaderLinkCreator._get_all_cpp_files_in_dir(dir_path)
-        return CPPToHeaderLinkCreator(cpp_files)
+        return CPPToHeaderLinkCreator(cpp_files, base_path)
 
     @staticmethod
     def _add_artifact_to_dict(artifact: AbstractGithubArtifact, dict_: Dict[str, AbstractGithubArtifact]) -> None:

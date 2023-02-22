@@ -77,7 +77,6 @@ class GithubRepositoryExtracter:
         paths = [issue_output_path, pull_output_path, commit_output_path]
         for artifact_set, path in zip(artifacts, paths):
             artifact_set.export(path, columns=["id", "content"], dataset_type="NL")
-            logger.info(f"{os.path.basename(path)}: {len(artifact_set)}")
         self.commits.export(commit_diff_output_path, columns=["id", "content"], dataset_type="PL")
         self.glink_store.save(output_path)
 

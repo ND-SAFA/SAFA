@@ -25,6 +25,14 @@
         <slot name="top" />
       </template>
 
+      <template v-if="slots.header" #header="scope">
+        <slot name="header" v-bind="scope" />
+      </template>
+
+      <template v-if="slots.body" #body="scope">
+        <slot name="body" v-bind="scope" />
+      </template>
+
       <template v-if="slots.selection" #body-selection="scope">
         <slot name="selection" v-bind="scope" />
       </template>

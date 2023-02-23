@@ -1,21 +1,20 @@
 <template>
-  <stepper
-    v-model="currentStep"
-    :steps="steps"
-    submit-text="Create Project"
-    @submit="saveProject()"
-  >
-    <template #items>
-      <v-stepper-content step="1">
+  <panel-card>
+    <stepper
+      v-model="currentStep"
+      :steps="steps"
+      submit-text="Create Project"
+      @submit="handleSave()"
+    >
+      <template #1>
         <project-identifier-input
-          v-model:description="projectSaveStore.description"
-          v-model:name="projectSaveStore.name"
+          v-model:name="name"
+          v-model:description="description"
           data-cy-description="input-project-description-standard"
           data-cy-name="input-project-name-standard"
         />
-      </v-stepper-content>
-
-      <v-stepper-content step="2">
+      </template>
+      <template #2>
         <file-uploader
           :artifact-map="artifactMap"
           :uploader="artifactUploader"
@@ -33,9 +32,8 @@
             />
           </template>
         </file-uploader>
-      </v-stepper-content>
-
-      <v-stepper-content step="3">
+      </template>
+      <template #3>
         <file-uploader
           :artifact-map="artifactMap"
           :default-valid-state="true"
@@ -55,17 +53,16 @@
             />
           </template>
         </file-uploader>
-      </v-stepper-content>
-
-      <v-stepper-content step="4">
+      </template>
+      <template #4>
         <tim-tree
           :artifact-panels="artifactUploader.panels"
           :in-view="currentStep === 4"
           :trace-panels="traceUploader.panels"
         />
-      </v-stepper-content>
-    </template>
-  </stepper>
+      </template>
+    </stepper>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -77,30 +74,38 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { ArtifactMap, StepState } from "@/types";
+import { ArtifactMap, StepperStep } from "@/types";
 import { projectSaveStore } from "@/hooks";
 import {
   createArtifactUploader,
   createTraceUploader,
   handleImportProject,
 } from "@/api";
-import { Stepper } from "@/components/common";
+import { Stepper, PanelCard } from "@/components/common";
 import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
 import { FileUploader, ArtifactTypeCreator, TraceFileCreator } from "../panels";
 
-const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
-
-const steps = ref<StepState[]>([
-  [PROJECT_IDENTIFIER_STEP_NAME, false],
-  ["Upload Artifacts", true],
-  ["Upload Trace Links", true],
-  ["View TIM", true],
+const steps = ref<StepperStep[]>([
+  { title: "Name Project", done: false },
+  { title: "Upload Artifacts", done: true },
+  { title: "Upload Trace Links", done: true },
+  { title: "View TIM", done: true },
 ]);
 const currentRoute = useRoute();
 const currentStep = ref(1);
 const artifactUploader = ref(createArtifactUploader());
 const traceUploader = ref(createTraceUploader());
+
+const name = computed({
+  get: () => projectSaveStore.name,
+  set: (value) => (projectSaveStore.name = value),
+});
+
+const description = computed({
+  get: () => projectSaveStore.description,
+  set: (value) => (projectSaveStore.description = value),
+});
 
 const artifactMap = computed<ArtifactMap>(() =>
   artifactUploader.value.panels
@@ -124,7 +129,7 @@ const traceFiles = computed(() =>
  * @param isValid - Whether the step is valid.
  */
 function setStepIsValid(stepIndex: number, isValid: boolean): void {
-  steps.value[stepIndex] = [steps.value[stepIndex][0], isValid];
+  steps.value[stepIndex].done = isValid;
 }
 
 /**
@@ -140,7 +145,7 @@ function handleClearData() {
 /**
  * Attempts to create a project.
  */
-function saveProject(): void {
+function handleSave(): void {
   handleImportProject(
     projectSaveStore.getCreationRequest(
       artifactUploader.value,
@@ -153,22 +158,9 @@ function saveProject(): void {
 }
 
 watch(
-  () => currentStep.value,
-  (stepNumber) => {
-    if (stepNumber === 1) {
-      const hasName = projectSaveStore.name !== "";
-
-      steps.value[0] = [PROJECT_IDENTIFIER_STEP_NAME, hasName];
-    } else if (stepNumber === 2) {
-      steps.value[0] = [projectSaveStore.name, true];
-    }
-  }
-);
-
-watch(
   () => projectSaveStore.name,
-  (newName) => {
-    steps.value[0] = [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""];
+  (name) => {
+    steps.value[0].done = !!name;
   }
 );
 

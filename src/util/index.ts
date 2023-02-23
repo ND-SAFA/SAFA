@@ -9,5 +9,6 @@ export * from "./object-factory";
 export * from "./sub-tree-operations";
 export * from "./icons";
 export * from "./tim-factory";
+export * from "./job-helper";
 
 export * from "./enabled-features";

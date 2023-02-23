@@ -1,9 +1,4 @@
 /**
- * Defines the name of a step and whether the step is currently valid.
- */
-export type StepState = [string, boolean];
-
-/**
  * The variants of text that can be displayed.
  */
 export type TextType =

@@ -1,6 +1,9 @@
 <template>
-  <private-page>
-    <job-display />
+  <private-page
+    title="Project Uploads"
+    subtitle="Select an upload below to see more details on its status."
+  >
+    <jobs-table />
   </private-page>
 </template>
 
@@ -14,5 +17,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PrivatePage, JobDisplay } from "@/components";
+import { PrivatePage, JobsTable } from "@/components";
 </script>

@@ -108,6 +108,10 @@ const iconId = computed(() => {
       return "mdi-logout-variant";
     case "file":
       return "mdi-paperclip";
+    case "down":
+      return "mdi-chevron-down";
+    case "up":
+      return "mdi-chevron-up";
     case "home-list":
       return "mdi-view-list";
     case "home-add":
@@ -115,6 +119,8 @@ const iconId = computed(() => {
     case "job-complete":
       return "mdi-check-circle-outline";
     case "job-cancel":
+      return "mdi-minus-circle-outline";
+    case "job-fail":
       return "mdi-close-circle-outline";
     case "trace-approve":
       return "mdi-check-circle-outline";

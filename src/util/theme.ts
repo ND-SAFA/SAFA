@@ -161,11 +161,11 @@ export function getScoreColor(score: number | string): string {
 export function getJobStatusColor(status: JobStatus): string {
   switch (status) {
     case JobStatus.COMPLETED:
-      return ThemeColors.modified;
+      return "primary";
     case JobStatus.IN_PROGRESS:
-      return "#EEBC3D";
-    case JobStatus.CANCELLED:
-      return ThemeColors.removed;
+      return "secondary";
+    case JobStatus.FAILED:
+      return "negative";
     default:
       return "";
   }

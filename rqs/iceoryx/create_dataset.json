@@ -6,14 +6,17 @@
           "object_type": "CREATE_SOURCE_SPLITS",
           "job_args": {
           },
-          "export_path": "~/desktop/safa/datasets/iceoryx_splits",
+          "export_path": "~/desktop/safa/datasets/iceoryx_splits/base",
           "trace_dataset_creator": {
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/iceoryx"
-              }
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "~/desktop/safa/datasets/iceoryx_splits/diffs"
+            }
           },
-          "splits": [0.10, 0.30],
+          "splits": [
+            0.10,
+            0.30
+          ],
           "artifact_type": "Issue"
         }
       ]

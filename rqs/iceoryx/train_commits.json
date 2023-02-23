@@ -8,12 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "thearod5/nl-bert",
-                "thearod5/pl-bert"
-              ]
-            }
+            "model_path": "thearod5/pl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 1,
@@ -46,7 +41,7 @@
                 },
                 {
                   "object_type": "HUB",
-                  "name": "iceoryx_code"
+                  "name": "iceoryx_commits"
                 }
               ]
             },

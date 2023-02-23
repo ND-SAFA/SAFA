@@ -16,7 +16,6 @@ import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import type { QNotifyCreateOptions } from "quasar";
 import { MessageType, SnackbarMessage } from "@/types";
-import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common";
 
@@ -32,21 +31,19 @@ const showAction = computed(() => messageType.value === MessageType.UPDATE);
 
 const messageColor = computed(() => {
   switch (messageType.value) {
-    case MessageType.INFO:
-      return "primary";
     case MessageType.WARNING:
       return "warning";
     case MessageType.ERROR:
-      return "error";
+      return "negative";
     case MessageType.SUCCESS:
-      return ThemeColors.added;
+      return "positive";
     default:
-      return ThemeColors.modified;
+      return "primary";
   }
 });
 
-function buildNotification(): QNotifyCreateOptions {
-  const actions: QNotifyCreateOptions["actions"] = [];
+function buildNotification() {
+  const actions = [];
 
   if (hasErrors.value) {
     actions.push({
@@ -64,10 +61,19 @@ function buildNotification(): QNotifyCreateOptions {
     });
   }
 
+  actions.push({
+    icon: "close",
+    color: "white",
+    "data-cy": "button-snackbar-close",
+  });
+
   return {
     message: snackbarMessage.value,
     color: messageColor.value,
-    actions: [],
+    attrs: {
+      "data-cy": `snackbar-${messageType.value}`,
+    },
+    actions: actions,
   };
 }
 

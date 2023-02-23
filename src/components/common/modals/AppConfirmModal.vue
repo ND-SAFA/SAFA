@@ -30,7 +30,6 @@ export default {
 import { computed } from "vue";
 import { ConfirmationType } from "@/types";
 import { logStore } from "@/hooks";
-import { Typography } from "@/components/common/display";
 import TextButton from "@/components/common/button/TextButton.vue";
 import Modal from "./Modal.vue";
 
@@ -42,15 +41,15 @@ const isOpen = computed(() => message.value.type !== ConfirmationType.CLEAR);
  * Confirms the confirmation message.
  */
 function handleConfirm(): void {
-  logStore.clearConfirmation();
   message.value.statusCallback(true);
+  logStore.clearConfirmation();
 }
 
 /**
  * Closes the confirmation message.
  */
 function handleClose(): void {
-  logStore.clearConfirmation();
   message.value.statusCallback(false);
+  logStore.clearConfirmation();
 }
 </script>

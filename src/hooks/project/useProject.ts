@@ -5,7 +5,7 @@ import {
   GenerationModelSchema,
   VersionSchema,
 } from "@/types";
-import { createProject } from "@/util";
+import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
@@ -132,9 +132,7 @@ export const useProject = defineStore("project", {
     addProject(project: IdentifierSchema): void {
       this.allProjects = [
         project,
-        ...this.allProjects.filter(
-          ({ projectId }) => projectId !== project.projectId
-        ),
+        ...removeMatches(this.allProjects, "projectId", [project.projectId]),
       ];
     },
   },

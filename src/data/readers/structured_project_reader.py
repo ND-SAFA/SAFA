@@ -12,6 +12,7 @@ from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.readers.entity.entity_reader import EntityReader
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.logging.logger_manager import logger
 
 
 class StructuredProjectReader(AbstractProjectReader):
@@ -45,6 +46,7 @@ class StructuredProjectReader(AbstractProjectReader):
         artifact_df = self._read_artifact_df(self.project_path, self._get_artifact_definitions())
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()
+        logger.info(f"Artifacts: {len(artifact_df)} Traces: {len(trace_df)} Queries: {len(layer_mapping_df)}")
         return artifact_df, trace_df, layer_mapping_df
 
     def get_project_name(self) -> str:

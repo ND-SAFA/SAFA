@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Dict
 
 from data.hub.abstract_dataset_descriptor import AbstractHubId
@@ -5,17 +6,10 @@ from data.hub.hub_ids.iceory.abstract_iceoryx_hub_id import IceoryxHubId
 from util.override import overrides
 
 
-class IceoryxCode(IceoryxHubId):
+class IceoryxCode(IceoryxHubId, ABC):
     """
     Identifier iceoryx open source project.
     """
-
-    @staticmethod
-    def get_stage_name() -> str:
-        """
-        :return: Returns the name of the eval data file.
-        """
-        return "code"
 
     @classmethod
     @overrides(AbstractHubId)
@@ -26,19 +20,22 @@ class IceoryxCode(IceoryxHubId):
         return {
             "artifacts": {
                 "Code": {
-                    "path": "code.csv"
+                    "path": "Code.csv"
+                },
+                "Issue": {
+                    "path": "Issue.csv"
                 }
             },
             "traces": {
-                "code2issue": {
-                    "source": "Code",
+                "issue2code": {
+                    "source": "Issue",
                     "target": "Code",
-                    "path": "code2code.csv"
+                    "path": "Issue2Code.csv"
                 }
             },
             "overrides": {
                 "allowed_orphans": 640,
-                "allowed_missing_sources": 8347,
-                "allowed_missing_targets": 5
+                "allowed_missing_sources": 6,
+                "allowed_missing_targets": 8346
             }
         }

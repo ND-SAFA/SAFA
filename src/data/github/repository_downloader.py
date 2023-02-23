@@ -76,7 +76,7 @@ class RepositoryDownloader:
                          artifact_set_creator: Callable[[], Union[GArtifactSet, List[GArtifactSet]]],
                          load: bool) -> List[GArtifactSet]:
         """
-        Loads artifact set or parses artifact set at data file path.
+        Downloads artifact set from GitHub, or loads artifact set if data file exists.
         :param data_file_path: The path to the data file to load.
         :param artifact_set_creator: Callable representing the parsing of an artifact set
         :param load: If true, loads data in data file. Otherwise, calls artifact_set_creator
@@ -101,7 +101,7 @@ class RepositoryDownloader:
         """
         issue_artifacts = []
         for issue in tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
-            if issue.pull_request is not None:
+            if issue.pull_request is not None:  # TODO: WHY
                 continue
             self.wait_for_rate_limit(github_instance)
             issue_artifacts.append(GIssue.parse(issue))

@@ -17,24 +17,23 @@ class AbstractSplitStrategy(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_split(dataset: DatasetType, percent_split: float, slice_num: int) -> DatasetType:
+    def create_split(dataset: DatasetType, second_split_percentage: float) -> Tuple[DatasetType, DatasetType]:
         """
         Creates the split of the dataset
         :param dataset: The dataset to split.
-        :type percent_split: The percentage of the dataset contained in the second split.
-        :type slice_num: The slice number to return.
+        :param second_split_percentage: The percentage of the data to be contained in second split
         :return: Dataset containing slice of data.
         """
         raise NotImplementedError()
 
     @staticmethod
-    def split_data(data: GenericData, percent_split: float, labels: List[int] = None, **kwargs) -> Tuple[GenericData, GenericData]:
+    def split_data(data: GenericData, second_split_percentage: float, labels: List[int] = None, **kwargs) -> Tuple[GenericData, GenericData]:
         """
         Splits data into slices using labels to guarantee equal proportions of the labels in each split
         :param data: The data to split.
-        :param percent_split: The percentage of the data to be contained in second split
+        :param second_split_percentage: The percentage of the data to be contained in second split
         :param labels: The labels to stratify data with.
         :return: Two slices of data.
         """
         random_state = RandomUtil.CURRENT_SEED if RandomUtil.CURRENT_SEED is not None else 0
-        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=random_state, **kwargs)
+        return train_test_split(data, test_size=second_split_percentage, stratify=labels, random_state=random_state, **kwargs)

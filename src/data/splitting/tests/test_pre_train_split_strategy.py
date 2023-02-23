@@ -1,7 +1,9 @@
 import os
+from collections import OrderedDict
 
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from data.datasets.dataset_role import DatasetRole
 from data.readers.pre_train_project_reader import PreTrainProjectReader
 from data.splitting.dataset_splitter import DatasetSplitter
 from data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
@@ -15,11 +17,12 @@ class TestPreTrainSplitStrategy(BaseTraceTest):
 
     def test_with_splitter(self):
         orig_dataset = self.get_dataset()
-        splitter = DatasetSplitter(orig_dataset)
-        train_dataset, test_dataset = splitter.split(0.6)
+        splitter = DatasetSplitter(orig_dataset, OrderedDict({DatasetRole.TRAIN: 1-self.VAlIDATION_PERCENTAGE,
+                                                              DatasetRole.VAL: self.VAlIDATION_PERCENTAGE}))
+        splits = splitter.split_dataset()
         file_contents = []
         n_lines = 0
-        for dataset in [train_dataset, test_dataset]:
+        for dataset_role, dataset in splits.items():
             self.assertTrue(os.path.exists(dataset.training_file_path))
             file_content = self.get_file_contents(dataset.training_file_path)
             file_contents.append(file_content)
@@ -31,7 +34,7 @@ class TestPreTrainSplitStrategy(BaseTraceTest):
     def test_create_split(self):
         strategy = self.get_pre_train_split_strategy()
         orig_dataset = self.get_dataset()
-        train_dataset = strategy.create_split(orig_dataset, self.VAlIDATION_PERCENTAGE, 1)
+        train_dataset, test_dataset = strategy.create_split(orig_dataset, self.VAlIDATION_PERCENTAGE)
         self.assertTrue(os.path.exists(train_dataset.training_file_path))
         orig_contents = self.get_file_contents(orig_dataset.training_file_path)
         train_contents = self.get_file_contents(train_dataset.training_file_path)

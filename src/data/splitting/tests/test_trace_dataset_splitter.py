@@ -1,6 +1,10 @@
+from collections import OrderedDict
 from unittest import mock
 from unittest.mock import patch
 
+from data.datasets.dataset_role import DatasetRole
+from data.splitting.random_split_strategy import RandomSplitStrategy
+from data.splitting.remainder_split_strategy import RemainderSplitStrategy
 from data.splitting.tests.base_split_test import BaseSplitTest
 from data.splitting.dataset_splitter import DatasetSplitter
 from models.model_manager import ModelManager
@@ -16,11 +20,12 @@ class TestTraceDatasetSplitter(BaseSplitTest):
     @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        splitter = DatasetSplitter(self.get_trace_dataset())
-        train_dataset, test_dataset = splitter.split(self.VAlIDATION_PERCENTAGE)
-        train_dataset.prepare_for_training()
+        splitter = DatasetSplitter(self.get_trace_dataset(), OrderedDict({DatasetRole.TRAIN: 1-self.VAlIDATION_PERCENTAGE,
+                                                              DatasetRole.VAL: self.VAlIDATION_PERCENTAGE}))
+        splits = splitter.split_dataset()
+        splits[DatasetRole.TRAIN].prepare_for_training()
         model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
-        trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
+        trainer_dataset = splits[DatasetRole.TRAIN].to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
 

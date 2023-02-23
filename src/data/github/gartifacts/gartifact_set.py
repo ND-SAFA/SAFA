@@ -40,7 +40,7 @@ class GArtifactSet(Generic[T]):
         :param output_file_path: The path to the file to save to.
         :return: None
         """
-        values = [artifact.to_dict() for artifact in self.artifacts]
+        values = [artifact.get_state_dict() for artifact in self.artifacts]
         file_content = {
             GArtifactSet.TYPE_PARAM: self.artifact_type.value,
             GArtifactSet.ARTIFACT_PARAM: values

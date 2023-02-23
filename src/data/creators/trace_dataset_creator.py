@@ -331,7 +331,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param label: The label to group error with, if it exists.
         :return: None
         """
-        error_msg = f"Found too null references to {label} artifacts ({len(missing_artifact_ids)})"
+        error_msg = f"Found too many null references to {label} artifacts ({len(missing_artifact_ids)})"
         default_msg = f"No missing {label} artifacts."
         TraceDatasetCreator.assert_artifact_less_than(missing_artifact_ids, max_missing_allowed, error_msg, default_msg)
 

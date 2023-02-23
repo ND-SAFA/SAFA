@@ -49,6 +49,7 @@ class GIssue(AbstractGithubArtifact):
         """
         if self.body is None:
             self.body = ""
+        # TODO : Merge  into basic data cleaning
         self.body = re.sub("<!-.*->", "", self.body)
         self.body = re.sub("```.*```", "", self.body, flags=re.DOTALL)
         self.body = " ".join(word_tokenize(self.body))

@@ -87,7 +87,7 @@ class GCommit(AbstractGithubArtifact):
         parent = commit.parents[0] if has_parent else commit
         commit = commit if has_parent else EMPTY_TREE_SHA
         differs = set()
-        for diff in parent.diff(commit, create_patch=True):
+        for diff in parent.diff(commit, create_patch=True):  # TODO: Use actual diff objects instead of parsing string
             diff_lines = str(diff).split("\n")
             for diff_line in diff_lines:
                 if diff_line.startswith("+") or diff_line.startswith("-") and '@' not in diff_line and not diff_line.startswith("---"):

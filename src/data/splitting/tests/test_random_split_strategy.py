@@ -10,5 +10,4 @@ class TestRandomSplitStrategy(BaseSplitTest):
 
     def test_split_sizes(self):
         split_type = SupportedSplitStrategy.SPLIT_BY_LINK
-        self.assert_split(split_type)
         self.assert_split_multiple(split_type)

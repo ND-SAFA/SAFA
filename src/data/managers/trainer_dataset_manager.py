@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -11,7 +12,9 @@ from data.datasets.trace_dataset import TraceDataset
 from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.splitting.dataset_splitter import DatasetSplitter
+from data.splitting.supported_split_strategy import SupportedSplitStrategy
 from util.base_object import BaseObject
+from util.enum_util import get_enum_from_name
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
 
@@ -144,33 +147,28 @@ class TrainerDatasetManager(BaseObject):
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
-                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, TraceDataset]:
+                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, AbstractDataset]:
         """
         Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split data
         :param train_dataset: the train dataset
         :param dataset_creators_map: a map of dataset role to all dataset creators
         :return: a dictionary mapping dataset role to split for all split data
         """
-        split_roles = []
-        split_percentages = []
-        split_strategies = []
+        dataset_role_to_split_percentage: OrderedDict[DatasetRole, float] = OrderedDict()
+        strategies: List[SupportedSplitStrategy] = []
         for dataset_role, dataset_creator in dataset_creators_map.items():
             if isinstance(dataset_creator, SplitDatasetCreator):
                 dataset_creator.name = dataset_creators_map[DatasetRole.TRAIN].get_name()
-                split_roles.append(dataset_role)
-                split_percentages.append(dataset_creator.val_percentage)
-                split_strategies.append(dataset_creator.split_strategy)
-
-        dataset_splits_map = {}
-        if len(split_roles) < 1:
-            return dataset_splits_map
-        splitter = DatasetSplitter(train_dataset)
-        splits = splitter.split_multiple(split_percentages, split_strategies)
-        train_dataset, split_datasets = splits[0], splits[1:]
-        dataset_splits_map[DatasetRole.TRAIN] = train_dataset
-        for i, dataset_role in enumerate(split_roles):
-            dataset_splits_map[dataset_role] = split_datasets[i]
-        return dataset_splits_map
+                split_strategy_enum = get_enum_from_name(SupportedSplitStrategy, dataset_creator.split_strategy) \
+                    if not isinstance(dataset_creator.split_strategy, SupportedSplitStrategy) else dataset_creator.split_strategy
+                strategies.append(split_strategy_enum)
+                dataset_role_to_split_percentage[dataset_role] = dataset_creator.val_percentage
+        if len(dataset_role_to_split_percentage) < 1:
+            return {}
+        dataset_role_to_split_percentage[DatasetRole.TRAIN] = 1-sum(dataset_role_to_split_percentage.values())
+        dataset_role_to_split_percentage.move_to_end(DatasetRole.TRAIN, last=False)
+        splitter = DatasetSplitter(train_dataset, dataset_role_to_split_percentage, strategies)
+        return splitter.split_dataset()
 
     @staticmethod
     def _create_datasets_from_creators(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \

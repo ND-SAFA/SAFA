@@ -1,8 +1,5 @@
 from enum import Enum
 
-from data.splitting.all_artifact_split_strategy import AllArtifactSplitStrategy
-from data.splitting.all_sources_split_strategy import AllSourcesSplitStrategy
-from data.splitting.combination_split_strategy import CombinationSplitStrategy
 from data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
 from data.splitting.random_split_strategy import RandomSplitStrategy
 from data.splitting.source_split_strategy import SourceSplitStrategy
@@ -15,7 +12,4 @@ class SupportedSplitStrategy(Enum):
     """
     SPLIT_BY_LINK = RandomSplitStrategy
     SPLIT_BY_SOURCE = SourceSplitStrategy
-    COMBINATION = CombinationSplitStrategy
-    ALL_SOURCES = AllSourcesSplitStrategy
-    ALL_ARTIFACTS = AllArtifactSplitStrategy
     PRE_TRAIN = PreTrainSplitStrategy

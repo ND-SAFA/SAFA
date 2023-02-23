@@ -2,6 +2,7 @@
   <q-stepper
     v-model="currentStep"
     flat
+    animated
     class="full-width bg-transparent"
     :alternative-labels="minimal"
   >
@@ -104,3 +105,10 @@ function onStepForward(): void {
   }
 }
 </script>
+
+<style lang="scss">
+.q-stepper__title {
+  white-space: pre-wrap;
+  width: min-content;
+}
+</style>

@@ -20,6 +20,13 @@ export const useJobs = defineStore("jobs", {
   getters: {},
   actions: {
     /**
+     * Toggles whether a job is selected.
+     * @param job - The job to select.
+     */
+    selectJob(job: JobSchema): void {
+      this.selectedJob = this.selectedJob === job ? undefined : job;
+    },
+    /**
      * Adds job to list of jobs if new job, otherwise updates previous one.
      * New or updated job will be first element of the list of jobs.
      *

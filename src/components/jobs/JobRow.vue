@@ -125,7 +125,7 @@ const steps = computed<StepperStep[]>(
  * Opens the view job expansion panel.
  */
 function handleExpand(): void {
-  jobStore.selectedJob = props.job;
+  jobStore.selectJob(props.job);
   rowExpanded.value = !rowExpanded.value;
 }
 

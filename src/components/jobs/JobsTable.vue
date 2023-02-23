@@ -6,6 +6,7 @@
       row-key="id"
       :loading="loading"
       :rows-per-page="10"
+      :expanded="expanded"
     >
       <template #body="props">
         <job-row
@@ -52,6 +53,9 @@ const jobLog = ref<JobLogSchema[]>([]);
 const rows = computed(() => jobStore.jobs);
 const loading = computed(() => appStore.isLoading > 0);
 const logText = computed(() => JSON.stringify(jobLog.value, null, 2));
+const expanded = computed(() =>
+  jobStore.selectedJob ? [jobStore.selectedJob.id] : []
+);
 
 /**
  * Reloads the list of jobs.

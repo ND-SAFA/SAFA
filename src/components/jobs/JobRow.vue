@@ -33,7 +33,7 @@
   </q-tr>
   <q-tr v-show="props.expanded" :props="props.quasarProps">
     <q-td colspan="100%">
-      <stepper minimal :model-value="currentStep" :steps="steps" />
+      <stepper minimal dense-labels :model-value="currentStep" :steps="steps" />
       <flex-box full-width justify="end">
         <text-button
           outlined

@@ -3,7 +3,7 @@
     v-model="currentStep"
     flat
     animated
-    class="full-width bg-transparent"
+    :class="className"
     :alternative-labels="minimal"
   >
     <q-step
@@ -74,6 +74,11 @@ const props = defineProps<{
    * Whether to render the stepper content in a condensed format.
    */
   minimal?: boolean;
+  /**
+   * If true, the label text will be made as dense as possible.
+   * Useful when displaying long lists of steps
+   */
+  denseLabels?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -85,6 +90,11 @@ const currentStep = useVModel(props, "modelValue");
 const isStepDone = computed(() => props.steps[props.modelValue - 1].done);
 const continueText = computed(() =>
   currentStep.value === props.steps.length ? "Submit" : "Continue"
+);
+const className = computed(() =>
+  props.denseLabels
+    ? "full-width bg-transparent stepper-minimal"
+    : "full-width bg-transparent"
 );
 
 /**
@@ -107,8 +117,10 @@ function onStepForward(): void {
 </script>
 
 <style lang="scss">
-.q-stepper__title {
-  white-space: pre-wrap;
-  width: min-content;
+.stepper-minimal {
+  .q-stepper__title {
+    white-space: pre-wrap;
+    width: min-content;
+  }
 }
 </style>

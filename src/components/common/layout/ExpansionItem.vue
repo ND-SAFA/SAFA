@@ -1,5 +1,5 @@
 <template>
-  <q-expansion-item :label="props.label">
+  <q-expansion-item :label="props.label" :caption="props.caption">
     <q-card class="q-my-md">
       <slot />
     </q-card>
@@ -18,5 +18,6 @@ export default {
 <script setup lang="ts">
 const props = defineProps<{
   label: string;
+  caption?: string;
 }>();
 </script>

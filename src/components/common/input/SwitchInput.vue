@@ -1,6 +1,6 @@
 <template>
-  <q-toggle v-model="model">
-    <typography :value="props.label" />
+  <q-toggle v-model="model" :color="props.color">
+    <typography :value="props.label" :color="props.color" />
   </q-toggle>
 </template>
 
@@ -14,12 +14,14 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { ThemeColor } from "@/types";
 import { useVModel } from "@/hooks";
 import Typography from "@/components/common/display/Typography.vue";
 
 const props = defineProps<{
   modelValue: boolean;
   label: string;
+  color?: ThemeColor;
 }>();
 
 defineEmits<{

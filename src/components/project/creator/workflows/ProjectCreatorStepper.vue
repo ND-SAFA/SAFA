@@ -15,51 +15,52 @@
         />
       </template>
       <template #2>
-        <file-uploader
-          :artifact-map="artifactMap"
-          :uploader="artifactUploader"
-          item-name="artifact"
-          @change="artifactUploader.panels = $event"
-          @upload:valid="setStepIsValid(1, true)"
-          @upload:invalid="setStepIsValid(1, false)"
-        >
-          <template #creator="{ isCreatorOpen, onAddFile, onClose }">
-            <artifact-type-creator
-              :artifact-types="artifactTypes"
-              :is-open="isCreatorOpen"
-              @close="onClose"
-              @submit="onAddFile"
-            />
-          </template>
-        </file-uploader>
+        <artifact-type-step />
+        <!--        <file-uploader-->
+        <!--          :artifact-map="artifactMap"-->
+        <!--          :uploader="artifactUploader"-->
+        <!--          item-name="artifact"-->
+        <!--          @change="artifactUploader.panels = $event"-->
+        <!--          @upload:valid="setStepIsValid(1, true)"-->
+        <!--          @upload:invalid="setStepIsValid(1, false)"-->
+        <!--        >-->
+        <!--          <template #creator="{ isCreatorOpen, onAddFile, onClose }">-->
+        <!--            <artifact-type-creator-->
+        <!--              :artifact-types="artifactTypes"-->
+        <!--              :is-open="isCreatorOpen"-->
+        <!--              @close="onClose"-->
+        <!--              @submit="onAddFile"-->
+        <!--            />-->
+        <!--          </template>-->
+        <!--        </file-uploader>-->
       </template>
       <template #3>
-        <file-uploader
-          :artifact-map="artifactMap"
-          :default-valid-state="true"
-          :uploader="traceUploader"
-          item-name="trace matrix"
-          @change="traceUploader.panels = $event"
-          @upload:valid="setStepIsValid(2, true)"
-          @upload:invalid="setStepIsValid(2, false)"
-        >
-          <template #creator="{ isCreatorOpen, onAddFile, onClose }">
-            <trace-file-creator
-              :artifact-types="artifactTypes"
-              :is-open="isCreatorOpen"
-              :trace-files="traceFiles"
-              @close="onClose"
-              @submit="onAddFile"
-            />
-          </template>
-        </file-uploader>
+        <!--        <file-uploader-->
+        <!--          :artifact-map="artifactMap"-->
+        <!--          :default-valid-state="true"-->
+        <!--          :uploader="traceUploader"-->
+        <!--          item-name="trace matrix"-->
+        <!--          @change="traceUploader.panels = $event"-->
+        <!--          @upload:valid="setStepIsValid(2, true)"-->
+        <!--          @upload:invalid="setStepIsValid(2, false)"-->
+        <!--        >-->
+        <!--          <template #creator="{ isCreatorOpen, onAddFile, onClose }">-->
+        <!--            <trace-file-creator-->
+        <!--              :artifact-types="artifactTypes"-->
+        <!--              :is-open="isCreatorOpen"-->
+        <!--              :trace-files="traceFiles"-->
+        <!--              @close="onClose"-->
+        <!--              @submit="onAddFile"-->
+        <!--            />-->
+        <!--          </template>-->
+        <!--        </file-uploader>-->
       </template>
       <template #4>
-        <tim-tree
-          :artifact-panels="artifactUploader.panels"
-          :in-view="currentStep === 4"
-          :trace-panels="traceUploader.panels"
-        />
+        <!--        <tim-tree-->
+        <!--          :artifact-panels="artifactUploader.panels"-->
+        <!--          :in-view="currentStep === 4"-->
+        <!--          :trace-panels="traceUploader.panels"-->
+        <!--        />-->
       </template>
     </stepper>
   </panel-card>
@@ -84,6 +85,7 @@ import {
 import { Stepper, PanelCard } from "@/components/common";
 import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
+import ArtifactTypeStep from "@/components/project/creator/steps/ArtifactTypeStep.vue";
 import { FileUploader, ArtifactTypeCreator, TraceFileCreator } from "../panels";
 
 const steps = ref<StepperStep[]>([

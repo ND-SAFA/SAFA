@@ -9,6 +9,7 @@ from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.managers.tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.splitting.supported_split_strategy import SupportedSplitStrategy
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 from variables.experimental_variable import ExperimentalVariable
@@ -21,7 +22,7 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             [DatasetRole.PRE_TRAIN, DatasetRole.VAL])
         pre_train_creator = dataset_container_manager._dataset_creators.pop(DatasetRole.PRE_TRAIN)
         dataset_container_manager._dataset_creators[DatasetRole.TRAIN] = pre_train_creator
-        dataset_container_manager._dataset_creators[DatasetRole.VAL].split_strategy = None
+        dataset_container_manager._dataset_creators[DatasetRole.VAL].split_strategy = SupportedSplitStrategy.PRE_TRAIN
         dataset_container_manager._prepare_datasets(None)
         self.assertTrue(isinstance(dataset_container_manager[DatasetRole.VAL], PreTrainDataset))
         for role in [DatasetRole.TRAIN, DatasetRole.VAL]:

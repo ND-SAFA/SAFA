@@ -6,6 +6,7 @@ from data.datasets.pre_train_dataset import PreTrainDataset
 from data.readers.pre_train_project_reader import PreTrainProjectReader
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from util.file_util import FileUtil
+from util.override import overrides
 
 
 class PreTrainSplitStrategy(AbstractSplitStrategy):
@@ -15,14 +16,17 @@ class PreTrainSplitStrategy(AbstractSplitStrategy):
 
     SPLIT_DIR_NAME = "split_{}"
 
-    def create_split(self, dataset: PreTrainDataset) -> Tuple[PreTrainDataset, PreTrainDataset]:
+    @staticmethod
+    @overrides(AbstractSplitStrategy)
+    def create_split(dataset: PreTrainDataset, second_split_percentage: float) -> Tuple[PreTrainDataset, PreTrainDataset]:
         """
-        Creates the split of the pretraining dataset
+        Creates the split of the dataset
         :param dataset: The dataset to split.
-        :return: PreTrainDataset containing slice of data.
+        :param second_split_percentage: The percentage of the data to be contained in second split
+        :return: Dataset containing slice of data.
         """
         file_contents = FileUtil.read_file(dataset.training_file_path).split(PreTrainProjectReader.DELIMINATOR)
-        content1, content2 = AbstractSplitStrategy.split_data(file_contents, self.percent_of_split_dataset)
+        content1, content2 = AbstractSplitStrategy.split_data(file_contents, second_split_percentage)
         base_dir, filename = FileUtil.split_base_path_and_filename(dataset.training_file_path)
         splits = []
         for i, content in enumerate([content1, content2]):

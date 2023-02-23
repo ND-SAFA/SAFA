@@ -154,16 +154,20 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_creators_map: a map of dataset role to all dataset creators
         :return: a dictionary mapping dataset role to split for all split data
         """
-        split_roles_to_strategy = OrderedDict()
+        dataset_role_to_split_percentage: OrderedDict[DatasetRole, float] = OrderedDict()
+        strategies: List[SupportedSplitStrategy] = []
         for dataset_role, dataset_creator in dataset_creators_map.items():
             if isinstance(dataset_creator, SplitDatasetCreator):
                 dataset_creator.name = dataset_creators_map[DatasetRole.TRAIN].get_name()
                 split_strategy_enum = get_enum_from_name(SupportedSplitStrategy, dataset_creator.split_strategy) \
                     if not isinstance(dataset_creator.split_strategy, SupportedSplitStrategy) else dataset_creator.split_strategy
-                split_strategy = split_strategy_enum.value(dataset_creator.val_percentage)
-                split_roles_to_strategy[dataset_role] = split_strategy
-
-        splitter = DatasetSplitter(train_dataset, split_roles_to_strategy)
+                strategies.append(split_strategy_enum)
+                dataset_role_to_split_percentage[dataset_role] = dataset_creator.val_percentage
+        if len(dataset_role_to_split_percentage) < 1:
+            return {}
+        dataset_role_to_split_percentage[DatasetRole.TRAIN] = 1-sum(dataset_role_to_split_percentage.values())
+        dataset_role_to_split_percentage.move_to_end(DatasetRole.TRAIN, last=False)
+        splitter = DatasetSplitter(train_dataset, dataset_role_to_split_percentage, strategies)
         return splitter.split_dataset()
 
     @staticmethod

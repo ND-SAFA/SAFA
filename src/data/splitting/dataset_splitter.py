@@ -1,10 +1,11 @@
-from typing import List, Tuple, Type, Union, Dict
+from typing import List, Tuple, Type, Union, Dict, Iterable, OrderedDict
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.splitting.abstract_trace_split_strategy import AbstractTraceSplitStrategy
+from data.splitting.remainder_split_strategy import RemainderSplitStrategy
 from data.splitting.supported_split_strategy import SupportedSplitStrategy
 
 
@@ -13,34 +14,40 @@ class DatasetSplitter:
     Responsible for splitting a dataset via different strategies.
     """
 
-    def __init__(self, dataset: AbstractDataset, split_roles_to_strategy: Dict[DatasetRole, AbstractSplitStrategy]):
+    def __init__(self, dataset: AbstractDataset, dataset_role_to_split_percentage: OrderedDict[DatasetRole, float],
+                 strategies: List[SupportedSplitStrategy] = None):
         """
-        Creates splitter targetting given dataset.
+        Creates splitter targeting given dataset.
         :param dataset: The dataset to split.
-        :param split_roles_to_strategy: A dictionary mapping dataset role to the desired split strategy
+        :param dataset_role_to_split_percentage: A dictionary mapping dataset role to the desired split percentage
+        :param strategies: A list of strategies to apply to obtain each split
         """
         self.dataset = dataset
-        self.split_roles_to_strategy = split_roles_to_strategy
+        self.dataset_role_to_split_percentage = dataset_role_to_split_percentage
+        self.strategies = self._get_default_split_strategies() if not strategies else strategies
 
     def split_dataset(self) -> Dict[DatasetRole, AbstractDataset]:
-        percent_splits = [strategy.total_split_percentage for strategy in self.split_roles_to_strategy.values()]
+        """
+        Split the dataset based on specifications in split_roles_to_strategy
+        :return: A dictionary mapping dataset role to the corresponding split
+        """
         splits = {}
-        percent_rem = 1
         dataset = self.dataset
-        i = 0
-        for dataset_role, split_strategy in self.split_roles_to_strategy.items():
-            split_strategy.update_percent_of_split_dataset(split_strategy.total_split_percentage / percent_rem)
-            split1, dataset = split_strategy.create_split(dataset)
+        percent_already_split = 0
+        for i, items in enumerate(self.dataset_role_to_split_percentage.items()):
+            dataset_role, total_split_percentage = items
+            split_strategy = self.strategies[i].value if i < len(self.strategies) else RemainderSplitStrategy
+            percent_to_split = total_split_percentage / (1-percent_already_split)
+            split1, dataset = split_strategy.create_split(dataset, 1-percent_to_split)
             splits[dataset_role] = split1
-            i += 1
-            percent_rem = sum(percent_splits[i:])
+            percent_already_split += percent_to_split
         return splits
 
-    def _get_default_split_strategy(self) -> SupportedSplitStrategy:
+    def _get_default_split_strategies(self) -> List[SupportedSplitStrategy]:
         """
         Returns the default split strategy based on the dataset type
         :return: The default split strategy
         """
-        if isinstance(self.dataset, PreTrainDataset):
-            return SupportedSplitStrategy.PRE_TRAIN
-        return SupportedSplitStrategy.SPLIT_BY_LINK
+        default = SupportedSplitStrategy.PRE_TRAIN if isinstance(self.dataset, PreTrainDataset) \
+            else SupportedSplitStrategy.SPLIT_BY_LINK
+        return [default for i in range(len(self.dataset_role_to_split_percentage.keys())-1)]

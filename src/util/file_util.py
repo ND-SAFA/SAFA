@@ -217,3 +217,19 @@ class FileUtil:
             components.append(file_name)
         components.reverse()
         return delimiter.join(components)
+
+    @staticmethod
+    def find_all_file_paths_that_meet_condition(dir_path: str, condition: Callable = None) -> List[str]:
+        """
+        Reads all code files in directory with allowed extensions.
+        :param dir_path: Path to directory where code files live
+        :param condition: A callable that returns True if the filepath should be included
+        :return: List containing all code file paths.
+        """
+        condition = condition if condition is not None else lambda x: True
+        file_paths = []
+        for subdir, dirs, files in os.walk(dir_path):
+            for f in files:
+                if condition(f):
+                    file_paths.append(os.path.join(subdir, f))
+        return file_paths

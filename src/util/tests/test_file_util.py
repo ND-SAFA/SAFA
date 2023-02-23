@@ -66,3 +66,20 @@ class TestFileUtil(BaseTest):
         self.assertEqual("456", FileUtil.get_file_name("123/456"))
         self.assertEqual("123-456", FileUtil.get_file_name("123/456", 1))
         self.assertEqual("def-123-456", FileUtil.get_file_name("abc/def/123/456", 2))
+
+    def test_find_all_file_paths_that_meet_condition(self):
+        """
+        Tests that move dir contents moves all files inside the directory to the specified location
+        """
+        base_dir = os.path.join(TEST_OUTPUT_DIR, "base_dir")
+        nested_dir = os.path.join(base_dir, "nested_dir")
+        files = ["file1.txt", "file2.txt"]
+
+        for filename in files:  # create empty files
+            FileUtil.safe_open_w(os.path.join(base_dir, filename))
+            FileUtil.safe_open_w(os.path.join(nested_dir, filename))
+
+        file_paths = FileUtil.find_all_file_paths_that_meet_condition(base_dir, lambda x: "2" in x)
+        self.assertIn(os.path.join(base_dir, files[1]), file_paths)
+        self.assertIn(os.path.join(nested_dir, files[1]), file_paths)
+

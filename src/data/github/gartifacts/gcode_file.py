@@ -1,7 +1,9 @@
+import io
 import os
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Union, List, Set, Iterable
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
+from data.github.github_constants import ALLOWED_CODE_EXTENSIONS
 from util.file_util import FileUtil
 from util.override import overrides
 
@@ -61,3 +63,28 @@ class GCodeFile(AbstractGithubArtifact):
         :return: None
         """
         self.content = cleaner(self.content)
+
+    @staticmethod
+    def ends_with_allowed_code_ext(filename: str, allowed_code_ext: Set[str]) -> bool:
+        """
+        Determine if file has allowed extensions.
+        :param filename: The file to check if it ends with an appropriate code ext
+        :param allowed_code_ext: A list of allowed code ext
+        :return: True if contains allowed extension else False.
+        """
+        for code_ext in allowed_code_ext:
+            if filename.endswith(code_ext):
+                return True
+        return False
+
+    @staticmethod
+    def get_all_code_files_with_ext(dir_path: str, allowed_code_ext: Iterable[str] = None):
+        """
+        Reads all code files in directory with allowed extensions.
+        :param dir_path: The path to the directory containing the code files
+        :param allowed_code_ext: A list of allowed code ext
+        :return: List containing all code file paths.
+        """
+        allowed_code_ext = ALLOWED_CODE_EXTENSIONS if allowed_code_ext is None else allowed_code_ext
+        return FileUtil.find_all_file_paths_that_meet_condition(dir_path,
+                                                                lambda f: GCodeFile.ends_with_allowed_code_ext(f, allowed_code_ext))

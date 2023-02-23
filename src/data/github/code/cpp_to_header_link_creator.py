@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Tuple
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gtraces.glink import GLink
+from util.file_util import FileUtil
 
 ARTIFACTS_TYPE = Dict[str, GCodeFile]
 LINKS_TYPE = Dict[str, GLink]
@@ -16,6 +17,7 @@ class CPPToHeaderLinkCreator:
     CPP_FOLDER_NAME = "source"
     HEADER_FOLDER_NAME = "include"
     HEADER_EXT = "hpp"
+    CPP_EXT = "cpp"
 
     def __init__(self, cpp_file_paths: List[str], base_path: str):
         """
@@ -118,8 +120,8 @@ class CPPToHeaderLinkCreator:
         :param file_path: The full path to the file
         :return The base path and the file name without the ext
         """
-        file_name = os.path.basename(file_path)
-        return os.path.dirname(file_path), os.path.splitext(file_name)[0]
+        base_path, file_name = FileUtil.split_base_path_and_filename(file_path)
+        return base_path, os.path.splitext(file_name)[0]
 
     @staticmethod
     def _get_all_cpp_files_in_dir(dir_path: str) -> List[str]:
@@ -128,11 +130,4 @@ class CPPToHeaderLinkCreator:
         :param dir_path: The path to the directory
         :return a list of all cpp files in a directory
         """
-        cpp_files = []
-        for file in os.listdir(dir_path):
-            full_path = os.path.join(dir_path, file)
-            if os.path.isdir(full_path):
-                cpp_files.extend(CPPToHeaderLinkCreator._get_all_cpp_files_in_dir(full_path))
-            if os.path.splitext(file)[-1] == ".cpp":
-                cpp_files.append(full_path)
-        return cpp_files
+        return GCodeFile.get_all_code_files_with_ext(dir_path, {f".{CPPToHeaderLinkCreator.CPP_EXT}"})

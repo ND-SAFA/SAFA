@@ -20,7 +20,7 @@ from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.gartifacts.gpull import GPull
-from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
+from data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
     ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
 from util.logging.logger_manager import logger
@@ -139,14 +139,8 @@ class RepositoryDownloader:
         Reads all code files in clone.
         :return: GArtifacSet containing all code files.
         """
-        code_artifacts = []
-        for subdir, dirs, files in os.walk(self.clone_path):
-            for f in files:
-                for code_ext in ALLOWED_CODE_EXTENSIONS:
-                    if f.endswith(code_ext):
-                        file_path = os.path.join(subdir, f)
-                        code_artifacts.append(GCodeFile(file_path, self.base_path))
-        return GArtifactSet(code_artifacts, GArtifactType.CODE)
+        code_file_paths = GCodeFile.get_all_code_files_with_ext(self.clone_path)
+        return GArtifactSet([GCodeFile(file_path, self.base_path) for file_path in code_file_paths], GArtifactType.CODE)
 
     def __get_repo(self) -> Repository:
         """

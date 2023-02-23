@@ -11,4 +11,4 @@ class IceoryxCodeTrain(IceoryxCode):
         """
         :return: Returns the name of the eval data file.
         """
-        return "code_train"
+        return "code-train"

@@ -1,15 +1,15 @@
 <template>
   <stepper-list-step
     title="GitHub Organizations"
-    :item-count="organizations.length"
-    :loading="organizationsLoading"
     empty-message="There are no organizations."
+    :item-count="organizations.length"
+    :loading="loading"
   >
-    <template v-for="organization in organizations" :key="organization.id">
-      <v-list-item three-line @click="handleOrganizationSelect(organization)">
-        <v-list-item-title v-text="organization.name" />
-      </v-list-item>
-    </template>
+    <list :items="organizations">
+      <template #item="{ item }">
+        <list-item :title="item.name" @click="handleOrganizationSelect(item)" />
+      </template>
+    </list>
   </stepper-list-step>
 </template>
 
@@ -23,23 +23,23 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { GitHubOrganizationSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadGitHubProjects } from "@/api";
-import { StepperListStep } from "@/components/common";
+import { StepperListStep, List, ListItem } from "@/components/common";
 
 const organizations = ref<GitHubOrganizationSchema[]>([]);
-const organizationsLoading = ref(false);
+const loading = ref(false);
 
 /**
  * Loads a user's GitHub organizations.
  */
-async function loadOrganizations() {
+async function handleReload() {
   if (!integrationsStore.validGitHubCredentials) return;
 
   integrationsStore.gitHubOrganization = undefined;
-  organizationsLoading.value = true;
+  loading.value = true;
 
   handleLoadGitHubProjects({
     onSuccess: (projects) => {
@@ -50,10 +50,8 @@ async function loadOrganizations() {
 
         organizations.value.push({ id: owner, name: owner });
       });
-
-      organizationsLoading.value = false;
     },
-    onError: () => (organizationsLoading.value = false),
+    onComplete: () => (loading.value = false),
   });
 }
 
@@ -67,8 +65,10 @@ function handleOrganizationSelect(
   integrationsStore.selectGitHubOrganization(selectedOrganization);
 }
 
+onMounted(() => handleReload());
+
 watch(
   () => integrationsStore.validGitHubCredentials,
-  () => loadOrganizations()
+  () => handleReload()
 );
 </script>

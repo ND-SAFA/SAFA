@@ -61,7 +61,7 @@ import FlexBox from "@/components/common/layout/FlexBox.vue";
 
 const props = defineProps<{
   /**
-   * The current step number.
+   * The current 1-based step number.
    */
   modelValue: number;
   /**

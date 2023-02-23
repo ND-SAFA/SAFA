@@ -1,5 +1,10 @@
 <template>
-  <q-card flat bordered :class="className">
+  <q-card
+    flat
+    bordered
+    :class="className"
+    style="border-left-width: 4px !important"
+  >
     <slot />
   </q-card>
 </template>

@@ -1,17 +1,19 @@
 <template>
   <div>
-    <flex-box class="width-fit" align="center">
-      <slot name="before" />
-      <v-tabs v-model="model" class="bg-transparent">
-        <v-tab v-for="{ name } in tabs" :key="name" class="bg-transparent">
-          <typography :value="name" />
-        </v-tab>
-      </v-tabs>
-      <slot name="after" />
-    </flex-box>
-    <v-window v-model="model" class="mt-1">
-      <slot />
-    </v-window>
+    <q-tabs v-model="model" active-color="primary">
+      <q-tab
+        v-for="{ id, name } in tabs"
+        :key="id"
+        :name="id"
+        :label="name"
+        no-caps
+      />
+    </q-tabs>
+    <q-tab-panels v-model="model" animated class="bg-transparent">
+      <q-tab-panel v-for="{ id } in tabs" :key="id" :name="id" class="q-pt-sm">
+        <slot :name="id" />
+      </q-tab-panel>
+    </q-tab-panels>
   </div>
 </template>
 
@@ -28,15 +30,13 @@ export default {
 <script setup lang="ts">
 import { SelectOption } from "@/types";
 import { useVModel } from "@/hooks";
-import { FlexBox } from "@/components/common/layout";
-import Typography from "../Typography.vue";
 
 const props = defineProps<{
   modelValue: number;
   tabs: SelectOption[];
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:modelValue", value: number): void;
 }>();
 

@@ -3,83 +3,66 @@
     title="Jira Organizations"
     empty-message="There are no organizations."
     :item-count="organizations.length"
-    :loading="organizationsLoading"
+    :loading="loading"
   >
-    <template v-for="organization in organizations" :key="organization.id">
-      <v-list-item @click="handleOrganizationSelect(organization)">
-        <v-list-item-content>
-          <v-list-item-title v-text="organization.name" />
-        </v-list-item-content>
-      </v-list-item>
-    </template>
+    <list :items="organizations">
+      <template #item="{ item }">
+        <list-item :title="item.name" @click="handleOrganizationSelect(item)" />
+      </template>
+    </list>
   </stepper-list-step>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { JiraOrganizationSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadJiraOrganizations } from "@/api";
-import { StepperListStep } from "@/components";
-
 /**
  * Allows for selecting a jira organization.
  */
-export default defineComponent({
+export default {
   name: "JiraOrganizationSelector",
-  components: {
-    StepperListStep,
-  },
-  data() {
-    return {
-      organizations: [] as JiraOrganizationSchema[],
-      organizationsLoading: false,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return integrationsStore.validJiraCredentials;
-    },
-  },
-  watch: {
-    /**
-     * Loads organizations when credentials are valid.
-     */
-    hasCredentials(): void {
-      this.loadOrganizations();
-    },
-  },
-  mounted() {
-    this.loadOrganizations();
-  },
-  methods: {
-    /**
-     * Loads a user's Jira organizations.
-     */
-    async loadOrganizations() {
-      if (!integrationsStore.validJiraCredentials) return;
+};
+</script>
 
-      integrationsStore.jiraOrganization = undefined;
-      this.organizationsLoading = true;
+<script setup lang="ts">
+import { watch, ref, onMounted } from "vue";
+import { JiraOrganizationSchema } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadJiraOrganizations } from "@/api";
+import { StepperListStep, List, ListItem } from "@/components/common";
 
-      handleLoadJiraOrganizations({
-        onSuccess: (organizations) => {
-          this.organizations = organizations;
-          this.organizationsLoading = false;
-        },
-        onError: () => (this.organizationsLoading = false),
-      });
+const organizations = ref<JiraOrganizationSchema[]>([]);
+const loading = ref(false);
+
+/**
+ * Reloads the organizations list.
+ */
+function handleReload(): void {
+  if (!integrationsStore.validJiraCredentials) return;
+
+  integrationsStore.jiraOrganization = undefined;
+  loading.value = true;
+
+  handleLoadJiraOrganizations({
+    onSuccess: (jiraOrganizations) => {
+      organizations.value = jiraOrganizations;
     },
-    /**
-     * Handles a click to select an organization.
-     * @param organization - The organization to select.
-     */
-    handleOrganizationSelect(organization: JiraOrganizationSchema | undefined) {
-      integrationsStore.selectJiraOrganization(organization);
-    },
-  },
-});
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Handles a click to select an organization.
+ * @param jiraOrganization - The organization to select.
+ */
+function handleOrganizationSelect(
+  jiraOrganization: JiraOrganizationSchema | undefined
+) {
+  integrationsStore.selectJiraOrganization(jiraOrganization);
+}
+
+onMounted(() => handleReload());
+
+watch(
+  () => integrationsStore.validGitHubCredentials,
+  () => handleReload()
+);
 </script>

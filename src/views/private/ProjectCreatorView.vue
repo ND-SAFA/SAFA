@@ -1,5 +1,8 @@
 <template>
-  <private-page>
+  <private-page
+    title="Create Project"
+    subtitle="Create a project using one of the following methods."
+  >
     <project-creator />
   </private-page>
 </template>

@@ -8,7 +8,7 @@
 
 <script lang="ts">
 /**
- * A generic list component
+ * A generic list component.
  */
 export default {
   name: "List",

@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 40em">
+  <div class="q-mx-auto" style="max-width: 40em">
     <text-input
       v-model="nameText"
       label="Project Name"

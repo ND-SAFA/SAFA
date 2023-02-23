@@ -6,7 +6,7 @@
       :data-cy-name="props.dataCyName"
       :data-cy-description="props.dataCyDescription"
     />
-    <div style="max-width: 40em">
+    <div style="max-width: 40em" class="q-mx-auto">
       <switch-input
         v-model="emptyFiles"
         class="mt-0"

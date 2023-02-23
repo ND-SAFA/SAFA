@@ -3,7 +3,7 @@
     title="GitHub"
     :loading="loading"
     :has-credentials="hasCredentials"
-    :inactive="inactive"
+    :inactive="props.inactive"
     @click="emit('click')"
     @connect="handleAuthentication"
     @disconnect="handleDeleteCredentials"

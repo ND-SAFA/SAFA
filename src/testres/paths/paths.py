@@ -8,4 +8,5 @@ PRETRAIN_DIR = join(TEST_DATA_DIR, "pre_train")
 #
 TEST_RESULT_READER = join(TEST_DATA_DIR, "result_reader")
 # github
-GITHUB_REPO_ARTIFACTS_DIR = join(TEST_DATA_DIR, "github", "artifacts")
+GITHUB_REPO_DIR = join(TEST_DATA_DIR, "github")
+GITHUB_REPO_ARTIFACTS_DIR = join(GITHUB_REPO_DIR, "artifacts")

@@ -1,5 +1,5 @@
 <template>
-  <file-list-step
+  <file-panel-list
     label="Artifact Type"
     :panels="panels"
     @panel:add="handleAddPanel"
@@ -8,7 +8,7 @@
     <template #panel="{ panel }">
       <text-input v-model="panel.name" label="Artifact Type" />
     </template>
-  </file-list-step>
+  </file-panel-list>
 </template>
 
 <script lang="ts">
@@ -22,18 +22,18 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { CreatorFilePanel } from "@/types";
 import { TextInput } from "@/components/common";
-import FileListStep from "./FileListStep.vue";
+import FilePanelList from "./FilePanelList.vue";
 
 // const props = defineProps<{}>();
 
 // const emit = defineEmits<{}>();
 
-const createEmptyPanel = () => ({
+const createEmptyPanel = (): CreatorFilePanel => ({
   name: "",
   open: true,
   ignoreErrors: false,
-  file: undefined as File | undefined,
 });
 
 const panels = ref([createEmptyPanel()]);

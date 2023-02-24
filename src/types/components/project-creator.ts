@@ -62,3 +62,14 @@ export enum CreatorTabTypes {
   bulk = "bulk",
   import = "import",
 }
+
+/**
+ * Represents a panel for uploading files in the project creator.
+ */
+export interface CreatorFilePanel {
+  name: string;
+  open: boolean;
+  ignoreErrors: boolean;
+  file?: File;
+  errorMessage?: string;
+}

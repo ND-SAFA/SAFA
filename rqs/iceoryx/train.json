@@ -27,9 +27,9 @@
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",
-            "save_steps": 100,
-            "eval_steps": 100,
-            "logging_steps": 10
+            "save_steps": 5,
+            "eval_steps": 5,
+            "logging_steps": 1
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

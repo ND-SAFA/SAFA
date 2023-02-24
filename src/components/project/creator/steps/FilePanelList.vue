@@ -7,8 +7,10 @@
         v-for="(panel, idx) in panels"
         :key="idx"
         :panel="panel"
-        :label="props.label"
-        @panel:delete="emit('panel:delete', idx)"
+        :index="idx"
+        :label="label"
+        :new-label="newLabel"
+        :variant="props.variant"
       >
         <template #panel>
           <slot name="panel" :panel="panel" />
@@ -22,7 +24,7 @@
         icon="add"
         :label="newLabel"
         data-cy="button-delete-artifact"
-        @click="emit('panel:add')"
+        @click="handleAddPanel"
       />
     </flex-box>
   </div>
@@ -39,7 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { CreatorFilePanel } from "@/types";
+import { projectSaveStore } from "@/hooks";
 import {
   TextButton,
   FlexBox,
@@ -49,14 +51,26 @@ import {
 import FilePanel from "./FilePanel.vue";
 
 const props = defineProps<{
-  panels: CreatorFilePanel[];
-  label: string;
+  variant: "artifact" | "trace";
 }>();
 
-const emit = defineEmits<{
-  (e: "panel:add"): void;
-  (e: "panel:delete", index: number): void;
-}>();
+// const emit = defineEmits<{}>();
 
-const newLabel = computed(() => `New ${props.label}`);
+const label = computed(() =>
+  props.variant === "artifact" ? "Artifact Type" : "Trace Matrix"
+);
+const newLabel = computed(() => `New ${label.value}`);
+
+const panels = computed(() =>
+  props.variant === "artifact"
+    ? projectSaveStore.artifactPanels
+    : projectSaveStore.tracePanels
+);
+
+/**
+ * Adds a new panel.
+ */
+function handleAddPanel(): void {
+  projectSaveStore.addPanel(props.variant);
+}
 </script>

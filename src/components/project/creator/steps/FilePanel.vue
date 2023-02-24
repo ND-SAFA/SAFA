@@ -8,6 +8,12 @@
   >
     <div class="q-mx-md">
       <slot name="panel" :panel="panel" />
+      <text-input
+        v-if="props.variant === 'artifact'"
+        v-model="panel.type"
+        label="Artifact Type"
+        hint="Required"
+      />
       <file-input
         v-model="panel.file"
         :multiple="false"
@@ -23,11 +29,7 @@
         <typography v-if="!isValid" :value="errorMessage" color="negative" />
       </flex-box>
       <flex-box justify="end">
-        <text-button
-          icon="delete"
-          label="Delete"
-          @click="emit('panel:delete')"
-        />
+        <text-button icon="delete" label="Delete" @click="handleDeletePanel" />
       </flex-box>
     </div>
   </expansion-item>
@@ -44,8 +46,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { ArtifactMap, CreatorFilePanel } from "@/types";
+import { CreatorFilePanel } from "@/types";
 import { getIcon } from "@/util";
+import { projectSaveStore } from "@/hooks";
 import { parseFilePanel } from "@/api";
 import {
   ExpansionItem,
@@ -54,19 +57,18 @@ import {
   TextButton,
   FlexBox,
   Typography,
+  TextInput,
 } from "@/components/common";
 
 const props = defineProps<{
-  artifactMap: ArtifactMap;
   panel: CreatorFilePanel;
+  index: number;
+  variant: "artifact" | "trace";
   label: string;
+  newLabel: string;
 }>();
 
-const emit = defineEmits<{
-  (e: "panel:delete"): void;
-}>();
-
-const newLabel = computed(() => `New ${props.label}`);
+// const emit = defineEmits<{}>();
 
 const errorMessage = computed(() => {
   if (props.panel.ignoreErrors) {
@@ -90,6 +92,13 @@ const iconId = computed(() =>
   isValid.value ? getIcon("success") : getIcon("error")
 );
 
+/**
+ * Deletes the current file panel.
+ */
+function handleDeletePanel() {
+  projectSaveStore.removePanel(props.variant, props.index);
+}
+
 watch(
   () => props.panel.type,
   (type) => {
@@ -110,6 +119,6 @@ watch(
 
 watch(
   () => props.panel.file,
-  () => parseFilePanel(props.panel, props.artifactMap)
+  () => parseFilePanel(props.panel, projectSaveStore.artifactMap)
 );
 </script>

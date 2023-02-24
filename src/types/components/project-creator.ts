@@ -1,4 +1,9 @@
-import { ArtifactSchema, LinkSchema, TraceLinkSchema } from "@/types/domain";
+import {
+  ArtifactSchema,
+  LinkSchema,
+  ModelType,
+  TraceLinkSchema,
+} from "@/types/domain";
 import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 /**
@@ -70,12 +75,18 @@ export interface CreatorFilePanel {
   variant: "artifact" | "trace";
   name: string;
   type: string;
-  toType?: string;
   open: boolean;
   ignoreErrors: boolean;
   itemNames: string[];
   file?: File;
   errorMessage?: string;
+
+  // Artifacts
   artifacts?: ArtifactSchema[];
+
+  // Traces
+  toType?: string;
+  isGenerated: boolean;
+  generateMethod: ModelType;
   traces?: TraceLinkSchema[];
 }

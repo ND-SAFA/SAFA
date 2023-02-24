@@ -73,6 +73,7 @@ export interface CreatorFilePanel {
   toType?: string;
   open: boolean;
   ignoreErrors: boolean;
+  itemNames: string[];
   file?: File;
   errorMessage?: string;
   artifacts?: ArtifactSchema[];

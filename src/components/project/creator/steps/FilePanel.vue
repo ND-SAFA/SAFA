@@ -44,9 +44,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { CreatorFilePanel } from "@/types";
+import { ArtifactMap, CreatorFilePanel } from "@/types";
 import { getIcon } from "@/util";
-import { parseArtifactFile } from "@/api";
+import { parseFilePanel } from "@/api";
 import {
   ExpansionItem,
   FileInput,
@@ -55,9 +55,9 @@ import {
   FlexBox,
   Typography,
 } from "@/components/common";
-import { parseFilePanel } from "@/api/handlers/project/parse-handler";
 
 const props = defineProps<{
+  artifactMap: ArtifactMap;
   panel: CreatorFilePanel;
   label: string;
 }>();
@@ -110,6 +110,6 @@ watch(
 
 watch(
   () => props.panel.file,
-  () => parseFilePanel(props.panel)
+  () => parseFilePanel(props.panel, props.artifactMap)
 );
 </script>

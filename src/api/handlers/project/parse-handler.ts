@@ -1,13 +1,29 @@
-import { CreatorFilePanel } from "@/types";
-import { parseArtifactFile } from "@/api";
+import {
+  ArtifactMap,
+  ArtifactSchema,
+  CreatorFilePanel,
+  LinkSchema,
+  TraceFile,
+  TraceLinkSchema,
+} from "@/types";
+import { extractTraceId } from "@/util";
+import { parseArtifactFile, parseTraceFile } from "@/api";
 
 /**
  * Parses a file for the project creator.
  *
  * @param panel - The panel to parse the file of.
+ * @param artifactMap - A collection of all parsed artifacts, keyed by name.
  */
-export function parseFilePanel(panel: CreatorFilePanel): void {
+export function parseFilePanel(
+  panel: CreatorFilePanel,
+  artifactMap: ArtifactMap
+): void {
   if (!panel.file) return;
+
+  const handleError = () => {
+    panel.errorMessage = "Unable to parse this file";
+  };
 
   if (panel.variant === "artifact") {
     parseArtifactFile(panel.type, panel.file)
@@ -15,9 +31,61 @@ export function parseFilePanel(panel: CreatorFilePanel): void {
         panel.artifacts = entities;
         panel.errorMessage =
           errors.length === 0 ? undefined : errors.join(", ");
+        panel.itemNames = entities.map(({ name }) => name);
+
+        entities.forEach((artifact) => {
+          artifactMap[artifact.name] = artifact;
+        });
       })
-      .catch(() => {
-        panel.errorMessage = "Unable to parse this file";
-      });
+      .catch(handleError);
+  } else {
+    parseTraceFile(panel.file)
+      .then(({ entities, errors }) => {
+        panel.traces = entities;
+
+        errors.push(...getTraceErrors(panel, artifactMap, entities));
+
+        panel.errorMessage =
+          errors.length === 0 ? undefined : errors.join(", ");
+        panel.itemNames = entities.map(extractTraceId);
+      })
+      .catch(handleError);
   }
+}
+
+/**
+ * Returns any errors for the given trace links.
+ *
+ * @param panel - The panel for uploading trace links.
+ * @param artifactMap - A collection of all artifacts.
+ * @param traces - The traces to check for errors.
+ * @return The error message, if there is one.
+ */
+function getTraceErrors(
+  panel: CreatorFilePanel,
+  artifactMap: ArtifactMap,
+  traces: TraceLinkSchema[]
+): string[] {
+  const errors: string[] = [];
+
+  traces.forEach(({ sourceName, targetName }) => {
+    if (!(sourceName in artifactMap)) {
+      errors.push(`Artifact ${sourceName} does not exist`);
+    } else if (!(targetName in artifactMap)) {
+      errors.push(`Artifact ${targetName} does not exist`);
+    } else {
+      const sourceArtifact = artifactMap[sourceName];
+      const targetArtifact = artifactMap[targetName];
+
+      if (sourceArtifact.type !== panel.type) {
+        errors.push(`${sourceArtifact.name} is not of type ${panel.type}`);
+      }
+
+      if (targetArtifact.type !== panel.toType) {
+        errors.push(`${targetArtifact.name} is not of type ${panel.toType}`);
+      }
+    }
+  });
+
+  return errors;
 }

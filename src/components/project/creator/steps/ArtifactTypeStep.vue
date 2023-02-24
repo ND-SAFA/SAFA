@@ -22,11 +22,13 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { CreatorFilePanel } from "@/types";
+import { ArtifactMap, CreatorFilePanel } from "@/types";
 import { TextInput } from "@/components/common";
 import FilePanelList from "./FilePanelList.vue";
 
-// const props = defineProps<{}>();
+const props = defineProps<{
+  artifactMap: ArtifactMap;
+}>();
 
 // const emit = defineEmits<{}>();
 
@@ -36,6 +38,7 @@ const createEmptyPanel = (): CreatorFilePanel => ({
   type: "",
   open: true,
   ignoreErrors: false,
+  itemNames: [],
 });
 
 const panels = ref([createEmptyPanel()]);

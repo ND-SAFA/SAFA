@@ -28,13 +28,13 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
+                "object_type": "HUB",
+                "name": "cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
+              "split_strategy": "SPLIT_BY_SOURCE",
               "val_percentage": 0.15
             },
             "eval_dataset_creator": {

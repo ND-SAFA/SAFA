@@ -43,9 +43,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { CreatorFilePanel } from "@/types";
 import { getIcon } from "@/util";
+import { parseArtifactFile } from "@/api";
 import {
   ExpansionItem,
   FileInput,
@@ -54,6 +55,7 @@ import {
   FlexBox,
   Typography,
 } from "@/components/common";
+import { parseFilePanel } from "@/api/handlers/project/parse-handler";
 
 const props = defineProps<{
   panel: CreatorFilePanel;
@@ -86,5 +88,28 @@ const headerClass = computed(() =>
 
 const iconId = computed(() =>
   isValid.value ? getIcon("success") : getIcon("error")
+);
+
+watch(
+  () => props.panel.type,
+  (type) => {
+    if (props.panel.variant === "trace") return;
+
+    props.panel.name = type;
+  }
+);
+
+watch(
+  () => [props.panel.type, props.panel.toType],
+  ([fromType, toType]) => {
+    if (props.panel.variant === "artifact") return;
+
+    props.panel.name = `${fromType} to ${toType}`;
+  }
+);
+
+watch(
+  () => props.panel.file,
+  () => parseFilePanel(props.panel)
 );
 </script>

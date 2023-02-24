@@ -6,7 +6,7 @@
     @panel:delete="handleDeletePanel"
   >
     <template #panel="{ panel }">
-      <text-input v-model="panel.name" label="Artifact Type" />
+      <text-input v-model="panel.type" label="Artifact Type" hint="Required" />
     </template>
   </file-panel-list>
 </template>
@@ -31,7 +31,9 @@ import FilePanelList from "./FilePanelList.vue";
 // const emit = defineEmits<{}>();
 
 const createEmptyPanel = (): CreatorFilePanel => ({
+  variant: "artifact",
   name: "",
+  type: "",
   open: true,
   ignoreErrors: false,
 });

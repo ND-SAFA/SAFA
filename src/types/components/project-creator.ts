@@ -1,4 +1,4 @@
-import { ArtifactSchema, LinkSchema } from "@/types/domain";
+import { ArtifactSchema, LinkSchema, TraceLinkSchema } from "@/types/domain";
 import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 /**
@@ -67,9 +67,14 @@ export enum CreatorTabTypes {
  * Represents a panel for uploading files in the project creator.
  */
 export interface CreatorFilePanel {
+  variant: "artifact" | "trace";
   name: string;
+  type: string;
+  toType?: string;
   open: boolean;
   ignoreErrors: boolean;
   file?: File;
   errorMessage?: string;
+  artifacts?: ArtifactSchema[];
+  traces?: TraceLinkSchema[];
 }

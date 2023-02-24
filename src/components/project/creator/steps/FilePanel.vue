@@ -1,13 +1,13 @@
 <template>
   <expansion-item
-    v-model="panel.open"
-    :label="panel.name || newLabel"
+    v-model="props.panel.open"
+    :label="props.panel.name || newLabel"
     :caption="props.label"
     :icon="iconId"
     :header-class="headerClass"
   >
     <div class="q-mx-md">
-      <slot name="panel" :panel="panel" />
+      <slot name="panel" :panel="props.panel" />
 
       <flex-box
         v-if="props.variant === 'trace'"
@@ -16,7 +16,7 @@
         y="2"
       >
         <select-input
-          v-model="panel.type"
+          v-model="props.panel.type"
           label="Source Type"
           :options="artifactTypes"
           hint="Required"
@@ -25,7 +25,7 @@
         />
         <icon class="q-mx-md" variant="trace" size="md" />
         <select-input
-          v-model="panel.toType"
+          v-model="props.panel.toType"
           label="Target Type"
           :options="artifactTypes"
           hint="Required"
@@ -35,15 +35,15 @@
       </flex-box>
       <text-input
         v-if="props.variant === 'artifact'"
-        v-model="panel.type"
+        v-model="props.panel.type"
         label="Artifact Type"
         hint="Required"
         data-cy="input-artifact-type"
       />
 
       <file-input
-        v-if="!props.panel.isGenerated"
-        v-model="panel.file"
+        v-if="!isGenerated"
+        v-model="props.panel.file"
         :multiple="false"
         data-cy="input-files-panel"
       />
@@ -52,21 +52,22 @@
         v-if="props.variant === 'trace'"
         full-width
         justify="between"
+        align="center"
         y="2"
       >
         <switch-input
-          v-model="panel.isGenerated"
+          v-model="props.panel.isGenerated"
           label="Generate Trace Links"
         />
         <gen-method-input
-          v-if="panel.isGenerated"
-          v-model="panel.generateMethod"
+          v-if="isGenerated"
+          v-model="props.panel.generateMethod"
         />
       </flex-box>
 
       <flex-box full-width justify="between" y="2">
         <switch-input
-          v-model="panel.ignoreErrors"
+          v-model="props.panel.ignoreErrors"
           label="Ignore Errors"
           color="grey"
           class="q-mr-sm"
@@ -126,9 +127,9 @@ import {
   GenMethodInput,
   Icon,
   SelectInput,
+  List,
+  AttributeChip,
 } from "@/components/common";
-import List from "@/components/common/display/list/List.vue";
-import AttributeChip from "@/components/common/display/attribute/AttributeChip.vue";
 
 const props = defineProps<{
   panel: CreatorFilePanel;
@@ -163,6 +164,8 @@ const iconId = computed(() =>
 );
 
 const artifactTypes = computed(() => projectSaveStore.artifactTypes);
+
+const isGenerated = computed(() => props.panel.isGenerated);
 
 /**
  * Deletes the current file panel.
@@ -203,6 +206,17 @@ watch(
       props.panel.itemNames = [];
       props.panel.errorMessage = undefined;
     }
+  }
+);
+
+watch(
+  () => isValid.value,
+  (valid) => {
+    props.panel.isValid = valid;
+
+    if (!valid) return;
+
+    props.panel.open = false;
   }
 );
 </script>

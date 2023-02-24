@@ -15,10 +15,18 @@
         />
       </template>
       <template #2>
-        <artifact-type-step />
+        <file-panel-list
+          label="Artifact Type"
+          variant="artifact"
+          @validate="handleValidateArtifacts"
+        />
       </template>
       <template #3>
-        <trace-matrix-step />
+        <file-panel-list
+          label="Trace Matrix"
+          variant="trace"
+          @validate="handleValidateTraces"
+        />
       </template>
       <template #4>
         <tim-tree :visible="currentStep === 4" />
@@ -42,15 +50,12 @@ import { handleImportProject } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
 import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
-import {
-  ArtifactTypeStep,
-  TraceMatrixStep,
-} from "@/components/project/creator/steps";
+import { FilePanelList } from "@/components/project/creator/steps";
 
 const steps = ref<StepperStep[]>([
   { title: "Name Project", done: false },
-  { title: "Upload Artifacts", done: true },
-  { title: "Upload Trace Links", done: true },
+  { title: "Upload Artifacts", done: false },
+  { title: "Upload Trace Links", done: false },
   { title: "View TIM", done: true },
 ]);
 const currentRoute = useRoute();
@@ -72,6 +77,22 @@ const description = computed({
 function handleClearData() {
   projectSaveStore.resetProject();
   currentStep.value = 1;
+}
+
+/**
+ * Updates whether the artifact step is valid.
+ * @param isValid - Whether the step is valid.
+ */
+function handleValidateArtifacts(isValid: boolean): void {
+  steps.value[1].done = isValid;
+}
+
+/**
+ * Updates whether the trace step is valid.
+ * @param isValid - Whether the step is valid.
+ */
+function handleValidateTraces(isValid: boolean): void {
+  steps.value[2].done = isValid;
 }
 
 /**

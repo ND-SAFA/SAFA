@@ -76,6 +76,7 @@ export interface CreatorFilePanel {
   name: string;
   type: string;
   open: boolean;
+  isValid: boolean;
   ignoreErrors: boolean;
   itemNames: string[];
   file?: File;

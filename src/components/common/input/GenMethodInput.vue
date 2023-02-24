@@ -3,14 +3,12 @@
     v-model="model"
     filled
     label="Model"
-    :items="options"
+    :options="options"
     option-value="id"
+    option-label="id"
   >
     <template #option="{ opt, itemProps }">
-      <div class="q-my-sm" v-bind="itemProps">
-        <typography el="div" :value="opt.id" />
-        <typography variant="caption" :value="opt.name" />
-      </div>
+      <list-item v-bind="itemProps" :title="opt.id" :subtitle="opt.name" />
     </template>
   </q-select>
 </template>
@@ -25,9 +23,10 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { traceModelOptions } from "@/util";
 import { useVModel } from "@/hooks";
-import { Typography } from "@/components/common/display";
+import ListItem from "@/components/common/display/list/ListItem.vue";
 
 const props = defineProps<{
   modelValue?: string;

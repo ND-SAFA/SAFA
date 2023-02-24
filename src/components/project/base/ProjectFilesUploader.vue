@@ -24,6 +24,7 @@
         color="primary"
         :disabled="disabled"
         :loading="loading"
+        class="q-mt-md"
         data-cy="button-create-project"
         @click="handleCreate"
       />

@@ -40,7 +40,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { projectSaveStore } from "@/hooks";
 import {
   TextButton,
@@ -54,7 +54,9 @@ const props = defineProps<{
   variant: "artifact" | "trace";
 }>();
 
-// const emit = defineEmits<{}>();
+const emit = defineEmits<{
+  (e: "validate", isValid: boolean): void;
+}>();
 
 const label = computed(() =>
   props.variant === "artifact" ? "Artifact Type" : "Trace Matrix"
@@ -67,10 +69,21 @@ const panels = computed(() =>
     : projectSaveStore.tracePanels
 );
 
+const isValid = computed(() =>
+  panels.value
+    .map(({ isValid }) => isValid)
+    .reduce((acc, cur) => acc && cur, true)
+);
+
 /**
  * Adds a new panel.
  */
 function handleAddPanel(): void {
   projectSaveStore.addPanel(props.variant);
 }
+
+watch(
+  () => isValid.value,
+  (valid) => emit("validate", valid)
+);
 </script>

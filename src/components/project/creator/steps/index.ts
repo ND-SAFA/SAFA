@@ -1,2 +1,1 @@
-export { default as ArtifactTypeStep } from "./ArtifactTypeStep.vue";
-export { default as TraceMatrixStep } from "./TraceMatrixStep.vue";
+export { default as FilePanelList } from "./FilePanelList.vue";

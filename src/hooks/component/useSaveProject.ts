@@ -2,13 +2,11 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactMap,
-  ArtifactUploader,
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
   ModelType,
   ProjectRole,
-  TraceUploader,
 } from "@/types";
 import { createProject } from "@/util";
 import sessionStore from "@/hooks/core/useSession";
@@ -19,6 +17,7 @@ const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
   name: "",
   type: "",
   open: true,
+  isValid: false,
   ignoreErrors: false,
   itemNames: [],
   isGenerated: false,

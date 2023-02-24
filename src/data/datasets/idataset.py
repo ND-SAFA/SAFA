@@ -5,7 +5,7 @@ from models.model_manager import ModelManager
 from util.base_object import BaseObject
 
 
-class AbstractDataset(BaseObject):
+class iDataset(BaseObject):
 
     @abstractmethod
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:

@@ -25,7 +25,7 @@ class TestBalancedBatchSampler(BaseTraceTest):
 
     def test_get_pos_neg_link_indices(self):
         sampler = self.get_sampler()
-        ordered_links = self.DATASET.get_ordered_links()
+        ordered_links = self.DATASET.get_ordered_link_ids()
         expected_pos_link_indices = [i for i, link in enumerate(ordered_links) if link.is_true_link]
         expected_neg_link_indices = [i for i, link in enumerate(ordered_links) if not link.is_true_link]
         pos_link_indices, neg_link_indices = sampler._get_pos_neg_link_indices(sampler.data_source)
@@ -42,7 +42,7 @@ class TestBalancedBatchSampler(BaseTraceTest):
     def assert_balanced_batches_in_sample(self, sample_indices, batch_size):
         neg_link_ids = deepcopy(self.DATASET.neg_link_ids)
         pos_link_ids = deepcopy(self.DATASET.pos_link_ids)
-        selected_link_ids = [link.id for link in self.DATASET.get_ordered_links()]
+        selected_link_ids = [link.id for link in self.DATASET.get_ordered_link_ids()]
         n_total_pos, n_total_neg = 0, 0
         n_batch_pos, n_batch_neg = 0, 0
         for i, link_index in enumerate(sample_indices):

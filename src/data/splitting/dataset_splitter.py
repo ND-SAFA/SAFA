@@ -1,6 +1,6 @@
 from typing import List, Tuple, Type, Union, Dict, Iterable, OrderedDict
 
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
@@ -14,7 +14,7 @@ class DatasetSplitter:
     Responsible for splitting a dataset via different strategies.
     """
 
-    def __init__(self, dataset: AbstractDataset, dataset_role_to_split_percentage: OrderedDict[DatasetRole, float],
+    def __init__(self, dataset: iDataset, dataset_role_to_split_percentage: OrderedDict[DatasetRole, float],
                  strategies: List[SupportedSplitStrategy] = None):
         """
         Creates splitter targeting given dataset.
@@ -26,7 +26,7 @@ class DatasetSplitter:
         self.dataset_role_to_split_percentage = dataset_role_to_split_percentage
         self.strategies = self._get_default_split_strategies() if not strategies else strategies
 
-    def split_dataset(self) -> Dict[DatasetRole, AbstractDataset]:
+    def split_dataset(self) -> Dict[DatasetRole, iDataset]:
         """
         Split the dataset based on specifications in split_roles_to_strategy
         :return: A dictionary mapping dataset role to the corresponding split

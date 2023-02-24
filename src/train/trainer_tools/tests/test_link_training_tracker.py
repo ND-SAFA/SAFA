@@ -17,7 +17,7 @@ class TestLinkTrainingTracker(BaseTraceTest):
     def test_track_batch_and_eval_epoch(self):
         tracker = self.get_link_training_tracker()
         tracker.track_batch(self.BATCH_INDICES, self.BATCH_LOGITS)
-        ordered_links = self.DATASET.get_ordered_links()
+        ordered_links = self.DATASET.get_ordered_link_ids()
         for i, batch_index in enumerate(self.BATCH_INDICES):
             link = ordered_links[batch_index]
             self.assertIn(link.id, tracker._link_id_to_epoch_logits)
@@ -61,7 +61,7 @@ class TestLinkTrainingTracker(BaseTraceTest):
         tracker = self.get_link_training_tracker()
         tracker.track_batch(self.BATCH_INDICES, self.BATCH_LOGITS)
         epoch_link_losses = tracker._calculate_epoch_link_losses()
-        ordered_links = self.DATASET.get_ordered_links()
+        ordered_links = self.DATASET.get_ordered_link_ids()
         for i, batch_index in enumerate(self.BATCH_INDICES):
             link = ordered_links[batch_index]
             self.assertIn(link.id, epoch_link_losses)

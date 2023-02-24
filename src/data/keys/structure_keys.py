@@ -10,6 +10,7 @@ class StructuredKeys:
         SOURCE = "source"
         TARGET = "target"
         LABEL = "label"
+        LINK_ID = "link_id"
 
     class Artifact:
         ID = "id"

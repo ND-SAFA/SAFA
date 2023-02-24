@@ -5,11 +5,11 @@ from typing import Any
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from models.model_manager import ModelManager
 
 
-class PreTrainDataset(AbstractDataset):
+class PreTrainDataset(iDataset):
 
     def __init__(self, training_file_path: str, block_size: int, **kwargs):
         """

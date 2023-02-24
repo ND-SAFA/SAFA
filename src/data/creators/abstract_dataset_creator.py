@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from util.base_object import BaseObject
 
-DatasetType = TypeVar("DatasetType", bound=AbstractDataset)
+DatasetType = TypeVar("DatasetType", bound=iDataset)
 
 
 class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):

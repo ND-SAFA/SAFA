@@ -5,7 +5,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
@@ -20,7 +20,7 @@ from variables.undetermined_variable import UndeterminedVariable
 
 
 class TrainerDatasetManager(BaseObject):
-    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
+    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, iDataset]
 
     def __init__(self,
                  pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,
@@ -96,7 +96,7 @@ class TrainerDatasetManager(BaseObject):
                 self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(creator)
         super().use_values_from_object_for_undetermined(obj)
 
-    def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
+    def get_datasets(self) -> Dict[DatasetRole, iDataset]:
         """
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
@@ -148,7 +148,7 @@ class TrainerDatasetManager(BaseObject):
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
-                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, AbstractDataset]:
+                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, iDataset]:
         """
         Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split data
         :param train_dataset: the train dataset

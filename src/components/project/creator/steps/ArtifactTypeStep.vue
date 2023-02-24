@@ -13,8 +13,4 @@ export default {
 
 <script setup lang="ts">
 import FilePanelList from "./FilePanelList.vue";
-
-// const props = defineProps<{}>();
-
-// const emit = defineEmits<{}>();
 </script>

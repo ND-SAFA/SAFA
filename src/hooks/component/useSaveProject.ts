@@ -36,7 +36,51 @@ export const useSaveProject = defineStore("saveProject", {
     tracePanels: [createEmptyPanel("trace")] as CreatorFilePanel[],
     artifactMap: {} as ArtifactMap,
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return All artifact types.
+     */
+    artifactTypes(): string[] {
+      return this.artifactPanels.map(({ type }) => type);
+    },
+    /**
+     * @return A project creation request with the uploaded data.
+     */
+    creationRequest(): CreateProjectByJsonSchema {
+      const artifacts = this.artifactPanels
+        .map(({ artifacts = [] }) => artifacts)
+        .reduce((acc, cur) => [...acc, ...cur], []);
+      const traces = this.tracePanels
+        .map(({ traces = [] }) => traces)
+        .reduce((acc, cur) => [...acc, ...cur], []);
+      const requests = this.tracePanels
+        .filter(({ isGenerated }) => isGenerated)
+        .map(({ type, toType = "", generateMethod }) => ({
+          artifactLevels: [
+            {
+              source: type,
+              target: toType,
+            },
+          ],
+          method: generateMethod,
+        }));
+      const user: MembershipSchema = {
+        projectMembershipId: "",
+        email: sessionStore.userEmail,
+        role: ProjectRole.OWNER,
+      };
+      const project = createProject({
+        name: this.name,
+        description: this.description,
+        owner: user.email,
+        members: [user],
+        artifacts,
+        traces,
+      });
+
+      return { project, requests };
+    },
+  },
   actions: {
     /**
      * Resets the created project state.
@@ -70,50 +114,6 @@ export const useSaveProject = defineStore("saveProject", {
       } else {
         this.tracePanels = this.tracePanels.filter((_, i) => i !== index);
       }
-    },
-    /**
-     * Creates a project creation request from uploaded data.
-     *
-     * @param artifactUploader - The uploaded artifacts.
-     * @param traceUploader - The uploaded trace links.
-     * @return The request to create this project.
-     */
-    getCreationRequest(
-      artifactUploader: ArtifactUploader,
-      traceUploader: TraceUploader
-    ): CreateProjectByJsonSchema {
-      const artifacts = artifactUploader.panels
-        .map(({ projectFile }) => projectFile.artifacts || [])
-        .reduce((acc, cur) => [...acc, ...cur], []);
-      const traces = traceUploader.panels
-        .map(({ projectFile }) => projectFile.traces || [])
-        .reduce((acc, cur) => [...acc, ...cur], []);
-      const requests = traceUploader.panels
-        .filter(({ projectFile }) => projectFile.isGenerated)
-        .map(({ projectFile }) => ({
-          artifactLevels: [
-            {
-              source: projectFile.sourceId,
-              target: projectFile.targetId,
-            },
-          ],
-          method: projectFile.method,
-        }));
-      const user: MembershipSchema = {
-        projectMembershipId: "",
-        email: sessionStore.userEmail,
-        role: ProjectRole.OWNER,
-      };
-      const project = createProject({
-        name: this.name,
-        description: this.description,
-        owner: user.email,
-        members: [user],
-        artifacts,
-        traces,
-      });
-
-      return { project, requests };
     },
   },
 });

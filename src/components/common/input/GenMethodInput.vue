@@ -1,69 +1,46 @@
 <template>
-  <v-select
+  <q-select
     v-model="model"
     filled
-    hide-details
     label="Model"
-    :items="modelOptions"
-    class="mr-2"
-    item-value="id"
-    item-text="id"
+    :items="options"
+    option-value="id"
   >
-    <template #item="{ item }">
-      <div class="my-1">
-        <typography el="div" :value="item.id" />
-        <typography variant="caption" :value="item.name" />
+    <template #option="{ opt, itemProps }">
+      <div class="q-my-sm" v-bind="itemProps">
+        <typography el="div" :value="opt.id" />
+        <typography variant="caption" :value="opt.name" />
       </div>
     </template>
-  </v-select>
+  </q-select>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { ModelType, SelectOption } from "@/types";
-import { traceModelOptions } from "@/util";
-import { Typography } from "@/components/common/display";
-
 /**
  * A selector for trace generation methods.
  */
-export default defineComponent({
+export default {
   name: "GenMethodInput",
-  components: {
-    Typography,
-  },
-  props: {
-    value: String,
-    onlyTrainable: Boolean,
-  },
-  data() {
-    return {
-      model: this.value,
-    };
-  },
-  computed: {
-    /**
-     * @return The trace generation model types.
-     */
-    modelOptions(): SelectOption[] {
-      return this.onlyTrainable
-        ? traceModelOptions().slice(0, 3)
-        : traceModelOptions();
-    },
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: ModelType) {
-      this.model = currentValue;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentValue: ModelType) {
-      this.$emit("input", currentValue);
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { traceModelOptions } from "@/util";
+import { useVModel } from "@/hooks";
+import { Typography } from "@/components/common/display";
+
+const props = defineProps<{
+  modelValue?: string;
+  onlyTrainable?: boolean;
+}>();
+
+defineEmits<{
+  (e: "update:modelValue"): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+const options = computed(() =>
+  props.onlyTrainable ? traceModelOptions().slice(0, 3) : traceModelOptions()
+);
 </script>

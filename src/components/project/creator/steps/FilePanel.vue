@@ -8,28 +8,93 @@
   >
     <div class="q-mx-md">
       <slot name="panel" :panel="panel" />
+
+      <flex-box
+        v-if="props.variant === 'trace'"
+        full-width
+        align="center"
+        y="2"
+      >
+        <select-input
+          v-model="panel.type"
+          label="Source Type"
+          :options="artifactTypes"
+          hint="Required"
+          class="full-width"
+          data-cy="input-source-type"
+        />
+        <icon class="q-mx-md" variant="trace" size="md" />
+        <select-input
+          v-model="panel.toType"
+          label="Target Type"
+          :options="artifactTypes"
+          hint="Required"
+          class="full-width"
+          data-cy="input-target-type"
+        />
+      </flex-box>
       <text-input
         v-if="props.variant === 'artifact'"
         v-model="panel.type"
         label="Artifact Type"
         hint="Required"
+        data-cy="input-artifact-type"
       />
+
       <file-input
+        v-if="!props.panel.isGenerated"
         v-model="panel.file"
         :multiple="false"
         data-cy="input-files-panel"
       />
-      <flex-box full-width justify="between">
+
+      <flex-box
+        v-if="props.variant === 'trace'"
+        full-width
+        justify="between"
+        y="2"
+      >
+        <switch-input
+          v-model="panel.isGenerated"
+          label="Generate Trace Links"
+        />
+        <gen-method-input
+          v-if="panel.isGenerated"
+          v-model="panel.generateMethod"
+        />
+      </flex-box>
+
+      <flex-box full-width justify="between" y="2">
         <switch-input
           v-model="panel.ignoreErrors"
           label="Ignore Errors"
           color="grey"
+          class="q-mr-sm"
           data-cy="button-ignore-errors"
         />
         <typography v-if="!isValid" :value="errorMessage" color="negative" />
       </flex-box>
+
+      <list v-if="props.panel.itemNames.length > 0" bordered class="q-mb-md">
+        <expansion-item label="Parsed Entities">
+          <div class="q-mx-md">
+            <attribute-chip
+              v-for="itemName of props.panel.itemNames"
+              :key="itemName"
+              :value="itemName"
+              :icon="props.variant"
+            />
+          </div>
+        </expansion-item>
+      </list>
+
       <flex-box justify="end">
-        <text-button icon="delete" label="Delete" @click="handleDeletePanel" />
+        <text-button
+          icon="delete"
+          label="Delete"
+          data-cy="button-delete-panel"
+          @click="handleDeletePanel"
+        />
       </flex-box>
     </div>
   </expansion-item>
@@ -58,7 +123,12 @@ import {
   FlexBox,
   Typography,
   TextInput,
+  GenMethodInput,
+  Icon,
+  SelectInput,
 } from "@/components/common";
+import List from "@/components/common/display/list/List.vue";
+import AttributeChip from "@/components/common/display/attribute/AttributeChip.vue";
 
 const props = defineProps<{
   panel: CreatorFilePanel;
@@ -71,12 +141,12 @@ const props = defineProps<{
 // const emit = defineEmits<{}>();
 
 const errorMessage = computed(() => {
-  if (props.panel.ignoreErrors) {
-    return undefined;
-  } else if (!props.panel.name) {
+  if (!props.panel.name) {
     return "The file requires an artifact type";
-  } else if (!props.panel.file) {
+  } else if (!props.panel.file && !props.panel.isGenerated) {
     return "No file has been uploaded";
+  } else if (props.panel.ignoreErrors) {
+    return undefined;
   } else {
     return props.panel.errorMessage;
   }
@@ -91,6 +161,8 @@ const headerClass = computed(() =>
 const iconId = computed(() =>
   isValid.value ? getIcon("success") : getIcon("error")
 );
+
+const artifactTypes = computed(() => projectSaveStore.artifactTypes);
 
 /**
  * Deletes the current file panel.
@@ -113,12 +185,24 @@ watch(
   ([fromType, toType]) => {
     if (props.panel.variant === "artifact") return;
 
-    props.panel.name = `${fromType} to ${toType}`;
+    props.panel.name =
+      !props.panel.type || !props.panel.toType
+        ? ""
+        : `${fromType} to ${toType}`;
   }
 );
 
 watch(
   () => props.panel.file,
-  () => parseFilePanel(props.panel, projectSaveStore.artifactMap)
+  (file) => {
+    if (file) {
+      parseFilePanel(props.panel, projectSaveStore.artifactMap);
+    } else {
+      props.panel.artifacts = [];
+      props.panel.traces = [];
+      props.panel.itemNames = [];
+      props.panel.errorMessage = undefined;
+    }
+  }
 );
 </script>

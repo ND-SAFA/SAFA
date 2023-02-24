@@ -1,5 +1,5 @@
 <template>
-  <div />
+  <file-panel-list label="Trace Matrix" variant="trace" />
 </template>
 
 <script lang="ts">
@@ -12,7 +12,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-const props = defineProps<{}>();
-
-const emit = defineEmits<{}>();
+import FilePanelList from "./FilePanelList.vue";
 </script>

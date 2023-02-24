@@ -12,13 +12,18 @@
       {{ text }}
     </q-tooltip>
     <icon
-      v-if="iconId || props.icon"
+      v-if="iconVisible"
       :id="iconId"
       :variant="props.icon"
       :color="iconColor"
       size="sm"
     />
-    <typography ellipsis inherit-color :l="iconId ? '1' : '0'" :value="text" />
+    <typography
+      ellipsis
+      inherit-color
+      :l="iconVisible ? '1' : ''"
+      :value="text"
+    />
   </q-chip>
   <flex-box v-else align="center">
     <q-linear-progress
@@ -110,6 +115,8 @@ const progress = computed(() =>
 const iconId = computed(() =>
   props.artifactType ? typeOptionsStore.getArtifactTypeIcon(props.value) : ""
 );
+
+const iconVisible = computed(() => iconId.value || props.icon);
 
 const displayColor = computed(() => {
   if (props.color) {

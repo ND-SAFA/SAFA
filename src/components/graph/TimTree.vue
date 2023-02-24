@@ -1,7 +1,12 @@
 <template>
-  <v-container>
+  <div>
     <flex-box justify="end">
-      <v-btn text @click="cyResetTim"> Reset Graph </v-btn>
+      <text-button
+        text
+        label="Center Graph"
+        icon="graph-center"
+        @click="cyResetTim"
+      />
     </flex-box>
     <cytoscape-controller
       id="cytoscape-tim"
@@ -10,22 +15,22 @@
     >
       <template #elements>
         <tim-node
-          v-for="panel in artifactPanels"
-          :key="panel.title"
-          :count="panel.projectFile.artifacts.length"
-          :artifact-type="panel.projectFile.type"
+          v-for="{ type, count } in artifacts"
+          :key="type"
+          :count="count"
+          :artifact-type="type"
         />
         <tim-link
-          v-for="panel in tracePanels"
-          :key="panel.projectFile.sourceId + panel.projectFile.targetId"
-          :count="panel.projectFile.traces.length"
-          :target-type="panel.projectFile.targetId"
-          :source-type="panel.projectFile.sourceId"
-          :generated="panel.projectFile.isGenerated"
+          v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
+          :key="name"
+          :count="count"
+          :target-type="targetType"
+          :source-type="sourceType"
+          :generated="isGenerated"
         />
       </template>
     </cytoscape-controller>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -40,21 +45,19 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { TracePanel, ArtifactPanel } from "@/types";
-import { appStore, layoutStore } from "@/hooks";
+import { appStore, layoutStore, projectSaveStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import { FlexBox } from "@/components/common/layout";
+import TextButton from "@/components/common/button/TextButton.vue";
 import CytoscapeController from "./CytoscapeController.vue";
 import { TimNode, TimLink } from "./tim";
 
 const props = defineProps<{
-  tracePanels: TracePanel[];
-  artifactPanels: ArtifactPanel[];
-  inView: boolean;
+  visible: boolean;
 }>();
 
 const className = computed(() => {
-  if (!props.inView) {
+  if (!props.visible) {
     return "artifact-view disabled";
   } else if (!appStore.isLoading) {
     return "artifact-view visible elevation-3";
@@ -63,10 +66,29 @@ const className = computed(() => {
   }
 });
 
+const artifacts = computed(() =>
+  projectSaveStore.artifactPanels.map(({ type, artifacts = [] }) => ({
+    type,
+    count: artifacts.length,
+  }))
+);
+
+const traces = computed(() =>
+  projectSaveStore.tracePanels.map(
+    ({ name, type, toType = "", traces = [], isGenerated }) => ({
+      name,
+      sourceType: type,
+      targetType: toType,
+      count: traces.length,
+      isGenerated,
+    })
+  )
+);
+
 watch(
-  () => props.inView,
-  (inView) => {
-    if (!inView) return;
+  () => props.visible,
+  (visible) => {
+    if (!visible) return;
 
     layoutStore.setTimTreeLayout();
   }

@@ -23,7 +23,7 @@
         text
         icon="add"
         :label="newLabel"
-        data-cy="button-delete-artifact"
+        data-cy="button-add-panel"
         @click="handleAddPanel"
       />
     </flex-box>

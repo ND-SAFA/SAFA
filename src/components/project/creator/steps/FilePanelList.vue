@@ -21,6 +21,7 @@
         text
         icon="add"
         :label="newLabel"
+        data-cy="button-delete-artifact"
         @click="emit('panel:add')"
       />
     </flex-box>

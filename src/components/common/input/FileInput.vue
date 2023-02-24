@@ -4,11 +4,12 @@
     clearable
     filled
     use-chips
-    label="Upload Files"
+    :label="label"
     :multiple="props.multiple"
     :error-message="props.errorMessage || ''"
     :error="showError"
     :data-cy="props.dataCy"
+    hint="File Types: .csv, .json"
     @clear="$emit('clear')"
   >
     <template #prepend>
@@ -66,4 +67,5 @@ const model = useVModel(props, "modelValue");
 const showError = computed(
   () => !!props.errorMessage && props.errorMessage.length > 0
 );
+const label = computed(() => (props.multiple ? "Upload Files" : "Upload FIle"));
 </script>

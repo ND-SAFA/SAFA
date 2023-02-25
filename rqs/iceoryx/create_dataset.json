@@ -10,9 +10,8 @@
           "trace_dataset_creator": {
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "~/desktop/safa/datasets/iceoryx_splits/code"
-            },
-            "remove_orphans": true
+              "project_path": "~/desktop/safa/datasets/iceoryx_splits/code/original"
+            }
           },
           "splits": [
             0.10,

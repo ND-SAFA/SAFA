@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractHubId
+from data.hub.abstract_hub_id import AbstractHubId
 from util.override import overrides
 
 
@@ -12,11 +12,10 @@ class IceoryxHubId(AbstractHubId, ABC):
 
     @staticmethod
     @abstractmethod
-    def get_stage_name() -> str:
+    def get_zip_name() -> str:
         """
-        :return: Returns the file name of the dataset file to read.
+        :return: Returns the name of the zip file.
         """
-        pass
 
     @classmethod
     @overrides(AbstractHubId)
@@ -24,8 +23,7 @@ class IceoryxHubId(AbstractHubId, ABC):
         """
         :return: Returns URL to CCHIT on the SAFA bucket containing definition file.
         """
-        base_path = "https://safa-datasets-open.s3.amazonaws.com/datasets/iceoryx/"
-        return f"{base_path}{cls.get_stage_name()}.zip"
+        return "https://safa-datasets-open.s3.amazonaws.com/datasets/iceoryx/code.zip"
 
     @classmethod
     @overrides(AbstractHubId)

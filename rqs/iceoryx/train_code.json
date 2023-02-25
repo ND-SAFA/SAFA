@@ -37,21 +37,30 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_code_train"
+                "name": "iceoryx_code",
+                "id_kwargs": {
+                  "stage": "train"
+                }
               }
             },
             "val_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_code_val"
+                "name": "iceoryx_code",
+                "id_kwargs": {
+                  "stage": "val"
+                }
               }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "iceoryx_code_eval"
+                "name": "iceoryx_code",
+                "id_kwargs": {
+                  "stage": "eval"
+                }
               }
             },
             "augmenter": {

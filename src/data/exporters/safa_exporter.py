@@ -104,8 +104,8 @@ class SafaExporter:
                 trace_link: TraceLink = links[trace_link_id]
                 if trace_link.is_true_link:
                     entries.append({
-                        StructuredKeys.Trace.TARGET: source_id,
-                        StructuredKeys.Trace.SOURCE: target_id
+                        StructuredKeys.Trace.SOURCE: source_id,
+                        StructuredKeys.Trace.TARGET: target_id
                     })
         return pd.DataFrame(entries)
 

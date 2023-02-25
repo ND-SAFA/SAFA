@@ -1,6 +1,6 @@
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractHubId
+from data.hub.abstract_hub_id import AbstractHubId
 
 
 class MipHubId(AbstractHubId):
@@ -8,12 +8,10 @@ class MipHubId(AbstractHubId):
     Describes the medical infusion pump dataset.
     """
 
-    @classmethod
-    def get_url(cls) -> str:
+    def get_url(self) -> str:
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/mip.zip"
 
-    @classmethod
-    def get_definition(cls) -> Dict:
+    def get_definition(self) -> Dict:
         return {
             "artifacts": {
                 "Components": {

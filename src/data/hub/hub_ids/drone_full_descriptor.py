@@ -1,6 +1,6 @@
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
+from data.hub.abstract_hub_id import AbstractDatasetDescriptor
 from util.override import overrides
 
 
@@ -9,17 +9,15 @@ class DroneFullDescriptor(AbstractDatasetDescriptor):
     Describes the DroneResponse project reader.
     """
 
-    @classmethod
     @overrides(AbstractDatasetDescriptor)
-    def get_url(cls) -> str:
+    def get_url(self) -> str:
         """
         :return: Returns URL to DroneResponse on the SAFA bucket containing definition file.
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/Drone.zip"
 
-    @classmethod
     @overrides(AbstractDatasetDescriptor)
-    def get_definition(cls) -> Dict:
+    def get_definition(self) -> Dict:
         """
         :return: Returns this project's structured project definition.
         """

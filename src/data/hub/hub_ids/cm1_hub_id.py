@@ -1,6 +1,6 @@
 from typing import Dict
 
-from data.hub.abstract_dataset_descriptor import AbstractHubId
+from data.hub.abstract_hub_id import AbstractHubId
 from util.override import overrides
 
 
@@ -9,17 +9,15 @@ class CM1HubId(AbstractHubId):
     Describes the CM1 project reader.
     """
 
-    @classmethod
     @overrides(AbstractHubId)
-    def get_url(cls) -> str:
+    def get_url(self) -> str:
         """
         :return: Returns URL to CM1 on the SAFA bucket containing definition file.
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/CM1.zip"
 
-    @classmethod
     @overrides(AbstractHubId)
-    def get_definition(cls) -> Dict:
+    def get_definition(self) -> Dict:
         """
         :return: Returns this project's structured project definition.
         """

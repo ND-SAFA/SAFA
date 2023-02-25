@@ -3,8 +3,7 @@ import os
 from datasets import DownloadConfig, DownloadManager
 
 from constants import CACHE_DIR_NAME, DATA_PATH_PARAM
-from data.hub.abstract_dataset_descriptor import AbstractHubId
-from data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.hub.abstract_hub_id import AbstractHubId
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 
@@ -24,7 +23,7 @@ class TraceDatasetDownloader:
         self.descriptor: AbstractHubId = descriptor
         super().__init__(**config_kwargs)  # calls _info where above is needed
         self.trace_dataset_creator = None
-        self.project_path = None
+        self.data_dir = None
 
     def download(self) -> str:
         """
@@ -32,17 +31,15 @@ class TraceDatasetDownloader:
         TODO: Check to see if works with multiple datasets using same url
         :return: Returns path to dataset.
         """
-        if self.project_path is None:
+        if self.data_dir is None:
             hub_path = os.path.join(os.environ[DATA_PATH_PARAM], CACHE_DIR_NAME)
             hub_path = os.path.expanduser(hub_path)
             download_config = DownloadConfig(cache_dir=hub_path)
             download_manager = DownloadManager(download_config=download_config)
             data_dir = download_manager.download_and_extract(self.descriptor.get_url())
             assert os.path.isdir(data_dir), f"Expected {data_dir} to be folder."
-            zip_file_query = FileUtil.ls_dir(data_dir, ignore=["__MACOSX"])
-            assert len(zip_file_query) == 1, f"Found more than one folder for extracted files:{zip_file_query}"
-            self.project_path = zip_file_query[0]  # include path to directory
             definition_content = JsonUtil.dict_to_json(self.descriptor.get_definition())
-            definition_file_path = os.path.join(self.project_path, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
+            definition_file_path = self.descriptor.get_definition_path(data_dir)
             FileUtil.write(definition_content, definition_file_path)
-        return self.project_path
+            self.data_dir = data_dir
+        return self.data_dir

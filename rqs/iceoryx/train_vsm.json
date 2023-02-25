@@ -1,0 +1,50 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": 812
+          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_code_train"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_code_val"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_code_eval"
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

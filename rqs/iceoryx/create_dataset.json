@@ -11,11 +11,12 @@
             "project_reader": {
               "object_type": "STRUCTURE",
               "project_path": "~/desktop/safa/datasets/iceoryx_splits/code"
-            }
+            },
+            "remove_orphans": true
           },
           "splits": [
             0.10,
-            0.30
+            0.60
           ],
           "artifact_type": "Issue"
         }

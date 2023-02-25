@@ -101,7 +101,7 @@ class RepositoryDownloader:
         """
         issue_artifacts = []
         for issue in tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
-            if issue.pull_request is not None:  # TODO: WHY
+            if issue.pull_request is not None:  # Pull requests handled in parse_pulls.
                 continue
             self.wait_for_rate_limit(github_instance)
             issue_artifacts.append(GIssue.parse(issue))

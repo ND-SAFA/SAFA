@@ -9,7 +9,6 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 
 from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
-from models.tiny_longformer import TinyLongformer
 from util.base_object import BaseObject
 
 
@@ -44,7 +43,7 @@ class ModelManager(BaseObject):
         """
         self.__config = AutoConfig.from_pretrained(self.model_path)
         self.__config.num_labels = 2
-        model = TinyLongformer(self.__config)
+        model = self.model_task.value.from_pretrained(self.__config)
         print(model)
         if self.layers_to_freeze:
             self._freeze_layers(model, self.layers_to_freeze)

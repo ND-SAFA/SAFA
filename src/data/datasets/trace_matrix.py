@@ -42,7 +42,6 @@ class TraceMatrix:
             query_predictions = query.preds
             query_labels = [link.get_label() for link in query.links]
             query_metric = metric(query_labels, query_predictions)
-            print(f"{source} ({len(query_labels)})", ":", query_metric)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
         if len(metric_values) == 0:

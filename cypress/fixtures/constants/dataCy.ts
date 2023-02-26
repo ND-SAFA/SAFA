@@ -60,11 +60,11 @@ export enum DataCy {
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
-  logoutButton = "button-logout",
+  logoutButton = "button-account-logout",
 
   // Account Editing
 
-  accountPage = "page-account",
+  accountPage = "icon-account",
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",

@@ -1,7 +1,8 @@
 import { DataCy, Routes } from "@/fixtures";
 
 Cypress.Commands.add("login", (email, password) => {
-  cy.inputText(DataCy.emailInput, email)
+  cy.visit(Routes.LOGIN_ACCOUNT)
+    .inputText(DataCy.emailInput, email)
     .inputText(DataCy.passwordInput, password)
     .clickButton(DataCy.loginButton);
 });
@@ -12,6 +13,10 @@ Cypress.Commands.add("loginToPage", (email, password, route, query = {}) => {
     Object.keys(query).length > 0
       ? "?" + new URLSearchParams(query).toString()
       : "";
+
+  console.log(route);
+  console.log(queryString);
+  console.log(route + queryString);
 
   cy.visit(route + queryString)
     .login(email, password)

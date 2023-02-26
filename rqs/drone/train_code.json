@@ -11,7 +11,7 @@
             "model_path": "microsoft/codebert-base"
           },
           "trainer_args": {
-            "num_train_epochs": 1,
+            "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "per_device_eval_batch_size": 16,
             "gradient_accumulation_steps": 250,
@@ -48,7 +48,7 @@
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.55
+              "val_percentage": 0.15
             },
             "augmenter": {
               "steps": [

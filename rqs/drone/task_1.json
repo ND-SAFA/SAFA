@@ -46,7 +46,7 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "drone",
-                "task": "task_2",
+                "task": "task_1",
                 "stage": "val"
               }
             },

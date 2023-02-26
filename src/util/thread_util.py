@@ -1,9 +1,8 @@
 import threading
+from queue import Queue
 from typing import Callable, List
 
 from tqdm import tqdm
-
-from util.general_util import ListUtil
 
 
 class ThreadUtil:
@@ -21,13 +20,27 @@ class ThreadUtil:
         :param n_threads: The number of threads to use to perform work.
         :return: None
         """
-        batches = ListUtil.batch(iterable, n_threads)
-        for batch in tqdm(batches, desc=title):
-            threads = []
-            for item in batch:
-                t1 = threading.Thread(target=thread_work, args=[item])
-                threads.append(t1)
-                t1.start()
 
-            for t in threads:
-                t.join()
+        item_queue = Queue()
+        for item in iterable:
+            item_queue.put(item)
+
+        progress_bar = tqdm(total=len(iterable), desc=title)
+
+        def thread_body() -> None:
+            """
+            Performs work on each item in the queue.
+            :return: None
+            """
+            while not item_queue.empty():
+                item = item_queue.get()
+                thread_work(item)
+                progress_bar.update()
+
+        threads = []
+        for i in range(n_threads):
+            t1 = threading.Thread(target=thread_body, args=[])
+            threads.append(t1)
+            t1.start()
+        for t in threads:
+            t.join()

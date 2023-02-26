@@ -1,3 +1,4 @@
+import os.path
 from typing import Dict, Tuple
 
 import pandas as pd
@@ -8,6 +9,9 @@ from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
+from util.general_util import ListUtil
+from util.logging.logger_manager import logger
+from util.thread_util import ThreadUtil
 
 
 class CsvProjectReader(AbstractProjectReader):
@@ -27,36 +31,46 @@ class CsvProjectReader(AbstractProjectReader):
         self.project_path = project_path
         self.overrides["allowed_orphans"] = NO_ORPHAN_CHECK_VALUE
 
-    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self, n_threads: int = 10) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame
         """
+        logger.info(f"Reading file: {self.project_path}")
         entity_df = pd.read_csv(self.project_path)
         trace_df_entries = []
         artifact_df_entries = {}
-        for _, row in entity_df.iterrows():
-            source_id = row[CSVKeys.SOURCE_ID]
-            target_id = row[CSVKeys.TARGET_ID]
-            self.add_artifact(source_id,
-                              row[CSVKeys.SOURCE],
-                              CSVKeys.SOURCE,
-                              artifact_df_entries)
-            self.add_artifact(target_id,
-                              row[CSVKeys.TARGET],
-                              CSVKeys.TARGET,
-                              artifact_df_entries)
-            trace_df_entries.append({
-                StructuredKeys.Trace.SOURCE: source_id,
-                StructuredKeys.Trace.TARGET: target_id,
-                StructuredKeys.Trace.LABEL: row[CSVKeys.LABEL]
-            })
+        project_name = os.path.basename(self.project_path)
+
+        def read_artifact(row_batches):
+            for row_index in row_batches:
+                row = entity_df.iloc[row_index]
+                source_id = row[CSVKeys.SOURCE_ID]
+                target_id = row[CSVKeys.TARGET_ID]
+                self.add_artifact(source_id,
+                                  row[CSVKeys.SOURCE],
+                                  CSVKeys.SOURCE,
+                                  artifact_df_entries)
+                self.add_artifact(target_id,
+                                  row[CSVKeys.TARGET],
+                                  CSVKeys.TARGET,
+                                  artifact_df_entries)
+                trace_df_entries.append({
+                    StructuredKeys.Trace.SOURCE: source_id,
+                    StructuredKeys.Trace.TARGET: target_id,
+                    StructuredKeys.Trace.LABEL: row[CSVKeys.LABEL]
+                })
+
+        index_batches = ListUtil.batch(list(range(len(entity_df))), 1000)
+        ThreadUtil.multi_thread_process(f"Reading {project_name}", index_batches, read_artifact, n_threads)
+
         trace_df = pd.DataFrame(trace_df_entries)
         layer_mapping_df = pd.DataFrame([{
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         }])
         artifact_df = pd.DataFrame(artifact_df_entries)
+        entity_df = None
         return artifact_df, trace_df, layer_mapping_df
 
     def get_project_name(self) -> str:

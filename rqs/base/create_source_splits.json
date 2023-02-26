@@ -1,0 +1,27 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_SOURCE_SPLITS",
+          "job_args": {
+          },
+          "export_path": "[EXPORT_FOLDER]",
+          "trace_dataset_creator": {
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "[PROJECTPATH]"
+            }
+          },
+          "splits": [
+            0.10,
+            0.30
+          ],
+          "artifact_type": [
+            "ARTIFACT_TYPE"
+          ]
+        }
+      ]
+    }
+  ]
+}

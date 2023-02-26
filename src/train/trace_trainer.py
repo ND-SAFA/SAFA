@@ -25,9 +25,9 @@ from util.base_object import BaseObject
 from util.logging.logger_manager import logger
 from util.override import overrides
 
-os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
-torch.use_deterministic_algorithms(True)
-
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
 

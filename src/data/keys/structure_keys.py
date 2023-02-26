@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, Iterable, List, Tuple
 
 
 class StructuredKeys:
@@ -42,3 +42,25 @@ class StructuredKeys:
         :return:Returns the columns of the DataFrame containing trace links.
         """
         return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL]
+
+    @staticmethod
+    def create_task_definition(base_definition: Dict, update_iterator: Iterable[Tuple[str, List[str]]]) -> Dict:
+        """
+        Creates task definition by constructing subset of base definition.
+        :param base_definition: The base definition containing referenced artifacts, traces, and overrides.
+        :param update_iterator: Iterator containing instructions for what properties to copy over.
+        :return: Task definition.
+        """
+        task_definition = StructuredKeys.create_empty_definition()
+        for parent_prop_name, child_keys in update_iterator:
+            for child_key in child_keys:
+                task_definition[parent_prop_name][child_key] = base_definition[parent_prop_name][child_key]
+        return task_definition
+
+    @staticmethod
+    def create_empty_definition() -> Dict:
+        """
+        Creates empty structure definition file.
+        :return: Dictionary containing artifact, traces, and override properties.
+        """
+        return {StructuredKeys.ARTIFACTS: {}, StructuredKeys.TRACES: {}, StructuredKeys.OVERRIDES: {}}

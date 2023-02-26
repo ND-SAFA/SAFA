@@ -8,10 +8,16 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
+              "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[PROJECT]"
+                "object_type": "HUB",
+                "name": "iceoryx_code2issue"
               }
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_type": "SPLIT_BY_LINK",
+              "validation_percentage": 0.5
             }
           }
         }

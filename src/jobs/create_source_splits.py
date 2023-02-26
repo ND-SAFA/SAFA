@@ -1,0 +1,85 @@
+import os
+from typing import List
+
+from sklearn.model_selection import train_test_split
+
+from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.exporters.safa_exporter import SafaExporter
+from data.keys.structure_keys import StructuredKeys
+from jobs.abstract_job import AbstractJob
+from jobs.components.job_args import JobArgs
+from jobs.components.job_result import JobResult
+
+STAGES = ["train", "val", "eval"]
+
+
+class CreateSourceSplits(AbstractJob):
+    """
+    Split dataset by source and export splits as structured datasets.
+    """
+
+    def __init__(self, job_args: JobArgs, trace_dataset_creator: TraceDatasetCreator, export_path: str, splits: List[float],
+                 artifact_type: str):
+        """
+        Initializes job for splitting dataset creator.
+        :param job_args: Job args. Not used.
+        :param trace_dataset_creator: The trace dataset creator used to read project.
+        :param export_path: Path to export splits to.
+        :param splits: List of floats determining the validation and eval percentages.
+        :param artifact_type: String representing artifact type to split by.
+        """
+        super().__init__(job_args)
+        self.trace_dataset_creator = trace_dataset_creator
+        self.export_path = export_path
+        self.splits = splits
+        self.artifact_type = artifact_type
+        self.artifact_df = None
+        self.layer_mapping_df = None
+
+    def _run(self) -> JobResult:
+        """
+        Separates artifacts in type into different splits and saves projects accordingly.
+        :return: JobResult containing empty message.
+        """
+        trace_dataset = self.trace_dataset_creator.create()
+        self.artifacts_df = self.trace_dataset_creator.artifact_df
+        self.layer_mapping_df = self.trace_dataset_creator.layer_mapping_df
+        types_defined = list(self.artifacts_df[StructuredKeys.Artifact.LAYER_ID].unique())
+        assert self.artifact_type in types_defined, f"{self.artifact_type} is not in: {types_defined}"
+
+        target_artifacts = self.artifacts_df[self.artifacts_df[StructuredKeys.Artifact.LAYER_ID] == self.artifact_type]
+        target_ids = list(target_artifacts[StructuredKeys.Artifact.ID])
+
+        val_total = self.splits[0] + self.splits[1]
+        train_ids, val_ids = train_test_split(target_ids, test_size=val_total)
+        val_ids, test_ids = train_test_split(val_ids, test_size=self.splits[1] / val_total)
+        split_id_batches = [train_ids, val_ids, test_ids]
+        type_artifact_ids = target_ids + val_ids + test_ids
+
+        self.create_splits(split_id_batches, trace_dataset, type_artifact_ids)
+
+        return JobResult.from_dict({"status": "ok"})
+
+    def create_splits(self, split_artifact_id_batches, trace_dataset, type_artifact_ids) -> None:
+        """
+        Creates each split by filtering only selected artifacts.
+        :param split_artifact_id_batches: Batches containing artifact ids to target in each split.
+        :param trace_dataset: The trace dataset containing all the trace links.
+        :param type_artifact_ids: The artifact ids of all splits.
+        :return: None
+        """
+        for split_ids, stage in zip(split_artifact_id_batches, STAGES):
+            all_ids = set(type_artifact_ids)
+            other_ids = all_ids - set(split_ids)
+
+            split_artifact_ids_mask = self.artifacts_df[StructuredKeys.Artifact.ID].isin(other_ids)
+            layer_mask = self.artifacts_df[StructuredKeys.Artifact.LAYER_ID] == self.artifact_type
+            split_artifact_df = self.artifacts_df[~(split_artifact_ids_mask & layer_mask)]
+            split_links = {trace.id: trace for trace in
+                           list(filter(lambda t: t.source not in other_ids and t.target not in other_ids,
+                                       trace_dataset.links.values()))}
+
+            exporter = SafaExporter()
+            export_path = os.path.join(self.export_path, f"{stage}")
+            os.makedirs(export_path, exist_ok=True)
+            exporter.export(export_path, split_links, split_artifact_df, self.layer_mapping_df)

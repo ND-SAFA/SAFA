@@ -49,5 +49,6 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
         for source_name in source_names[:n_sources]:
             source_links = trace_dataset.trace_matrix.query_matrix[source_name].links
             links_per_query = min(len(source_links), n_links_per_source)
-            agg_links.extend(source_links[:links_per_query])
+            query_links = source_links[:links_per_query]
+            agg_links.extend(query_links)
         return agg_links

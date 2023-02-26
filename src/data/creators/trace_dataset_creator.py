@@ -59,6 +59,22 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates TraceDataset with links.
         :return: TraceDataset.
         """
+        self.process_data()
+        trace_dataset = self._create_trace_dataset()
+        TraceDatasetCreator._log_trace_dataset(trace_dataset)
+        return trace_dataset
+
+    def export_as_safa(self, export_path: str):
+        """
+        Exports project as safa project to directory given.
+        :return:
+        """
+
+    def process_data(self):
+        """
+        Creates the necessary tables and performs validation checks on the data.
+        :return:  None
+        """
         self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
         self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructuredKeys.Trace.LABEL, 1)
         overrides = self.project_reader.get_overrides()
@@ -68,9 +84,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
-        trace_dataset = self._create_trace_dataset()
-        TraceDatasetCreator._log_trace_dataset(trace_dataset)
-        return trace_dataset
 
     def get_name(self) -> str:
         """
@@ -135,10 +148,11 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        artifact_type_2_id, id_2_artifact = self._create_artifact_maps(self.artifact_df)
+        artifact_type_2_id, id_2_artifact = self.create_artifact_maps(self.artifact_df)
         trace_dataset = self._create_trace_dataset_from_dataframe(id_2_artifact)
         if self.project_reader.should_generate_negative_links():
             self._generate_negative_links(self.layer_mapping_df, artifact_type_2_id, id_2_artifact, trace_dataset)
+        trace_dataset.shuffle_link_ids()
         return trace_dataset
 
     def _create_trace_dataset_from_dataframe(self, id_2_artifact: Id2Artifact) -> TraceDataset:
@@ -240,7 +254,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
             title = f"Generating negative links between {source_type} -> {target_type}"
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
-        trace_dataset.shuffle_link_ids()
 
     @staticmethod
     def _filter_unreferenced_traces(artifact_df: pd.DataFrame, trace_df: pd.DataFrame, max_missing_sources: int,
@@ -272,7 +285,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         return pd.DataFrame(valid_traces)
 
     @staticmethod
-    def _create_artifact_maps(artifact_df: pd.DataFrame) -> Tuple[ArtifactType2Id, Id2Artifact]:
+    def create_artifact_maps(artifact_df: pd.DataFrame) -> Tuple[ArtifactType2Id, Id2Artifact]:
         """
         Create mapping between artifact types and their associated artifacts and between artifact ids and their associated artifact.
         :param artifact_df: The data frame containing artifact data.
@@ -318,7 +331,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param label: The label to group error with, if it exists.
         :return: None
         """
-        error_msg = f"Found too null references to {label} artifacts ({len(missing_artifact_ids)})"
+        error_msg = f"Found too many null references to {label} artifacts ({len(missing_artifact_ids)})"
         default_msg = f"No missing {label} artifacts."
         TraceDatasetCreator.assert_artifact_less_than(missing_artifact_ids, max_missing_allowed, error_msg, default_msg)
 

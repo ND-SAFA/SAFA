@@ -1,0 +1,19 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "EXPORT_DATASET",
+          "trace_dataset_creator": {
+            "project_reader": {
+              "object_type": "HUB",
+              "name": "cm1"
+            },
+            "remove_orphans": true
+          },
+          "export_path": "~/desktop/safa/datasets/safa/cm1"
+        }
+      ]
+    }
+  ]
+}

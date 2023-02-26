@@ -6,6 +6,7 @@ Cypress.Commands.add("login", (email, password) => {
     .clickButton(DataCy.loginButton);
 });
 
+// TODO: There is something broken in this function now that the app has been refactored.
 Cypress.Commands.add("loginToPage", (email, password, route, query = {}) => {
   const queryString =
     Object.keys(query).length > 0

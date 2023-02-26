@@ -1,5 +1,9 @@
 name: SAFA application
-on: [push]
+on:
+  pull_request:
+    types:
+      - created
+      - syncronized
 jobs:
   build:
     runs-on: ubuntu-latest

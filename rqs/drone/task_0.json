@@ -23,13 +23,7 @@
               "precision"
             ],
             "skip_save": false,
-            "load_best_model_at_end": true,
-            "evaluation_strategy": "steps",
-            "save_strategy": "steps",
-            "logging_strategy": "steps",
-            "save_steps": 5,
-            "eval_steps": 5,
-            "logging_steps": 1
+            "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

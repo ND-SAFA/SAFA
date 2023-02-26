@@ -13,12 +13,7 @@
           "trainer_args": {
             "num_train_epochs": 1,
             "per_device_train_batch_size": 4,
-            "gradient_accumulation_steps": {
-              "*": [
-                16,
-                250
-              ]
-            },
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -44,7 +39,7 @@
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
+              "split_strategy": "SPLIT_BY_SOURCE",
               "val_percentage": 0.55
             },
             "augmenter": {

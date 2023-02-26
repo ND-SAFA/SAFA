@@ -43,7 +43,7 @@ class ModelManager(BaseObject):
         """
         self.__config = AutoConfig.from_pretrained(self.model_path)
         self.__config.num_labels = 2
-        model = self.model_task.value.from_pretrained(self.__config)
+        model = self.model_task.value.from_pretrained(self.model_path, config=self.__config)
         if self.layers_to_freeze:
             self._freeze_layers(model, self.layers_to_freeze)
         return model

@@ -8,14 +8,13 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "allenai/longformer-base-4096"
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
-            "max_seq_length": 4096,
-            "num_train_epochs": 4,
-            "per_device_train_batch_size": 1,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
             "per_device_eval_batch_size": 16,
-            "gradient_accumulation_steps": 4,
+            "gradient_accumulation_steps": 250,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -37,16 +36,28 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone_pl"
+                "name": "drone",
+                "task": "task_0",
+                "stage": "train"
               }
             },
             "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "val_percentage": 0.05
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_0",
+                "stage": "val"
+              }
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "val_percentage": 0.55
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_0",
+                "stage": "eval"
+              }
             },
             "augmenter": {
               "steps": [

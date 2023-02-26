@@ -52,9 +52,8 @@ class StructuredKeys:
         :return: Task definition.
         """
         task_definition = StructuredKeys.create_empty_definition()
-        for parent_prop_name, child_keys in update_iterator:
-            for child_key in child_keys:
-                task_definition[parent_prop_name][child_key] = base_definition[parent_prop_name][child_key]
+        for parent_prop_name, child_key in update_iterator:
+            task_definition[parent_prop_name][child_key] = base_definition[parent_prop_name][child_key]
         return task_definition
 
     @staticmethod

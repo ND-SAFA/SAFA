@@ -36,19 +36,28 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone_pl",
-                "id_kwargs": {
-                  "stage": "train"
-                }
+                "name": "drone",
+                "task": "task_1",
+                "stage": "train"
               }
             },
             "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "val_percentage": 0.15
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_2",
+                "stage": "val"
+              }
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "val_percentage": 0.15
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_1",
+                "stage": "eval"
+              }
             },
             "augmenter": {
               "steps": [

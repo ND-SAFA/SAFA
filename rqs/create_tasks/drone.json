@@ -6,18 +6,17 @@
           "object_type": "CREATE_SOURCE_SPLITS",
           "job_args": {
           },
-          "export_path": "~/desktop/safa/datasets/software-data/drone/drone_pl/splits",
+          "export_path": "~/desktop/safa/datasets/software-data/drone/drone_tasks",
           "trace_dataset_creator": {
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "~/desktop/safa/datasets/software-data/drone/drone_pl"
+              "project_path": "~/desktop/safa/datasets/software-data/drone"
             }
           },
           "splits": [
             0.10,
             0.60
-          ],
-          "artifact_type": "Design Definitions"
+          ]
         }
       ]
     }

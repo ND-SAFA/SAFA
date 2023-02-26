@@ -1,10 +1,8 @@
 import os
 from typing import Dict
 
-from data.hub.abstract_hub_id import AbstractHubId
 from data.hub.hub_ids.iceory.abstract_iceoryx_hub_id import IceoryxHubId
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
-from util.override import overrides
 
 
 class IceoryxCode(IceoryxHubId):
@@ -34,7 +32,6 @@ class IceoryxCode(IceoryxHubId):
         """
         return os.path.join(data_dir, self.stage, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
 
-    @overrides(AbstractHubId)
     def get_definition(self) -> Dict:
         """
         :return: Returns this project's structured project definition.

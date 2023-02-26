@@ -16,7 +16,6 @@ class TrainControllerHubId(AbstractHubId):
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/TrainController.zip"
 
-    @overrides(AbstractHubId)
     def get_definition(self) -> Dict:
         """
         :return: Returns this project's structured project definition.

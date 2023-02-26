@@ -16,7 +16,6 @@ class ITrustHubId(AbstractHubId):
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/iTrust.zip"
 
-    @overrides(AbstractHubId)
     def get_definition(self) -> Dict:
         """
         :return: Returns this project's structured project definition.

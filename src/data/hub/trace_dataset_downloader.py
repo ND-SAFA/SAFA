@@ -4,8 +4,6 @@ from datasets import DownloadConfig, DownloadManager
 
 from constants import CACHE_DIR_NAME, DATA_PATH_PARAM
 from data.hub.abstract_hub_id import AbstractHubId
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
 
 
 class TraceDatasetDownloader:
@@ -38,8 +36,8 @@ class TraceDatasetDownloader:
             download_manager = DownloadManager(download_config=download_config)
             data_dir = download_manager.download_and_extract(self.descriptor.get_url())
             assert os.path.isdir(data_dir), f"Expected {data_dir} to be folder."
-            definition_content = JsonUtil.dict_to_json(self.descriptor.get_definition())
-            definition_file_path = self.descriptor.get_definition_path(data_dir)
-            FileUtil.write(definition_content, definition_file_path)
+            # definition_content = JsonUtil.dict_to_json(self.descriptor.get_definition())
+            # definition_file_path = self.descriptor.get_definition_path(data_dir)
+            # FileUtil.write(definition_content, definition_file_path)
             self.data_dir = data_dir
         return self.data_dir

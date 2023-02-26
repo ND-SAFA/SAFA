@@ -25,8 +25,6 @@ class IceoryxHubId(AbstractHubId, ABC):
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/iceoryx/code.zip"
 
-    @classmethod
-    @overrides(AbstractHubId)
     def get_definition(cls) -> Dict:
         """
         :return: Returns this project's structured project definition.

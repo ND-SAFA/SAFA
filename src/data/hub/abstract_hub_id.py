@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Dict, Type
+from typing import Type
 
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
@@ -17,12 +17,6 @@ class AbstractHubId(ABC):
     def get_url(self) -> str:
         """
         :return: The url of the file(s) to download.
-        """
-
-    @abstractmethod
-    def get_definition(self) -> Dict:
-        """
-        :return: Returns project definition for structured project reader.
         """
 
     def get_definition_path(self, data_dir: str) -> str:

@@ -6,9 +6,11 @@ from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
 from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
-from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
-    COMMIT_DIFF_ARTIFACT_FILE, ISSUE_ARTIFACT_FILE, \
-    PULL_ARTIFACT_FILE
+from data.github.gartifacts.gissue import GIssue
+from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, CODE_ARTIFACT_FILE, \
+    CODE_EXPORT_FILE, COMMITDIFF2ISSUE_EXPORT_FILE, COMMIT_ARTIFACT_FILE, \
+    COMMIT_DIFF_EXPORT_FILE, COMMIT_EXPORT_FILE, ISSUE2CODE_EXPORT_FILE, ISSUE_ARTIFACT_FILE, \
+    ISSUE_EXPORT_FILE, PULL_ARTIFACT_FILE, PULL_EXPORT_FILE
 from data.github.gtraces.glink import GLink
 from data.github.gtraces.glink_processor import GLinkProcessor
 from data.github.gtraces.glink_store import GLinkStore
@@ -22,7 +24,13 @@ MIN_CODE_LENGTH = 5
 COMMIT_CLEANING_REGEX = {
     "Signed-off-by.+$": "",
     "\s{2}": ". ",
-    "\n": " "
+    "\n": " ",
+    "<!-.*->": "",
+    "```.*```": ""
+}
+ISSUE_CLEANING_REGEX = {
+    "<!-.*->": "",
+    "```.*```": ""
 }
 CODE_CLEANING_REGEX = {
     "// Copyright((.|\n)*)Apache-2\.0": ""
@@ -37,9 +45,9 @@ class RepositoryExporter:
     """
     Reads parsed artifacts and cleans them for export.
     """
-    SOURCE_FILE = "sources.csv"
-    TARGET_FILE = "targets.csv"
-    LINK_FILE = "links.csv"
+    DEFAULT_COL_ID = "artifacts"
+    OBJ = "obj"
+    COL_ID = "col_id"
 
     def __init__(self, repo_path: str):
         """
@@ -73,6 +81,7 @@ class RepositoryExporter:
         self.commits = self.__remove_short_commits(self.commits, MIN_WORD_LENGTH, MIN_CODE_LENGTH)
         self.commits = self.__clean_commits(self.commits, COMMIT_CLEANING_REGEX)
         self.code = self.__clean_code(self.code, CODE_CLEANING_REGEX)
+        self.issues = self.__clean_issues(self.issues, ISSUE_CLEANING_REGEX)
 
         self.glink_store.add_artifact_links(self.issues, self.pulls, self.commits)  # Note, code links are already exported.
         linked_issues, linked_pulls, linked_commits = self.glink_store_processor.get_linked_artifact_ids()
@@ -87,50 +96,46 @@ class RepositoryExporter:
         :return: None
         """
         entity_instructions: Dict[str: Dict] = {
-            ISSUE_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.issues,
-                "col_id": "artifact"
+            ISSUE_EXPORT_FILE: {
+                self.OBJ: self.issues
             },
-            PULL_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.pulls,
-                "col_id": "artifact"
+            PULL_EXPORT_FILE: {
+                self.OBJ: self.pulls
             },
-            COMMIT_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.commits,
-                "col_id": "artifact"
+            COMMIT_EXPORT_FILE: {
+                self.OBJ: self.commits
             },
-            COMMIT_DIFF_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.commits,
-                "col_id": "artifact",
+            COMMIT_DIFF_EXPORT_FILE: {
+                self.OBJ: self.commits,
                 "dataset_type": "PL"
             },
-            CODE_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.code,
-                "col_id": "artifact"
+            CODE_EXPORT_FILE: {
+                self.OBJ: self.code
             },
-            CODE2CODE_ARTIFACT_FILE.replace(".json", ".csv"): {
-                "obj": self.code2code,
-                "col_id": "trace"
+            CODE2CODE_EXPORT_FILE: {
+                self.OBJ: self.code2code,
+                self.COL_ID: "trace"
             }
         }
         trace_artifact_sets = self.glink_store.create_artifact_sets()
         trace_instructions = {file_name: {
-            "obj": artifact_set,
-            "col_id": "trace"
+            self.OBJ: artifact_set,
+            self.COL_ID: "trace"
         } for file_name, artifact_set in trace_artifact_sets.items()}
-        if "commit2issue.csv" in entity_instructions:  # copy commit2issue for commit_diff2issue
-            trace_instructions["commit_diff2issue.csv"] = {**trace_instructions["commit2issue.csv"]}  # TODO: Append ids with DIFF
+        trace_instructions[COMMITDIFF2ISSUE_EXPORT_FILE] = {**trace_instructions["commit2issue.csv"]}  # TODO: Append ids with DIFF
         entity_instructions.update(trace_instructions)
-        entity_instructions["issue2code.csv"] = {
-            "obj": self.__create_issue_2_code(),
-            "col_id": "trace"
+        entity_instructions[ISSUE2CODE_EXPORT_FILE] = {
+            self.OBJ: self.__create_issue_2_code(),
+            self.COL_ID: "trace"
         }
 
         for file_name, instructions in entity_instructions.items():
+            if self.COL_ID not in instructions:
+                instructions[self.COL_ID] = self.DEFAULT_COL_ID
             export_path = os.path.join(output_path, file_name)
-            assert "obj" in instructions, f"Expected instructions to contain obj."
-            artifact_set = instructions.pop("obj")
-            col_id = instructions.pop("col_id")
+            assert self.OBJ in instructions, f"Expected instructions to contain obj."
+            artifact_set: GArtifactSet = instructions.pop(self.OBJ)
+            col_id = instructions.pop(self.COL_ID)
             artifact_set.export(export_path, columns=EXPORT_COLUMN_MAP[col_id], **instructions)
 
     def __read_artifact_set(self, artifact_file_name: str) -> GArtifactSet:
@@ -230,7 +235,24 @@ class RepositoryExporter:
         return code_artifact_set
 
     @staticmethod
-    def __clean_content(artifact_set: GArtifactSet[Union[GCodeFile, GCommit]], regex_replacements: Dict):
+    def __clean_issues(issue_artifact_set: GArtifactSet[GIssue], regex_replacements: Dict):
+        """
+        Cleans the issue title and bodies of given set.
+        :param issue_artifact_set: Set of issues to clean.
+        :param regex_replacements: Regex cleaning substitutions.
+        :return: Cleaned set of issues.
+        """
+        RepositoryExporter.__clean_content(issue_artifact_set, regex_replacements)
+        return issue_artifact_set
+
+    @staticmethod
+    def __clean_content(artifact_set: GArtifactSet[Union[GCodeFile, GCommit, GIssue]], regex_replacements: Dict) -> None:
+        """
+        Cleans the content of artifact set by applying substitutions.
+        :param artifact_set: The set of artifact to clean.
+        :param regex_replacements: The set of regex replacements.
+        :return: None
+        """
         for regex, replacement in regex_replacements.items():
             for a in artifact_set.artifacts:
                 a.clean_content(lambda s: re.sub(regex, replacement, s).strip())

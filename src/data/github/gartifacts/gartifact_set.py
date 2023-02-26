@@ -5,11 +5,7 @@ import pandas as pd
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.gcode_file import GCodeFile
-from data.github.gartifacts.gcommit import GCommit
-from data.github.gartifacts.gissue import GIssue
-from data.github.gartifacts.gpull import GPull
-from data.github.gtraces.glink import GLink
+from data.github.gartifacts.supported_gartifacts import SupportedGArtifacts
 from util.logging.logger_manager import logger
 
 T = TypeVar('T', bound="AbstractArtifact")
@@ -109,18 +105,7 @@ class GArtifactSet(Generic[T]):
         :param artifact_type: The type of artifact to create.
         :return: Class constructor for given type.
         """
-        if artifact_type == GArtifactType.LINK:
-            return GLink
-        if artifact_type == GArtifactType.COMMIT:
-            return GCommit
-        if artifact_type == GArtifactType.ISSUE:
-            return GIssue
-        if artifact_type == GArtifactType.PULL:
-            return GPull
-        if artifact_type == GArtifactType.CODE:
-            return GCodeFile
-        else:
-            raise Exception("Unknown artifact type: " + artifact_type.value)
+        return SupportedGArtifacts.get_value(artifact_type)
 
     def __contains__(self, artifact_id: str) -> bool:
         """

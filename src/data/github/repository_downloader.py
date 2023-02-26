@@ -23,6 +23,7 @@ from data.github.gartifacts.gpull import GPull
 from data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
     ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
+from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 
 
@@ -51,75 +52,21 @@ class RepositoryDownloader:
         :param output_dir: The path to the directory to save repository artifacts.
         :param load: Whether to load from pre-existing files
         """
-        # A. Paths
         output_path = os.path.join(output_dir, self.repository_name)
-        issue_file_path = os.path.join(output_path, ISSUE_ARTIFACT_FILE)
-        commit_file_path = os.path.join(output_path, COMMIT_ARTIFACT_FILE)
-        pull_request_file_path = os.path.join(output_path, PULL_ARTIFACT_FILE)
-        code_export_path = os.path.join(output_path, CODE_ARTIFACT_FILE)
-        code2code_export_path = os.path.join(output_path, CODE2CODE_ARTIFACT_FILE)
+        artifacts = {
+            ISSUE_ARTIFACT_FILE: lambda: self.parse_issues(git, github_repo),
+            PULL_ARTIFACT_FILE: lambda: self.parse_pulls(git, github_repo),
+            COMMIT_ARTIFACT_FILE: lambda: self.parse_commits(local_repo),
+            CODE_ARTIFACT_FILE: lambda: self.read_code_files(),
+            CODE2CODE_ARTIFACT_FILE: lambda: self.extract_code_links()
+        }
 
-        # A. Create output directory
-        if not os.path.isdir(output_path):
-            os.makedirs(output_path)
+        FileUtil.create_dir_safely(output_path)
         git, github_repo, local_repo = self.__get_repo()
 
-        # 1. Parse issues
-        self.load_or_retrieve(issue_file_path, lambda: self.parse_issues(git, github_repo), load)
-        self.load_or_retrieve(pull_request_file_path, lambda: self.parse_pulls(git, github_repo), load)
-        self.load_or_retrieve(commit_file_path, lambda: self.parse_commits(local_repo), load)
-        self.load_or_retrieve(code_export_path, lambda: self.read_code_files(), False)
-        self.load_or_retrieve(code2code_export_path, lambda: self.extract_code_links(), False)
-
-    @staticmethod
-    def load_or_retrieve(data_file_path: Union[str, List[str]],
-                         artifact_set_creator: Callable[[], Union[GArtifactSet, List[GArtifactSet]]],
-                         load: bool) -> List[GArtifactSet]:
-        """
-        Downloads artifact set from GitHub, or loads artifact set if data file exists.
-        :param data_file_path: The path to the data file to load.
-        :param artifact_set_creator: Callable representing the parsing of an artifact set
-        :param load: If true, loads data in data file. Otherwise, calls artifact_set_creator
-        :return: Loaded or parsed ArtifactSet
-        """
-        data_file_paths = data_file_path if isinstance(data_file_path, list) else [data_file_path]
-        if load:
-            artifact_sets = [GArtifactSet.load(p) for p in data_file_paths]
-        else:
-            artifact_sets = artifact_set_creator()
-            artifact_sets = artifact_sets if isinstance(artifact_sets, list) else [artifact_sets]
-            for artifact_set, export_path in zip(artifact_sets, data_file_paths):
-                artifact_set.save(export_path)
-        return artifact_sets
-
-    def parse_issues(self, github_instance, repo: Repository) -> GArtifactSet[Issue]:
-        """
-        Extracts issues at given repository.
-        :param github_instance: The instance of the github API.
-        :param repo: The repository to gather issues from.
-        :return: Set of artifacts representing issues in repository.
-        """
-        issue_artifacts = []
-        for issue in tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
-            if issue.pull_request is not None:  # Pull requests handled in parse_pulls.
-                continue
-            self.wait_for_rate_limit(github_instance)
-            issue_artifacts.append(GIssue.parse(issue))
-
-        return GArtifactSet(issue_artifacts, GArtifactType.ISSUE)
-
-    def parse_pulls(self, github_instance, repo: Repository) -> GArtifactSet[Issue]:
-        """
-        Extracts pull requests at given repository.
-        :param github_instance: The instance of the github API.
-        :param repo: The repository to gather pulls from.
-        :return: Set of artifacts representing pulls in repository.
-        """
-        pulls = []
-        for pr in tqdm(repo.get_pulls(state="all"), desc="Scraping pulls"):
-            self.wait_for_rate_limit(github_instance)
-            pulls.append(GPull.parse(pr))
-        return GArtifactSet(pulls, GArtifactType.PULL)
+        for output_file, parse_lambda in artifacts.items():
+            output_path = os.path.join(output_path, output_file)
+            self.load_or_retrieve(output_path, parse_lambda, load)
 
     def extract_code_links(self) -> GArtifactSet:
         """
@@ -149,10 +96,62 @@ class RepositoryDownloader:
         """
         github_instance = Github(login_or_token=self.token)
         github_instance.get_user()
-        self.wait_for_rate_limit(github_instance)
+        RepositoryDownloader.wait_for_rate_limit(github_instance)
         repo = github_instance.get_repo(self.repository_name)
         local_repo = self.__clone_repository(self.repository_name, self.clone_path)
         return github_instance, repo, local_repo
+
+    @staticmethod
+    def load_or_retrieve(data_file_path: Union[str, List[str]],
+                         artifact_set_creator: Callable[[], Union[GArtifactSet, List[GArtifactSet]]],
+                         load: bool) -> List[GArtifactSet]:
+        """
+        Downloads artifact set from GitHub, or loads artifact set if data file exists.
+        :param data_file_path: The path to the data file to load.
+        :param artifact_set_creator: Callable representing the parsing of an artifact set
+        :param load: If true, loads data in data file. Otherwise, calls artifact_set_creator
+        :return: Loaded or parsed ArtifactSet
+        """
+        data_file_paths = data_file_path if isinstance(data_file_path, list) else [data_file_path]
+        if load:
+            artifact_sets = [GArtifactSet.load(p) for p in data_file_paths]
+        else:
+            artifact_sets = artifact_set_creator()
+            artifact_sets = artifact_sets if isinstance(artifact_sets, list) else [artifact_sets]
+            for artifact_set, export_path in zip(artifact_sets, data_file_paths):
+                artifact_set.save(export_path)
+        return artifact_sets
+
+    @staticmethod
+    def parse_issues(github_instance, repo: Repository) -> GArtifactSet[Issue]:
+        """
+        Extracts issues at given repository.
+        :param github_instance: The instance of the github API.
+        :param repo: The repository to gather issues from.
+        :return: Set of artifacts representing issues in repository.
+        """
+        issue_artifacts = []
+        for issue in tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
+            if issue.pull_request is not None:  # Pull requests handled in parse_pulls.
+                continue
+            RepositoryDownloader.wait_for_rate_limit(github_instance)
+            issue_artifacts.append(GIssue.parse(issue))
+
+        return GArtifactSet(issue_artifacts, GArtifactType.ISSUE)
+
+    @staticmethod
+    def parse_pulls(github_instance, repo: Repository) -> GArtifactSet[Issue]:
+        """
+        Extracts pull requests at given repository.
+        :param github_instance: The instance of the github API.
+        :param repo: The repository to gather pulls from.
+        :return: Set of artifacts representing pulls in repository.
+        """
+        pulls = []
+        for pr in tqdm(repo.get_pulls(state="all"), desc="Scraping pulls"):
+            RepositoryDownloader.wait_for_rate_limit(github_instance)
+            pulls.append(GPull.parse(pr))
+        return GArtifactSet(pulls, GArtifactType.PULL)
 
     @staticmethod
     def parse_commits(repo: Repository) -> GArtifactSet[GCommit]:

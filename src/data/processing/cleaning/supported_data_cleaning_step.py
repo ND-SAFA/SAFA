@@ -24,3 +24,4 @@ class SupportedDataCleaningStep(Enum):
     REMOVE_NON_ALPHA = RemoveNonAlphaCharsStep
     SEPARATE_CAMEL_CASE = SeparateCamelCaseStep
     LEMMATIZE_WORDS = LemmatizeWordStep
+    REGEX_REPLACEMENTS = RegexReplacementStep

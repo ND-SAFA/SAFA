@@ -14,6 +14,8 @@ from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTI
 from data.github.gtraces.glink import GLink
 from data.github.gtraces.glink_processor import GLinkProcessor
 from data.github.gtraces.glink_store import GLinkStore
+from data.processing.cleaning.data_cleaner import DataCleaner
+from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 
 GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Revert.*of.*",
@@ -79,9 +81,9 @@ class RepositoryExporter:
         """
         self.commits = self.__remove_default_commits(self.commits)
         self.commits = self.__remove_short_commits(self.commits, MIN_WORD_LENGTH, MIN_CODE_LENGTH)
-        self.commits = self.__clean_commits(self.commits, COMMIT_CLEANING_REGEX)
-        self.code = self.__clean_code(self.code, CODE_CLEANING_REGEX)
-        self.issues = self.__clean_issues(self.issues, ISSUE_CLEANING_REGEX)
+        self.commits = self.__clean_commits(self.commits, RepositoryExporter.__create_regex_data_cleaner(COMMIT_CLEANING_REGEX))
+        self.code = self.__clean_code(self.code, RepositoryExporter.__create_regex_data_cleaner(CODE_CLEANING_REGEX))
+        self.issues = self.__clean_issues(self.issues, RepositoryExporter.__create_regex_data_cleaner(ISSUE_CLEANING_REGEX))
 
         self.glink_store.add_artifact_links(self.issues, self.pulls, self.commits)  # Note, code links are already exported.
         linked_issues, linked_pulls, linked_commits = self.glink_store_processor.get_linked_artifact_ids()
@@ -214,45 +216,53 @@ class RepositoryExporter:
         return GArtifactSet(long_messages, GArtifactType.COMMIT)
 
     @staticmethod
-    def __clean_commits(commit_artifact_set: GArtifactSet[GCommit], regex_replacements: Dict) -> GArtifactSet[GCommit]:
+    def __clean_commits(commit_artifact_set: GArtifactSet[GCommit], data_cleaner: DataCleaner) -> GArtifactSet[GCommit]:
         """
         Removes redundant text and strips content.
         :param commit_artifact_set: The set of artifacts to clean.
         :return: The cleaned artifacts.
         """
-        RepositoryExporter.__clean_content(commit_artifact_set, regex_replacements)
+        RepositoryExporter.__clean_content(commit_artifact_set, data_cleaner)
         return commit_artifact_set
 
     @staticmethod
-    def __clean_code(code_artifact_set: GArtifactSet[GCodeFile], regex_replacement: Dict) -> GArtifactSet[GCodeFile]:
+    def __clean_code(code_artifact_set: GArtifactSet[GCodeFile], data_cleaner: DataCleaner) -> GArtifactSet[GCodeFile]:
         """
         Cleans the code bodies.
         :param code_artifact_set: Artifact set of code modules.
-        :param regex_replacement: The replacements for cleaning code modules.
+        :param data_cleaner: The replacements for cleaning code modules.
         :return: Cleaned code artifact set.
         """
-        RepositoryExporter.__clean_content(code_artifact_set, regex_replacement)
+        RepositoryExporter.__clean_content(code_artifact_set, data_cleaner)
         return code_artifact_set
 
     @staticmethod
-    def __clean_issues(issue_artifact_set: GArtifactSet[GIssue], regex_replacements: Dict):
+    def __clean_issues(issue_artifact_set: GArtifactSet[GIssue], data_cleaner: DataCleaner):
         """
         Cleans the issue title and bodies of given set.
         :param issue_artifact_set: Set of issues to clean.
-        :param regex_replacements: Regex cleaning substitutions.
+        :param data_cleaner: Regex cleaning substitutions.
         :return: Cleaned set of issues.
         """
-        RepositoryExporter.__clean_content(issue_artifact_set, regex_replacements)
+        RepositoryExporter.__clean_content(issue_artifact_set, data_cleaner)
         return issue_artifact_set
 
     @staticmethod
-    def __clean_content(artifact_set: GArtifactSet[Union[GCodeFile, GCommit, GIssue]], regex_replacements: Dict) -> None:
+    def __clean_content(artifact_set: GArtifactSet[Union[GCodeFile, GCommit, GIssue]], data_cleaner: DataCleaner) -> None:
         """
         Cleans the content of artifact set by applying substitutions.
         :param artifact_set: The set of artifact to clean.
-        :param regex_replacements: The set of regex replacements.
+        :param data_cleaner: The set of regex replacements.
         :return: None
         """
-        for regex, replacement in regex_replacements.items():
-            for a in artifact_set.artifacts:
-                a.clean_content(lambda s: re.sub(regex, replacement, s).strip())
+        for a in artifact_set.artifacts:
+            a.clean_content(lambda s: data_cleaner.run([s])[0])
+
+    @staticmethod
+    def __create_regex_data_cleaner(regex_replacements: Dict) -> DataCleaner:
+        """
+        Constructs data cleaner performing regex replacements.
+        :param regex_replacements: The regex substitutions.
+        :return: The data cleaner.
+        """
+        return DataCleaner(steps=[RegexReplacementStep(regex_replacements)])

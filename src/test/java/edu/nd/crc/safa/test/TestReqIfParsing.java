@@ -1,11 +1,12 @@
 package edu.nd.crc.safa.test;
 
-import edu.nd.crc.safa.utilities.reqif.ReqIf;
+import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
+
+import edu.nd.crc.safa.utilities.reqif.datatypes.ReqIf;
+import edu.nd.crc.safa.utilities.reqif.parsing.ReqIfFileParser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import org.junit.jupiter.api.Test;
 
 public class TestReqIfParsing {
@@ -107,9 +108,7 @@ public class TestReqIfParsing {
         "</REQ-IF>";
 
     @Test
-    public void test() throws JsonProcessingException {
-        XmlMapper mapper = new XmlMapper();
-        mapper.registerModule(new JaxbAnnotationModule());
-        ReqIf reqIf = mapper.readValue(file, new TypeReference<>() {});
+    public void test() throws JsonProcessingException, JAXBException, XMLStreamException {
+        ReqIf reqIf = ReqIfFileParser.parseReqIfFile(file);
     }
 }

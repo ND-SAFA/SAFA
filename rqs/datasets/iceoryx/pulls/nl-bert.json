@@ -8,12 +8,11 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/pl-bert"
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": 1,
             "per_device_train_batch_size": 4,
-            "per_device_eval_batch_size": 16,
             "gradient_accumulation_steps": 250,
             "learning_rate": 5e-5,
             "metrics": [
@@ -23,15 +22,21 @@
               "precision"
             ],
             "skip_save": false,
-            "load_best_model_at_end": true
+            "load_best_model_at_end": true,
+            "evaluation_strategy": "steps",
+            "save_strategy": "steps",
+            "logging_strategy": "steps",
+            "save_steps": 5,
+            "eval_steps": 5,
+            "logging_steps": 1
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone",
-                "task": "task_1",
+                "name": "iceoryx",
+                "task": "issue2pull",
                 "stage": "train"
               }
             },
@@ -39,8 +44,8 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone",
-                "task": "task_1",
+                "name": "iceoryx",
+                "task": "issue2pull",
                 "stage": "val"
               }
             },
@@ -48,8 +53,8 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone",
-                "task": "task_1",
+                "name": "iceoryx",
+                "task": "issue2pull",
                 "stage": "eval"
               }
             },

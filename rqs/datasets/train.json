@@ -35,6 +35,10 @@
                 {
                   "object_type": "HUB",
                   "name": "itrust"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "cm1"
                 }
               ]
             },

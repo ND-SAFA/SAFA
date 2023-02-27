@@ -29,7 +29,8 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "cm1"
+                "name": "cm1",
+                "local_path": "~/desktop/safa/datasets/software-data/cm1"
               }
             },
             "val_dataset_creator": {

@@ -12,7 +12,7 @@ class AbstractHubId(ABC):
     Interface for definition where to download a dataset and how to read it.
     """
 
-    def __init__(self, local_path: str):
+    def __init__(self, local_path: str = None):
         """
         Initializes dataset to defined url or local path.
         :param local_path: The path to local version of the dataset.

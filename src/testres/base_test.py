@@ -36,6 +36,7 @@ class BaseTest(TestCase):
         :param sized: The object whose length is being verified.
         :return: None
         """
+        self.assertIsNotNone(sized)
         self.assertEqual(size, len(sized))
 
     @classmethod

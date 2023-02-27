@@ -16,7 +16,7 @@ class SeparateCamelCaseStep(AbstractDataProcessingStep):
         :param kwargs: Ignored.
         :return: Processed data entries.
         """
-        pass
+        return [SeparateCamelCaseStep.separate_camel_case(s) for s in data_entries]
 
     @staticmethod
     def separate_camel_case(doc: str):

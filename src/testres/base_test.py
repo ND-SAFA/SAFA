@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List, Tuple
+from typing import List, Sized, Tuple
 
 import mock
 from django.test import TestCase
@@ -28,6 +28,15 @@ class BaseTest(TestCase):
     BASE_TEST_MODEL = "hf-internal-testing/tiny-random-bert"
     BASE_MODEL_LAYERS = 5  # bert-base = 12
     configure_logging = True
+
+    def assertSize(self, size: int, sized: Sized) -> None:
+        """
+        Asserts size of list (or other) is equal to given size.
+        :param size: The expected size of sized object.
+        :param sized: The object whose length is being verified.
+        :return: None
+        """
+        self.assertEqual(size, len(sized))
 
     @classmethod
     def setUpClass(cls):

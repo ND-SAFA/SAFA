@@ -9,10 +9,10 @@ from util.supported_enum import SupportedEnum
 
 
 class SupportedDatasets(SupportedEnum):
-    CCHIT = CCHITHubId
-    CM1 = CM1HubId
-    TRAINCONTROLLER = TrainControllerHubId
     DRONE = DroneHubId
     ITRUST = ITrustHubId
+    CM1 = CM1HubId
     MIP = MipHubId
+    CCHIT = CCHITHubId
+    TRAINCONTROLLER = TrainControllerHubId
     ICEORYX_CODE = IceoryxCode

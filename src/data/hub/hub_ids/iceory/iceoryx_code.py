@@ -15,6 +15,7 @@ class IceoryxCode(IceoryxHubId):
         Initialized code dataset to given stage.
         :param stage: Either train, val, or eval.
         """
+        super().__init__()
         self.stage = stage
 
     @staticmethod

@@ -39,6 +39,18 @@
                 {
                   "object_type": "HUB",
                   "name": "cm1"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "mip"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "cchit"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "traincontroller"
                 }
               ]
             },

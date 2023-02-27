@@ -346,6 +346,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param n_items_per_line: How many items to print per line.
         :return: None
         """
+        artifact_ids = list(set(artifact_ids))
         n_artifacts = len(artifact_ids)
         if n_artifacts > n_allowed:
             artifact_id_str = "\n".join(

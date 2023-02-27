@@ -5,7 +5,6 @@ from typing import Type
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.readers.structured_project_reader import StructuredProjectReader
-from util.file_util import FileUtil
 
 
 class AbstractHubId(ABC):
@@ -13,20 +12,33 @@ class AbstractHubId(ABC):
     Interface for definition where to download a dataset and how to read it.
     """
 
-    @abstractmethod
-    def get_url(self) -> str:
+    def __init__(self, local_path: str):
         """
-        :return: The url of the file(s) to download.
+        Initializes dataset to defined url or local path.
+        :param local_path: The path to local version of the dataset.
         """
+        self.local_path = local_path
+
+    def get_path(self) -> str:
+        """
+        Returns path to dataset.
+        :return: Local path if defined otherwise hub url.
+        """
+        if self.local_path:
+            return self.local_path
+        return self.get_url()
 
     def get_definition_path(self, data_dir: str) -> str:
         """
         :return: Returns the path to save and read definition from.
         """
-        zip_file_query = FileUtil.ls_dir(data_dir, ignore=["__MACOSX"])
-        assert len(zip_file_query) == 1, f"Found more than one folder for extracted files:{zip_file_query}"
-        project_dir_path = zip_file_query[0]  # include path to directory
-        return os.path.join(project_dir_path, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
+        return os.path.join(data_dir, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
+
+    @abstractmethod
+    def get_url(self) -> str:
+        """
+        :return: The url of the file(s) to download.
+        """
 
     @staticmethod
     def get_project_reader() -> Type[AbstractProjectReader]:

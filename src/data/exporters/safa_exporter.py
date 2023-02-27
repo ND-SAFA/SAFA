@@ -69,7 +69,7 @@ class SafaExporter:
                 })
             file_name = artifact_type + ".csv"
             local_export_path = os.path.join(export_path, file_name)
-            pd.DataFrame(entries).to_csv(local_export_path, index=False)
+            pd.DataFrame(entries).to_csv(local_export_path, index=False, encoding="utf-8")
             self.artifact_definitions[artifact_type] = {
                 SafaKeys.FILE: file_name
             }
@@ -93,7 +93,7 @@ class SafaExporter:
                 "Source": source_type,
                 "Target": target_type
             }
-            trace_df.to_csv(export_file_path, index=False)
+            trace_df.to_csv(export_file_path, index=False, encoding="utf-8")
 
     def create_trace_df(self, links: Dict[int, TraceLink], source_type, target_type) -> pd.DataFrame:
         """

@@ -27,4 +27,4 @@ class TestRemoveNonAlphaChars(BaseTest):
 
         for cleaned_file in cleaned_files:
             for expected_removed_str in self.EXPECTED_REMOVED_STRINGS:
-                self.assertNotIn(expected_removed_str, cleaned_file)
+                self.assertTrue(expected_removed_str not in cleaned_file)

@@ -12,7 +12,7 @@ class TestLemmatizeWordStep(BaseTest):
         Tests simple use case.
         """
         phrase = "I worked on the data entries"
-        expected = "I work on the data entr"
+        expected = "i work on the data entri"
         step = LemmatizeWordStep()
         resulting_phrases = step.run([phrase])
         self.assertSize(1, resulting_phrases)

@@ -24,7 +24,7 @@ class LemmatizeWordStep(AbstractDataProcessingStep):
         :param kwargs: Ignored.
         :return: Processed entries.
         """
-        return [LemmatizeWordStep.stem_doc(s) for s in data_entries]
+        return [self.stem_doc(s) for s in data_entries]
 
     def stem_doc(self, doc):
         """

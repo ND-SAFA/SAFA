@@ -3,6 +3,7 @@ from enum import Enum
 from data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
 from data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
 from data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
+from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 from data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
 from data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 from data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep

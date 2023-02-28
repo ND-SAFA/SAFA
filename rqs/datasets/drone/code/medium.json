@@ -37,13 +37,16 @@
               "data_cleaner": {
                 "steps": [
                   {
+                    "object_type": "EXTRACT_CODE_IDENTIFIERS"
+                  },
+                  {
+                    "object_type": "LEMMATIZE_WORDS"
+                  },
+                  {
                     "object_type": "REMOVE_NON_ALPHA"
                   },
                   {
                     "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
                   },
                   {
                     "object_type": "REMOVE_WHITE_SPACE"

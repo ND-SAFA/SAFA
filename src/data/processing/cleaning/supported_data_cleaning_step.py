@@ -1,5 +1,6 @@
 from enum import Enum
 
+from data.processing.cleaning.extract_code_identifiers import ExtractCodeIdentifiersStep
 from data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
 from data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
 from data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
@@ -26,3 +27,4 @@ class SupportedDataCleaningStep(Enum):
     SEPARATE_CAMEL_CASE = SeparateCamelCaseStep
     LEMMATIZE_WORDS = LemmatizeWordStep
     REGEX_REPLACEMENTS = RegexReplacementStep
+    EXTRACT_CODE_IDENTIFIERS = ExtractCodeIdentifiersStep

@@ -1,8 +1,6 @@
-import os
-
 from data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
 from testres.base_test import BaseTest
-from testres.paths.paths import TEST_DATA_DIR
+from testres.paths.paths import TEST_FILE_PATH
 from util.file_util import FileUtil
 
 
@@ -10,7 +8,7 @@ class TestRemoveNonAlphaChars(BaseTest):
     """
     Tests ability to remove non alpha numeric characters from strings.
     """
-    TEST_FILE_PATH = os.path.join(TEST_DATA_DIR, "cleaning", "test.hpp")
+
     TEST_FILE = FileUtil.read_file(TEST_FILE_PATH)
     EXPECTED_REMOVED_STRINGS = ["@brief", "//", "{"]
 

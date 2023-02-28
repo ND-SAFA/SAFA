@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-medium"
+            "model_path": "pl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -33,25 +33,6 @@
                 "name": "drone",
                 "task": "task_1",
                 "stage": "train"
-              },
-              "data_cleaner": {
-                "steps": [
-                  {
-                    "object_type": "EXTRACT_CODE_IDENTIFIERS"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
-                  },
-                  {
-                    "object_type": "REMOVE_NON_ALPHA"
-                  },
-                  {
-                    "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "REMOVE_WHITE_SPACE"
-                  }
-                ]
               }
             },
             "val_dataset_creator": {
@@ -61,22 +42,6 @@
                 "name": "drone",
                 "task": "task_1",
                 "stage": "val"
-              },
-              "data_cleaner": {
-                "steps": [
-                  {
-                    "object_type": "REMOVE_NON_ALPHA"
-                  },
-                  {
-                    "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
-                  },
-                  {
-                    "object_type": "REMOVE_WHITE_SPACE"
-                  }
-                ]
               }
             },
             "eval_dataset_creator": {
@@ -86,22 +51,6 @@
                 "name": "drone",
                 "task": "task_1",
                 "stage": "eval"
-              },
-              "data_cleaner": {
-                "steps": [
-                  {
-                    "object_type": "REMOVE_NON_ALPHA"
-                  },
-                  {
-                    "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
-                  },
-                  {
-                    "object_type": "REMOVE_WHITE_SPACE"
-                  }
-                ]
               }
             },
             "augmenter": {

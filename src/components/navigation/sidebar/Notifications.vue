@@ -12,14 +12,17 @@
             value="There are no notifications in the current session."
           />
         </div>
-        <list v-else :items="notifications" class="nav-notifications q-pa-md">
-          <template #item="{ item }">
-            <list-item dense class="q-px-none">
-              <alert :type="item.type">
-                <typography :value="item.message" />
-              </alert>
-            </list-item>
-          </template>
+        <list v-else class="nav-notifications q-pa-md">
+          <list-item
+            v-for="item in notifications"
+            :key="item.message"
+            dense
+            class="q-px-none"
+          >
+            <alert :type="item.type">
+              <typography :value="item.message" />
+            </alert>
+          </list-item>
         </list>
       </q-menu>
     </q-btn>

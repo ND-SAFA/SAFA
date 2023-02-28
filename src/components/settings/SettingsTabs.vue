@@ -1,8 +1,5 @@
 <template>
   <sidebar-grid>
-    <template #header>
-      <settings-header />
-    </template>
     <template #sidebar>
       <project-buttons />
       <project-display />
@@ -37,7 +34,6 @@ import {
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
-import SettingsHeader from "./SettingsHeader.vue";
 import { SettingsMembers } from "./members";
 
 /**
@@ -54,7 +50,6 @@ export default defineComponent({
     UploadNewVersion,
     TabList,
     SettingsMembers,
-    SettingsHeader,
   },
   data() {
     return {

@@ -5,14 +5,14 @@
     :item-count="projects.length"
     :loading="loading"
   >
-    <list :items="projects">
-      <template #item="{ item }">
-        <list-item
-          :title="item.name"
-          :subtitle="getRepositoryTime(item)"
-          @click="handleProjectSelect(item)"
-        />
-      </template>
+    <list>
+      <list-item
+        v-for="item in projects"
+        :key="item.name"
+        :title="item.name"
+        :subtitle="getRepositoryTime(item)"
+        @click="handleProjectSelect(item)"
+      />
     </list>
   </stepper-list-step>
 </template>

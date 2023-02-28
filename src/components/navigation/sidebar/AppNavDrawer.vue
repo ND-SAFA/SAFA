@@ -59,12 +59,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { useQuasar } from "quasar";
 import { appStore, useTheme } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
 const { darkMode } = useTheme();
+const $q = useQuasar();
 
 const sidebarOpen = computed({
   get(): boolean {
@@ -76,7 +78,7 @@ const sidebarOpen = computed({
 });
 
 onMounted(() => {
-  if (window.innerWidth < 1000) {
+  if ($q.screen.lt.md) {
     appStore.toggleAppPanel();
   }
 });

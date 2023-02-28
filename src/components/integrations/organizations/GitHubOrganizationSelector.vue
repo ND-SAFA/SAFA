@@ -5,10 +5,13 @@
     :item-count="organizations.length"
     :loading="loading"
   >
-    <list :items="organizations">
-      <template #item="{ item }">
-        <list-item :title="item.name" @click="handleOrganizationSelect(item)" />
-      </template>
+    <list>
+      <list-item
+        v-for="item in organizations"
+        :key="item.name"
+        :title="item.name"
+        @click="handleOrganizationSelect(item)"
+      />
     </list>
   </stepper-list-step>
 </template>

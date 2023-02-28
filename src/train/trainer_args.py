@@ -7,8 +7,7 @@ from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_S
     GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, \
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
-    OPTIMIZER_DEFAULT, SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
-    SCHEDULER_DEFAULT, \
+    SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     USE_BALANCED_BATCHES_DEFAULT
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
@@ -40,9 +39,9 @@ class TrainerArgs(TrainingArguments, BaseObject):
     do_eval: bool = True
     place_model_on_device: bool = True
     total_training_epochs: int = None
-    optimizer_name: str = OPTIMIZER_DEFAULT
+    # optimizer_name: str = OPTIMIZER_DEFAULT
     loss_function: Callable = FunctionalWrapper(cross_entropy)
-    scheduler_name: str = SCHEDULER_DEFAULT
+    # scheduler_name: str = SCHEDULER_DEFAULT
     gradient_accumulation_steps: int = GRADIENT_ACCUMULATION_DEFAULT
     skip_save: bool = False
     use_balanced_batches: bool = USE_BALANCED_BATCHES_DEFAULT

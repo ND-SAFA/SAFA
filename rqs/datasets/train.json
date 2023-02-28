@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-medium"
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 5,

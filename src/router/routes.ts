@@ -1,3 +1,20 @@
+import { RouteRecordRaw } from "vue-router";
+import {
+  ArtifactView,
+  CreateAccountView,
+  ErrorPageView,
+  ForgotPasswordView,
+  HomeView,
+  LoginView,
+  MyAccountView,
+  ProjectCreatorView,
+  ProjectSelectorView,
+  ProjectSettingsView,
+  ResetPasswordView,
+  TracePredictionView,
+  UploadStatusView,
+} from "@/views";
+
 /**
  * Enumerates the possible routes within the app.
  */
@@ -40,4 +57,72 @@ export const routesPublic: string[] = [
   Routes.CREATE_ACCOUNT,
   Routes.FORGOT_PASSWORD,
   Routes.RESET_PASSWORD,
+];
+export const routes: Array<RouteRecordRaw> = [
+  {
+    path: Routes.LOGIN_ACCOUNT,
+    name: "Login",
+    component: LoginView,
+  },
+  {
+    path: Routes.CREATE_ACCOUNT,
+    name: "Create Account",
+    component: CreateAccountView,
+  },
+  {
+    path: Routes.FORGOT_PASSWORD,
+    name: "Forgot Password",
+    component: ForgotPasswordView,
+  },
+  {
+    path: Routes.RESET_PASSWORD,
+    name: "Reset Password",
+    component: ResetPasswordView,
+  },
+
+  {
+    path: Routes.HOME,
+    name: "Home",
+    component: HomeView,
+  },
+  {
+    path: Routes.PROJECT_CREATOR,
+    name: "Create Project",
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.MY_PROJECTS,
+    name: "My Projects",
+    component: ProjectSelectorView,
+  },
+  {
+    path: Routes.ACCOUNT,
+    name: "My Account",
+    component: MyAccountView,
+  },
+  {
+    path: Routes.ARTIFACT,
+    name: "Artifact View",
+    component: ArtifactView,
+  },
+  {
+    path: Routes.TRACE_LINK,
+    name: "Trace Prediction",
+    component: TracePredictionView,
+  },
+  {
+    path: Routes.PROJECT_SETTINGS,
+    name: "Project Settings",
+    component: ProjectSettingsView,
+  },
+  {
+    path: Routes.ERROR,
+    name: "Error Page",
+    component: ErrorPageView,
+  },
+  {
+    path: Routes.UPLOAD_STATUS,
+    name: "Upload Status",
+    component: UploadStatusView,
+  },
 ];

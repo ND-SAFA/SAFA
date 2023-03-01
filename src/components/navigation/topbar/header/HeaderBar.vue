@@ -2,6 +2,7 @@
   <div class="full-width">
     <flex-box full-width :wrap="false" justify="between" align="center">
       <project-searchbar v-if="graphVisible" />
+      <q-space />
       <flex-box align="center">
         <update-button />
         <saving-icon />

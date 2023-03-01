@@ -1,21 +1,19 @@
 <template>
   <panel-card>
-    <v-row style="min-height: 60vh">
-      <v-col cols="12" lg="4">
-        <v-navigation-drawer
-          v-if="$vuetify.breakpoint.lgAndUp"
-          absolute
-          permanent
-          width="33%"
-        >
-          <attribute-editor />
-        </v-navigation-drawer>
-        <attribute-editor v-else />
-      </v-col>
-      <v-col cols="12" lg="8">
-        <attribute-layout-editor />
-      </v-col>
-    </v-row>
+    <q-layout container view="lHh Lpr lff" style="min-height: 60vh">
+      <q-drawer
+        v-if="!smallWindow"
+        model-value
+        persistent
+        bordered
+        :breakpoint="0"
+        :width="280"
+      >
+        <attribute-editor />
+      </q-drawer>
+      <attribute-editor v-else />
+      <attribute-layout-editor />
+    </q-layout>
   </panel-card>
 </template>
 
@@ -29,7 +27,13 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { useQuasar } from "quasar";
+import { computed } from "vue";
 import { PanelCard } from "@/components/common";
 import AttributeEditor from "./AttributeEditor.vue";
 import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
+
+const $q = useQuasar();
+
+const smallWindow = computed(() => $q.screen.lt.lg);
 </script>

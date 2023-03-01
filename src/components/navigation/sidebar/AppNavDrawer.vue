@@ -1,7 +1,7 @@
 <template>
   <q-drawer
     persistent
-    :model-value="true"
+    model-value
     elevated
     breakpoint="0"
     width="280"

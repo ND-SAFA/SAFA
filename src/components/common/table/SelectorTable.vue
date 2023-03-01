@@ -109,7 +109,7 @@ const props = defineProps<{
   /**
    * The values of selected rows.
    */
-  selected: Record<string, unknown>[];
+  selected?: Record<string, unknown>[];
   /**
    * The name of an item.
    */

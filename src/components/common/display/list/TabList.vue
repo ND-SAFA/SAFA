@@ -32,7 +32,13 @@ import { SelectOption } from "@/types";
 import { useVModel } from "@/hooks";
 
 const props = defineProps<{
-  modelValue: number;
+  /**
+   * The tab id currently selected.
+   */
+  modelValue: string;
+  /**
+   * The tabs to display.
+   */
   tabs: SelectOption[];
 }>();
 

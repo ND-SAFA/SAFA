@@ -2,10 +2,16 @@
   <div>
     <slot name="header" />
     <flex-box :column="smallWindow">
-      <flex-item :parts="smallWindow ? '12' : '4'">
+      <flex-item
+        :parts="smallWindow ? '12' : '4'"
+        :class="smallWindow ? 'full-width' : ''"
+      >
         <slot name="sidebar" />
       </flex-item>
-      <flex-item :parts="smallWindow ? '12' : '8'">
+      <flex-item
+        :parts="smallWindow ? '12' : '8'"
+        :class="smallWindow ? 'full-width' : ''"
+      >
         <slot />
       </flex-item>
     </flex-box>

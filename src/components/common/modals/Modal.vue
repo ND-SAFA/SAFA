@@ -93,9 +93,9 @@ const style = computed(() => {
     case "sm":
       return "width: 400px";
     case "md":
-      return "width: 600px";
+      return "width: 600px; max-width: unset;";
     case "lg":
-      return "width: 800px";
+      return "width: 800px; max-width: unset;";
     default:
       return "";
   }

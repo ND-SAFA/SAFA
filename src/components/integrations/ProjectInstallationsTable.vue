@@ -1,120 +1,98 @@
 <template>
-  <panel-card>
-    <typography el="h2" variant="subtitle" value="Data Integrations" />
-    <v-data-table
-      :headers="headers"
-      :items="installations"
-      :loading="isLoading"
-      item-key="installationId"
-      class="mt-5"
+  <panel-card title="Data Integrations">
+    <selector-table
+      addable
+      :columns="columns"
+      :rows="rows"
+      row-key="installationId"
+      @row:add="modalOpen = true"
     >
-      <template #[`item.lastUpdate`]="{ item }">
-        <span>
-          {{ getDateDisplay(item.lastUpdate) }}
-        </span>
+      <template #cell-actions="{ row }">
+        <text-button
+          text
+          label="Re-Sync Data"
+          color="primary"
+          icon="sync"
+          @click="handleSync(row)"
+        />
       </template>
-
-      <template #[`item.actions`]="{ item }">
-        <text-button text color="primary" icon="sync" @click="handleSync(item)">
-          Re-Sync Data
-        </text-button>
-      </template>
-
-      <template #[`footer.prepend`]>
-        <div class="py-3">
-          <icon-button
-            fab
-            color="primary"
-            icon="add"
-            tooltip="Import New Project"
-            data-cy="button-integration-add"
-            @click="modalOpen = true"
-          />
-          <modal
-            :is-open="modalOpen"
-            title="Import Data"
-            :actions-height="0"
-            @close="modalOpen = false"
-          >
-            <template #body>
-              <integrations-stepper
-                type="connect"
-                @submit="modalOpen = false"
-              />
-            </template>
-          </modal>
-        </div>
-      </template>
-    </v-data-table>
+    </selector-table>
+    <modal
+      :open="modalOpen"
+      size="lg"
+      title="Import Data"
+      @close="modalOpen = false"
+    >
+      <integrations-stepper type="connect" @submit="modalOpen = false" />
+    </modal>
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { InstallationSchema } from "@/types";
+/**
+ * Renders a table of all active installations for the current project.
+ */
+export default {
+  name: "ProjectInstallationsTable",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { InstallationSchema, TableColumn } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { integrationsStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
 import {
-  Typography,
-  IconButton,
   Modal,
-  PanelCard,
   TextButton,
+  SelectorTable,
+  PanelCard,
 } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
-/**
- * Renders a table of all active installations for the current project.
- */
-export default defineComponent({
-  name: "ProjectInstallationsTable",
-  components: {
-    TextButton,
-    PanelCard,
-    IntegrationsStepper,
-    Modal,
-    Typography,
-    IconButton,
+const columns: TableColumn<InstallationSchema>[] = [
+  {
+    label: "Integration Type",
+    name: "type",
+    field: (row) => row.type,
   },
-  data() {
-    return {
-      modalOpen: false,
-      isLoading: false,
-      headers: [
-        { text: "Integration Type", value: "type" },
-        { text: "Project ID", value: "installationId" },
-        { text: "Last Synced", value: "lastUpdate" },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
-    };
+  {
+    label: "Project ID",
+    name: "installationId",
+    field: (row) => row.installationId,
   },
-  computed: {
-    /**
-     * @return All project installations.
-     */
-    installations(): InstallationSchema[] {
-      return integrationsStore.installations;
-    },
+  {
+    label: "Last Synced",
+    name: "lastUpdate",
+    field: (row) => row.lastUpdate,
   },
-  methods: {
-    /**
-     * @returns The display name for when this installation was last synced.
-     */
-    getDateDisplay(timestamp: string) {
-      return timestampToDisplay(timestamp);
-    },
-    /**
-     * Syncs the current project with the selected installation's data.
-     * @param installation - THe installation to sync.
-     */
-    handleSync(installation: InstallationSchema): void {
-      this.isLoading = true;
+  {
+    label: "Actions",
+    name: "actions",
+    field: () => "",
+  },
+];
 
-      handleSyncInstallation(installation, {
-        onComplete: () => (this.isLoading = false),
-      });
-    },
-  },
-});
+const modalOpen = ref(false);
+const loading = ref(false);
+
+const rows = computed(() =>
+  integrationsStore.installations.map((installation) => ({
+    ...installation,
+    lastUpdate: timestampToDisplay(installation.lastUpdate),
+  }))
+);
+
+/**
+ * Syncs the current project with the selected installation's data.
+ * @param installation - THe installation to sync.
+ */
+function handleSync(installation: InstallationSchema): void {
+  loading.value = true;
+
+  handleSyncInstallation(installation, {
+    onComplete: () => (loading.value = false),
+  });
+}
 </script>

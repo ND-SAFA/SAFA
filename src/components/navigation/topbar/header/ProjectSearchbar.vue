@@ -9,6 +9,7 @@
     :options-dark="false"
     label="Search Artifacts"
     style="min-width: 200px; width: 30vw"
+    color="accent"
     class="q-ma-sm nav-input"
     data-cy="input-artifact-search-nav"
     :options="options"
@@ -87,7 +88,6 @@ const value = computed({
 });
 
 function filterOptions(search: string, update: (fn: () => void) => void) {
-  console.log(search);
   if (search === "") {
     update(() => (options.value = artifactStore.currentArtifacts));
   } else {

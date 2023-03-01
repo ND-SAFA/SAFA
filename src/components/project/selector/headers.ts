@@ -12,6 +12,7 @@ export const projectNameColumn: TableColumn<IdentifierSchema> = {
   label: "Name",
   sortable: true,
   field: (row) => row.name,
+  align: "left",
 };
 
 export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
@@ -36,6 +37,7 @@ export const versionColumns: TableColumn<VersionSchema>[] = [
     label: "Major",
     sortable: true,
     field: (row) => row.majorVersion,
+    align: "left",
   },
   {
     name: "minorVersion",

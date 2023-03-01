@@ -5,6 +5,7 @@ export const jobColumns: TableColumn<JobSchema>[] = [
     name: "name",
     label: "Name",
     field: (job) => job.name,
+    align: "left",
   },
   {
     name: "currentProgress",

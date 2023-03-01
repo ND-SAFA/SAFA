@@ -1,81 +1,73 @@
 <template>
-  <v-container>
-    <v-text-field
+  <div class="q-my-md">
+    <text-input
       v-model="store.editedAttribute.key"
-      filled
-      :disabled="store.isUpdate"
+      :disabled="isUpdate"
       data-cy="input-attribute-key"
       label="Key"
-      hint="The unique key that this attribute is saved under."
+      hint="The attribute's id."
     />
-    <v-text-field
+    <text-input
       v-model="store.editedAttribute.label"
-      filled
       label="Label"
       data-cy="input-attribute-label"
-      hint="The label that is displayed for
-    this attribute."
+      hint="The attribute's display name."
     />
-    <v-select
+    <select-input
       v-model="store.editedAttribute.type"
-      filled
-      :disabled="store.isUpdate"
+      option-to-value
+      :disabled="isUpdate"
       data-cy="input-attribute-type"
       label="Attribute Type"
-      item-text="name"
-      item-value="id"
-      :items="typeOptions"
+      option-label="name"
+      option-value="id"
+      :options="typeOptions"
+      class="q-mb-md"
     />
-    <v-combobox
-      v-if="store.showOptions"
+    <multiselect-input
+      v-if="showOptions"
       v-model="store.editedAttribute.options"
-      filled
-      chips
-      deletable-chips
-      multiple
+      add-values
+      :options="[]"
       label="Options"
       data-cy="input-attribute-options"
       hint="Type in an option and press enter to save."
     />
-    <div v-if="store.showBounds">
-      <v-text-field
+    <div v-if="showBounds">
+      <text-input
         v-model="store.editedAttribute.min"
-        filled
         label="Minimum"
         data-cy="input-attribute-min"
         type="number"
         :hint="store.minBoundHint"
       />
-      <v-text-field
+      <text-input
         v-model="store.editedAttribute.max"
-        filled
         label="Maximum"
         data-cy="input-attribute-max"
         type="number"
         :hint="store.maxBoundHint"
       />
     </div>
-    <flex-box justify="space-between">
+    <flex-box justify="between" t="2">
       <text-button
-        v-if="store.isUpdate"
+        v-if="isUpdate"
+        label="Delete"
         data-cy="button-delete-attribute"
         text
         icon="delete"
         @click="handleDelete"
-      >
-        Delete
-      </text-button>
-      <v-spacer />
+      />
+      <q-space />
       <text-button
-        :disabled="!store.canSave"
+        :disabled="!canSave"
+        label="Save"
         data-cy="button-save-attribute"
         icon="save"
         @click="handleSave"
-      >
-        Save
-      </text-button>
+      />
     </flex-box>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -88,12 +80,18 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
 import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
-import { FlexBox, TextButton } from "@/components/common";
+import {
+  FlexBox,
+  TextButton,
+  TextInput,
+  SelectInput,
+  MultiselectInput,
+} from "@/components/common";
 
 const props = defineProps<{
   attribute?: AttributeSchema;
@@ -105,6 +103,11 @@ const emit = defineEmits<{
 
 const typeOptions = attributeTypeOptions();
 const store = ref(attributeSaveStore(props.attribute?.key || ""));
+
+const isUpdate = computed(() => store.value.isUpdate);
+const showOptions = computed(() => store.value.showOptions);
+const showBounds = computed(() => store.value.showBounds);
+const canSave = computed(() => store.value.canSave);
 
 /**
  * Saves an attribute.

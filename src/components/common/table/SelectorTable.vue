@@ -5,7 +5,6 @@
     :rows="props.rows"
     :row-key="rowKey"
     :rows-per-page="5"
-    :dense="props.minimal"
     :loading="props.loading"
     selection="single"
     data-cy="generic-selector-table"
@@ -16,14 +15,8 @@
       <div />
     </template>
 
-    <template #top>
-      <flex-box
-        v-if="!props.minimal"
-        full-width
-        align="center"
-        justify="between"
-        y="2"
-      >
+    <template v-if="!props.minimal" #top>
+      <flex-box full-width align="center" justify="between" y="2">
         <searchbar v-model="searchText" :label="searchLabel" />
         <icon-button
           tooltip="Refresh"
@@ -109,7 +102,7 @@ const props = defineProps<{
   /**
    * The values of selected rows.
    */
-  selected: Record<string, unknown>[];
+  selected?: Record<string, unknown>[];
   /**
    * The name of an item.
    */

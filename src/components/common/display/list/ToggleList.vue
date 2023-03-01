@@ -1,33 +1,44 @@
 <template>
-  <v-list-group :prepend-icon="icon" :value="value" @click="$emit('click')">
-    <template #activator>
-      <v-list-item-title>
-        <slot name="activator" />
-        <typography v-if="title" :value="title" data-cy="generic-list-item" />
-      </v-list-item-title>
-    </template>
-    <v-divider class="faded" />
-    <slot />
-    <v-divider class="faded" />
-  </v-list-group>
+  <list>
+    <expansion-item
+      :label="props.title"
+      data-cy="generic-list-item"
+      @click="$emit('click')"
+    >
+      <template v-if="slots.icon" #icon>
+        <slot name="icon" />
+      </template>
+      <separator class="faded" />
+      <slot />
+      <separator class="faded" />
+    </expansion-item>
+  </list>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import Typography from "../Typography.vue";
-
 /**
  * Displays a toggleable list.
  *
  * @emits-1 `click` - On activator click.
  */
-export default defineComponent({
+export default {
   name: "ToggleList",
-  components: { Typography },
-  props: {
-    value: Boolean,
-    icon: String,
-    title: String,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { useSlots } from "vue";
+import ExpansionItem from "@/components/common/layout/ExpansionItem.vue";
+import Separator from "../Separator.vue";
+import List from "./List.vue";
+
+const props = defineProps<{
+  title: string;
+}>();
+
+defineEmits<{
+  (e: "click"): void;
+}>();
+
+const slots = useSlots();
 </script>

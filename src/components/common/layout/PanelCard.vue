@@ -1,8 +1,13 @@
 <template>
-  <div class="q-mb-md">
+  <div :class="containerClassName">
     <q-card flat :class="className">
       <flex-box align="center">
-        <icon v-if="!!props.icon" :variant="icon" class="q-mr-sm" size="lg" />
+        <icon
+          v-if="!!props.icon"
+          :variant="props.icon"
+          class="q-mr-sm"
+          size="lg"
+        />
         <typography
           v-if="!!props.title"
           variant="subtitle"
@@ -49,17 +54,29 @@ const props = withDefaults(
      * An icon to display before the title.
      */
     icon?: IconVariant;
+    /**
+     * The panel's classes.
+     */
+    class?: string;
+    /**
+     * The panel's container's classes.
+     */
+    containerClass?: string;
   }>(),
   {
     color: "primary",
     title: undefined,
     icon: undefined,
+    class: "",
+    containerClass: "",
   }
 );
 
 const slots = useSlots();
 
 const className = computed(
-  () => `q-pa-md overflow-hidden bg-neutral bd-${props.color}`
+  () => `q-pa-md overflow-hidden bg-neutral bd-${props.color} ${props.class}`
 );
+
+const containerClassName = computed(() => `q-mb-md ${props.containerClass}`);
 </script>

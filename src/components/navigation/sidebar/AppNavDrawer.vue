@@ -1,20 +1,20 @@
 <template>
   <q-drawer
     persistent
-    :model-value="true"
+    model-value
     elevated
     breakpoint="0"
-    width="280"
+    width="260"
     :mini="!sidebarOpen"
+    :style="style"
   >
     <flex-box
       v-if="sidebarOpen"
       full-width
       justify="between"
       align="center"
-      x="3"
       y="3"
-      style="height: 40px; padding-left: 5px; padding-right: 5px"
+      style="height: 40px; padding-left: 10px; padding-right: 10px"
     >
       <safa-icon style="width: 200px !important" />
       <icon-button
@@ -59,12 +59,19 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { useQuasar } from "quasar";
+import { ThemeColors } from "@/util";
 import { appStore, useTheme } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
 const { darkMode } = useTheme();
+const $q = useQuasar();
+
+const style = computed(() =>
+  darkMode.value ? `background-color: ${ThemeColors.darkGrey}` : ""
+);
 
 const sidebarOpen = computed({
   get(): boolean {
@@ -76,7 +83,7 @@ const sidebarOpen = computed({
 });
 
 onMounted(() => {
-  if (window.innerWidth < 1000) {
+  if ($q.screen.lt.md) {
     appStore.toggleAppPanel();
   }
 });

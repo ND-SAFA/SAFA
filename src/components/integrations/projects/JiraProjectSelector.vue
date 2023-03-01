@@ -5,18 +5,18 @@
     :item-count="projects.length"
     :loading="loading"
   >
-    <list :items="projects">
-      <template #item="{ item }">
-        <list-item
-          :title="item.name"
-          :subtitle="item.key"
-          @click="handleProjectSelect(item)"
-        >
-          <template #icon>
-            <img :src="item.mediumAvatarUrl" :alt="item.name" />
-          </template>
-        </list-item>
-      </template>
+    <list>
+      <list-item
+        v-for="item in projects"
+        :key="item.name"
+        :title="item.name"
+        :subtitle="item.key"
+        @click="handleProjectSelect(item)"
+      >
+        <template #icon>
+          <img :src="item.mediumAvatarUrl" :alt="item.name" />
+        </template>
+      </list-item>
     </list>
   </stepper-list-step>
 </template>

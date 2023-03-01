@@ -1,8 +1,5 @@
 <template>
   <sidebar-grid>
-    <template #header>
-      <trace-prediction-header />
-    </template>
     <template #sidebar>
       <project-display />
     </template>
@@ -30,7 +27,6 @@ import { TraceLinkGenerator } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project";
 import { ModelTable } from "./training";
 import { TraceApprovalTable } from "./approval";
-import TracePredictionHeader from "./TracePredictionHeader.vue";
 
 /**
  * Tabs for predicting and approving trace links.
@@ -40,7 +36,6 @@ export default defineComponent({
   components: {
     PanelCard,
     SidebarGrid,
-    TracePredictionHeader,
     ProjectDisplay,
     TraceLinkGenerator,
     ModelTable,

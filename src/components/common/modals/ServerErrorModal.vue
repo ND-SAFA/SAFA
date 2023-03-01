@@ -1,13 +1,11 @@
 <template>
   <modal title="Server Errors" :open="open" @close="handleClose">
-    <list :items="props.errors">
-      <template #item="{ item }">
-        <list-item>
-          <code style="word-break: break-all">
-            {{ item }}
-          </code>
-        </list-item>
-      </template>
+    <list>
+      <list-item v-for="error in props.errors" :key="error">
+        <code style="word-break: break-all">
+          {{ error }}
+        </code>
+      </list-item>
     </list>
   </modal>
 </template>

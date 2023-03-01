@@ -24,6 +24,10 @@ $color-removed: var(--q-removedLight);
   background-color: $color-background !important;
 }
 
+.bg-neutral {
+  background-color: $color-neutral !important;
+}
+
 .bd-primary {
   border: 1px solid $color-primary !important;
 }

@@ -45,7 +45,9 @@ export type SizeType =
   | "7"
   | "8"
   | "9"
-  | "10";
+  | "10"
+  | "11"
+  | "12";
 
 /**
  * Package: 'vue3-drr-grid-layout'

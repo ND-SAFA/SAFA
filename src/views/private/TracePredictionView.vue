@@ -1,5 +1,5 @@
 <template>
-  <private-page full-window>
+  <private-page full-window back-to-project title="Trace Prediction">
     <trace-prediction-tabs />
   </private-page>
 </template>

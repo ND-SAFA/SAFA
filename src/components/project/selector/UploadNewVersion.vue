@@ -1,96 +1,88 @@
 <template>
-  <panel-card>
-    <typography el="h2" variant="subtitle" value="Data File Upload" />
+  <panel-card title="Data File Upload">
     <typography
       el="p"
       value="Select files to upload to the current project version."
     />
-    <project-files-input
-      v-model="selectedFiles"
-      data-cy="input-files-version"
-    />
+    <project-files-input v-model="files" data-cy="input-files-version" />
     <switch-input
       v-model="replaceAllArtifacts"
       label="Replace all artifacts"
       class="ml-4"
     />
-    <v-btn
-      block
-      color="primary"
-      data-cy="button-upload-files"
-      @click="handleSubmit"
-    >
-      Upload Project Files
-    </v-btn>
+    <template #actions>
+      <text-button
+        block
+        label="Upload Project Files"
+        color="primary"
+        data-cy="button-upload-files"
+        @click="handleSubmit"
+      />
+    </template>
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { projectStore } from "@/hooks";
-import { handleUploadProjectVersion } from "@/api";
-import { SwitchInput, Typography, PanelCard } from "@/components/common";
-import { ProjectFilesInput } from "../base";
-
 /**
  * Displays inputs for uploading a new version.
  */
-export default defineComponent({
+export default {
   name: "UploadNewVersion",
-  components: {
-    PanelCard,
-    Typography,
-    SwitchInput,
-    ProjectFilesInput,
-  },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      selectedFiles: [] as File[],
-      isLoading: false,
-      setAsNewVersion: true,
-      replaceAllArtifacts: false,
-    };
-  },
-  watch: {
-    /**
-     * Sets the current project and version when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+};
+</script>
 
-      this.selectedFiles = [];
-      this.replaceAllArtifacts = false;
-    },
-  },
-  methods: {
-    /**
-     * Closes the modal and clears data.
-     */
-    handleReset() {
-      this.selectedFiles = [];
-    },
-    /**
-     * Attempts to upload a new project version.
-     */
-    handleSubmit() {
-      this.isLoading = true;
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { projectStore } from "@/hooks";
+import { handleUploadProjectVersion } from "@/api";
+import {
+  SwitchInput,
+  Typography,
+  PanelCard,
+  TextButton,
+} from "@/components/common";
+import { ProjectFilesInput } from "../base";
 
-      handleUploadProjectVersion(
-        projectStore.projectId,
-        projectStore.versionId,
-        this.selectedFiles,
-        this.setAsNewVersion,
-        this.replaceAllArtifacts
-      )
-        .then(() => this.handleReset())
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+const props = defineProps<{
+  open: boolean;
+}>();
+
+const files = ref<File[]>([]);
+const loading = ref(false);
+const replaceAllArtifacts = ref(false);
+
+/**
+ * Resets component data.
+ */
+function handleReset() {
+  files.value = [];
+  loading.value = false;
+  replaceAllArtifacts.value = false;
+}
+
+/**
+ * Uploads a new project version.
+ */
+function handleSubmit() {
+  loading.value = true;
+
+  handleUploadProjectVersion(
+    projectStore.projectId,
+    projectStore.versionId,
+    files.value,
+    true,
+    replaceAllArtifacts.value
+  )
+    .then(() => handleReset())
+    .finally(() => (loading.value = false));
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+
+    handleReset();
+  }
+);
 </script>

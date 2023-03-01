@@ -84,11 +84,10 @@ const props = withDefaults(
 );
 
 const className = useMargins(props, () => [
-  [true, "flex"],
+  [true, props.column ? "column" : "row"],
   ["align", `align-${props.align}`],
   ["justify", `justify-${props.justify}`],
   ["fullWidth", "full-width"],
-  ["column", "column"],
   ["wrap", "wrap"],
   [props.wrap === false, "nowrap"],
 ]);

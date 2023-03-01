@@ -1,6 +1,6 @@
 <template>
   <list :items="options">
-    <template #item="{ item }">
+    <template v-for="item in options" :key="item.label">
       <separator v-if="item.divider" />
       <list-item
         :to="item.path"

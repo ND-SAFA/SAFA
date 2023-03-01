@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-tabs v-model="model" active-color="primary">
+      <slot name="before" />
       <q-tab
         v-for="{ id, name } in tabs"
         :key="id"
@@ -8,6 +9,7 @@
         :label="name"
         no-caps
       />
+      <slot name="after" />
     </q-tabs>
     <q-tab-panels v-model="model" animated class="bg-transparent">
       <q-tab-panel v-for="{ id } in tabs" :key="id" :name="id" class="q-pt-sm">
@@ -32,7 +34,13 @@ import { SelectOption } from "@/types";
 import { useVModel } from "@/hooks";
 
 const props = defineProps<{
-  modelValue: number;
+  /**
+   * The tab id currently selected.
+   */
+  modelValue: string;
+  /**
+   * The tabs to display.
+   */
   tabs: SelectOption[];
 }>();
 

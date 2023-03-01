@@ -20,6 +20,7 @@
       option-value="versionId"
       style="width: 120px"
       class="nav-input"
+      color="accent"
     >
       <template #selected>
         {{ versionToString(version) }}

@@ -1,103 +1,79 @@
 <template>
-  <div>
-    <tab-list v-model="tab" :tabs="tabs">
-      <template #before>
-        <typography r="4" el="h2" variant="subtitle" value="Layouts" />
-      </template>
-      <template #after>
-        <text-button
-          v-if="!createOpen"
-          text
-          icon="add"
-          @click="handleAddLayout"
-        >
-          Add Layout
-        </text-button>
-      </template>
-      <v-window-item v-for="(_, idx) in tabs" :key="idx + 1">
-        <save-attribute-layout
-          v-if="idx === tab"
-          :layout="layouts[idx]"
-          @save="handleSaveLayout(idx)"
-        />
-      </v-window-item>
-    </tab-list>
-  </div>
+  <tab-list v-model="tab" :tabs="tabs">
+    <template #before>
+      <typography r="4" el="h2" variant="subtitle" value="Layouts" />
+    </template>
+    <template #after>
+      <text-button v-if="!createOpen" text icon="add" @click="handleAddLayout">
+        Add Layout
+      </text-button>
+    </template>
+    <template v-for="({ id }, idx) in tabs" #[id] :key="id">
+      <save-attribute-layout
+        v-if="idx === tab"
+        :layout="layouts[idx]"
+        @save="handleSaveLayout(id)"
+      />
+    </template>
+  </tab-list>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { AttributeLayoutSchema, SelectOption } from "@/types";
+/**
+ * Allows for editing attribute layouts.
+ */
+export default {
+  name: "AttributeLayoutEditor",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { SelectOption } from "@/types";
 import { attributesStore } from "@/hooks";
 import { TabList, TextButton, Typography } from "@/components/common";
 import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 
-/**
- * Allows for editing attribute layouts.
- */
-export default defineComponent({
-  name: "AttributeLayoutEditor",
-  components: {
-    TextButton,
-    SaveAttributeLayout,
-    TabList,
-    Typography,
-  },
-  data() {
-    return {
-      createOpen: false,
-    };
-  },
-  computed: {
-    /**
-     * @return The layout tab currently being edited.
-     */
-    tab: {
-      get(): number {
-        return attributesStore.selectedLayout;
-      },
-      set(tab: number): void {
-        attributesStore.selectedLayout = tab;
-      },
-    },
-    /**
-     * @return The list of custom attribute layouts.
-     */
-    layouts(): AttributeLayoutSchema[] {
-      return attributesStore.attributeLayouts;
-    },
-    /**
-     * @return The tabs for each layout.
-     */
-    tabs(): SelectOption[] {
-      const tabs = attributesStore.attributeLayouts.map(({ id, name }) => ({
-        id,
-        name,
-      }));
+const createOpen = ref(false);
 
-      if (this.createOpen) {
-        tabs.push({ id: "", name: "New Layout" });
-      }
-
-      return tabs;
-    },
+const tab = computed({
+  get() {
+    return attributesStore.selectedLayoutId;
   },
-  methods: {
-    /**
-     * Adds a new attribute layout.
-     */
-    handleAddLayout(): void {
-      this.createOpen = true;
-      this.tab = attributesStore.attributeLayouts.length;
-    },
-    /**
-     * Closes the layout creator on save.
-     * @param idx - The index of the saved layout.
-     */
-    handleSaveLayout(idx: number): void {
-      this.createOpen = false;
-      this.tab = idx;
-    },
+  set(tab) {
+    attributesStore.selectedLayoutId = tab;
   },
 });
+
+const layouts = computed(() => attributesStore.attributeLayouts);
+
+const tabs = computed<SelectOption[]>(() => {
+  const tabs = attributesStore.attributeLayouts.map(({ id, name }) => ({
+    id,
+    name,
+  }));
+
+  if (createOpen.value) {
+    tabs.push({ id: "", name: "New Layout" });
+  }
+
+  return tabs;
+});
+
+/**
+ * Adds a new attribute layout.
+ */
+function handleAddLayout(): void {
+  createOpen.value = true;
+  tab.value = "";
+}
+
+/**
+ * Closes the layout creator on save.
+ * @param id - The id of the saved layout.
+ */
+function handleSaveLayout(id: string): void {
+  createOpen.value = false;
+  tab.value = id;
+}
 </script>

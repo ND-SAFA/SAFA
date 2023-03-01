@@ -1,22 +1,16 @@
-//.nav-input {
-//  fieldset, div, i {
-//    color: fade-out($color-accent, 0.1) !important;
-//  }
-//
-//  .q-field__control:before {
-//    border-color: fade-out($color-accent, 0.1) !important;
-//  }
-//
-//  &:hover {
-//    fieldset, div, label, i {
-//      color: $color-accent !important;
-//    }
-//
-//    .q-field__control:before {
-//      border-color: $color-accent !important;
-//    }
-//  }
-//}
+.nav-input {
+  fieldset, div, label, i {
+    color: $color-accent !important;
+  }
+
+  .q-field__control:before {
+    border-color: $color-accent !important;
+  }
+}
+
+body.body--dark .q-layout__shadow:after {
+  box-shadow: 0 0 10px 2px rgb(255 255 255 / 6%), 0 0px 10px rgb(255 255 255 / 6%);
+}
 
 .nav-notifications {
   min-width: 300px;

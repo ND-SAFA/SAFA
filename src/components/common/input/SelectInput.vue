@@ -6,6 +6,8 @@
     :options="props.options"
     :option-value="props.optionValue"
     :option-label="props.optionLabel"
+    :map-options="props.optionToValue"
+    :emit-value="props.optionToValue"
   />
 </template>
 
@@ -27,6 +29,10 @@ const props = defineProps<{
   options: unknown[];
   optionValue?: string;
   optionLabel?: string;
+  /**
+   * Only saves the option's value, not the entire object.
+   */
+  optionToValue?: boolean;
 }>();
 
 defineEmits<{

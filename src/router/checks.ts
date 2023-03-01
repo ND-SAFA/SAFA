@@ -8,6 +8,14 @@ import {
   routesWithRequiredProject,
 } from "@/router/routes";
 
+type RouteChecks = Record<
+  string,
+  (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized
+  ) => Promise<RouteLocationRaw | void>
+>;
+
 /**
  * Defines list of functions that are run before navigating to a new page.
  * This serves as the central location for setting any state a page might
@@ -17,12 +25,8 @@ import {
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks = {
-  async redirectToLoginIfNoSessionFound(
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: (location: RouteLocationRaw) => void
-  ): Promise<void> {
+export const routerBeforeChecks: RouteChecks = {
+  async redirectToLoginIfNoSessionFound(to) {
     if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
@@ -32,16 +36,24 @@ export const routerChecks = {
 
       return;
     } catch (e) {
-      next({
+      return {
         path: Routes.LOGIN_ACCOUNT,
         query: {
           ...to.query,
           [QueryParams.LOGIN_PATH]: to.path,
         },
-      });
+      };
     }
   },
-  requireProjectForRoutes(to: RouteLocationNormalized): void {
+  async closePanelsIfNotInGraph(to) {
+    if (to.path === Routes.ARTIFACT) return;
+
+    appStore.closeSidePanels();
+  },
+};
+
+export const routerAfterChecks: RouteChecks = {
+  async requireProjectForRoutes(to) {
     if (
       projectStore.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
@@ -51,12 +63,7 @@ export const routerChecks = {
     const versionId = to.query[QueryParams.VERSION];
 
     if (typeof versionId === "string") {
-      handleLoadVersion(versionId, undefined, false);
+      await handleLoadVersion(versionId, undefined, false);
     }
-  },
-  closePanelsIfNotInGraph(to: RouteLocationNormalized): void {
-    if (to.path === Routes.ARTIFACT) return;
-
-    appStore.closeSidePanels();
   },
 };

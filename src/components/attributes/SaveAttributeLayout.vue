@@ -1,24 +1,21 @@
 <template>
   <div>
-    <v-row v-if="store.isCustom" dense>
-      <v-col cols="6">
-        <v-text-field v-model="store.editedLayout.name" filled label="Name"
-      /></v-col>
-      <v-col cols="6">
-        <artifact-type-input
-          v-model="store.editedLayout.artifactTypes"
-          multiple
-          persistent-hint
-          hint="The layout will only appear on these artifact types."
-          :error-messages="store.typeErrors"
-      /></v-col>
-    </v-row>
+    <flex-box v-if="store.isCustom" column b="3">
+      <text-input v-model="store.editedLayout.name" label="Name" />
+      <artifact-type-input
+        v-model="store.editedLayout.artifactTypes"
+        multiple
+        hint="The layout only appears on these types."
+        :error-message="store.typeErrors"
+        class="full-width"
+      />
+    </flex-box>
 
     <panel-card>
       <attribute-grid editable :layout="store.editedLayout">
         <template #item="{ attribute }">
-          <v-card v-if="!!attribute" outlined class="pa-3 mx-2">
-            <flex-box align="center" justify="space-between">
+          <q-card v-if="!!attribute" bordered class="q-pa-md q-ma-sm">
+            <flex-box align="center" justify="between">
               <div>
                 <typography :value="attribute.label" />
                 <br />
@@ -27,28 +24,30 @@
               <icon-button
                 icon="delete"
                 tooltip="Remove from layout"
-                color="error"
+                color="negative"
                 @click="handleDeleteAttribute(attribute)"
               />
             </flex-box>
-          </v-card>
+          </q-card>
         </template>
       </attribute-grid>
     </panel-card>
 
-    <flex-box justify="space-between" b="4">
+    <flex-box justify="between" b="4">
       <text-button
         v-if="store.isCustom && store.isUpdate"
         text
+        label="Delete"
         icon="delete"
         @click="handleDeleteLayout"
-      >
-        Delete
-      </text-button>
-      <v-spacer />
-      <text-button :disabled="!store.canSave" icon="save" @click="handleSave">
-        Save
-      </text-button>
+      />
+      <q-space />
+      <text-button
+        label="Save"
+        :disabled="!store.canSave"
+        icon="save"
+        @click="handleSave"
+      />
     </flex-box>
   </div>
 </template>
@@ -75,6 +74,7 @@ import {
   Typography,
   IconButton,
   TextButton,
+  TextInput,
 } from "@/components/common";
 
 const props = defineProps<{

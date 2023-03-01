@@ -3,7 +3,7 @@
     bordered
     side="right"
     :model-value="drawerOpen"
-    breakpoint="0"
+    :breakpoint="0"
     :width="width"
   >
     <div class="q-pa-sm full-height bg-background">
@@ -99,11 +99,11 @@ const width = computed(() => {
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"
   ) {
-    return "600";
+    return 600;
   } else if (openState.value === "generateTrace") {
-    return "800";
+    return 800;
   } else {
-    return "400";
+    return 400;
   }
 });
 

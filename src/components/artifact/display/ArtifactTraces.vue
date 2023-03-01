@@ -1,7 +1,7 @@
 <template>
   <div v-if="doDisplay">
     <panel-card>
-      <flex-box justify="space-between" align="center">
+      <flex-box justify="between" align="center">
         <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
         <text-button
           text
@@ -48,7 +48,7 @@
     </panel-card>
 
     <panel-card>
-      <flex-box justify="space-between" align="center">
+      <flex-box justify="between" align="center">
         <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
         <text-button
           text

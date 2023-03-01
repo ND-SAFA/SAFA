@@ -1,7 +1,7 @@
 <template>
   <v-timeline-item small :color="stepColor">
     <v-alert outlined border="left" :color="stepColor">
-      <flex-box justify="space-between" align="center">
+      <flex-box justify="between" align="center">
         <div>
           <typography el="div" bold :value="stepName" />
           <typography variant="caption" :value="stepTimestamp" />

@@ -14,7 +14,6 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
-import type { QNotifyCreateOptions } from "quasar";
 import { MessageType, SnackbarMessage } from "@/types";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common";
@@ -74,6 +73,7 @@ function buildNotification() {
       "data-cy": `snackbar-${messageType.value}`,
     },
     actions: actions,
+    multiLine: false,
   };
 }
 

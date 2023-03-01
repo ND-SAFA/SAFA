@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" justify="space-between">
+  <flex-box v-if="doDisplay" justify="between">
     <flex-box align="center" justify="center">
       <text-button
         v-if="showUnreviewed"

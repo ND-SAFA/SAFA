@@ -3,8 +3,8 @@
     persistent
     model-value
     elevated
-    breakpoint="0"
-    width="260"
+    :breakpoint="0"
+    :width="260"
     :mini="!sidebarOpen"
     :style="style"
   >

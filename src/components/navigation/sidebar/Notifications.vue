@@ -2,7 +2,7 @@
   <div>
     <q-btn round flat color="primary" @click="handleOpen">
       <icon variant="notification" />
-      <q-tooltip delay="200">View notifications</q-tooltip>
+      <q-tooltip :delay="200">View notifications</q-tooltip>
       <q-badge v-if="newNotifications > 0" color="secondary" floating rounded>
         {{ newNotifications }}
       </q-badge>

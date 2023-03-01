@@ -29,7 +29,7 @@
     </v-expansion-panels>
 
     <v-divider class="my-4" />
-    <flex-box justify="space-between" align="center">
+    <flex-box justify="between" align="center">
       <typography color="error" r="2" :value="errorMessage" />
       <v-btn
         color="primary"

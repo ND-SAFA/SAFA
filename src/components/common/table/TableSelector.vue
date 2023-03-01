@@ -22,7 +22,7 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
+      <flex-box v-if="!minimal" align="center" justify="between" y="2">
         <v-text-field
           v-model="search"
           label="Search"

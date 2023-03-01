@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <flex-box align="center" justify="space-between">
+    <flex-box align="center" justify="between">
       <v-tooltip bottom>
         <template #activator="{ props }">
           <typography

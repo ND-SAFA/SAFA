@@ -49,6 +49,7 @@ export const useAttributes = defineStore("attributes", {
     initializeProject(project: ProjectSchema): void {
       this.attributes = project.attributes || [];
       this.attributeLayouts = project.attributeLayouts || [];
+      this.selectedLayoutId = project.attributeLayouts?.[0]?.id || "";
     },
 
     /**

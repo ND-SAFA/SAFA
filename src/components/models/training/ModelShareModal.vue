@@ -15,7 +15,6 @@
       </flex-box>
     </template>
     <template #actions>
-      <v-spacer />
       <v-btn :disabled="!canSave" color="primary" @click="handleSave">
         Share
       </v-btn>

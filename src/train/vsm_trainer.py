@@ -1,3 +1,4 @@
+import time
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -19,7 +20,6 @@ from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from util.override import overrides
-import time
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
@@ -96,10 +96,15 @@ class VSMTrainer(iTrainer):
             if link_id not in eval_dataset.links:  # source, target pair between layers that should not be linked
                 continue
             row, col = divmod(i, len(raw_targets))
-            predictions.append(similarity_matrix[row][col])
-            label_ids.append(int(predictions[-1] > threshold))
-            links.append(eval_dataset.links[link_id])
+            score = similarity_matrix[row][col]
+            link = eval_dataset.links[link_id]
+            label = 1 if link.is_true_link else 0
+
+            predictions.append(score)
+            label_ids.append(label)
+            links.append(link)
             source_target_pairs.append(pair)
+
         metrics = self.eval(links, predictions, self.metrics) if self.metrics else None
         prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=metrics)
         trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)

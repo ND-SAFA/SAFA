@@ -6,7 +6,7 @@ from data.hub.abstract_hub_id import AbstractHubId
 from data.keys.safa_format import SafaKeys
 
 
-class MultiTaskHubId(AbstractHubId, ABC):
+class MultiStageHubId(AbstractHubId, ABC):
     """
     Provides base implementation for managing different tasks with different splits all from the same source file.
     """

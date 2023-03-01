@@ -1,9 +1,9 @@
 from data.hub.abstract_hub_id import AbstractHubId
-from data.hub.hub_ids.multi_task_hub_id import MultiTaskHubId
+from data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
 from util.override import overrides
 
 
-class DroneHubId(MultiTaskHubId):
+class DroneHubId(MultiStageHubId):
     """
     Describes the DroneResponse project reader.
     """

@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
@@ -24,7 +23,7 @@ class VSMJob(AbstractTraceJob):
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param metrics: List of metric names to use for evaluation
         """
-        super().__init__(job_args=job_args, model_manager=None, trainer_dataset_manager=trainer_dataset_manager,
+        super().__init__(job_args=job_args, model_manager=ModelManager("VSM"), trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=TrainerArgs(output_dir=job_args.output_dir))
         self.metrics = metrics
         self._trainer: Optional[VSMTrainer] = None

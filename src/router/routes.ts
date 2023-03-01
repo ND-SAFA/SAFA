@@ -2,7 +2,6 @@ import { RouteRecordRaw } from "vue-router";
 import {
   ArtifactView,
   CreateAccountView,
-  ErrorPageView,
   ForgotPasswordView,
   HomeView,
   LoginView,
@@ -31,7 +30,6 @@ export enum Routes {
   TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
-  ERROR = "/error",
 }
 
 /**
@@ -114,11 +112,6 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
     component: ProjectSettingsView,
-  },
-  {
-    path: Routes.ERROR,
-    name: "Error Page",
-    component: ErrorPageView,
   },
   {
     path: Routes.UPLOAD_STATUS,

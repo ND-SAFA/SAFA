@@ -20,20 +20,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { PanelCard } from "@/components/common";
-import AttributeEditor from "./AttributeEditor.vue";
-import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
-
 /**
  * Renders settings for customizing artifact attributes.
  */
-export default defineComponent({
+export default {
   name: "AttributeSettings",
-  components: {
-    AttributeLayoutEditor,
-    AttributeEditor,
-    PanelCard,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PanelCard } from "@/components/common";
+import AttributeEditor from "./AttributeEditor.vue";
+import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
 </script>

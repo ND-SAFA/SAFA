@@ -87,7 +87,6 @@ const value = computed({
 });
 
 function filterOptions(search: string, update: (fn: () => void) => void) {
-  console.log(search);
   if (search === "") {
     update(() => (options.value = artifactStore.currentArtifacts));
   } else {

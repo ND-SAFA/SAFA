@@ -1,18 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { routerChecks } from "@/router/checks";
+import { routerAfterChecks, routerBeforeChecks } from "@/router/checks";
 import { routes } from "./routes";
 
 export const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+router.beforeEach(async (to, from) => {
+  for (const check of Object.values(routerBeforeChecks)) {
+    const redirect = await check(to, from);
 
-/**
- * Iterates through each router check and exits after the first check
- * uses the next function.
- */
-router.beforeResolve(async (to, from) => {
-  for (const check of Object.values(routerChecks)) {
+    if (!redirect) continue;
+
+    return redirect;
+  }
+});
+
+router.afterEach(async (to, from) => {
+  for (const check of Object.values(routerAfterChecks)) {
     const redirect = await check(to, from);
 
     if (!redirect) continue;

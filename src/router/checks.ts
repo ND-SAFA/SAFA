@@ -8,6 +8,14 @@ import {
   routesWithRequiredProject,
 } from "@/router/routes";
 
+type RouteChecks = Record<
+  string,
+  (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized
+  ) => Promise<RouteLocationRaw | void>
+>;
+
 /**
  * Defines list of functions that are run before navigating to a new page.
  * This serves as the central location for setting any state a page might
@@ -17,13 +25,7 @@ import {
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<
-  string,
-  (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized
-  ) => Promise<RouteLocationRaw | void>
-> = {
+export const routerBeforeChecks: RouteChecks = {
   async redirectToLoginIfNoSessionFound(to) {
     if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
@@ -43,6 +45,14 @@ export const routerChecks: Record<
       };
     }
   },
+  async closePanelsIfNotInGraph(to) {
+    if (to.path === Routes.ARTIFACT) return;
+
+    appStore.closeSidePanels();
+  },
+};
+
+export const routerAfterChecks: RouteChecks = {
   async requireProjectForRoutes(to) {
     if (
       projectStore.isProjectDefined ||
@@ -55,10 +65,5 @@ export const routerChecks: Record<
     if (typeof versionId === "string") {
       await handleLoadVersion(versionId, undefined, false);
     }
-  },
-  async closePanelsIfNotInGraph(to) {
-    if (to.path === Routes.ARTIFACT) return;
-
-    appStore.closeSidePanels();
   },
 };

@@ -13,6 +13,7 @@
     :error="showError"
     :class="className"
     :hint="props.hint"
+    :new-value-mode="props.addValues ? 'add-unique' : ''"
   />
 </template>
 
@@ -68,6 +69,10 @@ const props = withDefaults(
      * A testing selector.
      */
     dataCy?: string;
+    /**
+     * If true, new options can be created by pressing enter.
+     */
+    addValues?: boolean;
   }>(),
   {
     b: "1",
@@ -76,10 +81,11 @@ const props = withDefaults(
     class: "",
     hint: undefined,
     dataCy: undefined,
+    optionsLabel: undefined,
   }
 );
 
-const emit = defineEmits<{
+defineEmits<{
   /**
    * Called when the model is updated.
    */

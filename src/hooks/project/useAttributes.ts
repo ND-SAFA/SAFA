@@ -24,9 +24,9 @@ export const useAttributes = defineStore("attributes", {
      */
     attributeLayouts: [] as AttributeLayoutSchema[],
     /**
-     * The index of the current layout selected for editing.
+     * The id of the current layout selected for editing.
      */
-    selectedLayout: 0,
+    selectedLayoutId: "",
   }),
   getters: {
     /**
@@ -40,12 +40,6 @@ export const useAttributes = defineStore("attributes", {
       );
 
       return layout?.positions || [];
-    },
-    /**
-     * @return The id of the selected layout.
-     */
-    selectedLayoutId(): string {
-      return this.attributeLayouts[this.selectedLayout]?.id || "";
     },
   },
   actions: {

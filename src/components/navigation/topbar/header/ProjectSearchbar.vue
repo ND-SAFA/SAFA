@@ -9,6 +9,7 @@
     :options-dark="false"
     label="Search Artifacts"
     style="min-width: 200px; width: 30vw"
+    color="accent"
     class="q-ma-sm nav-input"
     data-cy="input-artifact-search-nav"
     :options="options"

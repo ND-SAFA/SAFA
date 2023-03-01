@@ -2,7 +2,7 @@
   <q-btn
     :color="props.color"
     :fab="props.fab"
-    :class="props.disabled ? 'disable-events' : ''"
+    :disable="props.disabled"
     :size="size"
     :data-cy="props.dataCy"
     :flat="!props.fab"
@@ -54,7 +54,7 @@ const props = defineProps<{
   /**
    * Whether the component is disabled.
    */
-  disabled?: string;
+  disabled?: boolean;
   /**
    * Renders a smaller component.
    */

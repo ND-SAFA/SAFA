@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" wrap style="margin-bottom: 20px">
+  <flex-box v-if="doDisplay" wrap t="2" style="margin-bottom: 12px">
     <text-button
       text
       label="Download"

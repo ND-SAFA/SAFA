@@ -1,53 +1,47 @@
 <template>
-  <div>
-    <flex-box
-      t="6"
-      full-width
-      wrap
-      justify="space-between"
-      align="center"
-      class="px-4"
-    >
+  <div class="q-pr-md">
+    <flex-box full-width wrap justify="between" align="center">
       <typography
         variant="subtitle"
         :value="createOpen ? 'New Attribute' : 'Attributes'"
       />
-      <v-spacer />
+      <q-space />
       <text-button
         v-if="!createOpen"
         text
+        label="Create"
         icon="add"
         data-cy="button-add-attribute"
         @click="createOpen = true"
-      >
-        Add Attribute
-      </text-button>
-      <text-button v-else text icon="cancel" @click="createOpen = false">
-        Cancel
-      </text-button>
+      />
+      <text-button
+        v-else
+        text
+        label="Cancel"
+        icon="cancel"
+        @click="createOpen = false"
+      />
     </flex-box>
     <save-attribute v-if="createOpen" @save="createOpen = false" />
-    <v-divider v-if="createOpen" />
-    <v-list expand>
-      <toggle-list
-        v-for="attribute in attributes"
-        :key="attribute.key"
-        :title="attribute.label"
-      >
-        <template #activator>
-          <span @click.stop="">
-            <icon-button
-              class="ml-auto"
-              icon="add"
-              tooltip="Add to layout"
-              :disabled="isAttributeInLayout(attribute)"
-              @click="handleAddToLayout(attribute)"
-            />
-          </span>
-        </template>
-        <save-attribute :attribute="attribute" />
-      </toggle-list>
-    </v-list>
+    <separator v-if="createOpen" />
+    <toggle-list
+      v-for="attribute in attributes"
+      :key="attribute.key"
+      :title="attribute.label"
+    >
+      <template #icon>
+        <span @click.stop="">
+          <icon-button
+            class="ml-auto"
+            icon="add"
+            tooltip="Add to layout"
+            :disabled="isAttributeInLayout(attribute)"
+            @click="handleAddToLayout(attribute)"
+          />
+        </span>
+      </template>
+      <save-attribute :attribute="attribute" />
+    </toggle-list>
     <flex-box v-if="attributes.length === 0" justify="center">
       <typography
         variant="caption"
@@ -58,9 +52,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+/**
+ * Renders the list of project attributes and allows for editing them.
+ */
+export default {
+  name: "AttributeEditor",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { AttributePositionSchema, AttributeSchema } from "@/types";
-import { attributeTypeOptions } from "@/util";
 import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
 import {
   FlexBox,
@@ -68,58 +70,32 @@ import {
   ToggleList,
   Typography,
   IconButton,
+  Separator,
 } from "@/components/common";
 import SaveAttribute from "./SaveAttribute.vue";
 
+const createOpen = ref(false);
+
+const attributes = computed(() => attributesStore.attributes);
+
+const layoutStore = computed(() =>
+  attributeLayoutSaveStore(attributesStore.selectedLayoutId)
+);
+
 /**
- * Renders the list of project attributes and allows for editing them.
+ * @return Whether this attribute is in the current layout.
  */
-export default defineComponent({
-  name: "AttributeEditor",
-  components: {
-    IconButton,
-    TextButton,
-    Typography,
-    FlexBox,
-    SaveAttribute,
-    ToggleList,
-  },
-  data() {
-    return {
-      typeOptions: attributeTypeOptions(),
-      createOpen: false,
-    };
-  },
-  computed: {
-    /**
-     * @return The list of custom attributes.
-     */
-    attributes(): AttributeSchema[] {
-      return attributesStore.attributes;
-    },
-    /**
-     * @return The store for the current layout being edited.
-     */
-    layoutStore() {
-      return attributeLayoutSaveStore(attributesStore.selectedLayoutId);
-    },
-  },
-  methods: {
-    /**
-     * @return Whether this attribute is in the current layout.
-     */
-    isAttributeInLayout(attribute: AttributeSchema): boolean {
-      return !!this.layoutStore.editedLayout.positions.find(
-        ({ key }: AttributePositionSchema) => key === attribute.key
-      );
-    },
-    /**
-     * Adds an attribute to the current layout.
-     * @param attribute - The attribute to add.
-     */
-    handleAddToLayout(attribute: AttributeSchema): void {
-      this.layoutStore.addAttribute(attribute.key);
-    },
-  },
-});
+function isAttributeInLayout(attribute: AttributeSchema): boolean {
+  return !!layoutStore.value.editedLayout.positions.find(
+    ({ key }: AttributePositionSchema) => key === attribute.key
+  );
+}
+
+/**
+ * Adds an attribute to the current layout.
+ * @param attribute - The attribute to add.
+ */
+function handleAddToLayout(attribute: AttributeSchema): void {
+  layoutStore.value.addAttribute(attribute.key);
+}
 </script>

@@ -31,7 +31,7 @@ const props = withDefaults(
     /**
      * The model value.
      */
-    modelValue: string;
+    modelValue?: string | number | null;
     /**
      * An error message to display, if one exists.
      */
@@ -70,6 +70,7 @@ const props = withDefaults(
     dataCy?: string;
   }>(),
   {
+    modelValue: undefined,
     b: "1",
     label: "",
     errorMessage: "",

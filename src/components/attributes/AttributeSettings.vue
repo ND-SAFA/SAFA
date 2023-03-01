@@ -7,12 +7,16 @@
         persistent
         bordered
         :breakpoint="0"
-        :width="280"
+        :width="300"
       >
         <attribute-editor />
       </q-drawer>
-      <attribute-editor v-else />
-      <attribute-layout-editor />
+      <q-page-container>
+        <q-page class="q-mx-md">
+          <attribute-editor v-if="smallWindow" />
+          <attribute-layout-editor />
+        </q-page>
+      </q-page-container>
     </q-layout>
   </panel-card>
 </template>

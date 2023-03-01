@@ -1,5 +1,12 @@
 <template>
-  <q-input v-model="model" outlined clearable :label="label" class="full-width">
+  <q-input
+    v-model="model"
+    dense
+    outlined
+    clearable
+    :label="label"
+    class="full-width"
+  >
     <template #prepend>
       <icon variant="search" />
     </template>

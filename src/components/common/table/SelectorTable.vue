@@ -2,7 +2,7 @@
   <data-table
     v-model:selected="selectedRows"
     :columns="props.columns"
-    :rows="props.rows"
+    :rows="filteredRows"
     :row-key="rowKey"
     :rows-per-page="5"
     :loading="props.loading"
@@ -94,7 +94,7 @@ const props = defineProps<{
   /**
    * The rows of the table.
    */
-  rows: Record<string, unknown>;
+  rows: Record<string, unknown>[];
   /**
    * The field on each row that is unique.
    */
@@ -133,8 +133,7 @@ const emit = defineEmits<{
   (e: "row:add"): void;
 }>();
 
-const searchText = ref("");
-
+const searchText = ref<string | null>("");
 const selectedRows = useVModel(props, "selected");
 
 const searchLabel = computed(() =>
@@ -144,13 +143,29 @@ const addLabel = computed(() => `Add ${props.itemName || ""}`);
 const editLabel = computed(() => `Edit ${props.itemName || ""}`);
 const deleteLabel = computed(() => `Delete ${props.itemName || ""}`);
 
+const lowercaseSearchText = computed(() =>
+  (searchText.value || "").toLowerCase()
+);
+const columnKeys = computed(() => props.columns.map(({ name }) => name));
+const filteredRows = computed(() =>
+  props.rows.filter((row) => {
+    for (const key of columnKeys.value) {
+      if (String(row[key]).toLowerCase().includes(lowercaseSearchText.value)) {
+        return true;
+      }
+    }
+
+    return false;
+  })
+);
+
 /**
  * Selects a clicked row, or deselects a selected row.
  * @param evt - The click event.
  * @param row - The row to toggle selecting.
  */
 function handleRowClick(evt: Event, row: Record<string, unknown>): void {
-  if (props.selected.includes(row)) {
+  if (props.selected?.includes(row)) {
     emit("update:selected", []);
   } else {
     emit("update:selected", [row]);

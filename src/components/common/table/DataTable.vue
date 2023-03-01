@@ -108,7 +108,11 @@ const props = defineProps<{
   /**
    * A function to filter the table with.
    */
-  filter?: (rows: Record<string, unknown>[]) => Record<string, unknown>[];
+  filter?: (
+    rows: Record<string, unknown>[],
+    filterText: string | undefined,
+    cols: TableColumn[]
+  ) => Record<string, unknown>[];
   /**
    * Which attribute to sort by.
    */

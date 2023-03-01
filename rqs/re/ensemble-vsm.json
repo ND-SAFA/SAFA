@@ -85,16 +85,22 @@
               }
             },
             "val_dataset_creator": {
-              "object_type": "HUB",
-              "name": "drone",
-              "task": "task_0",
-              "stage": "val"
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_0",
+                "stage": "val"
+              }
             },
             "eval_dataset_creator": {
-              "object_type": "HUB",
-              "name": "drone",
-              "task": "task_0",
-              "stage": "eval"
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_0",
+                "stage": "eval"
+              }
             },
             "augmenter": {
               "steps": [

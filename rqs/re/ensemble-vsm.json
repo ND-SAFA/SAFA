@@ -9,12 +9,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny",
-                "thearod5/nl-bert"
-              ]
-            }
+            "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
             "num_train_epochs": 1,
@@ -35,17 +30,53 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "HUB",
-                "project_path": "CM1"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/lhp/experiment/heating"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.10
+              "val_percentage": 0.70
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
+              "val_percentage": 0.20
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": 812
+          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/lhp/experiment/heating"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
               "val_percentage": 0.70
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.20
             },
             "augmenter": {
               "steps": [

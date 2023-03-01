@@ -70,7 +70,7 @@ const { darkMode } = useTheme();
 const $q = useQuasar();
 
 const style = computed(() =>
-  darkMode ? `background-color: ${ThemeColors.darkGrey}` : ""
+  darkMode.value ? `background-color: ${ThemeColors.darkGrey}` : ""
 );
 
 const sidebarOpen = computed({

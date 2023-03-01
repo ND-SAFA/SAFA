@@ -4,7 +4,6 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
-from util.general_util import ListUtil
 
 from constants import OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
@@ -14,7 +13,7 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
 from train.metrics.metrics_manager import MetricsManager
-from util.dict_util import DictUtil
+from util.dict_util import DictUtil, ListUtil
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 

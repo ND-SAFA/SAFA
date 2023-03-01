@@ -14,7 +14,7 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
-from util.general_util import ListUtil
+from util.dict_util import ListUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil

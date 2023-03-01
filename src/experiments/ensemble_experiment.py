@@ -1,8 +1,10 @@
 import os
 from collections import OrderedDict
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
+from sklearn.preprocessing import minmax_scale, scale
+from util.general_util import ListUtil
 
 from constants import OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
@@ -12,13 +14,19 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
 from train.metrics.metrics_manager import MetricsManager
+from util.dict_util import DictUtil
 from util.file_util import FileUtil
-from util.general_util import ListUtil
 from util.json_util import JsonUtil
+
+
+def average(arr):
+    return sum(arr) / len(arr)
+
 
 EnsembleFunctions = {
     "sum": sum,
-    "max": max
+    "max": max,
+    "average": average
 }
 
 
@@ -36,9 +44,10 @@ class EnsembleExperiment(Experiment):
         self.set_cross_step_vars(self.steps)
         jobs: List[TrainJob] = super().run()
         global_labels, global_links, global_predictions = self.collect_job_predictions(jobs)
+        global_predictions = EnsembleExperiment.scale_predictions(global_predictions)
 
         ListUtil.assert_equal(global_labels)
-        EnsembleExperiment.assert_same_links(global_links)
+        DictUtil.assert_same_keys(global_links)
         ensemble_labels = global_labels[0]
         ensemble_metrics = jobs[0].trainer_args.metrics
 
@@ -61,19 +70,6 @@ class EnsembleExperiment(Experiment):
                 job_experimental_vars = job.result[JobResult.EXPERIMENTAL_VARS]
                 if len(job_experimental_vars) == 0:
                     job.result[JobResult.EXPERIMENTAL_VARS] = {"model_path": job.model_manager.model_path.lower()}
-
-    @staticmethod
-    def ensemble_predictions(global_predictions: np.array, agg_func: Callable[[np.array], float], technique_axis: int = 0):
-        """
-        Applies aggregation function across prediction to create ensemble prediction.
-        :param global_predictions: The prediction across several techniques.
-        :param agg_func: The aggregation function to use to combine scores.
-        :param technique_axis: The axis along which each technique is stacked.
-        :return: Aggregated predictions.
-        """
-        global_predictions = np.array(global_predictions)
-        ensemble_predictions = np.apply_along_axis(func1d=agg_func, arr=global_predictions, axis=technique_axis)
-        return ensemble_predictions
 
     @staticmethod
     def collect_job_predictions(jobs):
@@ -151,16 +147,26 @@ class EnsembleExperiment(Experiment):
         return preds, labels
 
     @staticmethod
-    def assert_same_links(links: List[Dict]) -> None:
+    def ensemble_predictions(global_predictions: List[List[float]], agg_func: Callable[[np.array], float], technique_axis: int = 0):
         """
-        Asserts that links are the same size and have the same keys.
-        :param links: List of link mappings.
-        :return: None
+        Applies aggregation function across prediction to create ensemble prediction.
+        :param global_predictions: The prediction across several techniques.
+        :param agg_func: The aggregation function to use to combine scores.
+        :param technique_axis: The axis along which each technique is stacked.
+        :return: Aggregated predictions.
         """
-        link_sizes = [len(l) for l in links]
-        ListUtil.assert_mono_array(link_sizes)
-        link_keys = [set(l.keys()) for l in links]
-        for i in range(1, len(links)):
-            before_keys = link_keys[i - 1]
-            after_keys = link_keys[i]
-            assert before_keys == after_keys, f"Expected {before_keys} to be equal to {after_keys}."
+        global_predictions = np.array(global_predictions)
+        ensemble_predictions = np.apply_along_axis(func1d=agg_func, arr=global_predictions, axis=technique_axis)
+        return ensemble_predictions
+
+    @staticmethod
+    def scale_predictions(predictions: List[List[float]]) -> List[List[float]]:
+        """
+        Scales predictions so that technique has been standardized and squished to fit between 0 and 1
+        :param predictions: List of technique predictions.
+        :return: List of technique predictions
+        """
+        scaled_predictions = []
+        for p in predictions:
+            scaled_predictions.append(minmax_scale(scale(p)))
+        return scaled_predictions

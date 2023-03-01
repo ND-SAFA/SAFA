@@ -1,7 +1,7 @@
 <template>
   <panel-card title="Project Members">
     <selector-table
-      :columns="columns"
+      :columns="membersColumns"
       :rows="rows"
       row-key="email"
       addable
@@ -39,12 +39,7 @@ import { handleDeleteMember, handleGetMembers } from "@/api";
 import { PanelCard } from "@/components/common";
 import SelectorTable from "@/components/common/table/SelectorTable.vue";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
-
-const columns: TableColumn<MembershipSchema>[] = [
-  { label: "Email", name: "email", field: (row) => row.email },
-  { label: "Role", name: "role", field: (row) => row.role },
-  { label: "Actions", name: "actions", field: (row) => "", sortable: false },
-];
+import { membersColumns } from "./headers";
 
 const editedMember = ref<MembershipSchema | undefined>();
 const loading = ref(false);

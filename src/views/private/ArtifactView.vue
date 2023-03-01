@@ -1,5 +1,5 @@
 <template>
-  <private-page full-window>
+  <private-page full-window graph>
     <project-tree />
     <artifact-fab />
 

@@ -22,4 +22,8 @@ export interface TableColumn<T = Record<string, unknown>> {
    * Whether this column is sortable.
    */
   sortable?: boolean;
+  /**
+   * How to align the text content.
+   */
+  align?: "left" | "center";
 }

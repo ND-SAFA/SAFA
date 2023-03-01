@@ -1,6 +1,6 @@
 <template>
   <q-page v-if="doDisplay" :padding="!props.fullWindow">
-    <div class="q-mx-auto q-pa-lg" :style="style">
+    <div v-if="!graph" class="q-mx-auto q-pa-lg" :style="style">
       <back-button v-if="props.backToProject" to-project class="q-mb-sm" />
       <flex-box v-if="!!props.title" justify="between" align="center">
         <typography el="h1" variant="title" :value="props.title" />
@@ -15,6 +15,7 @@
       />
       <slot />
     </div>
+    <slot v-else />
   </q-page>
   <q-page v-else>
     <div class="full-width" style="margin-top: 40vh">
@@ -52,6 +53,7 @@ import {
 
 const props = defineProps<{
   fullWindow?: boolean;
+  graph?: boolean;
   title?: string;
   subtitle?: string;
   backToProject?: boolean;

@@ -2,7 +2,7 @@
   <panel-card title="Data Integrations">
     <selector-table
       addable
-      :columns="columns"
+      :columns="installationsColumns"
       :rows="rows"
       row-key="installationId"
       @row:add="modalOpen = true"
@@ -39,7 +39,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { InstallationSchema, TableColumn } from "@/types";
+import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { integrationsStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
@@ -50,29 +50,7 @@ import {
   PanelCard,
 } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
-
-const columns: TableColumn<InstallationSchema>[] = [
-  {
-    label: "Integration Type",
-    name: "type",
-    field: (row) => row.type,
-  },
-  {
-    label: "Project ID",
-    name: "installationId",
-    field: (row) => row.installationId,
-  },
-  {
-    label: "Last Synced",
-    name: "lastUpdate",
-    field: (row) => row.lastUpdate,
-  },
-  {
-    label: "Actions",
-    name: "actions",
-    field: () => "",
-  },
-];
+import { installationsColumns } from "./headers";
 
 const modalOpen = ref(false);
 const loading = ref(false);

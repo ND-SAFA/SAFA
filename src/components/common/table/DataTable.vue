@@ -17,6 +17,7 @@
       :column-sort-order="props.sortOrder"
       :sort-method="props.sort"
       :data-cy="props.dataCy"
+      table-header-class="text-primary"
       @row-click="(e, r, i) => emit('row-click', e, r, i)"
     >
       <slot />

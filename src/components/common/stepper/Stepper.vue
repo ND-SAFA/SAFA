@@ -4,6 +4,7 @@
     flat
     animated
     :class="className"
+    header-nav
     :alternative-labels="minimal"
   >
     <q-step
@@ -13,6 +14,7 @@
       :title="step.title"
       :done="step.done"
       :caption="step.caption"
+      :header-nav="step.done"
     >
       <slot :name="idx + 1" />
     </q-step>

@@ -3,7 +3,7 @@
     v-model:selected="selectedRows"
     :columns="props.columns"
     :rows="filteredRows"
-    :row-key="rowKey"
+    :row-key="props.rowKey"
     :rows-per-page="5"
     :loading="props.loading"
     selection="single"
@@ -74,19 +74,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { TableColumn } from "@/types";
-import { useVModel } from "@/hooks";
+import { useTableFilter, useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import { Searchbar } from "@/components/common/input";
 import { IconButton } from "@/components/common/button";
 import DataTable from "./DataTable.vue";
 
 const props = defineProps<{
-  /**
-   * Whether to display loading state.
-   */
-  loading?: boolean;
   /**
    * The columns to render in the table.
    */
@@ -99,6 +95,10 @@ const props = defineProps<{
    * The field on each row that is unique.
    */
   rowKey: string | ((row: Record<string, unknown>) => string);
+  /**
+   * Whether to display loading state.
+   */
+  loading?: boolean;
   /**
    * The values of selected rows.
    */
@@ -133,31 +133,13 @@ const emit = defineEmits<{
   (e: "row:add"): void;
 }>();
 
-const searchText = ref<string | null>("");
 const selectedRows = useVModel(props, "selected");
 
-const searchLabel = computed(() =>
-  props.itemName ? `Search ${props.itemName}s` : "Search"
-);
+const { searchText, searchLabel, filteredRows } = useTableFilter(props);
+
 const addLabel = computed(() => `Add ${props.itemName || ""}`);
 const editLabel = computed(() => `Edit ${props.itemName || ""}`);
 const deleteLabel = computed(() => `Delete ${props.itemName || ""}`);
-
-const lowercaseSearchText = computed(() =>
-  (searchText.value || "").toLowerCase()
-);
-const columnKeys = computed(() => props.columns.map(({ name }) => name));
-const filteredRows = computed(() =>
-  props.rows.filter((row) => {
-    for (const key of columnKeys.value) {
-      if (String(row[key]).toLowerCase().includes(lowercaseSearchText.value)) {
-        return true;
-      }
-    }
-
-    return false;
-  })
-);
 
 /**
  * Selects a clicked row, or deselects a selected row.

@@ -13,7 +13,7 @@
         </panel-card>
       </template>
       <template #approval>
-        <trace-approval-table />
+        <approval-table />
       </template>
     </tab-list>
   </sidebar-grid>
@@ -36,7 +36,7 @@ import { TabList, SidebarGrid, PanelCard } from "@/components/common";
 import { TraceLinkGenerator } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project";
 import { ModelTable } from "./training";
-import { TraceApprovalTable } from "./approval";
+import { ApprovalTable } from "./approval";
 
 const tabs = tracePredictionTabOptions();
 

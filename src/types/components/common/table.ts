@@ -26,4 +26,12 @@ export interface TableColumn<T = Record<string, unknown>> {
    * How to align the text content.
    */
   align?: "left" | "center";
+  /**
+   * A function for formatting the cell text.
+   */
+  format?(value: unknown): string;
+  /**
+   * A function for comparing two rows when sorting by this column.
+   */
+  sort?(a: unknown, b: unknown): number;
 }

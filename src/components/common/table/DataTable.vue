@@ -14,8 +14,7 @@
       :rows="props.rows"
       :row-key="props.rowKey"
       :selection="props.selection"
-      :column-sort-order="props.sortOrder"
-      :sort-method="props.sort"
+      :sort-method="sortRows"
       :data-cy="props.dataCy"
       table-header-class="text-primary"
       @row-click="(e, r, i) => emit('row-click', e, r, i)"
@@ -118,20 +117,9 @@ const props = defineProps<{
    */
   sortBy?: string;
   /**
-   * Whether to sort  `ad` (ascending-descending) or `da` (descending-ascending).
+   * Whether to sort descending.
    */
-  sortOrder?: "ad" | "da";
-  /**
-   * Applies the sorting.
-   * @param rows - The rows being sorted.
-   * @param sortBy - The column name being sorted by.
-   * @param desc - Whether sorting in descending order.
-   */
-  sort?: (
-    rows: Record<string, unknown>[],
-    sortBy: string,
-    desc: boolean
-  ) => Record<string, unknown>[];
+  sortDesc?: boolean;
   /**
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
@@ -150,6 +138,7 @@ const emit = defineEmits<{
   (e: "update:selected", rows: Record<string, unknown>[]): void;
   (e: "update:visibleColumns", cols: string[]): void;
   (e: "update:expanded", rows: string[]): void;
+  (e: "update:sortBy", sortBy: string | undefined): void;
   (
     e: "row-click",
     evt: Event,
@@ -163,6 +152,8 @@ const slots = useSlots();
 const selectedRows = useVModel(props, "selected");
 const visibleCols = useVModel(props, "visibleColumns");
 const expandedRows = useVModel(props, "expanded");
+const sortBy = useVModel(props, "sortBy");
+const sortDesc = useVModel(props, "sortDesc");
 
 const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
@@ -170,24 +161,67 @@ const customCellSlots = computed(() =>
 
 const pagination = ref({
   sortBy: props.sortBy,
-  descending: props.sortOrder === "da",
+  descending: props.sortDesc,
   rowsPerPage: props.rowsPerPage || 20,
   page: 1,
-  rowsNumber: props.rows.length,
 });
 
+function sortRows(
+  rows: Record<string, unknown>[],
+  sortBy: string,
+  descending: boolean
+): Record<string, unknown>[] {
+  const sortedRows = [...rows];
+
+  if (sortBy) {
+    sortedRows.sort((a, b) => {
+      const x = descending ? b : a;
+      const y = descending ? a : b;
+
+      return String(x[sortBy]) > String(y[sortBy])
+        ? 1
+        : String(x[sortBy]) < String(y[sortBy])
+        ? -1
+        : 0;
+    });
+  }
+
+  return sortedRows;
+}
+
 watch(
   () => props.sortBy,
-  (sortBy) => (pagination.value.sortBy = sortBy)
+  (sort) => {
+    if (pagination.value.sortBy === sort) return;
+
+    pagination.value.sortBy = sort;
+  }
 );
 
 watch(
-  () => props.rows.length,
-  (rows) => (pagination.value.rowsNumber = rows)
+  () => pagination.value.sortBy,
+  (sort) => {
+    if (sortBy.value === sort) return;
+
+    sortBy.value = sort;
+  }
 );
 
 watch(
-  () => props.sortBy,
-  (desc) => (pagination.value.descending = desc === "da")
+  () => props.sortDesc,
+  (desc) => {
+    if (pagination.value.descending === desc) return;
+
+    pagination.value.descending = desc;
+  }
+);
+
+watch(
+  () => pagination.value.descending,
+  (desc) => {
+    if (sortDesc.value === desc) return;
+
+    sortDesc.value = desc;
+  }
 );
 </script>

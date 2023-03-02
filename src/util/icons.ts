@@ -76,6 +76,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-chevron-down";
     case "up":
       return "mdi-chevron-up";
+    case "arrow-down":
+      return "mdi-arrow-down";
+    case "arrow-up":
+      return "mdi-arrow-up";
     case "home-list":
       return "mdi-view-list";
     case "home-add":

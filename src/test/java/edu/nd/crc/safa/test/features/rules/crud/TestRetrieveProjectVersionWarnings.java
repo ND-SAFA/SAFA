@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.builders.CommitBuilder;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
+import edu.nd.crc.safa.test.features.rules.TestRules;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.json.JSONArray;
@@ -39,6 +40,9 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         ProjectVersion projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
+
+        TestRules.getDefaultRules().forEach(rule ->
+            serviceProvider.getRuleService().addRule(projectVersion.getProject(), rule));
 
         // Step - Retrieve project warnings
         JSONObject emptyRules = getProjectRules(projectVersion);

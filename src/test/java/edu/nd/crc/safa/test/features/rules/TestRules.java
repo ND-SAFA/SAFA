@@ -1,16 +1,11 @@
-package edu.nd.crc.safa.features.rules.parser;
+package edu.nd.crc.safa.test.features.rules;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import edu.nd.crc.safa.features.rules.parser.ParserRule;
 
-/**
- * The default list of rules applied to projects when generating warnings.
- */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DefaultTreeRules {
+public class TestRules {
     private static final String MISSING_CHILD = "Missing child";
 
     public static List<ParserRule> getDefaultRules() {

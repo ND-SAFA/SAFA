@@ -73,7 +73,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
 
         // VP - Project warnings present in response
         JSONObject projectWarnings = creationResponse.getJSONObject("warnings");
-        assertThat(projectWarnings.keySet()).isNotEmpty();
+        assertThat(projectWarnings.keySet()).isEmpty();
 
         return project;
     }

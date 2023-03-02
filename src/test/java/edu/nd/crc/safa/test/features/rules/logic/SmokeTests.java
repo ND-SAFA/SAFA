@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.rules.parser.ArtifactRelationship;
 import edu.nd.crc.safa.features.rules.parser.Condition;
-import edu.nd.crc.safa.features.rules.parser.DefaultTreeRules;
 import edu.nd.crc.safa.features.rules.parser.Function;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.parser.TreeVerifier;
@@ -21,6 +20,7 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
+import edu.nd.crc.safa.test.features.rules.TestRules;
 
 import org.junit.jupiter.api.Test;
 
@@ -131,7 +131,7 @@ class SmokeTests extends ApplicationBaseTest {
         // Step - Calculate violated rules.
         TreeVerifier verifier = new TreeVerifier();
         Map<UUID, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
-            DefaultTreeRules.getDefaultRules());
+            TestRules.getDefaultRules());
 
         // VP - Verify that right warnings were triggered.
         UUID targetId = dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId();
@@ -142,4 +142,5 @@ class SmokeTests extends ApplicationBaseTest {
         targetRule = violatedRules.get(targetId).get(1).toString();
         assertThat(targetRule).contains("must not have package children");
     }
+
 }

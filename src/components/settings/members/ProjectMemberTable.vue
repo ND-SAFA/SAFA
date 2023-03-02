@@ -1,5 +1,8 @@
 <template>
-  <panel-card title="Project Members">
+  <panel-card
+    title="Project Members"
+    subtitle="Edit and invite project members."
+  >
     <selector-table
       :columns="membersColumns"
       :rows="rows"

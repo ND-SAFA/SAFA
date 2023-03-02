@@ -1,21 +1,20 @@
 <template>
-  <v-container>
+  <div>
     <typography
       el="p"
       value="Train the model on trace links in the current project. Both links that exist and those that do not will inform the model."
     />
     <trace-matrix-creator v-model="matrices" />
-    <v-btn
+    <text-button
       block
+      label="Start Model Training"
       color="primary"
-      class="mt-4"
+      class="q-mt-sm"
       :disabled="!isValid"
       :loading="isLoading"
       @click="handleSubmit"
-    >
-      Start Model Training
-    </v-btn>
-  </v-container>
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,7 +30,7 @@ export default {
 import { computed, ref } from "vue";
 import { ArtifactLevelSchema, GenerationModelSchema } from "@/types";
 import { handleTrainModel } from "@/api";
-import { Typography } from "@/components/common";
+import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "@/components/traceLink";
 
 const props = defineProps<{

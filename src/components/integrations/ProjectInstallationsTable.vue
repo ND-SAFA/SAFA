@@ -1,5 +1,8 @@
 <template>
-  <panel-card title="Data Integrations">
+  <panel-card
+    title="Data Integrations"
+    subtitle="View data integration sources and synchronize data between them."
+  >
     <selector-table
       addable
       :columns="installationsColumns"

@@ -1,9 +1,8 @@
 <template>
-  <panel-card title="Data File Upload">
-    <typography
-      el="p"
-      value="Select files to upload to the current project version."
-    />
+  <panel-card
+    title="Data File Upload"
+    subtitle="Select files to upload to the current project version."
+  >
     <project-files-input v-model="files" data-cy="input-files-version" />
     <switch-input
       v-model="replaceAllArtifacts"
@@ -35,12 +34,7 @@ export default {
 import { ref, watch } from "vue";
 import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import {
-  SwitchInput,
-  Typography,
-  PanelCard,
-  TextButton,
-} from "@/components/common";
+import { SwitchInput, PanelCard, TextButton } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
 const props = defineProps<{

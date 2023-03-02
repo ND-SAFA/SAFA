@@ -6,6 +6,8 @@
     :options="options"
     option-value="id"
     option-label="id"
+    map-options
+    emit-value
   >
     <template #option="{ opt, itemProps }">
       <list-item v-bind="itemProps" :title="opt.id" :subtitle="opt.name" />

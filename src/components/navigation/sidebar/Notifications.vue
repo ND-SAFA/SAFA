@@ -19,9 +19,7 @@
             dense
             class="q-px-none"
           >
-            <alert :type="item.type">
-              <typography :value="item.message" />
-            </alert>
+            <alert :type="item.type" :message="item.message" />
           </list-item>
         </list>
       </q-menu>

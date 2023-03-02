@@ -1,54 +1,54 @@
 <template>
-  <v-timeline-item small :color="stepColor">
-    <v-alert outlined border="left" :color="stepColor">
-      <flex-box justify="between" align="center">
-        <div>
-          <typography el="div" bold :value="stepName" />
-          <typography variant="caption" :value="stepTimestamp" />
-        </div>
-        <v-chip :color="stepColor">{{ step.status }}</v-chip>
+  <q-timeline-entry
+    :color="stepColor"
+    :title="stepName"
+    :subtitle="stepTimestamp"
+  >
+    <template #title>
+      <flex-box justify="between">
+        <typography variant="subtitle" :value="stepName" />
+        <q-chip outline :color="stepColor">{{ step.status }}</q-chip>
       </flex-box>
-
-      <flex-box v-if="step.type === 'document'" t="2" align="center">
-        <typography value="Trained on documents:" />
-        <v-chip
-          v-for="document in step.documents"
-          :key="document.url"
-          outlined
-          class="ma-1"
+    </template>
+    <flex-box v-if="step.type === 'document'" t="2" align="center">
+      <typography value="Trained on documents:" />
+      <q-chip
+        v-for="document in step.documents"
+        :key="document.url"
+        outline
+        class="q-ma-sm"
+      >
+        {{ document.name }}
+      </q-chip>
+    </flex-box>
+    <flex-box v-else-if="step.type === 'repository'" t="2" align="center">
+      <typography value="Trained on repositories:" />
+      <q-chip
+        v-for="repo in step.repositories"
+        :key="repo.url"
+        outline
+        class="q-ma-sm"
+      >
+        {{ repo.name }}
+      </q-chip>
+    </flex-box>
+    <flex-box v-else-if="step.type === 'project'" t="2" align="center">
+      <typography value="Trained on project data:" />
+      <flex-box v-for="project in step.projects" :key="project.id">
+        <q-chip outline color="primary" class="q-ma-sm">
+          {{ project.name }}
+        </q-chip>
+        <q-chip
+          v-for="level in project.levels"
+          :key="level.source + level.target"
+          outline
+          class="q-ma-sm"
         >
-          {{ document.name }}
-        </v-chip>
+          {{ level.source }} To {{ level.target }}
+        </q-chip>
       </flex-box>
-      <flex-box v-else-if="step.type === 'repository'" t="2" align="center">
-        <typography value="Trained on repositories:" />
-        <v-chip
-          v-for="repo in step.repositories"
-          :key="repo.url"
-          outlined
-          class="ma-1"
-        >
-          {{ repo.name }}
-        </v-chip>
-      </flex-box>
-      <flex-box v-else-if="step.type === 'project'" t="2" align="center">
-        <typography value="Trained on project data:" />
-        <flex-box v-for="project in step.projects" :key="project.id">
-          <v-chip outlined color="primary" class="ma-1">
-            {{ project.name }}
-          </v-chip>
-          <v-chip
-            v-for="level in project.levels"
-            :key="level.source + level.target"
-            outlined
-            class="ma-1"
-          >
-            {{ level.source }} To {{ level.target }}
-          </v-chip>
-        </flex-box>
-      </flex-box>
-    </v-alert>
-  </v-timeline-item>
+    </flex-box>
+  </q-timeline-entry>
 </template>
 
 <script lang="ts">
@@ -63,6 +63,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { TrainingStepSchema } from "@/types";
+import { timestampToDisplay } from "@/util";
 import { Typography, FlexBox } from "@/components/common";
 
 const props = defineProps<{
@@ -84,9 +85,9 @@ const stepColor = computed(
     ({
       "In Progress": "secondary",
       Completed: "primary",
-      Failed: "error",
+      Failed: "negative",
     }[props.step.status] || "Training")
 );
 
-const stepTimestamp = computed(() => "12:00 PM, Jan 1, 2023");
+const stepTimestamp = computed(() => timestampToDisplay(props.step.updatedAt));
 </script>

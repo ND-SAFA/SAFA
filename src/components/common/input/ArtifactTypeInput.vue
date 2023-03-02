@@ -12,7 +12,7 @@
     @submit="emit('blur')"
   >
     <template #selected-item="{ opt }">
-      <attribute-chip artifact-type :value="opt" />
+      <attribute-chip v-if="!!opt" artifact-type :value="opt" />
     </template>
   </q-select>
 </template>

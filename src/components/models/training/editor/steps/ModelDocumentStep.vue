@@ -1,39 +1,40 @@
 <template>
-  <v-container style="max-width: 40em">
+  <div>
     <under-construction-alert />
     <typography
       el="p"
       value="Upload any technical documents that would train the model to understand this domain."
     />
     <file-input />
-    <v-btn disabled block color="primary"> Start Model Pre-Training </v-btn>
-  </v-container>
+    <text-button
+      disabled
+      block
+      label="Start Model Pre-Training"
+      color="primary"
+      class="q-mt-sm"
+    />
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * A step for training a model on documents.
+ */
+export default {
+  name: "ModelDocumentStep",
+};
+</script>
+
+<script setup lang="ts">
 import { GenerationModelSchema } from "@/types";
 import {
   Typography,
   FileInput,
   UnderConstructionAlert,
+  TextButton,
 } from "@/components/common";
 
-/**
- * A step for training a model on documents.
- */
-export default defineComponent({
-  name: "ModelDocumentStep",
-  components: {
-    Typography,
-    FileInput,
-    UnderConstructionAlert,
-  },
-  props: {
-    model: {
-      type: Object as PropType<GenerationModelSchema>,
-      required: true,
-    },
-  },
-});
+const props = defineProps<{
+  model: GenerationModelSchema;
+}>();
 </script>

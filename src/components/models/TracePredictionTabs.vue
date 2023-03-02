@@ -8,7 +8,7 @@
         <model-table />
       </template>
       <template #generation>
-        <panel-card>
+        <panel-card title="Generate Trace Links">
           <trace-link-generator :is-open="tab === 'generation'" />
         </panel-card>
       </template>

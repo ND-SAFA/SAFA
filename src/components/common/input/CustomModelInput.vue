@@ -1,21 +1,19 @@
 <template>
-  <v-select
+  <q-select
     v-model="model"
     filled
-    hide-details
     label="Custom Model"
-    :items="projectStore.models"
-    class="mr-2"
-    item-text="name"
-    item-value="id"
+    :items="options"
+    option-label="name"
+    option-value="id"
   >
-    <template #item="{ item }">
-      <div class="my-1">
-        <typography el="div" :value="item.name" />
-        <typography variant="caption" :value="item.baseModel" />
+    <template #option="{ opt }">
+      <div class="q-my-sm">
+        <typography el="div" :value="opt.name" />
+        <typography variant="caption" :opt="item.baseModel" />
       </div>
     </template>
-  </v-select>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -30,27 +28,18 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GenerationModelSchema } from "@/types";
-import { projectStore } from "@/hooks";
+import { projectStore, useVModel } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<{
-  modelValue?: GenerationModelSchema;
+  modelValue: GenerationModelSchema | undefined;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "update:modelValue", value: GenerationModelSchema | undefined): void;
-  (e: "enter"): void;
 }>();
 
-const model = computed({
-  get() {
-    return props.modelValue?.id;
-  },
-  set(value) {
-    emit(
-      "update:modelValue",
-      projectStore.models.find(({ id }) => id === value)
-    );
-  },
-});
+const model = useVModel(props, "modelValue");
+
+const options = computed(() => projectStore.models);
 </script>

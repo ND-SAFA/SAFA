@@ -1,20 +1,18 @@
 <template>
   <div>
-    <typography el="h2" variant="subtitle" value="Generate Trace Links" />
     <typography el="p" b="4" :value="modalDescription" />
     <custom-model-input v-model="model" />
     <trace-matrix-creator v-model="matrices" />
-    <v-btn
+    <text-button
       block
+      label="Generate Trace Links"
       :disabled="!isValid"
       :loading="isLoading"
       color="primary"
       data-cy="button-trace-generate"
-      class="mt-2"
+      class="q-mt-md"
       @click="handleSubmit"
-    >
-      Generate Trace Links
-    </v-btn>
+    />
   </div>
 </template>
 
@@ -23,6 +21,7 @@ import { defineComponent } from "vue";
 import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
 import { handleGenerateLinks } from "@/api";
 import { Typography, CustomModelInput } from "@/components/common";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { TraceMatrixCreator } from "../save";
 
 /**
@@ -33,6 +32,7 @@ import { TraceMatrixCreator } from "../save";
 export default defineComponent({
   name: "TraceLinkGenerator",
   components: {
+    TextButton,
     TraceMatrixCreator,
     CustomModelInput,
     Typography,

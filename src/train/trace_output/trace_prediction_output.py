@@ -17,6 +17,7 @@ class TracePredictionEntry(TypedDict):
     source: str
     target: str
     score: float
+    label: float
 
 
 class TracePredictionOutput(AbstractTraceOutput):

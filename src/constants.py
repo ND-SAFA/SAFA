@@ -26,6 +26,7 @@ BASE_EXPERIMENT_NAME = "base_experiment"
 BEST_MODEL_NAME = "best"
 EXPERIMENT_ID_DEFAULT = 0
 OUTPUT_FILENAME = "output.json"
+STAGES = ["train", "val", "eval"]
 
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
@@ -78,7 +79,9 @@ DELETE_TEST_OUTPUT = os.getenv("DELETE_TEST_OUTPUT", "true").capitalize() == "Tr
 MNT_DIR = os.environ.get('MNT_DIR', "")
 
 # -------------- PATHS --------------
-PROJ_PATH = dirname(dirname(dirname(abspath(__file__))))
+PROJ_PATH = dirname(dirname(abspath(__file__)))
+RES_PATH = os.path.join(PROJ_PATH, "res")
+JAVA_KEYWORDS_PATH = os.path.join(RES_PATH, "JavaReservedKeywords.txt")
 
 # -------------- SCRIPT PATHS --------------
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]

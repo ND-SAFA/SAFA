@@ -1,0 +1,85 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": 812
+          },
+          "model_manager": {
+            "model_path": "thearod5/nl-bert"
+          },
+          "trainer_args": {
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 250,
+            "learning_rate": 5e-5,
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ],
+            "skip_save": false,
+            "load_best_model_at_end": true,
+            "evaluation_strategy": "steps",
+            "save_strategy": "steps",
+            "logging_strategy": "steps",
+            "save_steps": 1,
+            "eval_steps": 1,
+            "logging_steps": 1
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "HUB",
+                  "name": "drone"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "itrust"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "cm1"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "mip"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "cchit"
+                },
+                {
+                  "object_type": "HUB",
+                  "name": "traincontroller"
+                }
+              ]
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.02
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.75
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

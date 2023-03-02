@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
 import pandas as pd
 
@@ -11,6 +11,15 @@ from data.tree.trace_link import TraceLink
 from util.file_util import FileUtil
 
 
+class ProjectData(TypedDict):
+    """
+    The project data necessary to export it.
+    """
+    artifact_df: pd.DataFrame
+    layer_mapping_df: pd.DataFrame
+    traces: Dict[int, TraceLink]
+
+
 class SafaExporter:
     """
     Exports trace dataset as a SAFA one.
@@ -18,27 +27,26 @@ class SafaExporter:
 
     def __init__(self):
         """
-        Initializes exporter for given trace dataset.
-        :param trace_dataset_creator: The creator responsible for creating trace dataset.
+        Initializes empty exporter.
         """
         self.artifact_definitions = {}
         self.trace_definitions = {}
         self.artifact_type_2_id = None
         self.id_2_artifact = None
 
-    def export(self, export_path, links: Dict[int, TraceLink], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
+    @staticmethod
+    def export(export_path, project_data: ProjectData):
         """
         Exports entities as a project in the safa format.
         :param export_path: Path to export project to.
-        :param links: Links present in the project.
-        :param artifact_df: DataFrame containing artifacts.
-        :param layer_mapping_df: DataFrame containing trace queries in project.
+        :param project_data: Data containing trace queries, artifacts, and traces between them.
         :return: None
         """
-        self.artifact_type_2_id, self.id_2_artifact = TraceDatasetCreator.create_artifact_maps(artifact_df)
-        self.create_artifact_definitions(layer_mapping_df, export_path)
-        self.create_trace_definitions(links, layer_mapping_df, export_path)
-        self.create_tim(export_path)
+        exporter = SafaExporter()
+        exporter.artifact_type_2_id, exporter.id_2_artifact = TraceDatasetCreator.create_artifact_maps(project_data["artifact_df"])
+        exporter.create_artifact_definitions(project_data["layer_mapping_df"], export_path)
+        exporter.create_trace_definitions(project_data["traces"], project_data["layer_mapping_df"], export_path)
+        exporter.create_tim(export_path)
 
     def create_artifact_definitions(self, layer_mapping_df: pd.DataFrame, export_path: str) -> None:
         """
@@ -61,7 +69,7 @@ class SafaExporter:
                 })
             file_name = artifact_type + ".csv"
             local_export_path = os.path.join(export_path, file_name)
-            pd.DataFrame(entries).to_csv(local_export_path, index=False)
+            pd.DataFrame(entries).to_csv(local_export_path, index=False, encoding="utf-8")
             self.artifact_definitions[artifact_type] = {
                 SafaKeys.FILE: file_name
             }
@@ -85,7 +93,7 @@ class SafaExporter:
                 "Source": source_type,
                 "Target": target_type
             }
-            trace_df.to_csv(export_file_path, index=False)
+            trace_df.to_csv(export_file_path, index=False, encoding="utf-8")
 
     def create_trace_df(self, links: Dict[int, TraceLink], source_type, target_type) -> pd.DataFrame:
         """

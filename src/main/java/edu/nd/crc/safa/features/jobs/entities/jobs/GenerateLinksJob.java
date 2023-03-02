@@ -85,7 +85,7 @@ public class GenerateLinksJob extends CommitJob {
                     .generateLinksWithMethod(tracingPayload));
             } else {
                 ModelAppEntity model = tracingPayload.getModel();
-                TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
                     model.getBaseModel(),
                     this.serviceProvider.getSafaRequestBuilder()
                 );

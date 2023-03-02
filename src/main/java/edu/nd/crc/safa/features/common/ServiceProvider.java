@@ -36,7 +36,6 @@ import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipReposi
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
-import edu.nd.crc.safa.features.models.services.BertService;
 import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
@@ -112,7 +111,6 @@ public class ServiceProvider {
     private final ModelRepository modelRepository;
     private final ModelService modelService;
     private final ModelProjectRepository modelProjectRepository;
-    private final BertService bertService;
     // Matrix
     private final TraceMatrixRepository traceMatrixRepository;
     // Changes

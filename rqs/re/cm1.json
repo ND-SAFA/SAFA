@@ -9,12 +9,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny",
-                "thearod5/nl-bert"
-              ]
-            }
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 1,
@@ -31,6 +26,42 @@
             "skip_save": false,
             "load_best_model_at_end": true
           },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "CM1"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.10
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.70
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": 812
+          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",

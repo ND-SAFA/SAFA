@@ -9,7 +9,7 @@
       </template>
       <template #generation>
         <panel-card title="Generate Trace Links">
-          <trace-link-generator :is-open="tab === 'generation'" />
+          <trace-link-generator :open="tab === 'generation'" />
         </panel-card>
       </template>
       <template #approval>

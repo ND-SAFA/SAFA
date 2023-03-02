@@ -3,15 +3,18 @@
     v-model="model"
     filled
     label="Custom Model"
-    :items="options"
+    :options="options"
     option-label="name"
     option-value="id"
+    emit-value
+    map-options
   >
-    <template #option="{ opt }">
-      <div class="q-my-sm">
-        <typography el="div" :value="opt.name" />
-        <typography variant="caption" :opt="item.baseModel" />
-      </div>
+    <template #option="{ opt, itemProps }">
+      <list-item
+        v-bind="itemProps"
+        :title="opt.name"
+        :subtitle="opt.baseModel"
+      />
     </template>
   </q-select>
 </template>
@@ -29,7 +32,7 @@ export default {
 import { computed } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { projectStore, useVModel } from "@/hooks";
-import { Typography } from "@/components/common/display";
+import ListItem from "@/components/common/display/list/ListItem.vue";
 
 const props = defineProps<{
   modelValue: GenerationModelSchema | undefined;

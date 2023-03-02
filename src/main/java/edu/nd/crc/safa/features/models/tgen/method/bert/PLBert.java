@@ -15,7 +15,7 @@ public class PLBert extends TBert {
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
             "PL_BERT",
-            "thearod5/tbert"
+            "thearod5/pl-bert"
         );
     }
 }

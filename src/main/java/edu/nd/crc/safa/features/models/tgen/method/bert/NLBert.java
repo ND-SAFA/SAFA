@@ -14,7 +14,7 @@ public class NLBert extends TBert {
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
             "NL_BERT",
-            "thearod5/sebert-task-cls"
+            "thearod5/nl-bert"
         );
     }
 }

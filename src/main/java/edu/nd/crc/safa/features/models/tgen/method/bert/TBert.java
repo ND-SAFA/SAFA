@@ -40,13 +40,15 @@ import org.json.JSONObject;
 /**
  * Responsible for providing an API for predicting trace links using TBert.
  */
-public abstract class TBert implements ITraceLinkGeneration {
+public class TBert implements ITraceLinkGeneration {
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final BertMethodIdentifier methodId;
 
-    protected TBert(SafaRequestBuilder safaRequestBuilder) {
+    public TBert(SafaRequestBuilder safaRequestBuilder, BertMethodIdentifier methodId) {
         this.safaRequestBuilder = safaRequestBuilder;
+        this.methodId = methodId;
     }
 
     /**
@@ -55,7 +57,6 @@ public abstract class TBert implements ITraceLinkGeneration {
      * @param newModelPath The path to save the new model to.
      */
     public void createModel(String newModelPath) {
-        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         copyModel(methodId.getStatePath(), newModelPath);
     }
 
@@ -66,7 +67,6 @@ public abstract class TBert implements ITraceLinkGeneration {
      * @param targetStatePath The path to store the new model at.
      */
     public void copyModel(String sourceStatePath, String targetStatePath) {
-        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         ModelIdentifierDTO creationRequest = new ModelIdentifierDTO(
             methodId.getBaseModel(),
             sourceStatePath,
@@ -82,7 +82,6 @@ public abstract class TBert implements ITraceLinkGeneration {
      * Deletes model by sending request to TGEN to delete model files
      */
     public void deleteModel() {
-        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         ModelIdentifierDTO creationRequest = new ModelIdentifierDTO();
         creationRequest.setModelPath(methodId.getStatePath());
         this.safaRequestBuilder
@@ -93,7 +92,7 @@ public abstract class TBert implements ITraceLinkGeneration {
 
     @Override
     public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
-        return this.generateLinksWithState(this.getBertMethodIdentifier().getStatePath(), false, tracingPayload);
+        return this.generateLinksWithState(methodId.getStatePath(), false, tracingPayload);
     }
 
     /**
@@ -172,7 +171,6 @@ public abstract class TBert implements ITraceLinkGeneration {
         String statePath,
         boolean loadFromStorage,
         TracingPayload tracingPayload) {
-        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         return new TGenPredictionRequestDTO(
             methodId.getBaseModel(),
             statePath,
@@ -185,7 +183,6 @@ public abstract class TBert implements ITraceLinkGeneration {
     private TGenTrainingRequest createTrainingPayload(String statePath,
                                                       TracingRequest tracingRequest,
                                                       ProjectAppEntity projectAppEntity) {
-        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
         return new TGenTrainingRequest(
             methodId.getBaseModel(),
@@ -239,8 +236,6 @@ public abstract class TBert implements ITraceLinkGeneration {
             throw new SafaError("An error occurred while training the model", e);
         }
     }
-
-    abstract BertMethodIdentifier getBertMethodIdentifier();
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {

@@ -34,7 +34,7 @@ public class TrainModelJob extends AbstractJob {
             this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(currentVersion);
 
         for (TracingRequest tracingRequest : this.trainingRequest.getRequests()) {
-            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+            TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
                 tracingRequest.getModel().getBaseModel(),
                 this.serviceProvider.getSafaRequestBuilder());
 

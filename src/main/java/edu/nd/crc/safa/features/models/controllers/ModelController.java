@@ -64,7 +64,7 @@ public class ModelController extends BaseController {
         // Step - Copy model to project
         if (createModel) {
             try {
-                TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
                     modelAppEntity.getBaseModel(),
                     serviceProvider.getSafaRequestBuilder()
                 );
@@ -102,7 +102,7 @@ public class ModelController extends BaseController {
         this.serviceProvider.getModelRepository().delete(model);
 
         // Step - Delete model files
-        TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+        TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
             modelAppEntity.getBaseModel(),
             serviceProvider.getSafaRequestBuilder()
         );
@@ -205,7 +205,7 @@ public class ModelController extends BaseController {
             UUID targetId = modelAppEntity.getId();
 
             // Step - Copy model to new project
-            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+            TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
                 modelAppEntity.getBaseModel(),
                 serviceProvider.getSafaRequestBuilder()
             );

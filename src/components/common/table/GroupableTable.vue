@@ -72,6 +72,10 @@ const props = defineProps<{
    * The default row keys to sort by.
    */
   defaultSortBy?: string;
+  /**
+   * Determines whether a row should be visible.
+   */
+  filterRow?(row: Record<string, unknown>): boolean;
 }>();
 
 // const emit = defineEmits<{}>();

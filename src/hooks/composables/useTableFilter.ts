@@ -22,6 +22,10 @@ export function useTableFilter(props: TableFilterProps): TableFilterHook {
 
   const filteredRows = computed(() =>
     props.rows.filter((row) => {
+      if (props.filterRow && !props.filterRow(row)) {
+        return false;
+      }
+
       for (const key of columnKeys.value) {
         if (
           String(row[key]).toLowerCase().includes(lowercaseSearchText.value)

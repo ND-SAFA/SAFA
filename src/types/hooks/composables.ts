@@ -37,6 +37,10 @@ export interface TableFilterProps {
    * The name of an item.
    */
   itemName?: string;
+  /**
+   * Determines whether a row should be visible.
+   */
+  filterRow?(row: Record<string, unknown>): boolean;
 }
 
 /**

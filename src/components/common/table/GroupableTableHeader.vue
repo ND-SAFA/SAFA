@@ -27,7 +27,7 @@
         option-value="name"
         option-label="label"
         option-to-value
-        class="q-mx-md"
+        class="q-ml-sm"
         data-cy="artifact-table-sort-by"
       >
         <template #prepend>
@@ -41,6 +41,7 @@
           </div>
         </template>
       </select-input>
+      <separator v-if="!!slots['header-right']" vertical class="q-mx-sm" />
       <slot name="header-right" />
     </flex-box>
     <slot name="header-bottom" />
@@ -57,12 +58,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, useSlots } from "vue";
 import { TableColumn } from "@/types";
 import { useVModel } from "@/hooks";
 import { Searchbar, SelectInput } from "@/components/common/input";
 import { CommitButtons, IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
+import { Separator } from "@/components/common/display";
 
 const props = defineProps<{
   /**
@@ -102,6 +104,8 @@ const searchText = useVModel(props, "searchText");
 const sortBy = useVModel(props, "sortBy");
 const sortDesc = useVModel(props, "sortDesc");
 const groupBy = useVModel(props, "groupBy");
+
+const slots = useSlots();
 
 const inputOptions = computed(() =>
   props.columns

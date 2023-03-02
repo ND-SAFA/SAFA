@@ -26,10 +26,10 @@ def first(arr):
 
 
 EnsembleFunctions = {
-    # "sum": sum,
-    # "max": max,
+    "sum": sum,
+    "max": max,
     "average": average,
-    "first": first
+    # "first": first
 }
 
 

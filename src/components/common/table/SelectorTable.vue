@@ -75,7 +75,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TableColumn } from "@/types";
+import { TableColumn, TableRow } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import { Searchbar } from "@/components/common/input";
@@ -90,11 +90,11 @@ const props = defineProps<{
   /**
    * The rows of the table.
    */
-  rows: Record<string, unknown>[];
+  rows: TableRow[];
   /**
    * The field on each row that is unique.
    */
-  rowKey: string | ((row: Record<string, unknown>) => string);
+  rowKey: string | ((row: TableRow) => string);
   /**
    * Whether to display loading state.
    */
@@ -102,7 +102,7 @@ const props = defineProps<{
   /**
    * The values of selected rows.
    */
-  selected?: Record<string, unknown>[];
+  selected?: TableRow[];
   /**
    * The name of an item.
    */
@@ -114,11 +114,11 @@ const props = defineProps<{
   /**
    * Whether these rows are editable.
    */
-  editable?: boolean | ((row: Record<string, unknown>) => boolean);
+  editable?: boolean | ((row: TableRow) => boolean);
   /**
    * Whether these rows are deletable.
    */
-  deletable?: boolean | ((row: Record<string, unknown>) => boolean);
+  deletable?: boolean | ((row: TableRow) => boolean);
   /**
    * Whether to display minimal information.
    */
@@ -126,10 +126,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selected", rows: Record<string, unknown>[]): void;
+  (e: "update:selected", rows: TableRow[]): void;
   (e: "refresh"): void;
-  (e: "row:edit", row: Record<string, unknown>): void;
-  (e: "row:delete", row: Record<string, unknown>): void;
+  (e: "row:edit", row: TableRow): void;
+  (e: "row:delete", row: TableRow): void;
   (e: "row:add"): void;
 }>();
 
@@ -146,7 +146,7 @@ const deleteLabel = computed(() => `Delete ${props.itemName || ""}`);
  * @param evt - The click event.
  * @param row - The row to toggle selecting.
  */
-function handleRowClick(evt: Event, row: Record<string, unknown>): void {
+function handleRowClick(evt: Event, row: TableRow): void {
   if (props.selected?.includes(row)) {
     emit("update:selected", []);
   } else {
@@ -159,7 +159,7 @@ function handleRowClick(evt: Event, row: Record<string, unknown>): void {
  * @param row - The row to check.
  * @return Whether it is editable.
  */
-function isEditEnabled(row: Record<string, unknown>): boolean {
+function isEditEnabled(row: TableRow): boolean {
   return typeof props.editable === "function"
     ? props.editable(row)
     : !!props.editable;
@@ -170,7 +170,7 @@ function isEditEnabled(row: Record<string, unknown>): boolean {
  * @param row - The row to check.
  * @return Whether it is deletable.
  */
-function isDeleteEnabled(row: Record<string, unknown>): boolean {
+function isDeleteEnabled(row: TableRow): boolean {
   return typeof props.deletable === "function"
     ? props.deletable(row)
     : !!props.deletable;

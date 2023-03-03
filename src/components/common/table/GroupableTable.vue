@@ -138,6 +138,9 @@ const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
 );
 
+/**
+ * Applies sorting and grouping to filtered rows by adding header rows in between each group.
+ */
 const groupedRows = computed(() => {
   const sortedRows = sortRows(filteredRows.value, sortBy.value, sortDesc.value);
 

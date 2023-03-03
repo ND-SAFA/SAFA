@@ -62,7 +62,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, useSlots, watch } from "vue";
-import { TableColumn } from "@/types";
+import { TableColumn, TableRow } from "@/types";
 import { sortRows } from "@/util";
 import { useVModel } from "@/hooks";
 
@@ -82,11 +82,11 @@ const props = defineProps<{
   /**
    * The rows of the table.
    */
-  rows: Record<string, unknown>;
+  rows: TableRow;
   /**
    * The field on each row that is unique.
    */
-  rowKey: string | ((row: Record<string, unknown>) => string);
+  rowKey: string | ((row: TableRow) => string);
   /**
    * The number of rows to display per page.
    */
@@ -98,7 +98,7 @@ const props = defineProps<{
   /**
    * The values of selected rows.
    */
-  selected?: Record<string, unknown>[];
+  selected?: TableRow[];
   /**
    * The ids of expanded rows.
    */
@@ -111,10 +111,10 @@ const props = defineProps<{
    * A function to filter the table with.
    */
   filter?: (
-    rows: Record<string, unknown>[],
+    rows: TableRow[],
     filterText: string | undefined,
     cols: TableColumn[]
-  ) => Record<string, unknown>[];
+  ) => TableRow[];
   /**
    * Which attribute to sort by.
    */
@@ -126,11 +126,7 @@ const props = defineProps<{
   /**
    * A function to sort the table with.
    */
-  sort?(
-    rows: Record<string, unknown>[],
-    sortBy: string,
-    descending: boolean
-  ): Record<string, unknown>[];
+  sort?(rows: TableRow[], sortBy: string, descending: boolean): TableRow[];
   /**
    * Where to place separators. Defaults to horizontal.
    */
@@ -150,16 +146,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selected", rows: Record<string, unknown>[]): void;
+  (e: "update:selected", rows: TableRow[]): void;
   (e: "update:visibleColumns", cols: string[]): void;
   (e: "update:expanded", rows: string[]): void;
   (e: "update:sortBy", sortBy: string | undefined): void;
-  (
-    e: "row-click",
-    evt: Event,
-    row: Record<string, unknown>,
-    index: number
-  ): void;
+  (e: "row-click", evt: Event, row: TableRow, index: number): void;
 }>();
 
 const slots = useSlots();

@@ -29,6 +29,7 @@
           option-value="id"
           option-label="name"
           data-cy="input-approval-type"
+          b=""
         />
       </template>
 

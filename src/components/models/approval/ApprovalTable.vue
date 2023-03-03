@@ -4,14 +4,18 @@
     subtitle="Review, approve, and decline generated trace links."
   >
     <groupable-table
+      v-model:group-by="groupBy"
       v-model:expanded="expanded"
       expandable
-      :columns="approvalColumns"
+      :columns="columns"
       :rows="rows"
       row-key="traceLinkId"
       :loading="loading"
-      default-sort-by="sourceName"
+      default-sort-by="score"
+      :default-group-by="groupBy"
+      default-sort-desc
       :filter-row="filterRow"
+      :custom-cells="customCells"
     >
       <template #header-right>
         <multiselect-input
@@ -40,7 +44,29 @@
         </flex-box>
       </template>
 
-      <template #body-expanded> </template>
+      <template #body-cell-sourceType="{ row }">
+        <attribute-chip :value="row.sourceType" artifact-type />
+      </template>
+
+      <template #body-cell-targetType="{ row }">
+        <attribute-chip :value="row.targetType" artifact-type />
+      </template>
+
+      <template #body-cell-approvalStatus="{ row }">
+        <attribute-chip :value="row.approvalStatus" />
+      </template>
+
+      <template #body-cell-score="{ row }">
+        <attribute-chip :value="row.score" confidence-score />
+      </template>
+
+      <template #body-cell-actions="{ row }">
+        <trace-link-approval :trace="row" />
+      </template>
+
+      <template #body-expanded="{ row }">
+        <trace-link-display :trace="row" :show-only="expandedDisplay" />
+      </template>
     </groupable-table>
   </panel-card>
 </template>
@@ -67,15 +93,26 @@ import {
   GroupableTable,
   MultiselectInput,
   TextButton,
+  FlexBox,
+  AttributeChip,
 } from "@/components/common";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
+import { TraceLinkApproval, TraceLinkDisplay } from "@/components/traceLink";
 import { approvalColumns } from "./headers";
 
 const options = approvalTypeOptions();
 
+const customCells: (keyof FlatTraceLink | string)[] = [
+  "sourceType",
+  "targetType",
+  "approvalStatus",
+  "score",
+  "actions",
+];
+
 const currentRoute = useRoute();
 
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
+const groupBy = ref<string | undefined>(); // "targetName"
 
 const rows = computed(() => approvalStore.traceLinks);
 
@@ -89,6 +126,31 @@ const expanded = computed({
     approvalStore.expandedIds = ids;
   },
 });
+
+/**
+ * @return What parts of the expansion panel to show.
+ */
+const expandedDisplay = computed<undefined | "source" | "target">(() => {
+  switch (groupBy.value) {
+    case "sourceName":
+      return "target";
+    case "targetName":
+      return "source";
+    default:
+      return undefined;
+  }
+});
+
+const columns = computed(() =>
+  approvalColumns.filter(
+    (col) =>
+      !(
+        (approvalTypes.value.length === 1 && col.name === "approvalStatus") ||
+        (groupBy.value === "sourceName" && col.name === "sourceType") ||
+        (groupBy.value === "targetName" && col.name === "targetType")
+      )
+  )
+);
 
 /**
  * Refreshes table data.
@@ -128,4 +190,21 @@ watch(
     handleRefresh();
   }
 );
+
+// /**
+//  * Opens all panels in the group.
+//  * @param data - The current grouping information.
+//  */
+// function handleOpenAll(data: TraceTableGroup) {
+//   approvalStore.selectLinks((link) => link[data.groupBy[0]] === data.group);
+// }
+// /**
+//  * Closes all panels in the group.
+//  * @param data - The current grouping information.
+//  */
+// function handleCloseAll(data: TraceTableGroup) {
+//   approvalStore.deselectLinks(
+//       (link) => link[data.groupBy[0]] !== data.group
+//   );
+// }
 </script>

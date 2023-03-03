@@ -1,53 +1,60 @@
 <template>
-  <flex-box v-if="doDisplay" justify="between">
+  <flex-box v-if="doDisplay" justify="between" class="width-max">
     <flex-box align="center" justify="center">
       <text-button
-        v-if="showUnreviewed"
+        v-if="showUnreview"
         text
-        :loading="isUnreviewLoading"
+        label="Un-Review"
+        :loading="unreviewLoading"
         data-cy="button-trace-unreview"
         icon="trace-unreview"
         @click="handleUnreview"
-      >
-        Un-Review
-      </text-button>
+      />
       <text-button
-        v-if="showApproved"
+        v-if="showApprove"
         text
-        :loading="isApproveLoading"
+        label="Approve"
+        :loading="approveLoading"
         data-cy="button-trace-approve"
         icon="trace-approve"
+        color="primary"
         @click="handleApprove"
-      >
-        Approve
-      </text-button>
+      />
       <text-button
-        v-if="showDeclined"
+        v-if="showDecline"
         text
-        :loading="isDeclineLoading"
+        label="Decline"
+        :loading="declineLoading"
         data-cy="button-trace-decline"
         icon="trace-decline"
+        color="negative"
         @click="handleDecline"
-      >
-        Decline
-      </text-button>
+      />
     </flex-box>
-    <flex-box v-if="showDelete">
-      <v-divider v-if="showApproved || showDeclined" vertical />
+    <flex-box v-if="props.deletable">
+      <separator v-if="showApprove || showDecline" vertical />
       <text-button
         text
+        label="Delete"
         icon="delete"
         data-cy="button-trace-delete"
         @click="handleDelete"
-      >
-        Delete
-      </text-button>
+      />
     </flex-box>
   </flex-box>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * Displays trace link approval buttons.
+ */
+export default {
+  name: "TraceLinkApproval",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
@@ -57,101 +64,69 @@ import {
   handleDeleteLink,
   handleUnreviewLink,
 } from "@/api";
-import { FlexBox, TextButton } from "@/components/common";
+import { FlexBox, TextButton, Separator } from "@/components/common";
+
+const props = defineProps<{
+  trace: TraceLinkSchema;
+  deletable?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "approve"): void;
+  (e: "decline"): void;
+  (e: "unreview"): void;
+  (e: "delete"): void;
+}>();
+
+const approveLoading = ref(false);
+const declineLoading = ref(false);
+const unreviewLoading = ref(false);
+
+const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+
+const showApprove = computed(() => linkStatus(props.trace).canBeApproved());
+const showDecline = computed(() => linkStatus(props.trace).canBeDeclined());
+const showUnreview = computed(() => linkStatus(props.trace).canBeReset());
 
 /**
- * Displays trace link approval buttons.
- *
- * @emits-1 `link:approve` - On Link Approval.
- * @emits-2 `link:decline` - On Link Decline.
- * @emits-2 `link:unreview` - On Link Un-review.
- * @emits-2 `link:delete` - On Link Delete.
+ * Approves the given link and updates the stored links.
  */
-export default defineComponent({
-  name: "TraceLinkApproval",
-  components: {
-    TextButton,
-    FlexBox,
-  },
-  props: {
-    link: {
-      type: Object as PropType<TraceLinkSchema>,
-      required: true,
-    },
-    showDelete: Boolean,
-  },
-  data() {
-    return {
-      isApproveLoading: false,
-      isDeclineLoading: false,
-      isUnreviewLoading: false,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether to display these buttons.
-     */
-    doDisplay(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-    /**
-     * @return Whether this link can be approved.
-     */
-    showApproved(): boolean {
-      return linkStatus(this.link).canBeApproved();
-    },
-    /**
-     * @return Whether this link can be declined.
-     */
-    showDeclined(): boolean {
-      return linkStatus(this.link).canBeDeclined();
-    },
-    /**
-     * @return Whether this link can be unreviewed.
-     */
-    showUnreviewed(): boolean {
-      return linkStatus(this.link).canBeReset();
-    },
-  },
-  methods: {
-    /**
-     * Approves the given link and updates the stored links.
-     */
-    handleApprove() {
-      this.isApproveLoading = true;
-      handleApproveLink(this.link, {
-        onSuccess: () => this.$emit("link:approve", this.link),
-        onComplete: () => (this.isApproveLoading = false),
-      });
-    },
-    /**
-     * Declines the given link and updates the stored links.
-     */
-    handleDecline() {
-      this.isDeclineLoading = true;
-      handleDeclineLink(this.link, {
-        onSuccess: () => this.$emit("link:decline", this.link),
-        onComplete: () => (this.isDeclineLoading = false),
-      });
-    },
-    /**
-     * Unreviews the given link and updates the stored links.
-     */
-    handleUnreview() {
-      this.isDeclineLoading = true;
-      handleUnreviewLink(this.link, {
-        onSuccess: () => this.$emit("link:unreview", this.link),
-        onComplete: () => (this.isDeclineLoading = false),
-      });
-    },
-    /**
-     * Deletes the given link.
-     */
-    handleDelete() {
-      handleDeleteLink(this.link, {
-        onSuccess: () => this.$emit("link:delete", this.link),
-      });
-    },
-  },
-});
+function handleApprove() {
+  approveLoading.value = true;
+  handleApproveLink(props.trace, {
+    onSuccess: () => emit("approve"),
+    onComplete: () => (approveLoading.value = false),
+  });
+}
+
+/**
+ * Declines the given link and updates the stored links.
+ */
+function handleDecline() {
+  declineLoading.value = true;
+  handleDeclineLink(props.trace, {
+    onSuccess: () => emit("decline"),
+    onComplete: () => (declineLoading.value = false),
+  });
+}
+
+/**
+ * Unreviews the given link and updates the stored links.
+ */
+function handleUnreview() {
+  unreviewLoading.value = true;
+  handleUnreviewLink(props.trace, {
+    onSuccess: () => emit("unreview"),
+    onComplete: () => (unreviewLoading.value = false),
+  });
+}
+
+/**
+ * Deletes the given link.
+ */
+function handleDelete() {
+  handleDeleteLink(props.trace, {
+    onSuccess: () => emit("delete"),
+  });
+}
 </script>

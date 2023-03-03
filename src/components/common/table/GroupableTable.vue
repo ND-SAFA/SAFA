@@ -56,7 +56,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { TableColumn } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
 import GroupableTableRow from "./GroupableTableRow.vue";
@@ -93,6 +93,10 @@ const props = defineProps<{
    */
   defaultSortBy?: string;
   /**
+   * The default sort direction.
+   */
+  defaultSortDesc?: boolean;
+  /**
    * Determines whether a row should be visible.
    */
   filterRow?(row: Record<string, unknown>): boolean;
@@ -110,19 +114,25 @@ const props = defineProps<{
   customCells?: string[];
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:expanded", expanded: string[]): void;
+  (e: "update:groupBy", groupBy: string | undefined): void;
 }>();
 
 const { searchText, searchLabel, filteredRows } = useTableFilter(props);
 
 const groupBy = ref<string | undefined>(props.defaultGroupBy);
 const sortBy = ref<string | undefined>(props.defaultSortBy);
-const sortDesc = ref(false);
+const sortDesc = ref(props.defaultSortDesc || false);
 
 const expandedRows = useVModel(props, "expanded");
 
 const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
+);
+
+watch(
+  () => groupBy.value,
+  (group) => emit("update:groupBy", group)
 );
 </script>

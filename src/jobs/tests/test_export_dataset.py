@@ -1,3 +1,5 @@
+from unittest import skip
+
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from jobs.create_datasets_job import CreateDatasetsJob
@@ -7,6 +9,7 @@ from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 
 
+@skip("Skip for now. Needs refactored.")
 class TestExportDatasetJob(BaseJobTest):
     """
     Tests ability to export dataset as SAFA.

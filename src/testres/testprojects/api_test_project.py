@@ -79,12 +79,12 @@ class ApiTestProject(AbstractTestProject):
         """
         layer_mapping_data = [
             (
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE, 0),
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, 0)
+                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, 0),
+                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, 0)
             ),
             (
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE, 1),
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, 1)
+                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, 1),
+                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, 1)
             )
         ]
         return EntryCreator.create_layer_mapping_entries(layer_mapping_data)
@@ -100,7 +100,7 @@ class ApiTestProject(AbstractTestProject):
         for source_dict, target_dict in zip(sources, targets):
             for source_id, source_body in source_dict.items():
                 for target_id, target_body in target_dict.items():
-                    links.append((source_id, target_id))
+                    links.append((source_id, source_body))
         return links
 
     @staticmethod
@@ -134,4 +134,4 @@ class ApiTestProject(AbstractTestProject):
         :param links_list: Link entries containing tuples between source id and target id.
         :return: List of ids.
         """
-        return list(TestDataManager.create_link_map(links_list).keys())
+        return list(TestDataManager.create_trace_dataframe(links_list).keys())

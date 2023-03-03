@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 import pandas as pd
 
@@ -31,7 +31,7 @@ class DataFrameUtil:
         return df
 
     @staticmethod
-    def filter_df(df: pd.DataFrame, filter_lambda: Callable[[pd.Series], bool]) -> pd.DataFrame:
+    def filter_df_by_row(df: pd.DataFrame, filter_lambda: Callable[[pd.Series], bool]) -> pd.DataFrame:
         """
         Returns DataFrame containing rows returning true in filter.
         :param df: The original DataFrame.
@@ -39,6 +39,16 @@ class DataFrameUtil:
         :return: DataFrame containing filtered rows.
         """
         return df[df.apply(filter_lambda, axis=1)]
+
+    @staticmethod
+    def filter_df_by_index(df: pd.DataFrame, index_to_filter: List[Any]) -> pd.DataFrame:
+        """
+         Returns DataFrame containing rows if index not in index_to_filter.
+         :param df: The original DataFrame.
+         :param index_to_filter: The list of indices to filter out.
+         :return: DataFrame containing filtered rows.
+         """
+        return df[~df.index.isin(index_to_filter)]
 
     @staticmethod
     def query_df(df: pd.DataFrame, query: Dict):

@@ -41,9 +41,9 @@ class TestMetricAtK(BaseTest, ABC):
         trace_links = self.create_trace_links(prefix, n_artifacts, self.labels)
         targets = [self.TARGET_PREFIX + str(i) for i in range(self.n_targets)]
         for i, trace_link in enumerate(trace_links):
-            self.assertEqual(trace_link.source.id, "S0")
-            self.assertEqual(trace_link.target.id, targets[i])
-            self.assertEqual(trace_link.is_true_link, self.labels[i] == 1)
+            self.assertEqual(trace_link.source, "S0")
+            self.assertEqual(trace_link.target, targets[i])
+            self.assertEqual(trace_link.label, self.labels[i])
 
     @property
     @abstractmethod

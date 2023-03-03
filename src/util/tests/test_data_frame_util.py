@@ -33,9 +33,9 @@ class TestDataFrameUtil(BaseTest):
         Tests ability to filter data frame.
         """
         df = pd.DataFrame([{"name": "one"}])
-        query_df = DataFrameUtil.filter_df(df, lambda r: r["name"] == "one")
+        query_df = DataFrameUtil.filter_df_by_row(df, lambda r: r["name"] == "one")
         self.assertEqual(len(query_df), 1)
-        query_df = DataFrameUtil.filter_df(df, lambda r: r["name"] == "two")
+        query_df = DataFrameUtil.filter_df_by_row(df, lambda r: r["name"] == "two")
         self.assertEqual(len(query_df), 0)
 
     def test_add_optional_column(self):

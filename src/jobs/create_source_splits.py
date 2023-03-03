@@ -44,11 +44,11 @@ class CreateSourceSplits(AbstractJob):
         trace_dataset = self.trace_dataset_creator.create()
         self.artifacts_df = self.trace_dataset_creator.artifact_df
         self.layer_mapping_df = self.trace_dataset_creator.layer_mapping_df
-        types_defined = list(self.artifacts_df[StructuredKeys.Artifact.LAYER_ID].unique())
+        types_defined = list(self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value].unique())
         assert self.artifact_type in types_defined, f"{self.artifact_type} is not in: {types_defined}"
 
-        target_artifacts = self.artifacts_df[self.artifacts_df[StructuredKeys.Artifact.LAYER_ID] == self.artifact_type]
-        target_ids = list(target_artifacts[StructuredKeys.Artifact.ID])
+        target_artifacts = self.artifacts_df[self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type]
+        target_ids = list(target_artifacts.index)
 
         val_total = self.splits[0] + self.splits[1]
         train_ids, val_ids = train_test_split(target_ids, test_size=val_total)
@@ -72,8 +72,8 @@ class CreateSourceSplits(AbstractJob):
             all_ids = set(type_artifact_ids)
             other_ids = all_ids - set(split_ids)
 
-            split_artifact_ids_mask = self.artifacts_df[StructuredKeys.Artifact.ID].isin(other_ids)
-            layer_mask = self.artifacts_df[StructuredKeys.Artifact.LAYER_ID] == self.artifact_type
+            split_artifact_ids_mask = self.artifact_df.index.isin(other_ids)
+            layer_mask = self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type
             split_artifact_df = self.artifacts_df[~(split_artifact_ids_mask & layer_mask)]
             split_links = {trace.id: trace for trace in
                            list(filter(lambda t: t.source not in other_ids and t.target not in other_ids,

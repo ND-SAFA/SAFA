@@ -19,7 +19,7 @@ class TestMultiTraceDatasetCreator(BaseTraceTest):
         expected_projects = [StructuredTestProject(), CsvTestProject()]
         expected_datasets = [TraceDatasetCreator(project.get_project_reader()).create() for project in expected_projects]
         for dataset in expected_datasets:
-            for link_id in dataset.links:
+            for link_id in dataset.trace_df.index:
                 self.assertIn(link_id, multi_dataset.links)
             for link_id in dataset.pos_link_ids:
                 self.assertIn(link_id, multi_dataset.pos_link_ids)

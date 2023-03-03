@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import Dict, List, Set, Tuple, Type
 
 import pandas as pd
@@ -5,13 +6,14 @@ import pandas as pd
 from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.dataframes.layer_dataframe import LayerDataFrame
 from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.supported_dataset_reader import SupportedDatasetReader
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from data.dataframes.trace_dataframe import TraceDataFrame
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
 from util.general_util import ListUtil
@@ -19,10 +21,6 @@ from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from util.thread_util import ThreadUtil
-from util.uncased_dict import UncasedDict
-
-ArtifactType2Id = Dict[str, List[str]]
-Id2Artifact = Dict[str, Artifact]
 
 
 class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
@@ -76,7 +74,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return:  None
         """
         self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
-        self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructuredKeys.Trace.LABEL, 1)
         overrides = self.project_reader.get_overrides()
         ReflectionUtil.set_attributes(self, overrides)
         self._verify_orphans()
@@ -118,8 +115,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         if self.orphan_artifact_ids is None:
             orphan_artifact_ids: Set = set()
             linked_artifact_ids = self._get_linked_artifact_ids()
-            for i, row in self.artifact_df.iterrows():
-                artifact_id = row[StructuredKeys.Artifact.ID]
+            for index, row in self.artifact_df.iterrows():
+                artifact_id = index
                 if artifact_id not in linked_artifact_ids:
                     orphan_artifact_ids.add(artifact_id)
             self.orphan_artifact_ids = list(orphan_artifact_ids)
@@ -132,51 +129,27 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         valid_traces = self._filter_unreferenced_traces(self.artifact_df, self.trace_df,
                                                         self.allowed_missing_sources, self.allowed_missing_targets)
-        self.trace_df = pd.DataFrame(valid_traces)
+        self.trace_df = TraceDataFrame(valid_traces)
 
     def _clean_artifact_tokens(self) -> None:
         """
         Performs data cleaning steps on artifact tokens and creates artifacts.
         :return: None
         """
-        artifact_tokens = self.artifact_df[StructuredKeys.Artifact.BODY]
+        artifact_tokens = self.artifact_df[StructuredKeys.Artifact.CONTENT]
         artifact_tokens = self.data_cleaner.run(artifact_tokens)
-        self.artifact_df[StructuredKeys.Artifact.BODY] = artifact_tokens
+        self.artifact_df[StructuredKeys.Artifact.CONTENT] = artifact_tokens
 
     def _create_trace_dataset(self) -> TraceDataset:
         """
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        artifact_type_2_id, id_2_artifact = self.create_artifact_maps(self.artifact_df)
-        trace_dataset = self._create_trace_dataset_from_dataframe(id_2_artifact)
         if self.project_reader.should_generate_negative_links():
-            self._generate_negative_links(self.layer_mapping_df, artifact_type_2_id, id_2_artifact, trace_dataset)
-        trace_dataset.shuffle_link_ids()
+            self._generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
+        self._log_artifact_types(self.artifact_df)
+        trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_mapping_df=self.layer_mapping_df)
         return trace_dataset
-
-    def _create_trace_dataset_from_dataframe(self, id_2_artifact: Id2Artifact) -> TraceDataset:
-        """
-        Creates trace links in DataFrame and constructs trace dataset containing them.
-        :param id_2_artifact: Map of artifact type to artifact id.
-        :return: TraceDataset containing links in trace dataframe.
-        """
-        trace_link_map = {}
-        positive_link_ids = []
-        negative_link_ids = []
-        for _, row in self.trace_df.iterrows():
-            source_id = row[StructuredKeys.Trace.SOURCE]
-            target_id = row[StructuredKeys.Trace.TARGET]
-            source_artifact = id_2_artifact[source_id]
-            target_artifact = id_2_artifact[target_id]
-            is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
-            trace_link = TraceLink(source_artifact, target_artifact, is_true_link=is_true_link)
-            trace_link_map[trace_link.id] = trace_link
-            if is_true_link:
-                positive_link_ids.append(trace_link.id)
-            else:
-                negative_link_ids.append(trace_link.id)
-        return TraceDataset(trace_link_map, pos_link_ids=positive_link_ids, neg_link_ids=negative_link_ids)
 
     def _filter_artifacts_by_ids(self, artifact_ids: Set[str]) -> None:
         """
@@ -185,15 +158,11 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
 
-        def filter_by_id(row: pd.Series):
-            assert StructuredKeys.Artifact.ID in row, f"Missing artifact id property ({StructuredKeys.Artifact.ID}): {row.to_dict()}"
-            return row[StructuredKeys.Artifact.ID] in artifact_ids
-
         def remove_traces_with_missing_artifacts(row: pd.Series):
-            return row[StructuredKeys.Trace.SOURCE] in artifact_ids and row[StructuredKeys.Trace.TARGET] in artifact_ids
+            return row[StructuredKeys.Trace.SOURCE.value] in artifact_ids and row[StructuredKeys.Trace.TARGET.value] in artifact_ids
 
-        self.artifact_df = DataFrameUtil.filter_df(self.artifact_df, filter_by_id)
-        self.trace_df = DataFrameUtil.filter_df(self.trace_df, remove_traces_with_missing_artifacts)
+        self.artifact_df = DataFrameUtil.filter_df_by_index(self.artifact_df, list(artifact_ids))
+        self.trace_df = DataFrameUtil.filter_df_by_row(self.trace_df, remove_traces_with_missing_artifacts)
 
     def _verify_orphans(self) -> None:
         """
@@ -214,30 +183,29 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         if self.linked_artifact_ids is None:
             linked_artifact_ids = set()
             for _, row in self.trace_df.iterrows():
-                source_id = row[StructuredKeys.Trace.SOURCE]
-                target_id = row[StructuredKeys.Trace.TARGET]
-                is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
+                source_id = row[StructuredKeys.Trace.SOURCE.value]
+                target_id = row[StructuredKeys.Trace.TARGET.value]
+                is_true_link = int(row[StructuredKeys.Trace.LABEL.value]) == 1
                 if is_true_link:
                     linked_artifact_ids.update({source_id, target_id})
             self.linked_artifact_ids = linked_artifact_ids
         return self.linked_artifact_ids
 
     @staticmethod
-    def _generate_negative_links(layer_mapping_df: pd.DataFrame, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact,
-                                 trace_dataset: TraceDataset, n_threads=10) -> None:
+    def _generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
+                                 trace_df: TraceDataFrame, n_threads=10) -> None:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
-        :param artifact_type_2_id: Map of artifact type to artifact ids associated with it.
-        :param id_2_artifact: Map of artifact id to their associated artifact.
-        :param trace_dataset: The trace dataset to add negative links to.
+        :param artifact_df: DataFrame containing information about the artifacts in the project.
+        :param trace_df: DataFrame containing true links present in project.
         :return: None
         """
         for _, row in layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            source_artifact_ids: List[str] = artifact_type_2_id[source_type]
-            target_artifact_ids: List[str] = artifact_type_2_id[target_type]
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+            source_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == source_type].index
+            target_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == target_type].index
 
             def create_target_links(artifact_id) -> None:
                 """
@@ -245,19 +213,19 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                 :param artifact_id: The id of the artifact to link to targets.
                 :return:  None
                 """
-                artifact = id_2_artifact[artifact_id]
+                artifact = artifact_df.get_artifact(artifact_id)
                 for target_artifact_id in target_artifact_ids:
-                    target_artifact = id_2_artifact[target_artifact_id]
-                    trace_link_id = TraceLink.generate_link_id(artifact_id, target_artifact_id)
-                    if trace_link_id not in trace_dataset.links:
-                        trace_dataset.add_link(TraceLink(artifact, target_artifact, is_true_link=False))
+                    target_artifact = artifact_df.get_artifact(target_artifact_id)
+                    trace_link_id = TraceDataFrame.generate_link_id(artifact_id, target_artifact_id)
+                    if trace_link_id not in trace_df.index:
+                        trace_df.add_link(artifact[ArtifactKeys.ID], target_artifact[ArtifactKeys.ID], 0)
 
             title = f"Generating negative links between {source_type} -> {target_type}"
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
 
     @staticmethod
-    def _filter_unreferenced_traces(artifact_df: pd.DataFrame, trace_df: pd.DataFrame, max_missing_sources: int,
-                                    max_missing_targets: int) -> pd.DataFrame:
+    def _filter_unreferenced_traces(artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame, max_missing_sources: int,
+                                    max_missing_targets: int) -> TraceDataFrame:
         """
         Filters out trace links with references to unknown artifacts. Errors are thrown when flags are set to not allow null references.
         :param artifact_df: DataFrame containing artifacts.
@@ -267,12 +235,12 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: DataFrame of trace links without links containing null references.
         """
         valid_traces = []
-        valid_artifact_ids = artifact_df[StructuredKeys.Artifact.ID].values
+        valid_artifact_ids = artifact_df.index
         missing_sources = []
         missing_targets = []
         for _, row in trace_df.iterrows():
-            source_id = row[StructuredKeys.Trace.SOURCE]
-            target_id = row[StructuredKeys.Trace.TARGET]
+            source_id = row[StructuredKeys.Trace.SOURCE.value]
+            target_id = row[StructuredKeys.Trace.TARGET.value]
             if source_id not in valid_artifact_ids:
                 missing_sources.append(source_id)
             elif target_id not in valid_artifact_ids:
@@ -282,45 +250,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
         TraceDatasetCreator.assert_missing_artifact_ids(missing_sources, max_missing_sources, "source")
         TraceDatasetCreator.assert_missing_artifact_ids(missing_targets, max_missing_targets, "target")
-        return pd.DataFrame(valid_traces)
-
-    @staticmethod
-    def create_artifact_maps(artifact_df: pd.DataFrame) -> Tuple[ArtifactType2Id, Id2Artifact]:
-        """
-        Create mapping between artifact types and their associated artifacts and between artifact ids and their associated artifact.
-        :param artifact_df: The data frame containing artifact data.
-        :return: Map containing artifacts types and their associated artifacts.
-        """
-        artifact_type_2_id: ArtifactType2Id = UncasedDict()
-        id_2_artifact: Id2Artifact = UncasedDict()
-        for _, row in artifact_df.iterrows():
-            TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
-
-        artifact_type_summary = []
-        for artifact_type, artifact_ids in artifact_type_2_id.items():
-            artifact_type_summary.append(f"[{artifact_type.title()}: {len(artifact_ids)}]")
-        logger.info(",".join(artifact_type_summary))
-        return artifact_type_2_id, id_2_artifact
-
-    @staticmethod
-    def _add_artifact_to_maps(artifact_row: pd.Series, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact) -> Artifact:
-        """
-        If non-existent, creates artifact and adds it to artifact map.
-        :param artifact_row: The row in the artifact dataframe to create.
-        :param artifact_type_2_id: The map of type to artifact id.
-        :param id_2_artifact: The map between artifact ids and their associated artifact.
-        :return: Artifact created or retrieved if existent.
-        """
-        artifact_id: str = artifact_row[StructuredKeys.Artifact.ID]
-        artifact_type = artifact_row[StructuredKeys.Artifact.LAYER_ID]
-        if artifact_type not in artifact_type_2_id:
-            artifact_type_2_id[artifact_type] = []
-
-        if artifact_id not in id_2_artifact:
-            artifact_body = artifact_row[StructuredKeys.Artifact.BODY]
-            artifact_type_2_id[artifact_type].append(artifact_id)
-            id_2_artifact[artifact_id] = Artifact(artifact_id, artifact_body)
-        return id_2_artifact[artifact_id]
+        return TraceDataFrame(valid_traces)
 
     @staticmethod
     def assert_missing_artifact_ids(missing_artifact_ids: List[str], max_missing_allowed: int, label: str) -> None:
@@ -356,14 +286,26 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                 logger.info(f"{default_msg} ({n_artifacts})")
 
     @staticmethod
-    def _log_trace_dataset(trace_dataset) -> None:
+    def _log_artifact_types(artifact_df: ArtifactDataFrame) -> None:
+        """
+        Logs the number of artifacts of each type in the project
+        :param artifact_df: The dataframe containing artifact information
+        :return: None
+        """
+        artifact_type_summary = []
+        counter = Counter(artifact_df.layer_id)
+        for layer_id, count in counter.items():
+            artifact_type_summary.append(f"[{layer_id.title()}: {count}]")
+        logger.info(",".join(artifact_type_summary))
+
+    @staticmethod
+    def _log_trace_dataset(trace_dataset: TraceDataset) -> None:
         """
         Logs dataset detailing the number of positive, negative, and total links it has.
         :param trace_dataset: The trace dataset containing links.
         :return: None
         """
         n_positive = len(trace_dataset.pos_link_ids)
-        n_total = len(trace_dataset.links)
+        n_total = len(trace_dataset)
         n_negative = n_total - n_positive
         logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")
-        return trace_dataset

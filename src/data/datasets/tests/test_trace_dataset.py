@@ -10,7 +10,7 @@ from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from testres.base_trace_test import BaseTraceTest
@@ -95,7 +95,7 @@ class TestTraceDataset(BaseTraceTest):
 
         true_source_id, true_target_id = "source_id1", "target_id1"
         trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
-        true_link_id = TraceLink.generate_link_id(true_source_id, true_target_id)
+        true_link_id = TraceDataFrame.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.links)
         self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
         self.assertIn(true_link_id, trace_dataset.pos_link_ids)
@@ -104,7 +104,7 @@ class TestTraceDataset(BaseTraceTest):
 
         false_source_id, false_target_id = "source_id2", "target_id2"
         trace_dataset.create_and_add_link(false_source_id, false_target_id, source_tokens, target_tokens, is_true_link=False)
-        false_link_id = TraceLink.generate_link_id(false_source_id, false_target_id)
+        false_link_id = TraceDataFrame.generate_link_id(false_source_id, false_target_id)
         self.assertIn(false_link_id, trace_dataset.links)
         self.assertIn(false_link_id, trace_dataset.neg_link_ids)
         self.assertNotIn(false_link_id, trace_dataset.pos_link_ids)

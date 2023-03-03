@@ -6,8 +6,7 @@ import pandas as pd
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame
 from util.file_util import FileUtil
 
 
@@ -26,7 +25,7 @@ class SafaExporter:
         self.artifact_type_2_id = None
         self.id_2_artifact = None
 
-    def export(self, export_path, links: Dict[int, TraceLink], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
+    def export(self, export_path, links: Dict[int, TraceDataFrame], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
         """
         Exports entities as a project in the safa format.
         :param export_path: Path to export project to.
@@ -35,7 +34,6 @@ class SafaExporter:
         :param layer_mapping_df: DataFrame containing trace queries in project.
         :return: None
         """
-        self.artifact_type_2_id, self.id_2_artifact = TraceDatasetCreator.create_artifact_maps(artifact_df)
         self.create_artifact_definitions(layer_mapping_df, export_path)
         self.create_trace_definitions(links, layer_mapping_df, export_path)
         self.create_tim(export_path)
@@ -47,8 +45,8 @@ class SafaExporter:
         """
         artifact_types = set()
         for _, row in layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
             artifact_types.update({source_type, target_type})
 
         for artifact_type in artifact_types:
@@ -56,8 +54,8 @@ class SafaExporter:
             for artifact_id in self.artifact_type_2_id[artifact_type]:
                 artifact: Artifact = self.id_2_artifact[artifact_id]
                 entries.append({
-                    StructuredKeys.Artifact.ID: artifact.id,
-                    StructuredKeys.Artifact.BODY: artifact.token,
+                    StructuredKeys.Artifact.ID.value: artifact.id,
+                    StructuredKeys.Artifact.CONTENT.value: artifact.token,
                 })
             file_name = artifact_type + ".csv"
             local_export_path = os.path.join(export_path, file_name)
@@ -66,7 +64,7 @@ class SafaExporter:
                 SafaKeys.FILE: file_name
             }
 
-    def create_trace_definitions(self, links: Dict[int, TraceLink], layer_mapping_df: pd.DataFrame, export_path: str) -> None:
+    def create_trace_definitions(self, links: Dict[int, TraceDataFrame], layer_mapping_df: pd.DataFrame, export_path: str) -> None:
         """
         Create trace definition between each layer in trace creator.
         :param links: The trace links to save.
@@ -74,8 +72,8 @@ class SafaExporter:
         :return: None
         """
         for _, row in layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
             matrix_name = f"{source_type}2{target_type}"
             file_name = matrix_name + ".csv"
             export_file_path = os.path.join(export_path, file_name)
@@ -87,7 +85,7 @@ class SafaExporter:
             }
             trace_df.to_csv(export_file_path, index=False)
 
-    def create_trace_df(self, links: Dict[int, TraceLink], source_type, target_type) -> pd.DataFrame:
+    def create_trace_df(self, links: Dict[int, TraceDataFrame], source_type, target_type) -> pd.DataFrame:
         """
         Creates data frame containing positive traces between source and target types.
         :param links: The links to save.
@@ -100,12 +98,12 @@ class SafaExporter:
         entries = []
         for source_id in source_artifact_ids:
             for target_id in target_artifact_ids:
-                trace_link_id = TraceLink.generate_link_id(source_id, target_id)
-                trace_link: TraceLink = links[trace_link_id]
+                trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
+                trace_link: TraceDataFrame = links[trace_link_id]
                 if trace_link.is_true_link:
                     entries.append({
-                        StructuredKeys.Trace.TARGET: source_id,
-                        StructuredKeys.Trace.SOURCE: target_id
+                        StructuredKeys.Trace.TARGET.value: target_id,
+                        StructuredKeys.Trace.SOURCE.value: source_id
                     })
         return pd.DataFrame(entries)
 

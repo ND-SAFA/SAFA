@@ -26,8 +26,8 @@ class TestFolderEntityFormat(AbstractEntityFormatTest):
     def get_entities() -> List[Dict]:
         def create_body(artifact_id: int) -> Dict:
             return {
-                StructuredKeys.Artifact.ID: str(artifact_id) + ".txt",
-                StructuredKeys.Artifact.BODY: f"This is artifact {artifact_id}."
+                StructuredKeys.Artifact.ID.value: str(artifact_id) + ".txt",
+                StructuredKeys.Artifact.CONTENT.value: f"This is artifact {artifact_id}."
             }
 
         return [create_body(i) for i in range(1, 3, 1)]

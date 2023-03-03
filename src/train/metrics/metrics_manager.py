@@ -6,7 +6,7 @@ from datasets import load_metric
 from scipy.special import softmax
 
 from data.datasets.trace_matrix import TraceMatrix
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.map_metric import MapMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
@@ -15,7 +15,7 @@ from train.metrics.supported_trace_metric import get_metric_name, get_metric_pat
 from train.trace_output.stage_eval import Metrics, TracePredictions
 
 warnings.filterwarnings('ignore')
-ArtifactQuery = Dict[str, List[TraceLink]]
+ArtifactQuery = Dict[str, List[TraceDataFrame]]
 ProjectQueries = Dict[str, ArtifactQuery]
 
 
@@ -24,16 +24,17 @@ class MetricsManager:
     Calculates metrics for trace trainer.
     """
 
-    def __init__(self, trace_links: List[TraceLink], trace_predictions: TracePredictions = None,
+    def __init__(self, trace_df: TraceDataFrame, link_ids: List[int], trace_predictions: TracePredictions = None,
                  predicted_similarities: List[float] = None):
         """
         Constructs metrics manager with labels from trace links and scores from prediction output.
-        :param trace_links: The links defining the labels associated with prediction output.
+        :param trace_df: The dataframe defining the links.
+        :param link_ids: The links associated with prediction output.
         :param trace_predictions: The output of a model.
         :param predicted_similarities: The similarity scores predicted
         """
         scores = self.get_similarity_scores(trace_predictions) if predicted_similarities is None else predicted_similarities
-        self.trace_matrix = TraceMatrix(trace_links, scores)
+        self.trace_matrix = TraceMatrix(trace_df, scores, link_ids)
 
     def eval(self, metric_names: List) -> Metrics:
         """

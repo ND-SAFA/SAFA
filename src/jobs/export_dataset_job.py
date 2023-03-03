@@ -32,5 +32,5 @@ class ExportDatasetJob(AbstractJob):
         trace_dataset = self.trace_dataset_creator.create()
         artifact_df, trace_df, layer_mapping_df = self.trace_dataset_creator.project_reader.read_project()
         safa_exporter = SafaExporter()
-        safa_exporter.export(self.export_path, trace_dataset.links, artifact_df, layer_mapping_df)
+        safa_exporter.export(self.export_path, trace_dataset.trace_df, artifact_df, layer_mapping_df)
         return JobResult.from_dict({"status": 0, JobResult.SAVED_DATASET_PATHS: self.export_path})

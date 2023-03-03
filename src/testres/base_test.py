@@ -11,8 +11,8 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 from constants import DELETE_TEST_OUTPUT
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from util.logging.logger_config import LoggerConfig
 from util.logging.logger_manager import LoggerManager
@@ -102,14 +102,15 @@ class BaseTest(TestCase):
         n_source, n_target = n_artifacts
         source_artifacts = BaseTest.create_artifacts(source_prefix, n_source)
         target_artifacts = BaseTest.create_artifacts(target_prefix, n_target)
-        trace_links = []
+        trace_links = {TraceKeys.SOURCE.value: [], TraceKeys.TARGET.value: [], TraceKeys.LABEL.value: []}
         label_index = 0
-        for source_artifact in source_artifacts:
-            for target_artifact in target_artifacts:
-                is_true_link = labels[label_index] == 1
-                trace_links.append(TraceLink(source_artifact, target_artifact, is_true_link))
+        for s_id, source_artifact in source_artifacts.iterrows():
+            for t_id, target_artifact in target_artifacts.iterrows():
+                trace_links[TraceKeys.SOURCE.value].append(s_id)
+                trace_links[TraceKeys.TARGET.value].append(t_id)
+                trace_links[TraceKeys.LABEL.value].append(labels[label_index])
                 label_index += 1
-        return trace_links
+        return TraceDataFrame(trace_links)
 
     @staticmethod
     def create_artifacts(prefix: str, n_artifacts: int, body: str = "body"):
@@ -120,4 +121,7 @@ class BaseTest(TestCase):
         :param body: The artifact body to supply artifacts with.
         :return: List of artifacts created.
         """
-        return [Artifact(prefix + str(i), body) for i in range(n_artifacts)]
+        ids = [prefix + str(i) for i in range(n_artifacts)]
+        bodies = [body for i in range(n_artifacts)]
+        layer_ids = [1 for i in range(n_artifacts)]
+        return ArtifactDataFrame({ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})

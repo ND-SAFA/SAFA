@@ -114,6 +114,26 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.deselectLink(traceLink.traceLinkId);
       this.updateLinkStatus(traceLink, ApprovalType.UNREVIEWED);
     },
+    /**
+     * Expands all matching links.
+     * @param filter - The filter to select which links to expand.
+     */
+    expandLinks(filter: (traceLink: FlatTraceLink) => boolean): void {
+      this.expandedIds = this.traceLinks
+        .filter(filter)
+        .map((link) => link.traceLinkId);
+    },
+    /**
+     * Collapses all matching links.
+     * @param filter - The filter to select which links to preserve.
+     */
+    collapseLinks(filter: (traceLink: FlatTraceLink) => boolean): void {
+      this.expandedIds = this.traceLinks
+        .filter(
+          (link) => this.expandedIds.includes(link.traceLinkId) && filter(link)
+        )
+        .map((link) => link.traceLinkId);
+    },
   },
 });
 

@@ -16,6 +16,8 @@
       default-sort-desc
       :filter-row="filterRow"
       :custom-cells="customCells"
+      @group:open="handleOpenGroup"
+      @group:close="handleCloseGroup"
     >
       <template #header-right>
         <multiselect-input
@@ -113,7 +115,7 @@ const customCells: (keyof FlatTraceLink | string)[] = [
 const currentRoute = useRoute();
 
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
-const groupBy = ref<string | undefined>(); // "targetName"
+const groupBy = ref<string | undefined>("targetName");
 
 const rows = computed(() => approvalStore.traceLinks);
 
@@ -192,20 +194,21 @@ watch(
   }
 );
 
-// /**
-//  * Opens all panels in the group.
-//  * @param data - The current grouping information.
-//  */
-// function handleOpenAll(data: TraceTableGroup) {
-//   approvalStore.selectLinks((link) => link[data.groupBy[0]] === data.group);
-// }
-// /**
-//  * Closes all panels in the group.
-//  * @param data - The current grouping information.
-//  */
-// function handleCloseAll(data: TraceTableGroup) {
-//   approvalStore.deselectLinks(
-//       (link) => link[data.groupBy[0]] !== data.group
-//   );
-// }
+/**
+ * Expands all panels in the group.
+ * @param groupBy - The grouped field.
+ * @param groupValue - The grouped value.
+ */
+function handleOpenGroup(groupBy: keyof FlatTraceLink, groupValue: unknown) {
+  approvalStore.expandLinks((link) => link[groupBy] === groupValue);
+}
+
+/**
+ * Collapses all panels in the group.
+ * @param groupBy - The grouped field.
+ * @param groupValue - The grouped value.
+ */
+function handleCloseGroup(groupBy: keyof FlatTraceLink, groupValue: unknown) {
+  approvalStore.collapseLinks((link) => link[groupBy] !== groupValue);
+}
 </script>

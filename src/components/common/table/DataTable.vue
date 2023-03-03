@@ -14,7 +14,8 @@
       :rows="props.rows"
       :row-key="props.rowKey"
       :selection="props.selection"
-      :sort-method="sortRows"
+      :sort-method="sort"
+      :separator="props.separator"
       :data-cy="props.dataCy"
       table-header-class="text-primary"
       class="data-table"
@@ -62,6 +63,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref, useSlots, watch } from "vue";
 import { TableColumn } from "@/types";
+import { sortRows } from "@/util";
 import { useVModel } from "@/hooks";
 
 const props = defineProps<{
@@ -122,6 +124,18 @@ const props = defineProps<{
    */
   sortDesc?: boolean;
   /**
+   * A function to sort the table with.
+   */
+  sort?(
+    rows: Record<string, unknown>[],
+    sortBy: string,
+    descending: boolean
+  ): Record<string, unknown>[];
+  /**
+   * Where to place separators. Defaults to horizontal.
+   */
+  separator?: "horizontal" | "vertical" | "cell" | "none";
+  /**
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
   customCells?: string[];
@@ -156,6 +170,8 @@ const expandedRows = useVModel(props, "expanded");
 const sortBy = useVModel(props, "sortBy");
 const sortDesc = useVModel(props, "sortDesc");
 
+const sort = computed(() => props.sort || sortRows);
+
 const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
 );
@@ -166,29 +182,6 @@ const pagination = ref({
   rowsPerPage: props.rowsPerPage || 20,
   page: 1,
 });
-
-function sortRows(
-  rows: Record<string, unknown>[],
-  sortBy: string,
-  descending: boolean
-): Record<string, unknown>[] {
-  const sortedRows = [...rows];
-
-  if (sortBy) {
-    sortedRows.sort((a, b) => {
-      const x = descending ? b : a;
-      const y = descending ? a : b;
-
-      return String(x[sortBy]) > String(y[sortBy])
-        ? 1
-        : String(x[sortBy]) < String(y[sortBy])
-        ? -1
-        : 0;
-    });
-  }
-
-  return sortedRows;
-}
 
 watch(
   () => props.sortBy,

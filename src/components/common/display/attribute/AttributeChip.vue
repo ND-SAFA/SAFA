@@ -30,6 +30,7 @@
       rounded
       :value="props.value"
       :color="displayColor"
+      :track-color="trackColor"
       size="20px"
     />
     <typography l="2" :value="progress + '%'" style="width: 50px" />
@@ -133,6 +134,19 @@ const iconColor = computed(() => {
     return "primary";
   } else {
     return displayColor.value;
+  }
+});
+
+const trackColor = computed(() => {
+  switch (displayColor.value) {
+    case "positive":
+      return "green-3";
+    case "secondary":
+      return "amber-4";
+    case "negative":
+      return "red-3";
+    default:
+      return "";
   }
 });
 

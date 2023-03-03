@@ -17,7 +17,6 @@
     <typography
       v-else
       default-expanded
-      secondary
       t="1"
       variant="expandable"
       :value="

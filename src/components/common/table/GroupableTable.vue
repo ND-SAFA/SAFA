@@ -4,10 +4,12 @@
     v-model:sort-desc="sortDesc"
     v-model:expanded="expandedRows"
     :columns="props.columns"
-    :rows="filteredRows"
+    :rows="groupedRows"
     :row-key="props.rowKey"
     :loading="props.loading"
     :expanded="props.expandable ? expandedRows : undefined"
+    :sort="(r) => r"
+    separator="cell"
   >
     <template #top>
       <groupable-table-header
@@ -34,6 +36,8 @@
         :columns="props.columns"
         :row="quasarProps.row"
         :expandable="props.expandable"
+        @group:open="(by, val) => emit('group:open', by, val)"
+        @group:close="(by, val) => emit('group:close', by, val)"
       >
         <template v-for="name in customCellSlots" #[name]="scope">
           <slot :name="name" v-bind="scope" />
@@ -57,7 +61,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { TableColumn } from "@/types";
+import { TableColumn, TableGroupRow, TableRow } from "@/types";
+import { sortRows } from "@/util";
 import { useTableFilter, useVModel } from "@/hooks";
 import GroupableTableRow from "./GroupableTableRow.vue";
 import GroupableTableHeader from "./GroupableTableHeader.vue";
@@ -71,11 +76,11 @@ const props = defineProps<{
   /**
    * The rows of the table.
    */
-  rows: Record<string, unknown>[];
+  rows: TableRow[];
   /**
    * The field on each row that is unique.
    */
-  rowKey: string | ((row: Record<string, unknown>) => string);
+  rowKey: string | ((row: TableRow) => string);
   /**
    * The name of an item.
    */
@@ -99,7 +104,7 @@ const props = defineProps<{
   /**
    * Determines whether a row should be visible.
    */
-  filterRow?(row: Record<string, unknown>): boolean;
+  filterRow?(row: TableRow): boolean;
   /**
    * Whether table rows can be expanded.
    */
@@ -117,6 +122,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:expanded", expanded: string[]): void;
   (e: "update:groupBy", groupBy: string | undefined): void;
+  (e: "group:open", groupBy: string, groupValue: unknown): void;
+  (e: "group:close", groupBy: string, groupValue: unknown): void;
 }>();
 
 const { searchText, searchLabel, filteredRows } = useTableFilter(props);
@@ -130,6 +137,33 @@ const expandedRows = useVModel(props, "expanded");
 const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
 );
+
+const groupedRows = computed(() => {
+  const sortedRows = sortRows(filteredRows.value, sortBy.value, sortDesc.value);
+
+  if (!groupBy.value) {
+    return sortedRows;
+  }
+
+  const rowsByGroup: Record<string, TableGroupRow[]> = {};
+
+  sortedRows.forEach((row) => {
+    const group = String(row[groupBy.value || ""]);
+
+    rowsByGroup[group] = [...(rowsByGroup[group] || []), row];
+  });
+
+  return Object.entries(rowsByGroup)
+    .map(([$groupValue, rows]) => [
+      {
+        $groupValue,
+        $groupBy: groupBy.value,
+        $groupRows: rows.length,
+      },
+      ...rows,
+    ])
+    .reduce((acc, cur) => [...acc, ...cur], []);
+});
 
 watch(
   () => groupBy.value,

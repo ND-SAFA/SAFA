@@ -4,6 +4,8 @@
     subtitle="Review, approve, and decline generated trace links."
   >
     <groupable-table
+      v-model:expanded="expanded"
+      expandable
       :columns="approvalColumns"
       :rows="rows"
       row-key="traceLinkId"
@@ -22,8 +24,23 @@
           option-to-value
           option-value="id"
           option-label="name"
+          data-cy="input-approval-type"
         />
       </template>
+
+      <template #header-bottom>
+        <flex-box full-width justify="end">
+          <text-button
+            text
+            label="Clear Unreviewed"
+            icon="trace-decline-all"
+            color="negative"
+            @click="handleDeclineAll"
+          />
+        </flex-box>
+      </template>
+
+      <template #body-expanded> </template>
     </groupable-table>
   </panel-card>
 </template>
@@ -44,12 +61,14 @@ import { ApprovalType, FlatTraceLink } from "@/types";
 import { approvalTypeOptions } from "@/util";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { Routes } from "@/router";
-import { handleGetGeneratedLinks } from "@/api";
+import { handleDeclineAll, handleGetGeneratedLinks } from "@/api";
 import {
   PanelCard,
   GroupableTable,
   MultiselectInput,
+  TextButton,
 } from "@/components/common";
+import FlexBox from "@/components/common/layout/FlexBox.vue";
 import { approvalColumns } from "./headers";
 
 const options = approvalTypeOptions();
@@ -61,6 +80,15 @@ const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
 const rows = computed(() => approvalStore.traceLinks);
 
 const loading = computed(() => appStore.isLoading > 0);
+
+const expanded = computed({
+  get() {
+    return approvalStore.expandedIds;
+  },
+  set(ids) {
+    approvalStore.expandedIds = ids;
+  },
+});
 
 /**
  * Refreshes table data.

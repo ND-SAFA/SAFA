@@ -18,6 +18,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      */
     traceLinks: [] as FlatTraceLink[],
     /**
+     * @deprecated
      * All links that are selected.
      */
     selectedLinks: [] as FlatTraceLink[],
@@ -29,6 +30,10 @@ export const useTraceApproval = defineStore("traceApproval", {
      * Declined generated link ids.
      */
     declinedIds: [] as string[],
+    /**
+     * Expanded generated link ids.
+     */
+    expandedIds: [] as string[],
   }),
   getters: {
     /**
@@ -66,6 +71,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       flatLink.approvalStatus = status;
     },
     /**
+     * @deprecated
      * Selects all links that meet the filter predicate.
      *
      * @param filter - The filter to run on all links.
@@ -74,6 +80,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.selectedLinks = this.traceLinks.filter(filter);
     },
     /**
+     * @deprecated
      * Deselects all links that meet the filter predicate.
      *
      * @param filter - The filter to run on selected links.
@@ -82,6 +89,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.selectedLinks = this.selectedLinks.filter(filter);
     },
     /**
+     * @deprecated
      * Toggles the selected state of a link.
      *
      * @param traceLink - The link to toggle.

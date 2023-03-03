@@ -1,11 +1,11 @@
 from abc import ABC
 
 from data.hub.abstract_hub_id import AbstractHubId
-from data.hub.hub_ids.multi_task_hub_id import MultiTaskHubId
+from data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
 from util.override import overrides
 
 
-class IceoryxHubId(MultiTaskHubId, ABC):
+class IceoryxHubId(MultiStageHubId, ABC):
     """
     Identifier iceoryx open source project.
     """

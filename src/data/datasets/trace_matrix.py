@@ -25,6 +25,7 @@ class TraceMatrix:
         self.query_matrix = {}
         self.source_ids = []
         self.labels = []
+        self.entries = []
         self.scores = predicted_scores
         self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
         if randomize:
@@ -93,6 +94,7 @@ class TraceMatrix:
             self.source_ids.append(link.source.id)
         self.query_matrix[link.source.id].links.append(link)
         self.labels.append(link.get_label())
+        self.entries.append({"source": link.source.id, "target": link.target.id})
         if pred is not None:
             self.query_matrix[link.source.id].preds.append(pred)
 

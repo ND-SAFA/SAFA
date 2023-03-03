@@ -33,6 +33,7 @@ class JobResult(BaseObject):
     EXPERIMENTAL_VARS = "experimental_vars"
     EXPORT_PATH = "export_path"
     PREDICTION_OUTPUT = "prediction_output"
+    LABEL_IDS = "label_ids"
 
     _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
                    STATUS: Schema(type=TYPE_INTEGER),

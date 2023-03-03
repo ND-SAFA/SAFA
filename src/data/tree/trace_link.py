@@ -51,3 +51,6 @@ class TraceLink(BaseObject):
 
     def __hash__(self):
         return self.id
+
+    def __repr__(self):
+        return f"{self.source.id}->{self.target.id}={self.is_true_link}"

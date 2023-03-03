@@ -8,8 +8,8 @@ from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from util.dataframe_util import DataFrameUtil
+from util.dict_util import ListUtil
 from util.file_util import FileUtil
-from util.general_util import ListUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
 

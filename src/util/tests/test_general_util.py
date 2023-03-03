@@ -1,5 +1,5 @@
 from testres.base_test import BaseTest
-from util.general_util import ListUtil
+from util.dict_util import ListUtil
 
 
 class TestListUtil(BaseTest):

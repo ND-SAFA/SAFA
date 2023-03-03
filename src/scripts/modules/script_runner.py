@@ -1,10 +1,11 @@
 import os
-from typing import Dict
+from typing import Dict, Type
 
 from django.core.wsgi import get_wsgi_application
 
 from constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from experiments.experiment import Experiment
+from scripts.modules.experiment_types import ExperimentTypes
 from scripts.modules.script_definition import ScriptDefinition
 from scripts.modules.script_reader import ScriptOutputReader
 from train.trainer_tools.trace_accelerator import TraceAccelerator
@@ -21,6 +22,7 @@ class ScriptRunner:
     Script Definition: JSON file definition experiment definition using any syntactic sugars.
     """
     FINISHED_HEADER = "Experiment Finished! :)"
+    EXPERIMENT_TYPE_PARAM = "experiment_type"
 
     def __init__(self, script_definition_path: str):
         """
@@ -69,7 +71,8 @@ class ScriptRunner:
         """
         if self.experiment is None:
             experiment_definition = self._load_experiment_definition()
-            self.experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
+            experiment_class = ScriptRunner.get_experiment_class(experiment_definition)
+            self.experiment = ObjectCreator.create(experiment_class, override=True, **experiment_definition)
         return self.experiment
 
     def _load_experiment_definition(self) -> Dict:
@@ -98,3 +101,16 @@ class ScriptRunner:
             FileUtil.create_dir_safely(self.experiment_dir)
         TraceAccelerator.wait_for_everyone()
         get_wsgi_application()
+
+    @staticmethod
+    def get_experiment_class(experiment_definition: Dict) -> Type[Experiment]:
+        """
+        Reads the current experiment type of definition.
+        :param experiment_definition: The definitions of the experiment.
+        :return: The experiment class defined in definition.
+        """
+        if ScriptRunner.EXPERIMENT_TYPE_PARAM in experiment_definition:
+            experiment_class_name = experiment_definition.pop(ScriptRunner.EXPERIMENT_TYPE_PARAM)
+        else:
+            experiment_class_name = ExperimentTypes.BASE.name
+        return ExperimentTypes.get_value(experiment_class_name)

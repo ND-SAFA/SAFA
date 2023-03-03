@@ -12,7 +12,7 @@ from data.tree.trace_link import TraceLink
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
-from util.general_util import ListUtil
+from util.dict_util import ListUtil
 
 
 class CreateSourceSplits(AbstractJob):

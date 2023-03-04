@@ -16,7 +16,8 @@
             "model_task": "DISTILL"
           },
            "teacher_model_manager": {
-            "model_path": "bert-base-uncased"
+            "model_path": "bert-base-uncased",
+              "model_task": "DISTILL"
           },
           "trainer_args": {
             "eval_steps": 10,

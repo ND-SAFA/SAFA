@@ -38,7 +38,7 @@ class State:
 class DistillTrainer(TraceTrainer):
     # These should be moved eventually to trainer args or constants
     OUTPUT_MODE = "classification"
-    DISTILL_PRED_LAYER_ONLY = True
+    DISTILL_PRED_LAYER_ONLY = False
     TEMPERATURE = 1
 
     def __init__(self, trainer_args: TrainerArgs, student_model_manager: ModelManager, teacher_model_manager: ModelManager,

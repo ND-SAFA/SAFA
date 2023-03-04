@@ -58,7 +58,7 @@ class LagMetric(AbstractTraceMetric):
 
             n_true = len(true_trace_indices)
             n_analyzed = max(true_trace_indices) + 1
-            return n_analyzed - n_true  # how many read that are not true links
+            return n_analyzed
 
         lag_score = trace_matrix.calculate_query_metric(lag_counter, default_value=None)
         return {

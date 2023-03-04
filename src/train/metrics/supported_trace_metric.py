@@ -4,6 +4,7 @@ from typing import List, Type
 from datasets import Metric, list_metrics
 
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from train.metrics.average_true_links_metrics import AverageTrueLinksMetric
 from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
 from train.metrics.f1_metric import FMetric
 from train.metrics.lag_metric import LagMetric
@@ -26,6 +27,7 @@ class SupportedTraceMetric(SupportedEnum):
     PRECISION = PrecisionAtKMetric
     RECALL_AT_THRESHOLD = RecallAtThresholdMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
+    AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     F = FMetric
 
     @staticmethod
@@ -34,7 +36,7 @@ class SupportedTraceMetric(SupportedEnum):
         :return: Returns the metrics that are applied on a per query basis.
         """
         return [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                RecallAtThresholdMetric.name, LagMetric.name]
+                RecallAtThresholdMetric.name, LagMetric.name, AverageTrueLinksMetric.name]
 
 
 def get_metric_path(metric_name: str) -> str:

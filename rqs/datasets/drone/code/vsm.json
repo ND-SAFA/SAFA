@@ -20,7 +20,7 @@
                 "object_type": "HUB",
                 "name": "drone",
                 "task": "task_1",
-                "stage": "train"
+                "stage": "eval"
               },
               "data_cleaner": {
                 "steps": [
@@ -43,54 +43,14 @@
               }
             },
             "val_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "HUB",
-                "name": "drone",
-                "task": "task_1",
-                "stage": "val"
-              },
-              "data_cleaner": {
-                "steps": [
-                  {
-                    "object_type": "REMOVE_NON_ALPHA"
-                  },
-                  {
-                    "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
-                  },
-                  {
-                    "object_type": "REMOVE_WHITE_SPACE"
-                  }
-                ]
-              }
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.75
             },
             "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "HUB",
-                "name": "drone",
-                "task": "task_1",
-                "stage": "eval"
-              },
-              "data_cleaner": {
-                "steps": [
-                  {
-                    "object_type": "REMOVE_NON_ALPHA"
-                  },
-                  {
-                    "object_type": "SEPARATE_CAMEL_CASE"
-                  },
-                  {
-                    "object_type": "LEMMATIZE_WORDS"
-                  },
-                  {
-                    "object_type": "REMOVE_WHITE_SPACE"
-                  }
-                ]
-              }
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.15
             },
             "augmenter": {
               "steps": [

@@ -23,8 +23,8 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class CalculateThreshold(AbstractTraceMetric):
-    metric_name = "threshold"
+class RecallAtThresholdMetric(AbstractTraceMetric):
+    name = "threshold"
 
     # TODO
     def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
@@ -45,7 +45,7 @@ class CalculateThreshold(AbstractTraceMetric):
             t = thresholds[index]
             p = precisions[index]
             r = recalls[index]
-            if r >= self.UPPER_RECALL_THRESHOLD and p > max_precision:
+            if r >= UPPER_RECALL_THRESHOLD and p > max_precision:
                 threshold = t
 
         if threshold is None:

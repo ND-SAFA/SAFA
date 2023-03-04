@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS, OUTPUT_FILENAME
+from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES, OUTPUT_FILENAME
 from jobs.components.job_result import JobResult
 from scripts.modules.script_definition import ScriptDefinition
 from util.file_util import FileUtil
@@ -33,7 +33,7 @@ class ScriptOutputReader:
         if experimental_vars_ignore is None:
             self.experiment_vars_ignore = EXPERIMENTAL_VARS_IGNORE
         if metrics is None:
-            self.metrics = METRICS
+            self.metric_names = METRIC_NAMES
         if display_metrics is None:
             self.display_metrics = DISPLAY_METRICS
 
@@ -53,7 +53,7 @@ class ScriptOutputReader:
         """
         logger.log_with_title("Evaluation Results", "")
         eval_df = self._get_eval_df()
-        self.print_results(eval_df, self.metrics, self.display_metrics)
+        self.print_results(eval_df, self.metric_names, self.display_metrics)
 
     def print_val(self) -> None:
         """
@@ -62,7 +62,7 @@ class ScriptOutputReader:
         """
         logger.log_with_title("Validation Results", "")
         val_df = self._get_val_df()
-        self.print_results(val_df, self.metrics, self.display_metrics)
+        self.print_results(val_df, self.metric_names, self.display_metrics)
 
     def upload_to_s3(self) -> None:
         """
@@ -90,9 +90,9 @@ class ScriptOutputReader:
             job_result = JsonUtil.read_json_file(output_path)
             JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
             base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}
-            validation_metrics = self.read_validation_entries(job_result, self.metrics, base_entry=base_entry)
+            validation_metrics = self.read_validation_entries(job_result, self.metric_names, base_entry=base_entry)
             val_entries.extend(validation_metrics)
-            eval_metric_entry = self.read_eval_entry(job_result, self.metrics, base_entry=base_entry)
+            eval_metric_entry = self.read_eval_entry(job_result, self.metric_names, base_entry=base_entry)
             if eval_metric_entry:
                 eval_entries.append(eval_metric_entry)
         self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)

@@ -3,12 +3,14 @@ from typing import Callable, Dict, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, \
+from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, \
+    GRADIENT_ACCUMULATION_DEFAULT, \
     GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, \
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
     SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     USE_BALANCED_BATCHES_DEFAULT
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -35,7 +37,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     greater_is_better: bool = GREATER_IS_BETTER_DEFAULT
     save_total_limit: int = SAVE_TOTAL_LIMIT_DEFAULT
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
-    metrics: List[str] = ["map", "f"]
+    metrics: List[str] = SupportedTraceMetric.get_keys()
     do_eval: bool = True
     place_model_on_device: bool = True
     total_training_epochs: int = None

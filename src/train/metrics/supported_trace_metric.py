@@ -10,8 +10,8 @@ from train.metrics.f1_metric import FMetric
 from train.metrics.lag_metric import LagMetric
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.map_metric import MapMetric
+from train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from train.metrics.recall_at_threshold import RecallAtThresholdMetric
 from util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"
@@ -24,7 +24,7 @@ class SupportedTraceMetric(SupportedEnum):
     LAG = LagMetric
     MAP = MapMetric
     PRECISION = PrecisionAtKMetric
-    RECALL_AT_THRESHOLD = RecallAtThresholdMetric
+    PRECISION_AT_RECALL = PrecisionAtRecallMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     F = FMetric
@@ -35,7 +35,7 @@ class SupportedTraceMetric(SupportedEnum):
         :return: Returns the metrics that are applied on a per query basis.
         """
         return [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                RecallAtThresholdMetric.name, LagMetric.name, AverageTrueLinksMetric.name]
+                PrecisionAtRecallMetric.name, LagMetric.name, AverageTrueLinksMetric.name]
 
 
 def get_metric_path(metric_name: str) -> str:

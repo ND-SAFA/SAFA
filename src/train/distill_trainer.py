@@ -265,7 +265,7 @@ class DistillTrainer(TraceTrainer):
         :return: The evaluation results
         """
         eval_dataloader = self.get_eval_dataloader()
-        num_labels = self.num_examples(eval_dataloader)
+        num_labels = 2
         eval_loss = 0
         nb_eval_steps = 0
         preds = []
@@ -297,10 +297,6 @@ class DistillTrainer(TraceTrainer):
         eval_loss = eval_loss / nb_eval_steps
 
         preds = preds[0]
-        if self.OUTPUT_MODE == "classification":
-            preds = np.argmax(preds, axis=1)
-        elif self.OUTPUT_MODE == "regression":
-            preds = np.squeeze(preds)
         output = PredictionOutput(predictions=preds, label_ids=None, metrics={})
         result = self._compute_validation_metrics(output)
         result['eval_loss'] = eval_loss

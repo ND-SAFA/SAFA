@@ -1,0 +1,66 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "DISTILL",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                812
+              ]
+            }
+          },
+          "student_model_manager": {
+            "model_path": "prajjwal1/bert-tiny",
+            "model_task": "DISTILL"
+          },
+           "teacher_model_manager": {
+            "model_path": "bert-base-uncased"
+          },
+          "trainer_args": {
+            "eval_steps": 10,
+            "weight_decay": 0.01,
+            "num_train_epochs": 5,
+            "gradient_accumulation_steps": 1,
+            "learning_rate": 5e-5,
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ],
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path":  "[DATA_PATH]/lhp/heating"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.30
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.30
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

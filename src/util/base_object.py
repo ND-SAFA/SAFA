@@ -1,6 +1,7 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any, Dict, List, Type, Union
 from typing_extensions import get_args
 
@@ -127,6 +128,8 @@ class BaseObject(ABC):
             val = variable.value
         else:
             val = variable
+        if ReflectionUtil.is_instance_or_subclass(expected_type, Enum):
+            val = get_enum_from_name(expected_type, val)
         return val
 
     @classmethod

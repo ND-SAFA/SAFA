@@ -22,7 +22,6 @@ class SupportedTraceMetric(SupportedEnum):
     Enumerates trace metrics.
     """
     LAG = LagMetric
-    MAP_AT_K = MapAtKMetric
     MAP = MapMetric
     PRECISION = PrecisionAtKMetric
     RECALL_AT_THRESHOLD = RecallAtThresholdMetric

@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Tuple, Any, Dict
+from typing import Tuple, Any, Dict, Union
 
 import numpy as np
 import torch
@@ -8,6 +8,7 @@ from torch.nn.modules.loss import MSELoss, CrossEntropyLoss
 from torch.utils.data.dataloader import DataLoader
 from tqdm import trange
 from transformers.file_utils import WEIGHTS_NAME, CONFIG_NAME
+from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.modeling_utils import PreTrainedModel
 from transformers.trainer_utils import PredictionOutput, SchedulerType, TrainOutput
 
@@ -54,6 +55,26 @@ class DistillTrainer(TraceTrainer):
         super().__init__(trainer_args=trainer_args, model_manager=student_model_manager,
                          trainer_dataset_manager=trainer_dataset_manager, save_strategy=save_strategy)
         self.teacher_model_manager = teacher_model_manager
+        self.best_model = None
+
+    @overrides(TraceTrainer)
+    def compute_loss(self, model, inputs, return_outputs=False) -> Union[Tuple[float, SequenceClassifierOutput], float]:
+        """
+        Computes the loss for predictions
+        :param model: The model to compute loss for
+        :param inputs: Inputs to the model
+        :param return_outputs: If True, returns the outputs in addition to the loss
+        :return: Either just the loss or the loss and outputs
+        """
+        labels = inputs.pop("labels")
+        logits, atts, reps = model(**inputs)
+        log_probs = -torch.nn.functional.log_softmax(logits, dim=-1)
+        if labels.dim() == log_probs.dim() - 1:
+            labels = labels.unsqueeze(-1)
+        labels = torch.clamp(labels, min=0)
+        loss = log_probs.gather(dim=-1, index=labels).sum()
+        outputs = SequenceClassifierOutput(loss=loss, logits=logits)
+        return (loss, outputs) if return_outputs else loss
 
     @overrides(TraceTrainer)
     def _inner_training_loop(self, batch_size=None, **kwargs) -> TrainOutput:
@@ -153,9 +174,10 @@ class DistillTrainer(TraceTrainer):
         if self.DISTILL_PRED_LAYER_ONLY:
             result = {**result, **self._do_eval(student_model)}
         self._result_to_file(result, output_eval_file)
-        save_model = not self.DISTILL_PRED_LAYER_ONLY or self._should_save(result, best_result)
+        save_model = self._should_save(result, best_result)
         if save_model:
             self._model_save(student_model)
+            self.best_model = student_model
         student_model.train()
         return result
 
@@ -183,7 +205,6 @@ class DistillTrainer(TraceTrainer):
         teacher_model = self.teacher_model_manager.get_model()
         self._move_model_to_device(teacher_model, self.args.device)
         teacher_model = self._wrap_model(teacher_model)
-        self.model = student_model
         return student_model, teacher_model
 
     def _compute_distill_loss_pred_layer_only(self, student_output: ModelOutputType, teacher_output: ModelOutputType,

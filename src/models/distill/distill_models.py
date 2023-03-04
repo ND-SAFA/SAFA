@@ -1108,7 +1108,7 @@ class BertForSentencePairClassification(BertPreTrainedModel):
 
 
 class TinyBertForSequenceClassification(BertPreTrainedModel):
-    def __init__(self, config, num_labels=2, fit_size=768):
+    def __init__(self, config, num_labels=2, fit_size=128):
         super(TinyBertForSequenceClassification, self).__init__(config)
         self.num_labels = num_labels
         self.bert = BertModel(config)

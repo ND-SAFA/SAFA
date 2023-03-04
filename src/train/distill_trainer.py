@@ -68,11 +68,7 @@ class DistillTrainer(TraceTrainer):
         """
         labels = inputs.pop("labels")
         logits, atts, reps = model(**inputs)
-        log_probs = -torch.nn.functional.log_softmax(logits, dim=-1)
-        if labels.dim() == log_probs.dim() - 1:
-            labels = labels.unsqueeze(-1)
-        labels = torch.clamp(labels, min=0)
-        loss = log_probs.gather(dim=-1, index=labels).sum()
+        loss = self._calculate_loss(logits, labels)
         outputs = SequenceClassifierOutput(loss=loss, logits=logits)
         return (loss, outputs) if return_outputs else loss
 
@@ -286,7 +282,6 @@ class DistillTrainer(TraceTrainer):
         :return: The evaluation results
         """
         eval_dataloader = self.get_eval_dataloader()
-        num_labels = 2
         eval_loss = 0
         nb_eval_steps = 0
         preds = []
@@ -296,17 +291,7 @@ class DistillTrainer(TraceTrainer):
             labels = inputs.pop("labels")
             with torch.no_grad():
                 logits, _, _ = model(**inputs)
-
-            # create eval loss and other metric required by the task
-            if self.OUTPUT_MODE == "classification":
-                loss_fct = CrossEntropyLoss()
-                tmp_eval_loss = loss_fct(logits.view(-1, num_labels), labels.view(-1))
-            elif self.OUTPUT_MODE == "regression":
-                loss_fct = MSELoss()
-                tmp_eval_loss = loss_fct(logits.view(-1), labels.view(-1))
-            else:
-                raise Exception("Unknown output mode")
-
+            tmp_eval_loss = self._calculate_loss(logits, labels)
             eval_loss += tmp_eval_loss.mean().item()
             nb_eval_steps += 1
             if len(preds) == 0:
@@ -323,6 +308,25 @@ class DistillTrainer(TraceTrainer):
         result['eval_loss'] = eval_loss
 
         return result
+
+    def _calculate_loss(self, logits: torch.Tensor, labels: torch.Tensor, num_labels: int = 2) -> torch.Tensor:
+        """
+        Calculates the loss using the model output logits and ground truth labels
+        :param logits:  The model output logits
+        :param labels: Ground-truth labels
+        :param num_labels: The number of unique labels
+        :return: The loss
+        """
+        # create eval loss and other metric required by the task
+        if self.OUTPUT_MODE == "classification":
+            loss_fct = CrossEntropyLoss()
+            tmp_eval_loss = loss_fct(logits.view(-1, num_labels), labels.view(-1))
+        elif self.OUTPUT_MODE == "regression":
+            loss_fct = MSELoss()
+            tmp_eval_loss = loss_fct(logits.view(-1), labels.view(-1))
+        else:
+            raise Exception("Unknown output mode")
+        return tmp_eval_loss
 
     def _prepare_data(self) -> Tuple[DataLoader, int, int]:
         """

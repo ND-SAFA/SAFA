@@ -84,8 +84,7 @@ RES_PATH = os.path.join(PROJ_PATH, "res")
 JAVA_KEYWORDS_PATH = os.path.join(RES_PATH, "JavaReservedKeywords.txt")
 
 # -------------- SCRIPT PATHS --------------
-METRIC_NAMES = ["avg_true_links", "lag", "map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2",
-                "precision@3"]
+METRIC_NAMES = ["avg_true_links", "lag", "map", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
 DISPLAY_METRICS = ["avg_true_links", "lag", "f2", "map"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",

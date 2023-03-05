@@ -2,6 +2,11 @@ import { Routes, editUser, invalidUser, deleteUser, DataCy } from "@/fixtures";
 
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {
+    before(() => {
+      cy.dbDeleteUser(editUser.email, invalidUser.password);
+      cy.createNewAccount(editUser.email, editUser.password);
+    });
+
     beforeEach(() => {
       cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
     });
@@ -16,6 +21,11 @@ describe("Account Editing", () => {
         .clickButton(DataCy.passwordChangeButton);
 
       cy.getCy(DataCy.snackbarError).should("be.visible");
+
+      // Test that the password was not changed.
+      cy.logout();
+      cy.login(editUser.email, editUser.password);
+      cy.locationShouldEqual(Routes.LOGIN_ACCOUNT);
     });
 
     it("Should be able to change my password with the correct current password", () => {

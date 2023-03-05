@@ -1,8 +1,7 @@
 import { DataCy, Routes } from "@/fixtures";
 
 Cypress.Commands.add("login", (email, password) => {
-  cy.visit(Routes.LOGIN_ACCOUNT)
-    .inputText(DataCy.emailInput, email)
+  cy.inputText(DataCy.emailInput, email)
     .inputText(DataCy.passwordInput, password)
     .clickButton(DataCy.loginButton);
 });

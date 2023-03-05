@@ -80,13 +80,17 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: THe prediction output
         """
         dataset = self.trainer_dataset_manager[dataset_role]
+
         self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         eval_metrics, metrics_manager = self._compute_trace_metrics(output, dataset_role)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
-        return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
-                                     source_target_pairs=dataset.get_source_target_pairs())
+
+        return TracePredictionOutput(predictions=metrics_manager.get_scores(),
+                                     label_ids=metrics_manager.trace_matrix.labels,
+                                     metrics=output.metrics,
+                                     prediction_entries=metrics_manager.get_trace_predictions())
 
     def cleanup(self) -> None:
         """

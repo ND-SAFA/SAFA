@@ -12,8 +12,8 @@ from jobs.train_job import TrainJob
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.wandb.Wandb import Wandb
 from util.base_object import BaseObject
+from util.dict_util import ListUtil
 from util.file_util import FileUtil
-from util.general_util import ListUtil
 from util.json_util import JsonUtil
 from util.override import overrides
 from util.status import Status

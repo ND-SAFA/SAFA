@@ -1,5 +1,7 @@
 from typing import List, Tuple
 
+import numpy as np
+
 
 class ListUtil:
     """
@@ -44,3 +46,27 @@ class ListUtil:
         for ndx in range(0, iterable_len, n):
             batches.append(iterable[ndx:min(ndx + n, iterable_len)])
         return batches
+
+    @staticmethod
+    def assert_equal(arrays) -> None:
+        """
+        Asserts that arrays contain the same elements.
+        :param arrays: The arrays to verify.
+        :return: None
+        """
+        arr_sizes = [len(l) for l in arrays]
+        ListUtil.assert_mono_array(arr_sizes)
+
+        labels_arr = np.array(arrays)
+        np.apply_along_axis(func1d=ListUtil.assert_mono_array, arr=labels_arr, axis=0)
+
+    @staticmethod
+    def assert_mono_array(arr, default_msg: str = None) -> None:
+        """
+        Asserts that array has same values.
+        :param arr: The array to assert.
+        :param default_msg: The message to display on failure.
+        :return: None
+        """
+        msg = f"Expected all label sizes to be equal: {arr}" if default_msg is None else default_msg
+        assert len(set(arr)) == 1, msg

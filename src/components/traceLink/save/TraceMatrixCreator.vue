@@ -1,26 +1,18 @@
 <template>
   <div>
-    <v-card
-      v-for="(matrix, idx) in model"
-      :key="idx"
-      outlined
-      class="my-2 pa-2 bd-primary"
-    >
+    <panel-card v-for="(matrix, idx) in model" :key="idx" class="q-my-md">
       <flex-box full-width align="center">
         <flex-box column full-width>
-          <flex-box b="2">
+          <flex-box full-width b="2">
             <artifact-type-input
               v-model="matrix.source"
-              hide-details
               label="Source Type"
-              class="mr-2"
+              class="q-mr-md"
               style="width: 50%"
             />
             <artifact-type-input
               v-model="matrix.target"
-              hide-details
               label="Target Type"
-              class="mr-2"
               style="width: 50%"
             />
           </flex-box>
@@ -34,18 +26,22 @@
           </flex-box>
         </flex-box>
         <icon-button
-          icon-id="mdi-delete-outline"
-          color="error"
+          icon="delete"
+          color="negative"
           tooltip="Remove trace matrix"
+          class="q-ml-md"
           @click="handleRemoveMatrix(idx)"
         />
       </flex-box>
-    </v-card>
+    </panel-card>
 
     <flex-box justify="center">
-      <text-button text icon="add" @click="handleCreateMatrix">
-        Add New Matrix
-      </text-button>
+      <text-button
+        text
+        label="Add New Matrix"
+        icon="add"
+        @click="handleCreateMatrix"
+      />
     </flex-box>
   </div>
 </template>
@@ -68,6 +64,7 @@ import {
   IconButton,
   AttributeChip,
   TextButton,
+  PanelCard,
 } from "@/components/common";
 
 const props = defineProps<{

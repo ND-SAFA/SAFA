@@ -17,6 +17,12 @@
         />
       </flex-box>
       <separator v-if="!!props.title" b="2" />
+      <typography
+        v-if="!!props.subtitle"
+        el="p"
+        b="4"
+        :value="props.subtitle"
+      />
       <slot />
       <q-card-actions v-if="!!slots.actions">
         <slot name="actions" />
@@ -51,6 +57,10 @@ const props = withDefaults(
      */
     title?: string;
     /**
+     * A subtitle title to render on the card.
+     */
+    subtitle?: string;
+    /**
      * An icon to display before the title.
      */
     icon?: IconVariant;
@@ -66,6 +76,7 @@ const props = withDefaults(
   {
     color: "primary",
     title: undefined,
+    subtitle: undefined,
     icon: undefined,
     class: "",
     containerClass: "",

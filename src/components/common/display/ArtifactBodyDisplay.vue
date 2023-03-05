@@ -11,7 +11,6 @@
     </flex-box>
     <template #subtitle>
       <typography
-        secondary
         variant="expandable"
         :value="props.artifact.body"
         :default-expanded="!!props.displayDivider && !!props.displayTitle"

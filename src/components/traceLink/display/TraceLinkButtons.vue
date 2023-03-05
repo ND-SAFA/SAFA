@@ -1,12 +1,12 @@
 <template>
   <flex-box y="4">
     <trace-link-approval
-      :link="traceLink"
-      show-delete
-      @link:approve="handleClose"
-      @link:decline="handleClose"
-      @link:unreview="handleClose"
-      @link:delete="handleClose"
+      :trace="traceLink"
+      deletable
+      @approve="handleClose"
+      @decline="handleClose"
+      @unreview="handleClose"
+      @delete="handleClose"
     />
   </flex-box>
 </template>

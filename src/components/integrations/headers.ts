@@ -1,4 +1,5 @@
 import { InstallationSchema, TableColumn } from "@/types";
+import { timestampToDisplay } from "@/util";
 
 export const installationsColumns: TableColumn<InstallationSchema>[] = [
   {
@@ -16,6 +17,7 @@ export const installationsColumns: TableColumn<InstallationSchema>[] = [
     label: "Last Synced",
     name: "lastUpdate",
     field: (row) => row.lastUpdate,
+    format: (lastUpdate: string) => timestampToDisplay(lastUpdate),
   },
   {
     label: "Actions",

@@ -1,13 +1,6 @@
-import { useRoute } from "vue-router";
 import { DocumentSchema } from "@/types";
 import { appStore, warningStore, sessionStore, documentStore } from "@/hooks";
-import {
-  navigateTo,
-  QueryParams,
-  Routes,
-  routesWithRequiredProject,
-  router,
-} from "@/router";
+import { navigateTo, QueryParams, Routes, router } from "@/router";
 import {
   getProjectVersion,
   handleSetProject,
@@ -27,15 +20,15 @@ export async function handleLoadVersion(
   document?: DocumentSchema,
   doNavigate = true
 ): Promise<void> {
+  const routeRequiresProject = router.currentRoute.value.matched.some(
+    ({ meta }) => meta.requiresProject
+  );
+
   appStore.onLoadStart();
   sessionStore.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
-    if (
-      !doNavigate ||
-      routesWithRequiredProject.includes(router.currentRoute.value.path)
-    )
-      return;
+    if (!doNavigate || routeRequiresProject) return;
 
     await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });
   };

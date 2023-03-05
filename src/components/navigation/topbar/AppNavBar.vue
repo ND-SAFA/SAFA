@@ -4,9 +4,9 @@
       <div class="full-width">
         <header-bar />
         <graph-bar v-if="graphVisible" />
-        <loading-bar />
       </div>
     </q-toolbar>
+    <loading-bar />
   </q-header>
 </template>
 

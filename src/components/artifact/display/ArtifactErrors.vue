@@ -1,6 +1,6 @@
 <template>
   <panel-card v-if="doDisplay" data-cy="artifact-warnings">
-    <flex-box justify="space-between">
+    <flex-box justify="between">
       <typography
         el="h2"
         l="1"

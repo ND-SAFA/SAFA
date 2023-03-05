@@ -2,7 +2,7 @@
   <div>
     <q-btn round flat color="primary" @click="handleOpen">
       <icon variant="notification" />
-      <q-tooltip delay="200">View notifications</q-tooltip>
+      <q-tooltip :delay="200">View notifications</q-tooltip>
       <q-badge v-if="newNotifications > 0" color="secondary" floating rounded>
         {{ newNotifications }}
       </q-badge>
@@ -19,9 +19,7 @@
             dense
             class="q-px-none"
           >
-            <alert :type="item.type">
-              <typography :value="item.message" />
-            </alert>
+            <alert :type="item.type" :message="item.message" />
           </list-item>
         </list>
       </q-menu>

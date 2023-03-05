@@ -32,6 +32,8 @@ export type IconVariant =
   | "file"
   | "down"
   | "up"
+  | "arrow-down"
+  | "arrow-up"
   | "home-list"
   | "home-add"
   | "job-complete"

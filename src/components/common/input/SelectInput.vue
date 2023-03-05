@@ -1,14 +1,19 @@
 <template>
   <q-select
     v-model="model"
-    filled
+    :filled="!props.outlined"
+    :outlined="props.outlined"
     :label="props.label"
     :options="props.options"
     :option-value="props.optionValue"
     :option-label="props.optionLabel"
     :map-options="props.optionToValue"
     :emit-value="props.optionToValue"
-  />
+  >
+    <template #prepend>
+      <slot name="prepend" />
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -27,12 +32,22 @@ const props = defineProps<{
   label: string;
   modelValue?: unknown;
   options: unknown[];
+  /**
+   * The key of an option's id.
+   */
   optionValue?: string;
+  /**
+   * The key of an option's display label.
+   */
   optionLabel?: string;
   /**
    * Only saves the option's value, not the entire object.
    */
   optionToValue?: boolean;
+  /**
+   * Whether to display as outlined, instead of the default filled.
+   */
+  outlined?: boolean;
 }>();
 
 defineEmits<{

@@ -2,7 +2,7 @@
   <div class="pb-4">
     <save-artifact-inputs />
     <v-divider class="my-4" />
-    <flex-box justify="space-between">
+    <flex-box justify="between">
       <text-button
         v-if="isUpdate"
         text
@@ -12,7 +12,7 @@
       >
         Delete
       </text-button>
-      <v-spacer />
+      <q-space />
       <text-button
         :disabled="!canSave"
         icon="save"

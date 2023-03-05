@@ -82,7 +82,7 @@
       color="primary"
       @input="handleInput"
     >
-      <v-spacer></v-spacer>
+      <q-space />
       <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
       <v-btn
         text

@@ -4,13 +4,17 @@
       <typography r="4" el="h2" variant="subtitle" value="Layouts" />
     </template>
     <template #after>
-      <text-button v-if="!createOpen" text icon="add" @click="handleAddLayout">
-        Add Layout
-      </text-button>
+      <text-button
+        v-if="!createOpen"
+        text
+        label="Add Layout"
+        icon="add"
+        @click="handleAddLayout"
+      />
     </template>
-    <template v-for="({ id }, idx) in tabs" #[id] :key="id">
+    <template v-for="({ id }, idx) in tabs" #[id] :key="idx">
       <save-attribute-layout
-        v-if="idx === tab"
+        v-if="id === tab"
         :layout="layouts[idx]"
         @save="handleSaveLayout(id)"
       />
@@ -34,14 +38,17 @@ import { attributesStore } from "@/hooks";
 import { TabList, TextButton, Typography } from "@/components/common";
 import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 
+const getTabId = (id?: string) => `tab-${id}`;
+const stripTabId = (tabId: string) => tabId.replace("tab-", "");
+
 const createOpen = ref(false);
 
 const tab = computed({
   get() {
-    return attributesStore.selectedLayoutId;
+    return getTabId(attributesStore.selectedLayoutId);
   },
   set(tab) {
-    attributesStore.selectedLayoutId = tab;
+    attributesStore.selectedLayoutId = stripTabId(tab);
   },
 });
 
@@ -49,12 +56,12 @@ const layouts = computed(() => attributesStore.attributeLayouts);
 
 const tabs = computed<SelectOption[]>(() => {
   const tabs = attributesStore.attributeLayouts.map(({ id, name }) => ({
-    id,
+    id: getTabId(id),
     name,
   }));
 
   if (createOpen.value) {
-    tabs.push({ id: "", name: "New Layout" });
+    tabs.push({ id: getTabId(), name: "New Layout" });
   }
 
   return tabs;
@@ -65,15 +72,15 @@ const tabs = computed<SelectOption[]>(() => {
  */
 function handleAddLayout(): void {
   createOpen.value = true;
-  tab.value = "";
+  tab.value = getTabId();
 }
 
 /**
  * Closes the layout creator on save.
- * @param id - The id of the saved layout.
+ * @param tabId - The tab id of the saved layout.
  */
-function handleSaveLayout(id: string): void {
+function handleSaveLayout(tabId: string): void {
   createOpen.value = false;
-  tab.value = id;
+  tab.value = tabId;
 }
 </script>

@@ -1,105 +1,88 @@
 <template>
-  <modal :is-open="!!isOpen" title="Share Model" @close="handleClose">
-    <template #body>
-      <flex-box column t="4">
-        <project-input v-model="projectId" exclude-current-project />
-        <v-select
-          v-model="shareMethod"
-          filled
-          hide-details
-          label="Share Method"
-          :items="shareMethods"
-          item-value="id"
-          item-text="name"
-        />
-      </flex-box>
-    </template>
+  <modal :open="props.open" title="Share Model" @close="emit('close')">
+    <project-input v-model="projectId" exclude-current-project />
+    <select-input
+      v-model="shareMethod"
+      label="Share Method"
+      :options="shareOptions"
+      option-value="id"
+      option-label="name"
+      option-to-value
+    />
     <template #actions>
-      <v-spacer />
-      <v-btn :disabled="!canSave" color="primary" @click="handleSave">
-        Share
-      </v-btn>
+      <text-button
+        label="Share"
+        :disabled="!canSave"
+        color="primary"
+        @click="handleSave"
+      />
     </template>
   </modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import {
-  IdentifierSchema,
-  ModelShareType,
-  GenerationModelSchema,
-} from "@/types";
-import { modelShareOptions } from "@/util";
-import { projectStore } from "@/hooks";
-import { handleShareModel } from "@/api";
-import { FlexBox, Modal, ProjectInput } from "@/components/common";
-
 /**
  * A modal for sharing models.
- *
- * @emits-1 `close` - On close.
  */
-export default defineComponent({
+export default {
   name: "ModelShareModal",
-  components: {
-    ProjectInput,
-    Modal,
-    FlexBox,
-  },
-  props: {
-    isOpen: Boolean,
-    model: Object as PropType<GenerationModelSchema | undefined>,
-  },
-  data() {
-    return {
-      projectId: "",
-      shareMethod: ModelShareType.CLONE,
-      shareMethods: modelShareOptions(),
-    };
-  },
-  computed: {
-    /**
-     * @return All unloaded projects for the current user.
-     */
-    projects(): IdentifierSchema[] {
-      return projectStore.unloadedProjects;
-    },
-    /**
-     * @return Whether the model can be shared.
-     */
-    canSave(): boolean {
-      return this.projectId !== "" && !!this.model;
-    },
-  },
-  watch: {
-    /**
-     * Resets the modal when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+};
+</script>
 
-      this.projectId = "";
-      this.shareMethod = ModelShareType.CLONE;
-    },
-  },
-  methods: {
-    /**
-     * Emits an event to close the modal.
-     */
-    handleClose() {
-      this.$emit("close");
-    },
-    /**
-     * Saves the current model.
-     */
-    handleSave() {
-      if (!this.model || !this.projectId) return;
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import { ModelShareType } from "@/types";
+import { modelShareOptions } from "@/util";
+import { modelSaveStore } from "@/hooks";
+import { handleShareModel } from "@/api";
+import {
+  Modal,
+  ProjectInput,
+  SelectInput,
+  TextButton,
+} from "@/components/common";
 
-      handleShareModel(this.projectId, this.model, this.shareMethod);
+const props = defineProps<{
+  open: boolean;
+}>();
 
-      this.handleClose();
-    },
-  },
-});
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const shareOptions = modelShareOptions();
+
+const projectId = ref("");
+const shareMethod = ref(ModelShareType.CLONE);
+
+const model = computed(() => modelSaveStore.baseModel);
+const canSave = computed(() => projectId.value !== "" && !!model.value);
+
+/**
+ * Resets the modal data.
+ */
+function handleReset() {
+  projectId.value = "";
+  shareMethod.value = ModelShareType.CLONE;
+}
+
+/**
+ * Saves the current model.
+ */
+function handleSave() {
+  if (!model.value || !projectId.value) return;
+
+  handleShareModel(projectId.value, model.value, shareMethod.value);
+
+  emit("close");
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+
+    handleReset();
+  }
+);
 </script>

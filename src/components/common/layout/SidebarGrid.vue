@@ -4,7 +4,7 @@
     <flex-box :column="smallWindow">
       <flex-item
         :parts="smallWindow ? '12' : '4'"
-        :class="smallWindow ? 'full-width' : ''"
+        :class="smallWindow ? 'full-width' : 'q-pr-md'"
       >
         <slot name="sidebar" />
       </flex-item>

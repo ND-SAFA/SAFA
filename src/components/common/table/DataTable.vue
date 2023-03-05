@@ -14,10 +14,11 @@
       :rows="props.rows"
       :row-key="props.rowKey"
       :selection="props.selection"
-      :column-sort-order="props.sortOrder"
-      :sort-method="props.sort"
+      :sort-method="sort"
+      :separator="props.separator"
       :data-cy="props.dataCy"
       table-header-class="text-primary"
+      class="data-table"
       @row-click="(e, r, i) => emit('row-click', e, r, i)"
     >
       <slot />
@@ -61,7 +62,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, useSlots, watch } from "vue";
-import { TableColumn } from "@/types";
+import { TableColumn, TableRow } from "@/types";
+import { sortRows } from "@/util";
 import { useVModel } from "@/hooks";
 
 const props = defineProps<{
@@ -80,11 +82,11 @@ const props = defineProps<{
   /**
    * The rows of the table.
    */
-  rows: Record<string, unknown>;
+  rows: TableRow;
   /**
    * The field on each row that is unique.
    */
-  rowKey: string | ((row: Record<string, unknown>) => string);
+  rowKey: string | ((row: TableRow) => string);
   /**
    * The number of rows to display per page.
    */
@@ -96,7 +98,7 @@ const props = defineProps<{
   /**
    * The values of selected rows.
    */
-  selected?: Record<string, unknown>[];
+  selected?: TableRow[];
   /**
    * The ids of expanded rows.
    */
@@ -108,26 +110,27 @@ const props = defineProps<{
   /**
    * A function to filter the table with.
    */
-  filter?: (rows: Record<string, unknown>[]) => Record<string, unknown>[];
+  filter?: (
+    rows: TableRow[],
+    filterText: string | undefined,
+    cols: TableColumn[]
+  ) => TableRow[];
   /**
    * Which attribute to sort by.
    */
   sortBy?: string;
   /**
-   * Whether to sort  `ad` (ascending-descending) or `da` (descending-ascending).
+   * Whether to sort descending.
    */
-  sortOrder?: "ad" | "da";
+  sortDesc?: boolean;
   /**
-   * Applies the sorting.
-   * @param rows - The rows being sorted.
-   * @param sortBy - The column name being sorted by.
-   * @param desc - Whether sorting in descending order.
+   * A function to sort the table with.
    */
-  sort?: (
-    rows: Record<string, unknown>[],
-    sortBy: string,
-    desc: boolean
-  ) => Record<string, unknown>[];
+  sort?(rows: TableRow[], sortBy: string, descending: boolean): TableRow[];
+  /**
+   * Where to place separators. Defaults to horizontal.
+   */
+  separator?: "horizontal" | "vertical" | "cell" | "none";
   /**
    * Any cells can be customized through the slot `body-cell-[name]`.
    */
@@ -143,15 +146,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:selected", rows: Record<string, unknown>[]): void;
+  (e: "update:selected", rows: TableRow[]): void;
   (e: "update:visibleColumns", cols: string[]): void;
   (e: "update:expanded", rows: string[]): void;
-  (
-    e: "row-click",
-    evt: Event,
-    row: Record<string, unknown>,
-    index: number
-  ): void;
+  (e: "update:sortBy", sortBy: string | undefined): void;
+  (e: "row-click", evt: Event, row: TableRow, index: number): void;
 }>();
 
 const slots = useSlots();
@@ -159,6 +158,10 @@ const slots = useSlots();
 const selectedRows = useVModel(props, "selected");
 const visibleCols = useVModel(props, "visibleColumns");
 const expandedRows = useVModel(props, "expanded");
+const sortBy = useVModel(props, "sortBy");
+const sortDesc = useVModel(props, "sortDesc");
+
+const sort = computed(() => props.sort || sortRows);
 
 const customCellSlots = computed(() =>
   props.customCells ? props.customCells.map((name) => `body-cell-${name}`) : []
@@ -166,24 +169,44 @@ const customCellSlots = computed(() =>
 
 const pagination = ref({
   sortBy: props.sortBy,
-  descending: props.sortOrder === "da",
+  descending: props.sortDesc,
   rowsPerPage: props.rowsPerPage || 20,
   page: 1,
-  rowsNumber: props.rows.length,
 });
 
 watch(
   () => props.sortBy,
-  (sortBy) => (pagination.value.sortBy = sortBy)
+  (sort) => {
+    if (pagination.value.sortBy === sort) return;
+
+    pagination.value.sortBy = sort;
+  }
 );
 
 watch(
-  () => props.rows.length,
-  (rows) => (pagination.value.rowsNumber = rows)
+  () => pagination.value.sortBy,
+  (sort) => {
+    if (sortBy.value === sort) return;
+
+    sortBy.value = sort;
+  }
 );
 
 watch(
-  () => props.sortBy,
-  (desc) => (pagination.value.descending = desc === "da")
+  () => props.sortDesc,
+  (desc) => {
+    if (pagination.value.descending === desc) return;
+
+    pagination.value.descending = desc;
+  }
+);
+
+watch(
+  () => pagination.value.descending,
+  (desc) => {
+    if (sortDesc.value === desc) return;
+
+    sortDesc.value = desc;
+  }
 );
 </script>

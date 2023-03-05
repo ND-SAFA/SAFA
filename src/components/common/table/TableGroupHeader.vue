@@ -1,6 +1,6 @@
 <template>
   <td :colspan="data.headers.length" data-cy="artifact-table-group">
-    <flex-box y="2" x="2" align="center" justify="space-between">
+    <flex-box y="2" x="2" align="center" justify="between">
       <flex-box align="center">
         <icon-button
           small

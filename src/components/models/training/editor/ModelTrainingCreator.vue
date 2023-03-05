@@ -1,32 +1,49 @@
 <template>
-  <v-timeline-item color="primary lighten-3" small>
-    <v-btn v-if="!addOpen" block color="primary" @click="addOpen = true">
-      Add Model Training
-    </v-btn>
-    <v-card v-else outlined class="pa-2">
+  <q-timeline-entry>
+    <text-button
+      v-if="!addOpen"
+      block
+      color="primary"
+      label="Add Model Training"
+      @click="addOpen = true"
+    />
+    <q-card v-else bordered flat class="q-pa-md">
       <tab-list v-model="tab" :tabs="tabs">
-        <v-window-item key="1">
-          <model-document-step :model="model" @submit="handleSubmit" />
-        </v-window-item>
-        <v-window-item key="2">
-          <model-repository-step :model="model" @submit="handleSubmit" />
-        </v-window-item>
-        <v-window-item key="3">
-          <model-keywords-step :model="model" @submit="handleSubmit" />
-        </v-window-item>
-        <v-window-item key="4">
-          <model-project-step :model="model" @submit="handleSubmit" />
-        </v-window-item>
+        <template #documents>
+          <model-document-step :model="props.model" @submit="addOpen = false" />
+        </template>
+        <template #repositories>
+          <model-repository-step
+            :model="props.model"
+            @submit="addOpen = false"
+          />
+        </template>
+        <template #keywords>
+          <model-keywords-step :model="props.model" @submit="addOpen = false" />
+        </template>
+        <template #project>
+          <model-project-step :model="props.model" @submit="addOpen = false" />
+        </template>
       </tab-list>
-    </v-card>
-  </v-timeline-item>
+    </q-card>
+  </q-timeline-entry>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * Displays inputs for training a model.
+ */
+export default {
+  name: "ModelTrainingCreator",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { trainingTabOptions } from "@/util";
 import { TabList } from "@/components/common";
+import TextButton from "@/components/common/button/TextButton.vue";
 import {
   ModelProjectStep,
   ModelDocumentStep,
@@ -34,38 +51,12 @@ import {
   ModelKeywordsStep,
 } from "./steps";
 
-/**
- * Displays inputs for training a model.
- */
-export default defineComponent({
-  name: "ModelTrainingCreator",
-  components: {
-    TabList,
-    ModelKeywordsStep,
-    ModelRepositoryStep,
-    ModelDocumentStep,
-    ModelProjectStep,
-  },
-  props: {
-    model: {
-      type: Object as PropType<GenerationModelSchema>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      addOpen: false,
-      tab: 3,
-      tabs: trainingTabOptions(),
-    };
-  },
-  methods: {
-    /**
-     * Called once a step has been submitted.
-     */
-    handleSubmit(): void {
-      this.addOpen = false;
-    },
-  },
-});
+const props = defineProps<{
+  model: GenerationModelSchema;
+}>();
+
+const tabs = trainingTabOptions();
+
+const tab = ref("documents");
+const addOpen = ref(false);
 </script>

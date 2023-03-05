@@ -1,5 +1,8 @@
 <template>
-  <panel-card title="Data Integrations">
+  <panel-card
+    title="Data Integrations"
+    subtitle="View data integration sources and synchronize data between them."
+  >
     <selector-table
       addable
       :columns="installationsColumns"
@@ -40,7 +43,6 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
-import { timestampToDisplay } from "@/util";
 import { integrationsStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
 import {
@@ -55,12 +57,7 @@ import { installationsColumns } from "./headers";
 const modalOpen = ref(false);
 const loading = ref(false);
 
-const rows = computed(() =>
-  integrationsStore.installations.map((installation) => ({
-    ...installation,
-    lastUpdate: timestampToDisplay(installation.lastUpdate),
-  }))
-);
+const rows = computed(() => integrationsStore.installations);
 
 /**
  * Syncs the current project with the selected installation's data.

@@ -1,9 +1,9 @@
 <template>
   <div class="q-pr-md">
-    <flex-box full-width wrap justify="between" align="center">
+    <flex-box full-width wrap justify="between" align="center" t="1">
       <typography
         variant="subtitle"
-        :value="createOpen ? 'New Attribute' : 'Attributes'"
+        :value="createOpen ? 'Attribute' : 'Attributes'"
       />
       <q-space />
       <text-button

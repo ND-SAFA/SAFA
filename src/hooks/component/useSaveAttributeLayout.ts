@@ -37,30 +37,28 @@ export const useSaveAttributeLayout = (id: string) =>
       /**
        * @return An error if this layout's list of types overlaps with another layout.
        */
-      typeErrors(): string[] {
+      typeErrors(): string | undefined {
         const { artifactTypes, id } = this.editedLayout;
 
         for (const layout of attributesStore.attributeLayouts || []) {
           if (layout.id === id) continue;
 
           if (artifactTypes.length === 0 && layout.artifactTypes.length === 0) {
-            return [`A default layout already exists: ${layout.name}.`];
+            return `A default layout already exists: ${layout.name}.`;
           }
 
           for (const type of artifactTypes) {
             if (layout.artifactTypes.includes(type)) {
-              return [`A layout for "${type}" already exists: ${layout.name}.`];
+              return `A layout for "${type}" already exists: ${layout.name}.`;
             }
           }
         }
-
-        return [];
       },
       /**
        * @return Whether this attribute layout can be saved.
        */
       canSave(): boolean {
-        return !!this.editedLayout.name && this.typeErrors.length === 0;
+        return !!this.editedLayout.name && !this.typeErrors;
       },
     },
     actions: {

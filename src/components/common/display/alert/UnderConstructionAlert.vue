@@ -1,20 +1,20 @@
 <template>
-  <v-alert outlined border="left" color="warning" class="mt-2">
-    <typography
-      value="This content is still under construction. Check back soon!"
-    />
-  </v-alert>
+  <alert
+    type="warning"
+    message="This content is still under construction. Check back soon!"
+    class="q-my-md"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import Typography from "../Typography.vue";
-
 /**
  * An alert for components that are still under construction.
  */
-export default defineComponent({
+export default {
   name: "UnderConstructionAlert",
-  components: { Typography },
-});
+};
+</script>
+
+<script setup lang="ts">
+import Alert from "./Alert.vue";
 </script>

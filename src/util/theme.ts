@@ -1,4 +1,9 @@
-import { ApprovalType, ArtifactDeltaState, JobStatus } from "@/types";
+import {
+  ApprovalType,
+  ArtifactDeltaState,
+  JobStatus,
+  ThemeColor,
+} from "@/types";
 
 /**
  * Defines all colors in the theme.
@@ -135,18 +140,34 @@ export function getBorderColor(state?: ArtifactDeltaState | string): string {
  * @param score - The score to get the color for.
  * @return The color.
  */
-export function getScoreColor(score: number | string): string {
+export function getScoreColor(score: number | string): ThemeColor {
   const [ints, decimals] = String(score).split(".");
   const tenths = decimals[0];
 
   if (ints === "1" || ["8", "9"].includes(tenths)) {
-    return ThemeColors.added;
+    return "positive";
   } else if (["6", "7"].includes(tenths)) {
-    return ThemeColors.secondary;
-  } else if (["4", "5"].includes(tenths)) {
-    return ThemeColors.warning;
+    return "secondary";
   } else {
-    return ThemeColors.error;
+    return "negative";
+  }
+}
+
+/**
+ * Returns the background color for an approval state.
+ * @param state - The state to get the color for.
+ * @return The color.
+ */
+export function getApprovalColor(state: ApprovalType | string): ThemeColor {
+  switch (state) {
+    case ApprovalType.APPROVED:
+      return "positive";
+    case ApprovalType.UNREVIEWED:
+      return "primary";
+    case ApprovalType.DECLINED:
+      return "negative";
+    default:
+      return "";
   }
 }
 
@@ -156,7 +177,7 @@ export function getScoreColor(score: number | string): string {
  * @param status - The job status to get the color of.
  * @returns The display color.
  */
-export function getJobStatusColor(status: JobStatus): string {
+export function getJobStatusColor(status: JobStatus): ThemeColor {
   switch (status) {
     case JobStatus.COMPLETED:
       return "primary";

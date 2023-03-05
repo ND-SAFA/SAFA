@@ -28,9 +28,10 @@
   <flex-box v-else align="center">
     <q-linear-progress
       rounded
-      :value="progress"
+      :value="props.value"
       :color="displayColor"
-      size="md"
+      :track-color="trackColor"
+      size="20px"
     />
     <typography l="2" :value="progress + '%'" style="width: 50px" />
   </flex-box>
@@ -50,11 +51,11 @@ import { computed } from "vue";
 import { ApprovalType, IconVariant, ThemeColor } from "@/types";
 import {
   camelcaseToDisplay,
-  getBackgroundColor,
+  getApprovalColor,
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
-import { typeOptionsStore, useTheme } from "@/hooks";
+import { typeOptionsStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import Icon from "@/components/common/display/icon/Icon.vue";
 import Typography from "../Typography.vue";
@@ -90,13 +91,11 @@ const props = defineProps<{
   dataCy?: string;
 }>();
 
-const { darkMode } = useTheme();
-
 const enumerated = computed(() => props.value in ApprovalType);
 
 const text = computed(() => {
   if (props.confidenceScore) {
-    return props.value.slice(0, 4);
+    return String(props.value).slice(0, 4);
   } else if (enumerated.value || props.value === props.value?.toUpperCase()) {
     return uppercaseToDisplay(props.value || "");
   } else if (props.format) {
@@ -124,7 +123,7 @@ const displayColor = computed(() => {
   } else if (props.confidenceScore) {
     return getScoreColor(props.value);
   } else if (enumerated.value) {
-    return getBackgroundColor(props.value, darkMode.value);
+    return getApprovalColor(props.value);
   } else {
     return "";
   }
@@ -135,6 +134,19 @@ const iconColor = computed(() => {
     return "primary";
   } else {
     return displayColor.value;
+  }
+});
+
+const trackColor = computed(() => {
+  switch (displayColor.value) {
+    case "positive":
+      return "green-3";
+    case "secondary":
+      return "amber-4";
+    case "negative":
+      return "red-3";
+    default:
+      return "";
   }
 });
 

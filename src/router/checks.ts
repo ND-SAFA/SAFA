@@ -1,12 +1,7 @@
 import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 import { appStore, projectStore, sessionStore } from "@/hooks";
 import { handleAuthentication, handleLoadVersion } from "@/api";
-import {
-  QueryParams,
-  Routes,
-  routesPublic,
-  routesWithRequiredProject,
-} from "@/router/routes";
+import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
   string,
@@ -27,7 +22,9 @@ type RouteChecks = Record<
  */
 export const routerBeforeChecks: RouteChecks = {
   async redirectToLoginIfNoSessionFound(to) {
-    if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
+    const isPublic = to.matched.some(({ meta }) => meta.isPublic);
+
+    if (sessionStore.doesSessionExist || isPublic) {
       return;
     }
 
@@ -54,16 +51,14 @@ export const routerBeforeChecks: RouteChecks = {
 
 export const routerAfterChecks: RouteChecks = {
   async requireProjectForRoutes(to) {
-    if (
-      projectStore.isProjectDefined ||
-      !routesWithRequiredProject.includes(to.path)
-    )
-      return;
+    const requiresProject = to.matched.some(({ meta }) => meta.requiresProject);
+
+    if (projectStore.isProjectDefined || !requiresProject) return;
 
     const versionId = to.query[QueryParams.VERSION];
 
-    if (typeof versionId === "string") {
-      await handleLoadVersion(versionId, undefined, false);
-    }
+    if (typeof versionId !== "string") return;
+
+    await handleLoadVersion(versionId, undefined, false);
   },
 };

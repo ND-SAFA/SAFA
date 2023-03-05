@@ -2,19 +2,27 @@
   <q-select
     v-model="model"
     multiple
-    filled
+    :filled="!props.outlined"
+    :outlined="props.outlined"
     use-chips
     use-input
     :label="props.label"
     :options="props.options"
-    :option-label="props.optionsLabel"
+    :option-value="props.optionValue"
+    :option-label="props.optionLabel"
+    :map-options="props.optionToValue"
+    :emit-value="props.optionToValue"
     :data-cy="props.dataCy"
-    :error-message="props.errorMessage || ''"
+    :error-message="props.errorMessage || undefined"
     :error="showError"
     :class="className"
     :hint="props.hint"
     :new-value-mode="props.addValues ? 'add-unique' : ''"
-  />
+  >
+    <template #prepend>
+      <slot name="prepend" />
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -42,9 +50,17 @@ const props = withDefaults(
      */
     options: unknown[];
     /**
-     * Returns the display name of an option.
+     * The key of an option's id.
      */
-    optionsLabel?: (option: unknown) => string;
+    optionValue?: string;
+    /**
+     * The key of an option's display label.
+     */
+    optionLabel?: string;
+    /**
+     * Only saves the option's value, not the entire object.
+     */
+    optionToValue?: boolean;
     /**
      * An error message to display, if one exists.
      */
@@ -73,6 +89,10 @@ const props = withDefaults(
      * If true, new options can be created by pressing enter.
      */
     addValues?: boolean;
+    /**
+     * Whether to display as outlined, instead of the default filled.
+     */
+    outlined?: boolean;
   }>(),
   {
     b: "1",
@@ -81,7 +101,8 @@ const props = withDefaults(
     class: "",
     hint: undefined,
     dataCy: undefined,
-    optionsLabel: undefined,
+    optionLabel: undefined,
+    optionValue: undefined,
   }
 );
 
@@ -97,6 +118,6 @@ const model = useVModel(props, "modelValue");
 const className = useMargins(props, () => [[!!props.class, props.class]]);
 
 const showError = computed(
-  () => !!props.errorMessage && props.errorMessage.length > 0
+  () => (!!props.errorMessage && props.errorMessage.length > 0) || undefined
 );
 </script>

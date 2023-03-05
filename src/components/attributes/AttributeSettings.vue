@@ -7,7 +7,7 @@
         persistent
         bordered
         :breakpoint="0"
-        :width="300"
+        :width="260"
       >
         <attribute-editor />
       </q-drawer>

@@ -8,11 +8,11 @@
       :rows-per-page="10"
       :expanded="expanded"
     >
-      <template #body="props">
+      <template #body="quasarProps">
         <job-row
-          v-model:expanded="props.expand"
-          :quasar-props="props"
-          :job="props.row"
+          v-model:expanded="quasarProps.expand"
+          :quasar-props="quasarProps"
+          :job="quasarProps.row"
           @view-logs="handleViewLogs"
         />
       </template>

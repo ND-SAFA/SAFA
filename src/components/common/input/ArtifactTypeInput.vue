@@ -1,33 +1,20 @@
 <template>
-  <v-combobox
+  <q-select
     ref="artifactTypeInput"
     v-model="model"
     filled
     :label="label"
     :multiple="!!multiple"
-    :items="typeOptionsStore.artifactTypes"
+    :options="options"
     :hint="hint"
-    :hide-details="hideDetails"
-    :persistent-hint="persistentHint"
-    :error-messages="errorMessages"
-    item-text="label"
-    item-value="type"
+    :error-message="errorMessage"
     @blur="emit('blur')"
     @submit="emit('blur')"
   >
-    <template #append>
-      <icon-button
-        small
-        icon="save"
-        tooltip="Save Types"
-        data-cy="button-save-types"
-        @click="handleClose"
-      />
+    <template #selected-item="{ opt }">
+      <attribute-chip v-if="!!opt" artifact-type :value="opt" />
     </template>
-    <template #selection="{ item }">
-      <attribute-chip artifact-type :value="item" />
-    </template>
-  </v-combobox>
+  </q-select>
 </template>
 
 <script lang="ts">
@@ -40,9 +27,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, withDefaults } from "vue";
+import { computed, withDefaults } from "vue";
 import { typeOptionsStore, useVModel } from "@/hooks";
-import { IconButton } from "@/components/common/button";
 import { AttributeChip } from "@/components/common/display";
 
 const props = withDefaults(
@@ -51,15 +37,13 @@ const props = withDefaults(
     multiple?: boolean;
     label?: string;
     hint?: string;
-    persistentHint?: boolean;
-    hideDetails?: boolean;
-    errorMessages?: string[];
+    errorMessage?: string;
   }>(),
   {
     label: "Artifact Types",
     multiple: false,
     hint: undefined,
-    errorMessages: undefined,
+    errorMessage: undefined,
   }
 );
 
@@ -68,14 +52,7 @@ const emit = defineEmits<{
   (e: "blur"): void;
 }>();
 
-const artifactTypeInput = ref<HTMLElement | null>(null);
-
 const model = useVModel(props, "modelValue");
 
-/**
- * Closes the selection window.
- */
-function handleClose(): void {
-  artifactTypeInput.value?.blur();
-}
+const options = computed(() => typeOptionsStore.artifactTypes);
 </script>

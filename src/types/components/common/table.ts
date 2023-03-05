@@ -26,4 +26,37 @@ export interface TableColumn<T = Record<string, unknown>> {
    * How to align the text content.
    */
   align?: "left" | "center";
+  /**
+   * A function for formatting the cell text.
+   */
+  format?(value: unknown): string;
+  /**
+   * A function for comparing two rows when sorting by this column.
+   */
+  sort?(a: unknown, b: unknown): number;
 }
+
+/**
+ * A generic row of a table.
+ */
+export type TableRow = Record<string, unknown>;
+
+/**
+ * A generic row of a table, or a group header.
+ */
+export type TableGroupRow =
+  | TableRow
+  | {
+      /**
+       * The field name that is being grouped by.
+       */
+      $groupBy: string;
+      /**
+       * The field value that all rows share for this group.
+       */
+      $groupValue: string;
+      /**
+       * The number of rows in this group.
+       */
+      $groupRows: number;
+    };

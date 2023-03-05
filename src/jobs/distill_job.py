@@ -36,6 +36,6 @@ class DistillJob(TrainJob):
             self._trainer = DistillTrainer(trainer_args=self.trainer_args,
                                            trainer_dataset_manager=self.trainer_dataset_manager,
                                            student_model_manager=self.student_model_manager,
-                                           teacher_model_manager=self.student_model_manager,
+                                           teacher_model_manager=self.teacher_model_manager,
                                            **kwargs)
         return self._trainer

@@ -20,16 +20,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import copy
 import json
 import logging
-import math
 import os
 import sys
 from io import open
 
+import math
 import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
-
-from transformers.file_utils import WEIGHTS_NAME, CONFIG_NAME
+from transformers.file_utils import CONFIG_NAME, WEIGHTS_NAME
 from transformers.modeling_utils import PreTrainedModel
 
 logger = logging.getLogger(__name__)
@@ -1108,7 +1107,7 @@ class BertForSentencePairClassification(BertPreTrainedModel):
 
 
 class TinyBertForSequenceClassification(BertPreTrainedModel):
-    def __init__(self, config, num_labels=2, fit_size=128):
+    def __init__(self, config, num_labels=2, fit_size=768):
         super(TinyBertForSequenceClassification, self).__init__(config)
         self.num_labels = num_labels
         self.bert = BertModel(config)

@@ -1,13 +1,13 @@
-import math
 import os
-from typing import Tuple, Any, Dict, Union
+from typing import Any, Dict, Tuple, Union
 
+import math
 import numpy as np
 import torch
-from torch.nn.modules.loss import MSELoss, CrossEntropyLoss
+from torch.nn.modules.loss import CrossEntropyLoss, MSELoss
 from torch.utils.data.dataloader import DataLoader
 from tqdm import trange
-from transformers.file_utils import WEIGHTS_NAME, CONFIG_NAME
+from transformers.file_utils import CONFIG_NAME, WEIGHTS_NAME
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.modeling_utils import PreTrainedModel
 from transformers.trainer_utils import PredictionOutput, SchedulerType, TrainOutput
@@ -39,7 +39,7 @@ class State:
 class DistillTrainer(TraceTrainer):
     # These should be moved eventually to trainer args or constants
     OUTPUT_MODE = "classification"
-    DISTILL_PRED_LAYER_ONLY = False
+    DISTILL_PRED_LAYER_ONLY = True
     TEMPERATURE = 1
 
     def __init__(self, trainer_args: TrainerArgs, student_model_manager: ModelManager, teacher_model_manager: ModelManager,
@@ -67,13 +67,15 @@ class DistillTrainer(TraceTrainer):
         :return: Either just the loss or the loss and outputs
         """
         labels = inputs.pop("labels")
-        logits, atts, reps = model(**inputs)
-        loss = self._calculate_loss(logits, labels)
-        outputs = SequenceClassifierOutput(loss=loss, logits=logits)
-        return (loss, outputs) if return_outputs else loss
+        student_output = model(**inputs)
+        if not return_outputs:
+            teacher_output = self.teacher_model_manager.get_model()(**inputs)
+            loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
+        else:
+            loss = self._calculate_loss(student_output[0], labels)
+        return (loss, student_output) if return_outputs else loss
 
-    @overrides(TraceTrainer)
-    def _inner_training_loop(self, batch_size=None, **kwargs) -> TrainOutput:
+    def _custom_inner_training_loop(self, batch_size=None, **kwargs) -> TrainOutput:
         """
         Overrides the training loop in Trace Trainer to perform distillation training
         :param batch_size: The size of the batch
@@ -101,6 +103,7 @@ class DistillTrainer(TraceTrainer):
                 state = self._training_step(inputs, student_model, teacher_model, state)
                 if (step + 1) % self.args.gradient_accumulation_steps == 0:
                     self.optimizer.step()
+                    self.lr_scheduler.step()
                     self.optimizer.zero_grad()
                     global_step += 1
                 if (global_step + 1) % self.args.eval_steps == 0 and self.eval_dataset:
@@ -128,10 +131,8 @@ class DistillTrainer(TraceTrainer):
             cls_loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
             loss = cls_loss
             state.losses[State.tr_cls_loss] += cls_loss.item()
-
         else:
             att_loss, rep_loss = self._compute_distill_loss_all_layers(student_output, teacher_output, att_loss, rep_loss)
-
             loss = rep_loss + att_loss
             state.losses[State.tr_att_loss] += att_loss.item()
             state.losses[State.tr_rep_loss] += rep_loss.item()
@@ -213,8 +214,8 @@ class DistillTrainer(TraceTrainer):
         :param label_ids: Contains the ground truth labels
         :return: The current cls_loss
         """
-        student_logits, student_atts, student_reps = student_output
-        teacher_logits, teacher_atts, teacher_reps = teacher_output
+        student_logits = student_output[0]
+        teacher_logits = teacher_output[0]
 
         if self.OUTPUT_MODE == "classification":
             cls_loss = self._soft_cross_entropy(student_logits / temperature,

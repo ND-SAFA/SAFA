@@ -22,7 +22,7 @@ class MultiStageHubId(AbstractHubId, ABC):
         self.task = task
         self.stage = stage
 
-    def get_definition_path(self, data_dir: str) -> str:
+    def get_project_path(self, data_dir: str) -> str:
         """
         Returns path to stage definition file.
         :param data_dir: The base project path containing all stages.

@@ -12,16 +12,12 @@
             }
           },
           "student_model_manager": {
-            "model_path": "prajjwal1/bert-tiny",
-            "model_task": "DISTILL"
+            "model_path": "prajjwal1/bert-tiny"
           },
-           "teacher_model_manager": {
-            "model_path": "bert-base-uncased",
-              "model_task": "DISTILL"
+          "teacher_model_manager": {
+            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
-            "eval_steps": 10,
-            "weight_decay": 0.01,
             "num_train_epochs": 5,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
@@ -32,14 +28,15 @@
               "precision"
             ],
             "skip_save": false,
-            "load_best_model_at_end": true
+            "load_best_model_at_end": true,
+            "eval_steps": 10
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path":  "[DATA_PATH]/lhp/heating"
+                "object_type": "HUB",
+                "name": "git"
               }
             },
             "val_dataset_creator": {

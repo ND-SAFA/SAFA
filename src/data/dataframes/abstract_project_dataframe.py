@@ -2,7 +2,7 @@ from abc import abstractmethod
 from collections import Set
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, Union, List, OrderedDict
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
@@ -61,7 +61,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         Sets the index of the dataframe and performs any other processing steps
         :return: None
         """
-        if self.index_name() is not None and not self.columns.empty:
+        if self.index_name() is not None and not self.columns.empty and self.index.name != self.index_name():
             self.set_index(self.index_name(), inplace=True)
 
     def add_new_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
@@ -117,6 +117,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         unexpected_columns = set(columns).difference(expected_columns)
         assert len(unexpected_columns) == 0, f"Unexpected columns in the trace df: {unexpected_columns}"
         for i, col in enumerate(expected_columns):
+            if col == self.index_name():
+                continue
             assert col == columns[i], f"Columns expected to be in the following order: {expected_columns}"
 
     def __setitem__(self, key: Any, value: Any) -> None:

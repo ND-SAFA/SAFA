@@ -100,7 +100,7 @@ class ApiTestProject(AbstractTestProject):
         for source_dict, target_dict in zip(sources, targets):
             for source_id, source_body in source_dict.items():
                 for target_id, target_body in target_dict.items():
-                    links.append((source_id, source_body))
+                    links.append((source_id, target_id))
         return links
 
     @staticmethod

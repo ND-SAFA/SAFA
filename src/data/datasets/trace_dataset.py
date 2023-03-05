@@ -378,9 +378,9 @@ class TraceDataset(iDataset):
         :param other: Dataset to combine
         :return: The combined dataset
         """
-        layer_mapping_df = pd.concat([self.layer_mapping_df, other.layer_mapping_df], ignore_index=True)
-        artifact_df = pd.concat([self.artifact_df, other.artifact_df], ignore_index=True)
-        trace_df = pd.concat([self.trace_df, other.trace_df], ignore_index=True)
+        layer_mapping_df = LayerDataFrame(pd.concat([self.layer_mapping_df, other.layer_mapping_df], ignore_index=True))
+        artifact_df = ArtifactDataFrame(pd.concat([self.artifact_df, other.artifact_df]))
+        trace_df = TraceDataFrame(pd.concat([self.trace_df, other.trace_df]))
         pos_link_ids = deepcopy(self.pos_link_ids) + deepcopy(other.pos_link_ids)
         neg_link_ids = deepcopy(self.neg_link_ids) + deepcopy(other.neg_link_ids)
         return TraceDataset(artifact_df=artifact_df, trace_df=trace_df, layer_mapping_df=layer_mapping_df,

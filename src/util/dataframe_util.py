@@ -48,7 +48,7 @@ class DataFrameUtil:
          :param index_to_filter: The list of indices to filter out.
          :return: DataFrame containing filtered rows.
          """
-        return df[~df.index.isin(index_to_filter)]
+        return df[df.index.isin(index_to_filter)]
 
     @staticmethod
     def query_df(df: pd.DataFrame, query: Dict):

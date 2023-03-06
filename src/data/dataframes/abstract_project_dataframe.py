@@ -116,10 +116,32 @@ class AbstractProjectDataFrame(pd.DataFrame):
                                           f"Received instead {columns}"
         unexpected_columns = set(columns).difference(expected_columns)
         assert len(unexpected_columns) == 0, f"Unexpected columns in the trace df: {unexpected_columns}"
-        for i, col in enumerate(expected_columns):
-            if col == self.index_name():
+        i = 0
+        for col in expected_columns:
+            if col == self.index_name() and columns[i] != col:
                 continue
             assert col == columns[i], f"Columns expected to be in the following order: {expected_columns}"
+            i += 1
+
+    @classmethod
+    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame", ignore_index: bool =False) -> "AbstractProjectDataFrame":
+        """
+        Combines two dataframes
+        :param dataframe1: The first dataframe
+        :param dataframe2: The second dataframe
+        :param ignore_index: If True, do not use the index values along the concatenation axis.
+        :return: The new combined dataframe
+        """
+        orient = 'record' if ignore_index else 'index'
+        data1 = dataframe1.to_dict(orient=orient)
+        data2 = dataframe2.to_dict(orient=orient)
+        if ignore_index:
+            data1.extend(data2)
+            return cls(data1)
+        data1.update(data2)
+        for index, cols in data1.items():
+            cols[cls.index_name()] = index
+        return cls.from_dict(data1.values())
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

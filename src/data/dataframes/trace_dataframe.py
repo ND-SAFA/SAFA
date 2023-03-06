@@ -84,10 +84,8 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param link_id: The id of the link
         :return: A dictionary mapping column names to the corresponding link information
         """
-        dict_ = EnumDict({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label})
-        if link_id:
-            dict_[TraceKeys.LINK_ID] = link_id
-            dict_.move_to_end(TraceKeys.LINK_ID, last=False)
+        dict_ = EnumDict({TraceKeys.LINK_ID: link_id} if link_id else {})
+        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id, TraceKeys.LABEL: label})
         return dict_
 
     @staticmethod

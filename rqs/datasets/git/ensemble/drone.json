@@ -11,8 +11,8 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "thearod5/git-tiny",
-                "thearod5/git-medium"
+                "thearod5/nl-bert",
+                "thearod5/pl-bert"
               ]
             }
           },

@@ -61,7 +61,11 @@
               ]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "jobs": [
         {
           "object_type": "VSM",
           "job_args": {

@@ -20,8 +20,8 @@
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",
-            "save_steps": 1,
-            "eval_steps": 1,
+            "save_steps": 5,
+            "eval_steps": 5,
             "logging_steps": 1
           },
           "trainer_dataset_manager": {

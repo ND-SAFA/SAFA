@@ -77,7 +77,6 @@ class DistillTrainer(TraceTrainer):
         labels = inputs.pop("labels")
         student_output = model(**inputs)
         if not return_outputs:
-            logger.info("Using soft-labels for distill training...")
             teacher_output = self.teacher_model_manager.get_model()(**inputs)
             loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
         else:

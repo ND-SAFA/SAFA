@@ -20,12 +20,6 @@
           "trainer_args": {
             "num_train_epochs": 1,
             "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
             "skip_save": false,
             "load_best_model_at_end": true,
             "evaluation_strategy": "steps",

@@ -6,11 +6,11 @@
           "object_type": "DOWNLOAD_REPO",
           "job_args": {
           },
-          "repo_name": "eclipse-iceoryx/iceoryx",
+          "repo_name": "ApolloAuto/apollo",
           "artifact_store_path": "~/desktop/safa/repos",
           "clone_path": "~/projects/safa/greader/clones",
-          "output_path": "~/desktop/safa/datasets/iceoryx",
-          "load": true
+          "output_path": "~/desktop/safa/datasets/apollo",
+          "load": false
         }
       ]
     }

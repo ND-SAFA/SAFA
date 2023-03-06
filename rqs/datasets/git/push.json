@@ -1,0 +1,21 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PUSH_MODEL",
+          "job_args": {
+            "random_seed": 42
+          },
+          "model_manager": {
+            "model_path": "~/output/git/train_tl/experiment_0/step_0/models/best"
+          },
+          "trainer_args": {
+            "hub_model_id": "thearod5/git-tiny"
+          },
+          "trainer_dataset_manager": null
+        }
+      ]
+    }
+  ]
+}

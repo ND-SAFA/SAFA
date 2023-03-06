@@ -1,4 +1,4 @@
-import { ArtifactData, DocumentType, SafetyCaseType } from "@/types";
+import { ArtifactCytoElementData, DocumentType, SafetyCaseType } from "@/types";
 import { appStore, documentStore } from "@/hooks";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 
@@ -15,7 +15,7 @@ export const safetyCaseMenuOption: MenuItem = {
       isNewArtifact: true,
     });
   },
-  isVisible: (artifactData: ArtifactData | undefined): boolean => {
+  isVisible: (artifactData: ArtifactCytoElementData | undefined): boolean => {
     if (artifactData === undefined) {
       return documentStore.currentType === DocumentType.SAFETY_CASE;
     }

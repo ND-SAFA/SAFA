@@ -45,11 +45,21 @@ export default Vue.extend({
   },
   data() {
     return {
-      tab: 0,
       createOpen: false,
     };
   },
   computed: {
+    /**
+     * @return The layout tab currently being edited.
+     */
+    tab: {
+      get(): number {
+        return attributesStore.selectedLayout;
+      },
+      set(tab: number): void {
+        attributesStore.selectedLayout = tab;
+      },
+    },
     /**
      * @return The list of custom attribute layouts.
      */
@@ -66,7 +76,7 @@ export default Vue.extend({
       }));
 
       if (this.createOpen) {
-        tabs.push({ id: "new", name: "New Layout" });
+        tabs.push({ id: "", name: "New Layout" });
       }
 
       return tabs;

@@ -1,5 +1,5 @@
 import { SvgStyle } from "@/types";
-import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
+import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape/styles/config";
 
 /**
  * Renders an SVG Rectangle.

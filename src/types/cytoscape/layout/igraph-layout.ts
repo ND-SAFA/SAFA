@@ -14,5 +14,5 @@ export interface IGraphLayout {
   postLayoutHooks: LayoutHook[];
   autoMoveHandlers: AutoMoveEventHandlers;
   cytoEventHandlers: CytoEventHandlers;
-  createLayout(cy: CytoCore): void;
+  createLayout(cy: CytoCore, generate?: boolean): void;
 }

@@ -5,11 +5,12 @@ import {
   CytoCore,
   IGraphLayout,
   CytoEvent,
-  ArtifactData,
+  ArtifactCytoElementData,
 } from "@/types";
 import { isArtifactData } from "@/util";
 import { selectionStore } from "@/hooks";
-import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
+import { timTreeCyPromise } from "@/cytoscape/cy";
+import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
@@ -66,9 +67,12 @@ export const applyCytoEvents: LayoutHook = (
     const eventName: string = cytoEvent.events.join(" ");
     const selector = cytoEvent.selector;
     const handler = (event: EventObject) => cytoEvent.action(cy, event);
+
     if (selector === undefined) {
+      cy.off(eventName);
       cy.on(eventName, handler);
     } else {
+      cy.off(eventName, selector);
       cy.on(eventName, selector, handler);
     }
   }
@@ -78,7 +82,7 @@ export const applyCytoEvents: LayoutHook = (
  * Centers on the selected or root node of the graph.
  */
 export const centerViewOnNode: LayoutHook = (): void => {
-  const selectedArtifacts = selectionStore.selectedArtifactId;
+  const selectedArtifacts = selectionStore.selectedArtifact?.id;
 
   if (!selectedArtifacts) {
     cyZoomReset();
@@ -105,7 +109,9 @@ export const dynamicVisibilityHookForContextMenuItems = (
 
   cy.on(CytoEvent.CXT_TAP, (event: EventObject) => {
     const data = event.target.data();
-    const artifactData: ArtifactData | undefined = isArtifactData(data)
+    const artifactData: ArtifactCytoElementData | undefined = isArtifactData(
+      data
+    )
       ? data
       : undefined;
     const contextMenuInstance = cy.contextMenus("get");

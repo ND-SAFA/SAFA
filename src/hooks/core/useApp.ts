@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
 
 import {
-  CreatorOpenState,
+  ArtifactCreatorOpenState,
   DetailsOpenState,
   PanelStateMap,
   PanelType,
+  TraceCreatorOpenState,
 } from "@/types";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
@@ -34,6 +35,7 @@ export const useApp = defineStore("app", {
       [PanelType.appPanel]: true,
       [PanelType.detailsPanel]: false,
       [PanelType.artifactCreator]: false,
+      [PanelType.traceCreator]: false,
       [PanelType.errorDisplay]: false,
       [PanelType.traceLinkDraw]: false,
     } as PanelStateMap,
@@ -54,8 +56,14 @@ export const useApp = defineStore("app", {
     /**
      * @return Whether the artifact creator is open.
      */
-    isArtifactCreatorOpen(): CreatorOpenState {
+    isArtifactCreatorOpen(): ArtifactCreatorOpenState {
       return this.isOpen[PanelType.artifactCreator];
+    },
+    /**
+     * @return Whether the trace creator is open.
+     */
+    isTraceCreatorOpen(): TraceCreatorOpenState {
+      return this.isOpen[PanelType.traceCreator];
     },
     /**
      * @return Whether the error display is open.
@@ -152,7 +160,7 @@ export const useApp = defineStore("app", {
      * @param openTo - What to open to.
      */
     openArtifactCreatorTo(openTo: {
-      type?: CreatorOpenState;
+      type?: ArtifactCreatorOpenState;
       isNewArtifact?: boolean;
     }): void {
       const { type, isNewArtifact } = openTo;
@@ -161,6 +169,15 @@ export const useApp = defineStore("app", {
 
       this.isOpen[PanelType.artifactCreator] = type || true;
       this.openDetailsPanel("saveArtifact");
+    },
+    /**
+     * Opens the artifact creator to a specific node type.
+     *
+     * @param openTo - What to open to.
+     */
+    openTraceCreatorTo(openTo?: TraceCreatorOpenState): void {
+      this.isOpen[PanelType.traceCreator] = openTo || true;
+      this.openDetailsPanel("saveTrace");
     },
     /**
      * Enqueues a new update to be loaded when the user is ready.

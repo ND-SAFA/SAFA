@@ -33,7 +33,10 @@
   opacity: 0.6;
 }
 
-// Fixes code-diff's broken styling
-code.hljs {
-  min-height: 26px;
+.show-on-hover {
+  opacity: 0;
+
+  &:hover {
+    opacity: 1;
+  }
 }

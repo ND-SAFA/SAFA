@@ -5,6 +5,7 @@ import {
   DocumentSchema,
   DocumentType,
   ProjectSchema,
+  GraphMode,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
@@ -21,10 +22,6 @@ export const useDocuments = defineStore("documents", {
     const baseDocument = createDocument();
 
     return {
-      /**
-       * Whether the document is currently in table view.
-       */
-      isTableView: false,
       /**
        * The base document with all artifacts.
        */
@@ -73,14 +70,8 @@ export const useDocuments = defineStore("documents", {
     /**
      * @return Whether the current document type is for editing a table.
      */
-    isEditableTableDocument(): boolean {
+    isTableOnlyDocument(): boolean {
       return isTableDocument(this.currentDocument.type);
-    },
-    /**
-     * @return Whether the current document type is for rendering a table.
-     */
-    isTableDocument(): boolean {
-      return this.isTableView || this.isEditableTableDocument;
     },
   },
   actions: {
@@ -184,6 +175,10 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
+
+      if (isTableDocument(document.type)) {
+        layoutStore.mode = GraphMode.table;
+      }
     },
     /**
      * Adds a new document.

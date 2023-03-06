@@ -94,7 +94,6 @@ export default Vue.extend({
      * Closes the model modal.
      */
     handleClose() {
-      console.log("!");
       this.isSaveOpen = false;
       this.isShareOpen = false;
       this.currentItem = undefined;

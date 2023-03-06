@@ -14,7 +14,7 @@
       el="p"
       :value="emptyMessage"
     />
-    <v-list>
+    <v-list v-if="!loading">
       <v-list-item-group style="max-height: 400px" class="overflow-y-auto">
         <slot name="items" />
       </v-list-item-group>

@@ -93,6 +93,16 @@ export enum NodePlacement {
 }
 
 /**
+ * Enumerates types of node shapes.
+ */
+export enum NodePlacement {
+  ROUND_RECTANGLE = "round-rectangle",
+  RECTANGLE = "rectangle",
+  ELLIPSE = "ellipse",
+  POLYGON = "polygon",
+}
+
+/**
  * Defines the klay layout settings.
  */
 export interface KlayLayoutSettings {

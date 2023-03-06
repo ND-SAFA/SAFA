@@ -9,20 +9,22 @@
     data-cy="table-header"
   >
     <template slot="right">
-      <v-autocomplete
-        outlined
-        multiple
-        dense
-        hide-details
-        v-if="inDeltaView"
-        label="Delta Types"
-        v-model="selectedDeltaTypes"
-        :items="deltaTypes"
-        item-text="name"
-        item-value="id"
-        style="width: 200px"
-        class="mb-1"
-      />
+      <flex-box v-if="inDeltaView">
+        <v-divider vertical />
+        <v-autocomplete
+          outlined
+          multiple
+          dense
+          hide-details
+          label="Delta Types"
+          v-model="selectedDeltaTypes"
+          :items="deltaTypes"
+          item-text="name"
+          item-value="id"
+          class="ml-2"
+          style="max-width: 300px"
+        />
+      </flex-box>
     </template>
   </table-header>
 </template>
@@ -33,7 +35,7 @@ import { DataTableHeader } from "vuetify";
 import { ArtifactDeltaState } from "@/types";
 import { deltaTypeOptions } from "@/util";
 import { deltaStore } from "@/hooks";
-import { TableHeader } from "@/components/common";
+import { TableHeader, FlexBox } from "@/components/common";
 
 /**
  * Represents the header and inputs for a table of artifacts.
@@ -47,6 +49,7 @@ export default Vue.extend({
   name: "ArtifactTableHeader",
   components: {
     TableHeader,
+    FlexBox,
   },
   props: {
     headers: {

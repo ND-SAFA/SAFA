@@ -36,10 +36,7 @@
 
       <template v-slot:[`item.name`]="{ item }">
         <td class="v-data-table__divider">
-          <artifact-table-row-name
-            :artifact="item"
-            data-cy="table-row-artifact"
-          />
+          <artifact-table-row-name :artifact="item" />
         </td>
       </template>
 
@@ -60,7 +57,11 @@
         v-slot:[`item.${attribute.key}`]="{ item }"
       >
         <td :key="attribute.key" class="v-data-table__divider">
-          <attribute-display :attribute="attribute" :model="item.attributes" />
+          <attribute-display
+            hide-title
+            :attribute="attribute"
+            :model="item.attributes || {}"
+          />
         </td>
       </template>
 
@@ -195,7 +196,7 @@ export default Vue.extend({
      * @param item - The artifact to view.
      */
     handleView(item: FlatArtifact) {
-      if (selectionStore.selectedArtifactId === item.id) {
+      if (selectionStore.selectedArtifact?.id === item.id) {
         this.selected = [];
       } else {
         this.selected = [item];

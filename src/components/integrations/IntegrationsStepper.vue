@@ -10,6 +10,10 @@
         <authentication-selector v-model="source" />
       </v-stepper-content>
       <v-stepper-content step="2">
+        <jira-organization-selector v-if="source === 'Jira'" />
+        <git-hub-organization-selector v-if="source === 'GitHub'" />
+      </v-stepper-content>
+      <v-stepper-content step="3">
         <jira-project-selector v-if="source === 'Jira'" />
         <git-hub-project-selector v-if="source === 'GitHub'" />
       </v-stepper-content>
@@ -27,6 +31,10 @@ import {
   handleSyncInstallation,
 } from "@/api";
 import { Stepper } from "@/components/common";
+import {
+  JiraOrganizationSelector,
+  GitHubOrganizationSelector,
+} from "./organizations";
 import { AuthenticationSelector } from "./authentication";
 import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 
@@ -38,6 +46,8 @@ import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 export default Vue.extend({
   name: "IntegrationsStepper",
   components: {
+    JiraOrganizationSelector,
+    GitHubOrganizationSelector,
     AuthenticationSelector,
     GitHubProjectSelector,
     JiraProjectSelector,
@@ -54,6 +64,7 @@ export default Vue.extend({
       source: undefined as "Jira" | "GitHub" | undefined,
       steps: [
         ["Connect to Source", false],
+        ["Select Organization", false],
         ["Select Project", false],
       ] as StepState[],
       currentStep: 1,
@@ -73,15 +84,27 @@ export default Vue.extend({
       }
     },
     /**
-     * @return Whether a project is selected
+     * @return What organization is selected.
      */
-    projectIsSelected(): boolean {
+    organizationIsSelected(): string | undefined {
       if (this.source === "Jira") {
-        return !!integrationsStore.jiraProject;
+        return integrationsStore.jiraOrganization?.name;
       } else if (this.source === "GitHub") {
-        return !!integrationsStore.gitHubProject;
+        return integrationsStore.gitHubOrganization?.name;
       } else {
-        return false;
+        return undefined;
+      }
+    },
+    /**
+     * @return Whether a project is selected.
+     */
+    projectIsSelected(): string | undefined {
+      if (this.source === "Jira") {
+        return integrationsStore.jiraProject?.name;
+      } else if (this.source === "GitHub") {
+        return integrationsStore.gitHubProject?.name;
+      } else {
+        return undefined;
       }
     },
   },
@@ -101,8 +124,20 @@ export default Vue.extend({
     /**
      * Updates the selection step when a project is selected.
      */
-    projectIsSelected(selected: boolean): void {
-      this.setStepIsValid(1, selected);
+    organizationIsSelected(name: string | undefined): void {
+      if (name) {
+        this.currentStep = 3;
+        this.setStepIsValid(1, true);
+      } else {
+        this.currentStep = 2;
+        this.setStepIsValid(1, false);
+      }
+    },
+    /**
+     * Updates the selection step when a project is selected.
+     */
+    projectIsSelected(name: string | undefined): void {
+      this.setStepIsValid(2, !!name);
     },
   },
   methods: {
@@ -135,6 +170,7 @@ export default Vue.extend({
           handleSyncInstallation(
             {
               type: "JIRA",
+              installationOrgId: integrationsStore.jiraOrganization?.id || "",
               installationId: integrationsStore.jiraProject?.id || "",
             },
             callbacks
@@ -143,6 +179,7 @@ export default Vue.extend({
           handleSyncInstallation(
             {
               type: "GITHUB",
+              installationOrgId: integrationsStore.gitHubOrganization?.id || "",
               installationId: integrationsStore.gitHubProject?.name || "",
             },
             callbacks

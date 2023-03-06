@@ -76,10 +76,10 @@ export const useCommits = defineStore("commits", {
      * @param commit - The commit to save.
      */
     saveCommit(commit: Commit): void {
-      this.commits = [
-        ...this.commits,
-        { commit, revert: this.getRevert(commit) },
-      ];
+      this.$patch({
+        commits: [...this.commits, { commit, revert: this.getRevert(commit) }],
+        revertedCommits: [],
+      });
     },
     /**
      * Removes the last commit from the store and attempts to revert the changes.
@@ -111,9 +111,12 @@ export const useCommits = defineStore("commits", {
       const lastCommitIndex = this.revertedCommits.length - 1;
       const lastCommitHistory = this.revertedCommits[lastCommitIndex];
 
-      this.revertedCommits = this.revertedCommits.filter(
-        (c, idx) => idx !== lastCommitIndex
-      );
+      this.$patch({
+        commits: [...this.commits, lastCommitHistory],
+        revertedCommits: this.revertedCommits.filter(
+          (c, idx) => idx !== lastCommitIndex
+        ),
+      });
 
       return lastCommitHistory.commit;
     },

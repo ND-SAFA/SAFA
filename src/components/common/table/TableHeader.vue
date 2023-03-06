@@ -1,23 +1,21 @@
 <template>
-  <flex-box justify="space-between" b="2">
-    <div>
-      <v-text-field
-        dense
-        outlined
-        clearable
-        hide-details
-        label="Search"
-        style="width: 30vw"
-        v-model="currentSearch"
-        append-icon="mdi-magnify"
-      />
+  <v-row dense class="mb-2">
+    <v-col cols="12">
       <flex-box align="center">
-        <commit-buttons v-if="showCommitButtons" color="primary" class="mt-2" />
-        <slot name="bottom" />
+        <v-text-field
+          dense
+          outlined
+          clearable
+          hide-details
+          label="Search"
+          style="width: 100%"
+          v-model="currentSearch"
+          append-icon="mdi-magnify"
+        />
+        <commit-buttons v-if="showCommitButtons" color="primary" class="mx-2" />
       </flex-box>
-    </div>
-    <div>
-      <slot name="right" />
+    </v-col>
+    <v-col cols="12">
       <flex-box>
         <v-autocomplete
           clearable
@@ -29,12 +27,12 @@
           :items="options"
           item-text="text"
           item-value="value"
-          style="max-width: 200px"
           :prepend-inner-icon="`mdi-arrow-${
             currentGroupDesc ? 'up' : 'down'
           }-thin-circle-outline`"
           @click:prepend-inner="currentGroupDesc = !currentGroupDesc"
           data-cy="artifact-table-group-by"
+          style="max-width: 300px"
         />
         <v-autocomplete
           outlined
@@ -46,17 +44,21 @@
           :items="options"
           item-text="text"
           item-value="value"
-          style="max-width: 200px"
-          class="ml-1"
+          class="mx-2"
           :prepend-inner-icon="`mdi-arrow-${
             currentSortDesc ? 'up' : 'down'
           }-thin-circle-outline`"
           @click:prepend-inner="currentSortDesc = !currentSortDesc"
           data-cy="artifact-table-sort-by"
+          style="max-width: 300px"
         />
+        <slot name="right" />
       </flex-box>
-    </div>
-  </flex-box>
+    </v-col>
+    <v-col cols="12">
+      <slot name="bottom" />
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">

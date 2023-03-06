@@ -109,7 +109,7 @@ export default Vue.extend({
     },
     value: {
       get() {
-        return selectionStore.selectedArtifactId;
+        return selectionStore.selectedArtifact?.id;
       },
       set(artifactId: string | null) {
         if (artifactId) {

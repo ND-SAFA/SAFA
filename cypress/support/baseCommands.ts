@@ -1,13 +1,20 @@
 import "cypress-file-upload";
-import { DataCy } from "../fixtures";
+
+Cypress.Commands.add("expandViewport", (size) => {
+  if (size === "l") {
+    cy.viewport(1024 * 2, 768 * 2);
+  } else {
+    cy.viewport(1024, 768);
+  }
+});
 
 Cypress.Commands.add("getCy", (dataCy, elementPosition, timeout) => {
   const elements = cy.get(`[data-cy="${dataCy}"]`, { timeout });
 
   if (elementPosition === "first") {
-    return elements.first();
+    return elements.first({ timeout });
   } else if (elementPosition === "last") {
-    return elements.last();
+    return elements.last({ timeout });
   } else {
     return elements;
   }
@@ -64,12 +71,14 @@ Cypress.Commands.add("switchTab", (tabLabel) => {
   cy.contains("div", tabLabel).click();
 });
 
-Cypress.Commands.add("closeModal", (dataCy) => {
-  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalCloseButton));
-});
+Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
+  cy.getCy(dataCy)
+    .should("be.visible")
+    .within(() => {
+      if (waitForLoad) {
+        cy.get(".v-data-table__progress").should("not.exist");
+      }
 
-Cypress.Commands.add("withinTableRows", (dataCy, fn) => {
-  cy.getCy(dataCy).within(() => {
-    fn(cy.get("tr"));
-  });
+      fn(cy.get("tr"));
+    });
 });

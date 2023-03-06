@@ -1,4 +1,4 @@
-import { JobSchema } from "@/types";
+import { JobLogSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -42,4 +42,18 @@ export async function deleteJobById(jobId: string): Promise<void> {
   return authHttpClient<void>(fillEndpoint(Endpoint.deleteJobById, { jobId }), {
     method: "DELETE",
   });
+}
+
+/**
+ * Returns the logs for a job.
+ *
+ * @param jobId - The job to get logs for.
+ */
+export async function getJobLog(jobId: string): Promise<JobLogSchema[]> {
+  return authHttpClient<JobLogSchema[]>(
+    fillEndpoint(Endpoint.getJobLog, { jobId }),
+    {
+      method: "GET",
+    }
+  );
 }

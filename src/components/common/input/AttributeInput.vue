@@ -12,7 +12,6 @@
   <v-textarea
     v-else-if="attribute.type === 'paragraph'"
     filled
-    no-resize
     :label="attribute.label"
     class="mr-2"
     rows="3"
@@ -122,7 +121,7 @@
     v-else-if="attribute.type === 'boolean'"
     :label="attribute.label"
     class="pl-4 mr-2"
-    :value="model[attribute.key]"
+    :input-value="model[attribute.key]"
     @change="handleInput"
   />
 </template>
@@ -161,22 +160,30 @@ export default Vue.extend({
     /**
      * Creates an error when an integer has a float value.
      */
-    intRules(): (value: string | undefined) => string | true {
-      return (value) =>
-        value?.includes(".") ? "Must be a valid integer." : true;
+    intRules(): (value: string | number | undefined) => string | true {
+      return (value) => {
+        if (value === undefined || value === "") {
+          return true;
+        } else {
+          const strValue = typeof value === "string" ? value : String(value);
+
+          return strValue.includes(".") ? "Must be a valid integer." : true;
+        }
+      };
     },
     /**
      * Creates an error when a number is not within bounds.
      */
-    numRules(): (value: string | undefined) => string | true {
+    numRules(): (value: string | number | undefined) => string | true {
       return (value) => {
-        const { min, max } = this.attribute;
+        const { min = null, max = null } = this.attribute;
+        const numValue = typeof value === "string" ? parseFloat(value) : value;
 
-        if (!value) {
+        if (numValue === undefined || isNaN(numValue)) {
           return true;
-        } else if (max !== undefined && parseFloat(value) > max) {
+        } else if (max !== null && numValue > max) {
           return `Value is greater than ${max}.`;
-        } else if (min !== undefined && parseFloat(value) < min) {
+        } else if (min !== null && numValue < min) {
           return `Value is less than ${min}.`;
         } else {
           return true;
@@ -188,14 +195,14 @@ export default Vue.extend({
      */
     lengthRules(): (value: string | string[] | undefined) => string | true {
       return (value) => {
-        const { min, max } = this.attribute;
+        const { min = null, max = null } = this.attribute;
         const unit = Array.isArray(value) ? "items" : "characters";
 
         if (!value) {
           return true;
-        } else if (max !== undefined && value.length > max) {
+        } else if (max !== null && value.length > max) {
           return `Value has greater than ${max} ${unit}.`;
-        } else if (min !== undefined && value.length < min) {
+        } else if (min !== null && value.length < min) {
           return `Value has less than ${min} ${unit}.`;
         } else {
           return true;

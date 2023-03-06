@@ -5,6 +5,7 @@
     small
     color="accent"
     icon-id="mdi-cloud-sync-outline"
+    data-cy="button-nav-load-update"
     @click="handleClick"
   >
     Load Project Updates

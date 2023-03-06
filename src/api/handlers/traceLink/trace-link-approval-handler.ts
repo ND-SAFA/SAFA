@@ -1,6 +1,6 @@
 import {
   ArtifactSchema,
-  ArtifactData,
+  ArtifactCytoElementData,
   ApprovalType,
   TraceLinkSchema,
   TraceType,
@@ -22,8 +22,8 @@ import {
  * @param target - The artifact to link to.
  */
 export async function handleCreateLink(
-  source: ArtifactSchema | ArtifactData,
-  target: ArtifactSchema | ArtifactData
+  source: ArtifactSchema | ArtifactCytoElementData,
+  target: ArtifactSchema | ArtifactCytoElementData
 ): Promise<void> {
   const sourceName =
     "artifactName" in source ? source.artifactName : source.name;

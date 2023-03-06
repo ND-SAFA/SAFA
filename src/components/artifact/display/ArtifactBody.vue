@@ -3,18 +3,17 @@
     <text-button text y="2" variant="artifact" @click="handleViewArtifact">
       View Artifact
     </text-button>
-    <typography
-      :variant="isCodeDisplay ? 'code' : 'body'"
-      el="p"
-      :value="selectedArtifactBody"
-    />
+    <panel-card class="pb-4">
+      <typography default-expanded :variant="variant" el="p" :value="body" />
+    </panel-card>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { ReservedArtifactType, TextType } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
-import { Typography, TextButton } from "@/components/common";
+import { Typography, TextButton, PanelCard } from "@/components/common";
 
 /**
  * Displays the selected node's body.
@@ -24,6 +23,7 @@ export default Vue.extend({
   components: {
     TextButton,
     Typography,
+    PanelCard,
   },
   computed: {
     /**
@@ -35,16 +35,16 @@ export default Vue.extend({
     /**
      * @return The selected artifact's body.
      */
-    selectedArtifactBody(): string {
+    body(): string {
       return this.artifact?.body.trim() || "";
     },
     /**
-     * An incredibly crude and temporary way to distinguish code nodes.
-     *
-     * @return Whether to display this body as code.
+     * @return The selected artifact's body text variant.
      */
-    isCodeDisplay(): boolean {
-      return this.artifact?.type.includes("code") || false;
+    variant(): TextType {
+      return this.artifact?.type === ReservedArtifactType.github
+        ? "code"
+        : "expandable";
     },
   },
   methods: {

@@ -2,6 +2,7 @@ import {
   GitHubProjectSchema,
   InstallationSchema,
   IOHandlerCallback,
+  JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
 import { integrationsStore, logStore, projectStore } from "@/hooks";
@@ -19,6 +20,7 @@ import {
   createGitHubProjectSync,
   createJiraProjectSync,
   handleJobSubmission,
+  getJiraInstallations,
 } from "@/api";
 
 /**
@@ -35,7 +37,7 @@ export function handleLoadInstallations({
 }: IOHandlerCallback): void {
   getProjectInstallations(projectStore.projectId)
     .then((installations) => {
-      projectStore.installations = installations;
+      integrationsStore.installations = installations;
       onSuccess?.();
     })
     .catch(onError)
@@ -65,6 +67,7 @@ export async function handleSyncInstallation(
     } else if (installation.type === "JIRA") {
       const job = await createJiraProjectSync(
         projectStore.versionId,
+        installation.installationOrgId,
         installation.installationId
       );
 
@@ -138,6 +141,24 @@ export function handleAuthorizeJira({
 }
 
 /**
+ * Loads Jira installations.
+ *
+ * @param onSuccess - Called if the action is successful, with the jira project list.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadJiraOrganizations({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<JiraOrganizationSchema[]>): void {
+  getJiraInstallations()
+    .then(onSuccess)
+    .catch((e) => {
+      onError?.(e);
+      logStore.onError(e);
+    });
+}
+
+/**
  * Loads Jira projects and sets the currently selected cloud id.
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
@@ -147,7 +168,11 @@ export function handleLoadJiraProjects({
   onSuccess,
   onError,
 }: IOHandlerCallback<JiraProjectSchema[]>): void {
-  getJiraProjects()
+  const installationId = integrationsStore.jiraOrganization?.id;
+
+  if (!installationId) return;
+
+  getJiraProjects(installationId)
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
@@ -209,7 +234,6 @@ export function handleAuthorizeGitHub({
 /**
  * Loads GitHub projects and sets the currently selected cloud id.
  *
- * @param credentials - The access and refresh token received from authorizing GitHub.
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
  */

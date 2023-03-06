@@ -50,25 +50,21 @@ export default Vue.extend({
     };
   },
   mounted() {
-    if (!integrationsStore.validGitHubCredentials) return;
-
     this.loadProjects();
   },
   computed: {
     /**
-     * @return Whether there are current valid credentials.
+     * @return The selected GitHub organization name.
      */
-    hasCredentials(): boolean {
-      return integrationsStore.validGitHubCredentials;
+    organizationName(): string | undefined {
+      return integrationsStore.gitHubOrganization?.name;
     },
   },
   watch: {
     /**
      * Loads projects when credentials are valid.
      */
-    hasCredentials(valid: boolean): void {
-      if (!valid) return;
-
+    organizationName(): void {
       this.loadProjects();
     },
   },
@@ -77,12 +73,16 @@ export default Vue.extend({
      * Loads a user's GitHub projects for a selected organization.
      */
     async loadProjects() {
+      if (!integrationsStore.gitHubOrganization) return;
+
       integrationsStore.gitHubProject = undefined;
       this.repositoriesLoading = true;
 
       handleLoadGitHubProjects({
         onSuccess: (repositories) => {
-          this.repositories = repositories;
+          this.repositories = repositories.filter(
+            ({ owner }) => owner === this.organizationName
+          );
           this.repositoriesLoading = false;
         },
         onError: () => (this.repositoriesLoading = false),

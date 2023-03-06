@@ -143,15 +143,17 @@ export const useDelta = defineStore("delta", {
      * @param id - The trace link id to find.
      * @return The trace links delta state, if one exists.
      */
-    getTraceDeltaType(id: string): ArtifactDeltaState | undefined {
+    getTraceDeltaType(id: string): ArtifactDeltaState {
       if (!this.inDeltaView) {
-        return undefined;
+        return ArtifactDeltaState.NO_CHANGE;
       } else if (id in this.projectDelta.traces.added) {
         return ArtifactDeltaState.ADDED;
       } else if (id in this.projectDelta.traces.modified) {
         return ArtifactDeltaState.MODIFIED;
       } else if (id in this.projectDelta.traces.removed) {
         return ArtifactDeltaState.REMOVED;
+      } else {
+        return ArtifactDeltaState.NO_CHANGE;
       }
     },
     /**

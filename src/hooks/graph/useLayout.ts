@@ -6,7 +6,9 @@ import {
   IGraphLayout,
   LayoutPayload,
   PositionSchema,
+  GraphMode,
 } from "@/types";
+import { typeOptionsStore } from "@/hooks";
 import {
   ArtifactGraphLayout,
   artifactTreeCyPromise,
@@ -41,8 +43,24 @@ export const useLayout = defineStore("layout", {
      * The current graph layout.
      */
     layout: undefined as IGraphLayout | undefined,
+    /**
+     * The current view mode of the graph.
+     */
+    mode: GraphMode.tree as GraphMode,
   }),
   getters: {
+    /**
+     * @return Whether the graph is in tree mode.
+     */
+    isTreeMode(): boolean {
+      return this.mode === GraphMode.tree;
+    },
+    /**
+     * @return Whether the graph is in table mode.
+     */
+    isTableMode(): boolean {
+      return this.mode === GraphMode.table;
+    },
     /**
      * @return Layout options for the graph.
      */
@@ -85,16 +103,19 @@ export const useLayout = defineStore("layout", {
     },
     /**
      * Resets the graph layout.
+     *
+     * @param layoutPayload - The cy instance and layout.
+     * @param generate - Whether to generate the layout positions.
      */
-    setGraphLayout(layoutPayload: LayoutPayload): void {
+    setGraphLayout(layoutPayload: LayoutPayload, generate?: boolean): void {
       appStore.onLoadStart();
 
       this.layout = layoutPayload.layout;
-      cyCreateLayout(layoutPayload);
+      cyCreateLayout(layoutPayload, generate);
       this.applyAutomove();
 
+      // Wait for the graph to render.
       setTimeout(() => {
-        // Wait for the graph to render.
         cyResetTim();
         cyResetTree();
         appStore.onLoadEnd();
@@ -107,7 +128,7 @@ export const useLayout = defineStore("layout", {
       const layout = new ArtifactGraphLayout();
       const payload = { layout, cyPromise: artifactTreeCyPromise };
 
-      this.setGraphLayout(payload);
+      this.setGraphLayout(payload, this.mode === GraphMode.tim);
     },
     /**
      * Resets the graph layout of the TIM tree.
@@ -116,7 +137,7 @@ export const useLayout = defineStore("layout", {
       const layout = new TimGraphLayout();
       const payload = { layout, cyPromise: timTreeCyPromise };
 
-      this.setGraphLayout(payload);
+      this.setGraphLayout(payload, true);
     },
     /**
      * Resets the layout of the graph.
@@ -130,8 +151,8 @@ export const useLayout = defineStore("layout", {
       deltaStore.clear();
       appStore.closeSidePanels();
 
+      // Wait for graph to render.
       setTimeout(() => {
-        // Wait for graph to render.
         this.setArtifactTreeLayout();
         appStore.onLoadEnd();
       }, 200);
@@ -145,6 +166,26 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
+    },
+    /**
+     * Switches the layout to tree mode, and only displays the listed types.
+     *
+     * @param visibleTypes - The types to display.
+     */
+    viewTreeTypes(visibleTypes: string[]): void {
+      const hiddenTypes = typeOptionsStore.artifactTypes.filter(
+        (type) => !visibleTypes.includes(type)
+      );
+
+      this.mode = GraphMode.tree;
+
+      hiddenTypes.forEach((ignoreType) => {
+        selectionStore.filterGraph({
+          type: "ignore",
+          action: "add",
+          ignoreType,
+        });
+      });
     },
   },
 });

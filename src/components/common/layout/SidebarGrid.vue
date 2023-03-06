@@ -2,10 +2,10 @@
   <div class="ma-8">
     <slot name="header" />
     <v-row dense>
-      <v-col :cols="$vuetify.breakpoint.mdAndUp ? 4 : 12">
+      <v-col :cols="$vuetify.breakpoint.lgAndUp ? 4 : 12">
         <slot name="sidebar" />
       </v-col>
-      <v-col :cols="$vuetify.breakpoint.mdAndUp ? 8 : 12">
+      <v-col :cols="$vuetify.breakpoint.lgAndUp ? 8 : 12">
         <slot />
       </v-col>
     </v-row>

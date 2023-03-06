@@ -1,9 +1,7 @@
-import { DataCy } from "../fixtures";
+import { DataCy, Routes } from "@/fixtures";
 
 Cypress.Commands.add("openProjectSelector", () => {
-  cy.visit("/open")
-    .location("pathname", { timeout: 2000 })
-    .should("equal", "/open");
+  cy.visit(Routes.MY_PROJECTS).locationShouldEqual(Routes.MY_PROJECTS);
 });
 
 Cypress.Commands.add("openUploadFiles", () => {
@@ -13,13 +11,11 @@ Cypress.Commands.add("openUploadFiles", () => {
 Cypress.Commands.add("projectSelectorContinue", (select) => {
   if (select === "project") {
     cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-      tr.should("not.contain", "Loading").should("not.contain", "No");
-      tr.last().click();
+      tr.eq(1).click();
     });
   } else if (select === "version") {
     cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-      tr.should("not.contain", "Loading").should("not.contain", "No");
-      tr.last().click();
+      tr.eq(1).click();
     });
   } else {
     cy.clickButton(DataCy.stepperContinueButton);

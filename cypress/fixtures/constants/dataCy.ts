@@ -6,7 +6,7 @@ export enum DataCy {
 
   appLoading = "app-loading",
 
-  // Navigation
+  // Navigation - Project Graph
 
   navGraphCenterButton = "button-nav-graph-center",
   navGraphFilterButton = "button-nav-graph-filter",
@@ -14,7 +14,20 @@ export enum DataCy {
   navTreeButton = "button-nav-tree",
   navTableButton = "button-nav-table",
   navDeltaButton = "button-nav-delta",
+  navTimButton = "button-nav-tim",
   sidebarCloseButton = "button-sidebar-close",
+  navUndoButton = "button-nav-undo",
+  navRedoButton = "button-nav-redo",
+  navLoadUpdatesButton = "button-nav-load-update",
+
+  // Navigation - Webpage
+  navHomeButton = "nav-Home-button",
+  navCreateProjectButton = "button-nav-Create Project",
+  navOpenProjectButton = "button-nav-Open Project",
+  navProjectUploadButton = "button-nav-Project Upload",
+  navArtifactViewButton = "button-nav-Artifact View",
+  navTraceLinkApprovalButton = "button-nav-Trace Prediction",
+  navSettingsButton = "button-nav-Settings",
 
   // Steppers
 
@@ -37,6 +50,7 @@ export enum DataCy {
 
   newAccountEmailInput = "input-new-email",
   newAccountPasswordInput = "input-new-password",
+  createAccountPageButton = "button-create-account-redirect",
   createAccountButton = "button-create-account",
   createAccountLoginButton = "button-create-account-login",
 
@@ -62,6 +76,7 @@ export enum DataCy {
   snackbarInfo = "snackbar-info",
   snackbarSuccess = "snackbar-success",
   snackbarWarning = "snackbar-warning",
+  snackbarUpdate = "snackbar-update",
   snackbarError = "snackbar-error",
   snackbarCloseButton = "button-snackbar-close",
 
@@ -96,9 +111,12 @@ export enum DataCy {
 
   jobTable = "job-table",
   jobStatus = "job-status",
+  jobProgress = "job-progress",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
   jobOpenButton = "button-open-job",
+  jobLogButton = "button-job-log",
+  jobLogText = "text-job-log",
 
   // Project Selection
 
@@ -167,6 +185,9 @@ export enum DataCy {
   selectedPanelChildItem = "list-selected-child-item",
   selectedPanelChildLinkButton = "button-selected-child-link",
 
+  selectedPanelTraceSource = "panel-trace-link-source",
+  selectedPanelTraceTarget = "panel-trace-link-target",
+
   // Artifact Tree
 
   artifactTree = "view-artifact-tree",
@@ -184,10 +205,15 @@ export enum DataCy {
 
   // Type Options
 
-  typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
+  artifactLevelContent = "panel-artifact-type",
+  artifactLevelOptions = "panel-artifact-type-options",
 
   // Project settings
+
+  projectSettingsDownloadButton = "button-settings-download",
+  projectSettingsEditButton = "button-settings-edit",
+  projectSettingsDeleteButton = "button-settings-delete",
 
   projectSettingsAddEmail = "settings-input-user-email",
   projectSettingsAddRole = "settings-input-user-role",
@@ -218,21 +244,29 @@ export enum DataCy {
   // Artifact Table
 
   artifactTable = "view-artifact-table",
-  artifactTableRow = "table-row-artifact",
-  artifactTableSortBy = "artifact-table-sort-by",
-  artifactTableGroupBy = "artifact-table-group-by",
-  artifactTableGroupByTableHeader = "artifact-table-group-sort-header",
+  artifactTableRowName = "artifact-table-row-name",
+
+  artifactTableSortByInput = "artifact-table-sort-by",
+  artifactTableGroupByInput = "artifact-table-group-by",
+
+  artifactTableGroup = "artifact-table-group",
+  artifactTableGroupType = "artifact-table-group-type",
+  artifactTableGroupValue = "artifact-table-group-value",
+
   artifactTableListItems = "button-checkmark-menu-item",
   artifactTableColumnHeader = "artifact-table-column-header",
-  artifactTableNameHeaderNotSorted = '*[aria-label= "Name: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
-  artifactTableTypeHeaderNotSorted = '*[aria-label= "Type: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
-  artifactTableNameHeaderSortedAsc = '*[aria-label= "Name: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
-  artifactTableTypeHeaderSortedAsc = '*[aria-label= "Type: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
-  artifactTableArtifact = "artifact-table-artifact",
+  artifactTableDeleteArtifactButton = "button-artifact-delete-icon",
+
   artifactTableArtifactWarning = "artifact-table-artifact-warning",
   artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
   artifactTableEditArtifactRowButton = "button-artifact-edit-icon",
-  artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
+
+  // Trace Matrix Table
+
+  traceMatrixTable = "view-trace-matrix-table",
+
+  traceMatrixTableRowTypeInput = "input-trace-matrix-table-row-types",
+  traceMatrixTableColTypeInput = "input-trace-matrix-table-col-types",
 
   // Trace Link Generation
 
@@ -240,6 +274,21 @@ export enum DataCy {
   traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",
+
+  // Project Version
+  projectSavingIndicator = "project-saving-indicator",
+
+  // Custom Attributes
+  addAttributeButton = "button-add-attribute",
+  attributeKeyInput = "input-attribute-key",
+  attributeLabelInput = "input-attribute-label",
+  attributeTypeInput = "input-attribute-type",
+  attributeOptionsInput = "input-attribute-options",
+  attributeMinInput = "input-attribute-min",
+  attributeMaxInput = "input-attribute-max",
+  attributeDeleteButton = "button-delete-attribute",
+  attributeSaveButton = "button-save-attribute",
+  attributeTableItem = "generic-list-item",
 }
 
 export enum DataIds {

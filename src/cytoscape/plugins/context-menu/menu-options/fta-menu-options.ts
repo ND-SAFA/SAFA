@@ -1,4 +1,9 @@
-import { ArtifactData, DocumentType, FTANodeType, MenuItem } from "@/types";
+import {
+  ArtifactCytoElementData,
+  DocumentType,
+  FTANodeType,
+  MenuItem,
+} from "@/types";
 import { appStore, documentStore } from "@/hooks";
 
 /**
@@ -14,7 +19,7 @@ export const ftaMenuItem: MenuItem = {
       isNewArtifact: true,
     });
   },
-  isVisible: (artifactData: ArtifactData | undefined): boolean => {
+  isVisible: (artifactData: ArtifactCytoElementData | undefined): boolean => {
     if (artifactData === undefined) {
       return documentStore.currentType === DocumentType.FTA;
     }

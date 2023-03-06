@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { AttributeSchema } from "@/types";
+import { AttributeSchema, AttributeType } from "@/types";
 import { createAttribute } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -26,6 +26,47 @@ export const useSaveAttribute = (id: string) =>
        */
       isUpdate(): boolean {
         return !!this.baseAttribute;
+      },
+      /**
+       * @return The data type of this attribute.
+       */
+      type(): AttributeType {
+        return this.editedAttribute.type;
+      },
+      /**
+       * @return Whether this attribute value has selectable options.
+       */
+      showOptions(): boolean {
+        return [AttributeType.select, AttributeType.multiselect].includes(
+          this.type
+        );
+      },
+      /**
+       * @return Whether this attribute value has min and max bounds.
+       */
+      showBounds(): boolean {
+        return [
+          AttributeType.text,
+          AttributeType.paragraph,
+          AttributeType.int,
+          AttributeType.float,
+        ].includes(this.type);
+      },
+      /**
+       * @return The hint for the min bound.
+       */
+      minBoundHint(): string {
+        return [AttributeType.int, AttributeType.float].includes(this.type)
+          ? "The minimum value of this number."
+          : "The minimum length of this value.";
+      },
+      /**
+       * @return The hint for the max bound.
+       */
+      maxBoundHint(): string {
+        return [AttributeType.int, AttributeType.float].includes(this.type)
+          ? "The maximum value of this number."
+          : "The maximum length of this value.";
       },
       /**
        * @return Whether this attribute can be saved.

@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import { artifactStore, documentStore, selectionStore } from "@/hooks";
+import { artifactStore, layoutStore, selectionStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, CheckmarkMenu, FlexBox } from "@/components/common";
@@ -108,7 +108,7 @@ export default Vue.extend({
      * @return Whether to disable a graph button.
      */
     isButtonDisabled(button: ButtonDefinition): boolean {
-      return button.isDisabled || documentStore.isTableDocument;
+      return button.isDisabled || layoutStore.isTableMode;
     },
     /**
      * Filters the visible artifacts on the graph.

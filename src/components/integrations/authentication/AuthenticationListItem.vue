@@ -1,6 +1,6 @@
 <template>
-  <v-list-item @click="handleClick">
-    <v-list-item-icon>
+  <v-list-item :inactive="inactive || !hasCredentials" @click="handleClick">
+    <v-list-item-icon style="align-self: center">
       <v-icon v-if="!isLoading" :color="color">
         mdi-transit-connection-variant
       </v-icon>
@@ -9,7 +9,7 @@
     <v-list-item-title>
       <typography variant="subtitle" :value="title" />
       <typography
-        el="p"
+        el="div"
         :value="hasCredentials ? 'Connected' : 'Not Connected'"
         :color="color"
       />
@@ -24,9 +24,19 @@
       >
         Connect
       </text-button>
-      <text-button v-else outlined variant="delete" @click="handleDisconnect">
-        Disconnect
-      </text-button>
+      <flex-box v-else column align="end">
+        <text-button
+          outlined
+          variant="add"
+          classes="mb-2"
+          @click="handleConnect"
+        >
+          Installation
+        </text-button>
+        <text-button outlined variant="delete" @click="handleDisconnect">
+          Disconnect
+        </text-button>
+      </flex-box>
     </v-list-item-action>
   </v-list-item>
 </template>
@@ -34,6 +44,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Typography, TextButton } from "@/components/common";
+import FlexBox from "@/components/common/layout/FlexBox.vue";
 
 /**
  * Displays a list item & buttons for authenticating an integration.
@@ -44,7 +55,7 @@ import { Typography, TextButton } from "@/components/common";
  */
 export default Vue.extend({
   name: "AuthenticationListItem",
-  components: { TextButton, Typography },
+  components: { FlexBox, TextButton, Typography },
   props: {
     hasCredentials: {
       type: Boolean,
@@ -58,6 +69,7 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    inactive: Boolean,
   },
   computed: {
     /**

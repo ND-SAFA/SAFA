@@ -11,9 +11,9 @@ import router from "@/router/router";
  */
 export async function navigateTo(
   route: Routes | string,
-  query?: Record<string, string | (string | null)[]>
+  query: Record<string, string | (string | null)[]> = {}
 ): Promise<void> {
-  if (router.currentRoute.path === route && !query) {
+  if (router.currentRoute.path === route && Object.keys(query).length === 0) {
     return;
   } else {
     await router.push({ path: route, query });

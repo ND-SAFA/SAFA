@@ -1,4 +1,18 @@
 /**
+ * Represents a GitHub installation (authorized organization).
+ */
+export interface GitHubOrganizationSchema {
+  /**
+   * The installation's unique id.
+   */
+  id: string;
+  /**
+   * The installation's name.
+   */
+  name: string;
+}
+
+/**
  * Defines a GitHub repository.
  */
 export interface GitHubProjectSchema {
@@ -26,4 +40,8 @@ export interface GitHubProjectSchema {
    * A timestamp for the project was created.
    */
   created_at: string;
+  /**
+   * The owner of this project.
+   */
+  owner: string;
 }

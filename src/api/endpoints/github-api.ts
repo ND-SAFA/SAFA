@@ -106,7 +106,9 @@ export async function createGitHubProject(
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.githubCreateProject, { repositoryName }),
+      fillEndpoint(Endpoint.githubCreateProject, {
+        repositoryName,
+      }),
       {
         method: "POST",
       }
@@ -127,7 +129,10 @@ export async function createGitHubProjectSync(
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.githubSyncProject, { versionId, repositoryName }),
+      fillEndpoint(Endpoint.githubSyncProject, {
+        versionId,
+        repositoryName,
+      }),
       {
         method: "PUT",
       }

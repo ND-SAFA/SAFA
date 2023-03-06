@@ -9,19 +9,22 @@
     :search-text.sync="currentSearch"
   >
     <template v-slot:right>
-      <v-autocomplete
-        outlined
-        dense
-        hide-details
-        multiple
-        label="Approval Types"
-        v-model="currentApprovalTypes"
-        :items="options"
-        item-text="name"
-        item-value="id"
-        class="mb-1"
-        data-cy="button-trace-link-generate-approval-type"
-      />
+      <flex-box>
+        <v-divider vertical />
+        <v-autocomplete
+          outlined
+          dense
+          hide-details
+          multiple
+          label="Approval Types"
+          v-model="currentApprovalTypes"
+          :items="options"
+          item-text="name"
+          item-value="id"
+          class="ml-2"
+          data-cy="button-trace-link-generate-approval-type"
+        />
+      </flex-box>
     </template>
     <template v-slot:bottom>
       <text-button
@@ -41,7 +44,7 @@ import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { approvalTypeOptions } from "@/util";
 import { handleDeclineAll } from "@/api";
-import { TableHeader, TextButton } from "@/components/common";
+import { TableHeader, TextButton, FlexBox } from "@/components/common";
 
 /**
  * Displays the header for the trace links table.
@@ -56,6 +59,7 @@ export default Vue.extend({
   components: {
     TextButton,
     TableHeader,
+    FlexBox,
   },
   props: {
     headers: {

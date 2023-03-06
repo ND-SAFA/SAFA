@@ -4,7 +4,6 @@ import {
   ProjectSchema,
   GenerationModelSchema,
   VersionSchema,
-  InstallationSchema,
 } from "@/types";
 import { createProject } from "@/util";
 import { pinia } from "@/plugins";
@@ -31,10 +30,6 @@ export const useProject = defineStore("project", {
      * The currently loaded project.
      */
     project: createProject(),
-    /**
-     * The 3rd party installations linked to the current project.
-     */
-    installations: [] as InstallationSchema[],
   }),
   getters: {
     /**

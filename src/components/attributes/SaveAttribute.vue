@@ -3,6 +3,7 @@
     <v-text-field
       filled
       :disabled="store.isUpdate"
+      data-cy="input-attribute-key"
       label="Key"
       v-model="store.editedAttribute.key"
       hint="The unique key that this attribute is saved under."
@@ -10,12 +11,15 @@
     <v-text-field
       filled
       label="Label"
+      data-cy="input-attribute-label"
       v-model="store.editedAttribute.label"
-      hint="The label that is displayed for this attribute."
+      hint="The label that is displayed for
+    this attribute."
     />
     <v-select
       filled
       :disabled="store.isUpdate"
+      data-cy="input-attribute-type"
       label="Attribute Type"
       v-model="store.editedAttribute.type"
       item-text="name"
@@ -23,18 +27,38 @@
       :items="typeOptions"
     />
     <v-combobox
-      v-if="store.editedAttribute.type.includes('select')"
+      v-if="store.showOptions"
       filled
       chips
       deletable-chips
       multiple
       label="Options"
+      data-cy="input-attribute-options"
       v-model="store.editedAttribute.options"
       hint="Type in an option and press enter to save."
     />
+    <div v-if="store.showBounds">
+      <v-text-field
+        filled
+        label="Minimum"
+        data-cy="input-attribute-min"
+        type="number"
+        v-model="store.editedAttribute.min"
+        :hint="store.minBoundHint"
+      />
+      <v-text-field
+        filled
+        label="Maximum"
+        data-cy="input-attribute-max"
+        type="number"
+        v-model="store.editedAttribute.max"
+        :hint="store.maxBoundHint"
+      />
+    </div>
     <flex-box justify="space-between">
       <text-button
         v-if="store.isUpdate"
+        data-cy="button-delete-attribute"
         text
         variant="delete"
         @click="handleDelete"
@@ -44,6 +68,7 @@
       <v-spacer />
       <text-button
         :disabled="!store.canSave"
+        data-cy="button-save-attribute"
         variant="save"
         @click="handleSave"
       >

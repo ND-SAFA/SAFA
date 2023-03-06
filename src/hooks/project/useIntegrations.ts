@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 
-import { GitHubProjectSchema, JiraProjectSchema } from "@/types";
+import {
+  GitHubOrganizationSchema,
+  GitHubProjectSchema,
+  InstallationSchema,
+  JiraOrganizationSchema,
+  JiraProjectSchema,
+} from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -9,9 +15,17 @@ import { pinia } from "@/plugins";
 export const useIntegrations = defineStore("integrations", {
   state: () => ({
     /**
+     * The 3rd party installations linked to the current project.
+     */
+    installations: [] as InstallationSchema[],
+    /**
      * Whether this user is connected to Jira.
      */
     validJiraCredentials: false,
+    /**
+     * A selected Jira installation to import from.
+     */
+    jiraOrganization: undefined as JiraOrganizationSchema | undefined,
     /**
      * A selected Jira project to import.
      */
@@ -21,12 +35,33 @@ export const useIntegrations = defineStore("integrations", {
      */
     validGitHubCredentials: false,
     /**
+     * A selected GitHub installation to import from.
+     */
+    gitHubOrganization: undefined as GitHubOrganizationSchema | undefined,
+    /**
      * A selected GitHub project to import.
      */
     gitHubProject: undefined as GitHubProjectSchema | undefined,
   }),
   getters: {},
   actions: {
+    /**
+     * Selects a Jira organization.
+     *
+     * @param organization - The organization to select.
+     */
+    selectJiraOrganization(
+      organization: JiraOrganizationSchema | undefined
+    ): void {
+      if (
+        !this.jiraOrganization ||
+        this.jiraOrganization?.id !== organization?.id
+      ) {
+        this.jiraOrganization = organization;
+      } else {
+        this.jiraOrganization = undefined;
+      }
+    },
     /**
      * Selects a Jira project.
      *
@@ -37,6 +72,23 @@ export const useIntegrations = defineStore("integrations", {
         this.jiraProject = project;
       } else {
         this.jiraProject = undefined;
+      }
+    },
+    /**
+     * Selects a GitHub organization.
+     *
+     * @param organization - The organization to select.
+     */
+    selectGitHubOrganization(
+      organization: GitHubOrganizationSchema | undefined
+    ): void {
+      if (
+        !this.gitHubOrganization ||
+        this.gitHubOrganization?.id !== organization?.id
+      ) {
+        this.gitHubOrganization = organization;
+      } else {
+        this.gitHubOrganization = undefined;
       }
     },
     /**

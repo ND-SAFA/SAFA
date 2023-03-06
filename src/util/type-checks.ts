@@ -1,6 +1,6 @@
 import {
   ArtifactSchema,
-  ArtifactData,
+  ArtifactCytoElementData,
   DeltaArtifact,
   EntityModification,
   ParseFilePanel,
@@ -41,7 +41,9 @@ export function isArtifact(
  * @param artifact - The artifact to check.
  * @return Whether this item is an artifact.
  */
-export function isArtifactData(artifact: unknown): artifact is ArtifactData {
+export function isArtifactData(
+  artifact: unknown
+): artifact is ArtifactCytoElementData {
   const requiredFields = [
     "body",
     "artifactName",

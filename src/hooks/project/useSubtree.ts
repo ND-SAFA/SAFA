@@ -69,6 +69,25 @@ export const useSubtree = defineStore("subtrees", {
       return this.subtreeMap[artifactId]?.children || [];
     },
     /**
+     * Returns the relationship between artifacts.
+     *
+     * @param sourceId - The source artifact's id.
+     * @param targetId - The target artifact's id.
+     * @return The relationship between these artifacts.
+     */
+    getRelationship(
+      sourceId: string,
+      targetId: string
+    ): "parent" | "child" | undefined {
+      if (this.getParents(sourceId).includes(targetId)) {
+        return "parent";
+      } else if (this.getChildren(sourceId).includes(targetId)) {
+        return "child";
+      } else {
+        return undefined;
+      }
+    },
+    /**
      * Recalculates the subtree map of project artifacts and updates store.
      *
      * @param artifacts - The artifacts to create the subtree for.

@@ -1,7 +1,7 @@
 /**
  * Represents the project TIM file format.
  */
-export type TimSchema = {
+export type TimJsonSchema = {
   DataFiles: {
     [artifactType: string]: {
       File: string;

@@ -1,4 +1,4 @@
-import { ArtifactTypeSchema, LabelledTraceDirectionSchema } from "@/types";
+import { ArtifactTypeSchema, TimArtifactLevelSchema } from "@/types";
 import { projectStore, typeOptionsStore } from "@/hooks";
 import { saveArtifactType } from "@/api/endpoints";
 
@@ -21,17 +21,17 @@ export async function handleSaveArtifactType(
 /**
  * Updates the icon for an artifact type.
  *
- * @param labeledType - The artifact type to add or edit.
+ * @param artifactLevel - The artifact type to add or edit.
  */
 export async function handleSaveArtifactTypeIcon(
-  labeledType: LabelledTraceDirectionSchema
+  artifactLevel: TimArtifactLevelSchema
 ): Promise<void> {
   const type = typeOptionsStore.allArtifactTypes.find(
-    ({ name }) => name === labeledType.type
+    ({ typeId }) => typeId === artifactLevel.typeId
   );
 
   if (!type) return;
 
-  typeOptionsStore.updateArtifactIcon(labeledType);
-  await handleSaveArtifactType({ ...type, icon: labeledType.icon });
+  typeOptionsStore.updateArtifactIcon(artifactLevel);
+  await handleSaveArtifactType({ ...type, icon: artifactLevel.icon });
 }

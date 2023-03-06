@@ -105,9 +105,9 @@ export default Vue.extend({
      * @return The artifact type directions for this project.
      */
     typeDirections(): [string, string[]][] {
-      return Object.entries(typeOptionsStore.artifactTypeDirections).filter(
-        ([, targets]) => targets.length > 0
-      );
+      return Object.values(typeOptionsStore.artifactLevels)
+        .map((level) => [level.name, level.allowedTypes] as [string, string[]])
+        .filter(([, targets]) => targets.length > 0);
     },
   },
 });

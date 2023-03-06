@@ -1,8 +1,8 @@
 import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 
-import { ArtifactData, CytoCore } from "@/types";
+import { ArtifactCytoElementData, CytoCore } from "@/types";
 import { handleCreateLink } from "@/api";
-import { disableDrawMode } from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape/plugins";
 
 /**
  * Creates the finalized trace link when an edge creation draw is completed.
@@ -20,8 +20,8 @@ export function onArtifactTreeEdgeComplete(
   targetNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
-  const sourceData: ArtifactData = sourceNode.data();
-  const targetData: ArtifactData = targetNode.data();
+  const sourceData: ArtifactCytoElementData = sourceNode.data();
+  const targetData: ArtifactCytoElementData = targetNode.data();
 
   disableDrawMode();
 

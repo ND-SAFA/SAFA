@@ -72,6 +72,7 @@
       :multiple="false"
       label="Parent Artifact"
       data-cy="input-artifact-parent"
+      class="mb-4"
     />
 
     <attribute-list-input :artifact="store.editedArtifact" />

@@ -3,6 +3,7 @@
     title="GitHub"
     :is-loading="isLoading"
     :has-credentials="hasCredentials"
+    :inactive="inactive"
     @click="handleClick"
     @connect="handleAuthentication"
     @disconnect="handleDeleteCredentials"
@@ -26,6 +27,9 @@ export default Vue.extend({
   name: "GitHubAuthentication",
   components: {
     AuthenticationListItem,
+  },
+  props: {
+    inactive: Boolean,
   },
   data() {
     return {

@@ -1,5 +1,5 @@
 import { EventObject } from "cytoscape";
-import { ArtifactData, CytoEvent } from "@/types";
+import { ArtifactCytoElementData, CytoEvent } from "@/types";
 
 /**
  * Depicts options given to cytoscape context menu plugin options.
@@ -81,7 +81,7 @@ export interface MenuItem {
    * Returns whether item should be displayed in context menu
    * at start of event.
    */
-  isVisible?: (artifact: ArtifactData | undefined) => boolean;
+  isVisible?: (artifact: ArtifactCytoElementData | undefined) => boolean;
   /**
    * Whether the item will be created as disabled.
    */

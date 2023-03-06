@@ -19,9 +19,25 @@
       {{ isExpanded ? "See Less" : "See More" }}
     </v-btn>
   </div>
-  <pre v-else-if="variant === 'code'" :class="className">
-     {{ value }}
-  </pre>
+  <div v-else-if="variant === 'code'" style="width: 100%">
+    <pre v-if="isExpanded" :class="className">{{ value }}</pre>
+    <div
+      v-else
+      :class="className + ' text-ellipsis'"
+      style="white-space: nowrap; width: inherit; max-width: 60vw"
+    >
+      {{ value }}
+    </div>
+    <v-btn
+      text
+      small
+      @click.stop="isExpanded = !isExpanded"
+      class="text--secondary"
+    >
+      {{ isExpanded ? "See Less" : "See More" }}
+    </v-btn>
+  </div>
+  <!--  <pre v-else-if="variant === 'code'" :class="className">{{ value }}</pre>-->
   <span v-else-if="el === 'span'" :class="className">
     {{ value }}
   </span>

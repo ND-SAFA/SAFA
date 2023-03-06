@@ -1,4 +1,4 @@
-import { ArtifactData } from "@/types";
+import { ArtifactCytoElementData } from "@/types";
 
 /**
  * Returns the number of parent and child warnings for an artifact.
@@ -7,7 +7,7 @@ import { ArtifactData } from "@/types";
  *
  * @return How many warnings to display.
  */
-export function getWarnings(data: ArtifactData): number {
+export function getWarnings(data: ArtifactCytoElementData): number {
   const parentWarnings = data.warnings?.length || 0;
   const childWarnings = data.childWarnings?.length || 0;
 

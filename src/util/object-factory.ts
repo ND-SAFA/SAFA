@@ -1,7 +1,5 @@
 import {
   ArtifactSchema,
-  ArtifactTypeIcons,
-  ArtifactTypeSchema,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
@@ -23,7 +21,6 @@ import {
   AttributeType,
   AttributeLayoutSchema,
 } from "@/types";
-import { defaultTypeIcon } from "@/util/icons";
 
 /**
  * @return An empty snackbar message.
@@ -69,7 +66,7 @@ export function createSession(): SessionSchema {
 }
 
 /**
- * @return An empty project identifier.
+ * @return A project identifier initialized to the given values.
  */
 export function createProjectIdentifier(
   identifier?: Partial<IdentifierSchema>
@@ -84,7 +81,7 @@ export function createProjectIdentifier(
 }
 
 /**
- * @return An empty project.
+ * @return A project initialized to the given values.
  */
 export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
   return {
@@ -137,6 +134,7 @@ export function createArtifact(
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
+    attributes: artifact?.attributes || {},
   };
 }
 
@@ -203,19 +201,6 @@ export function createCommit(version: VersionSchema): Commit {
       modified: [],
     },
   };
-}
-
-/**
- * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
- */
-export function createDefaultTypeIcons(
-  artifactTypes: ArtifactTypeSchema[] = []
-): ArtifactTypeIcons {
-  return artifactTypes
-    .map((t) => ({ [t.name]: t.icon.replace("mdi-help", defaultTypeIcon) }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), {
-      default: defaultTypeIcon,
-    });
 }
 
 /**

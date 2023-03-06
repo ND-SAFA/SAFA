@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mt-1">
-      <typography bold color="primary" :value="entry.label" />
+      <typography bold color="primary" :value="entry.name" />
       <typography secondary value="Icon:" />
     </div>
     <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionSchema } from "@/types";
+import { TimArtifactLevelSchema } from "@/types";
 import { allTypeIcons } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { handleSaveArtifactTypeIcon } from "@/api";
@@ -33,7 +33,7 @@ export default Vue.extend({
   name: "TypeIconInput",
   components: { Typography },
   props: {
-    entry: Object as PropType<LabelledTraceDirectionSchema>,
+    entry: Object as PropType<TimArtifactLevelSchema>,
   },
   data() {
     return { icons: allTypeIcons };
@@ -52,7 +52,7 @@ export default Vue.extend({
      * @param entry - The type to update.
      * @param icon - The icon to set.
      */
-    handleIconChange(entry: LabelledTraceDirectionSchema, icon: string) {
+    handleIconChange(entry: TimArtifactLevelSchema, icon: string) {
       handleSaveArtifactTypeIcon({ ...entry, icon });
     },
   },

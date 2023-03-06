@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -21,11 +22,10 @@ import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.util.StringUtils;
 
@@ -71,7 +71,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     public static String createJobName(String repositoryName) {
-        return "Importing GitHub project:" + repositoryName;
+        return "Importing GitHub project: " + repositoryName;
     }
 
     public static String createJobName(GithubIdentifier identifier) {
@@ -80,10 +80,9 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
         GithubAccessCredentialsRepository accessCredentialsRepository = this.serviceProvider
             .getGithubAccessCredentialsRepository();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
 
         this.credentials = accessCredentialsRepository.findByUser(principal).orElseThrow(() ->
             new SafaError("No GitHub credentials found for user " + principal.getEmail()));
@@ -91,19 +90,21 @@ public class GithubProjectCreationJob extends CommitJob {
 
     /**
      * Separate method for retrieving the GitHub project such that it can be mocked
+     *
+     * @param logger Logger for this job
      */
     @IJobStep(value = "Retrieving Github Repository", position = 2)
-    public void retrieveGitHubRepository() {
+    public void retrieveGitHubRepository(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
 
         this.githubRepositoryDTO = connectionService.getUserRepository(this.credentials, repositoryName);
+
+        logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
     }
 
     @IJobStep(value = "Creating SAFA Project", position = 3)
-    public void createSafaProject() {
-        ProjectService projectService = this.serviceProvider.getProjectService();
-
+    public void createSafaProject(JobLogger logger) {
         // Step - Save as SAFA project
         String projectName = this.githubRepositoryDTO.getName();
         String projectDescription = this.githubRepositoryDTO.getDescription();
@@ -122,16 +123,19 @@ public class GithubProjectCreationJob extends CommitJob {
         }
         this.serviceProvider.getProjectRepository().save(project);
 
+        logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
+
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
+
+        logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
     }
 
     protected GithubProject getGithubProjectMapping(Project project) {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
@@ -142,16 +146,17 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 4)
-    public void convertFiletreeToArtifactsAndTraceLinks() {
+    public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
 
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
-        System.out.println("HERE I AM " + projectCommit.getArtifacts().getSize());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
+
+        logger.log("Retrieved %d artifacts from project.", projectCommit.getArtifacts().getSize());
     }
 
     protected List<ArtifactAppEntity> getArtifacts() {
@@ -163,16 +168,16 @@ public class GithubProjectCreationJob extends CommitJob {
                 this.githubIdentifier.getRepositoryName(),
                 this.commitSha);
 
-        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filterOutFolders().getTree()) {
+        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
             GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
                 .getBlobInformation(this.credentials, file.getBlobApiUrl());
             String name = file.getPath();
-            String type = file.getType().name();
+            String type = file.getType().getArtifactTypeName();
             String summary = file.getSha();
             String body = "";
 
             if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
-                body = blobDTO.getContent();
+                body = base64Decode(blobDTO.getContent());
             }
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
@@ -189,5 +194,23 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         return artifacts;
+    }
+
+    /**
+     * Decodes GitHub's base64 encoded file bodies. Each line in the original file
+     * is base64 encoded in GitHub's storage, with newlines separating them.
+     *
+     * @param encodedBody The encoded file body
+     * @return The decoded file body
+     */
+    private String base64Decode(String encodedBody) {
+        StringBuilder output = new StringBuilder();
+
+        for (String line : encodedBody.split("\n")) {
+            byte[] decodedBytes = Base64.getDecoder().decode(line);
+            output.append(new String(decodedBytes));
+        }
+
+        return output.toString();
     }
 }

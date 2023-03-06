@@ -11,6 +11,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
@@ -53,6 +55,8 @@ public class ProjectAppEntity implements IAppEntity {
     ProjectParsingErrors errors;
     Map<UUID, LayoutPosition> layout;
     List<ModelAppEntity> models;
+    List<CustomAttributeAppEntity> attributes;
+    List<AttributeLayoutAppEntity> attributeLayouts;
 
     public ProjectAppEntity() {
         this.name = "";
@@ -66,6 +70,8 @@ public class ProjectAppEntity implements IAppEntity {
         this.errors = new ProjectParsingErrors();
         this.layout = new Hashtable<>();
         this.models = new ArrayList<>();
+        this.attributes = new ArrayList<>();
+        this.attributeLayouts = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -78,7 +84,9 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
                             Map<UUID, LayoutPosition> layout,
-                            List<ModelAppEntity> models) {
+                            List<ModelAppEntity> models,
+                            List<CustomAttributeAppEntity> attributes,
+                            List<AttributeLayoutAppEntity> attributeLayouts) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
@@ -95,6 +103,8 @@ public class ProjectAppEntity implements IAppEntity {
         this.errors = errors;
         this.layout = layout;
         this.models = models;
+        this.attributes = attributes;
+        this.attributeLayouts = attributeLayouts;
     }
 
     public ProjectAppEntity(ProjectCommit projectCommit) {

@@ -42,7 +42,7 @@ public abstract class CommitJob extends AbstractJob {
 
     @IJobStep(value = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
-        projectChanger.commit(projectCommit);
+        projectChanger.commitAsUser(projectCommit, getJobDbEntity().getUser());
     }
 
     @Override

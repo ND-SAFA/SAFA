@@ -8,7 +8,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.installations.app.InstallationDTO;
-import edu.nd.crc.safa.features.installations.app.ProjectWithInstallationDTO;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,36 +45,8 @@ public class InstallationsController extends BaseController {
         )
     )
     public List<InstallationDTO> getInstallationsByProject(@PathVariable("id") UUID id) {
+        this.resourceBuilder.fetchProject(id).withViewProject();
         return this.projectRepository.findInstallationsByProjectId(id);
     }
 
-    @GetMapping(AppRoutes.Projects.Installations.GITHUB_BY_IMPORTED)
-    @Operation(
-        method = "GET",
-        summary = "Find all projects that imported certain GitHub repositories",
-        responses = @ApiResponse(
-            responseCode = "200",
-            description = "A list with all projects that imported specified GitHub repositories. "
-                + "If the project does not exist the result is empty",
-            useReturnTypeSchema = true
-        )
-    )
-    public List<ProjectWithInstallationDTO> getGithubProjectsByInstallations(@PathVariable("ids") List<String> ids) {
-        return this.projectRepository.findAllThatImportedGivenGithubProjects(ids);
-    }
-
-    @GetMapping(AppRoutes.Projects.Installations.JIRA_BY_IMPORTED)
-    @Operation(
-        method = "GET",
-        summary = "Find all projects that imported certain JIRA projects",
-        responses = @ApiResponse(
-            responseCode = "200",
-            description = "A list with all projects that imported specified JIRA projects. "
-                + "If the project does not exist the result is empty",
-            useReturnTypeSchema = true
-        )
-    )
-    public List<ProjectWithInstallationDTO> getJiraProjectsByInstallations(@PathVariable("ids") List<Long> ids) {
-        return this.projectRepository.findAllThatImportedGivenJIRAProjects(ids);
-    }
 }

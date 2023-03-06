@@ -9,7 +9,6 @@ import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

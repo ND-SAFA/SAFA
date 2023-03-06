@@ -46,7 +46,17 @@ public class NotificationService {
      */
     public void broadcastChange(EntityChangeBuilder builder) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
-        EntityChangeMessage message = builder.get(safaUser.getEmail());
+        broadcastChangeToUser(builder, safaUser);
+    }
+
+    /**
+     * Broadcasts change in given builder to a given user.
+     *
+     * @param builder Builder for {@link edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage} to send.
+     * @param user    User to send message to
+     */
+    public void broadcastChangeToUser(EntityChangeBuilder builder, SafaUser user) {
+        EntityChangeMessage message = builder.get(user.getEmail());
         this.broadcastObject(builder.getTopic(), message);
     }
 

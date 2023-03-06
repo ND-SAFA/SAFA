@@ -21,17 +21,24 @@ public class ParserRule {
     private final RuleName mRuleName;
     private final List<Token> mTokens;
     private final String mText;
+    private final String ruleString;
 
     public ParserRule(ParserRule that) {
         mRuleName = that.mRuleName;
         mText = that.mText;
         mTokens = new ArrayList<>(that.mTokens);
+        this.ruleString = that.ruleString;
     }
 
     public ParserRule(final String name, final String description, final String rule) {
         mRuleName = new RuleName(name, description);
         mText = rule;
         mTokens = Tokenizer.lex(mText);
+        this.ruleString = rule;
+    }
+
+    public String getRule() {
+        return this.ruleString;
     }
 
     public RuleName getMRuleName() {

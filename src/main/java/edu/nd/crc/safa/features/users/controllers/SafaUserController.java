@@ -2,21 +2,16 @@ package edu.nd.crc.safa.features.users.controllers;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import javax.validation.Valid;
 
-import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.EmailService;
-import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordForgottenRequest;
@@ -41,7 +36,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Controller containing endpoints for:
@@ -201,20 +195,6 @@ public class SafaUserController extends BaseController {
     @GetMapping(AppRoutes.Accounts.SELF)
     public UserIdentifierDTO retrieveCurrentUser() {
         return new UserIdentifierDTO(safaUserService.getCurrentUser());
-    }
-
-    private void createSampleProject(CreateAccountRequest newUser) throws IOException {
-        AuthorizationSetter.setSessionAuthorization(newUser.getEmail(), serviceProvider);
-        List<MultipartFile> files = MultipartRequestService
-            .readDirectoryAsMultipartFiles(ProjectPaths.Resources.Tests.DefaultProject.V1,
-                "files");
-
-        this.serviceProvider
-            .getFlatFileService()
-            .createProjectFromFlatFiles(
-                new Project("Sample project", "Sample project for new user."),
-                files,
-                serviceProvider);
     }
 
     private String buildResetURL(String token) {

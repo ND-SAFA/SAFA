@@ -63,6 +63,7 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
 
     @Column(name = "name")
     String name;
+
     @Column(name = "document_type")
     @Enumerated(EnumType.STRING)
     DocumentType documentType;

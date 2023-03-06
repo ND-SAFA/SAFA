@@ -22,7 +22,8 @@ public abstract class WebApiUtils {
             return mono.blockOptional();
         } catch (WebClientResponseException ex) {
             log.error("Exception thrown while executing blocking call", ex);
-            throw new ExternalAPIException(ex.getStatusCode(), "External API call exception");
+            throw new ExternalAPIException(ex.getStatusCode(), "External API call exception: "
+                + ex.getResponseBodyAsString());
         }
     }
 }

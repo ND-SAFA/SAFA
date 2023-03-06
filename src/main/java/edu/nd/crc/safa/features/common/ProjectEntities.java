@@ -50,7 +50,6 @@ public class ProjectEntities {
 
     public ProjectEntities(ProjectAppEntity projectAppEntity) {
         this(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
-        this.createMaps();
     }
 
     private void createMaps() {

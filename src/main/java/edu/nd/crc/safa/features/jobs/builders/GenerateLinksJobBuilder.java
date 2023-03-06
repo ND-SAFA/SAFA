@@ -5,7 +5,6 @@ import java.io.IOException;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 
@@ -38,7 +37,7 @@ public class GenerateLinksJobBuilder extends AbstractJobBuilder<TraceGenerationR
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.GENERATE_LINKS;
+    Class<? extends AbstractJob> getJobType() {
+        return GenerateLinksJob.class;
     }
 }

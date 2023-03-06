@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaGithubBuilder;
@@ -44,7 +43,6 @@ public class GithubController extends BaseController {
 
     private final SafaUserService safaUserService;
     private final GithubConnectionService githubConnectionService;
-    private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final ExecutorDelegate executorDelegate;
     private final GithubControllerUtils githubControllerUtils;
 
@@ -53,13 +51,11 @@ public class GithubController extends BaseController {
                             ExecutorDelegate executorDelegate,
                             ServiceProvider serviceProvider,
                             GithubConnectionService githubConnectionService,
-                            GithubAccessCredentialsRepository githubAccessCredentialsRepository,
                             GithubControllerUtils githubControllerUtils) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = safaUserService;
         this.executorDelegate = executorDelegate;
         this.githubConnectionService = githubConnectionService;
-        this.githubAccessCredentialsRepository = githubAccessCredentialsRepository;
         this.githubControllerUtils = githubControllerUtils;
     }
 
@@ -68,9 +64,9 @@ public class GithubController extends BaseController {
         DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> output =
             executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
-            GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
+            GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(principal)
                 .orElseThrow(() -> new SafaError("No GitHub credentials found"));
             List<GithubRepositoryDTO> githubRepositoryDTOList = githubConnectionService
                 .getUserRepositories(githubAccessCredentials);
@@ -86,11 +82,12 @@ public class GithubController extends BaseController {
         @PathVariable("repositoryName") String repositoryName) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
-            this.checkCredentials();
 
             GithubIdentifier identifier = new GithubIdentifier(null, repositoryName);
-            CreateProjectViaGithubBuilder builder = new CreateProjectViaGithubBuilder(serviceProvider, identifier);
+            CreateProjectViaGithubBuilder builder
+                = new CreateProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
                 GithubResponseMessage.OK);
 
@@ -106,12 +103,13 @@ public class GithubController extends BaseController {
         @PathVariable("repositoryName") String repositoryName) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
-            this.checkCredentials();
 
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
-            UpdateProjectViaGithubBuilder builder = new UpdateProjectViaGithubBuilder(serviceProvider, identifier);
+            UpdateProjectViaGithubBuilder builder
+                = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
                 GithubResponseMessage.OK);
 
@@ -127,13 +125,13 @@ public class GithubController extends BaseController {
         @PathVariable("repositoryName") String repositoryName) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
-            this.checkCredentials();
 
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
-            ImportIntoProjectViaGithubBuilder builder = new ImportIntoProjectViaGithubBuilder(serviceProvider,
-                identifier);
+            ImportIntoProjectViaGithubBuilder builder
+                = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
                 GithubResponseMessage.OK);
 
@@ -143,16 +141,18 @@ public class GithubController extends BaseController {
         return output;
     }
 
-    private void checkCredentials() {
+    private SafaUser checkCredentials() {
         SafaUser principal = safaUserService.getCurrentUser();
-        GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
+        GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(principal)
             .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-        GithubResponseDTO<Void> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
+        GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
         if (!responseDTO.getMessage().equals(GithubResponseMessage.OK)) {
             throw new SafaError("Invalid GitHub credentials: " + responseDTO.getMessage());
         }
+
+        return principal;
     }
 
 }

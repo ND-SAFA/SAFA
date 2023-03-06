@@ -17,16 +17,16 @@ public class GithubControllerUtils {
 
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
 
-    public <T> GithubResponseDTO<T> checkCredentials(GithubAccessCredentials credentials) {
+    public GithubResponseDTO<Boolean> checkCredentials(GithubAccessCredentials credentials) {
         if (credentials.areCredentialsExpired()) {
             log.info("Deleting GitHub credentials");
             githubAccessCredentialsRepository.delete(credentials);
-            return new GithubResponseDTO<>(null, GithubResponseDTO.GithubResponseMessage.EXPIRED);
+            return new GithubResponseDTO<>(false, GithubResponseDTO.GithubResponseMessage.EXPIRED);
         }
         if (credentials.isTokenExpired()) {
-            return new GithubResponseDTO<>(null, GithubResponseDTO.GithubResponseMessage.TOKEN_REFRESH_REQUIRED);
+            return new GithubResponseDTO<>(false, GithubResponseDTO.GithubResponseMessage.TOKEN_REFRESH_REQUIRED);
         }
 
-        return new GithubResponseDTO<>(null, GithubResponseDTO.GithubResponseMessage.OK);
+        return new GithubResponseDTO<>(true, GithubResponseDTO.GithubResponseMessage.OK);
     }
 }

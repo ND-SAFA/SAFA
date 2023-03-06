@@ -47,10 +47,10 @@ public class GithubAccessCredentials {
     @Column(name = "refresh_token", length = 128)
     private String refreshToken;
 
-    @Column(name = "client_secret", length = 64)
+    @Transient
     private String clientSecret;
 
-    @Column(name = "client_id", length = 64)
+    @Transient
     private String clientId;
 
     @OneToOne

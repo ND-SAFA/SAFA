@@ -10,10 +10,10 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
@@ -70,18 +70,18 @@ public class JobService {
 
     /**
      * Creates new job with:
-     * - current authenticated user as creator
+     * - given authenticated user as creator
      * - status as In Progress
      * - current progress equals 0
      *
      * @param jobType The type of job being performed.
      * @param name    The name of the job.
+     * @param user    The user to create the job for
      * @return The saved job db entity.
      */
-    public JobDbEntity createNewJob(JobType jobType, String name) {
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
+    public JobDbEntity createNewJobForUser(Class<? extends AbstractJob> jobType, String name, SafaUser user) {
         JobDbEntity jobDbEntity = new JobDbEntity(
-            currentUser,
+            user,
             name,
             jobType,
             JobStatus.IN_PROGRESS,
@@ -93,6 +93,21 @@ public class JobService {
         );
         this.jobDbRepository.save(jobDbEntity);
         return jobDbEntity;
+    }
+
+    /**
+     * Creates new job with:
+     * - current authenticated user as creator
+     * - status as In Progress
+     * - current progress equals 0
+     *
+     * @param jobType The type of job being performed.
+     * @param name    The name of the job.
+     * @return The saved job db entity.
+     */
+    public JobDbEntity createNewJob(Class<? extends AbstractJob> jobType, String name) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        return createNewJobForUser(jobType, name, currentUser);
     }
 
     /**
@@ -151,7 +166,7 @@ public class JobService {
         if (jobOption.isPresent()) {
             return jobOption.get();
         }
-        throw new SafaError("Could not find job with id:" + jobId);
+        throw new SafaItemNotFoundError("Could not find job with id: " + jobId);
     }
 
     public void setJobName(JobDbEntity jobDbEntity, String newName) {

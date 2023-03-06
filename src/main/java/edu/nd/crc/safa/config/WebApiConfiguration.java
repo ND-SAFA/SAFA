@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubConnectionServiceImpl;
+import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
@@ -37,14 +39,18 @@ public class WebApiConfiguration {
 
     private JiraProjectRepository jiraProjectRepository;
 
+    private JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
+
+    private GithubAccessCredentialsRepository githubAccessCredentialsRepository;
+
     @Bean
     public JiraConnectionService jiraConnectionService() {
-        return new JiraConnectionServiceImpl(jiraProjectRepository, webClient());
+        return new JiraConnectionServiceImpl(jiraProjectRepository, jiraAccessCredentialsRepository, webClient());
     }
 
     @Bean
     public GithubConnectionService githubConnectionService() {
-        return new GithubConnectionServiceImpl(webClient());
+        return new GithubConnectionServiceImpl(webClient(), githubAccessCredentialsRepository);
     }
 
     private ExchangeFilterFunction logRequest() {

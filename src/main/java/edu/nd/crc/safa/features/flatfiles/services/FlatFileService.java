@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -19,23 +21,23 @@ import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.features.versions.services.VersionService;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 import org.javatuples.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,68 +48,68 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 @Scope("singleton")
-@AllArgsConstructor
 public class FlatFileService {
 
-    private final ProjectService projectService;
-    private final VersionService versionService;
+    private final ResourceBuilder resourceBuilder;
     private final CommitErrorRepository commitErrorRepository;
     private final TraceGenerationService traceGenerationService;
     private final FileUploadService fileUploadService;
     private final ProjectRetrievalService projectRetrievalService;
 
-    /**
-     * Creates given project and uploads flat files to it.
-     *
-     * @param project         The project to create.
-     * @param files           The files to update the project to.
-     * @param serviceProvider The persistent services.
-     * @return {@link ProjectAppEntity} The project with the entities in given flat files
-     * @throws IOException If error occurs while reading flat files.
-     */
-    public ProjectAppEntity createProjectFromFlatFiles(Project project,
-                                                       List<MultipartFile> files,
-                                                       ServiceProvider serviceProvider) throws IOException {
-        if (files.size() == 0) {
-            throw new SafaError("Could not create project because no files were received.");
-        }
-        this.projectService.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.versionService.createInitialProjectVersion(project);
-        ProjectAppEntity projectAppEntity = this.updateProjectFromFlatFiles(project,
-            projectVersion,
-            serviceProvider,
-            files,
-            true);
-        serviceProvider.getNotificationService().broadcastChange(
-            EntityChangeBuilder
-                .create(projectVersion)
-                .withVersionUpdate(projectVersion.getVersionId())
-        );
-        return projectAppEntity;
+    @Setter(onMethod = @__({@Autowired, @Lazy}))
+    private ServiceProvider serviceProvider;
+
+    public FlatFileService(ResourceBuilder resourceBuilder, CommitErrorRepository commitErrorRepository,
+                           TraceGenerationService traceGenerationService, FileUploadService fileUploadService,
+                           ProjectRetrievalService projectRetrievalService) {
+        this.resourceBuilder = resourceBuilder;
+        this.commitErrorRepository = commitErrorRepository;
+        this.traceGenerationService = traceGenerationService;
+        this.fileUploadService = fileUploadService;
+        this.projectRetrievalService = projectRetrievalService;
     }
 
     /**
      * Responsible for creating a project from given flat files. This includes
      * parsing tim.json, creating artifacts, and their trace links.
      *
-     * @param project         The project whose artifacts and trace links should be associated with
      * @param projectVersion  The version that the artifacts and errors will be associated with.
-     * @param serviceProvider Provides persistent services for storing entity.
      * @param files           The flat files defining the project
      * @param asCompleteSet   Whether entities in flat files are complete set of entities in project version.
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
-    public ProjectAppEntity updateProjectFromFlatFiles(Project project,
-                                                       ProjectVersion projectVersion,
-                                                       ServiceProvider serviceProvider,
+    public ProjectAppEntity updateProjectFromFlatFiles(ProjectVersion projectVersion,
                                                        List<MultipartFile> files,
                                                        boolean asCompleteSet)
         throws SafaError, IOException {
+
+        Project project = projectVersion.getProject();
         this.fileUploadService.uploadFilesToServer(project, files);
         JSONObject timFileContent = getTimFileContent(project);
-        this.parseFlatFilesAndCommitEntities(projectVersion, serviceProvider, timFileContent, asCompleteSet);
+        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent, asCompleteSet);
         return this.projectRetrievalService.getProjectAppEntity(projectVersion);
+    }
+
+    /**
+     * Responsible for creating a project from given flat files. This includes
+     * parsing tim.json, creating artifacts, and their trace links.
+     *
+     * @param projectVersionId  The ID of the version that the artifacts and errors will be associated with.
+     * @param user              The user performing the operation.
+     * @param files             The flat files defining the project
+     * @param asCompleteSet     Whether entities in flat files are complete set of entities in project version.
+     * @return FlatFileResponse containing uploaded, parsed, and generated files.
+     * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
+     */
+    public ProjectAppEntity updateProjectFromFlatFiles(UUID projectVersionId,
+                                                       SafaUser user,
+                                                       List<MultipartFile> files,
+                                                       boolean asCompleteSet)
+            throws SafaError, IOException {
+
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(projectVersionId).withEditVersionAs(user);
+        return updateProjectFromFlatFiles(projectVersion, files, asCompleteSet);
     }
 
     /**
@@ -116,13 +118,11 @@ public class FlatFileService {
      * before processing.
      *
      * @param projectVersion  The project version to be associated with the files specified.
-     * @param serviceProvider Provides persistent service to application.
      * @param timFileJson     JSON definition of project extracted from tim.json file.
      * @param asCompleteSet   Whether to save entities in flat files as entire set of entities in project.
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
-                                                ServiceProvider serviceProvider,
                                                 JSONObject timFileJson,
                                                 boolean asCompleteSet) {
         try {

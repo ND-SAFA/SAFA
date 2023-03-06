@@ -22,7 +22,7 @@ public class GithubResponseDTO<T> {
         OK("Ok"),
         ERROR("Error"),
         IMPORTED("Imported"),
-        EXPIRED("Expired credentials. Will deleted them"),
+        EXPIRED("Expired credentials. Will delete them"),
         MISSING("No credentials found"),
         DELETED("Deleted existing GitHub credentials");
 

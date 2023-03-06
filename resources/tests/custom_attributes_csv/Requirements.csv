@@ -1,0 +1,2 @@
+ID,Summary,Content,strAttr,intAttr,listAttr
+SR1,The Thermostat function shall set the value of the heat control.,The Thermostat function shall set the value of the heat control.,strValue,1,"[""val1"",""val2""]"

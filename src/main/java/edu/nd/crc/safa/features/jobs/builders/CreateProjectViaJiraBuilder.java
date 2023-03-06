@@ -3,9 +3,9 @@ package edu.nd.crc.safa.features.jobs.builders;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -14,18 +14,22 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifier> {
     JiraIdentifier jiraIdentifier;
 
+    SafaUser user;
+
     public CreateProjectViaJiraBuilder(
         ServiceProvider serviceProvider,
-        JiraIdentifier jiraIdentifier
+        JiraIdentifier jiraIdentifier,
+        SafaUser user
     ) {
-        super(serviceProvider);
+        super(serviceProvider, user);
         this.jiraIdentifier = jiraIdentifier;
+        this.user = user;
     }
 
     @Override
     protected JiraIdentifier constructIdentifier() {
         Project project = new Project("", ""); // Set once parse starts
-        this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
+        this.serviceProvider.getProjectService().saveProjectWithUserAsOwner(project, user);
         ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
         this.jiraIdentifier.setProjectVersion(projectVersion);
         return this.jiraIdentifier;
@@ -37,7 +41,8 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
         return new CreateProjectViaJiraJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier
+            this.identifier,
+            this.user
         );
     }
 
@@ -47,7 +52,7 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.PROJECT_CREATION_VIA_JIRA;
+    Class<? extends AbstractJob> getJobType() {
+        return CreateProjectViaJiraJob.class;
     }
 }

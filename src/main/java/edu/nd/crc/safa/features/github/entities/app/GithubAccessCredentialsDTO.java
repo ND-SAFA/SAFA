@@ -54,6 +54,9 @@ public class GithubAccessCredentialsDTO {
     @JsonProperty("error_description")
     private String errorDescription;
 
+    @JsonProperty("error_uri")
+    private String errorUri;
+
     public boolean isError() {
         return !Objects.isNull(this.error);
     }

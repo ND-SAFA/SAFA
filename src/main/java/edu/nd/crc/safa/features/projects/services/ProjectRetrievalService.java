@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
+import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
@@ -30,6 +34,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,6 +62,8 @@ public class ProjectRetrievalService {
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final ModelService modelService;
+    private final AttributeService attributeService;
+    private final AttributeLayoutService attributeLayoutService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -92,6 +99,11 @@ public class ProjectRetrievalService {
 
         List<ModelAppEntity> models = this.modelService.getUserModels();
 
+        List<CustomAttributeAppEntity> attributes = this.attributeService
+            .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
+
+        List<AttributeLayoutAppEntity> attributeLayouts = this.attributeLayoutService.getAppEntities(projectVersion);
+
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
@@ -102,7 +114,9 @@ public class ProjectRetrievalService {
             warnings,
             errors,
             layout,
-            models);
+            models,
+            attributes,
+            attributeLayouts);
     }
 
     /**

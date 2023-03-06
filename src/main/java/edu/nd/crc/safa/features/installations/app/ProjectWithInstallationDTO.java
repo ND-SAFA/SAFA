@@ -26,6 +26,11 @@ public class ProjectWithInstallationDTO {
     private String projectName;
 
     /**
+     * The Jira or GitHub organization id that the project is within.
+     */
+    private String installationOrgId;
+
+    /**
      * JIRA project id/GitHub repository name
      */
     private String installationId;
@@ -43,17 +48,19 @@ public class ProjectWithInstallationDTO {
     /**
      * Required for JPQL query projection
      *
-     * @param projectId      Safa project id
-     * @param projectName    Safa project name
-     * @param installationId JIRA project id/GitHub repository name
-     * @param lastUpdate     Timestamp of the last update
-     * @param type           Instance of {@link InstallationTypeEnum}
+     * @param projectId         Safa project id
+     * @param projectName       Safa project name
+     * @param installationOrgId The Jira or GitHub organization id that the project is within.
+     * @param installationId    JIRA project id/GitHub repository name
+     * @param lastUpdate        Timestamp of the last update
+     * @param type              Instance of {@link InstallationTypeEnum}
      */
     public ProjectWithInstallationDTO(UUID projectId,
                                       String projectName,
+                                      String installationOrgId,
                                       String installationId,
                                       Date lastUpdate,
                                       String type) {
-        this(projectId, projectName, installationId, lastUpdate, InstallationTypeEnum.valueOf(type));
+        this(projectId, projectName, installationOrgId, installationId, lastUpdate, InstallationTypeEnum.valueOf(type));
     }
 }

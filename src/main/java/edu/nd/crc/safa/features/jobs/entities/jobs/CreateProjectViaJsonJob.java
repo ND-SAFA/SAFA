@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -28,7 +29,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
     }
 
     @IJobStep(value = "Generating Trace Links", position = 1)
-    public void generateLinks() {
+    public void generateLinks(JobLogger logger) {
         TraceGenerationRequest request = this.traceGenerationRequest;
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(this.projectCommit);
 
@@ -36,6 +37,6 @@ public class CreateProjectViaJsonJob extends CommitJob {
             .getTraceGenerationService()
             .generateTraceLinks(request, projectAppEntity);
         this.projectCommit.addTraces(ModificationType.ADDED, generatedTraces);
-        System.out.println("Links generated:" + generatedTraces.size());
+        logger.log("Links generated: %s", generatedTraces.size());
     }
 }

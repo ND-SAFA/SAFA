@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.artifacts.entities.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
@@ -20,6 +23,7 @@ import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -70,36 +74,34 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         nullable = false,
         columnDefinition = "mediumtext")
     String content;
-    @Lob
-    @Column(columnDefinition = "mediumtext")
-    String customFields;
+
+    @Transient
+    private Map<String, JsonNode> customAttributeValues;
 
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
-        this.customFields = "{}";
+        this.customAttributeValues = new HashMap<>();
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            ModificationType modificationType,
                            Artifact artifact,
                            String summary,
-                           String content,
-                           String customFields) {
+                           String content) {
         this.artifact = artifact;
         this.modificationType = modificationType;
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
-        this.customFields = customFields;
+        this.customAttributeValues = new HashMap<>();
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            Artifact artifact,
                            String summary,
-                           String content,
-                           String customFields) {
-        this(projectVersion, ModificationType.ADDED, artifact, summary, content, customFields);
+                           String content) {
+        this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
     @Override
@@ -128,25 +130,38 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType().getName();
     }
 
+    /**
+     * Adds a custom attribute value to this ArtifactVersion object. This does NOT associate this
+     * custom attribute value with this artifact version in the database. It is merely a convenience so
+     * that all attribute values associated with this artifact version can be stored in a single
+     * object temporarily while this object is in flight.
+     *
+     * @param keyname The key for the attribute.
+     * @param value The value of the attribute as a json node.
+     */
+    public void addCustomAttributeValue(String keyname, JsonNode value) {
+        customAttributeValues.put(keyname, value);
+    }
+
     public boolean hasSameContent(IVersionEntity entityVersion) {
         if (entityVersion instanceof ArtifactVersion) {
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
-                artifactVersion.getCustomFields());
+                artifactVersion.getCustomAttributeValues());
         }
         return false;
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getCustomFields().toString());
+        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getAttributes());
     }
 
-    private boolean hasSameContent(String name, String summary, String content, String customFields) {
+    private boolean hasSameContent(String name, String summary, String content, Map<String, JsonNode> attributes) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
             && this.content.equals(content)
-            && this.customFields.equals(customFields);
+            && this.customAttributeValues.equals(attributes);
     }
 }

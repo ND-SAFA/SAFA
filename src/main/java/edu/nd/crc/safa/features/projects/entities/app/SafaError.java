@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Responsible for identifying error that were accounted
@@ -16,6 +17,7 @@ import lombok.Data;
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class SafaError extends RuntimeException {
     private final Exception exception;
     private final List<String> errors;

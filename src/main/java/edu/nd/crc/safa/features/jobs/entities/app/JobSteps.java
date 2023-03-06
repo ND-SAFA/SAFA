@@ -2,18 +2,6 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectImportJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectUpdateJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectImportJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.TrainModelJob;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -30,30 +18,7 @@ public class JobSteps {
         "Convert Issues To Artifacts And Trace Links"
     };
 
-    public static List<String> getJobSteps(JobType jobType) {
-        switch (jobType) {
-            case PROJECT_CREATION_VIA_FLAT_FILE:
-                return AbstractJob.getJobSteps(FlatFileProjectCreationJob.class);
-            case PROJECT_CREATION_VIA_JIRA:
-                return AbstractJob.getJobSteps(CreateProjectViaJiraJob.class);
-            case PROJECT_CREATION_VIA_GITHUB:
-                return AbstractJob.getJobSteps(GithubProjectCreationJob.class);
-            case PROJECT_CREATION_VIA_JSON:
-                return AbstractJob.getJobSteps(CreateProjectViaJsonJob.class);
-            case PROJECT_UPDATE_VIA_JIRA:
-                return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
-            case PROJECT_UPDATE_VIA_GITHUB:
-                return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
-            case IMPORT_VIA_JIRA:
-                return AbstractJob.getJobSteps(JiraProjectImportJob.class);
-            case IMPORT_VIA_GITHUB:
-                return AbstractJob.getJobSteps(GithubProjectImportJob.class);
-            case GENERATE_LINKS:
-                return AbstractJob.getJobSteps(GenerateLinksJob.class);
-            case TRAIN_MODEL:
-                return AbstractJob.getJobSteps(TrainModelJob.class);
-            default:
-                throw new SafaError("Unknown job type: %s.", jobType);
-        }
+    public static List<String> getJobSteps(Class<? extends AbstractJob> jobType) {
+        return AbstractJob.getJobSteps(jobType);
     }
 }

@@ -35,6 +35,18 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Attribute {
+        public static final String ROOT = Projects.BY_ID + "/attributes";
+        public static final String BY_KEY = ROOT + "/{key}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class AttributeLayout {
+        public static final String ROOT = Projects.BY_ID + "/attribute-layouts";
+        public static final String BY_ID = ROOT + "/{id}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Commits {
         public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
     }
@@ -118,6 +130,12 @@ public class AppRoutes {
         public static class Models {
             public static final String TRAIN = JOBS_PREFIX + AppRoutes.Projects.BY_ID + "/models/train";
         }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Logs {
+            public static final String BY_JOB_ID = Meta.JOB_ID + "/logs";
+            public static final String BY_JOB_ID_AND_STEP_NUM = BY_JOB_ID + "/{stepNum}";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -183,16 +201,15 @@ public class AppRoutes {
         public static class Installations {
             public static final String ROOT = Accounts.PREFIX + "/jira/installations";
             public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
-            public static final String REGISTER = RETRIEVE_AVAILABLE + "/{cloudId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
-            public static final String BY_ID = Import.ROOT + "/jira/{id}";
-            public static final String UPDATE = Versions.BY_ID + "/import/jira/{id}";
-            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{id}";
+            public static final String BY_ID = Import.ROOT + "/jira/{orgId}/{id}";
+            public static final String UPDATE = Versions.BY_ID + "/import/jira/{orgId}/{id}";
+            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{orgId}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{orgId}/{id}";
         }
     }
 

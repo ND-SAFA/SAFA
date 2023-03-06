@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.github.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
@@ -11,8 +12,17 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 public interface GithubConnectionService {
+
+    /**
+     * Gets access credentials for the given user.
+     *
+     * @param user The safa user to look up credentials for
+     * @return The user's github credentials, if they exist
+     */
+    Optional<GithubAccessCredentials> getGithubCredentials(SafaUser user);
 
     /**
      * @param credentials User credentials

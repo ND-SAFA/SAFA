@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,6 @@ public class FlatFileController extends BaseController {
         super(resourceBuilder, serviceProvider);
     }
 
-
     /**
      * Uploads and parses given flat files to the specified version.
      *
@@ -57,44 +56,25 @@ public class FlatFileController extends BaseController {
         @RequestParam("files") List<MultipartFile> files,
         @RequestPart(value = ProjectVariables.AS_COMPLETE_SET, required = false) Boolean asCompleteSet)
         throws SafaError, IOException {
+
         if (files.isEmpty()) {
             throw new SafaError("Could not create project because no files were received.");
         }
         if (asCompleteSet == null) {
             asCompleteSet = false;
         }
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        Project project = projectVersion.getProject();
+
+        SafaUser user = this.serviceProvider.getSafaUserService().getCurrentUser();
+
         ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().updateProjectFromFlatFiles(
-            project,
-            projectVersion,
-            serviceProvider,
-            files,
-            asCompleteSet);
+            versionId, user, files, asCompleteSet);
+
         this.serviceProvider.getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(versionId)
                 .withVersionUpdate(versionId)
         );
         return projectCreated;
-    }
-
-    /**
-     * Creates a new project using the given flat files to create the project arifacts, traces, and artifact types.
-     *
-     * @param files Files including artifact and traces files and requiring at minimum a Tim.json file.
-     * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
-     * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
-     */
-    @PostMapping(value = AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam List<MultipartFile> files)
-        throws SafaError, IOException {
-        return this.serviceProvider
-            .getFlatFileService()
-            .createProjectFromFlatFiles(new Project("", ""),
-                files,
-                this.serviceProvider);
     }
 
     @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

@@ -6,6 +6,9 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
+import edu.nd.crc.safa.features.attributes.services.AttributeService;
+import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
@@ -25,6 +28,7 @@ import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepositor
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraParsingService;
+import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
@@ -32,7 +36,6 @@ import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipReposi
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
-import edu.nd.crc.safa.features.models.services.BertService;
 import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
@@ -93,6 +96,12 @@ public class ServiceProvider {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
+
+    // Custom Attributes
+    private final AttributeService attributeService;
+    private final AttributeValueService attributeValueService;
+    private final AttributeLayoutService attributeLayoutService;
+
     //Traces
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;
@@ -102,7 +111,6 @@ public class ServiceProvider {
     private final ModelRepository modelRepository;
     private final ModelService modelService;
     private final ModelProjectRepository modelProjectRepository;
-    private final BertService bertService;
     // Matrix
     private final TraceMatrixRepository traceMatrixRepository;
     // Changes
@@ -154,4 +162,5 @@ public class ServiceProvider {
     private final GithubProjectRepository githubProjectRepository;
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
+    private JobLoggingService jobLoggingService;
 }

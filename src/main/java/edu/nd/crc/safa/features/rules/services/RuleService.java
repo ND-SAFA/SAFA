@@ -8,7 +8,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.entities.db.Rule;
-import edu.nd.crc.safa.features.rules.parser.DefaultTreeRules;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.parser.TreeVerifier;
@@ -39,9 +38,7 @@ public class RuleService {
                                                                 List<ArtifactVersion> artifacts,
                                                                 List<TraceLink> traceLinks) {
         TreeVerifier verifier = new TreeVerifier();
-        List<ParserRule> rulesToApply = new ArrayList<>();
-        rulesToApply.addAll(DefaultTreeRules.getDefaultRules());
-        rulesToApply.addAll(this.getProjectRules(project));
+        List<ParserRule> rulesToApply = new ArrayList<>(this.getProjectRules(project));
         return verifier.findRuleViolations(artifacts, traceLinks, rulesToApply);
     }
 
@@ -62,5 +59,20 @@ public class RuleService {
                 rule.getRule()));
         }
         return projectRules;
+    }
+
+    /**
+     * Add the given parser rule to the database and associate it with a project.
+     *
+     * @param project The project containing the rule.
+     * @param rule The rule to add.
+     */
+    public void addRule(Project project, ParserRule rule) {
+        Rule dbRule = new Rule();
+        dbRule.setName(rule.getMRuleName().getRuleName());
+        dbRule.setDescription(rule.getMRuleName().getRuleMessage());
+        dbRule.setRule(rule.getRule());
+        dbRule.setProject(project);
+        ruleRepository.save(dbRule);
     }
 }

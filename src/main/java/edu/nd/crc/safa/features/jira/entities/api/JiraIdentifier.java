@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jira.entities.api;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -20,7 +22,7 @@ public class JiraIdentifier {
      */
     Long jiraProjectId;
     /**
-     * The JIRA resource ID.w
+     * The JIRA resource ID.
      */
-    String cloudId;
+    UUID orgId;
 }

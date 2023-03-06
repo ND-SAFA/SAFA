@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.users.services;
 
 import java.util.Optional;
 
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -30,21 +31,33 @@ public class PermissionService {
 
     public void requireOwnerPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
-        if (!hasOwnerPermission(project, currentUser)) {
+        requireOwnerPermission(project, currentUser);
+    }
+
+    public void requireOwnerPermission(Project project, SafaUser user) {
+        if (!hasOwnerPermission(project, user)) {
             throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.OWNER));
         }
     }
 
     public void requireEditPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
-        if (!hasEditPermission(project, currentUser)) {
+        requireEditPermission(project, currentUser);
+    }
+
+    public void requireEditPermission(Project project, SafaUser user) {
+        if (!hasEditPermission(project, user)) {
             throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.EDITOR));
         }
     }
 
     public void requireViewPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
-        if (!hasViewingPermission(project, currentUser)) {
+        requireViewPermission(project, currentUser);
+    }
+
+    public void requireViewPermission(Project project, SafaUser user) {
+        if (!hasViewingPermission(project, user)) {
             throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.VIEWER));
         }
     }
@@ -64,5 +77,9 @@ public class PermissionService {
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {
         Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
         return roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
+    }
+
+    public boolean hasViewPermission(JobDbEntity job, SafaUser user) {
+        return job.getUser().getUserId().equals(user.getUserId());
     }
 }

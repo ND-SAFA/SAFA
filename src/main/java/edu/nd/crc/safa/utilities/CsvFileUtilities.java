@@ -20,26 +20,28 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface CsvFileUtilities {
     static List<CSVRecord> readArtifactFile(String pathToFile) throws IOException {
-        CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile);
-        FileUtilities.assertHasColumns(parsedFile, CsvArtifactFile.Constants.REQUIRED_COLUMNS);
-        return parsedFile.getRecords();
+        try (CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile)) {
+            FileUtilities.assertHasColumns(parsedFile, CsvArtifactFile.Constants.REQUIRED_COLUMNS);
+            return parsedFile.getRecords();
+        }
     }
 
     static List<CSVRecord> readArtifactFile(MultipartFile file) throws IOException {
-        return FileUtilities
-            .readMultiPartCSVFile(file, CsvArtifactFile.Constants.REQUIRED_COLUMNS)
-            .getRecords();
+        try (CSVParser parser = FileUtilities.readMultiPartCSVFile(file, CsvArtifactFile.Constants.REQUIRED_COLUMNS)) {
+            return parser.getRecords();
+        }
     }
 
     static List<CSVRecord> readTraceFile(String pathToFile) throws IOException {
-        CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile);
-        return parsedFile.getRecords();
+        try (CSVParser parsedFile = FileUtilities.readCSVFile(pathToFile)) {
+            return parsedFile.getRecords();
+        }
     }
 
     static List<CSVRecord> readTraceFile(MultipartFile file) throws IOException {
-        return FileUtilities
-            .readMultiPartCSVFile(file, CsvTraceFile.Constants.REQUIRED_COLUMNS)
-            .getRecords();
+        try (CSVParser parser = FileUtilities.readMultiPartCSVFile(file, CsvTraceFile.Constants.REQUIRED_COLUMNS)) {
+            return parser.getRecords();
+        }
     }
 
     static <T> void writeEntitiesAsCsvFile(File file,
@@ -48,7 +50,6 @@ public interface CsvFileUtilities {
                                            Function<T, String[]> entity2values) throws IOException {
         try (FileWriter reader = new FileWriter(file)) {
             try (CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers))) {
-                printer.printRecord((Object[]) headers);
                 for (T entity : entities) {
                     printer.printRecord((Object[]) entity2values.apply(entity));
                 }

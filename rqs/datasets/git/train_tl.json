@@ -3,15 +3,12 @@
     {
       "jobs": [
         {
-          "object_type": "DISTILL",
+          "object_type": "TRAIN",
           "job_args": {
             "random_seed": 812
           },
-          "student_model_manager": {
+          "model_manager": {
             "model_path": "prajjwal1/bert-tiny"
-          },
-          "teacher_model_manager": {
-            "model_path": "thearod5/nl-bert"
           },
           "trainer_args": {
             "num_train_epochs": 1,

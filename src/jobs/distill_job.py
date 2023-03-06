@@ -11,7 +11,7 @@ from util.override import overrides
 class DistillJob(TrainJob):
 
     def __init__(self, job_args: JobArgs, student_model_manager: ModelManager, teacher_model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs):
+                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs, loss_strategy: str = None):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job
@@ -24,6 +24,7 @@ class DistillJob(TrainJob):
                          trainer_args=trainer_args)
         self.student_model_manager = student_model_manager
         self.teacher_model_manager = teacher_model_manager
+        self.loss_strategy = loss_strategy
 
     @overrides(TrainJob)
     def get_trainer(self, **kwargs) -> TraceTrainer:
@@ -37,5 +38,6 @@ class DistillJob(TrainJob):
                                            trainer_dataset_manager=self.trainer_dataset_manager,
                                            student_model_manager=self.student_model_manager,
                                            teacher_model_manager=self.teacher_model_manager,
+                                           loss_strategy=self.loss_strategy,
                                            **kwargs)
         return self._trainer

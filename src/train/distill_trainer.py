@@ -43,7 +43,8 @@ class DistillTrainer(TraceTrainer):
     TEMPERATURE = 1
 
     def __init__(self, trainer_args: TrainerArgs, student_model_manager: ModelManager, teacher_model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
+                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, loss_strategy: str = None,
+                 **kwargs):
         """
         Handles the training and evaluation of learning models
         :param trainer_args: The learning model arguments
@@ -56,6 +57,7 @@ class DistillTrainer(TraceTrainer):
                          trainer_dataset_manager=trainer_dataset_manager, save_strategy=save_strategy)
         self.teacher_model_manager = teacher_model_manager
         self.best_model = None
+        self.loss_strategy = loss_strategy if loss_strategy else "weighted"
 
     def train(
             self,
@@ -78,10 +80,24 @@ class DistillTrainer(TraceTrainer):
         student_output = model(**inputs)
         loss = self._calculate_loss(student_output[0], labels)
         if not return_outputs:
-            teacher_output = self.teacher_model_manager.get_model()(**inputs)
-            soft_loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
-            loss = (loss + soft_loss) / 2
-
+            if self.loss_strategy == "weighted":
+                teacher_output = self.teacher_model_manager.get_model()(**inputs)
+                soft_loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
+                loss = (loss + soft_loss) / 2
+            elif self.loss_strategy == "on_correct":
+                teacher_output = self.teacher_model_manager.get_model()(**inputs)
+                teacher_labels = torch.argmax(teacher_output.logits, dim=-1)
+                soft_losses = []
+                for i, teacher_label in enumerate(teacher_labels):
+                    item_label = labels[i]
+                    if item_label == teacher_label:
+                        student_item_output = student_output[0][i]
+                        teacher_item_output = teacher_output[0][i]
+                        item_loss = self._compute_distill_loss_pred_layer_only(student_item_output, teacher_item_output,
+                                                                               self.TEMPERATURE, item_label)
+                        soft_losses.append(item_loss)
+                soft_loss = torch.stack(soft_losses).mean()
+                loss = (loss + soft_loss) / 2
         return (loss, student_output) if return_outputs else loss
 
     def _custom_inner_training_loop(self, batch_size=None, **kwargs) -> TrainOutput:
@@ -137,7 +153,7 @@ class DistillTrainer(TraceTrainer):
         with torch.no_grad():
             teacher_output = teacher_model(**inputs)
         if self.DISTILL_PRED_LAYER_ONLY:
-            cls_loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
+            cls_loss = self._compute_distill_loss_pred_layer_only(student_output[0], teacher_output[0], self.TEMPERATURE, labels)
             loss = cls_loss
             state.losses[State.tr_cls_loss] += cls_loss.item()
         else:
@@ -213,7 +229,7 @@ class DistillTrainer(TraceTrainer):
         teacher_model = self._wrap_model(teacher_model)
         return student_model, teacher_model
 
-    def _compute_distill_loss_pred_layer_only(self, student_output: ModelOutputType, teacher_output: ModelOutputType,
+    def _compute_distill_loss_pred_layer_only(self, student_logits: torch.Tensor, teacher_logits: torch.Tensor,
                                               temperature: float, label_ids: torch.Tensor) -> torch.Tensor:
         """
         Computes the distillation loss for the prediction layer only
@@ -223,8 +239,6 @@ class DistillTrainer(TraceTrainer):
         :param label_ids: Contains the ground truth labels
         :return: The current cls_loss
         """
-        student_logits = student_output[0]
-        teacher_logits = teacher_output[0]
 
         if self.OUTPUT_MODE == "classification":
             cls_loss = self._soft_cross_entropy(student_logits / temperature,

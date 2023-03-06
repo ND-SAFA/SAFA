@@ -34,12 +34,18 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.20
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.50
+              "val_percentage": {
+                "*": [
+                  0.20,
+                  0.40,
+                  0.60
+                ]
+              }
             },
             "augmenter": {
               "steps": [

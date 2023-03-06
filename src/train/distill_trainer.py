@@ -76,11 +76,12 @@ class DistillTrainer(TraceTrainer):
         """
         labels = inputs.pop("labels")
         student_output = model(**inputs)
+        loss = self._calculate_loss(student_output[0], labels)
         if not return_outputs:
             teacher_output = self.teacher_model_manager.get_model()(**inputs)
-            loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
-        else:
-            loss = self._calculate_loss(student_output[0], labels)
+            soft_loss = self._compute_distill_loss_pred_layer_only(student_output, teacher_output, self.TEMPERATURE, labels)
+            loss = (loss + soft_loss) / 2
+
         return (loss, student_output) if return_outputs else loss
 
     def _custom_inner_training_loop(self, batch_size=None, **kwargs) -> TrainOutput:

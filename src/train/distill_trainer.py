@@ -63,7 +63,7 @@ class DistillTrainer(TraceTrainer):
     ):
         model = self.teacher_model_manager.get_model()
         self._move_model_to_device(model, self.args.device)
-        self.train(**kwargs)
+        super().train(**kwargs)
 
     @overrides(TraceTrainer)
     def compute_loss(self, model, inputs, return_outputs=False) -> Union[Tuple[float, SequenceClassifierOutput], float]:

@@ -47,3 +47,6 @@ class HubProjectReader(AbstractProjectReader):
         :return: Returns the overrides of the project reader.
         """
         return self.project_reader.get_overrides()
+
+    def should_generate_negative_links(self) -> bool:
+        return self.project_reader.should_generate_negative_links()

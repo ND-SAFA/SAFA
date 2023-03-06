@@ -3,20 +3,28 @@
     {
       "jobs": [
         {
-          "object_type": "CREATE_SOURCE_SPLITS",
+          "object_type": "CREATE_DATASETS",
           "job_args": {
           },
-          "export_path": "~/desktop/safa/datasets/git-data/git/splits",
-          "trace_dataset_creator": {
-            "project_reader": {
-              "object_type": "CSV",
-              "project_path": "~/desktop/safa/datasets/git-data/git/git.csv"
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "~/desktop/safa/datasets/git-data/git/git.csv"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.10
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.10
             }
-          },
-          "splits": [
-            0.20,
-            0.10
-          ]
+          }
         }
       ]
     }

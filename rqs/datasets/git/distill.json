@@ -39,7 +39,6 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "git",
-                "task": "task_0",
                 "stage": "train"
               }
             },
@@ -48,7 +47,6 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "git",
-                "task": "task_0",
                 "stage": "val"
               }
             },
@@ -57,7 +55,6 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "git",
-                "task": "task_0",
                 "stage": "eval"
               }
             },

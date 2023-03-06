@@ -3,6 +3,7 @@ from typing import Dict, Iterable, List
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 from constants import STAGES
 from data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -13,6 +14,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from util.dict_util import ListUtil
+from util.logging.logger_manager import logger
 
 
 class CreateSourceSplits(AbstractJob):
@@ -51,13 +53,15 @@ class CreateSourceSplits(AbstractJob):
             split_id_batches = self.get_artifact_ids_in_splits(artifacts_to_split, self.splits)
             all_split_ids = set(ListUtil.flatten(split_id_batches))
 
-            for split_ids, stage in zip(split_id_batches, STAGES):
+            for split_ids, stage in tqdm(zip(split_id_batches, STAGES), desc="Processing splits."):
                 other_ids = all_split_ids - set(split_ids)
+                logger.info("Creating split artifacts")
                 split_artifact_df = CreateSourceSplits.create_task_split_artifact_df(artifact_df,
                                                                                      [source_name, target_name],
                                                                                      source_name,
                                                                                      other_ids)
-                task_split_ids = list(split_artifact_df[StructuredKeys.Artifact.ID])
+                task_split_ids = set(list(split_artifact_df[StructuredKeys.Artifact.ID]))
+                logger.info("Creating split trace links")
                 split_links = CreateSourceSplits.create_split_links(trace_links, task_split_ids)
                 split_project_data = ProjectData(artifact_df=split_artifact_df,
                                                  layer_mapping_df=pd.DataFrame([layer_mapping_row]),
@@ -75,7 +79,14 @@ class CreateSourceSplits(AbstractJob):
         :param artifact_ids: Artifacts ids to filter by.
         :return: Mapping of trace link id to trace links.
         """
-        relevant_traces = list(filter(lambda t: t.source.id in artifact_ids and t.target.id in artifact_ids, trace_links))
+        cache = {}
+
+        def check_exists(item):
+            if item not in cache:
+                cache[item] = item in artifact_ids
+            return cache[item]
+
+        relevant_traces = list(filter(lambda t: check_exists(t.source.id) and check_exists(t.target.id), trace_links))
         return {trace.id: trace for trace in relevant_traces}
 
     @staticmethod

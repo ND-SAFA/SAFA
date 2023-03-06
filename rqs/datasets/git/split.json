@@ -6,16 +6,16 @@
           "object_type": "CREATE_SOURCE_SPLITS",
           "job_args": {
           },
-          "export_path": "[EXPORT_FOLDER]",
+          "export_path": "~/desktop/safa/datasets/git-data/git/splits",
           "trace_dataset_creator": {
             "project_reader": {
-              "object_type": "STRUCTURE",
-              "project_path": "[PROJECTPATH]"
+              "object_type": "CSV",
+              "project_path": "~/desktop/safa/datasets/git-data/git/git.csv"
             }
           },
           "splits": [
-            0.10,
-            0.30
+            0.20,
+            0.10
           ]
         }
       ]

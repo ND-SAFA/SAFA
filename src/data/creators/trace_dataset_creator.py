@@ -1,6 +1,7 @@
 from typing import Dict, List, Set, Tuple, Type
 
 import pandas as pd
+from tqdm import tqdm
 
 from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
@@ -267,22 +268,29 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: DataFrame of trace links without links containing null references.
         """
         valid_traces = []
-        valid_artifact_ids = artifact_df[StructuredKeys.Artifact.ID].values
+        valid_artifact_ids = set(artifact_df[StructuredKeys.Artifact.ID].values)
         missing_sources = []
         missing_targets = []
-        for _, row in trace_df.iterrows():
-            source_id = row[StructuredKeys.Trace.SOURCE]
-            target_id = row[StructuredKeys.Trace.TARGET]
-            if source_id not in valid_artifact_ids:
-                missing_sources.append(source_id)
-            elif target_id not in valid_artifact_ids:
-                missing_targets.append(target_id)
-            else:
-                valid_traces.append(row.to_dict())
+
+        def verify_col(artifact_id_col: str) -> Tuple[List[str], pd.Series]:
+            artifact_ids = trace_df[artifact_id_col]
+            missing_ids = []
+            id_mask = []
+            for a_id in artifact_ids:
+                is_missing = a_id not in valid_artifact_ids
+                if is_missing:
+                    missing_ids.append(a_id)
+                id_mask.append(not is_missing)
+            return missing_ids, pd.Series(id_mask)
+
+        missing_sources, source_mask = verify_col(StructuredKeys.Trace.SOURCE)
+        missing_targets, target_mask = verify_col(StructuredKeys.Trace.TARGET)
 
         TraceDatasetCreator.assert_missing_artifact_ids(missing_sources, max_missing_sources, "source")
         TraceDatasetCreator.assert_missing_artifact_ids(missing_targets, max_missing_targets, "target")
-        return pd.DataFrame(valid_traces)
+
+        valid_traces = trace_df[source_mask & target_mask].reset_index()
+        return valid_traces
 
     @staticmethod
     def create_artifact_maps(artifact_df: pd.DataFrame) -> Tuple[ArtifactType2Id, Id2Artifact]:
@@ -293,7 +301,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         artifact_type_2_id: ArtifactType2Id = UncasedDict()
         id_2_artifact: Id2Artifact = UncasedDict()
-        for _, row in artifact_df.iterrows():
+        for row in tqdm(artifact_df.to_dict("records"), desc="Creating artifact map"):
             TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
 
         artifact_type_summary = []

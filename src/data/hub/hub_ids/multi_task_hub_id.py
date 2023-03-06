@@ -3,7 +3,6 @@ from abc import ABC
 
 from constants import STAGES
 from data.hub.abstract_hub_id import AbstractHubId
-from data.keys.safa_format import SafaKeys
 
 
 class MultiStageHubId(AbstractHubId, ABC):
@@ -32,5 +31,5 @@ class MultiStageHubId(AbstractHubId, ABC):
             tasks_defined = os.listdir(data_dir)
             assert self.task in tasks_defined, f"Task () is not one of: {tasks_defined}"
             assert self.stage in STAGES, f"Stage () is not one of: {STAGES}"
-            return os.path.join(data_dir, self.task, self.stage, SafaKeys.TIM_FILE)
-        return os.path.join(data_dir, self.task, SafaKeys.TIM_FILE)
+            return os.path.join(data_dir, self.task, self.stage)
+        return os.path.join(data_dir, self.task)

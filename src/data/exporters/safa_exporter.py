@@ -2,6 +2,7 @@ import os
 from typing import Dict, List, TypedDict
 
 import pandas as pd
+from tqdm import tqdm
 
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.keys.safa_format import SafaKeys
@@ -9,6 +10,7 @@ from data.keys.structure_keys import StructuredKeys
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.file_util import FileUtil
+from util.logging.logger_manager import logger
 
 
 class ProjectData(TypedDict):
@@ -105,16 +107,28 @@ class SafaExporter:
         """
         source_artifact_ids = self.artifact_type_2_id[source_type]
         target_artifact_ids = self.artifact_type_2_id[target_type]
+
+        source_cache = {}
+        target_cache = {}
+
+        def check_source(source_id, ids, cache):
+            if source_id not in cache:
+                cache[source_id] = source_id in ids
+            return cache[source_id]
+
         entries = []
-        for source_id in source_artifact_ids:
-            for target_id in target_artifact_ids:
-                trace_link_id = TraceLink.generate_link_id(source_id, target_id)
-                trace_link: TraceLink = links[trace_link_id]
-                if trace_link.is_true_link:
-                    entries.append({
-                        StructuredKeys.Trace.SOURCE: source_id,
-                        StructuredKeys.Trace.TARGET: target_id
-                    })
+        for trace_link in tqdm(links.values(), desc="Creating split trace DF.", total=len(links)):
+            source = trace_link.source.id
+            target = trace_link.target.id
+
+            has_sources = check_source(source, source_artifact_ids, source_cache)
+            has_targets = check_source(target, target_artifact_ids, target_cache)
+            if has_sources and has_targets and trace_link.is_true_link:
+                entries.append({
+                    StructuredKeys.Trace.SOURCE: source,
+                    StructuredKeys.Trace.TARGET: target
+                })
+
         return pd.DataFrame(entries)
 
     def create_tim(self, export_path) -> None:
@@ -130,3 +144,4 @@ class SafaExporter:
         }
         export_path = os.path.join(export_path, "tim.json")
         FileUtil.write(tim_definition, export_path)
+        logger.info(f"Exported: {export_path}")

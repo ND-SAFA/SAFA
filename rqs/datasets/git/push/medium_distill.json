@@ -8,7 +8,7 @@
             "random_seed": 42
           },
           "model_manager": {
-            "model_path": "~/output/distill-medium/experiment_0/step_0/base_experiment/models/best"
+            "model_path": "~/output/git-distill_medium/experiment_0/step_0/base_experiment/models/best"
           },
           "trainer_args": {
             "hub_model_id": "thearod5/git-medium-distilled"

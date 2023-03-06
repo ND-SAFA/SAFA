@@ -12,7 +12,7 @@
             "model_path": {
               "*": [
                 "thearod5/nl-bert",
-                "thearod5/pl-bert"
+                "thearod5/git-medium-distilled"
               ]
             }
           },

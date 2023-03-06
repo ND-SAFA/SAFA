@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/nl-bert"
+            "model_path": "thearod5/git-tiny"
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -38,10 +38,6 @@
                 },
                 {
                   "object_type": "HUB",
-                  "name": "cm1"
-                },
-                {
-                  "object_type": "HUB",
                   "name": "mip"
                 },
                 {
@@ -57,12 +53,14 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.02
+              "val_percentage": 0.10
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.75
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "cm1"
+              }
             },
             "augmenter": {
               "steps": [

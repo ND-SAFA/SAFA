@@ -12,9 +12,9 @@
             "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
-            "num_train_epochs": 1,
-            "per_device_eval_batch_size": 16,
+            "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 16,
             "gradient_accumulation_steps": 250,
             "learning_rate": 5e-5,
             "skip_save": false,
@@ -24,17 +24,19 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/lhp/experiment/heating"
+                "object_type": "HUB",
+                "name": "cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
               "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.70
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.15
             },
             "augmenter": {
               "steps": [
@@ -54,8 +56,8 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/lhp/experiment/heating"
+                "object_type": "HUB",
+                "name": "cm1"
               }
             },
             "val_dataset_creator": {

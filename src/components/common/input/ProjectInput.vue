@@ -1,6 +1,5 @@
 <template>
   <q-select
-    :ref="projectInput"
     v-model="model"
     filled
     use-chips
@@ -24,7 +23,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { projectStore, useVModel } from "@/hooks";
 
 const props = defineProps<{
@@ -33,8 +32,6 @@ const props = defineProps<{
   excludeCurrentProject?: boolean;
 }>();
 
-const projectInput = ref<HTMLElement | undefined>();
-
 const model = useVModel(props, "modelValue");
 
 const projects = computed(() =>
@@ -42,11 +39,4 @@ const projects = computed(() =>
     ? projectStore.unloadedProjects
     : projectStore.allProjects
 );
-
-/**
- * Closes the selection window.
- */
-function handleClose(): void {
-  projectInput.value?.blur();
-}
 </script>

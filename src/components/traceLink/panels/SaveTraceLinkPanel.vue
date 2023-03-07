@@ -1,51 +1,67 @@
 <template>
-  <details-panel panel="saveTrace" data-cy="panel-trace-save">
-    <artifact-input
-      v-model="sourceArtifactId"
-      label="Source Artifact"
-      :multiple="false"
-      data-cy="button-trace-save-source"
-      class="my-4"
-    />
-    <artifact-input
-      v-model="targetArtifactId"
-      label="Target Artifact"
-      :multiple="false"
-      data-cy="button-trace-save-target"
-      class="my-4"
-    />
+  <details-panel
+    panel="saveTrace"
+    data-cy="panel-trace-save"
+    @open="handleOpen"
+  >
+    <panel-card class="q-mt-md">
+      <artifact-input
+        v-model="sourceArtifactId"
+        label="Source Artifact"
+        data-cy="button-trace-save-source"
+      />
+      <artifact-input
+        v-model="targetArtifactId"
+        label="Target Artifact"
+        class="q-my-md"
+        data-cy="button-trace-save-target"
+      />
 
-    <v-expansion-panels>
-      <v-expansion-panel data-cy="panel-trace-directions">
-        <v-expansion-panel-title>
-          <typography value="Allowed Trace Directions" />
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div v-for="entry in artifactLevels" :key="entry.typeId">
-            <type-direction-input :artifact-level="entry" />
-          </div>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
-
-    <v-divider class="my-4" />
-    <flex-box justify="between" align="center">
-      <typography color="error" r="2" :value="errorMessage" />
-      <v-btn
-        color="primary"
-        :disabled="!canSave"
-        data-cy="button-trace-save"
-        @click="handleSubmit"
+      <expansion-item
+        label="Allowed Trace Directions"
+        data-cy="panel-trace-directions"
       >
-        Create
-      </v-btn>
-    </flex-box>
+        <type-direction-input
+          v-for="level in artifactLevels"
+          :key="level.typeId"
+          :artifact-level="level"
+        />
+      </expansion-item>
+
+      <typography
+        el="p"
+        color="negative"
+        class="q-my-md"
+        :value="errorMessage"
+      />
+
+      <template #actions>
+        <flex-box full-width justify="end">
+          <text-button
+            label="Create"
+            icon="save"
+            color="primary"
+            :disabled="!canSave"
+            data-cy="button-trace-save"
+            @click="handleSubmit"
+          />
+        </flex-box>
+      </template>
+    </panel-card>
   </details-panel>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { ArtifactSchema, TimArtifactLevelSchema } from "@/types";
+/**
+ * Allows for creating trace links.
+ */
+export default {
+  name: "SaveTraceLinkPanel",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import {
@@ -53,122 +69,73 @@ import {
   ArtifactInput,
   TypeDirectionInput,
   FlexBox,
+  ExpansionItem,
+  PanelCard,
+  TextButton,
 } from "@/components/common";
 import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
-/**
- * Allows for creating trace links.
- */
-export default defineComponent({
-  name: "SaveTraceLinkPanel",
-  components: {
-    DetailsPanel,
-    FlexBox,
-    Typography,
-    ArtifactInput,
-    TypeDirectionInput,
-  },
-  data() {
-    return {
-      sourceArtifactId: "",
-      targetArtifactId: "",
-    };
-  },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "saveTrace";
-    },
+const sourceArtifactId = ref("");
+const targetArtifactId = ref("");
 
-    /**
-     * @return The source artifact.
-     */
-    sourceArtifact(): ArtifactSchema | undefined {
-      return artifactStore.getArtifactById(this.sourceArtifactId);
-    },
-    /**
-     * @return The source artifact.
-     */
-    targetArtifact(): ArtifactSchema | undefined {
-      return artifactStore.getArtifactById(this.targetArtifactId);
-    },
-    /**
-     * @return Any errors in trying to create this link.
-     */
-    errorMessage(): string {
-      const source = this.sourceArtifact;
-      const target = this.targetArtifact;
+const sourceArtifact = computed(() =>
+  artifactStore.getArtifactById(sourceArtifactId.value)
+);
+const targetArtifact = computed(() =>
+  artifactStore.getArtifactById(targetArtifactId.value)
+);
 
-      if (!source || !target) return "";
+const errorMessage = computed(() => {
+  if (!sourceArtifact.value || !targetArtifact.value) return "";
 
-      const isLinkAllowed = traceStore.isLinkAllowed(source, target);
+  const isLinkAllowed = traceStore.isLinkAllowed(
+    sourceArtifact.value,
+    targetArtifact.value
+  );
 
-      return isLinkAllowed === true
-        ? ""
-        : isLinkAllowed || "Cannot create a trace link.";
-    },
-    /**
-     * @return Whether a link can be created.
-     */
-    canSave(): boolean {
-      return (
-        !!this.sourceArtifactId &&
-        !!this.targetArtifactId &&
-        this.errorMessage === ""
-      );
-    },
-    /**
-     * @return The current project's artifact types.
-     */
-    artifactLevels(): TimArtifactLevelSchema[] {
-      return typeOptionsStore.artifactLevels;
-    },
-  },
-  watch: {
-    /**
-     * Resets fields when the panel opens.
-     */
-    isOpen(open: boolean) {
-      const openState = appStore.isTraceCreatorOpen;
-
-      if (!open) return;
-
-      this.sourceArtifactId = "";
-      this.targetArtifactId = "";
-
-      if (typeof openState !== "object") return;
-
-      if (openState.type === "source") {
-        this.sourceArtifactId = openState.artifactId;
-      } else if (openState.type === "target") {
-        this.targetArtifactId = openState.artifactId;
-      } else {
-        this.sourceArtifactId = openState.sourceId;
-        this.targetArtifactId = openState.targetId;
-      }
-    },
-  },
-  methods: {
-    /**
-     * Creates a trace link from the given artifacts.
-     */
-    async handleSubmit(): Promise<void> {
-      const source = this.sourceArtifact;
-      const target = this.targetArtifact;
-
-      if (!source || !target) return;
-
-      await handleCreateLink(source, target);
-      this.handleClose();
-    },
-    /**
-     * Closes the trace link creator.
-     */
-    handleClose(): void {
-      appStore.closeSidePanels();
-    },
-  },
+  return isLinkAllowed === true
+    ? ""
+    : isLinkAllowed || "Cannot create a trace link.";
 });
+
+const canSave = computed(
+  () =>
+    !!sourceArtifactId.value &&
+    !!targetArtifactId.value &&
+    errorMessage.value === ""
+);
+
+const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
+
+/**
+ * Resets the panel state.
+ */
+function handleOpen(): void {
+  const openState = appStore.isTraceCreatorOpen;
+
+  sourceArtifactId.value = "";
+  targetArtifactId.value = "";
+
+  if (typeof openState !== "object") return;
+
+  if (openState.type === "source") {
+    sourceArtifactId.value = openState.artifactId;
+  } else if (openState.type === "target") {
+    targetArtifactId.value = openState.artifactId;
+  } else {
+    sourceArtifactId.value = openState.sourceId;
+    targetArtifactId.value = openState.targetId;
+  }
+}
+
+/**
+ * Creates a trace link from the given artifacts.
+ */
+async function handleSubmit(): Promise<void> {
+  if (!sourceArtifact.value || !targetArtifact.value) return;
+
+  await handleCreateLink(sourceArtifact.value, targetArtifact.value);
+
+  appStore.closeSidePanels();
+}
 </script>

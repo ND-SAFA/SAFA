@@ -14,7 +14,7 @@
         outline
         :removable="allowEditing"
         data-cy="chip-type-direction"
-        @close="handleDelete(type)"
+        @remove="handleDelete(type)"
       >
         <typography :value="getTypeLabel(type)" />
       </q-chip>

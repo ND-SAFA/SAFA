@@ -6,23 +6,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { appStore } from "@/hooks";
-import { TraceLinkButtons, TraceLinkContent } from "../display";
-
 /**
  * Displays trace link information.
  */
-export default defineComponent({
+export default {
   name: "TraceLinkPanel",
-  components: { TraceLinkButtons, TraceLinkContent },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayTrace";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import { TraceLinkButtons, TraceLinkContent } from "../display";
+
+const isOpen = computed(() => appStore.isDetailsPanelOpen === "displayTrace");
 </script>

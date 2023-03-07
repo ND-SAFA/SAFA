@@ -95,7 +95,9 @@ const title = computed(() => {
 });
 
 const width = computed(() => {
-  if (
+  if (openState.value === "displayTrace") {
+    return 500;
+  } else if (
     openState.value === "displayArtifactBody" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"

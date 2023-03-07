@@ -5,23 +5,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { appStore } from "@/hooks";
-import { ArtifactBody } from "../display";
-
 /**
  * Displays artifact content.
  */
-export default defineComponent({
+export default {
   name: "ArtifactBodyPanel",
-  components: { ArtifactBody },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayArtifactBody";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import { ArtifactBody } from "../display";
+
+const isOpen = computed(
+  () => appStore.isDetailsPanelOpen === "displayArtifactBody"
+);
 </script>

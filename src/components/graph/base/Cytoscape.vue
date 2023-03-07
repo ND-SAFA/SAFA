@@ -31,9 +31,9 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (e: CytoEvent, event: EventObject): void;
-}>();
+// const emit = defineEmits<{
+//   (e: CytoEvent, event: EventObject): void;
+// }>();
 
 const container = ref<HTMLElement | null>(null);
 const instance = ref<Core | undefined>(undefined);
@@ -63,11 +63,11 @@ onMounted(() => {
   const cyInstance = cytoscape({ container: container.value, ...props.config });
 
   // register all the component events as cytoscape ones
-  for (const eventType of Object.values(CytoEvent)) {
-    cyInstance?.on(eventType, (event: EventObject) => {
-      emit(eventType, event);
-    });
-  }
+  // for (const eventType of Object.values(CytoEvent)) {
+  //   cyInstance?.on(eventType, (event: EventObject) => {
+  //     emit(eventType, event);
+  //   });
+  // }
 
   instance.value = cyInstance;
 

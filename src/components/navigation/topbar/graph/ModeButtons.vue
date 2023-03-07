@@ -1,5 +1,5 @@
 <template>
-  <q-btn-group flat>
+  <q-btn-group flat class="q-mx-sm">
     <text-button
       v-bind="buttonProps(options.tim)"
       label="TIM"

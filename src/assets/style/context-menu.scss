@@ -27,6 +27,8 @@ $graph-border-radius: 8px;
     text-align: left;
     color: $color-text;
     border-radius: $graph-border-radius;
+    border-width: 0;
+    cursor: pointer;
   }
 
   .cy-context-menus-submenu-indicator {

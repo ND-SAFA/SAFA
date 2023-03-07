@@ -6,7 +6,7 @@
       <flex-box align="center">
         <update-button />
         <saving-icon />
-        <app-version />
+        <version-selector />
       </flex-box>
     </flex-box>
     <separator v-if="graphVisible" nav />
@@ -27,8 +27,8 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
+import { VersionSelector } from "@/components/project";
 import ProjectSearchbar from "./ProjectSearchbar.vue";
-import AppVersion from "./AppVersion.vue";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 

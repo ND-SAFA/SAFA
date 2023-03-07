@@ -1,209 +1,165 @@
 <template>
-  <details-panel panel="document">
-    <v-text-field
-      v-model="store.editedDocument.name"
-      filled
-      label="Name"
-      class="mt-4"
-      :error-messages="nameErrors"
-      data-cy="input-document-name"
-    />
-    <v-select
-      v-model="store.editedDocument.type"
-      filled
-      label="Type"
-      :items="types"
-      item-text="name"
-      item-value="id"
-      data-cy="input-document-type"
-    />
-    <artifact-type-input
-      v-model="store.includedTypes"
-      multiple
-      label="Include Artifact Types"
-      data-cy="input-document-include-types"
-      @blur="handleSaveTypes"
-    />
-    <artifact-input
-      v-model="store.editedDocument.artifactIds"
-      label="Artifacts"
-      data-cy="input-document-artifacts"
-    />
-    <switch-input
-      v-model="store.includeChildren"
-      class="ml-1"
-      label="Include artifact children"
-      data-cy="button-document-include-children"
-    />
-    <artifact-type-input
-      v-if="store.includeChildren"
-      v-model="store.includedChildTypes"
-      multiple
-      label="Include Child Types"
-      data-cy="input-document-include-child-types"
-      @blur="handleSaveChildren"
-    />
-    <artifact-input
-      v-if="store.includeChildren"
-      v-model="store.childIds"
-      label="Child Artifacts"
-      data-cy="input-document-child-artifacts"
-    />
+  <details-panel panel="document" @open="handleReset">
+    <panel-card>
+      <text-input
+        v-model="editedDocument.name"
+        label="Name"
+        :error-message="nameError"
+        data-cy="input-document-name"
+      />
+      <select-input
+        v-model="editedDocument.type"
+        label="Type"
+        :options="typeOptions"
+        option-label="name"
+        option-value="id"
+        option-to-value
+        class="q-mb-md"
+        data-cy="input-document-type"
+      />
+      <artifact-type-input
+        v-model="store.includedTypes"
+        multiple
+        label="Include Artifact Types"
+        class="q-mb-md"
+        data-cy="input-document-include-types"
+        @blur="handleSaveTypes"
+      />
+      <artifact-input
+        v-model="editedDocument.artifactIds"
+        multiple
+        label="Artifacts"
+        class="q-mb-md"
+        data-cy="input-document-artifacts"
+      />
+      <switch-input
+        v-model="store.includeChildren"
+        label="Include artifact children"
+        class="q-mb-md"
+        data-cy="button-document-include-children"
+      />
+      <artifact-type-input
+        v-if="includeChildren"
+        v-model="store.includedChildTypes"
+        multiple
+        label="Include Child Types"
+        class="q-mb-md"
+        data-cy="input-document-include-child-types"
+        @blur="handleSaveChildren"
+      />
+      <artifact-input
+        v-if="includeChildren"
+        v-model="store.childIds"
+        label="Child Artifacts"
+        class="q-mb-md"
+        data-cy="input-document-child-artifacts"
+      />
 
-    <v-divider class="my-4" />
-    <flex-box justify="between">
-      <text-button
-        v-if="isUpdate"
-        text
-        icon="delete"
-        data-cy="button-document-delete"
-        @click="handleDelete"
-      >
-        Delete
-      </text-button>
-      <q-space />
-      <text-button
-        :disabled="!canSave"
-        icon="save"
-        data-cy="button-document-save"
-        @click="handleSubmit"
-      >
-        Save
-      </text-button>
-    </flex-box>
+      <template #actions>
+        <flex-box full-width justify="between">
+          <text-button
+            v-if="isUpdate"
+            text
+            label="Delete"
+            icon="delete"
+            data-cy="button-document-delete"
+            @click="handleDelete"
+          />
+          <q-space />
+          <text-button
+            :disabled="!canSave"
+            label="Save"
+            icon="save"
+            data-cy="button-document-save"
+            @click="handleSubmit"
+          />
+        </flex-box>
+      </template>
+    </panel-card>
   </details-panel>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { DocumentSchema } from "@/types";
+/**
+ * Allows for creating and editing documents.
+ */
+export default {
+  name: "DocumentPanel",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, watch } from "vue";
+import { PanelType } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { appStore, documentSaveStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import {
-  FlexBox,
   ArtifactInput,
   ArtifactTypeInput,
+  FlexBox,
   SwitchInput,
   TextButton,
+  PanelCard,
+  TextInput,
+  SelectInput,
 } from "@/components/common";
 import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
-/**
- * Allows for creating and editing documents.
- */
-export default defineComponent({
-  name: "DocumentPanel",
-  components: {
-    DetailsPanel,
-    TextButton,
-    FlexBox,
-    SwitchInput,
-    ArtifactTypeInput,
-    ArtifactInput,
-  },
-  data() {
-    return {
-      types: documentTypeOptions(),
-    };
-  },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "document";
-    },
-    /**
-     * @return Whether an existing document is being updated.
-     */
-    isUpdate(): boolean {
-      return documentSaveStore.isUpdate;
-    },
-    /**
-     * @return Whether the current document name is valid.
-     */
-    isNameValid(): boolean {
-      return documentSaveStore.isNameValid;
-    },
-    /**
-     * @return Whether the current document is valid.
-     */
-    canSave(): boolean {
-      return documentSaveStore.canSave;
-    },
-    /**
-     * @return Document name errors to display.
-     */
-    nameErrors(): string[] {
-      return documentSaveStore.editedDocument.name === ""
-        ? []
-        : documentSaveStore.nameErrors;
-    },
-    /**
-     * @return The store for saving documents.
-     */
-    store(): typeof documentSaveStore {
-      return documentSaveStore;
-    },
-    /**
-     * @return The base document being edited.
-     */
-    baseDocument(): DocumentSchema | undefined {
-      return documentSaveStore.baseDocument;
-    },
-  },
-  watch: {
-    /**
-     * Reset the document when the modal is opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+const typeOptions = documentTypeOptions();
 
-      documentSaveStore.resetDocument();
-    },
-    /**
-     * Reset the document when the base document changes.
-     */
-    baseDocument() {
-      documentSaveStore.resetDocument();
-    },
-  },
-  methods: {
-    /**
-     * Emits a request to close the modal.
-     */
-    handleClose() {
-      this.$emit("close");
-    },
-    /**
-     * Generates artifacts to save on this document.
-     */
-    handleSaveTypes() {
-      documentSaveStore.updateArtifacts();
-    },
-    /**
-     * Generates child artifacts to save on this document.
-     */
-    handleSaveChildren() {
-      documentSaveStore.updateChildArtifacts();
-    },
-    /**
-     * Attempts to save the document.
-     */
-    handleSubmit() {
-      handleSaveDocument({
-        onSuccess: () => this.handleClose(),
-      });
-    },
-    /**
-     * Attempts to delete the document, after confirming.
-     */
-    handleDelete() {
-      handleDeleteDocument({
-        onSuccess: () => this.handleClose(),
-      });
-    },
-  },
-});
+const store = computed(() => documentSaveStore);
+const isUpdate = computed(() => documentSaveStore.isUpdate);
+const canSave = computed(() => documentSaveStore.canSave);
+const nameError = computed(() => documentSaveStore.nameError);
+const editedDocument = computed(() => documentSaveStore.editedDocument);
+const includeChildren = computed(() => documentSaveStore.includeChildren);
+
+/**
+ * Resets the document fields when opened.
+ */
+function handleReset(): void {
+  documentSaveStore.resetDocument();
+}
+
+/**
+ * Closes the document panel.
+ */
+function handleClose() {
+  appStore.closePanel(PanelType.detailsPanel);
+}
+
+/**
+ * Generates artifacts to save on this document.
+ */
+function handleSaveTypes() {
+  documentSaveStore.updateArtifacts();
+}
+
+/**
+ * Generates child artifacts to save on this document.
+ */
+function handleSaveChildren() {
+  documentSaveStore.updateChildArtifacts();
+}
+
+/**
+ * Attempts to save the document.
+ */
+function handleSubmit() {
+  handleSaveDocument({
+    onSuccess: () => handleClose(),
+  });
+}
+
+/**
+ * Attempts to delete the document after confirming.
+ */
+function handleDelete() {
+  handleDeleteDocument({
+    onSuccess: () => handleClose(),
+  });
+}
+
+watch(() => documentSaveStore.baseDocument, handleReset);
 </script>

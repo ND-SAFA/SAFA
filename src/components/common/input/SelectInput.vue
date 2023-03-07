@@ -3,6 +3,7 @@
     v-model="model"
     :filled="!props.outlined"
     :outlined="props.outlined"
+    :disable="props.disabled"
     :label="props.label"
     :options="props.options"
     :option-value="props.optionValue"
@@ -35,11 +36,11 @@ const props = defineProps<{
   /**
    * The key of an option's id.
    */
-  optionValue?: string;
+  optionValue?: string | ((opt: unknown) => string);
   /**
    * The key of an option's display label.
    */
-  optionLabel?: string;
+  optionLabel?: string | ((opt: unknown) => string);
   /**
    * Only saves the option's value, not the entire object.
    */
@@ -48,6 +49,10 @@ const props = defineProps<{
    * Whether to display as outlined, instead of the default filled.
    */
   outlined?: boolean;
+  /**
+   * Whether to disable this input.
+   */
+  disabled?: boolean;
 }>();
 
 defineEmits<{

@@ -1,45 +1,32 @@
 <template>
-  <div class="mt-4">
+  <panel-card>
     <text-button
-      v-if="!isSelectorVisible"
+      v-if="!selectorVisible"
       block
-      large
+      label="Compare Versions"
       color="primary"
       icon="view-delta"
       @click="handleChange"
-    >
-      Compare Versions
-    </text-button>
+    />
     <text-button
       v-else
       block
-      large
       outlined
+      label="Hide Delta View"
       icon="cancel"
       @click="handleChange"
-    >
-      Hide Delta View
-    </text-button>
-
-    <v-select
-      v-if="isSelectorVisible"
-      filled
-      :model-value="deltaStore.afterVersion"
-      :items="versions"
-      :loading="isLoading"
-      item-value="versionId"
+    />
+    <select-input
+      v-model="version"
+      :disabled="!selectorVisible"
+      :options="versions"
+      :loading="loading"
+      option-value="versionId"
+      :option-label="getVersionName"
       label="Delta Version"
-      class="mt-4"
-      @update:model-value="handleSetVersion"
-    >
-      <template #selection>
-        {{ getVersionName(deltaStore.afterVersion) }}
-      </template>
-      <template #item="{ item }">
-        {{ getVersionName(item) }}
-      </template>
-    </v-select>
-  </div>
+      class="q-mt-md"
+    />
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -52,7 +39,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
@@ -61,29 +48,26 @@ import {
   handleReloadProject,
   handleSetProjectDelta,
 } from "@/api";
-import { TextButton } from "@/components/common";
+import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
-const isLoading = ref(false);
-const isSelectorVisible = ref(deltaStore.inDeltaView);
+const loading = ref(false);
+const selectorVisible = ref(deltaStore.inDeltaView);
 const versions = ref<VersionSchema[]>([]);
 
-/**
- * Loads a new version.
- * @param newVersionId - The version to load.
- */
-function handleSetVersion(newVersionId: string): void {
-  const newVersion = versions.value.find(
-    ({ versionId }) => versionId === newVersionId
-  );
+const version = computed({
+  get() {
+    return deltaStore.afterVersion;
+  },
+  set(newVersion) {
+    if (!newVersion || !projectStore.version) return;
 
-  if (!newVersion || !projectStore.version) return;
+    loading.value = true;
 
-  isLoading.value = true;
-
-  handleSetProjectDelta(projectStore.version, newVersion, () => {
-    isLoading.value = false;
-  });
-}
+    handleSetProjectDelta(projectStore.version, newVersion, () => {
+      loading.value = false;
+    });
+  },
+});
 
 /**
  * Returns a version's name.
@@ -111,12 +95,12 @@ async function loadVersions(): Promise<void> {
  * Changes whether delta view is enabled.
  */
 function handleChange(): void {
-  if (isSelectorVisible.value) {
+  if (selectorVisible.value) {
     deltaStore.setIsDeltaViewEnabled(false);
     handleReloadProject();
-    isSelectorVisible.value = false;
+    selectorVisible.value = false;
   } else {
-    isSelectorVisible.value = true;
+    selectorVisible.value = true;
   }
 }
 

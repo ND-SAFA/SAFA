@@ -14,7 +14,8 @@
       dense
       outlined
       dark
-      :options-dark="false"
+      :options-dark="darkMode"
+      options-selected-class="primary"
       label="Version"
       :options="versions"
       option-value="versionId"
@@ -52,7 +53,7 @@
  * Displays the current project version.
  */
 export default {
-  name: "AppVersion",
+  name: "VersionSelector",
 };
 </script>
 
@@ -60,13 +61,15 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { projectStore } from "@/hooks";
+import { projectStore, useTheme } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
 import { Typography, FlexBox, TextButton, ListItem } from "@/components/common";
-import { VersionCreator } from "@/components/project/selector";
+import VersionCreator from "./VersionCreator.vue";
 
 const versions = ref<VersionSchema[]>([]);
 const openCreateVersion = ref(false);
+
+const { darkMode } = useTheme();
 
 const project = computed(() => projectStore.project);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);

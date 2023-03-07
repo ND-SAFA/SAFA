@@ -18,7 +18,7 @@
     </template>
     <template #selected-item="{ opt, index, removeAtIndex }">
       <q-chip
-        v-if="!!opt && index < 3"
+        v-if="!!opt && opt.name && index < 3"
         outline
         removable
         @remove="removeAtIndex(index)"

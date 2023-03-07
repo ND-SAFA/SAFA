@@ -1,67 +1,73 @@
 <template>
   <div>
-    <span class="mt-1">
-      <typography bold color="primary" :value="entry.name" />
-      <typography secondary value="Traces To:" />
-    </span>
-    <v-chip-group column>
-      <v-chip
-        v-for="type in entry.allowedTypes"
+    <typography
+      bold
+      color="primary"
+      class="q-mr-xs"
+      :value="props.artifactLevel.name"
+    />
+    <typography secondary value="Traces To" />
+    <div>
+      <q-chip
+        v-for="type in allowedTypes"
         :key="type"
-        :close="allowEditing"
+        outline
+        :removable="allowEditing"
         data-cy="chip-type-direction"
-        @click:close="handleDeleteDirection(entry, type)"
+        @close="handleDelete(type)"
       >
         <typography :value="getTypeLabel(type)" />
-      </v-chip>
-    </v-chip-group>
-    <v-chip v-if="entry.allowedTypes.length === 0">
-      <typography value="Any Type" />
-    </v-chip>
+      </q-chip>
+      <q-chip v-if="allowedTypes.length === 0">
+        <typography value="Any Type" />
+      </q-chip>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+/**
+ * Renders an input for changing the allowed artifact type directions.
+ */
+export default {
+  name: "TypeDirectionInput",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
 import { Typography } from "@/components/common/display";
 
+const props = defineProps<{
+  /**
+   * The artifact level to display and allow editing of.
+   */
+  artifactLevel: TimArtifactLevelSchema;
+}>();
+
+const allowEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
+const allowedTypes = computed(() => props.artifactLevel.allowedTypes);
+
 /**
- * Renders an input for changing the allowed artifact type directions.
+ * Converts an artifact type to a title case name.
+ * @param type - The type to convert.
+ * @return The type display name.
  */
-export default defineComponent({
-  name: "TypeDirectionInput",
-  components: { Typography },
-  props: {
-    entry: Object as PropType<TimArtifactLevelSchema>,
-  },
-  computed: {
-    /**
-     * @return Whether to allow editing.
-     */
-    allowEditing(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-  },
-  methods: {
-    /**
-     * Converts an artifact type to a title case name.
-     * @param type - The type to convert.
-     * @return The type display name.
-     */
-    getTypeLabel(type: string) {
-      return typeOptionsStore.getArtifactTypeDisplay(type);
-    },
-    /**
-     * Removes an artifact type direction.
-     * @param entry - The type to update.
-     * @param removedType - The type to remove.
-     */
-    handleDeleteDirection(entry: TimArtifactLevelSchema, removedType: string) {
-      handleRemoveDirection(entry, removedType);
-    },
-  },
-});
+function getTypeLabel(type: string) {
+  return typeOptionsStore.getArtifactTypeDisplay(type);
+}
+
+/**
+ * Removes an artifact type direction.
+ * @param removedType - The type to remove.
+ */
+function handleDelete(removedType: string) {
+  handleRemoveDirection(props.artifactLevel, removedType);
+}
 </script>

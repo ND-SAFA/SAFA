@@ -1,8 +1,8 @@
 <template>
-  <div v-if="isOpen">
+  <details-panel panel="displayArtifact">
     <artifact-buttons />
     <artifact-content />
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
@@ -15,11 +15,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { appStore } from "@/hooks";
+import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 import { ArtifactButtons, ArtifactContent } from "../display";
-
-const isOpen = computed(
-  () => appStore.isDetailsPanelOpen === "displayArtifact"
-);
 </script>

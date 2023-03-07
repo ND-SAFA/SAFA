@@ -13,6 +13,7 @@
   >
     <template #selected-item="{ opt }">
       <attribute-chip v-if="!!opt" artifact-type :value="opt" />
+      <typography v-if="optionCount > 0" l="1" :value="optionCountDisplay" />
     </template>
   </q-select>
 </template>
@@ -28,8 +29,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
-import { typeOptionsStore, useVModel } from "@/hooks";
-import { AttributeChip } from "@/components/common/display";
+import { artifactStore, typeOptionsStore, useVModel } from "@/hooks";
+import { AttributeChip, Typography } from "@/components/common/display";
 
 const props = withDefaults(
   defineProps<{
@@ -38,6 +39,7 @@ const props = withDefaults(
     label?: string;
     hint?: string;
     errorMessage?: string;
+    showCount?: boolean;
   }>(),
   {
     label: "Artifact Types",
@@ -55,4 +57,14 @@ const emit = defineEmits<{
 const model = useVModel(props, "modelValue");
 
 const options = computed(() => typeOptionsStore.artifactTypes);
+
+const optionCount = computed(() =>
+  props.showCount && typeof model.value === "string"
+    ? artifactStore.getArtifactsByType[model.value]?.length || 0
+    : 0
+);
+
+const optionCountDisplay = computed(() =>
+  optionCount.value === 1 ? "1 Artifact" : `${optionCount.value} Artifacts`
+);
 </script>

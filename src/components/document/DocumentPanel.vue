@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen">
+  <details-panel panel="document">
     <v-text-field
       v-model="store.editedDocument.name"
       filled
@@ -71,7 +71,7 @@
         Save
       </text-button>
     </flex-box>
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
@@ -87,6 +87,7 @@ import {
   SwitchInput,
   TextButton,
 } from "@/components/common";
+import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 /**
  * Allows for creating and editing documents.
@@ -94,6 +95,7 @@ import {
 export default defineComponent({
   name: "DocumentPanel",
   components: {
+    DetailsPanel,
     TextButton,
     FlexBox,
     SwitchInput,

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen" data-cy="panel-trace-save">
+  <details-panel panel="saveTrace" data-cy="panel-trace-save">
     <artifact-input
       v-model="sourceArtifactId"
       label="Source Artifact"
@@ -22,7 +22,7 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <div v-for="entry in artifactLevels" :key="entry.typeId">
-            <type-direction-input :entry="entry" />
+            <type-direction-input :artifact-level="entry" />
           </div>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -40,7 +40,7 @@
         Create
       </v-btn>
     </flex-box>
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
@@ -54,13 +54,20 @@ import {
   TypeDirectionInput,
   FlexBox,
 } from "@/components/common";
+import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 /**
  * Allows for creating trace links.
  */
 export default defineComponent({
   name: "SaveTraceLinkPanel",
-  components: { FlexBox, Typography, ArtifactInput, TypeDirectionInput },
+  components: {
+    DetailsPanel,
+    FlexBox,
+    Typography,
+    ArtifactInput,
+    TypeDirectionInput,
+  },
   data() {
     return {
       sourceArtifactId: "",

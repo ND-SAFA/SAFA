@@ -197,7 +197,7 @@ const className = useMargins(props, () => [
   ["error", "text-negative"],
   ["ellipsis", "text-ellipsis"],
   ["secondary", "text-grey-8"],
-  ["bold", "font-weight-bold"],
+  ["bold", "text-bold"],
   ["small", "text-sm"],
   ["large", "text-lg"],
   ["wrap", "text-wrap"],

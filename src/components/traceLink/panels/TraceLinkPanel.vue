@@ -1,8 +1,8 @@
 <template>
-  <div v-if="isOpen" data-cy="panel-trace-display">
+  <details-panel panel="displayTrace" data-cy="panel-trace-display">
     <trace-link-buttons />
     <trace-link-content />
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
@@ -15,9 +15,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { appStore } from "@/hooks";
+import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 import { TraceLinkButtons, TraceLinkContent } from "../display";
-
-const isOpen = computed(() => appStore.isDetailsPanelOpen === "displayTrace");
 </script>

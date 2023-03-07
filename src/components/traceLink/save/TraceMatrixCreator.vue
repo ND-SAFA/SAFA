@@ -6,22 +6,24 @@
           <flex-box full-width b="2">
             <artifact-type-input
               v-model="matrix.source"
+              show-count
               label="Source Type"
               class="q-mr-md"
               style="width: 50%"
             />
             <artifact-type-input
               v-model="matrix.target"
+              show-count
               label="Target Type"
               style="width: 50%"
             />
           </flex-box>
-          <flex-box justify="center">
+          <flex-box full-width justify="center">
             <attribute-chip
-              v-for="(detail, detailIdx) in getMatrixDetails(matrix)"
+              v-for="detail in getMatrixDetails(matrix)"
               :key="detail"
               :value="detail"
-              :icon="detailIdx < 2 ? 'artifact' : 'trace'"
+              icon="trace"
             />
           </flex-box>
         </flex-box>
@@ -92,10 +94,10 @@ function getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
   ]);
 
   return [
-    `Source Artifacts: ${sources.length}`,
-    `Target Artifacts: ${targets.length}`,
-    `Manual Links: ${manual.length}`,
-    `Approved Links: ${approved.length}`,
+    manual.length === 1 ? "1 Manual Link" : `${manual.length} Manual Links`,
+    approved.length === 1
+      ? "1 Approved Link"
+      : `${approved.length} Approved Links`,
   ];
 }
 

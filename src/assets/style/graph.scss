@@ -1,11 +1,8 @@
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
-.cy-container,
-#cytoscape-div,
 #cytoscape-artifact {
-  height: 100% !important;
-  max-height: 100vh !important;
+  min-height: inherit !important;
 }
 
 .artifact-view {

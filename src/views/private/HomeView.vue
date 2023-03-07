@@ -23,31 +23,30 @@
             variant="small"
             value="Chose which data source you would like to create a project from."
           />
-          <flex-box column align="start" t="2">
-            <text-button
-              text
-              icon="add"
-              color="primary"
-              @click="handleOpenStandard"
-            >
-              Create New Project
-            </text-button>
-            <text-button
-              text
-              icon="upload"
-              color="primary"
-              @click="handleOpenBulk"
-            >
-              Bulk Upload Project
-            </text-button>
-            <text-button
-              text
-              icon="integrate"
-              color="primary"
-              @click="handleOpenImport"
-            >
-              Import Jira/GitHub Project
-            </text-button>
+          <flex-box full-width justify="center" t="2">
+            <flex-box column>
+              <text-button
+                text
+                label="Create New Project"
+                icon="add"
+                color="primary"
+                @click="handleOpenStandard"
+              />
+              <text-button
+                text
+                label="Bulk Upload Project"
+                icon="upload"
+                color="primary"
+                @click="handleOpenBulk"
+              />
+              <text-button
+                text
+                label="Import Jira/GitHub Project"
+                icon="integrate"
+                color="primary"
+                @click="handleOpenImport"
+              />
+            </flex-box>
           </flex-box>
         </panel-card>
       </div>

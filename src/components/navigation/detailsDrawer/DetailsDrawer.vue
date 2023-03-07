@@ -5,8 +5,9 @@
     :model-value="drawerOpen"
     :breakpoint="0"
     :width="width"
+    class="bg-background"
   >
-    <div class="q-pa-sm full-height bg-background">
+    <div class="q-pa-sm q-mb-md full-height bg-background">
       <flex-box justify="between" align="center">
         <typography color="primary" variant="subtitle" :value="title" />
         <icon-button

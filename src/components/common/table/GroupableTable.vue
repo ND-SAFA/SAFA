@@ -62,7 +62,6 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { TableColumn, TableGroupRow, TableRow } from "@/types";
-import { sortRows } from "@/util";
 import { useTableFilter, useVModel } from "@/hooks";
 import GroupableTableRow from "./GroupableTableRow.vue";
 import GroupableTableHeader from "./GroupableTableHeader.vue";
@@ -126,11 +125,10 @@ const emit = defineEmits<{
   (e: "group:close", groupBy: string, groupValue: unknown): void;
 }>();
 
-const { searchText, searchLabel, filteredRows } = useTableFilter(props);
+const { searchText, searchLabel, sortBy, sortDesc, filteredRows } =
+  useTableFilter(props);
 
 const groupBy = ref<string | undefined>(props.defaultGroupBy);
-const sortBy = ref<string | undefined>(props.defaultSortBy);
-const sortDesc = ref(props.defaultSortDesc || false);
 
 const expandedRows = useVModel(props, "expanded");
 
@@ -142,15 +140,13 @@ const customCellSlots = computed(() =>
  * Applies sorting and grouping to filtered rows by adding header rows in between each group.
  */
 const groupedRows = computed(() => {
-  const sortedRows = sortRows(filteredRows.value, sortBy.value, sortDesc.value);
-
   if (!groupBy.value) {
-    return sortedRows;
+    return filteredRows.value;
   }
 
   const rowsByGroup: Record<string, TableGroupRow[]> = {};
 
-  sortedRows.forEach((row) => {
+  filteredRows.value.forEach((row) => {
     const group = String(row[groupBy.value || ""]);
 
     rowsByGroup[group] = [...(rowsByGroup[group] || []), row];

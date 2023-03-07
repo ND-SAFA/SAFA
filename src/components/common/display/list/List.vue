@@ -1,6 +1,12 @@
 <template>
   <q-list :bordered="props.bordered">
-    <slot />
+    <div
+      v-if="!!props.scrollHeight"
+      :style="`max-height: ${props.scrollHeight}px; overflow-y: auto`"
+    >
+      <slot />
+    </div>
+    <slot v-else />
   </q-list>
 </template>
 
@@ -15,6 +21,13 @@ export default {
 
 <script setup lang="ts">
 const props = defineProps<{
+  /**
+   * Whether to add a border to the list.
+   */
   bordered?: boolean;
+  /**
+   * The number of pixels to set the scroll area height to.
+   */
+  scrollHeight?: number;
 }>();
 </script>

@@ -25,8 +25,13 @@
         <slot name="subtitle" />
       </q-item-label>
     </q-item-section>
-    <q-item-section v-if="!!slots.actions">
-      <slot name="actions" />
+    <q-item-section
+      v-if="!!slots.actions"
+      :class="props.actionCols ? `col-${props.actionCols}` : ''"
+    >
+      <div @click.stop="">
+        <slot name="actions" />
+      </div>
     </q-item-section>
   </q-item>
 </template>
@@ -81,6 +86,10 @@ const props = defineProps<{
    * The color to render the component with.
    */
   color?: ThemeColor;
+  /**
+   * The optional number of columns ot take up with the action space, out of 12.
+   */
+  actionCols?: number;
   /**
    * The testing selector to set.
    */

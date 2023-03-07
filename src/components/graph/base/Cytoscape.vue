@@ -18,6 +18,7 @@ import { CytoEvent } from "@/types";
 
 const props = withDefaults(
   defineProps<{
+    id?: string;
     config: CytoscapeOptions;
     preConfig?: (cy: typeof cytoscape) => void;
     afterCreated?: (cy: Core) => void;
@@ -51,7 +52,7 @@ provide(
 
 onMounted(() => {
   // create a vue independent element
-  container.value?.setAttribute("id", "cytoscape-div");
+  container.value?.setAttribute("id", props.id || "cytoscape-div");
   container.value?.setAttribute("width", "100%");
   container.value?.setAttribute("style", "min-height: 600px;");
 

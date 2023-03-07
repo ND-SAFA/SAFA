@@ -6,23 +6,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { appStore } from "@/hooks";
-import { ArtifactButtons, ArtifactContent } from "../display";
-
 /**
  * Displays artifact information.
  */
-export default defineComponent({
+export default {
   name: "ArtifactPanel",
-  components: { ArtifactContent, ArtifactButtons },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayArtifact";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import { ArtifactButtons, ArtifactContent } from "../display";
+
+const isOpen = computed(
+  () => appStore.isDetailsPanelOpen === "displayArtifact"
+);
 </script>

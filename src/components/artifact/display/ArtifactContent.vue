@@ -8,22 +8,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+/**
+ * Displays artifact information.
+ */
+export default {
+  name: "ArtifactContent",
+};
+</script>
+
+<script setup lang="ts">
 import ArtifactFields from "./ArtifactFields.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";
 import ArtifactErrors from "./ArtifactErrors.vue";
 import ArtifactTraces from "./ArtifactTraces.vue";
-
-/**
- * Displays artifact information.
- */
-export default defineComponent({
-  name: "ArtifactContent",
-  components: {
-    ArtifactFields,
-    ArtifactDocuments,
-    ArtifactErrors,
-    ArtifactTraces,
-  },
-});
 </script>

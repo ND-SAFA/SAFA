@@ -59,9 +59,8 @@
       >
         <td class="v-data-table__divider">
           <attribute-display
-            hide-title
             :attribute="attribute"
-            :model="item.attributes || {}"
+            :values="item.attributes || {}"
           />
         </td>
       </template>

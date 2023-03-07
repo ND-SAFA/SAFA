@@ -3,18 +3,13 @@
     <project-tree />
     <artifact-fab />
 
-    <tab-list
-      v-if="isTableMode"
-      v-model="tab"
-      :tabs="tabs"
-      class="q-my-4 q-mx-10"
-    >
-      <v-window-item key="1">
+    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-ma-lg">
+      <template #artifacts>
         <artifact-table />
-      </v-window-item>
-      <v-window-item key="2">
+      </template>
+      <template #traces>
         <trace-matrix-table />
-      </v-window-item>
+      </template>
     </tab-list>
   </private-page>
 </template>
@@ -42,7 +37,7 @@ import {
 } from "@/components";
 
 const tabs = tableViewTabOptions();
-const tab = ref(0);
+const tab = ref("artifacts");
 
 const isTableMode = computed(() => layoutStore.isTableMode);
 </script>

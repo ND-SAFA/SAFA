@@ -2,7 +2,8 @@
   <attribute-grid v-if="doDisplay" :layout="layout">
     <template #item="{ attribute }">
       <attribute-display
-        :model="artifact.attributes || {}"
+        show-name
+        :values="attributes"
         :attribute="attribute"
       />
     </template>
@@ -10,37 +11,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
+/**
+ * Displays a list of generic attributes.
+ */
+export default {
+  name: "AttributeListDisplay",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { ArtifactSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 import AttributeGrid from "./AttributeGrid.vue";
 import AttributeDisplay from "./AttributeDisplay.vue";
 
-/**
- * Displays a list of generic attributes.
- */
-export default defineComponent({
-  name: "AttributeListDisplay",
-  components: { AttributeDisplay, AttributeGrid },
-  props: {
-    artifact: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * @return The layout for this artifact.
-     */
-    layout(): AttributeLayoutSchema | undefined {
-      return attributesStore.getLayoutByType(this.artifact.type);
-    },
-    /**
-     * @return Whether the attribute list should be displayed.
-     */
-    doDisplay(): boolean {
-      return !!this.layout && this.layout.positions.length > 0;
-    },
-  },
-});
+const props = defineProps<{
+  /**
+   * The artifact to display the custom attributes of.
+   */
+  artifact: ArtifactSchema;
+}>();
+
+const attributes = computed(() => props.artifact.attributes || {});
+
+const layout = computed(() =>
+  attributesStore.getLayoutByType(props.artifact.type)
+);
+
+const doDisplay = computed(() => (layout.value?.positions.length || 0) > 0);
 </script>

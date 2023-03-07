@@ -112,7 +112,7 @@ export const useAttributes = defineStore("attributes", {
       projectStore.project.attributeLayouts = this.attributeLayouts;
     },
     /**
-     * Returns the layout based on an artifact type.
+     * Returns the attribute grid layout for the given artifact type.
      *
      * @param type - The type to find.
      * @return The attribute layout.

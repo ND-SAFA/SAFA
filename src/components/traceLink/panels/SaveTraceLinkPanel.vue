@@ -4,7 +4,7 @@
     data-cy="panel-trace-save"
     @open="handleOpen"
   >
-    <panel-card class="q-mt-md">
+    <panel-card>
       <artifact-input
         v-model="sourceArtifactId"
         label="Source Artifact"

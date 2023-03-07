@@ -3,7 +3,7 @@
     <text-button
       text
       label="View Artifact"
-      y="2"
+      b="2"
       icon="artifact"
       @click="handleViewArtifact"
     />

@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="generateTrace" data-cy="panel-trace-display">
-    <panel-card class="q-mt-md">
+    <panel-card>
       <trace-link-generator :open="isOpen" @submit="handleClose" />
     </panel-card>
   </details-panel>

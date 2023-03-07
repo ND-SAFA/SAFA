@@ -1,5 +1,5 @@
 <template>
-  <div v-if="open">
+  <div v-if="open" class="q-my-sm">
     <slot />
   </div>
 </template>

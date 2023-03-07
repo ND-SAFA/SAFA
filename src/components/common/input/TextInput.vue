@@ -8,6 +8,7 @@
     :error="showError"
     :class="className"
     :hint="props.hint"
+    :type="props.type"
     @keydown="handleKeydown"
   />
 </template>

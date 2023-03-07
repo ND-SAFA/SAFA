@@ -1,5 +1,5 @@
 <template>
-  <flex-box y="2">
+  <flex-box b="2">
     <trace-link-approval
       :trace="traceLink"
       deletable

@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" y="2">
+  <flex-box v-if="doDisplay" b="2">
     <text-button
       text
       label="View Body"

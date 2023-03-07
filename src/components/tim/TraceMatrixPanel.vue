@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <flex-box y="2">
+    <flex-box b="2">
       <text-button
         text
         label="View In Tree"

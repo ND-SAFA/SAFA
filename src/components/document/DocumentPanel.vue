@@ -103,8 +103,8 @@ import {
   PanelCard,
   TextInput,
   SelectInput,
+  DetailsPanel,
 } from "@/components/common";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 const typeOptions = documentTypeOptions();
 

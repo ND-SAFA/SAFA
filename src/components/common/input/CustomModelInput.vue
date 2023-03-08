@@ -32,7 +32,7 @@ export default {
 import { computed } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { projectStore, useVModel } from "@/hooks";
-import ListItem from "@/components/common/display/list/ListItem.vue";
+import { ListItem } from "@/components/common/display";
 
 const props = defineProps<{
   modelValue: GenerationModelSchema | undefined;

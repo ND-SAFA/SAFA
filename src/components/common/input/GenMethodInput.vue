@@ -28,7 +28,7 @@ export default {
 import { computed } from "vue";
 import { traceModelOptions } from "@/util";
 import { useVModel } from "@/hooks";
-import ListItem from "@/components/common/display/list/ListItem.vue";
+import { ListItem } from "@/components/common/display";
 
 const props = defineProps<{
   modelValue?: string;

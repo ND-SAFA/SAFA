@@ -15,6 +15,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
+import { DetailsPanel } from "@/components/common";
 import { ArtifactButtons, ArtifactContent } from "../display";
 </script>

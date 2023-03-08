@@ -56,7 +56,7 @@
       </template>
 
       <template #body-cell-approvalStatus="{ row }">
-        <attribute-chip :value="row.approvalStatus" />
+        <attribute-chip :value="row.approvalStatus" approval-type />
       </template>
 
       <template #body-cell-score="{ row }">

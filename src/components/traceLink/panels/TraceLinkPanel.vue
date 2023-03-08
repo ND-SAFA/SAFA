@@ -15,6 +15,6 @@ export default {
 </script>
 
 <script setup lang="ts">
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
+import { DetailsPanel } from "@/components/common";
 import { TraceLinkButtons, TraceLinkContent } from "../display";
 </script>

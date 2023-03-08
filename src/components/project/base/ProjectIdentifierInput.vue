@@ -27,7 +27,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults } from "vue";
 import { useVModel } from "@/hooks";
-import TextInput from "@/components/common/input/TextInput.vue";
+import { TextInput } from "@/components/common";
 
 const props = withDefaults(
   defineProps<{

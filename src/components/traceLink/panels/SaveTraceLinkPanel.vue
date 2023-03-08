@@ -72,8 +72,8 @@ import {
   ExpansionItem,
   PanelCard,
   TextButton,
+  DetailsPanel,
 } from "@/components/common";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 const sourceArtifactId = ref("");
 const targetArtifactId = ref("");

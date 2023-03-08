@@ -30,7 +30,7 @@ export default {
 import { computed } from "vue";
 import { ConfirmationType } from "@/types";
 import { logStore } from "@/hooks";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { TextButton } from "@/components/common/button";
 import Modal from "./Modal.vue";
 
 const message = computed(() => logStore.confirmation);

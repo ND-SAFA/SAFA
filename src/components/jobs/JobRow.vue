@@ -85,8 +85,8 @@ import {
   IconButton,
   TextButton,
   FlexBox,
+  Stepper,
 } from "@/components/common";
-import Stepper from "@/components/common/stepper/Stepper.vue";
 
 const props = defineProps<{
   /**

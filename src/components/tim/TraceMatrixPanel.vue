@@ -46,8 +46,8 @@ import {
   TextButton,
   Icon,
   Separator,
+  DetailsPanel,
 } from "@/components/common";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 

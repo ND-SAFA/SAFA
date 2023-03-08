@@ -35,8 +35,7 @@ export default {
 import { computed } from "vue";
 import { IconVariant, SizeType, ThemeColor } from "@/types";
 import { useMargins } from "@/hooks";
-import Icon from "@/components/common/display/icon/Icon.vue";
-import Typography from "@/components/common/display/Typography.vue";
+import { Icon, Typography } from "@/components/common/display";
 
 const props = defineProps<{
   /**

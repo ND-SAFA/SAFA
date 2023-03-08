@@ -21,8 +21,7 @@ export default {
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
-import { PanelCard } from "@/components/common";
+import { DetailsPanel, PanelCard } from "@/components/common";
 import { SaveArtifactInputs, SaveArtifactButtons } from "../save";
 
 onMounted(() => {

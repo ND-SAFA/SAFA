@@ -1,15 +1,15 @@
 <template>
-  <div class="row">
-    <div class="col q-mr-md">
+  <flex-box>
+    <flex-item parts="6" class="q-mr-md">
       <theme-controller />
       <update-password />
       <delete-account />
-    </div>
-    <div class="col">
+    </flex-item>
+    <flex-item parts="6">
       <external-links />
       <integrations-accounts />
-    </div>
-  </div>
+    </flex-item>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -22,6 +22,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { FlexBox, FlexItem } from "@/components/common";
 import ExternalLinks from "./ExternalLinks.vue";
 import IntegrationsAccounts from "./IntegrationsAccounts.vue";
 import DeleteAccount from "./DeleteAccount.vue";

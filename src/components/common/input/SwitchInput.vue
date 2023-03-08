@@ -16,7 +16,7 @@ export default {
 <script setup lang="ts">
 import { ThemeColor } from "@/types";
 import { useVModel } from "@/hooks";
-import Typography from "@/components/common/display/Typography.vue";
+import { Typography } from "@/components/common/display";
 
 const props = defineProps<{
   modelValue: boolean;

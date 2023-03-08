@@ -48,7 +48,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, IconVariant, ThemeColor } from "@/types";
+import { IconVariant, ThemeColor } from "@/types";
 import {
   camelcaseToDisplay,
   getEnumColor,
@@ -57,7 +57,7 @@ import {
 } from "@/util";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
-import Icon from "@/components/common/display/icon/Icon.vue";
+import { Icon } from "../icon";
 import Typography from "../Typography.vue";
 
 const props = defineProps<{
@@ -74,9 +74,13 @@ const props = defineProps<{
    */
   artifactType?: boolean;
   /**
-   * Whether this chip is for an delta type, customizing the display and icon.
+   * Whether this chip is for a delta type, customizing the display and icon.
    */
   deltaType?: boolean;
+  /**
+   * Whether this chip is for an approval type, customizing the display and icon.
+   */
+  approvalType?: boolean;
   /**
    * Whether to render a confidence score instead of a chip.
    */
@@ -95,9 +99,7 @@ const props = defineProps<{
   dataCy?: string;
 }>();
 
-const enumerated = computed(
-  () => props.value in ApprovalType || props.deltaType
-);
+const enumerated = computed(() => props.approvalType || props.deltaType);
 
 const text = computed(() => {
   if (props.confidenceScore) {

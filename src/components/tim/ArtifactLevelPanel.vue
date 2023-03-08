@@ -48,8 +48,8 @@ import {
   TextButton,
   Icon,
   FlexBox,
+  DetailsPanel,
 } from "@/components/common";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const artifactLevelName = computed(() => artifactLevel.value?.name || "");

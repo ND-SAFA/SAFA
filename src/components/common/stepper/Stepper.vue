@@ -59,8 +59,8 @@ export default {
 import { computed } from "vue";
 import { StepperStep } from "@/types";
 import { useVModel } from "@/hooks";
-import TextButton from "@/components/common/button/TextButton.vue";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
+import { TextButton } from "@/components/common/button";
+import { FlexBox } from "@/components/common/layout";
 
 const props = defineProps<{
   /**

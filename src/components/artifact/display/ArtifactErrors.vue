@@ -4,13 +4,13 @@
       <icon variant="warning" />
     </template>
 
-    <toggle-list
+    <expansion-item
       v-for="(warning, idx) in warnings"
       :key="idx"
-      :title="warning.ruleName"
+      :label="warning.ruleName"
     >
       <typography :value="warning.ruleMessage" />
-    </toggle-list>
+    </expansion-item>
   </panel-card>
 </template>
 
@@ -26,7 +26,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { selectionStore, warningStore } from "@/hooks";
-import { Typography, ToggleList, PanelCard, Icon } from "@/components/common";
+import {
+  Typography,
+  PanelCard,
+  Icon,
+  ExpansionItem,
+} from "@/components/common";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

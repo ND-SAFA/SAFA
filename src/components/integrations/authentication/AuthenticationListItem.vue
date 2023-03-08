@@ -11,28 +11,30 @@
       <q-circular-progress v-else indeterminate />
     </template>
     <template #actions>
-      <text-button
-        v-if="!props.hasCredentials"
-        label="Connect"
-        color="primary"
-        outlined
-        icon="integrate"
-        @click="emit('connect')"
-      />
-      <flex-box v-else column align="end">
+      <flex-box full-width justify="end">
         <text-button
+          v-if="!props.hasCredentials"
+          label="Connect"
+          color="primary"
           outlined
-          label="Installation"
-          icon="add"
-          b="2"
+          icon="integrate"
           @click="emit('connect')"
         />
-        <text-button
-          outlined
-          label="Disconnect"
-          icon="delete"
-          @click="emit('disconnect')"
-        />
+        <flex-box v-else column align="end">
+          <text-button
+            outlined
+            label="Installation"
+            icon="add"
+            b="2"
+            @click="emit('connect')"
+          />
+          <text-button
+            outlined
+            label="Disconnect"
+            icon="delete"
+            @click="emit('disconnect')"
+          />
+        </flex-box>
       </flex-box>
     </template>
   </list-item>
@@ -49,8 +51,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TextButton, FlexBox, Icon } from "@/components/common";
-import ListItem from "@/components/common/display/list/ListItem.vue";
+import { TextButton, FlexBox, Icon, ListItem } from "@/components/common";
 
 const props = defineProps<{
   hasCredentials: boolean;

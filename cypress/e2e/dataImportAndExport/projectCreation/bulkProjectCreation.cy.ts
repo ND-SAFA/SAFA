@@ -7,12 +7,14 @@ import {
   Routes,
 } from "@/fixtures";
 
+// TODO: There is a weird uncaught exception (ResizeObserver loop limit exceeded) that is thrown when running this test.
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();
   });
 
   beforeEach(() => {
+    cy.viewport(1920, 1080);
     cy.loginToPage(
       validUser.email,
       validUser.password,

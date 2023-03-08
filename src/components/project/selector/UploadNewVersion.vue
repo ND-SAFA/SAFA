@@ -4,11 +4,7 @@
     subtitle="Select files to upload to the current project version."
   >
     <project-files-input v-model="files" data-cy="input-files-version" />
-    <switch-input
-      v-model="replaceAllArtifacts"
-      label="Replace all artifacts"
-      class="ml-4"
-    />
+    <switch-input v-model="replaceAllArtifacts" label="Replace all artifacts" />
     <template #actions>
       <text-button
         block

@@ -8,7 +8,8 @@
         @click="handleViewLevel"
       />
     </flex-box>
-    <panel-card class="mt-2">
+
+    <panel-card>
       <flex-box wrap align="center">
         <attribute-chip artifact-type :value="sourceType" />
         <icon class="q-mx-xs" size="sm" color="primary" variant="trace" />

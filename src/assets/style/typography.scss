@@ -3,6 +3,8 @@
 $heading-font-family: "Source Sans Pro";
 $body-font-family: "Source Sans Pro";
 
+// Text Styling
+
 #app {
   [class*="text-"] {
     font-family: $body-font-family, sans-serif !important;

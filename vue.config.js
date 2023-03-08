@@ -2,7 +2,7 @@
 const fs = require("fs");
 
 module.exports = {
-  transpileDependencies: ["vuetify", "quasar"],
+  transpileDependencies: ["quasar"],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,

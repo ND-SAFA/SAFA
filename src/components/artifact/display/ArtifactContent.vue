@@ -1,5 +1,5 @@
 <template>
-  <div class="py-4">
+  <div>
     <artifact-fields />
     <artifact-traces />
     <artifact-documents />

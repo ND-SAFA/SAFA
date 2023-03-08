@@ -9,28 +9,25 @@
     <flex-box column align="center">
       <text-button
         text
+        :label="`New Major Version: ${nextVersion('major')}`"
         color="primary"
         data-cy="button-create-major-version"
         @click="() => handleClick('major')"
-      >
-        New Major Version: {{ nextVersion("major") }}
-      </text-button>
+      />
       <text-button
         text
+        :label="`New Minor Version: ${nextVersion('minor')}`"
         color="primary"
         data-cy="button-create-minor-version"
         @click="() => handleClick('minor')"
-      >
-        New Minor Version: {{ nextVersion("minor") }}
-      </text-button>
+      />
       <text-button
         text
+        :label="`New Revision: ${nextVersion('revision')}`"
         color="primary"
         data-cy="button-create-revision-version"
         @click="() => handleClick('revision')"
-      >
-        New Revision: {{ nextVersion("revision") }}
-      </text-button>
+      />
     </flex-box>
   </modal>
 </template>

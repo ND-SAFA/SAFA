@@ -1,11 +1,17 @@
-// Fixes code-diff's broken styling
+// Code Diff - Line Style
+
 code.hljs {
   min-height: 26px;
 }
 
-.vue-grid-item.vue-grid-placeholder {
-  background-color: $color-modified;
+// Grid Layout - Item Backdrop
+
+.vue-grid-item.css-transforms {
+  background-color: $color-background;
+  border-radius: 4px;
 }
+
+// Quasar - Inputs
 
 .q-field {
   min-width: 200px;

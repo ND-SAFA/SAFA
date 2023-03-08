@@ -4,7 +4,7 @@ import { Notify } from "quasar";
 import type { QuasarPluginOptions } from "quasar";
 import { lightPalette } from "@/util";
 
-const options: Partial<QuasarPluginOptions> = {
+const quasarOptions: Partial<QuasarPluginOptions> = {
   config: {
     brand: lightPalette,
     notify: {},
@@ -16,4 +16,4 @@ const options: Partial<QuasarPluginOptions> = {
 };
 
 // To be used on app.use(Quasar, { ... })
-export default options;
+export default quasarOptions;

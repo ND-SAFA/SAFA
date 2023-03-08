@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4">
+  <div>
     <text-input
       v-if="!store.isFTA"
       v-model="store.editedArtifact.name"

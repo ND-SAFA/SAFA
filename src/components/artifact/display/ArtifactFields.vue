@@ -28,7 +28,7 @@
       data-cy="text-selected-body"
     />
 
-    <attribute-list-display class="mt-4" :artifact="artifact" />
+    <attribute-list-display :artifact="artifact" />
   </panel-card>
 </template>
 

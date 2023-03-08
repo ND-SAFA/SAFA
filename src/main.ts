@@ -5,19 +5,17 @@ import "vue3-drr-grid-layout/dist/style.css";
 
 import { Quasar } from "quasar";
 import { router } from "@/router";
-import { pinia, gridLayout, codeDiff } from "@/plugins";
+import { pinia, gridLayout, codeDiff, quasarOptions } from "@/plugins";
 import App from "@/App.vue";
-import quasarUserOptions from "./quasar-user-options";
 
 const app = createApp(App);
 
 app
-  // .use(vuetify)
   .use(pinia)
   .use(router)
   .use(gridLayout)
   .use(codeDiff)
-  .use(Quasar, quasarUserOptions);
+  .use(Quasar, quasarOptions);
 
 app.mount("#app");
 

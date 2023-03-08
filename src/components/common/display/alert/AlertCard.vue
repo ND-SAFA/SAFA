@@ -37,11 +37,11 @@ const props = defineProps<{
 
 const className = computed(() => {
   switch (props.type) {
-    case MessageType.ERROR:
+    case MessageType.error:
       return "bd-negative q-pa-sm";
-    case MessageType.SUCCESS:
+    case MessageType.success:
       return "bd-positive q-pa-sm";
-    case MessageType.WARNING:
+    case MessageType.warning:
       return "bd-secondary q-pa-sm";
     default:
       return "bd-primary q-pa-sm";

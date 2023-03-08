@@ -81,7 +81,7 @@ export function svgTitle(title: string, y: number, dataCy: string): string {
   return svgText(
     title,
     {
-      class: "align-center mx-2 text-ellipsis artifact-text",
+      class: "align-center q-mx-sm text-ellipsis artifact-text",
       x: 0,
       y,
       width: "100%",

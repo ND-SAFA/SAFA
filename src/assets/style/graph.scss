@@ -1,6 +1,8 @@
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
+// Graph Window
+
 #cytoscape-artifact {
   min-height: inherit !important;
 }
@@ -18,6 +20,8 @@ $graph-border-radius: 8px;
     display: none;
   }
 }
+
+// Graph Nodes
 
 .artifact-svg-wrapper {
   &.artifact-svg-delta-ADDED,
@@ -44,11 +48,6 @@ $graph-border-radius: 8px;
   &.artifact-svg-delta-NO_CHANGE:hover > .artifact-svg-div {
     stroke: $color-primary;
   }
-}
-
-.no-icon-rotate {
-  cursor: pointer !important;
-  transform: none !important;
 }
 
 .artifact-text.text-body-1 {

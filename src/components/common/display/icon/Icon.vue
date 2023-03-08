@@ -71,7 +71,7 @@ const iconColor = computed(() => {
     case "error":
     case "trace-decline":
     case "trace-decline-all":
-      return "error";
+      return "negative";
     default:
       return "";
   }

@@ -158,12 +158,17 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @param state - The state to get the color for.
  * @return The color.
  */
-export function getApprovalColor(state: ApprovalType | string): ThemeColor {
+export function getEnumColor(
+  state: ApprovalType | ArtifactDeltaState | string
+): ThemeColor {
   switch (state) {
+    case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
       return "positive";
+    case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
       return "primary";
+    case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
       return "negative";
     default:

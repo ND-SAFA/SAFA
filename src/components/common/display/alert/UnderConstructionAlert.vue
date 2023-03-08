@@ -1,5 +1,5 @@
 <template>
-  <alert
+  <alert-card
     type="warning"
     message="This content is still under construction. Check back soon!"
     class="q-my-md"
@@ -16,5 +16,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import Alert from "./Alert.vue";
+import AlertCard from "./AlertCard.vue";
 </script>

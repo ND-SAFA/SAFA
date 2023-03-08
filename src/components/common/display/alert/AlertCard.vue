@@ -15,7 +15,7 @@
  * Displays a generic alert.
  */
 export default {
-  name: "Alert",
+  name: "AlertCard",
 };
 </script>
 

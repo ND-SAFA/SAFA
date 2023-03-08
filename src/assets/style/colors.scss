@@ -47,3 +47,7 @@ $color-removed: var(--q-removedLight);
 .bd-warning {
   border: 1px solid $color-warning !important;
 }
+
+.text-text {
+  color: $color-text !important;
+}

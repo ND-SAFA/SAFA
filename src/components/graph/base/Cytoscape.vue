@@ -5,16 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  defineProps,
-  withDefaults,
-  provide,
-  onMounted,
-  defineEmits,
-} from "vue";
-import cytoscape, { CytoscapeOptions, Core, EventObject } from "cytoscape";
-import { CytoEvent } from "@/types";
+import { ref, withDefaults, provide, onMounted } from "vue";
+import cytoscape, { CytoscapeOptions, Core } from "cytoscape";
 
 const props = withDefaults(
   defineProps<{
@@ -24,6 +16,7 @@ const props = withDefaults(
     afterCreated?: (cy: Core) => void;
   }>(),
   {
+    id: "cytoscape-div",
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     preConfig: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -52,7 +45,7 @@ provide(
 
 onMounted(() => {
   // create a vue independent element
-  container.value?.setAttribute("id", props.id || "cytoscape-div");
+  container.value?.setAttribute("id", props.id);
   container.value?.setAttribute("width", "100%");
   container.value?.setAttribute("style", "min-height: 600px;");
 

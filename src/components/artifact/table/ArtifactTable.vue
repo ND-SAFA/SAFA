@@ -1,224 +1,140 @@
 <template>
   <panel-card>
-    <v-data-table
-      v-model="selected"
-      v-model:sort-by="sortBy"
+    <groupable-table
       v-model:group-by="groupBy"
-      v-model:group-desc="groupDesc"
-      v-model:sort-desc="sortDesc"
-      single-select
-      show-group-by
-      fixed-header
-      height="60vh"
-      :headers="headers"
-      :items="items"
-      :search="searchText"
-      :items-per-page="50"
-      data-cy="view-artifact-table"
-      class="mt-4 artifact-table"
-      @click:row="handleView($event)"
+      :columns="columns"
+      :rows="rows"
+      row-key="id"
+      default-sort-by="name"
+      :default-group-by="groupBy"
+      :loading="loading"
+      :filter-row="filterRow"
+      :custom-cells="customCells"
+      @row-click="handleView"
     >
-      <template #top>
-        <artifact-table-header
-          v-model:group-by="groupBy"
-          v-model:sort-by="sortBy"
-          v-model:group-desc="groupDesc"
-          v-model:sort-desc="sortDesc"
-          v-model:search-text="searchText"
-          :headers="headers"
-          @filter="selectedDeltaTypes = $event"
+      <template #header-right>
+        <multiselect-input
+          v-if="inDeltaView"
+          v-model="deltaTypes"
+          outlined
+          dense
+          :use-chips="false"
+          :options="options"
+          label="Delta Types"
+          option-to-value
+          option-value="id"
+          option-label="name"
+          data-cy="input-delta-type"
+          b=""
+          style="max-width: 300px"
         />
       </template>
 
-      <template #[`group.header`]="data">
-        <table-group-header :data="data" />
+      <template #body-cell-type="{ row }">
+        <attribute-chip :value="row.type" artifact-type />
       </template>
 
-      <template #[`item.name`]="{ item }">
-        <td class="v-data-table__divider">
-          <artifact-table-row-name :artifact="item" />
-        </td>
+      <template #body-cell-deltaType="{ row }">
+        <attribute-chip :value="getDeltaType(row)" delta-type />
       </template>
 
-      <template #[`item.deltaState`]="{ item }">
-        <td class="v-data-table__divider">
-          <artifact-table-delta-chip :artifact="item" />
-        </td>
+      <template #body-cell-actions="{ row }">
+        <div @click.stop>
+          <artifact-table-row-actions :artifact="row" />
+        </div>
       </template>
-
-      <template #[`item.type`]="{ item }">
-        <td class="v-data-table__divider">
-          <attribute-chip :value="item.type" artifact-type />
-        </td>
-      </template>
-
-      <template
-        v-for="attribute in attributes"
-        #[`item.${attribute.key}`]="{ item }"
-        :key="attribute.key"
-      >
-        <td class="v-data-table__divider">
-          <attribute-display
-            :attribute="attribute"
-            :values="item.attributes || {}"
-          />
-        </td>
-      </template>
-
-      <template #[`item.actions`]="{ item }">
-        <td @click.stop="">
-          <artifact-table-row-actions :artifact="item" />
-        </td>
-      </template>
-    </v-data-table>
+    </groupable-table>
   </panel-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+/**
+ Represents a table of artifacts.
+ */
+export default {
+  name: "ArtifactTable",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { ArtifactDeltaState, FlatArtifact, TableGroupRow } from "@/types";
 import {
-  ArtifactDeltaState,
-  FlatArtifact,
-  AttributeSchema,
-  DataTableHeader,
-  ArtifactSchema,
-} from "@/types";
+  deltaTypeOptions,
+  artifactAttributesColumns,
+  artifactColumns,
+  artifactDeltaColumn,
+  actionsColumn,
+} from "@/util";
 import {
+  appStore,
   artifactStore,
+  attributesStore,
   deltaStore,
   selectionStore,
-  attributesStore,
 } from "@/hooks";
 import {
-  AttributeChip,
-  TableGroupHeader,
-  AttributeDisplay,
   PanelCard,
+  GroupableTable,
+  AttributeChip,
+  MultiselectInput,
 } from "@/components/common";
-import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactTableRowName from "./ArtifactTableRowName.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
-import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
+
+const customCells: (keyof FlatArtifact | string)[] = [
+  "type",
+  "deltaType",
+  "actions",
+];
+
+const options = deltaTypeOptions();
+
+const groupBy = ref<string | undefined>("type");
+const deltaTypes = ref<ArtifactDeltaState[]>([]);
+
+const loading = computed(() => appStore.isLoading > 0);
+const inDeltaView = computed(() => deltaStore.inDeltaView);
+
+const columns = computed(() => [
+  ...artifactColumns,
+  ...(inDeltaView.value ? [artifactDeltaColumn] : []),
+  ...artifactAttributesColumns(attributesStore.attributes),
+  actionsColumn,
+]);
+
+const rows = computed(() => artifactStore.flatArtifacts);
 
 /**
- * Represents a table of artifacts.
+ * Filters out rows that don't match the selected delta types.
+ * @param row - The artifact to filter.
+ * @return Whether to keep the row.
  */
-export default defineComponent({
-  name: "ArtifactTable",
-  components: {
-    PanelCard,
-    AttributeDisplay,
-    ArtifactTableRowActions,
-    AttributeChip,
-    ArtifactTableHeader,
-    ArtifactTableRowName,
-    TableGroupHeader,
-    ArtifactTableDeltaChip,
-  },
-  data() {
-    return {
-      searchText: "",
-      sortBy: ["name"],
-      groupBy: "type",
-      sortDesc: false,
-      groupDesc: false,
-      selectedDeltaTypes: [] as ArtifactDeltaState[],
-      selected: [] as FlatArtifact[],
-    };
-  },
-  computed: {
-    /**
-     * @return Whether delta view is enabled.
-     */
-    inDeltaView(): boolean {
-      return deltaStore.inDeltaView;
-    },
-    /**
-     * @return The artifact table's headers.
-     */
-    headers(): DataTableHeader<ArtifactSchema>[] {
-      return [
-        {
-          text: "Name",
-          value: "name",
-          width: "200px",
-          filterable: true,
-          divider: true,
-        },
-        {
-          text: "Type",
-          value: "type",
-          width: "200px",
-          filterable: true,
-          divider: true,
-        },
-        ...(deltaStore.inDeltaView
-          ? [
-              {
-                text: "Delta State",
-                value: "deltaState",
-                width: "200px",
-                groupable: false,
-              },
-            ]
-          : []),
-        ...attributesStore.attributes.map(({ key, label }) => ({
-          text: label,
-          value: key,
-          width: "300px",
-          divider: true,
-        })),
-        {
-          text: "Actions",
-          value: "actions",
-          width: "150px",
-          groupable: false,
-        },
-      ];
-    },
-    /**
-     * @return The artifact table's columns.
-     */
-    attributes(): AttributeSchema[] {
-      return attributesStore.attributes;
-    },
-    /**
-     * @return The artifact table's items.
-     */
-    items(): FlatArtifact[] {
-      const selectedTypes = this.inDeltaView ? this.selectedDeltaTypes : [];
+function filterRow(row: FlatArtifact): boolean {
+  return (
+    !inDeltaView.value ||
+    deltaTypes.value.length === 0 ||
+    deltaTypes.value.includes(getDeltaType(row))
+  );
+}
 
-      return artifactStore.flatArtifacts.filter(
-        ({ id }) =>
-          selectedTypes.length === 0 ||
-          selectedTypes.includes(deltaStore.getArtifactDeltaType(id))
-      );
-    },
-  },
-  watch: {
-    /**
-     * Updates the selection store when the selected artifact changes.
-     */
-    selected(items: FlatArtifact[]) {
-      if (items.length === 0) {
-        selectionStore.clearSelections();
-      } else {
-        selectionStore.selectArtifact(items[0].id);
-      }
-    },
-  },
-  methods: {
-    /**
-     * Opens the view artifact side panel.
-     * @param item - The artifact to view.
-     */
-    handleView(item: FlatArtifact) {
-      if (selectionStore.selectedArtifact?.id === item.id) {
-        this.selected = [];
-      } else {
-        this.selected = [item];
-      }
-    },
-  },
-});
+/**
+ * Returns the delta type for a row.
+ * @param row - The artifact to check.
+ * @return The type of change delta loaded for this artifact.
+ */
+function getDeltaType(row: FlatArtifact): ArtifactDeltaState {
+  return deltaStore.getArtifactDeltaType(row.id);
+}
+
+/**
+ * Opens the view artifact side panel.
+ * @param row - The artifact to view.
+ */
+function handleView(row: TableGroupRow | FlatArtifact) {
+  if ("id" in row && selectionStore.selectedArtifact?.id !== row.id) {
+    selectionStore.selectArtifact(String(row.id));
+  } else {
+    selectionStore.clearSelections();
+  }
+}
 </script>

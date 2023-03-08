@@ -11,5 +11,6 @@ export * from "./icons";
 export * from "./tim-factory";
 export * from "./job-helper";
 export * from "./table-helper";
+export * from "./table-headers";
 
 export * from "./enabled-features";

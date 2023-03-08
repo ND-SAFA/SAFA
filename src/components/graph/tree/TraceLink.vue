@@ -36,6 +36,7 @@ const definition = computed(() => ({
     faded: props.faded,
     traceType: props.trace.traceType,
     approvalStatus: props.trace.approvalStatus,
+    score: props.trace.score,
     dark: darkMode.value,
   },
   classes: props.trace.sourceId === props.trace.targetId ? ["loop"] : [],

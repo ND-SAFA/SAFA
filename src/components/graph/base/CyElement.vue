@@ -5,13 +5,11 @@
 <script setup lang="ts">
 import {
   ref,
-  defineProps,
   withDefaults,
   watch,
   onBeforeUnmount,
   onMounted,
   inject,
-  defineEmits,
 } from "vue";
 import {
   Selector,
@@ -21,7 +19,6 @@ import {
   CollectionReturnValue,
   Position,
 } from "cytoscape";
-import { CytoEvent } from "@/types";
 
 const props = withDefaults(
   defineProps<{

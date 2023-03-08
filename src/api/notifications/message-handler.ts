@@ -1,5 +1,4 @@
 import { Frame } from "webstomp-client";
-import { useRoute } from "vue-router";
 import {
   ActionType,
   ChangeMessageSchema,

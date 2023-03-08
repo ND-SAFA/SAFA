@@ -3,7 +3,7 @@
     :title="`Artifact Changes: ${props.delta.name}`"
     :open="props.open"
     size="lg"
-    @close="$emit('close')"
+    @close="emit('close')"
   >
     <code-diff
       v-if="deltaType === 'added' && !!artifact"

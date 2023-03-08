@@ -36,6 +36,7 @@
         :columns="props.columns"
         :row="quasarProps.row"
         :expandable="props.expandable"
+        @click="emit('row-click', quasarProps.row)"
         @group:open="(by, val) => emit('group:open', by, val)"
         @group:close="(by, val) => emit('group:close', by, val)"
       >
@@ -123,6 +124,7 @@ const emit = defineEmits<{
   (e: "update:groupBy", groupBy: string | undefined): void;
   (e: "group:open", groupBy: string, groupValue: unknown): void;
   (e: "group:close", groupBy: string, groupValue: unknown): void;
+  (e: "row-click", row: TableRow): void;
 }>();
 
 const { searchText, searchLabel, sortBy, sortDesc, filteredRows } =

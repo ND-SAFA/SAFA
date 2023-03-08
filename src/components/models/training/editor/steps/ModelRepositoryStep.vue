@@ -34,7 +34,7 @@ import {
   SelectInput,
 } from "@/components/common";
 
-const props = defineProps<{
+defineProps<{
   model: GenerationModelSchema;
 }>();
 </script>

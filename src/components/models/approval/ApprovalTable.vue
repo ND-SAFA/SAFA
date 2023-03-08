@@ -87,7 +87,7 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { ApprovalType, FlatTraceLink } from "@/types";
-import { approvalTypeOptions } from "@/util";
+import { approvalTypeOptions, approvalColumns } from "@/util";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { Routes } from "@/router";
 import { handleDeclineAll, handleGetGeneratedLinks } from "@/api";
@@ -100,7 +100,6 @@ import {
   AttributeChip,
 } from "@/components/common";
 import { TraceLinkApproval, TraceLinkDisplay } from "@/components/traceLink";
-import { approvalColumns } from "./headers";
 
 const options = approvalTypeOptions();
 

@@ -8,7 +8,7 @@
         <artifact-table />
       </template>
       <template #traces>
-        <trace-matrix-table />
+        <trace-table />
       </template>
     </tab-list>
   </private-page>
@@ -32,7 +32,7 @@ import {
   PrivatePage,
   ArtifactFab,
   TabList,
-  TraceMatrixTable,
+  TraceTable,
   ProjectTree,
 } from "@/components";
 

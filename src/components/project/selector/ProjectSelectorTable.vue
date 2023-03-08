@@ -43,11 +43,11 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IdentifierSchema } from "@/types";
+import { projectExpandedColumns, projectNameColumn } from "@/util";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import { handleGetProjects } from "@/api";
 import { SelectorTable } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
-import { projectExpandedColumns, projectNameColumn } from "./headers";
 
 const props = defineProps<{
   /**

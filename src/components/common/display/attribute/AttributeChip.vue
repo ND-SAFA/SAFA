@@ -51,7 +51,7 @@ import { computed } from "vue";
 import { ApprovalType, IconVariant, ThemeColor } from "@/types";
 import {
   camelcaseToDisplay,
-  getApprovalColor,
+  getEnumColor,
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
@@ -74,6 +74,10 @@ const props = defineProps<{
    */
   artifactType?: boolean;
   /**
+   * Whether this chip is for an delta type, customizing the display and icon.
+   */
+  deltaType?: boolean;
+  /**
    * Whether to render a confidence score instead of a chip.
    */
   confidenceScore?: boolean;
@@ -91,7 +95,9 @@ const props = defineProps<{
   dataCy?: string;
 }>();
 
-const enumerated = computed(() => props.value in ApprovalType);
+const enumerated = computed(
+  () => props.value in ApprovalType || props.deltaType
+);
 
 const text = computed(() => {
   if (props.confidenceScore) {
@@ -123,7 +129,7 @@ const displayColor = computed(() => {
   } else if (props.confidenceScore) {
     return getScoreColor(props.value);
   } else if (enumerated.value) {
-    return getApprovalColor(props.value);
+    return getEnumColor(props.value);
   } else {
     return "";
   }

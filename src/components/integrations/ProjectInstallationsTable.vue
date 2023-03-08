@@ -43,6 +43,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
+import { installationsColumns } from "@/util";
 import { integrationsStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
 import {
@@ -52,7 +53,6 @@ import {
   PanelCard,
 } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
-import { installationsColumns } from "./headers";
 
 const modalOpen = ref(false);
 const loading = ref(false);

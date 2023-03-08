@@ -42,11 +42,11 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { JobLogSchema, JobSchema } from "@/types";
+import { jobColumns } from "@/util";
 import { appStore, jobStore } from "@/hooks";
 import { getJobLog, handleReloadJobs } from "@/api";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";
-import { jobColumns } from "./headers";
 
 const jobLog = ref<JobLogSchema[]>([]);
 

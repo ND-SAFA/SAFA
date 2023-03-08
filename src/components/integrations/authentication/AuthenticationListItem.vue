@@ -13,20 +13,26 @@
     <template #actions>
       <text-button
         v-if="!props.hasCredentials"
+        label="Connect"
         color="primary"
         outlined
         icon="integrate"
         @click="emit('connect')"
-      >
-        Connect
-      </text-button>
+      />
       <flex-box v-else column align="end">
-        <text-button outlined icon="add" b="2" @click="emit('connect')">
-          Installation
-        </text-button>
-        <text-button outlined icon="delete" @click="emit('disconnect')">
-          Disconnect
-        </text-button>
+        <text-button
+          outlined
+          label="Installation"
+          icon="add"
+          b="2"
+          @click="emit('connect')"
+        />
+        <text-button
+          outlined
+          label="Disconnect"
+          icon="delete"
+          @click="emit('disconnect')"
+        />
       </flex-box>
     </template>
   </list-item>

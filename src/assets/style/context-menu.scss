@@ -1,5 +1,7 @@
 $graph-border-radius: 8px;
 
+// Styles for the Cytoscape right-click context menu.
+
 .cy-context-menus-cxt-menu {
   display: none;
   z-index: 1000;
@@ -27,6 +29,8 @@ $graph-border-radius: 8px;
     text-align: left;
     color: $color-text;
     border-radius: $graph-border-radius;
+    border-width: 0;
+    cursor: pointer;
   }
 
   .cy-context-menus-submenu-indicator {

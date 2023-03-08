@@ -2,12 +2,12 @@
  * Enumerates app store message types.
  */
 export enum MessageType {
-  INFO = "info",
-  UPDATE = "update",
-  SUCCESS = "success",
-  ERROR = "error",
-  WARNING = "warning",
-  CLEAR = "clear",
+  info = "info",
+  update = "update",
+  success = "success",
+  error = "error",
+  warning = "warning",
+  clear = "clear",
 }
 
 /**

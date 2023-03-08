@@ -1,11 +1,4 @@
-import {
-  ArtifactMap,
-  ArtifactSchema,
-  CreatorFilePanel,
-  LinkSchema,
-  TraceFile,
-  TraceLinkSchema,
-} from "@/types";
+import { ArtifactMap, CreatorFilePanel, TraceLinkSchema } from "@/types";
 import { extractTraceId } from "@/util";
 import { parseArtifactFile, parseTraceFile } from "@/api";
 

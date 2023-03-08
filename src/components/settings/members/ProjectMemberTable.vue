@@ -36,13 +36,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MembershipSchema, ProjectRole, TableColumn } from "@/types";
+import { MembershipSchema, ProjectRole } from "@/types";
+import { membersColumns } from "@/util";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { PanelCard } from "@/components/common";
 import SelectorTable from "@/components/common/table/SelectorTable.vue";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
-import { membersColumns } from "./headers";
 
 const editedMember = ref<MembershipSchema | undefined>();
 const loading = ref(false);

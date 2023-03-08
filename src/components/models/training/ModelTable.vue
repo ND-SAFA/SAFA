@@ -45,13 +45,13 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { GenerationModelSchema } from "@/types";
+import { modelColumns } from "@/util";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
 import { IconButton, PanelCard, SelectorTable } from "@/components/common";
 import { ModelTraining } from "./editor";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
-import { modelColumns } from "./headers";
 
 const saveOpen = ref(false);
 const shareOpen = ref(false);

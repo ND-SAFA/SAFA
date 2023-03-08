@@ -31,7 +31,7 @@
             color="primary"
             variant="trace"
           />
-          <div v-for="type in direction[1]" :key="type" class="q-mb-1">
+          <div v-for="type in direction[1]" :key="type">
             <attribute-chip artifact-type :value="type" />
           </div>
         </flex-box>

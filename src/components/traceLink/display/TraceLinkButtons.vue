@@ -1,5 +1,5 @@
 <template>
-  <flex-box y="4">
+  <flex-box b="2">
     <trace-link-approval
       :trace="traceLink"
       deletable
@@ -12,35 +12,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { TraceLinkSchema } from "@/types";
+/**
+ * Displays buttons for the selected trace link.
+ */
+export default {
+  name: "TraceLinkButtons",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { appStore, selectionStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import { TraceLinkApproval } from "./index";
 
-/**
- * Displays buttons for the selected trace link.
- */
-export default defineComponent({
-  name: "TraceLinkButtons",
-  components: { TraceLinkApproval, FlexBox },
-  computed: {
-    /**
-     * @return The selected trace link.
-     */
-    traceLink(): TraceLinkSchema | undefined {
-      return selectionStore.selectedTraceLink;
-    },
-  },
-  methods: {
-    /**
-     * Closes this panel.
-     */
-    handleClose(): void {
-      appStore.closeSidePanels();
-    },
-  },
-});
-</script>
+const traceLink = computed(() => selectionStore.selectedTraceLink);
 
-<style scoped lang="scss"></style>
+/**
+ * Closes this panel.
+ */
+function handleClose(): void {
+  appStore.closeSidePanels();
+}
+</script>

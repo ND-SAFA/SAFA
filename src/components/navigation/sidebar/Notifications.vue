@@ -19,7 +19,7 @@
             dense
             class="q-px-none"
           >
-            <alert :type="item.type" :message="item.message" />
+            <alert-card :type="item.type" :message="item.message" />
           </list-item>
         </list>
       </q-menu>
@@ -39,7 +39,13 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { logStore } from "@/hooks";
-import { Typography, Icon, Alert, List, ListItem } from "@/components/common";
+import {
+  Typography,
+  Icon,
+  AlertCard,
+  List,
+  ListItem,
+} from "@/components/common";
 
 const viewedMessages = ref(0);
 

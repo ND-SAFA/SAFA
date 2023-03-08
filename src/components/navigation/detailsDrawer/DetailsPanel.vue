@@ -1,0 +1,45 @@
+<template>
+  <div v-if="open" class="q-my-sm">
+    <slot />
+  </div>
+</template>
+
+<script lang="ts">
+/**
+ * Controls the open state of a details right side panel.
+ */
+export default {
+  name: "DetailsPanel",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, watch } from "vue";
+import { DetailsOpenState } from "@/types";
+import { appStore } from "@/hooks";
+
+const props = defineProps<{
+  /**
+   * The panel being controlled.
+   */
+  panel: DetailsOpenState;
+}>();
+
+const emit = defineEmits<{
+  /**
+   * Emitted when the panel is opened.
+   */
+  (e: "open"): void;
+}>();
+
+const open = computed(() => appStore.isDetailsPanelOpen === props.panel);
+
+watch(
+  () => open.value,
+  (open) => {
+    if (!open) return;
+
+    emit("open");
+  }
+);
+</script>

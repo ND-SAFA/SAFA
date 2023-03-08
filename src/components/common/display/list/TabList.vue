@@ -27,7 +27,6 @@
 <script lang="ts">
 /**
  * Renders content across multiple tabs.
- * Use the `<v-tab/>` component to wrap each tab's child component.
  */
 export default {
   name: "TabList",

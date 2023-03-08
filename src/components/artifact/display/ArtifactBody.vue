@@ -1,59 +1,45 @@
 <template>
   <div>
-    <text-button text y="2" icon="artifact" @click="handleViewArtifact">
-      View Artifact
-    </text-button>
-    <panel-card class="pb-4">
+    <text-button
+      text
+      label="View Artifact"
+      b="2"
+      icon="artifact"
+      @click="handleViewArtifact"
+    />
+    <panel-card>
       <typography default-expanded :variant="variant" el="p" :value="body" />
     </panel-card>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { ReservedArtifactType, TextType } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
-import { Typography, TextButton, PanelCard } from "@/components/common";
-
 /**
  * Displays the selected node's body.
  */
-export default defineComponent({
+export default {
   name: "ArtifactBody",
-  components: {
-    TextButton,
-    Typography,
-    PanelCard,
-  },
-  computed: {
-    /**
-     * @return The selected artifact.
-     */
-    artifact() {
-      return selectionStore.selectedArtifact;
-    },
-    /**
-     * @return The selected artifact's body.
-     */
-    body(): string {
-      return this.artifact?.body.trim() || "";
-    },
-    /**
-     * @return The selected artifact's body text variant.
-     */
-    variant(): TextType {
-      return this.artifact?.type === ReservedArtifactType.github
-        ? "code"
-        : "expandable";
-    },
-  },
-  methods: {
-    /**
-     * Displays the entire artifact.
-     */
-    handleViewArtifact(): void {
-      appStore.openDetailsPanel("displayArtifact");
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { ReservedArtifactType } from "@/types";
+import { appStore, selectionStore } from "@/hooks";
+import { Typography, TextButton, PanelCard } from "@/components/common";
+
+const artifact = computed(() => selectionStore.selectedArtifact);
+
+const body = computed(() => artifact.value?.body.trim() || "");
+
+const variant = computed(() =>
+  artifact.value?.type === ReservedArtifactType.github ? "code" : "expandable"
+);
+
+/**
+ * Displays the entire artifact.
+ */
+function handleViewArtifact(): void {
+  appStore.openDetailsPanel("displayArtifact");
+}
 </script>

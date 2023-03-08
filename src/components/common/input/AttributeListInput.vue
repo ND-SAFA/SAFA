@@ -2,7 +2,8 @@
   <attribute-grid v-if="layout" :layout="layout">
     <template #item="{ attribute }">
       <attribute-input
-        :model="artifact.attributes || {}"
+        class="q-mr-sm q-pb-md"
+        :attributes="attributes"
         :attribute="attribute"
       />
     </template>
@@ -10,49 +11,44 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
+/**
+ * A list of inputs for a list of generic attributes.
+ */
+export default {
+  name: "AttributeListInput",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, onMounted, watch } from "vue";
+import { ArtifactSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 import { AttributeGrid } from "@/components/common/display";
 import AttributeInput from "./AttributeInput.vue";
 
-/**
- * A list of inputs for a list of generic attributes.
- */
-export default defineComponent({
-  name: "AttributeListInput",
-  components: { AttributeGrid, AttributeInput },
-  props: {
-    artifact: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * @return The layout for this artifact.
-     */
-    layout(): AttributeLayoutSchema | undefined {
-      return attributesStore.getLayoutByType(this.artifact.type);
-    },
-  },
-  watch: {
-    artifact() {
-      this.initializeArtifact();
-    },
-  },
-  mounted() {
-    this.initializeArtifact();
-  },
-  methods: {
-    /**
-     * Initializes the artifact's custom attributes.
-     */
-    initializeArtifact(): void {
-      if (this.artifact.attributes) return;
+const props = defineProps<{
+  artifact: ArtifactSchema;
+}>();
 
-      this.artifact.attributes = {};
-    },
-  },
-});
+const layout = computed(() =>
+  attributesStore.getLayoutByType(props.artifact.type)
+);
+
+const attributes = computed(() => props.artifact.attributes || {});
+
+/**
+ * Initializes the artifact's custom attributes.
+ */
+function initializeArtifact(): void {
+  if (props.artifact.attributes) return;
+
+  props.artifact.attributes = {};
+}
+
+onMounted(() => initializeArtifact());
+
+watch(
+  () => props.artifact,
+  () => initializeArtifact()
+);
 </script>

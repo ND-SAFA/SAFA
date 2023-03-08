@@ -1,3 +1,5 @@
+// Navigation Inputs
+
 .nav-input {
   fieldset, div, label, i {
     color: $color-accent !important;
@@ -8,12 +10,16 @@
   }
 }
 
-body.body--dark .q-layout__shadow:after {
-  box-shadow: 0 0 10px 2px rgb(255 255 255 / 6%), 0 0px 10px rgb(255 255 255 / 6%);
-}
+// Navigation Notifications
 
 .nav-notifications {
   min-width: 300px;
   max-height: 40vh;
   overflow-y: scroll;
+}
+
+// Fixes box shadow in dark mode.
+
+body.body--dark .q-layout__shadow:after {
+  box-shadow: 0 0 10px 2px rgb(255 255 255 / 6%), 0 0px 10px rgb(255 255 255 / 6%);
 }

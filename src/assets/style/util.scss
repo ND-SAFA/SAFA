@@ -1,8 +1,4 @@
-.full-window-page {
-  max-width: 100%;
-  height: 100%;
-  padding: 0;
-}
+// Width Utilities
 
 .width {
   &-min {
@@ -16,6 +12,8 @@
   }
 }
 
+// Flex Utilities
+
 .align {
   &-start {
     align-items: flex-start !important;
@@ -28,12 +26,13 @@
   }
 }
 
-.faded {
-  opacity: 0.6;
+.nowrap {
+  flex-wrap: nowrap;
 }
 
-.disable-events {
-  pointer-events: none;
+// Opacity Changes
+
+.faded {
   opacity: 0.6;
 }
 
@@ -43,8 +42,4 @@
   &:hover {
     opacity: 1;
   }
-}
-
-.nowrap {
-  flex-wrap: nowrap;
 }

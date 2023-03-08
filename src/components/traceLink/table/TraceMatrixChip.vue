@@ -1,15 +1,22 @@
 <template>
-  <v-lazy>
-    <v-chip
-      v-if="doDisplay"
-      outlined
-      :color="isGenerated ? 'secondary' : 'primary'"
-      @click.stop="handleClick"
-    >
-      <typography :value="source.name" />
-      <icon class="mx-1" :rotate="isChild ? -180 : 0" variant="trace" />
-      <typography :value="target.name" />
-    </v-chip>
+  <div>
+    <div v-if="doDisplay" @click.stop>
+      <q-chip
+        clickable
+        outline
+        :color="isGenerated ? 'secondary' : 'primary'"
+        @click="handleClick"
+      >
+        <typography :value="source.name" color="text" />
+        <icon
+          size="sm"
+          class="q-mx-xs"
+          :rotate="isChild ? -180 : 0"
+          variant="trace"
+        />
+        <typography color="text" :value="target.name" />
+      </q-chip>
+    </div>
     <div v-else class="show-on-hover">
       <div class="width-fit" @click.stop>
         <icon-button
@@ -19,90 +26,64 @@
         />
       </div>
     </div>
-  </v-lazy>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
-import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
-import { Typography, IconButton, Icon } from "@/components/common";
-
 /**
  * Renders a chip representing a trace link between two artifacts.
  */
-export default defineComponent({
+export default {
   name: "TraceMatrixChip",
-  components: {
-    Icon,
-    IconButton,
-    Typography,
-  },
-  props: {
-    source: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-    target: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * @return The relationship from the parent to the child artifact.
-     */
-    direction(): "parent" | "child" | undefined {
-      return subtreeStore.getRelationship(this.source.id, this.target.id);
-    },
-    /**
-     * @return Whether the relationship is as a child.
-     */
-    isChild(): boolean {
-      return this.direction === "child";
-    },
-    /**
-     * @return Whether to display the chip.
-     */
-    doDisplay(): boolean {
-      return !!this.direction;
-    },
-    /**
-     * @return The trace link between these artifacts.
-     */
-    traceLink(): TraceLinkSchema | undefined {
-      return this.isChild
-        ? traceStore.getTraceLinkByArtifacts(this.target.id, this.source.id)
-        : traceStore.getTraceLinkByArtifacts(this.source.id, this.target.id);
-    },
-    /**
-     * @return Whether this trace link is generated
-     */
-    isGenerated(): boolean {
-      return this.traceLink?.traceType === TraceType.GENERATED;
-    },
-  },
-  methods: {
-    /**
-     * Selects the trace link represented by this chip.
-     */
-    handleClick(): void {
-      const traceLink = this.traceLink;
+};
+</script>
 
-      if (!traceLink) return;
+<script setup lang="ts">
+import { computed } from "vue";
+import { ArtifactSchema, TraceType } from "@/types";
+import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
+import { Typography, IconButton, Icon } from "@/components/common";
 
-      selectionStore.selectTraceLink(traceLink);
-    },
-    /**
-     * Opens the trace creation panel to create a link between these artifacts.
-     */
-    handleCreateLink(): void {
-      appStore.openTraceCreatorTo({
-        type: "both",
-        sourceId: this.source.id,
-        targetId: this.target.id,
-      });
-    },
-  },
-});
+const props = defineProps<{
+  source: ArtifactSchema;
+  target: ArtifactSchema;
+}>();
+
+const direction = computed(() =>
+  subtreeStore.getRelationship(props.source.id, props.target.id)
+);
+
+const isChild = computed(() => direction.value === "child");
+const doDisplay = computed(() => !!direction.value);
+
+const traceLink = computed(() =>
+  isChild.value
+    ? traceStore.getTraceLinkByArtifacts(props.target.id, props.source.id)
+    : traceStore.getTraceLinkByArtifacts(props.source.id, props.target.id)
+);
+
+const isGenerated = computed(
+  () => traceLink.value?.traceType === TraceType.GENERATED
+);
+
+/**
+ * Selects the trace link represented by this chip.
+ */
+function handleClick(): void {
+  console.log({ traceLink });
+  if (!traceLink.value) return;
+
+  selectionStore.selectTraceLink(traceLink.value);
+}
+
+/**
+ * Opens the trace creation panel to create a link between these artifacts.
+ */
+function handleCreateLink(): void {
+  appStore.openTraceCreatorTo({
+    type: "both",
+    sourceId: props.source.id,
+    targetId: props.target.id,
+  });
+}
 </script>

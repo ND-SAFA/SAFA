@@ -1,5 +1,7 @@
 <template>
   <data-table
+    v-model:sort-by="sortBy"
+    v-model:sort-desc="sortDesc"
     v-model:selected="selectedRows"
     :columns="props.columns"
     :rows="filteredRows"
@@ -9,6 +11,7 @@
     selection="single"
     data-cy="generic-selector-table"
     :custom-cells="['actions']"
+    :sort="(r) => r"
     @row-click="handleRowClick"
   >
     <template #selection>
@@ -135,7 +138,8 @@ const emit = defineEmits<{
 
 const selectedRows = useVModel(props, "selected");
 
-const { searchText, searchLabel, filteredRows } = useTableFilter(props);
+const { searchText, searchLabel, sortBy, sortDesc, filteredRows } =
+  useTableFilter(props);
 
 const addLabel = computed(() => `Add ${props.itemName || ""}`);
 const editLabel = computed(() => `Edit ${props.itemName || ""}`);

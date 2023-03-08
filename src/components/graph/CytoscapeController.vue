@@ -1,7 +1,7 @@
 <template>
   <cytoscape3
     :id="id"
-    class="cy-container neutral-bg"
+    class="cy-container bg-neutral"
     :config="props.cytoCoreGraph.config"
     :pre-config="preConfig"
     :after-created="afterCreated"

@@ -1,55 +1,59 @@
 <template>
-  <v-btn
+  <text-button
     outlined
     block
-    :color="titleColor"
-    class="my-1"
-    style="background-color: white"
-    @click="$emit('click', name)"
+    :color="color"
+    class="q-mb-sm"
+    @click="emit('click')"
   >
-    <span class="text-ellipsis" style="max-width: 300px; color: inherit">
-      {{ name }}
-    </span>
-  </v-btn>
+    <typography
+      ellipsis
+      :value="name"
+      :color="color"
+      style="max-width: 300px"
+    />
+  </text-button>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { DeltaType } from "@/types";
-
 /**
  * Displays an artifact delta button.
- *
- * @emits `click` (name: string) - On click.
  */
-export default defineComponent({
+export default {
   name: "ArtifactDeltaButton",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    deltaType: {
-      type: String as PropType<DeltaType>,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * The color to display for the button.
-     */
-    titleColor(): string {
-      switch (this.deltaType) {
-        case "added":
-          return "success";
-        case "modified":
-          return "info";
-        case "removed":
-          return "error";
-        default:
-          return "black";
-      }
-    },
-  },
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { DeltaType, ThemeColor } from "@/types";
+import { TextButton, Typography } from "@/components/common";
+
+const props = defineProps<{
+  /**
+   * The changed entity name.
+   */
+  name: string;
+  /**
+   * The type of change delta for this entity.
+   */
+  deltaType: DeltaType;
+}>();
+
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
+
+const color = computed<ThemeColor>(() => {
+  switch (props.deltaType) {
+    case "added":
+      return "positive";
+    case "modified":
+      return "primary";
+    case "removed":
+      return "negative";
+    default:
+      return "black";
+  }
 });
 </script>

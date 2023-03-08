@@ -19,22 +19,22 @@ import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common";
 
 const snackbarMessage = ref("");
-const messageType = ref<MessageType>(MessageType.CLEAR);
+const messageType = ref<MessageType>(MessageType.clear);
 const errors = ref<string[]>([]);
 
 const $q = useQuasar();
 
 const hasErrors = computed(() => errors.value.length > 0);
 const isErrorOpen = computed(() => appStore.isErrorDisplayOpen);
-const showAction = computed(() => messageType.value === MessageType.UPDATE);
+const showAction = computed(() => messageType.value === MessageType.update);
 
 const messageColor = computed(() => {
   switch (messageType.value) {
-    case MessageType.WARNING:
+    case MessageType.warning:
       return "warning";
-    case MessageType.ERROR:
+    case MessageType.error:
       return "negative";
-    case MessageType.SUCCESS:
+    case MessageType.success:
       return "positive";
     default:
       return "primary";
@@ -92,7 +92,7 @@ function handleShowMessage(message: SnackbarMessage) {
 watch(
   () => logStore.message,
   (newMessage) => {
-    if (newMessage.type === MessageType.CLEAR) return;
+    if (newMessage.type === MessageType.clear) return;
 
     handleShowMessage(newMessage);
     logStore.clearMessage();

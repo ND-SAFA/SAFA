@@ -1,5 +1,5 @@
 <template>
-  <alert>
+  <alert-card>
     <flex-box align="center">
       <typography
         color="primary"
@@ -12,7 +12,7 @@
         @click="handleOpenWiki"
       />
     </flex-box>
-  </alert>
+  </alert-card>
 </template>
 
 <script lang="ts">
@@ -28,7 +28,7 @@ export default {
 import TextButton from "@/components/common/button/TextButton.vue";
 import FlexBox from "@/components/common/layout/FlexBox.vue";
 import Typography from "../Typography.vue";
-import Alert from "./Alert.vue";
+import AlertCard from "./AlertCard.vue";
 
 /**
  * Opens the SAFA WIKI docs.

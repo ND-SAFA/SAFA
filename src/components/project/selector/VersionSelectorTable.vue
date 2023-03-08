@@ -36,10 +36,10 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { IdentifierSchema, VersionSchema } from "@/types";
+import { actionsColumn, versionColumns } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { SelectorTable } from "@/components/common";
-import { actionColumn, versionColumns } from "./headers";
 import VersionCreator from "./VersionCreator.vue";
 
 const props = defineProps<{
@@ -85,7 +85,7 @@ const selectedItems = computed({
 });
 
 const columns = computed(() =>
-  props.minimal ? versionColumns : [...versionColumns, actionColumn]
+  props.minimal ? versionColumns : [...versionColumns, actionsColumn]
 );
 
 const rows = computed(() =>

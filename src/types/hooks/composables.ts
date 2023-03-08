@@ -41,16 +41,20 @@ export interface TableFilterProps {
    * Determines whether a row should be visible.
    */
   filterRow?(row: Record<string, unknown>): boolean;
+  /**
+   * The default row keys to sort by.
+   */
+  defaultSortBy?: string;
+  /**
+   * The default sort direction.
+   */
+  defaultSortDesc?: boolean;
 }
 
 /**
- * Defines a hook for filtering table rows.
+ * Defines a hook for sorting and filtering table rows.
  */
 export interface TableFilterHook {
-  /**
-   * The table rows after filtering.
-   */
-  filteredRows: ComputedRef<Record<string, unknown>[]>;
   /**
    * The table search text.
    */
@@ -59,4 +63,16 @@ export interface TableFilterHook {
    * The table search label.
    */
   searchLabel: ComputedRef<string>;
+  /**
+   * The table search sort field.
+   */
+  sortBy: Ref<string | undefined>;
+  /**
+   * The table search sort direction.
+   */
+  sortDesc: Ref<boolean>;
+  /**
+   * The table rows after filtering.
+   */
+  filteredRows: ComputedRef<Record<string, unknown>[]>;
 }

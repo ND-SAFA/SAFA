@@ -1,6 +1,6 @@
 <template>
   <q-page v-if="doDisplay" :padding="!props.fullWindow">
-    <div v-if="!graph" class="q-mx-auto q-pa-lg" :style="style">
+    <div v-if="!props.graph" class="q-mx-auto q-pa-lg" :style="style">
       <back-button v-if="props.backToProject" to-project class="q-mb-sm" />
       <flex-box v-if="!!props.title" justify="between" align="center">
         <typography el="h1" variant="title" :value="props.title" />

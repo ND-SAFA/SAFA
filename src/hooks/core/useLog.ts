@@ -63,7 +63,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onInfo(message: string): void {
-      this.setMessage({ message, type: MessageType.INFO, errors: [] });
+      this.setMessage({ message, type: MessageType.info, errors: [] });
     },
     /**
      * Creates a snackbar for updating with the given message.
@@ -71,7 +71,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onUpdate(message: string): void {
-      this.setMessage({ message, type: MessageType.UPDATE, errors: [] });
+      this.setMessage({ message, type: MessageType.update, errors: [] });
     },
     /**
      * Creates a snackbar success with the given message.
@@ -79,7 +79,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onSuccess(message: string): void {
-      this.setMessage({ message, type: MessageType.SUCCESS, errors: [] });
+      this.setMessage({ message, type: MessageType.success, errors: [] });
     },
     /**
      * Creates a snackbar warning with the given message.
@@ -87,7 +87,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onWarning(message: string): void {
-      this.setMessage({ message, type: MessageType.WARNING, errors: [] });
+      this.setMessage({ message, type: MessageType.warning, errors: [] });
     },
     /**
      * Creates a snackbar error with the given message.
@@ -95,7 +95,7 @@ export const useLog = defineStore("log", {
      * @param message - The error message encountered.
      */
     onError(message: string): void {
-      this.setMessage({ message, type: MessageType.ERROR, errors: [] });
+      this.setMessage({ message, type: MessageType.error, errors: [] });
     },
     /**
      * Creates a snackbar error with the given server error.
@@ -105,7 +105,7 @@ export const useLog = defineStore("log", {
     onServerError(error: APIErrorBody | undefined): void {
       this.setMessage({
         message: error?.message || "An unexpected error occurred.",
-        type: MessageType.ERROR,
+        type: MessageType.error,
         errors: error?.errors || [],
       });
     },

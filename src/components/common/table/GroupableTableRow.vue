@@ -22,7 +22,7 @@
             />
             <typography secondary :value="groupRows" x="2" />
           </flex-box>
-          <flex-box>
+          <flex-box v-if="props.expandable">
             <icon-button
               small
               color="negative"
@@ -40,6 +40,7 @@
           </flex-box>
         </flex-box>
         <typography
+          v-if="!!groupHeaderDescription"
           default-expanded
           variant="expandable"
           :value="groupHeaderDescription"
@@ -51,7 +52,7 @@
     v-else
     :props="props.quasarProps"
     class="cursor-pointer"
-    @click="handleExpand"
+    @click="handleClickRow"
   >
     <q-td
       v-for="(column, idx) in props.columns"
@@ -124,6 +125,7 @@ const emit = defineEmits<{
   (e: "update:expanded", expanded: boolean): void;
   (e: "group:open", groupBy: string, groupValue: unknown): void;
   (e: "group:close", groupBy: string, groupValue: unknown): void;
+  (e: "click"): void;
 }>();
 
 const slots = useSlots();
@@ -154,9 +156,13 @@ const groupHeaderDescription = computed(() =>
 );
 
 /**
- * Expands the row.
+ * Expands the row if expandable, and emits a clicked event.
  */
-function handleExpand(): void {
+function handleClickRow(): void {
+  emit("click");
+
+  if (!props.expandable) return;
+
   rowExpanded.value = !rowExpanded.value;
 }
 </script>

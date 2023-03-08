@@ -1,20 +1,23 @@
 <template>
   <div :class="containerClassName">
     <q-card flat :class="className">
-      <flex-box align="center">
-        <icon
-          v-if="!!props.icon"
-          :variant="props.icon"
-          class="q-mr-sm"
-          size="lg"
-        />
-        <typography
-          v-if="!!props.title"
-          variant="subtitle"
-          el="h2"
-          :value="props.title"
-          :color="props.color"
-        />
+      <flex-box align="center" justify="between">
+        <flex-box align="center">
+          <icon
+            v-if="!!props.icon"
+            :variant="props.icon"
+            class="q-mr-sm"
+            size="lg"
+          />
+          <typography
+            v-if="!!props.title"
+            variant="subtitle"
+            el="h2"
+            :value="props.title"
+            :color="props.color"
+          />
+        </flex-box>
+        <slot name="title-actions" />
       </flex-box>
       <separator v-if="!!props.title" b="2" />
       <typography

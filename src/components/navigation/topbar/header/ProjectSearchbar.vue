@@ -6,7 +6,8 @@
     use-input
     clearable
     dark
-    :options-dark="false"
+    :options-dark="darkMode"
+    options-selected-class="primary"
     label="Search Artifacts"
     style="min-width: 200px; width: 30vw"
     color="accent"
@@ -55,7 +56,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { ArtifactSchema } from "@/types";
 import { filterArtifacts } from "@/util";
-import { artifactStore, selectionStore } from "@/hooks";
+import { artifactStore, selectionStore, useTheme } from "@/hooks";
 import {
   ArtifactBodyDisplay,
   Typography,
@@ -64,6 +65,8 @@ import {
 } from "@/components/common";
 
 const options = ref(artifactStore.currentArtifacts);
+
+const { darkMode } = useTheme();
 
 /**
  * Returns the display text for how many matches there are.

@@ -16,6 +16,8 @@ $color-added: var(--q-addedLight);
 $color-modified: var(--q-modifiedLight);
 $color-removed: var(--q-removedLight);
 
+// Background Palette Tags
+
 .bg-transparent {
   background-color: transparent !important;
 }
@@ -27,6 +29,8 @@ $color-removed: var(--q-removedLight);
 .bg-neutral {
   background-color: $color-neutral !important;
 }
+
+// Border Palette Tags
 
 .bd-primary {
   border: 1px solid $color-primary !important;
@@ -46,4 +50,10 @@ $color-removed: var(--q-removedLight);
 
 .bd-warning {
   border: 1px solid $color-warning !important;
+}
+
+// Text Palette Tags
+
+.text-text {
+  color: $color-text !important;
 }

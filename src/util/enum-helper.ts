@@ -247,7 +247,7 @@ export function trainingTabOptions(): SelectOption[] {
 export function tableViewTabOptions(): SelectOption[] {
   return [
     createEnumOption("artifacts", "Artifacts"),
-    createEnumOption("traceLinks", "Trace Links"),
+    createEnumOption("traces", "Trace Links"),
   ];
 }
 

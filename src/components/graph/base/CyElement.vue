@@ -5,13 +5,11 @@
 <script setup lang="ts">
 import {
   ref,
-  defineProps,
   withDefaults,
   watch,
   onBeforeUnmount,
   onMounted,
   inject,
-  defineEmits,
 } from "vue";
 import {
   Selector,
@@ -21,7 +19,6 @@ import {
   CollectionReturnValue,
   Position,
 } from "cytoscape";
-import { CytoEvent } from "@/types";
 
 const props = withDefaults(
   defineProps<{
@@ -33,9 +30,9 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (e: CytoEvent, event: EventObject): void;
-}>();
+// const emit = defineEmits<{
+//   (e: CytoEvent, event: EventObject): void;
+// }>();
 
 const id = ref<string>(props.definition.data.id || "");
 const selector = ref<Selector>(`#${id.value}`);
@@ -43,11 +40,11 @@ const instance = ref<Core | undefined>(undefined);
 
 function add(): CollectionReturnValue | undefined {
   // register all the component events as cytoscape ones
-  for (const eventType of Object.values(CytoEvent)) {
-    instance.value?.on(eventType, selector.value, (event: EventObject) => {
-      emit(eventType, event);
-    });
-  }
+  // for (const eventType of Object.values(CytoEvent)) {
+  //   instance.value?.on(eventType, selector.value, (event: EventObject) => {
+  //     emit(eventType, event);
+  //   });
+  // }
 
   // if sync is on, track position
   if (props.sync) {

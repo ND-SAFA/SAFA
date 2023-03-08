@@ -6,7 +6,7 @@
       value="Enter keywords for the domain that this model should be trained on. Press enter to save a keyword."
     />
     <select-input multiple label="Keywords" class="q-mb-md" />
-    <v-btn block color="primary"> Generate Training Materials </v-btn>
+    <text-button block label="Generate Training Materials" color="primary" />
   </div>
   <div v-else>
     <under-construction-alert />

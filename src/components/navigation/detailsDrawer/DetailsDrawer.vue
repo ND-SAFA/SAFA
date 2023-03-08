@@ -5,8 +5,9 @@
     :model-value="drawerOpen"
     :breakpoint="0"
     :width="width"
+    class="bg-background"
   >
-    <div class="q-pa-sm full-height bg-background">
+    <div class="q-pa-sm q-mb-md full-height bg-background">
       <flex-box justify="between" align="center">
         <typography color="primary" variant="subtitle" :value="title" />
         <icon-button
@@ -94,7 +95,9 @@ const title = computed(() => {
 });
 
 const width = computed(() => {
-  if (
+  if (openState.value === "displayTrace") {
+    return 500;
+  } else if (
     openState.value === "displayArtifactBody" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"

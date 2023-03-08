@@ -9,7 +9,6 @@
     <div style="max-width: 40em" class="q-mx-auto">
       <switch-input
         v-model="emptyFiles"
-        class="mt-0"
         label="Create an empty project"
         data-cy="toggle-create-empty-project"
       />

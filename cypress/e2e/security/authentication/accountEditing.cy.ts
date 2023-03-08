@@ -1,5 +1,4 @@
 import { Routes, editUser, invalidUser, deleteUser, DataCy } from "@/fixtures";
-// TODO: There is something broken here. Find it and fix it.
 
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {

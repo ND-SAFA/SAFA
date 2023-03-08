@@ -1,5 +1,6 @@
 import { DataCy } from "@/fixtures";
 
+// TODO: Same uncaught exception as in bulkProjectCreation.cy.ts
 describe("Job Submission", () => {
   beforeEach(() => {
     cy.initProject(false);

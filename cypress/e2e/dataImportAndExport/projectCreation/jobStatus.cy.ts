@@ -1,5 +1,6 @@
 import { DataCy, Routes } from "@/fixtures";
 
+//TODO: Progress tracking will need to fixed as its broken rn =(
 describe("Job Status", () => {
   beforeEach(() => {
     cy.initProject(false);

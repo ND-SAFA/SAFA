@@ -7,6 +7,7 @@ import {
   validUser,
 } from "@/fixtures";
 
+// TODO: A Lot of selectors are broken here, we will need to remap and fix them
 describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();

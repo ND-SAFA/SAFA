@@ -50,6 +50,7 @@
       <artifact-input
         v-if="includeChildren"
         v-model="store.childIds"
+        multiple
         label="Child Artifacts"
         class="q-mb-md"
         data-cy="input-document-child-artifacts"
@@ -103,8 +104,8 @@ import {
   PanelCard,
   TextInput,
   SelectInput,
+  DetailsPanel,
 } from "@/components/common";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
 
 const typeOptions = documentTypeOptions();
 

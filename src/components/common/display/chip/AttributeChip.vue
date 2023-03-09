@@ -1,12 +1,13 @@
 <template>
-  <q-chip
+  <chip
     v-if="!props.confidenceScore"
     :class="chipClassName"
     :outline="enumerated"
     :color="displayColor"
+    :removable="props.removable"
     :data-cy="props.dataCy"
     style="max-width: 200px"
-    class="bg-white"
+    @remove="emit('remove')"
   >
     <q-tooltip :hidden="text.length < 10">
       {{ text }}
@@ -24,7 +25,7 @@
       :l="iconVisible ? '1' : ''"
       :value="text"
     />
-  </q-chip>
+  </chip>
   <flex-box v-else align="center">
     <q-linear-progress
       rounded
@@ -48,7 +49,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, IconVariant, ThemeColor } from "@/types";
+import { IconVariant, ThemeColor } from "@/types";
 import {
   camelcaseToDisplay,
   getEnumColor,
@@ -56,15 +57,29 @@ import {
   uppercaseToDisplay,
 } from "@/util";
 import { typeOptionsStore } from "@/hooks";
-import { FlexBox } from "@/components/common/layout";
-import Icon from "@/components/common/display/icon/Icon.vue";
-import Typography from "../Typography.vue";
+import { FlexBox, Typography } from "../content";
+import { Icon } from "../icon";
+import Chip from "./Chip.vue";
 
 const props = defineProps<{
   /**
    * The chip text.
    */
   value: string;
+
+  /**
+   * The color to render the component with.
+   */
+  color?: ThemeColor;
+  /**
+   * The type of icon to render.
+   */
+  icon?: IconVariant;
+  /**
+   * Whether the chip is removable. Displays a remove icon button.
+   */
+  removable?: boolean;
+
   /**
    * If true, the chip text will be converted from "camelCase" to "Display Case".
    */
@@ -74,30 +89,32 @@ const props = defineProps<{
    */
   artifactType?: boolean;
   /**
-   * Whether this chip is for an delta type, customizing the display and icon.
+   * Whether this chip is for a delta type, customizing the display and icon.
    */
   deltaType?: boolean;
+  /**
+   * Whether this chip is for an approval type, customizing the display and icon.
+   */
+  approvalType?: boolean;
   /**
    * Whether to render a confidence score instead of a chip.
    */
   confidenceScore?: boolean;
-  /**
-   * The type of icon to render.
-   */
-  icon?: IconVariant;
-  /**
-   * The color to render the component with.
-   */
-  color?: ThemeColor;
+
   /**
    * The testing selector to set.
    */
   dataCy?: string;
 }>();
 
-const enumerated = computed(
-  () => props.value in ApprovalType || props.deltaType
-);
+const emit = defineEmits<{
+  /**
+   * When the remove button is clicked.
+   */
+  (e: "remove"): void;
+}>();
+
+const enumerated = computed(() => props.approvalType || props.deltaType);
 
 const text = computed(() => {
   if (props.confidenceScore) {
@@ -157,6 +174,6 @@ const trackColor = computed(() => {
 });
 
 const chipClassName = computed(() =>
-  enumerated.value ? "q-mr-sm" : "qmr-sm bd-primary bg-neutral"
+  enumerated.value ? "q-mr-sm bg-neutral" : "qmr-sm bd-primary bg-neutral"
 );
 </script>

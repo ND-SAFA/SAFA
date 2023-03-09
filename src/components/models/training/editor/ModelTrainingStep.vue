@@ -7,45 +7,40 @@
     <template #title>
       <flex-box justify="between">
         <typography variant="subtitle" :value="stepName" />
-        <q-chip outline :color="stepColor">{{ step.status }}</q-chip>
+        <chip outline :color="stepColor" :label="step.status" />
       </flex-box>
     </template>
     <flex-box v-if="step.type === 'document'" t="2" align="center">
       <typography value="Trained on documents:" />
-      <q-chip
+      <chip
         v-for="document in step.documents"
         :key="document.url"
         outline
         class="q-ma-sm"
-      >
-        {{ document.name }}
-      </q-chip>
+        :label="document.name"
+      />
     </flex-box>
     <flex-box v-else-if="step.type === 'repository'" t="2" align="center">
       <typography value="Trained on repositories:" />
-      <q-chip
+      <chip
         v-for="repo in step.repositories"
         :key="repo.url"
         outline
         class="q-ma-sm"
-      >
-        {{ repo.name }}
-      </q-chip>
+        :label="repo.name"
+      />
     </flex-box>
     <flex-box v-else-if="step.type === 'project'" t="2" align="center">
       <typography value="Trained on project data:" />
       <flex-box v-for="project in step.projects" :key="project.id">
-        <q-chip outline color="primary" class="q-ma-sm">
-          {{ project.name }}
-        </q-chip>
-        <q-chip
+        <chip outline color="primary" class="q-ma-sm" :label="project.name" />
+        <chip
           v-for="level in project.levels"
           :key="level.source + level.target"
           outline
           class="q-ma-sm"
-        >
-          {{ level.source }} To {{ level.target }}
-        </q-chip>
+          :label="`${level.source} To ${level.target}`"
+        />
       </flex-box>
     </flex-box>
   </q-timeline-entry>
@@ -64,7 +59,7 @@ export default {
 import { computed } from "vue";
 import { TrainingStepSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, Chip } from "@/components/common";
 
 const props = defineProps<{
   step: TrainingStepSchema;

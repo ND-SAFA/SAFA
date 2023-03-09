@@ -189,7 +189,7 @@ const className = useMargins(props, () => [
   [props.variant === "subtitle", "text-h5"],
   [props.variant === "small", "text-subtitle2"],
   [props.variant === "caption", "text-caption text-grey-8"],
-  [props.variant === "code", "text-body1 overflow-y-auto"],
+  [props.variant === "code", "text-body1"],
   [props.variant === "body" || props.variant === "expandable", "text-body1"],
   ["align", `text-${props.align}`],
   [!!props.color && !darkMode.value, `text-${props.color}`],

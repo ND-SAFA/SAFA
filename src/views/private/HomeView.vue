@@ -7,8 +7,8 @@
       variant="large"
       value="Welcome to SAFA!"
     />
-    <div class="row">
-      <div class="col q-mr-md">
+    <flex-box :column="smallWindow">
+      <flex-item :parts="parts" :full-width="smallWindow" class="q-mr-md">
         <panel-card title="Load Existing Project" icon="home-list">
           <typography
             variant="small"
@@ -16,8 +16,8 @@
           />
           <project-version-stepper minimal />
         </panel-card>
-      </div>
-      <div class="col">
+      </flex-item>
+      <flex-item :parts="parts" :full-width="smallWindow">
         <panel-card title="Create New Project" icon="home-add">
           <typography
             variant="small"
@@ -49,8 +49,8 @@
             </flex-box>
           </flex-box>
         </panel-card>
-      </div>
-    </div>
+      </flex-item>
+    </flex-box>
   </private-page>
 </template>
 
@@ -64,6 +64,8 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { useQuasar } from "quasar";
+import { computed } from "vue";
 import { CreatorTabTypes } from "@/types";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -73,7 +75,13 @@ import {
   PanelCard,
   TextButton,
   ProjectVersionStepper,
+  FlexItem,
 } from "@/components";
+
+const $q = useQuasar();
+
+const smallWindow = computed(() => $q.screen.lt.lg);
+const parts = computed(() => (smallWindow.value ? "12" : "6"));
 
 function handleOpenStandard() {
   navigateTo(Routes.PROJECT_CREATOR, {

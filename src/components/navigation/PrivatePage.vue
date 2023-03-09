@@ -60,5 +60,5 @@ const props = defineProps<{
 }>();
 
 const doDisplay = computed(() => sessionStore.doesSessionExist);
-const style = computed(() => (props.fullWindow ? "" : "max-width: 1000px"));
+const style = computed(() => (props.fullWindow ? "" : "max-width: 1200px"));
 </script>

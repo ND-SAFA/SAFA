@@ -45,8 +45,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { handleSaveProject } from "@/api";
-import { Modal } from "@/components/common";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { Modal, TextButton } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 

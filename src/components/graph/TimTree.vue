@@ -47,8 +47,7 @@ export default {
 import { computed, watch } from "vue";
 import { appStore, layoutStore, projectSaveStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
-import { FlexBox } from "@/components/common/layout";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { FlexBox, TextButton } from "@/components/common";
 import CytoscapeController from "./CytoscapeController.vue";
 import { TimNode, TimLink } from "./tim";
 

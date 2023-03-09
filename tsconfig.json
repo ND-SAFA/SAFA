@@ -12,8 +12,8 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "mocha", "chai", "vuetify"],
-    "typeRoots": ["./node_modules/@types", "./node_modules/vuetify/types"],
+    "types": ["webpack-env", "mocha", "chai"],
+    "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@/*": ["src/*"]
     },

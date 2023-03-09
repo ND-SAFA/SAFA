@@ -48,9 +48,8 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { Typography, Separator } from "@/components/common/display";
+import { Typography, Separator, FlexBox } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
-import { FlexBox } from "@/components/common/layout";
 
 const props = defineProps<{
   /**

@@ -46,8 +46,7 @@ import { ref, watch, computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";
-import { Modal, TextButton } from "@/components/common";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
+import { Modal, TextButton, FlexBox } from "@/components/common";
 
 const props = defineProps<{
   open: boolean;
@@ -101,7 +100,7 @@ function handleClick(versionType: VersionType) {
 }
 
 watch(
-  () => props.isOpen,
+  () => props.open,
   (open) => {
     if (!open || !props.project) return;
 

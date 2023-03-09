@@ -48,8 +48,7 @@ export default {
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
 import { IconVariant, ThemeColor, URLQuery } from "@/types";
-import Typography from "../Typography.vue";
-import Separator from "../Separator.vue";
+import { Typography, Separator } from "../content";
 import { Icon } from "../icon";
 
 const props = defineProps<{

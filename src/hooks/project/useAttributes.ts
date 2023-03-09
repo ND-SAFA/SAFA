@@ -171,6 +171,10 @@ export const useAttributes = defineStore("attributes", {
       this.attributeLayouts = this.attributeLayouts.filter(
         ({ id }) => id !== layout.id
       );
+
+      if (this.selectedLayoutId !== layout.id) return;
+
+      this.selectedLayoutId = this.attributeLayouts[0]?.id || "";
     },
   },
 });

@@ -22,8 +22,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { appStore } from "@/hooks";
-import List from "@/components/common/display/list/List.vue";
-import ListItem from "@/components/common/display/list/ListItem.vue";
+import { List, ListItem } from "@/components/common/display";
 import Modal from "./Modal.vue";
 
 const props = defineProps<{

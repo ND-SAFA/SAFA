@@ -3,32 +3,18 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  withDefaults,
-  watch,
-  onBeforeUnmount,
-  onMounted,
-  inject,
-} from "vue";
+import { ref, watch, onBeforeUnmount, onMounted, inject } from "vue";
 import {
   Selector,
   Core,
   ElementDefinition,
-  EventObject,
   CollectionReturnValue,
   Position,
 } from "cytoscape";
 
-const props = withDefaults(
-  defineProps<{
-    definition: ElementDefinition;
-    sync?: boolean;
-  }>(),
-  {
-    sync: false,
-  }
-);
+const props = defineProps<{
+  definition: ElementDefinition;
+}>();
 
 // const emit = defineEmits<{
 //   (e: CytoEvent, event: EventObject): void;
@@ -38,6 +24,8 @@ const id = ref<string>(props.definition.data.id || "");
 const selector = ref<Selector>(`#${id.value}`);
 const instance = ref<Core | undefined>(undefined);
 
+const cy = inject<Promise<Core>>("cy");
+
 function add(): CollectionReturnValue | undefined {
   // register all the component events as cytoscape ones
   // for (const eventType of Object.values(CytoEvent)) {
@@ -46,36 +34,12 @@ function add(): CollectionReturnValue | undefined {
   //   });
   // }
 
-  // if sync is on, track position
-  if (props.sync) {
-    instance.value?.on("drag", selector.value, (event: EventObject) => {
-      /*  Note: Cytoscape behaves badly when ele.position is an observer object. The underlying
-          data may change, which adjust edge target coordinates, without re-drawing the node.
-
-          In the definition below, and in the position watcher, JSON.parse(JSON.stringify())
-          returns a raw object. Here, "definition.position" is an observer because of Vue, and
-          event.target.position() seems to be an observer also. Without this strip, we end up with
-          an observer of an observer after a drag event, one of which is stripped out in the
-          watcher, creating the same problem we had initially.
-      */
-
-      // strip observers from the event position
-      // update definition object
-      // eslint-disable-next-line vue/no-mutating-props
-      props.definition.position = JSON.parse(
-        JSON.stringify(event.target.position())
-      );
-    });
-  }
-
   // strip observers from the original definition
   let def = JSON.parse(JSON.stringify(props.definition));
 
   // add the element to cytoscape
   return instance.value?.add(def);
 }
-
-const cy = inject<Promise<Core>>("cy");
 
 onMounted(() => {
   cy?.then((cy: Core) => {

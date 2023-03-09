@@ -7,7 +7,7 @@
       label="Add Model Training"
       @click="addOpen = true"
     />
-    <q-card v-else bordered flat class="q-pa-md">
+    <panel-card v-else>
       <tab-list v-model="tab" :tabs="tabs">
         <template #documents>
           <model-document-step :model="props.model" @submit="addOpen = false" />
@@ -25,7 +25,7 @@
           <model-project-step :model="props.model" @submit="addOpen = false" />
         </template>
       </tab-list>
-    </q-card>
+    </panel-card>
   </q-timeline-entry>
 </template>
 
@@ -42,8 +42,7 @@ export default {
 import { ref } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { trainingTabOptions } from "@/util";
-import { TabList } from "@/components/common";
-import TextButton from "@/components/common/button/TextButton.vue";
+import { TabList, TextButton, PanelCard } from "@/components/common";
 import {
   ModelProjectStep,
   ModelDocumentStep,

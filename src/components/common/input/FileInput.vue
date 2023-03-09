@@ -30,7 +30,7 @@ export default {
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
 import { useVModel } from "@/hooks";
-import Icon from "@/components/common/display/icon/Icon.vue";
+import { Icon } from "@/components/common/display";
 
 const props = withDefaults(
   defineProps<{

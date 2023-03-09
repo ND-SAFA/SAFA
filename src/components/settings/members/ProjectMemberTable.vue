@@ -40,8 +40,7 @@ import { MembershipSchema, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { PanelCard } from "@/components/common";
-import SelectorTable from "@/components/common/table/SelectorTable.vue";
+import { PanelCard, SelectorTable } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
 const editedMember = ref<MembershipSchema | undefined>();

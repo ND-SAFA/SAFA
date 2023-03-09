@@ -29,7 +29,7 @@ import { computed, withDefaults } from "vue";
 import { ThemeColor } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
-import { FlexBox } from "@/components/common/layout";
+import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
 
 withDefaults(

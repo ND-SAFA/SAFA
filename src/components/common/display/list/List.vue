@@ -2,7 +2,8 @@
   <q-list :bordered="props.bordered">
     <div
       v-if="!!props.scrollHeight"
-      :style="`max-height: ${props.scrollHeight}px; overflow-y: auto`"
+      class="scrollable"
+      :style="`max-height: ${props.scrollHeight}px`"
     >
       <slot />
     </div>

@@ -18,8 +18,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { appStore } from "@/hooks";
-import DetailsPanel from "@/components/navigation/detailsDrawer/DetailsPanel.vue";
-import { PanelCard } from "@/components/common";
+import { DetailsPanel, PanelCard } from "@/components/common";
 import { TraceLinkGenerator } from "../save";
 
 const isOpen = computed(() => appStore.isDetailsPanelOpen === "generateTrace");

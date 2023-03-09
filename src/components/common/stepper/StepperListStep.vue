@@ -11,11 +11,7 @@
       el="p"
       :value="props.emptyMessage"
     />
-    <div
-      v-if="!props.loading"
-      style="max-height: 400px"
-      class="overflow-y-auto"
-    >
+    <div v-if="!props.loading" style="max-height: 400px" class="scrollable">
       <slot />
     </div>
   </div>

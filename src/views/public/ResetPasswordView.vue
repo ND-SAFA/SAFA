@@ -57,8 +57,7 @@ export default {
 import { ref, onMounted, computed } from "vue";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { updatePassword } from "@/api";
-import TextButton from "@/components/common/button/TextButton.vue";
-import { CardPage, PasswordInput, Typography } from "@/components";
+import { CardPage, PasswordInput, Typography, TextButton } from "@/components";
 
 const token = ref("");
 const password = ref("");

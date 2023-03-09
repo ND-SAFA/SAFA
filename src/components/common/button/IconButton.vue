@@ -28,7 +28,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant, ThemeColor } from "@/types";
-import Icon from "@/components/common/display/icon/Icon.vue";
+import { Icon } from "@/components/common/display";
 
 const props = defineProps<{
   /**

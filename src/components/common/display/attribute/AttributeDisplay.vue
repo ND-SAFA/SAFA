@@ -26,8 +26,8 @@ import { computed } from "vue";
 import { AttributeCollectionSchema, AttributeSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
-import Typography from "../Typography.vue";
-import AttributeChip from "./AttributeChip.vue";
+import { Typography } from "../content";
+import { AttributeChip } from "../chip";
 
 const props = defineProps<{
   /**

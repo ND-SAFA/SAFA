@@ -64,7 +64,7 @@ import {
   GridItemData,
 } from "@/types";
 import { attributesStore } from "@/hooks";
-import { FlexBox } from "@/components/common/layout";
+import { FlexBox } from "../content";
 
 const props = defineProps<{
   layout: AttributeLayoutSchema;

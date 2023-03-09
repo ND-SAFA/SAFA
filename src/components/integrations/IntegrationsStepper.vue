@@ -41,8 +41,7 @@ import {
   handleImportJiraProject,
   handleSyncInstallation,
 } from "@/api";
-import { Stepper } from "@/components/common";
-import PanelCard from "@/components/common/layout/PanelCard.vue";
+import { Stepper, PanelCard } from "@/components/common";
 import {
   JiraOrganizationSelector,
   GitHubOrganizationSelector,

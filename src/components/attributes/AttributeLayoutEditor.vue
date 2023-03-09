@@ -16,7 +16,7 @@
       <save-attribute-layout
         v-if="id === tab"
         :layout="layouts[idx]"
-        @save="handleSaveLayout(id)"
+        @save="handleSaveLayout"
       />
     </template>
   </tab-list>
@@ -38,7 +38,7 @@ import { attributesStore } from "@/hooks";
 import { TabList, TextButton, Typography } from "@/components/common";
 import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 
-const getTabId = (id?: string) => `tab-${id}`;
+const getTabId = (id = "") => `tab-${id}`;
 const stripTabId = (tabId: string) => tabId.replace("tab-", "");
 
 const createOpen = ref(false);

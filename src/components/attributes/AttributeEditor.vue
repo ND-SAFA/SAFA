@@ -24,13 +24,13 @@
     </flex-box>
     <save-attribute v-if="createOpen" @save="createOpen = false" />
     <separator v-if="createOpen" />
-    <toggle-list
+    <expansion-item
       v-for="attribute in attributes"
       :key="attribute.key"
-      :title="attribute.label"
+      :label="attribute.label"
     >
       <template #icon>
-        <span @click.stop="">
+        <span @click.stop>
           <icon-button
             class="ml-auto"
             icon="add"
@@ -41,7 +41,8 @@
         </span>
       </template>
       <save-attribute :attribute="attribute" />
-    </toggle-list>
+      <separator class="faded" />
+    </expansion-item>
     <flex-box v-if="attributes.length === 0" justify="center">
       <typography
         variant="caption"
@@ -67,10 +68,10 @@ import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
 import {
   FlexBox,
   TextButton,
-  ToggleList,
   Typography,
   IconButton,
   Separator,
+  ExpansionItem,
 } from "@/components/common";
 import SaveAttribute from "./SaveAttribute.vue";
 

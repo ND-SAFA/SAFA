@@ -22,7 +22,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { MessageType } from "@/types";
-import Typography from "../Typography.vue";
+import { Typography } from "../content";
 
 const props = defineProps<{
   /**

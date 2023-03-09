@@ -14,7 +14,7 @@
     <panel-card>
       <attribute-grid editable :layout="store.editedLayout">
         <template #item="{ attribute }">
-          <q-card v-if="!!attribute" bordered class="q-pa-md q-ma-sm">
+          <panel-card v-if="!!attribute" class="q-ma-sm">
             <flex-box align="center" justify="between">
               <div>
                 <typography :value="attribute.label" />
@@ -28,7 +28,7 @@
                 @click="handleDeleteAttribute(attribute)"
               />
             </flex-box>
-          </q-card>
+          </panel-card>
         </template>
       </attribute-grid>
     </panel-card>
@@ -82,7 +82,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "save"): void;
+  (e: "save", layoutId: string): void;
 }>();
 
 const store = ref(attributeLayoutSaveStore(props.layout?.id || ""));
@@ -92,7 +92,7 @@ const store = ref(attributeLayoutSaveStore(props.layout?.id || ""));
  */
 function handleSave() {
   handleSaveAttributeLayout(store.value.editedLayout, store.value.isUpdate, {
-    onSuccess: () => emit("save"),
+    onSuccess: ({ id }) => emit("save", id),
   });
 }
 

@@ -94,9 +94,12 @@ import { computed, useSlots } from "vue";
 import { TableColumn, TableGroupRow } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
-import { Typography, AttributeChip } from "@/components/common/display";
+import {
+  Typography,
+  AttributeChip,
+  FlexBox,
+} from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
-import { FlexBox } from "@/components/common/layout";
 
 const props = defineProps<{
   /**

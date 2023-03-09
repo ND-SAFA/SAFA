@@ -4,14 +4,12 @@
     <flex-box :column="smallWindow">
       <flex-item
         :parts="smallWindow ? '12' : '4'"
-        :class="smallWindow ? 'full-width' : 'q-pr-md'"
+        :full-width="smallWindow"
+        :class="smallWindow ? '' : 'q-pr-md'"
       >
         <slot name="sidebar" />
       </flex-item>
-      <flex-item
-        :parts="smallWindow ? '12' : '8'"
-        :class="smallWindow ? 'full-width' : ''"
-      >
+      <flex-item :parts="smallWindow ? '12' : '8'" :full-width="smallWindow">
         <slot />
       </flex-item>
     </flex-box>
@@ -31,8 +29,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuasar } from "quasar";
-import FlexBox from "./FlexBox.vue";
-import FlexItem from "./FlexItem.vue";
+import { FlexBox, FlexItem } from "@/components/common/display";
 
 const $q = useQuasar();
 

@@ -7,6 +7,8 @@ import {
   validUser,
 } from "@/fixtures";
 
+// TODO: There may be a lot of functions broken as there is a couple of components missing
+
 Cypress.Commands.add("initEmptyProject", () => {
   cy.dbResetJobs().dbResetProjects();
 
@@ -72,9 +74,10 @@ Cypress.Commands.add("openPanelAfterClose", () => {
 });
 
 Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
-  cy.clickButton(DataCy.creationCreatePanelButton);
-  cy.getCy(DataCy.creationTypeInput).type(name);
-  cy.clickButton(DataCy.creationTypeButton);
+  //cy.clickButton(DataCy.creationCreatePanelButton);
+  //cy.getCy(DataCy.creationTypeInput).type(name);
+  cy.inputText(DataCy.creationTypeInput, name);
+  //cy.clickButton(DataCy.creationTypeButton);
   cy.uploadFiles(DataCy.creationStandardFilesInput, file);
 
   if (next) {

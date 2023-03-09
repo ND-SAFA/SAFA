@@ -32,20 +32,17 @@ describe("Standard Project Creation", () => {
     describe("I can create sets of artifacts by type", () => {
       it("Cannot create a new panel with an empty name", () => {
         // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard").clickButton(
-          DataCy.creationCreatePanelButton
-        );
+        cy.setProjectIdentifier("standard");
 
-        cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
 
       it("Can create a new panel of artifacts", () => {
         cy.setProjectIdentifier("standard").createArtifactPanel(
           "hazard",
-          simpleProjectFilesMap.hazard
+          simpleProjectFilesMap.hazard,
+          true
         );
-
-        cy.clickButton(DataCy.creationCreatePanelButton);
 
         cy.getCy(DataCy.creationFilePanel).should("be.visible");
       });

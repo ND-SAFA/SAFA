@@ -16,7 +16,7 @@ class ThreadUtil:
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
         :param iterable: The iterable containing the items to batch and perform work over.
-        :param thread_work: The callable performing the work on item.
+        :param thread_work: The callable performing the work on item_index.
         :param n_threads: The number of threads to use to perform work.
         :return: None
         """
@@ -29,7 +29,7 @@ class ThreadUtil:
 
         def thread_body() -> None:
             """
-            Performs work on each item in the queue.
+            Performs work on each item_index in the queue.
             :return: None
             """
             while not item_queue.empty():

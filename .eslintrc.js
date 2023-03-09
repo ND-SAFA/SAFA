@@ -25,6 +25,7 @@ module.exports = {
     "max-lines": ["warn", 300],
     "vue/no-mutating-props": 0,
     "vue/script-setup-uses-vars": "error",
+    "vue/multi-word-component-names": 0,
     "import/order": [
       "warn",
       {

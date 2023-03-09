@@ -80,7 +80,7 @@ import {
 
 const $q = useQuasar();
 
-const smallWindow = computed(() => $q.screen.lt.lg);
+const smallWindow = computed(() => $q.screen.lt.md);
 const parts = computed(() => (smallWindow.value ? "12" : "6"));
 
 function handleOpenStandard() {

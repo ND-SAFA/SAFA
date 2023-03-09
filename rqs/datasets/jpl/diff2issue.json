@@ -29,7 +29,7 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "jpl",
-                "task": "diff2issue",
+                "task": "task_1",
                 "stage": "train"
               }
             },
@@ -38,7 +38,7 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "jpl",
-                "task": "diff2issue",
+                "task": "task_1",
                 "stage": "val"
               }
             },
@@ -47,7 +47,7 @@
               "project_reader": {
                 "object_type": "HUB",
                 "name": "jpl",
-                "task": "diff2issue",
+                "task": "task_1",
                 "stage": "eval"
               }
             },

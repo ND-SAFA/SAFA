@@ -46,7 +46,14 @@ const props = defineProps<{
    * How many parts this column should take up, out of 12.
    */
   parts?: SizeType | "auto";
+  /**
+   * Whether to expand to full width.
+   */
+  fullWidth?: boolean;
 }>();
 
-const className = useMargins(props, () => [["parts", `col-${props.parts}`]]);
+const className = useMargins(props, () => [
+  ["parts", `col-${props.parts}`],
+  ["fullWidth", "full-width"],
+]);
 </script>

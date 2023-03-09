@@ -3,6 +3,7 @@
     <bindings schemaLocation="reqif.xsd">
         <bindings node="//xsd:complexType[@name='ALTERNATIVE-ID']">
             <class name="AlternativeId" />
+            <property name="alternativeId" />
         </bindings>
         <bindings node="//xsd:complexType[@name='ATTRIBUTE-DEFINITION-BOOLEAN']">
             <class name="AttributeDefinitionBoolean" />
@@ -111,6 +112,72 @@
         </bindings>
         <bindings node="//xsd:complexType[@name='REQ-IF-TOOL-EXTENSION']">
             <class name="ReqIfToolExtension" />
+            <property name="reqIfToolExtension" />
+        </bindings>
+
+        <bindings node="//xsd:element[@name='THE-HEADER']/xsd:complexType">
+            <class name="TheHeader" />
+        </bindings>
+        <bindings node="//xsd:element[@name='THE-HEADER']">
+            <property name="theHeader"/>
+        </bindings>
+
+        <bindings node="//xsd:element[@name='CORE-CONTENT']/xsd:complexType">
+            <class name="CoreContent" />
+        </bindings>
+        <bindings node="//xsd:element[@name='CORE-CONTENT']">
+            <property name="coreContent" />
+        </bindings>
+
+        <bindings node="//xsd:element[@name='TOOL-EXTENSIONS']/xsd:complexType">
+            <class name="ToolExtensions" />
+        </bindings>
+        <bindings node="//xsd:element[@name='TOOL-EXTENSIONS']">
+            <property name="toolExtensions" />
+        </bindings>
+
+        <bindings node="//xsd:element[@name='REQ-IF-CONTENT']">
+            <property name="reqIfContent" />
+        </bindings>
+
+        <bindings node="//xsd:element[@name='REQ-IF-HEADER']">
+            <property name="reqIfHeader" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:attribute[@name='IDENTIFIER']">
+            <property name="identifier" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:element[@name='DEFAULT-VALUE']">
+            <property name="defaultValue" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:element[@name='DEFAULT-VALUE']/xsd:complexType">
+            <class name="DefaultValue" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:element[@name='TYPE']">
+            <property name="type" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:element[@name='TYPE']/xsd:complexType">
+            <class name="Type" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:attribute[@name='DESC']">
+            <property name="desc" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:attribute[@name='IS-EDITABLE']">
+            <property name="isEditable" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:attribute[@name='LAST-CHANGE']">
+            <property name="lastChange" />
+        </bindings>
+
+        <bindings multiple="true" node="//xsd:attribute[@name='LONG-NAME']">
+            <property name="longName" />
         </bindings>
     </bindings>
 </bindings>

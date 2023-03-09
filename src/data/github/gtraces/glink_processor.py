@@ -66,3 +66,13 @@ class GLinkProcessor:
             for t in connecting_traces:
                 transitive_traces.append(GLink(t.source, t2.target))
         return GArtifactSet(transitive_traces, GArtifactType.LINK)
+
+    @staticmethod
+    def flip(link_set: GArtifactSet[GLink]):
+        """
+        Creates artifact set with reverse direction of link.
+        :param link_set: Set of links.
+        :return: Artifact set of flipped links.
+        """
+        flipped_set = list(map(lambda t: GLink(t.target, t.source), link_set))
+        return GArtifactSet(flipped_set, GArtifactType.LINK)

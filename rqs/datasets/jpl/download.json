@@ -6,10 +6,10 @@
           "object_type": "DOWNLOAD_REPO",
           "job_args": {
           },
-          "repo_name": "nasa-jpl/osr-rover-code",
-          "artifact_store_path": "~/desktop/safa/repos",
-          "clone_path": "~/projects/safa/greader/clones",
-          "output_path": "~/desktop/safa/datasets/jpl-rover-code",
+          "repo_name": "ros/ros",
+          "artifact_store_path": "~/desktop/safa/github/artifacts",
+          "clone_path": "~/desktop/safa/github/clones",
+          "output_path": "~/desktop/safa/datasets/ros",
           "load": true
         }
       ]

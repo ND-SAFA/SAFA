@@ -19,6 +19,7 @@ from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 
 GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Revert.*of.*",
+                          "Merge branch.*into.*",
                           "Merge branch.*of.*"]
 MIN_WORD_LENGTH = 5
 MIN_CODE_LENGTH = 5

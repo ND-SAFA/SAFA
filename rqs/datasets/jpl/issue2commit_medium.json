@@ -49,10 +49,10 @@
             "augmenter": {
               "steps": [
                 {
-                  "object_type": "RESAMPLE"
+                  "object_type": "SIMPLE_WORD_REPLACEMENT"
                 },
                 {
-                  "object_type": "SIMPLE_WORD_REPLACEMENT"
+                  "object_type": "RESAMPLE"
                 }
               ]
             }

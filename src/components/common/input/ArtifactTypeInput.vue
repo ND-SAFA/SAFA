@@ -8,8 +8,7 @@
     :options="options"
     :hint="hint"
     :error-message="errorMessage"
-    @blur="emit('blur')"
-    @submit="emit('blur')"
+    @popup-hide="emit('blur')"
   >
     <template #selected-item="{ opt }">
       <attribute-chip v-if="!!opt" artifact-type :value="opt" />

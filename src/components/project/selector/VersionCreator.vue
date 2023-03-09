@@ -100,7 +100,7 @@ function handleClick(versionType: VersionType) {
 }
 
 watch(
-  () => props.isOpen,
+  () => props.open,
   (open) => {
     if (!open || !props.project) return;
 

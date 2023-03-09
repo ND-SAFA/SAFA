@@ -46,8 +46,12 @@ export default {
 <script setup lang="ts">
 import { computed, useSlots, withDefaults } from "vue";
 import { IconVariant, ThemeColor } from "@/types";
-import { Typography, Icon, Separator } from "@/components/common/display";
-import FlexBox from "./FlexBox.vue";
+import {
+  Typography,
+  Icon,
+  Separator,
+  FlexBox,
+} from "@/components/common/display";
 
 const props = withDefaults(
   defineProps<{

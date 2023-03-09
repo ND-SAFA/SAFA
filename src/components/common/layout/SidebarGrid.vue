@@ -31,8 +31,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuasar } from "quasar";
-import FlexBox from "./FlexBox.vue";
-import FlexItem from "./FlexItem.vue";
+import { FlexBox, FlexItem } from "@/components/common/display";
 
 const $q = useQuasar();
 

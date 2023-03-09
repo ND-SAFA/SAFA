@@ -6,6 +6,7 @@
     map-options
     emit-value
     use-input
+    :clearable="multiple"
     :multiple="multiple"
     :label="label || 'Artifact'"
     :options="options"
@@ -17,14 +18,12 @@
       <artifact-body-display v-bind="itemProps" display-title :artifact="opt" />
     </template>
     <template #selected-item="{ opt, index, removeAtIndex }">
-      <q-chip
+      <attribute-chip
         v-if="!!opt && opt.name && index < 3"
-        outline
         removable
+        :value="opt.name"
         @remove="removeAtIndex(index)"
-      >
-        <typography :value="opt.name" />
-      </q-chip>
+      />
       <typography
         v-else-if="index === 3"
         secondary
@@ -51,7 +50,11 @@ export default {
 import { computed, ref } from "vue";
 import { filterArtifacts } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
-import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
+import {
+  Typography,
+  ArtifactBodyDisplay,
+  AttributeChip,
+} from "@/components/common/display";
 
 const props = defineProps<{
   modelValue: string[] | string | undefined;

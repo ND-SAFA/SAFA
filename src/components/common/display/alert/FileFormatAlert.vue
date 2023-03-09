@@ -5,12 +5,9 @@
         color="primary"
         value="The format of files can be found here:"
       />
-      <text-button
-        text
-        label="SAFA WIKI"
-        color="primary"
-        @click="handleOpenWiki"
-      />
+      <q-btn flat color="primary" @click="handleOpenWiki">
+        <typography value="SAFA WIKI" />
+      </q-btn>
     </flex-box>
   </alert-card>
 </template>
@@ -25,9 +22,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import TextButton from "@/components/common/button/TextButton.vue";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
-import Typography from "../Typography.vue";
+import { Typography, FlexBox } from "../content";
 import AlertCard from "./AlertCard.vue";
 
 /**

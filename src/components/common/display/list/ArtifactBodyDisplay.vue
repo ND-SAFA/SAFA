@@ -32,10 +32,9 @@ export default {
 import { computed } from "vue";
 import { ArtifactSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
-import { FlexBox } from "@/components/common/layout";
-import { ListItem } from "./list";
-import { AttributeChip } from "./attribute";
-import Typography from "./Typography.vue";
+import { FlexBox, Typography } from "../content";
+import { AttributeChip } from "../chip";
+import ListItem from "./ListItem.vue";
 
 const props = defineProps<{
   /**

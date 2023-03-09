@@ -1,13 +1,12 @@
 <template>
   <q-select
-    ref="documentSelector"
     v-model="document"
     dense
     outlined
     dark
     :options-dark="darkMode"
     options-selected-class="primary"
-    :options="documentStore.projectDocuments"
+    :options="options"
     label="View"
     class="nav-input"
     option-label="name"
@@ -55,7 +54,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
@@ -68,9 +67,9 @@ import {
 import { handleSwitchDocuments } from "@/api";
 import { IconButton, TextButton, ListItem } from "@/components/common";
 
-const documentSelector = ref<HTMLElement | null>(null);
-
 const { darkMode } = useTheme();
+
+const options = computed(() => documentStore.projectDocuments);
 
 const document = computed({
   get() {

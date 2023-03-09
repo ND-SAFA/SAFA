@@ -63,8 +63,7 @@ import { TableColumn } from "@/types";
 import { useVModel } from "@/hooks";
 import { Searchbar, SelectInput } from "@/components/common/input";
 import { CommitButtons, IconButton } from "@/components/common/button";
-import { FlexBox } from "@/components/common/layout";
-import { Separator } from "@/components/common/display";
+import { FlexBox, Separator } from "@/components/common/display";
 
 const props = defineProps<{
   /**

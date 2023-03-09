@@ -50,6 +50,7 @@
       <artifact-input
         v-if="includeChildren"
         v-model="store.childIds"
+        multiple
         label="Child Artifacts"
         class="q-mb-md"
         data-cy="input-document-child-artifacts"

@@ -12,11 +12,7 @@
       <typography secondary :value="jobStatus(props.job).progress()" />
     </q-td>
     <q-td align="end">
-      <q-chip
-        outline
-        :color="jobStatus(props.job).color()"
-        data-cy="job-status"
-      >
+      <chip outline :color="jobStatus(props.job).color()" data-cy="job-status">
         <q-circular-progress
           v-if="jobStatus(props.job).isInProgress()"
           :color="jobStatus(props.job).color()"
@@ -24,11 +20,12 @@
         />
         <icon
           v-else
+          size="sm"
           :color="jobStatus(props.job).color()"
           :variant="jobStatus(props.job).icon()"
         />
         <typography l="1" :value="jobStatus(props.job).status()" />
-      </q-chip>
+      </chip>
     </q-td>
   </q-tr>
   <q-tr v-show="props.expanded" :props="props.quasarProps">
@@ -86,6 +83,7 @@ import {
   TextButton,
   FlexBox,
   Stepper,
+  Chip,
 } from "@/components/common";
 
 const props = defineProps<{

@@ -80,7 +80,7 @@ export default {
 import { computed } from "vue";
 import { TableColumn, TableRow } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
-import { FlexBox } from "@/components/common/layout";
+import { FlexBox } from "@/components/common/display";
 import { Searchbar } from "@/components/common/input";
 import { IconButton } from "@/components/common/button";
 import DataTable from "./DataTable.vue";

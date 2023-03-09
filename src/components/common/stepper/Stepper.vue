@@ -60,7 +60,7 @@ import { computed } from "vue";
 import { StepperStep } from "@/types";
 import { useVModel } from "@/hooks";
 import { TextButton } from "@/components/common/button";
-import { FlexBox } from "@/components/common/layout";
+import { FlexBox } from "@/components/common/display";
 
 const props = defineProps<{
   /**

@@ -51,7 +51,7 @@ export function svgNode(
         ${svgTitle(title, y - 18, "type")}
         ${svgDiv({
           x,
-          y: y + 7,
+          y: y + 10,
           width,
           color,
         })}
@@ -85,7 +85,7 @@ export function svgTitle(title: string, y: number, dataCy: string): string {
       x: 0,
       y,
       width: "100%",
-      height: 24,
+      height: 26,
     },
     dataCy
   );

@@ -8,19 +8,16 @@
     />
     <typography secondary value="Traces To" />
     <div>
-      <q-chip
+      <chip
         v-for="type in allowedTypes"
         :key="type"
         outline
         :removable="allowEditing"
+        :label="getTypeLabel(type)"
         data-cy="chip-type-direction"
         @remove="handleDelete(type)"
-      >
-        <typography :value="getTypeLabel(type)" />
-      </q-chip>
-      <q-chip v-if="allowedTypes.length === 0">
-        <typography value="Any Type" />
-      </q-chip>
+      />
+      <chip v-if="allowedTypes.length === 0" outline label="Any Type" />
     </div>
   </div>
 </template>
@@ -39,7 +36,7 @@ import { computed } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
-import { Typography } from "@/components/common/display";
+import { Typography, Chip } from "@/components/common/display";
 
 const props = defineProps<{
   /**

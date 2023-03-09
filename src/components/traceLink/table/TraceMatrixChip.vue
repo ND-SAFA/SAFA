@@ -1,10 +1,11 @@
 <template>
   <div>
     <div v-if="doDisplay" @click.stop>
-      <q-chip
+      <chip
         clickable
         outline
-        :color="isGenerated ? 'secondary' : 'primary'"
+        :color="color"
+        :style="style"
         @click="handleClick"
       >
         <typography :value="source.name" color="text" />
@@ -15,7 +16,7 @@
           variant="trace"
         />
         <typography color="text" :value="target.name" />
-      </q-chip>
+      </chip>
     </div>
     <div v-else class="show-on-hover">
       <div class="width-fit" @click.stop>
@@ -40,9 +41,9 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema, TraceType } from "@/types";
+import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
-import { Typography, IconButton, Icon } from "@/components/common";
+import { Typography, IconButton, Icon, Chip } from "@/components/common";
 
 const props = defineProps<{
   source: ArtifactSchema;
@@ -64,6 +65,28 @@ const traceLink = computed(() =>
 
 const isGenerated = computed(
   () => traceLink.value?.traceType === TraceType.GENERATED
+);
+
+const isUnreviewed = computed(
+  () =>
+    isGenerated.value &&
+    traceLink.value?.approvalStatus === ApprovalType.UNREVIEWED
+);
+
+// Ignored until final decision is made on coloring logic.
+// const color = computed(() =>
+//   isGenerated.value
+//     ? isUnreviewed.value
+//       ? "secondary"
+//       : "positive"
+//     : "primary"
+// );
+
+const color = computed(() => (isGenerated.value ? "secondary" : "primary"));
+const style = computed(
+  () =>
+    "border-width: 2px; " +
+    (isUnreviewed.value ? "border-style: dashed;" : "border-style: solid;")
 );
 
 /**

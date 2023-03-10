@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
 from data.github.gtraces.glink import GLink
 from data.github.gtraces.glink_processor import GLinkProcessor
@@ -22,3 +23,16 @@ class TestGLinkProcessor(TestCase):
         self.assertListEqual(["1"], issues)
         self.assertEqual(0, len(pulls))
         self.assertListEqual(["1"], commits)
+
+    def test_get_transitive_traces(self):
+        """
+        Verifies that transitive traces are able to be detected and created.
+        :return:
+        """
+        upper = GArtifactSet([GLink("S1", "T1"), GLink("S2", "T2")], GArtifactType.LINK)
+        lower = GArtifactSet([GLink("T1", "C1"), GLink("T3", "C2")], GArtifactType.LINK)
+        transitive_traces = GLinkProcessor.get_transitive_traces(upper, lower)
+        self.assertEqual(1, len(transitive_traces))
+        t = transitive_traces[0]
+        self.assertEqual("S1", t.source)
+        self.assertEqual("C1", t.target)

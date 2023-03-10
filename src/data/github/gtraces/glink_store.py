@@ -37,6 +37,15 @@ class GLinkStore:
                 artifact_sets[file_name] = self.get_artifact_set(source_type, target_type)
         return artifact_sets
 
+    def has_artifact_set(self, source_type: GArtifactType, target_type: GArtifactType):
+        """
+        Returns whether trace links exists between given types.
+        :param source_type: The source type of artifacts.
+        :param target_type: The target type of artifacts.
+        :return: Whether trace links exist between source and target type of artifact.
+        """
+        return source_type in self.store and target_type in self.store[source_type]
+
     def get_artifact_set(self, source_type: GArtifactType, target_type: GArtifactType):
         """
         Returns artifact set containing links between source and target types.
@@ -44,6 +53,8 @@ class GLinkStore:
         :param target_type: The target type of artifacts.
         :return: Artifact set containing trace links between source and target types.
         """
+        if not self.has_artifact_set(source_type, target_type):
+            return GArtifactSet([], GArtifactType.LINK)
         links = self.store[source_type][target_type]
         return GArtifactSet(links, GArtifactType.LINK)
 

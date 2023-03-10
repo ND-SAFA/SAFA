@@ -18,12 +18,6 @@
             "num_train_epochs": 5,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
             "skip_save": false,
             "load_best_model_at_end": true
           },

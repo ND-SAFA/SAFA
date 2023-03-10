@@ -1,5 +1,5 @@
 import json
-from typing import Generic, List, Tuple, Type, TypeVar
+from typing import Dict, Generic, List, Tuple, Type, TypeVar
 
 import pandas as pd
 
@@ -83,6 +83,12 @@ class GArtifactSet(Generic[T]):
         artifacts, artifact_type = GArtifactSet.__read_data_file(data_file_path)
         return GArtifactSet(artifacts, artifact_type)
 
+    def get_entity_dict(self) -> Dict[str, T]:
+        """
+        :return: Returns mapping betwen entity ids and artifacts.
+        """
+        return {entity_id: entity for entity, entity_id in zip(self.artifacts, self.artifact_ids)}
+
     @staticmethod
     def __read_data_file(artifact_file_path: str) -> Tuple[List[T], GArtifactType]:
         """
@@ -106,6 +112,35 @@ class GArtifactSet(Generic[T]):
         :return: Class constructor for given type.
         """
         return SupportedGArtifacts.get_value(artifact_type)
+
+    def __getitem__(self, item_index: int) -> T:
+        """
+        Returns artifact at given index.
+        :param item_index: The index of the artifact to retrieve.
+        :return: The artifact.
+        """
+        assert isinstance(item_index, int), f"Expected index to be int but got {type(item_index)}"
+        return self.artifacts[item_index]
+
+    def __iter__(self):
+        """
+        :return: Returns iterator to artifacts.
+        """
+        for artifact in self.artifacts:
+            yield artifact
+
+    def __add__(self, other):
+        """
+        Adds to artifact sets together if they contain the same type of entities.
+        :param other: The other artifact set.
+        :return: Artifact set containing combined articacts.
+        """
+        assert isinstance(other, GArtifactSet), f"Expected other to be GArtifactSet."
+        assert self.artifact_type == other.artifact_type, f"Expected same artifact types {self.artifact_type} {other.artifact_type}."
+        entity_dict: Dict[str, T] = self.get_entity_dict()
+        entity_dict.update(other.get_entity_dict())
+        artifacts = list(entity_dict.values())
+        return GArtifactSet(artifacts, self.artifact_type)
 
     def __contains__(self, artifact_id: str) -> bool:
         """

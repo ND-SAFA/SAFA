@@ -8,7 +8,7 @@ from data.github.gartifacts.gcode_file import GCodeFile
 from data.github.gartifacts.gcommit import GCommit
 from data.github.gartifacts.gissue import GIssue
 from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, CODE_ARTIFACT_FILE, \
-    CODE_EXPORT_FILE, COMMITDIFF2ISSUE_EXPORT_FILE, COMMIT_ARTIFACT_FILE, \
+    CODE_EXPORT_FILE, COMMIT2ISSUE_EXPORT_FILE, COMMITDIFF2ISSUE_EXPORT_FILE, COMMIT_ARTIFACT_FILE, \
     COMMIT_DIFF_EXPORT_FILE, COMMIT_EXPORT_FILE, ISSUE2CODE_EXPORT_FILE, ISSUE_ARTIFACT_FILE, \
     ISSUE_EXPORT_FILE, PULL_ARTIFACT_FILE, PULL_EXPORT_FILE
 from data.github.gtraces.glink import GLink
@@ -19,8 +19,9 @@ from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 
 GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Revert.*of.*",
+                          "Merge branch.*into.*",
                           "Merge branch.*of.*"]
-MIN_WORD_LENGTH = 10
+MIN_WORD_LENGTH = 5
 MIN_CODE_LENGTH = 5
 
 COMMIT_CLEANING_REGEX = {
@@ -47,7 +48,7 @@ class RepositoryExporter:
     """
     Reads parsed artifacts and cleans them for export.
     """
-    DEFAULT_COL_ID = "artifacts"
+    DEFAULT_COL_ID = "artifact"
     OBJ = "obj"
     COL_ID = "col_id"
 
@@ -64,6 +65,7 @@ class RepositoryExporter:
         self.code2code = self.__read_artifact_set(CODE2CODE_ARTIFACT_FILE)
         self.glink_store = GLinkStore()
         self.glink_store_processor = GLinkProcessor(self.glink_store)
+        self.commit2issue = None
 
     def extract(self, output_path: str) -> None:
         """
@@ -90,6 +92,7 @@ class RepositoryExporter:
         self.issues = self.issues.filter(linked_issues)
         self.pulls = self.pulls.filter(linked_pulls)
         self.commits = self.commits.filter(linked_commits)
+        self.commit2issue = self.__create_issue_2_commit()
 
     def save(self, output_path: str) -> None:
         """
@@ -117,20 +120,36 @@ class RepositoryExporter:
             CODE2CODE_EXPORT_FILE: {
                 self.OBJ: self.code2code,
                 self.COL_ID: "trace"
+            },
+            COMMIT2ISSUE_EXPORT_FILE: {
+                self.OBJ: self.commit2issue,
+                self.COL_ID: "trace"
             }
         }
-        trace_artifact_sets = self.glink_store.create_artifact_sets()
+        trace_artifact_sets: Dict[str, GArtifactSet[GLink]] = self.glink_store.create_artifact_sets()
         trace_instructions = {file_name: {
             self.OBJ: artifact_set,
             self.COL_ID: "trace"
         } for file_name, artifact_set in trace_artifact_sets.items()}
-        trace_instructions[COMMITDIFF2ISSUE_EXPORT_FILE] = {**trace_instructions["commit2issue.csv"]}  # TODO: Append ids with DIFF
-        entity_instructions.update(trace_instructions)
+
+        if COMMIT2ISSUE_EXPORT_FILE in trace_instructions:
+            trace_instructions[COMMITDIFF2ISSUE_EXPORT_FILE] = {
+                **entity_instructions[COMMIT2ISSUE_EXPORT_FILE]}  # TODO: Append ids with DIFF
+
+        # appe
+        for k, v in trace_instructions.items():
+            if k in entity_instructions:
+                entity_instructions[k] = {
+                    self.OBJ: entity_instructions[k][self.OBJ] + v[self.OBJ],
+                    self.COL_ID: "trace"
+                }
+
         entity_instructions[ISSUE2CODE_EXPORT_FILE] = {
-            self.OBJ: self.__create_issue_2_code(),
+            self.OBJ: self.__create_issue_2_code(self.commit2issue),
             self.COL_ID: "trace"
         }
 
+        os.makedirs(output_path, exist_ok=True)
         for file_name, instructions in entity_instructions.items():
             if self.COL_ID not in instructions:
                 instructions[self.COL_ID] = self.DEFAULT_COL_ID
@@ -149,12 +168,23 @@ class RepositoryExporter:
         artifact_file_path = os.path.join(self.repo_path, artifact_file_name)
         return GArtifactSet.load(artifact_file_path)
 
-    def __create_issue_2_code(self):
+    def __create_issue_2_commit(self) -> GArtifactSet[GLink]:
+        """
+        Creates links between commits and issues using direct and transitive links.
+        :return: The links between commits and issues.
+        """
+        commit2pull = self.glink_store.get_artifact_set(GArtifactType.COMMIT, GArtifactType.PULL)
+        pull2issue = self.glink_store.get_artifact_set(GArtifactType.PULL, GArtifactType.ISSUE)
+        transitive_commit2_issue = GLinkProcessor.get_transitive_traces(commit2pull, pull2issue)
+        commit2issue = self.glink_store.get_artifact_set(GArtifactType.COMMIT, GArtifactType.ISSUE)
+        commit2issue = commit2issue + transitive_commit2_issue
+        return commit2issue
+
+    def __create_issue_2_code(self, commit2issue: GArtifactSet[GLink]):
         """
         Creates trace links between issues and code through the commits implementing issue.
         :return: GArtifactSet containing links.
         """
-        commit2issue = self.glink_store.get_artifact_set(GArtifactType.COMMIT, GArtifactType.ISSUE)
         commit2files = {}
         for c in self.commits.artifacts:
             commit2files[c.get_id()] = c.files
@@ -162,6 +192,8 @@ class RepositoryExporter:
         glinks = []
         for commit2issue_link in commit2issue.artifacts:
             c_id = commit2issue_link.source
+            if c_id not in commit2files:
+                continue
             files = commit2files[c_id]
             for f in files:
                 for extension in ALLOWED_CODE_EXTENSIONS:

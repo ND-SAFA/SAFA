@@ -15,6 +15,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.tree.trace_link import TraceLink
 from train.itrainer import iTrainer
 from train.metrics.metrics_manager import MetricsManager
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
@@ -36,6 +37,8 @@ class VSMTrainer(iTrainer):
         :param vectorizer: vectorizer for assigning weights to words, must be one of sklearn.text.extraction
         :param metrics: A list of metric names to use for evaluation
         """
+        if metrics is None:
+            metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics

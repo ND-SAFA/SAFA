@@ -7,7 +7,6 @@ from constants import NO_ORPHAN_CHECK_VALUE
 from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
-from util.dataframe_util import DataFrameUtil
 from util.dict_util import ListUtil
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
@@ -69,7 +68,7 @@ class CsvProjectReader(AbstractProjectReader):
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         }])
-        artifact_df = pd.DataFrame(artifact_df_entries)
+        artifact_df = pd.DataFrame(artifact_df_entries.values())
         entity_df = None
         return artifact_df, trace_df, layer_mapping_df
 
@@ -96,12 +95,12 @@ class CsvProjectReader(AbstractProjectReader):
         :param artifact_type: The name of type of artifact.
         :param artifact_df_entries: DataFrame containing entries for each artifact processed.
         """
-        if StructuredKeys.Artifact.ID not in artifact_df_entries or a_id not in artifact_df_entries[StructuredKeys.Artifact.ID]:
-            DataFrameUtil.append(artifact_df_entries, {
+        if a_id not in artifact_df_entries:
+            artifact_df_entries[a_id] = {
                 StructuredKeys.Artifact.ID: a_id,
                 StructuredKeys.Artifact.BODY: a_body,
                 StructuredKeys.Artifact.LAYER_ID: CsvProjectReader.get_layer_id(artifact_type)
-            })
+            }
 
     @staticmethod
     def get_layer_id(artifact_type: str) -> str:

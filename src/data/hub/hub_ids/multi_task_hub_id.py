@@ -1,9 +1,9 @@
 import os
 from abc import ABC
+from typing import List
 
 from constants import STAGES
 from data.hub.abstract_hub_id import AbstractHubId
-from data.keys.safa_format import SafaKeys
 
 
 class MultiStageHubId(AbstractHubId, ABC):
@@ -22,15 +22,28 @@ class MultiStageHubId(AbstractHubId, ABC):
         self.task = task
         self.stage = stage
 
-    def get_definition_path(self, data_dir: str) -> str:
+    def get_project_path(self, data_dir: str) -> str:
         """
         Returns path to stage definition file.
         :param data_dir: The base project path containing all stages.
         :return: Path to stage definition file.
         """
-        if self.stage:
-            tasks_defined = os.listdir(data_dir)
-            assert self.task in tasks_defined, f"Task () is not one of: {tasks_defined}"
-            assert self.stage in STAGES, f"Stage () is not one of: {STAGES}"
-            return os.path.join(data_dir, self.task, self.stage, SafaKeys.TIM_FILE)
-        return os.path.join(data_dir, self.task, SafaKeys.TIM_FILE)
+        project_path = data_dir
+        tasks_defined = os.listdir(data_dir)
+        project_path = self.add_if_exists(self.task, tasks_defined, project_path)
+        project_path = self.add_if_exists(self.stage, STAGES, project_path)
+        return project_path
+
+    @staticmethod
+    def add_if_exists(module: str, defined_modules: List[str], base_path: str):
+        """
+        Adds module to base path if defined.
+        :param module: The module to be added to path.
+        :param defined_modules: List of defined modules to check existence in.
+        :param base_path: The base path to append to.
+        :return: The final path.
+        """
+        if module:
+            assert module in defined_modules, f"Expected ({module}) to be one of ({defined_modules})."
+            return os.path.join(base_path, module)
+        return base_path

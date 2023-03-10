@@ -1,22 +1,21 @@
 from typing import Dict
 
 import datasets
-from sklearn.metrics import recall_score
+import numpy as np
 
 from data.datasets.trace_matrix import TraceMatrix
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
-Recall@K metric measures the percentage of true links that were correctly predicted.
+The average true links per query by source artifact.
 """
 
 _KWARGS_DESCRIPTION = """
 Args:
-    predictions (`list` of `int`): Predicted labels.
+    predictions (`list` of `float`): Predicted labels.
     references (`list` of `int`): Ground truth labels.
-    k (int): The level of the threshold to consider a similar score a true label.
 Returns:
-    recall_at_k (`float` or `int`): Recall@K score. 
+    avg_true_links (`float` or `int`): Average true links per query.
 """
 
 _CITATION = """
@@ -24,21 +23,33 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class RecallAtThresholdMetric(AbstractTraceMetric):
-    name = "recall@k"
+class AverageTrueLinksMetric(AbstractTraceMetric):
+    name = "avg_true_links"
 
-    def _compute(self, predictions, references, trace_matrix: TraceMatrix = None, k=3, **kwargs) -> Dict:
+    # TODO
+    def _compute(self, predictions, references, trace_matrix: TraceMatrix, **kwargs) -> Dict:
         """
-        Recall@K metric measures the percentage of true links that were correctly predicted.
+        Returns the average true links per query.
         :param predictions: predicted labels
         :param labels: ground truth labels.
-        :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
-        :return: Recall@K score.
+        :return: Average number of positive links.
         """
-        score = trace_matrix.calculate_query_metric_at_k(recall_score, k)
-        metric_name = self.name.replace("k", k)
-        return {metric_name: score}
+
+        def get_n_positives(labels, _):
+            """
+            Returns the number of positive labels in query.
+            :param labels: The labels in the query.
+            :param _: Ignored.
+            :return: The sum of labels, assuming negative label is 0.
+            """
+            return sum(labels)
+
+        score = trace_matrix.calculate_query_metric(get_n_positives, default_value=np.nan)
+
+        return {
+            "avg_true_links": score
+        }
 
     def _info(self) -> datasets.MetricInfo:
         """

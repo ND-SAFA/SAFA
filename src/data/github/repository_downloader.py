@@ -65,8 +65,8 @@ class RepositoryDownloader:
         git, github_repo, local_repo = self.__get_repo()
 
         for output_file, parse_lambda in artifacts.items():
-            output_path = os.path.join(output_path, output_file)
-            self.load_or_retrieve(output_path, parse_lambda, load)
+            artifact_set_path = os.path.join(output_path, output_file)
+            self.load_or_retrieve(artifact_set_path, parse_lambda, load)
 
     def extract_code_links(self) -> GArtifactSet:
         """
@@ -94,10 +94,12 @@ class RepositoryDownloader:
         Returns github instance for user along with reference to defined repository and its clone.
         :return: github instance, repository, and cloned repository
         """
+
         github_instance = Github(login_or_token=self.token)
         github_instance.get_user()
         RepositoryDownloader.wait_for_rate_limit(github_instance)
         repo = github_instance.get_repo(self.repository_name)
+        logger.info(f"Downloading repository: {self.repository_name}")
         local_repo = self.__clone_repository(self.repository_name, self.clone_path)
         return github_instance, repo, local_repo
 
@@ -179,11 +181,11 @@ class RepositoryDownloader:
         """
         repo_url = RepositoryDownloader.REPO_TEMPLATE.format(repository_name)
         if not os.path.exists(clone_path):
-            logger.info("Clone {}...".format(repository_name))
+            logger.info(f"Cloning {repository_name}...")
             local_git.Repo.clone_from(repo_url, clone_path)
-            logger.info("finished cloning project")
+            logger.info("Finish cloning project")
         else:
-            logger.info("Skip clone project as it already exist...")
+            logger.info(f"Loading repository from {clone_path}...")
         local_repo = local_git.Repo(clone_path)
         return local_repo
 

@@ -29,6 +29,7 @@ class LinkFinder:
         :return: List of links containing given issue.
         """
         issue_text_bodies = [issue.title, issue.body] + issue.comments
+        issue_text_bodies = [b for b in issue_text_bodies if b is not None]
         issue_links = LinkFinder.search_links(issue_text_bodies)
         return issue_links
 

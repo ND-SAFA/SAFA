@@ -7,11 +7,7 @@ from scipy.special import softmax
 
 from data.datasets.trace_matrix import TraceMatrix
 from data.tree.trace_link import TraceLink
-from train.metrics.map_at_k_metric import MapAtKMetric
-from train.metrics.map_metric import MapMetric
-from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
-from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
+from train.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
 from train.trace_output.stage_eval import Metrics, TracePredictions
 from train.trace_output.trace_prediction_output import TracePredictionEntry
 
@@ -45,8 +41,7 @@ class MetricsManager:
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
-        trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                                RecallAtThresholdMetric.name]
+        trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
         scores = self.trace_matrix.scores
         labels = self.trace_matrix.labels
         for metric_path in metric_paths:

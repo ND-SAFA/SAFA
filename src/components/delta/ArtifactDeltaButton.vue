@@ -6,12 +6,7 @@
     class="q-mb-sm"
     @click="emit('click')"
   >
-    <typography
-      ellipsis
-      :value="name"
-      :color="color"
-      style="max-width: 300px"
-    />
+    <typography ellipsis :value="name" :color="color" />
   </text-button>
 </template>
 

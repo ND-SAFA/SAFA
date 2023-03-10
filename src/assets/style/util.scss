@@ -10,12 +10,22 @@
   &-fit {
     width: fit-content;
   }
+  &-100 {
+    width: 100%;
+  }
+  &-50 {
+    width: 50%;
+  }
 }
 
 // Height Utilities
 
 .scrollable {
   overflow-y: scroll;
+
+  &-md {
+    max-height: 400px;
+  }
 }
 
 // Flex Utilities

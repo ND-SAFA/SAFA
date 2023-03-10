@@ -8,11 +8,10 @@
     options-selected-class="primary"
     :options="options"
     label="View"
-    class="nav-input"
+    class="nav-input nav-document"
     option-label="name"
     option-value="documentId"
     color="accent"
-    style="width: 200px"
     data-cy="button-document-select-open"
   >
     <template #option="{ opt, itemProps }">

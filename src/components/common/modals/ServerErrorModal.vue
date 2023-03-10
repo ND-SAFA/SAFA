@@ -2,7 +2,7 @@
   <modal title="Server Errors" :open="open" @close="handleClose">
     <list>
       <list-item v-for="error in props.errors" :key="error">
-        <code style="word-break: break-all">
+        <code class="text-word-break-all">
           {{ error }}
         </code>
       </list-item>

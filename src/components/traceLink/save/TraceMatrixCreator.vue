@@ -8,14 +8,13 @@
               v-model="matrix.source"
               show-count
               label="Source Type"
-              class="q-mr-md"
-              style="width: 50%"
+              class="q-mr-md width-50"
             />
             <artifact-type-input
               v-model="matrix.target"
               show-count
               label="Target Type"
-              style="width: 50%"
+              class="width-50"
             />
           </flex-box>
           <flex-box full-width justify="center">

@@ -14,9 +14,9 @@
       justify="between"
       align="center"
       y="3"
-      style="height: 40px; padding-left: 10px; padding-right: 10px"
+      class="nav-sidebar-header-open"
     >
-      <safa-icon style="width: 200px !important" />
+      <safa-icon />
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"
@@ -31,7 +31,7 @@
       align="center"
       full-width
       y="3"
-      style="height: 40px"
+      class="nav-sidebar-header"
     >
       <icon-button
         icon="nav-toggle"

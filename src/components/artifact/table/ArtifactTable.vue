@@ -24,9 +24,9 @@
           option-to-value
           option-value="id"
           option-label="name"
+          class="table-input"
           data-cy="input-delta-type"
           b=""
-          style="max-width: 300px"
         />
       </template>
 

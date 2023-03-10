@@ -33,3 +33,44 @@ h1, h2, h3, h4, h6, h6 {
 .inherit-color {
   color: inherit !important;
 }
+
+.text-expanded {
+  white-space: nowrap;
+  width: inherit;
+  max-width: 60vw;
+}
+
+.text-white-space-normal {
+  white-space: normal;
+}
+
+.text-word-break-all {
+  word-break: break-all;
+}
+
+// Text Block Styling
+
+.attribute-chip {
+  max-width: 200px;
+}
+
+.attribute-bar {
+  width: 200px;
+
+  .attribute-bar-text {
+    max-width: 50px;
+  }
+}
+
+.artifact-display {
+  max-width: 500px;
+}
+
+.trace-matrix-chip {
+  border-width: 2px;
+  border-style: solid;
+
+  &-unreviewed {
+    border-style: dashed;
+  }
+}

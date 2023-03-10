@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <q-layout container view="lHh Lpr lff" style="min-height: 60vh">
+    <q-layout container view="lHh Lpr lff" class="settings-attributes">
       <q-drawer
         v-if="!smallWindow"
         model-value

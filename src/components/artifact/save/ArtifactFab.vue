@@ -1,5 +1,5 @@
 <template>
-  <q-page-sticky position="bottom-right" :offset="fabPos" style="z-index: 100">
+  <q-page-sticky position="bottom-right" :offset="fabPos" class="artifact-fab">
     <q-fab
       v-model="open"
       v-touch-pan.prevent.mouse="handleMoveFab"

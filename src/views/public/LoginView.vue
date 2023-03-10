@@ -15,9 +15,9 @@
       <text-button
         color="primary"
         label="Login"
-        style="width: 8em"
         :disabled="password.length === 0"
         :loading="isLoading"
+        class="login-button"
         data-cy="button-login"
         @click="handleSubmit"
       />

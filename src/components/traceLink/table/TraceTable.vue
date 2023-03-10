@@ -19,10 +19,9 @@
           :use-chips="false"
           :options="options"
           label="Row Types"
-          data-cy="input-trace-table-row-types"
           b=""
-          class="q-mr-sm"
-          style="max-width: 300px"
+          class="q-mr-sm table-input"
+          data-cy="input-trace-table-row-types"
         />
         <multiselect-input
           v-model="colTypes"
@@ -31,9 +30,9 @@
           :use-chips="false"
           :options="options"
           label="Column Types"
-          data-cy="input-trace-table-row-types"
           b=""
-          style="max-width: 300px"
+          class="table-input"
+          data-cy="input-trace-table-col-types"
         />
       </template>
 

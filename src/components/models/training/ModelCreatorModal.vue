@@ -10,7 +10,6 @@
         v-if="!isUpdate"
         v-model="editedModel.baseModel"
         only-trainable
-        style="max-width: 200px"
       />
     </flex-box>
     <template #actions>

@@ -117,12 +117,3 @@ function onStepForward(): void {
   }
 }
 </script>
-
-<style lang="scss">
-.stepper-minimal {
-  .q-stepper__title {
-    white-space: pre-wrap;
-    width: min-content;
-  }
-}
-</style>

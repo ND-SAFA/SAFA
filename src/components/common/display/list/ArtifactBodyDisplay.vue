@@ -2,7 +2,7 @@
   <list-item
     :clickable="props.clickable"
     :divider="props.displayDivider"
-    style="max-width: 500px"
+    class="artifact-display"
     @click="emit('click')"
   >
     <flex-box align="center" justify="between">

@@ -23,7 +23,11 @@ class ModelManager(BaseObject):
                  layers_to_freeze: List[int] = None):
         """
         Handles loading model and related functions
-        :param model_path: the path to the saved model
+        :param model_path: The path to the saved model
+        :param model_task: The task the model should perform (e.g. masked learning model or sequence classification)
+        :param model_size: The size of the model
+        :param model_architecture: Whether the model should be siamese or single
+        :param layers_to_freeze: The layers to freeze during training
         """
 
         self._tokenizer: Optional[AutoTokenizer] = None
@@ -41,9 +45,8 @@ class ModelManager(BaseObject):
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        self._config = AutoConfig.from_pretrained(self.model_path)
-        self._config.num_labels = 2
-        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
+        config = self.get_config()
+        model = self.model_task.value.from_pretrained(self.model_path, config=config)
         if self.layers_to_freeze:
             self._freeze_layers(model, self.layers_to_freeze)
         return model
@@ -63,7 +66,8 @@ class ModelManager(BaseObject):
         :return: the PreTrainedModel object
         """
         if self._config is None:
-            self.get_model()
+            self._config = AutoConfig.from_pretrained(self.model_path)
+            self._config.num_labels = 2
         return self._config
 
     def clear_model(self) -> None:

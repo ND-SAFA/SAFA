@@ -153,14 +153,14 @@ const errorMessage = computed(() => {
   }
 });
 
-const isValid = computed(() => !errorMessage.value);
+const valid = computed(() => !errorMessage.value);
 
 const headerClass = computed(() =>
-  isValid.value ? "text-positive" : "text-negative"
+  valid.value ? "text-positive" : "text-negative"
 );
 
 const iconId = computed(() =>
-  isValid.value ? getIcon("success") : getIcon("error")
+  valid.value ? getIcon("success") : getIcon("error")
 );
 
 const artifactTypes = computed(() => projectSaveStore.artifactTypes);
@@ -210,11 +210,11 @@ watch(
 );
 
 watch(
-  () => isValid.value,
-  (valid) => {
-    props.panel.isValid = valid;
+  () => [valid.value, props.panel.loading],
+  () => {
+    props.panel.valid = valid.value;
 
-    if (!valid) return;
+    if (!valid.value || props.panel.loading) return;
 
     props.panel.open = false;
   }

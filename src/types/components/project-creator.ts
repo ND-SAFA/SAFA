@@ -19,7 +19,8 @@ export interface CreatorFilePanel {
   name: string;
   type: string;
   open: boolean;
-  isValid: boolean;
+  valid: boolean;
+  loading: boolean;
   ignoreErrors: boolean;
   itemNames: string[];
   file?: File;

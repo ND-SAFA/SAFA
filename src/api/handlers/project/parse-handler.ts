@@ -21,9 +21,10 @@ export function parseFilePanel(
     panel.errorMessage = "Unable to parse this file";
   };
 
-  if (panel.variant === "artifact") {
-    panel.type = panel.type || fileType;
+  panel.loading = true;
+  panel.type = panel.type || fileType;
 
+  if (panel.variant === "artifact") {
     parseArtifactFile(panel.type, panel.file)
       .then(({ entities, errors }) => {
         panel.artifacts = entities;
@@ -35,9 +36,9 @@ export function parseFilePanel(
           artifactMap[artifact.name] = artifact;
         });
       })
-      .catch(handleError);
+      .catch(handleError)
+      .finally(() => (panel.loading = false));
   } else {
-    panel.type = panel.type || fileType;
     panel.toType = panel.toType || fileTargetType;
 
     parseTraceFile(panel.file)
@@ -50,7 +51,8 @@ export function parseFilePanel(
           errors.length === 0 ? undefined : errors.join(", ");
         panel.itemNames = entities.map(extractTraceId);
       })
-      .catch(handleError);
+      .catch(handleError)
+      .finally(() => (panel.loading = false));
   }
 }
 

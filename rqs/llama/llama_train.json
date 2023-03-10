@@ -13,7 +13,8 @@
             }
           },
           "model_manager": {
-            "model_path": "decapoda-research/llama-7b-hf"
+            "model_path": "decapoda-research/llama-65b-hf",
+            "model_task": "SEQUENCE_SIMILARITY"
           },
           "trainer_args": {
             "evaluation_strategy": "steps",

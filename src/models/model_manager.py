@@ -26,9 +26,9 @@ class ModelManager(BaseObject):
         :param model_path: the path to the saved model
         """
 
-        self.__tokenizer: Optional[AutoTokenizer] = None
-        self.__model: Optional[PreTrainedModel] = None
-        self.__config: Optional[PretrainedConfig] = None
+        self._tokenizer: Optional[AutoTokenizer] = None
+        self._model: Optional[PreTrainedModel] = None
+        self._config: Optional[PretrainedConfig] = None
         self.model_path = model_path
         self.model_output_path = model_output_path
         self.model_task = model_task
@@ -36,14 +36,14 @@ class ModelManager(BaseObject):
         self.model_size = model_size
         self.layers_to_freeze = layers_to_freeze
 
-    def __load_model(self) -> PreTrainedModel:
+    def _load_model(self) -> PreTrainedModel:
         """
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        self.__config = AutoConfig.from_pretrained(self.model_path)
-        self.__config.num_labels = 2
-        model = self.model_task.value.from_pretrained(self.model_path, config=self.__config)
+        self._config = AutoConfig.from_pretrained(self.model_path)
+        self._config.num_labels = 2
+        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
         if self.layers_to_freeze:
             self._freeze_layers(model, self.layers_to_freeze)
         return model
@@ -53,31 +53,36 @@ class ModelManager(BaseObject):
         Gets the PreTrainedModel
         :return: the PreTrainedModel object
         """
-        if self.__model is None:
-            self.__model = self.__load_model()
-        return self.__model
+        if self._model is None:
+            self._model = self._load_model()
+        return self._model
 
     def get_config(self) -> PretrainedConfig:
         """
         Gets the PreTrainedModel configuration.
         :return: the PreTrainedModel object
         """
-        if self.__config is None:
+        if self._config is None:
             self.get_model()
-        return self.__config
+        return self._config
 
     def clear_model(self) -> None:
         """
         Removes reference to model.
         :return: None
         """
-        del self.__model  # need delete because other pointers exist in trainer
-        del self.__tokenizer
-        self.__model = None
-        self.__tokenizer = None
+        del self._model  # need delete because other pointers exist in trainer
+        del self._tokenizer
+        self._model = None
+        self._tokenizer = None
         gc.collect()
 
     def update_model(self, model_path: str) -> PreTrainedModel:
+        """
+        Updates the model path and reloads the model
+        :param model_path: The path to the model
+        :return: The updated model
+        """
         self.clear_model()
         self.model_path = model_path
         return self.get_model()
@@ -87,9 +92,9 @@ class ModelManager(BaseObject):
         Gets the pretrained Tokenizer
         :return: the Tokenizer
         """
-        if self.__tokenizer is None:
-            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path, eos_token='[EOS]')
-        return self.__tokenizer
+        if self._tokenizer is None:
+            self._tokenizer = AutoTokenizer.from_pretrained(self.model_path, eos_token='[EOS]')
+        return self._tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:
         """

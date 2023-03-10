@@ -9,6 +9,7 @@ from jobs.download_repository_job import DownloadRepositoryJob
 from jobs.export_artifacts_job import ExportArtifactsJob
 from jobs.export_dataset_job import ExportDatasetJob
 from jobs.gan_train_job import GanTrainJob
+from jobs.llama_train_job import LLaMATrainJob
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.predict_job import PredictJob
 from jobs.push_model_job import PushModelJob
@@ -24,6 +25,7 @@ class SupportedJobType(Enum):
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
     GAN_TRAIN = GanTrainJob
+    LLAMA_TRAIN = LLaMATrainJob
     MLM_PRE_TRAIN = MLMPreTrainJob
     PRE_TRAIN = MLMPreTrainJob
     PREDICT = PredictJob

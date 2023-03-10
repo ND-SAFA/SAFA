@@ -1,7 +1,3 @@
-import { addStreamCommands } from "@lensesio/cypress-websocket-testing";
-
-addStreamCommands();
-
 import "./baseCommands";
 import "./dbCommands";
 import "./shouldCommands";

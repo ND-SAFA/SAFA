@@ -2,7 +2,6 @@ import {
   ArtifactDeltaState,
   WarningSchema,
   FTANodeType,
-  PositionSchema,
   SafetyCaseType,
   TraceLinkSchema,
 } from "@/types";
@@ -148,13 +147,7 @@ export interface ArtifactCytoElementData extends CytoElementData {
 /**
  * Defines an artifact element.
  */
-export interface ArtifactCytoElement
-  extends CytoElement<ArtifactCytoElementData> {
-  /**
-   * The artifact's position in the graph
-   */
-  position?: PositionSchema;
-}
+export type ArtifactCytoElement = CytoElement<ArtifactCytoElementData>;
 
 /**
  * Defines a trace link's data in cytoscape.

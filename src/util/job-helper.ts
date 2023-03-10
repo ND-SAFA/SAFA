@@ -12,8 +12,6 @@ export function jobStatus(job: JobSchema) {
   return {
     isCompleted: () => job.status === JobStatus.COMPLETED,
     isInProgress: () => job.status === JobStatus.IN_PROGRESS,
-    isFailed: () => job.status === JobStatus.FAILED,
-    isCancelled: () => job.status === JobStatus.CANCELLED,
     progress: () => {
       switch (job.status) {
         case JobStatus.IN_PROGRESS:

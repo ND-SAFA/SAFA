@@ -13,7 +13,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GraphElementType, GraphMode, TraceLinkSchema } from "@/types";
+import {
+  GraphElementType,
+  GraphMode,
+  TraceCytoElement,
+  TraceLinkSchema,
+} from "@/types";
 import { deltaStore, useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
@@ -24,7 +29,7 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
-const definition = computed(() => ({
+const definition = computed<TraceCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
     graph: GraphMode.tree,

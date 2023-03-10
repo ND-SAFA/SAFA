@@ -110,7 +110,7 @@ function handleReload() {
  * @return Whether it can be deleted.
  */
 function isDeletable(project: IdentifierSchema): boolean {
-  return sessionStore.isAdmin(project);
+  return sessionStore.isOwner(project);
 }
 
 /**

@@ -119,10 +119,8 @@ function filterRow(row: FlatArtifact): boolean {
  * @param row - The artifact to view.
  */
 function handleView(row: TableGroupRow | FlatArtifact) {
-  if ("id" in row && selectionStore.selectedArtifact?.id !== row.id) {
-    selectionStore.selectArtifact(String(row.id));
-  } else {
-    selectionStore.clearSelections();
+  if ("id" in row) {
+    selectionStore.toggleSelectArtifact(String(row.id));
   }
 }
 </script>

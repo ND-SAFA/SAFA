@@ -95,8 +95,8 @@ const traces = computed(() =>
 
 watch(
   () => props.visible,
-  (visible) => {
-    if (!visible) return;
+  () => {
+    if (!props.visible) return;
 
     layoutStore.setTimTreeLayout();
   }

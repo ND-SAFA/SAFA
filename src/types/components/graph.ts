@@ -40,7 +40,7 @@ export interface CytoElement<Data = CytoElementData> {
   /**
    * The element's cytoscape classes.
    */
-  classes?: string[];
+  classes?: string;
 }
 
 /**

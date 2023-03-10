@@ -73,7 +73,7 @@
           class="q-mr-sm"
           data-cy="button-ignore-errors"
         />
-        <typography v-if="!isValid" :value="errorMessage" color="negative" />
+        <typography v-if="!valid" :value="errorMessage" color="negative" />
       </flex-box>
 
       <list v-if="props.panel.itemNames.length > 0" class="q-mb-md">

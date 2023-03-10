@@ -8,28 +8,36 @@
         @click="cyResetTim"
       />
     </flex-box>
-    <cytoscape-controller
-      id="cytoscape-tim"
-      :cyto-core-graph="timGraph"
-      :class="className"
-    >
-      <template #elements>
-        <tim-node
-          v-for="{ type, count } in artifacts"
-          :key="type"
-          :count="count"
-          :artifact-type="type"
-        />
-        <tim-link
-          v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
-          :key="name"
-          :count="count"
-          :target-type="targetType"
-          :source-type="sourceType"
-          :generated="isGenerated"
-        />
-      </template>
-    </cytoscape-controller>
+    <panel-card>
+      <cytoscape-controller
+        id="cytoscape-tim"
+        :cyto-core-graph="timGraph"
+        :class="className"
+      >
+        <template #elements>
+          <tim-node
+            v-for="{ type, count } in artifacts"
+            :key="type"
+            :count="count"
+            :artifact-type="type"
+          />
+          <tim-link
+            v-for="{
+              name,
+              sourceType,
+              targetType,
+              count,
+              isGenerated,
+            } in traces"
+            :key="name"
+            :count="count"
+            :target-type="targetType"
+            :source-type="sourceType"
+            :generated="isGenerated"
+          />
+        </template>
+      </cytoscape-controller>
+    </panel-card>
   </div>
 </template>
 
@@ -48,6 +56,7 @@ import { computed, watch } from "vue";
 import { appStore, layoutStore, projectSaveStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import { FlexBox, TextButton } from "@/components/common";
+import PanelCard from "@/components/common/layout/PanelCard.vue";
 import CytoscapeController from "./CytoscapeController.vue";
 import { TimNode, TimLink } from "./tim";
 

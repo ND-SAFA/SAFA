@@ -76,7 +76,7 @@
         <typography v-if="!isValid" :value="errorMessage" color="negative" />
       </flex-box>
 
-      <list v-if="props.panel.itemNames.length > 0" bordered class="q-mb-md">
+      <list v-if="props.panel.itemNames.length > 0" class="q-mb-md">
         <expansion-item label="Parsed Entities">
           <div class="q-mx-md">
             <attribute-chip

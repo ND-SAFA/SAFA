@@ -14,11 +14,16 @@ export function parseFilePanel(
 ): void {
   if (!panel.file) return;
 
+  const [fileType = "", fileTargetType = ""] =
+    panel.file.name?.split(".")[0]?.split("2") || [];
+
   const handleError = () => {
     panel.errorMessage = "Unable to parse this file";
   };
 
   if (panel.variant === "artifact") {
+    panel.type = panel.type || fileType;
+
     parseArtifactFile(panel.type, panel.file)
       .then(({ entities, errors }) => {
         panel.artifacts = entities;
@@ -32,6 +37,9 @@ export function parseFilePanel(
       })
       .catch(handleError);
   } else {
+    panel.type = panel.type || fileType;
+    panel.toType = panel.toType || fileTargetType;
+
     parseTraceFile(panel.file)
       .then(({ entities, errors }) => {
         panel.traces = entities;

@@ -3,6 +3,7 @@
     v-model:sort-by="sortBy"
     v-model:sort-desc="sortDesc"
     v-model:expanded="expandedRows"
+    virtual-scroll
     :columns="props.columns"
     :rows="groupedRows"
     :row-key="props.rowKey"
@@ -11,7 +12,7 @@
     :sort="(r) => r"
     separator="cell"
   >
-    <template #top>
+    <template #top="scope">
       <groupable-table-header
         v-model:search-text="searchText"
         v-model:group-by="groupBy"
@@ -19,6 +20,8 @@
         v-model:sort-desc="sortDesc"
         :columns="columns"
         :search-label="searchLabel"
+        :in-fullscreen="scope.inFullscreen"
+        @toggle-fullscreen="scope.toggleFullscreen"
       >
         <template #header-right>
           <slot name="header-right" />

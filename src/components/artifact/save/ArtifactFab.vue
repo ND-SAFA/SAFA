@@ -1,11 +1,11 @@
 <template>
-  <q-page-sticky position="bottom-right" :offset="fabPos" class="artifact-fab">
+  <q-page-sticky position="bottom-left" :offset="fabPos" class="artifact-fab">
     <q-fab
       v-model="open"
       v-touch-pan.prevent.mouse="handleMoveFab"
       direction="up"
-      vertical-actions-align="right"
-      :color="isCreateLinkEnabled ? 'accent' : 'primary'"
+      vertical-actions-align="left"
+      :color="isCreateLinkEnabled ? 'secondary' : 'primary'"
       active-icon="mdi-close"
       :icon="isCreateLinkEnabled ? 'mdi-ray-start-arrow' : 'mdi-plus'"
       :disable="draggingFab"
@@ -13,7 +13,6 @@
     >
       <q-fab-action
         label="Generate Trace Links"
-        label-position="left"
         icon="mdi-link-variant-plus"
         class="bg-background"
         data-cy="button-fab-generate-trace"
@@ -22,7 +21,6 @@
       <q-fab-action
         v-if="isTreeMode"
         :label="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
-        label-position="left"
         :icon="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
         class="bg-background"
         data-cy="button-fab-draw-trace"
@@ -31,7 +29,6 @@
       <q-fab-action
         v-if="isEditor"
         label="Create Trace Link"
-        label-position="left"
         icon="mdi-ray-start-end"
         class="bg-background"
         data-cy="button-fab-create-trace"
@@ -40,7 +37,6 @@
       <q-fab-action
         v-if="isEditor"
         label="Create Artifact"
-        label-position="left"
         icon="mdi-folder-plus-outline"
         class="bg-background"
         data-cy="button-fab-create-artifact"
@@ -85,7 +81,7 @@ function handleMoveFab(ev: {
 }) {
   draggingFab.value = ev.isFirst !== true && ev.isFinal !== true;
 
-  fabPos.value = [fabPos.value[0] - ev.delta.x, fabPos.value[1] - ev.delta.y];
+  fabPos.value = [fabPos.value[0] + ev.delta.x, fabPos.value[1] - ev.delta.y];
 }
 
 /**

@@ -80,6 +80,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-arrow-down";
     case "arrow-up":
       return "mdi-arrow-up";
+    case "fullscreen":
+      return "mdi-fullscreen";
+    case "fullscreen-exit":
+      return "mdi-fullscreen-exit";
     case "home-list":
       return "mdi-view-list";
     case "home-add":

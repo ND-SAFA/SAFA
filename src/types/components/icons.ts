@@ -34,6 +34,8 @@ export type IconVariant =
   | "up"
   | "arrow-down"
   | "arrow-up"
+  | "fullscreen"
+  | "fullscreen-exit"
   | "home-list"
   | "home-add"
   | "job-complete"

@@ -145,17 +145,20 @@ export function handleAuthorizeJira({
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action runs.
  */
 export function handleLoadJiraOrganizations({
   onSuccess,
   onError,
+  onComplete,
 }: IOHandlerCallback<JiraOrganizationSchema[]>): void {
   getJiraInstallations()
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
       logStore.onError(e);
-    });
+    })
+    .finally(onComplete);
 }
 
 /**
@@ -163,10 +166,12 @@ export function handleLoadJiraOrganizations({
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action runs.
  */
 export function handleLoadJiraProjects({
   onSuccess,
   onError,
+  onComplete,
 }: IOHandlerCallback<JiraProjectSchema[]>): void {
   const installationId = integrationsStore.jiraOrganization?.id;
 
@@ -177,7 +182,8 @@ export function handleLoadJiraProjects({
     .catch((e) => {
       onError?.(e);
       logStore.onError(e);
-    });
+    })
+    .finally(onComplete);
 }
 
 /**
@@ -236,15 +242,18 @@ export function handleAuthorizeGitHub({
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action completes.
  */
 export function handleLoadGitHubProjects({
   onSuccess,
   onError,
+  onComplete,
 }: IOHandlerCallback<GitHubProjectSchema[]>): void {
   getGitHubProjects()
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
       logStore.onError(e);
-    });
+    })
+    .finally(onComplete);
 }

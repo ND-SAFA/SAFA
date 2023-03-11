@@ -1,134 +1,134 @@
 <template>
-  <v-container>
-    <v-text-field
-      filled
-      :disabled="store.isUpdate"
+  <div class="q-my-md">
+    <text-input
+      v-model="store.editedAttribute.key"
+      :disabled="isUpdate"
       data-cy="input-attribute-key"
       label="Key"
-      v-model="store.editedAttribute.key"
-      hint="The unique key that this attribute is saved under."
+      hint="The attribute's id."
     />
-    <v-text-field
-      filled
+    <text-input
+      v-model="store.editedAttribute.label"
       label="Label"
       data-cy="input-attribute-label"
-      v-model="store.editedAttribute.label"
-      hint="The label that is displayed for
-    this attribute."
+      hint="The attribute's display name."
     />
-    <v-select
-      filled
-      :disabled="store.isUpdate"
+    <select-input
+      v-model="store.editedAttribute.type"
+      option-to-value
+      :disabled="isUpdate"
       data-cy="input-attribute-type"
       label="Attribute Type"
-      v-model="store.editedAttribute.type"
-      item-text="name"
-      item-value="id"
-      :items="typeOptions"
+      option-label="name"
+      option-value="id"
+      :options="typeOptions"
+      class="q-mb-md"
     />
-    <v-combobox
-      v-if="store.showOptions"
-      filled
-      chips
-      deletable-chips
-      multiple
+    <multiselect-input
+      v-if="showOptions"
+      v-model="store.editedAttribute.options"
+      add-values
+      :options="[]"
       label="Options"
       data-cy="input-attribute-options"
-      v-model="store.editedAttribute.options"
       hint="Type in an option and press enter to save."
     />
-    <div v-if="store.showBounds">
-      <v-text-field
-        filled
+    <div v-if="showBounds">
+      <text-input
+        v-model="store.editedAttribute.min"
         label="Minimum"
         data-cy="input-attribute-min"
         type="number"
-        v-model="store.editedAttribute.min"
         :hint="store.minBoundHint"
       />
-      <v-text-field
-        filled
+      <text-input
+        v-model="store.editedAttribute.max"
         label="Maximum"
         data-cy="input-attribute-max"
         type="number"
-        v-model="store.editedAttribute.max"
         :hint="store.maxBoundHint"
       />
     </div>
-    <flex-box justify="space-between">
+    <flex-box justify="between" t="2">
       <text-button
-        v-if="store.isUpdate"
+        v-if="isUpdate"
+        label="Delete"
         data-cy="button-delete-attribute"
         text
-        variant="delete"
+        icon="delete"
         @click="handleDelete"
-      >
-        Delete
-      </text-button>
-      <v-spacer />
+      />
+      <q-space />
       <text-button
-        :disabled="!store.canSave"
+        :disabled="!canSave"
+        label="Save"
         data-cy="button-save-attribute"
-        variant="save"
+        icon="save"
         @click="handleSave"
-      >
-        Save
-      </text-button>
+      />
     </flex-box>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Allows for creating and editing attributes.
+ */
+export default {
+  name: "SaveAttribute",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
 import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
-import { FlexBox, TextButton } from "@/components/common";
+import {
+  FlexBox,
+  TextButton,
+  TextInput,
+  SelectInput,
+  MultiselectInput,
+} from "@/components/common";
+
+const props = defineProps<{
+  attribute?: AttributeSchema;
+}>();
+
+const emit = defineEmits<{
+  (e: "save"): void;
+}>();
+
+const typeOptions = attributeTypeOptions();
+const store = ref(attributeSaveStore(props.attribute?.key || ""));
+
+const isUpdate = computed(() => store.value.isUpdate);
+const showOptions = computed(() => store.value.showOptions);
+const showBounds = computed(() => store.value.showBounds);
+const canSave = computed(() => store.value.canSave);
 
 /**
- * Allows for creating and editing attributes.
- *
- * @emits-1 `save` - On attribute save.
+ * Saves an attribute.
  */
-export default Vue.extend({
-  name: "SaveAttribute",
-  components: { TextButton, FlexBox },
-  props: {
-    attribute: Object as PropType<AttributeSchema>,
-  },
-  data() {
-    return {
-      typeOptions: attributeTypeOptions(),
-      store: attributeSaveStore(this.attribute?.key || ""),
-    };
-  },
-  mounted() {
-    this.store.resetAttribute(this.attribute);
-  },
-  methods: {
-    /**
-     * Saves an attribute.
-     */
-    handleSave() {
-      handleSaveAttribute(this.store.editedAttribute, this.store.isUpdate, {
-        onSuccess: () => this.$emit("save"),
-      });
-    },
-    /**
-     * Deletes an attribute.
-     */
-    handleDelete() {
-      handleDeleteAttribute(this.store.editedAttribute, {});
-    },
-  },
-  watch: {
-    /**
-     * Update the base attribute if it changes.
-     */
-    attribute() {
-      this.store.resetAttribute(this.attribute);
-    },
-  },
-});
+function handleSave() {
+  handleSaveAttribute(store.value.editedAttribute, store.value.isUpdate, {
+    onSuccess: () => emit("save"),
+  });
+}
+
+/**
+ * Deletes an attribute.
+ */
+function handleDelete() {
+  handleDeleteAttribute(store.value.editedAttribute, {});
+}
+
+onMounted(() => store.value.resetAttribute(props.attribute));
+
+watch(
+  () => props.attribute,
+  () => store.value.resetAttribute(props.attribute)
+);
 </script>

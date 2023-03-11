@@ -18,10 +18,6 @@ export const useTraceApproval = defineStore("traceApproval", {
      */
     traceLinks: [] as FlatTraceLink[],
     /**
-     * All links that are selected.
-     */
-    selectedLinks: [] as FlatTraceLink[],
-    /**
      * Approved generated link ids.
      */
     approvedIds: [] as string[],
@@ -29,6 +25,10 @@ export const useTraceApproval = defineStore("traceApproval", {
      * Declined generated link ids.
      */
     declinedIds: [] as string[],
+    /**
+     * Expanded generated link ids.
+     */
+    expandedIds: [] as string[],
   }),
   getters: {
     /**
@@ -47,7 +47,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      * @param generated - The generated links and their states.
      */
     initializeTraces(generated: GeneratedLinksSchema) {
-      this.selectedLinks = [];
+      this.expandedIds = [];
       this.$patch(generated);
     },
     /**
@@ -66,34 +66,12 @@ export const useTraceApproval = defineStore("traceApproval", {
       flatLink.approvalStatus = status;
     },
     /**
-     * Selects all links that meet the filter predicate.
+     * Deselects a link.
      *
-     * @param filter - The filter to run on all links.
+     * @param traceLinkId - The link id to deselect.
      */
-    selectLinks(filter: (link: FlatTraceLink) => boolean) {
-      this.selectedLinks = this.traceLinks.filter(filter);
-    },
-    /**
-     * Deselects all links that meet the filter predicate.
-     *
-     * @param filter - The filter to run on selected links.
-     */
-    deselectLinks(filter: (link: FlatTraceLink) => boolean) {
-      this.selectedLinks = this.selectedLinks.filter(filter);
-    },
-    /**
-     * Toggles the selected state of a link.
-     *
-     * @param traceLink - The link to toggle.
-     */
-    toggleLink(traceLink: FlatTraceLink) {
-      if (this.selectedLinks.includes(traceLink)) {
-        this.deselectLinks(
-          ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
-        );
-      } else {
-        this.selectedLinks = [...this.selectedLinks, traceLink];
-      }
+    deselectLink(traceLinkId: string) {
+      this.expandedIds = this.expandedIds.filter((id) => id !== traceLinkId);
     },
     /**
      * Updates the stored links with a new approved status.
@@ -105,9 +83,7 @@ export const useTraceApproval = defineStore("traceApproval", {
         (declinedId) => declinedId != traceLink.traceLinkId
       );
       this.approvedIds = [...this.approvedIds, traceLink.traceLinkId];
-      this.deselectLinks(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
-      );
+      this.deselectLink(traceLink.traceLinkId);
       this.updateLinkStatus(traceLink, ApprovalType.APPROVED);
     },
     /**
@@ -120,9 +96,7 @@ export const useTraceApproval = defineStore("traceApproval", {
         (approvedId) => approvedId != traceLink.traceLinkId
       );
       this.declinedIds = [...this.declinedIds, traceLink.traceLinkId];
-      this.deselectLinks(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
-      );
+      this.deselectLink(traceLink.traceLinkId);
       this.updateLinkStatus(traceLink, ApprovalType.DECLINED);
     },
     /**
@@ -137,10 +111,28 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.declinedIds = this.declinedIds.filter(
         (declinedId) => declinedId != traceLink.traceLinkId
       );
-      this.deselectLinks(
-        ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
-      );
+      this.deselectLink(traceLink.traceLinkId);
       this.updateLinkStatus(traceLink, ApprovalType.UNREVIEWED);
+    },
+    /**
+     * Expands all matching links.
+     * @param filter - The filter to select which links to expand.
+     */
+    expandLinks(filter: (traceLink: FlatTraceLink) => boolean): void {
+      this.expandedIds = this.traceLinks
+        .filter(filter)
+        .map((link) => link.traceLinkId);
+    },
+    /**
+     * Collapses all matching links.
+     * @param filter - The filter to select which links to preserve.
+     */
+    collapseLinks(filter: (traceLink: FlatTraceLink) => boolean): void {
+      this.expandedIds = this.traceLinks
+        .filter(
+          (link) => this.expandedIds.includes(link.traceLinkId) && filter(link)
+        )
+        .map((link) => link.traceLinkId);
     },
   },
 });

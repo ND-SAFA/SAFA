@@ -1,145 +1,119 @@
 <template>
   <div>
-    <v-card
-      outlined
-      class="my-2 pa-2 primary-border"
-      v-for="(matrix, idx) in model"
-      :key="idx"
-    >
+    <panel-card v-for="(matrix, idx) in model" :key="idx" class="q-my-md">
       <flex-box full-width align="center">
         <flex-box column full-width>
-          <flex-box b="2">
+          <flex-box full-width b="2">
             <artifact-type-input
-              hide-details
               v-model="matrix.source"
+              show-count
               label="Source Type"
-              class="mr-2"
-              style="width: 50%"
+              class="q-mr-md width-50"
             />
             <artifact-type-input
-              hide-details
               v-model="matrix.target"
+              show-count
               label="Target Type"
-              class="mr-2"
-              style="width: 50%"
+              class="width-50"
             />
           </flex-box>
-          <flex-box justify="center">
+          <flex-box full-width justify="center">
             <attribute-chip
-              v-for="(detail, idx) in getMatrixDetails(matrix)"
+              v-for="detail in getMatrixDetails(matrix)"
               :key="detail"
               :value="detail"
-              :icon="
-                idx < 2 ? 'mdi-alpha-a-box-outline' : 'mdi-ray-start-arrow'
-              "
+              icon="trace"
             />
           </flex-box>
         </flex-box>
         <icon-button
-          icon-id="mdi-delete-outline"
-          color="error"
+          icon="delete"
+          color="negative"
           tooltip="Remove trace matrix"
+          class="q-ml-md"
           @click="handleRemoveMatrix(idx)"
         />
       </flex-box>
-    </v-card>
+    </panel-card>
 
     <flex-box justify="center">
-      <text-button text variant="add" @click="handleCreateMatrix">
-        Add New Matrix
-      </text-button>
+      <text-button
+        text
+        label="Add New Matrix"
+        icon="add"
+        @click="handleCreateMatrix"
+      />
     </flex-box>
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Creates an array of trace matrices.
+ */
+export default {
+  name: "TraceMatrixCreator",
+};
+</script>
+
+<script setup lang="ts">
 import { ArtifactLevelSchema } from "@/types";
-import { artifactStore, traceStore } from "@/hooks";
+import { artifactStore, traceStore, useVModel } from "@/hooks";
 import {
   ArtifactTypeInput,
   FlexBox,
   IconButton,
   AttributeChip,
   TextButton,
+  PanelCard,
 } from "@/components/common";
 
-/**
- * Creates an array of trace matrices.
- *
- * @emits `input` (ArtifactLevelModel[]) - On matrix change.
- */
-export default Vue.extend({
-  name: "TraceMatrixCreator",
-  components: {
-    TextButton,
-    IconButton,
-    ArtifactTypeInput,
-    FlexBox,
-    AttributeChip,
-  },
-  props: {
-    value: {
-      type: Array as PropType<ArtifactLevelSchema[]>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-    };
-  },
-  methods: {
-    /**
-     * Returns displayable characteristics on a matrix of artifacts.
-     * @param matrix - The matrix to get details for.
-     */
-    getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
-      const sources = artifactStore.getArtifactsByType[matrix.source] || [];
-      const targets = artifactStore.getArtifactsByType[matrix.target] || [];
-      const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
-        "manual",
-      ]);
-      const approved = traceStore.getTraceLinksByArtifactSets(
-        sources,
-        targets,
-        ["approved"]
-      );
+const props = defineProps<{
+  modelValue: ArtifactLevelSchema[];
+}>();
 
-      return [
-        `Source Artifacts: ${sources.length}`,
-        `Target Artifacts: ${targets.length}`,
-        `Manual Links: ${manual.length}`,
-        `Approved Links: ${approved.length}`,
-      ];
-    },
-    /**
-     * Creates a new trace matrix.
-     */
-    handleCreateMatrix(): void {
-      this.model.push({ source: "", target: "" });
-    },
-    /**
-     * Removes a matrix from the list.
-     * @param idx - The matrix index to remove.
-     */
-    handleRemoveMatrix(idx: number) {
-      this.model = this.model.filter((_, currentIdx) => currentIdx !== idx);
-    },
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: ArtifactLevelSchema[]) {
-      this.model = currentValue;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentValue: ArtifactLevelSchema[]) {
-      this.$emit("input", currentValue);
-    },
-  },
-});
+defineEmits<{
+  (e: "update:modelValue", value: ArtifactLevelSchema[]): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+/**
+ * Returns displayable characteristics on a matrix of artifacts.
+ * @param matrix - The matrix to get details for.
+ */
+function getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
+  const sources = artifactStore.getArtifactsByType[matrix.source] || [];
+  const targets = artifactStore.getArtifactsByType[matrix.target] || [];
+  const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
+    "manual",
+  ]);
+  const approved = traceStore.getTraceLinksByArtifactSets(sources, targets, [
+    "approved",
+  ]);
+
+  return [
+    manual.length === 1 ? "1 Manual Link" : `${manual.length} Manual Links`,
+    approved.length === 1
+      ? "1 Approved Link"
+      : `${approved.length} Approved Links`,
+  ];
+}
+
+/**
+ * Creates a new trace matrix.
+ */
+function handleCreateMatrix(): void {
+  model.value.push({ source: "", target: "" });
+}
+
+/**
+ * Removes a matrix from the list.
+ * @param idx - The matrix index to remove.
+ */
+function handleRemoveMatrix(idx: number) {
+  model.value = model.value.filter(
+    (_: ArtifactLevelSchema, currentIdx: number) => currentIdx !== idx
+  );
+}
 </script>

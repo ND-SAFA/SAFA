@@ -1,58 +1,118 @@
 <template>
-  <v-tooltip bottom :disabled="tooltip.length < 20">
-    <template v-slot:activator="{ on, attrs }">
-      <v-list-item
-        v-on="on"
-        v-bind="attrs"
-        :data-cy="dataCy"
-        @click="handleClick"
-      >
-        <v-list-item-title>
-          <typography :value="item.title" data-cy="generic-list-item" />
-        </v-list-item-title>
-        <v-list-item-subtitle v-if="!!item.subtitle">
-          <typography secondary :value="item.subtitle" />
-        </v-list-item-subtitle>
+  <q-item
+    :clickable="itemClickable"
+    :v-ripple="!!props.to"
+    :to="props.to"
+    :color="color"
+    :data-cy="dataCy"
+    @click="emit('click')"
+  >
+    <q-tooltip v-if="!!props.tooltip">
+      {{ itemTooltip }}
+    </q-tooltip>
+    <q-item-section v-if="!!props.icon || !!slots.icon" avatar>
+      <icon v-if="!!props.icon" :variant="props.icon" />
+      <slot name="icon" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>
+        <typography v-if="!!props.title" :value="props.title" />
         <slot />
-      </v-list-item>
-    </template>
-    <span>
-      {{ tooltip }}
-    </span>
-  </v-tooltip>
+        <separator v-if="!!props.divider" t="1" />
+      </q-item-label>
+      <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
+        <typography v-if="!!props.subtitle" secondary :value="props.subtitle" />
+        <slot name="subtitle" />
+      </q-item-label>
+    </q-item-section>
+    <q-item-section
+      v-if="!!slots.actions"
+      :class="props.actionCols ? `col-${props.actionCols}` : ''"
+    >
+      <div @click.stop="">
+        <slot name="actions" />
+      </div>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ListItem } from "@/types";
-import Typography from "../Typography.vue";
-
 /**
  * Displays a generic list item.
- *
- * @emits `click` - On click.
  */
-export default Vue.extend({
+export default {
   name: "ListItem",
-  components: { Typography },
-  props: {
-    item: Object as PropType<ListItem>,
-    dataCy: String,
-  },
-  computed: {
-    tooltip(): string {
-      return this.item.subtitle
-        ? `${this.item.title} - ${this.item.subtitle}`
-        : this.item.title;
-    },
-  },
-  methods: {
-    /**
-     * Handles button clicks by emitting them.
-     */
-    handleClick() {
-      this.$emit("click");
-    },
-  },
+};
+</script>
+
+<script setup lang="ts">
+import { computed, useSlots } from "vue";
+import { IconVariant, ThemeColor, URLQuery } from "@/types";
+import { Typography, Separator } from "../content";
+import { Icon } from "../icon";
+
+const props = defineProps<{
+  /**
+   * The item title, instead of using the `default` slot.
+   */
+  title?: string;
+  /**
+   * The icon subtitle, instead of using the `subtitle` slot.
+   */
+  subtitle?: string;
+  /**
+   * The item tooltip.
+   * If set to true, a tooltip will be generated based on the title and subtitle.
+   */
+  tooltip?: true | string;
+  /**
+   * Whether the item is clickable. Automatically set if `to` is set.
+   */
+  clickable?: boolean;
+  /**
+   * Where the list item navigates to when clicked.
+   */
+  to?: string | { path: string; query: URLQuery };
+  /**
+   * Whether to render a divider between the title and subtitle.
+   */
+  divider?: boolean;
+  /**
+   * The type of icon to render.
+   */
+  icon?: IconVariant;
+  /**
+   * The color to render the component with.
+   */
+  color?: ThemeColor;
+  /**
+   * The optional number of columns ot take up with the action space, out of 12.
+   */
+  actionCols?: number;
+  /**
+   * The testing selector to set.
+   */
+  dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  /**
+   * Called when clicked.
+   */
+  (e: "click"): void;
+}>();
+
+const slots = useSlots();
+
+const itemClickable = computed(() => !!(props.clickable || props.to));
+
+const itemTooltip = computed(() => {
+  if (typeof props.tooltip === "string") {
+    return props.tooltip;
+  } else if (props.tooltip === true) {
+    return props.subtitle ? `${props.title} - ${props.subtitle}` : props.title;
+  } else {
+    return undefined;
+  }
 });
 </script>

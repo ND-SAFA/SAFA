@@ -1,43 +1,29 @@
 <template>
-  <flex-box full-width justify="space-between" align="center">
+  <flex-box full-width justify="between" align="center" y="1">
     <flex-box align="center">
       <document-selector />
       <mode-buttons />
     </flex-box>
     <flex-box align="center">
       <graph-buttons />
-      <v-divider inset vertical class="accent mx-1 mb-2 faded" />
+      <separator vertical inset nav x="1" />
       <commit-buttons />
     </flex-box>
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { FlexBox, CommitButtons } from "@/components/common";
-import { DocumentSelector } from "@/components/document";
-import GraphButtons from "./GraphButtons.vue";
-import ModeButtons from "./ModeButtons.vue";
-
 /**
  * Renders options specific to the artifact graph.
  */
-export default Vue.extend({
+export default {
   name: "GraphBar",
-  components: {
-    ModeButtons,
-    GraphButtons,
-    CommitButtons,
-    FlexBox,
-    DocumentSelector,
-  },
-  props: {},
-  data() {
-    return {};
-  },
-  computed: {},
-  methods: {},
-});
+};
 </script>
 
-<style scoped lang="scss"></style>
+<script setup lang="ts">
+import { FlexBox, CommitButtons, Separator } from "@/components/common";
+import { DocumentSelector } from "@/components/document";
+import GraphButtons from "./GraphButtons.vue";
+import ModeButtons from "./ModeButtons.vue";
+</script>

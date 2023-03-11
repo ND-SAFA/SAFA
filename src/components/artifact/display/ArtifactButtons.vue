@@ -1,83 +1,71 @@
 <template>
-  <flex-box t="2" v-if="doDisplay">
+  <flex-box v-if="doDisplay" b="2">
     <text-button
       text
-      variant="artifact"
+      label="View Body"
+      icon="artifact"
       data-cy="button-artifact-body"
       @click="handleViewBody"
-    >
-      View Body
-    </text-button>
+    />
     <text-button
       text
-      variant="edit"
+      label="Edit"
+      icon="edit"
       data-cy="button-artifact-edit"
-      @click="handleEditArtifact"
-    >
-      Edit
-    </text-button>
-    <v-divider vertical />
+      @click="handleEdit"
+    />
+    <separator vertical />
     <text-button
       text
-      variant="delete"
+      label="Delete"
+      icon="delete"
       data-cy="button-artifact-delete"
-      @click="handleDeleteArtifact"
-    >
-      Delete
-    </text-button>
+      @click="handleDelete"
+    />
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ArtifactSchema } from "@/types";
-import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
-import { handleDeleteArtifact } from "@/api";
-import { FlexBox, TextButton } from "@/components/common";
-
 /**
  * Displays artifact buttons.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactButtons",
-  components: { TextButton, FlexBox },
-  computed: {
-    /**
-     * @return Whether to display these actions.
-     */
-    doDisplay(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-    /**
-     * @return The selected artifact.
-     */
-    artifact(): ArtifactSchema | undefined {
-      return selectionStore.selectedArtifact;
-    },
-  },
-  methods: {
-    /**
-     * Attempts to delete the selected artifact.
-     */
-    handleDeleteArtifact(): void {
-      if (!this.artifact) return;
+};
+</script>
 
-      handleDeleteArtifact(this.artifact, {
-        onSuccess: () => appStore.closeSidePanels(),
-      });
-    },
-    /**
-     * Opens the artifact creator.
-     */
-    handleEditArtifact(): void {
-      appStore.openArtifactCreatorTo({});
-    },
-    /**
-     * Opens the artifact body display.
-     */
-    handleViewBody(): void {
-      appStore.openDetailsPanel("displayArtifactBody");
-    },
-  },
-});
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
+import { handleDeleteArtifact } from "@/api";
+import { FlexBox, TextButton, Separator } from "@/components/common";
+
+const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+
+const artifact = computed(() => selectionStore.selectedArtifact);
+
+/**
+ * Attempts to delete the selected artifact.
+ */
+function handleDelete(): void {
+  if (!artifact.value) return;
+
+  handleDeleteArtifact(artifact.value, {
+    onSuccess: () => appStore.closeSidePanels(),
+  });
+}
+
+/**
+ * Opens the artifact creator.
+ */
+function handleEdit(): void {
+  appStore.openArtifactCreatorTo({});
+}
+
+/**
+ * Opens the artifact body display.
+ */
+function handleViewBody(): void {
+  appStore.openDetailsPanel("displayArtifactBody");
+}
 </script>

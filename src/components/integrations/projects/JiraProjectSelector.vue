@@ -1,102 +1,74 @@
 <template>
   <stepper-list-step
+    title="Jira Projects"
     empty-message="There are no projects."
     :item-count="projects.length"
-    :loading="projectsLoading"
-    title="Jira Projects"
+    :loading="loading"
   >
-    <template slot="items">
-      <template v-for="project in projects">
-        <v-list-item :key="project.id" @click="handleProjectSelect(project)">
-          <v-list-item-icon>
-            <v-avatar>
-              <img :src="project.mediumAvatarUrl" :alt="project.name" />
-            </v-avatar>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title v-text="project.name" />
-
-            <v-list-item-subtitle v-text="getProjectSubtitle(project)" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-    </template>
+    <list>
+      <list-item
+        v-for="item in projects"
+        :key="item.name"
+        :title="item.name"
+        :subtitle="item.key"
+        @click="handleProjectSelect(item)"
+      >
+        <template #icon>
+          <img :src="item.mediumAvatarUrl" :alt="item.name" />
+        </template>
+      </list-item>
+    </list>
   </stepper-list-step>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { JiraProjectSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadJiraProjects } from "@/api";
-import { StepperListStep } from "@/components";
-
 /**
  * Allows for selecting a jira project.
  */
-export default Vue.extend({
+export default {
   name: "JiraProjectSelector",
-  components: {
-    StepperListStep,
-  },
-  data() {
-    return {
-      projects: [] as JiraProjectSchema[],
-      projectsLoading: false,
-    };
-  },
-  mounted() {
-    this.loadProjects();
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return !!integrationsStore.jiraOrganization;
-    },
-  },
-  watch: {
-    /**
-     * Loads projects when credentials are valid.
-     */
-    hasCredentials(): void {
-      this.loadProjects();
-    },
-  },
-  methods: {
-    /**
-     * Loads a user's Jira projects for a selected site.
-     */
-    async loadProjects() {
-      if (!integrationsStore.jiraOrganization) return;
+};
+</script>
 
-      integrationsStore.jiraProject = undefined;
-      this.projectsLoading = true;
+<script setup lang="ts">
+import { onMounted, watch, ref } from "vue";
+import { JiraProjectSchema } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadJiraProjects } from "@/api";
+import { StepperListStep, List, ListItem } from "@/components/common";
 
-      handleLoadJiraProjects({
-        onSuccess: (projects) => {
-          this.projects = projects;
-          this.projectsLoading = false;
-        },
-        onError: () => (this.projectsLoading = false),
-      });
+const projects = ref<JiraProjectSchema[]>([]);
+const loading = ref(false);
+
+/**
+ * Loads a user's Jira projects for a selected site.
+ */
+function handleReload() {
+  if (!integrationsStore.jiraOrganization) return;
+
+  integrationsStore.jiraProject = undefined;
+  loading.value = true;
+
+  handleLoadJiraProjects({
+    onSuccess: (jiraProjects) => {
+      projects.value = jiraProjects;
     },
-    /**
-     * Returns a project's subtitle.
-     * @param project - The project to extract from.
-     * @return The subtitle.
-     */
-    getProjectSubtitle(project: JiraProjectSchema): string {
-      return project.key;
-    },
-    /**
-     * Handles a click to select a project.
-     * @param project - The project to select.
-     */
-    handleProjectSelect(project: JiraProjectSchema | undefined) {
-      integrationsStore.selectJiraProject(project);
-    },
-  },
-});
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Handles a click to select a project.
+ * @param project - The project to select.
+ */
+function handleProjectSelect(project: JiraProjectSchema | undefined) {
+  integrationsStore.selectJiraProject(project);
+}
+
+onMounted(() => handleReload());
+
+watch(
+  () => integrationsStore.jiraOrganization,
+  () => handleReload()
+);
 </script>

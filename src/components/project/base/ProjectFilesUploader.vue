@@ -1,14 +1,13 @@
 <template>
   <div>
     <project-identifier-input
-      v-bind:name.sync="identifier.name"
-      v-bind:description.sync="identifier.description"
-      :data-cy-name="dataCyName"
-      :data-cy-description="dataCyDescription"
+      v-model:name="identifier.name"
+      v-model:description="identifier.description"
+      :data-cy-name="props.dataCyName"
+      :data-cy-description="props.dataCyDescription"
     />
-    <v-container style="max-width: 40em">
+    <div class="q-mx-auto long-input">
       <switch-input
-        class="mt-0"
         v-model="emptyFiles"
         label="Create an empty project"
         data-cy="toggle-create-empty-project"
@@ -18,100 +17,87 @@
         v-model="selectedFiles"
         data-cy="input-files-bulk"
       />
-      <v-btn
+      <text-button
         block
+        label="Create Project From Files"
         color="primary"
-        :disabled="isDisabled"
-        @click="handleCreate"
-        :loading="isLoading"
+        :disabled="disabled"
+        :loading="loading"
+        class="q-mt-md"
         data-cy="button-create-project"
-      >
-        Create Project From Files
-      </v-btn>
-    </v-container>
+        @click="handleCreate"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { IdentifierSchema } from "@/types";
+/**
+ * Creates projects with bulk uploaded files.
+ */
+export default {
+  name: "ProjectFilesUploader",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, withDefaults } from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
-import { SwitchInput } from "@/components/common";
+import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
-/**
- * Creates projects with bulk uploaded files.
- *
- * @emits-1 `submit` - On project creation submitted.
- */
-export default Vue.extend({
-  name: "ProjectFilesUploader",
-  components: {
-    ProjectFilesInput,
-    SwitchInput,
-    ProjectIdentifierInput,
-  },
-  props: {
-    dataCyName: {
-      type: String,
-      default: "input-project-name",
-    },
-    dataCyDescription: {
-      type: String,
-      default: "input-project-description",
-    },
-  },
-  data() {
-    return {
-      selectedFiles: [] as File[],
-      isLoading: false,
-      emptyFiles: false,
-    };
-  },
-  computed: {
-    /**
-     * @return  The identifier being updated.
-     */
-    identifier(): IdentifierSchema {
-      return identifierSaveStore.editedIdentifier;
-    },
-    /**
-     * Whether the submit button is disabled.
-     */
-    isDisabled(): boolean {
-      const isNameInvalid = this.identifier.name.length === 0;
+const props = withDefaults(
+  defineProps<{
+    dataCyName?: string;
+    dataCyDescription?: string;
+  }>(),
+  {
+    dataCyName: "input-project-name",
+    dataCyDescription: "input-project-description",
+  }
+);
 
-      if (this.emptyFiles) {
-        return isNameInvalid;
-      } else {
-        return (
-          isNameInvalid ||
-          (this.selectedFiles.length === 0 && !this.emptyFiles) ||
-          !this.selectedFiles.find(({ name }) => name === "tim.json")
-        );
-      }
-    },
-  },
-  methods: {
-    /**
-     * Attempts to save the project.
-     */
-    async handleCreate() {
-      this.isLoading = true;
+const emit = defineEmits<{
+  (e: "submit"): void;
+}>();
 
-      handleBulkImportProject(this.identifier, this.selectedFiles, {
-        onSuccess: () => {
-          this.selectedFiles = [];
-          this.isLoading = false;
-          this.$emit("submit");
-        },
-        onError: () => {
-          this.isLoading = false;
-        },
-      });
-    },
-  },
+const selectedFiles = ref<File[]>([]);
+const loading = ref(false);
+const emptyFiles = ref(false);
+
+const identifier = computed(() => identifierSaveStore.editedIdentifier);
+
+const disabled = computed(() => {
+  const isNameInvalid = identifier.value.name.length === 0;
+
+  if (emptyFiles.value) {
+    return isNameInvalid;
+  } else {
+    return (
+      isNameInvalid ||
+      (selectedFiles.value.length === 0 && !emptyFiles.value) ||
+      !selectedFiles.value.find(({ name }) => name === "tim.json")
+    );
+  }
 });
+
+/**
+ * Attempts to save the project.
+ */
+async function handleCreate() {
+  loading.value = true;
+
+  handleBulkImportProject(identifier.value, selectedFiles.value, {
+    onSuccess: () => {
+      selectedFiles.value = [];
+      loading.value = false;
+      emit("submit");
+    },
+    onError: () => {
+      loading.value = false;
+    },
+  });
+}
 </script>

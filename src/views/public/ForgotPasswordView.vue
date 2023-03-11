@@ -1,25 +1,24 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
         el="h1"
-        class="mb-3"
         value="Forgot Password"
       />
 
       <div v-if="!isSubmitted">
         <typography
           el="p"
+          b="2"
           value=" Please enter your email to reset your password."
         />
 
-        <v-text-field
-          filled
-          label="Email"
+        <text-input
           v-model="email"
-          :error-messages="isError ? ['Unable to reset password'] : []"
+          label="Email"
+          :error-message="isError && 'Unable to reset password'"
         />
       </div>
 
@@ -31,69 +30,70 @@
       />
     </template>
 
-    <template v-slot:actions>
-      <v-btn
+    <template #actions>
+      <text-button
         v-if="!isSubmitted"
         color="primary"
-        @click="handleReset"
+        label="Reset Password"
         :disabled="email.length === 0"
         :loading="isLoading"
-      >
-        Reset Password
-      </v-btn>
+        @click="handleReset"
+      />
 
-      <span class="ml-auto">
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
-          Back To Login
-        </v-btn>
+      <span class="q-ml-auto">
+        <text-button
+          text
+          small
+          label="Back To Login"
+          color="primary"
+          @click="handleLogin"
+        />
       </span>
     </template>
   </card-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
-import { createPasswordReset } from "@/api";
-import { CardPage, Typography } from "@/components";
-
 /**
  * Displays the forgot password page.
  */
-export default Vue.extend({
+export default {
   name: "ForgotPasswordView",
-  components: { CardPage, Typography },
-  data() {
-    return {
-      email: "",
-      isSubmitted: false,
-      isError: false,
-      isLoading: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Sends a password reset email.
-     */
-    handleReset() {
-      this.isLoading = true;
+};
+</script>
 
-      createPasswordReset({
-        email: this.email,
-      })
-        .then(() => {
-          this.isSubmitted = true;
-          this.isError = false;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+<script setup lang="ts">
+import { ref } from "vue";
+import { navigateTo, Routes } from "@/router";
+import { createPasswordReset } from "@/api";
+import { CardPage, Typography, TextButton, TextInput } from "@/components";
+
+const email = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isSubmitted = ref(false);
+
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Sends a password reset email.
+ */
+function handleReset() {
+  isLoading.value = true;
+
+  createPasswordReset({
+    email: email.value,
+  })
+    .then(() => {
+      isSubmitted.value = true;
+      isError.value = false;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

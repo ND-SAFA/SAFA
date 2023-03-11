@@ -1,153 +1,98 @@
 <template>
-  <panel-card v-if="isDeltaMode">
-    <typography el="h2" variant="subtitle" value="Artifacts" />
-    <v-divider />
-
-    <v-list expand>
-      <delta-button-group
-        delta-type="added"
-        :items="addedArtifacts"
-        @click="handleAddedSelect"
-      />
-      <delta-button-group
-        delta-type="removed"
-        :items="removedArtifacts"
-        @click="handleRemovedSelect"
-      />
-      <delta-button-group
-        delta-type="modified"
-        :items="modifiedArtifacts"
-        @click="handleModifiedSelect"
-      />
-    </v-list>
+  <panel-card v-if="inDeltaView" title="Artifacts">
+    <delta-button-group
+      delta-type="added"
+      :items="addedArtifacts"
+      @click="handleAddedSelect"
+    />
+    <delta-button-group
+      delta-type="removed"
+      :items="removedArtifacts"
+      @click="handleRemovedSelect"
+    />
+    <delta-button-group
+      delta-type="modified"
+      :items="modifiedArtifacts"
+      @click="handleModifiedSelect"
+    />
 
     <artifact-delta-diff
-      v-if="selectedDeltaArtifact !== undefined"
-      :isOpen="selectedDeltaArtifact !== undefined"
-      :name="selectedDeltaArtifact.name"
-      :input-artifact="selectedDeltaArtifact.artifact"
-      :delta-type="selectedDeltaArtifact.deltaType"
-      @close="handleCloseModal"
+      v-if="!!selectedDelta"
+      :open="!!selectedDelta"
+      :delta="selectedDelta"
+      @close="selectedDelta = undefined"
     />
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays artifact delta information.
+ */
+export default {
+  name: "ArtifactDeltas",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
-import { deltaStore, selectionStore } from "@/hooks";
-import { Typography, PanelCard } from "@/components/common";
+import { deltaStore } from "@/hooks";
+import { PanelCard } from "@/components/common";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
+const selectedDelta = ref<ChangedArtifact | undefined>();
+
+const inDeltaView = computed(() => deltaStore.inDeltaView);
+const addedArtifacts = computed(() => deltaStore.addedArtifacts);
+const modifiedArtifacts = computed(() => deltaStore.modifiedArtifacts);
+const removedArtifacts = computed(() => deltaStore.removedArtifacts);
+
 /**
- * Displays artifact delta information.
- *
- * @emits `open` - On open.
+ * Selects an artifact.
  */
-export default Vue.extend({
-  name: "ArtifactDeltas",
-  components: { PanelCard, ArtifactDeltaDiff, DeltaButtonGroup, Typography },
-  data() {
-    return {
-      selectedDeltaArtifact: undefined as ChangedArtifact | undefined,
-      openPanels: [0, 1, 2],
-    };
-  },
-  computed: {
-    /**
-     * @return All added artifacts.
-     */
-    addedArtifacts() {
-      return deltaStore.addedArtifacts;
-    },
-    /**
-     * @return All removed artifacts.
-     */
-    removedArtifacts() {
-      return deltaStore.removedArtifacts;
-    },
-    /**
-     * @return All modified artifacts.
-     */
-    modifiedArtifacts() {
-      return deltaStore.modifiedArtifacts;
-    },
-    /**
-     * @return Whether the app is in delta view.
-     */
-    isDeltaMode(): boolean {
-      return deltaStore.inDeltaView;
-    },
-  },
-  methods: {
-    /**
-     * Selects an artifact.
-     */
-    handleArtifactSelect(
-      name: string,
-      artifact: DeltaArtifact,
-      deltaType: DeltaType
-    ): void {
-      this.selectedDeltaArtifact = { name, artifact, deltaType };
-    },
-    /**
-     * Selects an added artifact.
-     * @param id - The artifact to select.
-     */
-    handleAddedSelect(id: string): void {
-      selectionStore.selectArtifact(id);
-      // this.handleArtifactSelect(
-      //   this.addedArtifacts[id].name,
-      //   this.addedArtifacts[id],
-      //   "added"
-      // );
-    },
-    /**
-     * Selects a modified artifact.
-     * @param id - The artifact to select.
-     */
-    handleModifiedSelect(id: string): void {
-      selectionStore.selectArtifact(id);
-      // this.handleArtifactSelect(
-      //   this.modifiedArtifacts[id].after.name,
-      //   this.modifiedArtifacts[id],
-      //   "modified"
-      // );
-    },
-    /**
-     * Selects a removed artifact.
-     * @param id - The artifact to select.
-     */
-    handleRemovedSelect(id: string): void {
-      selectionStore.selectArtifact(id);
-      // this.handleArtifactSelect(
-      //   this.removedArtifacts[id].name,
-      //   this.removedArtifacts[id],
-      //   "removed"
-      // );
-    },
-    /**
-     * Closes the delta modal.
-     */
-    handleCloseModal(): void {
-      this.selectedDeltaArtifact = undefined;
-    },
-  },
-  watch: {
-    /**
-     * When the delta artifacts change, set all panels to open.
-     */
-    isDeltaMode() {
-      const panels: number[] = [];
+function handleArtifactSelect(
+  name: string,
+  artifact: DeltaArtifact,
+  deltaType: DeltaType
+): void {
+  selectedDelta.value = { name, artifact, deltaType };
+}
 
-      if (Object.keys(this.addedArtifacts).length > 0) panels.push(0);
-      if (Object.keys(this.removedArtifacts).length > 0) panels.push(1);
-      if (Object.keys(this.modifiedArtifacts).length > 0) panels.push(2);
+/**
+ * Selects an added artifact.
+ * @param id - The artifact to select.
+ */
+function handleAddedSelect(id: string): void {
+  handleArtifactSelect(
+    addedArtifacts.value[id].name,
+    addedArtifacts.value[id],
+    "added"
+  );
+}
 
-      this.openPanels = panels;
-      this.$emit("open");
-    },
-  },
-});
+/**
+ * Selects a modified artifact.
+ * @param id - The artifact to select.
+ */
+function handleModifiedSelect(id: string): void {
+  handleArtifactSelect(
+    modifiedArtifacts.value[id].after.name,
+    modifiedArtifacts.value[id],
+    "modified"
+  );
+}
+
+/**
+ * Selects a removed artifact.
+ * @param id - The artifact to select.
+ */
+function handleRemovedSelect(id: string): void {
+  handleArtifactSelect(
+    removedArtifacts.value[id].name,
+    removedArtifacts.value[id],
+    "removed"
+  );
+}
 </script>

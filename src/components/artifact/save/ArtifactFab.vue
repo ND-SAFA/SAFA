@@ -1,141 +1,130 @@
 <template>
-  <v-speed-dial
-    v-if="isEditor"
-    fixed
-    bottom
-    right
-    v-model="fab"
-    transition="scroll-y-transition"
-  >
-    <template v-slot:activator>
-      <v-btn
-        v-model="fab"
-        :color="isCreateLinkEnabled ? 'secondary darken-1' : 'primary'"
-        dark
-        fab
-        data-cy="button-fab-toggle"
-      >
-        <v-icon v-if="fab"> mdi-close </v-icon>
-        <v-icon
-          v-else-if="isCreateLinkEnabled"
-          style="transform: rotate(-45deg)"
-        >
-          mdi-ray-start-arrow
-        </v-icon>
-        <v-icon v-else>mdi-plus</v-icon>
-      </v-btn>
-    </template>
-    <icon-button
-      fab
-      small
-      icon-id="mdi-link-variant-plus"
-      tooltip="Generate Trace Links"
-      data-cy="button-fab-generate-trace"
-      @click="handleGenerateTraceLink"
-    />
-    <icon-button
-      v-if="isTreeMode"
-      fab
-      small
-      :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
-      :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
-      :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
-      data-cy="button-fab-draw-trace"
-      @click="handleDrawTraceLink"
-    />
-    <icon-button
-      fab
-      small
-      icon-id="mdi-ray-start-end"
-      tooltip="Add Trace Link"
-      data-cy="button-fab-create-trace"
-      @click="handleAddTraceLink"
-    />
-    <icon-button
-      fab
-      small
-      icon-id="mdi-folder-plus-outline"
-      tooltip="Add Artifact"
-      data-cy="button-fab-create-artifact"
-      @click="handleAddArtifact"
-    />
-  </v-speed-dial>
+  <q-page-sticky position="bottom-right" :offset="fabPos" class="artifact-fab">
+    <q-fab
+      v-model="open"
+      v-touch-pan.prevent.mouse="handleMoveFab"
+      direction="up"
+      vertical-actions-align="right"
+      :color="isCreateLinkEnabled ? 'accent' : 'primary'"
+      active-icon="mdi-close"
+      :icon="isCreateLinkEnabled ? 'mdi-ray-start-arrow' : 'mdi-plus'"
+      :disable="draggingFab"
+      data-cy="button-fab-toggle"
+    >
+      <q-fab-action
+        label="Generate Trace Links"
+        label-position="left"
+        icon="mdi-link-variant-plus"
+        class="bg-background"
+        data-cy="button-fab-generate-trace"
+        @click="handleGenerateTraceLink"
+      />
+      <q-fab-action
+        v-if="isTreeMode"
+        :label="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
+        label-position="left"
+        :icon="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
+        class="bg-background"
+        data-cy="button-fab-draw-trace"
+        @click="handleDrawTraceLink"
+      />
+      <q-fab-action
+        v-if="isEditor"
+        label="Create Trace Link"
+        label-position="left"
+        icon="mdi-ray-start-end"
+        class="bg-background"
+        data-cy="button-fab-create-trace"
+        @click="handleAddTraceLink"
+      />
+      <q-fab-action
+        v-if="isEditor"
+        label="Create Artifact"
+        label-position="left"
+        icon="mdi-folder-plus-outline"
+        class="bg-background"
+        data-cy="button-fab-create-artifact"
+        @click="handleAddArtifact"
+      />
+    </q-fab>
+  </q-page-sticky>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
-import { disableDrawMode, enableDrawMode } from "@/cytoscape";
-import { IconButton } from "@/components/common";
-
 /**
  * Displays the artifact tree action buttons.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactFab",
-  components: {
-    IconButton,
-  },
-  data() {
-    return { fab: false };
-  },
-  computed: {
-    /**
-     * @return Whether to render the artifact tree.
-     */
-    isTreeMode(): boolean {
-      return !appStore.isLoading && layoutStore.isTreeMode;
-    },
-    /**
-     * @return Whether trace link draw mode is currently enabled.
-     */
-    isCreateLinkEnabled(): boolean {
-      return appStore.isCreateLinkEnabled;
-    },
-    /**
-     * @return Whether the current user is an editor of the current project.
-     */
-    isEditor(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-  },
-  methods: {
-    /**
-     * Opens the add artifact modal.
-     */
-    handleAddArtifact(): void {
-      projectStore.ifProjectDefined(() => {
-        appStore.openArtifactCreatorTo({ isNewArtifact: true });
-      });
-    },
-    /**
-     * Opens the add trace link modal.
-     */
-    handleAddTraceLink(): void {
-      projectStore.ifProjectDefined(() => {
-        appStore.openDetailsPanel("saveTrace");
-      });
-    },
-    /**
-     * Enables the trace link creator.
-     */
-    handleDrawTraceLink(): void {
-      projectStore.ifProjectDefined(() => {
-        if (this.isCreateLinkEnabled) {
-          disableDrawMode();
-        } else {
-          enableDrawMode();
-        }
-      });
-    },
-    /**
-     * Opens the generate trace link modal.
-     */
-    handleGenerateTraceLink(): void {
-      projectStore.ifProjectDefined(() => {
-        appStore.openDetailsPanel("generateTrace");
-      });
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
+import { disableDrawMode, enableDrawMode } from "@/cytoscape";
+
+const open = ref(false);
+const fabPos = ref([18, 18]);
+const draggingFab = ref(false);
+
+const isTreeMode = computed(
+  () => !appStore.isLoading && layoutStore.isTreeMode
+);
+const isCreateLinkEnabled = computed(() => appStore.isCreateLinkEnabled);
+const isEditor = computed(() => sessionStore.isEditor(projectStore.project));
+
+/**
+ * Handles moving the fab tro another location.
+ * @param ev - The move event.
+ */
+function handleMoveFab(ev: {
+  isFirst?: boolean;
+  isFinal?: boolean;
+  delta: { x: number; y: number };
+}) {
+  draggingFab.value = ev.isFirst !== true && ev.isFinal !== true;
+
+  fabPos.value = [fabPos.value[0] - ev.delta.x, fabPos.value[1] - ev.delta.y];
+}
+
+/**
+ * Opens the add artifact modal.
+ */
+function handleAddArtifact(): void {
+  projectStore.ifProjectDefined(() => {
+    appStore.openArtifactCreatorTo({ isNewArtifact: true });
+  });
+}
+
+/**
+ * Opens the add trace link modal.
+ */
+function handleAddTraceLink(): void {
+  projectStore.ifProjectDefined(() => {
+    appStore.openDetailsPanel("saveTrace");
+  });
+}
+
+/**
+ * Enables the trace link creator.
+ */
+function handleDrawTraceLink(): void {
+  projectStore.ifProjectDefined(() => {
+    if (isCreateLinkEnabled.value) {
+      disableDrawMode();
+    } else {
+      enableDrawMode();
+    }
+  });
+}
+
+/**
+ * Opens the generate trace link modal.
+ */
+function handleGenerateTraceLink(): void {
+  projectStore.ifProjectDefined(() => {
+    appStore.openDetailsPanel("generateTrace");
+  });
+}
 </script>

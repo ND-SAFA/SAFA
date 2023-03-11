@@ -1,113 +1,91 @@
 <template>
   <modal
-    :title="`Artifact Changes: ${name}`"
-    :is-open="isOpen"
-    :actions-height="0"
-    size="l"
-    @close="$emit('close')"
+    :title="`Artifact Changes: ${props.delta.name}`"
+    :open="props.open"
+    size="lg"
+    @close="emit('close')"
   >
-    <template v-slot:body>
-      <div class="mt-5">
-        <code-diff
-          v-if="deltaType === 'added'"
-          :old-string="''"
-          :new-string="splitIntoLines(artifact.body)"
-          :context="context"
-          :output-format="outputFormat"
-          :diff-style="diffStyle"
-        />
-        <code-diff
-          v-else-if="deltaType === 'removed'"
-          :old-string="splitIntoLines(artifact.body)"
-          :new-string="''"
-          :context="context"
-          :output-format="outputFormat"
-          :diff-style="diffStyle"
-        />
-        <code-diff
-          v-else-if="deltaType === 'modified' && modification !== undefined"
-          :old-string="splitIntoLines(modification.before.body)"
-          :new-string="splitIntoLines(modification.after.body)"
-          :context="context"
-          :output-format="outputFormat"
-          :diff-style="diffStyle"
-        />
-      </div>
-    </template>
+    <code-diff
+      v-if="deltaType === 'added' && !!artifact"
+      :old-string="''"
+      :new-string="splitLines(artifact.body)"
+      :context="context"
+      :output-format="outputFormat"
+      :diff-style="diffStyle"
+      class="q-my-none"
+    />
+    <code-diff
+      v-else-if="deltaType === 'removed' && !!artifact"
+      :old-string="splitLines(artifact.body)"
+      :new-string="''"
+      :context="context"
+      :output-format="outputFormat"
+      :diff-style="diffStyle"
+      class="q-my-none"
+    />
+    <code-diff
+      v-else-if="deltaType === 'modified' && !!modification"
+      :old-string="splitLines(modification.before.body)"
+      :new-string="splitLines(modification.after.body)"
+      :context="context"
+      :output-format="outputFormat"
+      :diff-style="diffStyle"
+      class="q-my-none"
+    />
   </modal>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import CodeDiff from "vue-code-diff";
-import {
-  ArtifactSchema,
-  DeltaArtifact,
-  DeltaType,
-  EntityModification,
-} from "@/types";
+/**
+ * Displays artifact delta code diffs.
+ */
+export default {
+  name: "ArtifactDeltaDiff",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { CodeDiff } from "v-code-diff";
+import { ChangedArtifact } from "@/types";
 import { isArtifact, isModifiedArtifact, splitIntoLines } from "@/util";
 import { Modal } from "@/components/common";
 
+const props = defineProps<{
+  /**
+   * Whether the modal is open.
+   */
+  open: boolean;
+  /**
+   * The changed artifact to display.
+   */
+  delta: ChangedArtifact;
+}>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const context = 100;
+const outputFormat = "line-by-line";
+const diffStyle = "word";
+const maxWordCount = 15;
+
+const deltaType = computed(() => props.delta.deltaType);
+
+const artifact = computed(() =>
+  isArtifact(props.delta.artifact) ? props.delta.artifact : undefined
+);
+const modification = computed(() =>
+  isModifiedArtifact(props.delta.artifact) ? props.delta.artifact : undefined
+);
+
 /**
- * Displays artifact delta code diffs.
- *
- * @emits `close` - On close.
+ * Splits a string into separate links.
+ * @param str - The strong to split.
+ * @return The split string.
  */
-export default Vue.extend({
-  name: "ArtifactDeltaDiff",
-  components: { Modal, CodeDiff },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    inputArtifact: {
-      type: Object as PropType<DeltaArtifact>,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    deltaType: {
-      type: String as PropType<DeltaType>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      context: 100,
-      outputFormat: "line-by-line",
-      diffStyle: "word",
-      maxWordCount: 15,
-    };
-  },
-  computed: {
-    /**
-     * Returns the current artifact.
-     */
-    artifact(): DeltaArtifact | undefined {
-      return isArtifact(this.inputArtifact) ? this.inputArtifact : undefined;
-    },
-    /**
-     * Returns the current modified artifact.
-     */
-    modification(): EntityModification<ArtifactSchema> | undefined {
-      return isModifiedArtifact(this.inputArtifact)
-        ? this.inputArtifact
-        : undefined;
-    },
-  },
-  methods: {
-    /**
-     * Splits a string into separate links.
-     * @param str - The strong to split.
-     * @return The split string.
-     */
-    splitIntoLines(str: string): string {
-      return splitIntoLines(str, this.maxWordCount);
-    },
-  },
-});
+function splitLines(str: string): string {
+  return splitIntoLines(str, maxWordCount);
+}
 </script>

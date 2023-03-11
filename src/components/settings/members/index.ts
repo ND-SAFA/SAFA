@@ -1,1 +1,1 @@
-export { default as SettingsMembers } from "./SettingsMembers.vue";
+export { default as ProjectMemberTable } from "./ProjectMemberTable.vue";

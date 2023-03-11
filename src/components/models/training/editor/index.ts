@@ -1,1 +1,1 @@
-export { default as ModelEditor } from "./ModelEditor.vue";
+export { default as ModelTraining } from "./ModelTraining.vue";

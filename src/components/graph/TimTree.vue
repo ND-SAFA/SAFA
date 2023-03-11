@@ -1,105 +1,104 @@
 <template>
-  <v-container>
+  <div>
     <flex-box justify="end">
-      <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
+      <text-button
+        text
+        label="Center Graph"
+        icon="graph-center"
+        @click="cyResetTim"
+      />
     </flex-box>
-    <cytoscape-controller
-      id="cytoscape-tim"
-      :cyto-core-graph="cytoCoreGraph"
-      :class="className"
-    >
-      <template v-slot:elements>
-        <tim-node
-          v-for="panel in artifactPanels"
-          :key="panel.title"
-          :count="panel.projectFile.artifacts.length"
-          :artifact-type="panel.projectFile.type"
-        />
-        <tim-link
-          v-for="panel in tracePanels"
-          :key="panel.projectFile.sourceId + panel.projectFile.targetId"
-          :count="panel.projectFile.traces.length"
-          :target-type="panel.projectFile.targetId"
-          :source-type="panel.projectFile.sourceId"
-          :generated="panel.projectFile.isGenerated"
-        />
-      </template>
-    </cytoscape-controller>
-  </v-container>
+    <panel-card>
+      <cytoscape-controller
+        id="cytoscape-tim"
+        :cyto-core-graph="timGraph"
+        :class="className"
+      >
+        <template #elements>
+          <tim-node
+            v-for="{ type, count } in artifacts"
+            :key="type"
+            :count="count"
+            :artifact-type="type"
+          />
+          <tim-link
+            v-for="{
+              name,
+              sourceType,
+              targetType,
+              count,
+              isGenerated,
+            } in traces"
+            :key="name"
+            :count="count"
+            :target-type="targetType"
+            :source-type="sourceType"
+            :generated="isGenerated"
+          />
+        </template>
+      </cytoscape-controller>
+    </panel-card>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
-import { appStore, layoutStore } from "@/hooks";
-import { timGraph, cyResetTim } from "@/cytoscape";
-import { FlexBox } from "@/components/common/layout";
-import CytoscapeController from "./CytoscapeController.vue";
-import { TimNode, TimLink } from "./tim";
-
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
  * and links between them as edges.
  */
-export default Vue.extend({
+export default {
   name: "TimTree",
-  components: {
-    FlexBox,
-    CytoscapeController,
-    TimNode,
-    TimLink,
-  },
-  props: {
-    tracePanels: {
-      type: Array as PropType<TracePanel[]>,
-      required: true,
-    },
-    artifactPanels: {
-      type: Array as PropType<ArtifactPanel[]>,
-      required: true,
-    },
-    inView: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  methods: {
-    /**
-     * Resets the cytoscape viewport and centers artifacts.
-     */
-    async handleResetGraph(): Promise<void> {
-      cyResetTim();
-    },
-  },
-  computed: {
-    /**
-     * @return The tim graph.
-     */
-    cytoCoreGraph(): CytoCoreGraph {
-      return timGraph;
-    },
-    /**
-     * @return The class name for the tim tree.
-     */
-    className(): string {
-      if (!this.inView) {
-        return "artifact-view disabled";
-      } else if (!appStore.isLoading) {
-        return "artifact-view visible elevation-3";
-      } else {
-        return "artifact-view";
-      }
-    },
-  },
-  watch: {
-    /**
-     * When in view, reset the tim graph.
-     */
-    async inView(inView: boolean): Promise<void> {
-      if (!inView) return;
+};
+</script>
 
-      await layoutStore.setTimTreeLayout();
-    },
-  },
+<script setup lang="ts">
+import { computed, watch } from "vue";
+import { appStore, layoutStore, projectSaveStore } from "@/hooks";
+import { timGraph, cyResetTim } from "@/cytoscape";
+import { FlexBox, TextButton } from "@/components/common";
+import PanelCard from "@/components/common/layout/PanelCard.vue";
+import CytoscapeController from "./CytoscapeController.vue";
+import { TimNode, TimLink } from "./tim";
+
+const props = defineProps<{
+  visible: boolean;
+}>();
+
+const className = computed(() => {
+  if (!props.visible) {
+    return "artifact-view disabled";
+  } else if (!appStore.isLoading) {
+    return "artifact-view visible elevation-3";
+  } else {
+    return "artifact-view";
+  }
 });
+
+const artifacts = computed(() =>
+  projectSaveStore.artifactPanels.map(({ type, artifacts = [] }) => ({
+    type,
+    count: artifacts.length,
+  }))
+);
+
+const traces = computed(() =>
+  projectSaveStore.tracePanels.map(
+    ({ name, type, toType = "", traces = [], isGenerated }) => ({
+      name,
+      sourceType: type,
+      targetType: toType,
+      count: traces.length,
+      isGenerated,
+    })
+  )
+);
+
+watch(
+  () => props.visible,
+  () => {
+    if (!props.visible) return;
+
+    layoutStore.setTimTreeLayout();
+  }
+);
 </script>

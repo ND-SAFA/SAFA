@@ -1,17 +1,22 @@
-import Vue from "vue";
+import { createApp } from "vue";
 
-import "@/plugins/vue-cytoscape";
 import "@mdi/font/css/materialdesignicons.css";
+import "vue3-drr-grid-layout/dist/style.css";
 
+import { Quasar } from "quasar";
 import { router } from "@/router";
+import { pinia, gridLayout, codeDiff, quasarOptions } from "@/plugins";
 import App from "@/App.vue";
-import { vuetify, pinia } from "@/plugins";
 
-Vue.config.productionTip = false;
+const app = createApp(App);
 
-export default new Vue({
-  router,
-  vuetify,
-  pinia,
-  render: (h) => h(App),
-}).$mount("#app");
+app
+  .use(pinia)
+  .use(router)
+  .use(gridLayout)
+  .use(codeDiff)
+  .use(Quasar, quasarOptions);
+
+app.mount("#app");
+
+export default app;

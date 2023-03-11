@@ -1,28 +1,20 @@
 <template>
-  <div v-if="isOpen" data-cy="panel-trace-display">
+  <details-panel panel="displayTrace" data-cy="panel-trace-display">
     <trace-link-buttons />
     <trace-link-content />
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-import { TraceLinkButtons, TraceLinkContent } from "../display";
-
 /**
  * Displays trace link information.
  */
-export default Vue.extend({
+export default {
   name: "TraceLinkPanel",
-  components: { TraceLinkButtons, TraceLinkContent },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayTrace";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { DetailsPanel } from "@/components/common";
+import { TraceLinkButtons, TraceLinkContent } from "../display";
 </script>

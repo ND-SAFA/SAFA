@@ -1,64 +1,72 @@
 <template>
-  <v-file-input
+  <q-file
+    v-model="model"
     clearable
     filled
-    small-chips
-    label="Upload Files"
-    :multiple="multiple"
-    truncate-length="30"
-    class="mt-4"
-    v-model="model"
-    :data-cy="dataCy"
-    :error-messages="errors"
-    @click:clear="$emit('clear')"
-  />
+    use-chips
+    :label="label"
+    :multiple="props.multiple"
+    :error-message="props.errorMessage || ''"
+    :error="showError"
+    :data-cy="props.dataCy"
+    hint="File Types: .csv, .json"
+    @clear="$emit('clear')"
+  >
+    <template #prepend>
+      <icon variant="file" />
+    </template>
+  </q-file>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-
 /**
  * Displays a generic file selector.
- *
- * @emits-1 `clear` - On clear.
- * @emits-2 `input` (File[] | File | null) - On file change.
  */
-export default Vue.extend({
+export default {
   name: "FileInput",
-  props: {
-    value: Array as PropType<File[] | File | null>,
-    multiple: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    dataCy: {
-      type: String,
-      default: "input-files",
-    },
-    errors: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-    };
-  },
-  watch: {
+};
+</script>
+
+<script setup lang="ts">
+import { computed, withDefaults } from "vue";
+import { useVModel } from "@/hooks";
+import { Icon } from "@/components/common/display";
+
+const props = withDefaults(
+  defineProps<{
     /**
-     * Updates the model if the value changes.
+     * The synchronized files value.
      */
-    value(currentValue: File[] | File | null) {
-      this.model = currentValue;
-    },
+    modelValue?: File | File[] | null;
     /**
-     * Emits changes to the model.
+     * Whether to allow multiple files to be uploaded.
      */
-    model(currentValue: File[] | File | null) {
-      this.$emit("input", currentValue);
-    },
-  },
-});
+    multiple: boolean;
+    /**
+     * An error message to display, if one exists.
+     */
+    errorMessage?: string | false;
+    /**
+     * A testing selector.
+     */
+    dataCy?: string;
+  }>(),
+  {
+    dataCy: "input-files",
+    errorMessage: undefined,
+    modelValue: undefined,
+  }
+);
+
+defineEmits<{
+  (e: "clear"): void;
+  (e: "update:modelValue", files: File | File[] | null | undefined): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+const showError = computed(
+  () => !!props.errorMessage && props.errorMessage.length > 0
+);
+const label = computed(() => (props.multiple ? "Upload Files" : "Upload File"));
 </script>

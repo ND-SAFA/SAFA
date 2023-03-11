@@ -32,7 +32,10 @@ export const timGraph: CytoCoreGraph = {
       afterInit: () => undefined,
     },
   ],
-  async afterInit() {
-    await layoutStore.setTimTreeLayout();
+  afterInit() {
+    // Wait for initialized nodes to be added.
+    setTimeout(() => {
+      layoutStore.setTimTreeLayout();
+    }, 100);
   },
 };

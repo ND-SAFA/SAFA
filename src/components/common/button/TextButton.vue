@@ -1,97 +1,153 @@
 <template>
-  <v-btn
-    :outlined="outlined"
-    :text="text"
-    :disabled="disabled"
-    :large="large"
-    :block="block"
-    :loading="loading"
+  <q-btn
+    :disable="props.disabled"
+    :size="buttonSize"
+    :outline="props.outlined"
+    :flat="props.text"
+    :loading="props.loading"
+    :percentage="props.percentage"
     :color="buttonColor"
-    :value="value"
     :class="buttonClassName"
-    :data-cy="dataCy"
-    @click="$emit('click')"
+    :data-cy="props.dataCy"
+    @click="emit('click')"
   >
-    <v-icon v-if="buttonIconId" class="mr-1">{{ buttonIconId }}</v-icon>
+    <icon v-if="props.icon" :variant="props.icon" class="q-mr-sm" />
+    <typography
+      v-if="!!props.label"
+      :value="props.label"
+      :small="props.small"
+      :large="props.large"
+    />
     <slot />
-  </v-btn>
+  </q-btn>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-
 /**
  * A generic text button.
- *
- * @emits-1 `click` - On click.
  */
-export default Vue.extend({
+export default {
   name: "TextButton",
-  props: {
-    outlined: Boolean,
-    text: Boolean,
-    disabled: Boolean,
-    large: Boolean,
-    block: Boolean,
-    loading: Boolean,
-    color: String,
-    iconId: String,
-    value: String,
-    y: String,
-    x: String,
-    classes: String,
-    variant: String as PropType<
-      "add" | "edit" | "save" | "delete" | "cancel" | "artifact"
-    >,
-    dataCy: String,
-  },
-  computed: {
-    /**
-     * @return The icon to render.
-     */
-    buttonIconId(): string | undefined {
-      switch (this.variant) {
-        case "add":
-          return "mdi-plus";
-        case "edit":
-          return "mdi-pencil";
-        case "save":
-          return "mdi-content-save";
-        case "delete":
-          return "mdi-delete";
-        case "cancel":
-          return "mdi-close";
-        case "artifact":
-          return "mdi-application-array-outline";
-        default:
-          return this.iconId;
-      }
-    },
-    /**
-     * @return The color to render.
-     */
-    buttonColor(): string | undefined {
-      switch (this.variant) {
-        case "add":
-        case "save":
-          return "primary";
-        case "delete":
-          return "error";
-        default:
-          return this.color;
-      }
-    },
-    /**
-     * @return The button's class name.
-     */
-    buttonClassName(): string {
-      let classNames = this.classes || "";
+};
+</script>
 
-      if (this.x) classNames += ` mx-${this.x}`;
-      if (this.y) classNames += ` my-${this.y}`;
+<script setup lang="ts">
+import { computed } from "vue";
+import { IconVariant, SizeType, ThemeColor } from "@/types";
+import { useMargins } from "@/hooks";
+import { Icon, Typography } from "@/components/common/display";
 
-      return classNames;
-    },
-  },
+const props = defineProps<{
+  /**
+   * Renders an outlined button.
+   */
+  outlined?: boolean;
+  /**
+   * Renders a flat text button.
+   */
+  text?: boolean;
+  /**
+   * Renders the button as a full width block.
+   */
+  block?: boolean;
+  /**
+   * The loading percentage to render on a loading button.
+   */
+  percentage?: number;
+  /**
+   * The button text to display, if not using the default slot.
+   */
+  label?: string;
+  /**
+   * Whether the component is disabled.
+   */
+  disabled?: boolean;
+  /**
+   * Renders a smaller component.
+   */
+  small?: boolean;
+  /**
+   * Renders a larger component.
+   */
+  large?: boolean;
+  /**
+   * Whether the component is loading.
+   */
+  loading?: boolean;
+  /**
+   * The color to render the component with.
+   */
+  color?: ThemeColor;
+  /**
+   * The type of icon to render.
+   */
+  icon?: IconVariant;
+  /**
+   * The classnames to include on this component.
+   */
+  class?: string;
+  /**
+   * The x margin.
+   */
+  x?: SizeType;
+  /**
+   * The y margin.
+   */
+  y?: SizeType;
+  /**
+   * The left margin.
+   */
+  l?: SizeType;
+  /**
+   * The right margin.
+   */
+  r?: SizeType;
+  /**
+   * The top margin.
+   */
+  t?: SizeType;
+  /**
+   * The bottom margin.
+   */
+  b?: SizeType;
+  /**
+   * The testing selector to set.
+   */
+  dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  /**
+   * Called when clicked.
+   */
+  (e: "click"): void;
+}>();
+
+const buttonClassName = useMargins(props, () => [
+  ["color", `text-${props.color}`],
+  ["block", "full-width"],
+  ["class", props.class],
+]);
+
+const buttonColor = computed(() => {
+  switch (props.icon) {
+    case "add":
+    case "save":
+      return "primary";
+    case "delete":
+      return "negative";
+    default:
+      return props.color;
+  }
+});
+
+const buttonSize = computed(() => {
+  if (props.large) {
+    return "lg";
+  } else if (props.small) {
+    return "sm";
+  } else {
+    return undefined;
+  }
 });
 </script>

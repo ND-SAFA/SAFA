@@ -1,18 +1,70 @@
+// Public
+
+.card-page {
+  width: 450px;
+
+  .login-button {
+    width: 120px;
+  }
+}
+
+// Navigation - Inputs
+
 .nav-input {
-  fieldset, i {
-    color: fade-out($color-accent, 0.5) !important;
+  fieldset, div, label, i {
+    color: $color-accent !important;
   }
 
-  &:hover {
-    fieldset, div, label, i {
-      color: $color-accent !important;
+  .q-field__control:before {
+    border-color: $color-accent !important;
+  }
+
+  &.nav-search {
+    min-width: 200px;
+    width: 30vw;
+  }
+
+  &.nav-document {
+    width: 200px;
+  }
+
+  &.nav-version {
+    width: 120px;
+  }
+}
+
+// Navigation - Topbar
+
+.nav-topbar {
+  min-height: 70px;
+}
+
+.nav-saving-icon {
+  position: relative;
+  right: 23px;
+}
+
+// Navigation - Sidebar
+
+.nav-sidebar-header {
+  height: 40px;
+
+  &-open {
+    padding-left: 10px;
+    padding-right: 10px;
+
+    img {
+      width: 200px !important;
     }
   }
 }
 
-.nav-selected {
-  color: var(--v-primary-base) !important;
+.nav-account {
+  position: absolute;
+  bottom: 0;
 }
+
+// Navigation - Notifications
 
 .nav-notifications {
   min-width: 300px;
@@ -20,6 +72,38 @@
   overflow-y: scroll;
 }
 
-.v-tabs-bar, .v-window {
-  background-color: transparent !important;
+.nav-alert {
+  border-left-width: 4px !important;
+}
+
+// Navigation - Page
+
+.nav-page-centered {
+  max-width: 1100px;
+}
+
+.nav-page-loading {
+  margin-top: 40vh;
+}
+
+// Fixes box shadow in dark mode.
+
+body.body--dark .q-layout__shadow:after {
+  box-shadow: 0 0 10px 2px rgb(255 255 255 / 6%), 0 0 10px rgb(255 255 255 / 6%);
+}
+
+// Navigation - Modal
+
+.modal {
+  &-sm {
+    width: 400px;
+  }
+  &-md {
+    width: 600px;
+    max-width: unset;
+  }
+  &-lg {
+    width: 800px;
+    max-width: unset;
+  }
 }

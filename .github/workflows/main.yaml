@@ -22,7 +22,7 @@ jobs:
           node-version: 14
 
       - name: Install Node.js dependencies
-        run: npm ci
+        run: npm i
 
       - name: Run linters
         run: npm run lint

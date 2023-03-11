@@ -48,6 +48,18 @@ export enum CytoEvent {
    */
 
   /**
+   * When the mouse button is pressed.
+   */
+  MOUSE_DOWN = "mousedown",
+  /**
+   * When the mouse button is released.
+   */
+  MOUSE_UP = "mouseup",
+  /**
+   * After `mousedown` then `mouseup`.
+   */
+  CLICK = "click",
+  /**
    * When the cursor is put on top of the target.
    */
   MOUSE_OVER = "mouseover",
@@ -55,6 +67,23 @@ export enum CytoEvent {
    * When the cursor is moved off of the target.
    */
   MOUSE_OUT = "mouseout",
+  /**
+   * When the cursor is moved somewhere on top of the target.
+   */
+  MOUSE_MOVE = "mousemove",
+  /**
+   * When one or more fingers starts to touch the screen.
+   */
+  TOUCH_START = "touchstart",
+  /**
+   * When one or more fingers are moved on the screen.
+   */
+  TOUCH_MOVE = "touchmove",
+  /**
+   * When one or more fingers are removed from the screen.
+   */
+  TOUCH_END = "touchend",
+
   /**
    * When the viewport is resized (usually by calling cy.resize(),
    * a window resize, or toggling a class on the Cytoscape.js div).

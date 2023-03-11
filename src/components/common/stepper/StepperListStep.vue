@@ -1,54 +1,38 @@
 <template>
   <div>
-    <typography el="h1" variant="subtitle" :value="title" />
-    <v-divider />
-    <v-progress-circular
-      v-if="loading"
-      indeterminate
-      size="48"
-      class="mx-auto my-2 d-block"
-    />
+    <typography el="h1" variant="subtitle" :value="props.title" />
+    <separator />
+    <div v-if="props.loading" class="q-py-md q-mx-auto width-fit">
+      <q-circular-progress indeterminate size="lg" />
+    </div>
     <typography
-      v-if="itemCount === 0 && !loading"
+      v-if="props.itemCount === 0 && !props.loading && props.emptyMessage"
       variant="small"
       el="p"
-      :value="emptyMessage"
+      :value="props.emptyMessage"
     />
-    <v-list v-if="!loading">
-      <v-list-item-group style="max-height: 400px" class="overflow-y-auto">
-        <slot name="items" />
-      </v-list-item-group>
-    </v-list>
+    <div v-if="!props.loading" class="scrollable-md">
+      <slot />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Typography } from "@/components/common/display";
-
 /**
  * Presents a list in a stepper workflow for item selection.
  */
-export default Vue.extend({
+export default {
   name: "StepperListStep",
-  components: { Typography },
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    itemCount: {
-      type: Number,
-      required: true,
-    },
-    emptyMessage: {
-      type: String,
-      required: true,
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { Typography, Separator } from "@/components/common/display";
+
+const props = defineProps<{
+  title: string;
+  itemCount: number;
+  emptyMessage?: string;
+  loading?: boolean;
+}>();
 </script>

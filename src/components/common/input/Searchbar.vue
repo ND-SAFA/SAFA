@@ -1,0 +1,43 @@
+<template>
+  <q-input
+    v-model="model"
+    dense
+    outlined
+    clearable
+    :label="label"
+    class="full-width"
+  >
+    <template #prepend>
+      <icon variant="search" />
+    </template>
+  </q-input>
+</template>
+
+<script lang="ts">
+/**
+ * Searchbar
+ */
+export default {
+  name: "Searchbar",
+};
+</script>
+
+<script setup lang="ts">
+import { withDefaults } from "vue";
+import { useVModel } from "@/hooks";
+import { Icon } from "@/components/common/display";
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    label?: string;
+  }>(),
+  { label: "Search" }
+);
+
+defineEmits<{
+  (e: "update:modelValue"): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+</script>

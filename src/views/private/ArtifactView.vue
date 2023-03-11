@@ -1,28 +1,30 @@
 <template>
-  <private-page full-window>
-    <template v-slot:page>
-      <project-tree />
-      <artifact-fab />
+  <private-page full-window graph>
+    <project-tree />
+    <artifact-fab />
 
-      <tab-list
-        v-if="isTableView"
-        v-model="tab"
-        :tabs="tabs"
-        class="my-4 mx-10"
-      >
-        <v-tab-item key="1">
-          <artifact-table />
-        </v-tab-item>
-        <v-tab-item key="2">
-          <trace-matrix-table />
-        </v-tab-item>
-      </tab-list>
-    </template>
+    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-ma-lg">
+      <template #artifacts>
+        <artifact-table />
+      </template>
+      <template #traces>
+        <trace-table />
+      </template>
+    </tab-list>
   </private-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the artifact tree and table.
+ */
+export default {
+  name: "ArtifactView",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { tableViewTabOptions } from "@/util";
 import { layoutStore } from "@/hooks";
 import {
@@ -30,36 +32,12 @@ import {
   PrivatePage,
   ArtifactFab,
   TabList,
-  TraceMatrixTable,
+  TraceTable,
   ProjectTree,
 } from "@/components";
 
-/**
- * Displays the artifact tree and table.
- */
-export default Vue.extend({
-  name: "ArtifactView",
-  components: {
-    ProjectTree,
-    TraceMatrixTable,
-    TabList,
-    ArtifactFab,
-    ArtifactTable,
-    PrivatePage,
-  },
-  data() {
-    return {
-      tab: 0,
-      tabs: tableViewTabOptions(),
-    };
-  },
-  computed: {
-    /**
-     * @return Whether table view is enabled.
-     */
-    isTableView(): boolean {
-      return layoutStore.isTableMode;
-    },
-  },
-});
+const tabs = tableViewTabOptions();
+const tab = ref("artifacts");
+
+const isTableMode = computed(() => layoutStore.isTableMode);
 </script>

@@ -1,72 +1,70 @@
 <template>
-  <cytoscape
+  <cytoscape3
     :id="id"
-    class="cy-container neutral-bg"
-    :config="cytoCoreGraph.config"
-    :preConfig="preConfig"
-    :afterCreated="afterCreated"
+    class="cy-container bg-neutral"
+    :config="props.cytoCoreGraph.config"
+    :pre-config="preConfig"
+    :after-created="afterCreated"
   >
     <slot v-if="initialized" name="elements" />
-  </cytoscape>
+  </cytoscape3>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { CytoCore, CytoCoreGraph } from "@/types";
-import { logStore } from "@/hooks";
-
 /**
  * Abstracts setting up a cytoscape instance and corresponding plugins.
  */
-export default Vue.extend({
+export default {
   name: "CytoscapeController",
-  props: {
-    cytoCoreGraph: {
-      type: Object as PropType<CytoCoreGraph>,
-      required: true,
-    },
-    id: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      initialized: false,
-    };
-  },
-  methods: {
-    /**
-     * Initializes all plugins.
-     * @param cy - The cytoscape instance.
-     */
-    preConfig(cy: CytoCore) {
-      this.cytoCoreGraph.plugins.forEach((plugin) => {
-        try {
-          plugin.initialize(cy);
-        } catch (e) {
-          logStore.onDevError(`Plugin installation error: ${e}`);
-        }
-      });
-    },
-    /**
-     * Finalizes all plugins.
-     * @param cy - The cytoscape instance.
-     */
-    async afterCreated(cy: CytoCore) {
-      if (this.cytoCoreGraph.saveCy) {
-        this.cytoCoreGraph.saveCy(cy);
-      } else {
-        logStore.onDevError(
-          `Unable to save cytoscape instance in: ${this.cytoCoreGraph.name}`
-        );
-      }
-      this.cytoCoreGraph.plugins.forEach((plugin) => {
-        plugin.afterInit(cy);
-      });
-      this.cytoCoreGraph.afterInit(cy);
-      this.initialized = true;
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
+import { logStore } from "@/hooks";
+import { Cytoscape3 } from "./base";
+
+const props = defineProps<{
+  cytoCoreGraph: CytoCoreGraph;
+  id: string;
+}>();
+
+const initialized = ref(false);
+
+/**
+ * Initializes all plugins.
+ * @param cy - The cytoscape instance.
+ */
+function preConfig(cy: CytoCore) {
+  props.cytoCoreGraph.plugins.forEach((plugin: CytoCorePlugin) => {
+    try {
+      plugin.initialize(cy);
+    } catch (e) {
+      logStore.onDevError(`Plugin installation error: ${e}`);
+    }
+  });
+}
+
+/**
+ * Finalizes all plugins.
+ * @param cy - The cytoscape instance.
+ */
+async function afterCreated(cy: CytoCore) {
+  if (props.cytoCoreGraph.saveCy) {
+    props.cytoCoreGraph.saveCy(cy);
+  } else {
+    logStore.onDevError(
+      `Unable to save cytoscape instance in: ${props.cytoCoreGraph.name}`
+    );
+  }
+
+  props.cytoCoreGraph.plugins.forEach((plugin: CytoCorePlugin) => {
+    plugin.afterInit(cy);
+  });
+
+  props.cytoCoreGraph.afterInit(cy);
+
+  initialized.value = true;
+}
 </script>

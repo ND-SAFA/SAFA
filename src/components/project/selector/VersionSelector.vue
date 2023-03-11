@@ -1,202 +1,112 @@
 <template>
-  <table-selector
-    v-if="this.isOpen"
-    item-key="versionId"
-    no-data-text="Project contains no versions"
-    :headers="headers"
-    :items="displayedVersions"
-    :is-open="isOpen"
-    :is-loading="isLoading"
-    :minimal="minimal"
-    :has-edit="false"
-    :has-add="showEdit"
-    :has-delete="showEdit"
-    :can-delete-last-item="false"
-    data-cy="table-version"
-    class="version-table"
-    @item:select="handleSelectVersion"
-    @item:delete="handleDeleteVersion"
-    @item:add="handleAddItem"
-    @refresh="handleLoadProjectVersions"
-  >
-    <template v-slot:addItemDialogue>
-      <version-creator
-        :is-open="addVersionDialogue"
-        :project="project"
-        @close="handleCreatorClose"
-        @create="handleVersionCreated"
-      />
-    </template>
-  </table-selector>
+  <flex-box align="center" r="1">
+    <typography
+      el="h1"
+      variant="subtitle"
+      color="white"
+      class="text-expanded"
+      :value="projectName"
+      x="4"
+    />
+    <q-select
+      v-if="isProjectDefined"
+      v-model="version"
+      dense
+      outlined
+      dark
+      :options-dark="darkMode"
+      options-selected-class="primary"
+      label="Version"
+      :options="versions"
+      option-value="versionId"
+      class="nav-input nav-version"
+      color="accent"
+    >
+      <template #selected>
+        {{ versionToString(version) }}
+      </template>
+      <template #option="{ opt, itemProps }">
+        <list-item v-bind="itemProps" :title="versionToString(opt)" />
+      </template>
+      <template #after-options>
+        <text-button
+          text
+          label="Add Version"
+          icon="add"
+          @click="openCreateVersion = true"
+        />
+      </template>
+    </q-select>
+
+    <version-creator
+      :open="openCreateVersion"
+      :project="project"
+      @close="openCreateVersion = false"
+      @create="handleVersionCreated"
+    />
+  </flex-box>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { IdentifierSchema, VersionSchema } from "@/types";
-import { projectStore, sessionStore } from "@/hooks";
-import { getProjectVersions, handleDeleteVersion } from "@/api";
-import { TableSelector } from "@/components/common";
+/**
+ * Displays the current project version.
+ */
+export default {
+  name: "VersionSelector",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
+import { VersionSchema } from "@/types";
+import { versionToString } from "@/util";
+import { projectStore, useTheme } from "@/hooks";
+import { getProjectVersions, handleLoadVersion } from "@/api";
+import { Typography, FlexBox, TextButton, ListItem } from "@/components/common";
 import VersionCreator from "./VersionCreator.vue";
 
-/**
- * Displays list of project versions available to given project and allows them
- * to select, edit, delete, or create projects. Versions list is refreshed
- * whenever mounted or isOpen is changed to true.
- *
- * @emits-1 `selected` (ProjectVersion) - On version selected.
- * @emits-1 `unselected` - On version unselected.
- */
-export default Vue.extend({
-  name: "VersionSelector",
-  components: {
-    TableSelector,
-    VersionCreator,
-  },
-  props: {
-    /**
-     * Whether this component is currently in view. If within
-     * a stepper then this is true when this component is within the current step.
-     */
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    /**
-     * The currently selected project whose versions we are displaying.
-     */
-    project: {
-      type: Object as PropType<IdentifierSchema>,
-      required: false,
-    },
-    hideCurrentVersion: {
-      type: Boolean,
-      required: false,
-    },
-    minimal: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    const baseHeaders = [
-      {
-        text: "Major",
-        value: "majorVersion",
-        sortable: true,
-        isSelectable: true,
-      },
-      {
-        text: "Minor",
-        value: "minorVersion",
-        sortable: true,
-        isSelectable: true,
-      },
-      {
-        text: "Revision",
-        value: "revision",
-        sortable: true,
-        isSelectable: true,
-      },
-    ];
+const versions = ref<VersionSchema[]>([]);
+const openCreateVersion = ref(false);
 
-    return {
-      headers: this.minimal
-        ? baseHeaders
-        : [
-            ...baseHeaders,
-            { text: "Actions", value: "actions", sortable: false },
-          ],
-      versions: [] as VersionSchema[],
-      addVersionDialogue: false,
-      isLoading: false,
-    };
-  },
-  mounted() {
-    this.handleLoadProjectVersions();
-  },
-  watch: {
-    project() {
-      this.handleLoadProjectVersions();
-    },
-  },
-  computed: {
-    /**
-     * @return The displayed versions.
-     */
-    displayedVersions(): VersionSchema[] {
-      return this.hideCurrentVersion
-        ? this.versions.filter(
-            ({ versionId }) => versionId !== projectStore.versionId
-          )
-        : this.versions;
-    },
-    /**
-     * @return Whether to allow this user to add or delete a version.
-     */
-    showEdit(): boolean {
-      return sessionStore.isEditor(this.project);
-    },
-  },
-  methods: {
-    /**
-     * Loads project versions.
-     */
-    handleLoadProjectVersions() {
-      if (!this.project?.projectId) return;
+const { darkMode } = useTheme();
 
-      this.isLoading = true;
+const project = computed(() => projectStore.project);
+const isProjectDefined = computed(() => projectStore.isProjectDefined);
+const projectName = computed(() =>
+  isProjectDefined.value ? project.value.name : "No Project Selected"
+);
 
-      getProjectVersions(this.project.projectId)
-        .then((versions: VersionSchema[]) => {
-          this.versions = versions;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    /**
-     * Emits selected versions.
-     */
-    handleSelectVersion(item: VersionSchema) {
-      if (item) {
-        this.$emit("selected", item);
-      } else {
-        this.$emit("unselected");
-      }
-    },
-    /**
-     * Opens the version add modal.
-     */
-    handleAddItem() {
-      this.addVersionDialogue = true;
-    },
-    /**
-     * Closes the version add modal.
-     */
-    handleCreatorClose() {
-      this.addVersionDialogue = false;
-    },
-    /**
-     * Adds the new version the version list, and emits the new version to select.
-     * @param version - The new version.
-     */
-    handleVersionCreated(version: VersionSchema) {
-      this.versions = [version, ...this.versions];
-      this.addVersionDialogue = false;
-    },
-    /**
-     * Attempts to delete the version.
-     * @param version - The version to delete.
-     */
-    handleDeleteVersion(version: VersionSchema) {
-      handleDeleteVersion(version, {
-        onSuccess: () => {
-          this.versions = this.versions.filter(
-            (v) => v.versionId != version.versionId
-          );
-        },
-      });
-    },
+const version = computed({
+  get: () => projectStore.version,
+  set(version: VersionSchema | undefined) {
+    if (!version) return;
+
+    handleLoadVersion(version.versionId);
   },
 });
+
+/**
+ * Loads the versions of the current project.
+ */
+async function updateVersionList(): Promise<void> {
+  const { projectId } = project.value;
+  versions.value = projectId ? await getProjectVersions(projectId) : [];
+}
+
+/**
+ * Adds the new version the version list and loads that version.
+ * @param version - The new version.
+ */
+async function handleVersionCreated(version: VersionSchema): Promise<void> {
+  versions.value = [version, ...versions.value];
+  openCreateVersion.value = false;
+  await handleLoadVersion(version.versionId);
+}
+
+onMounted(() => updateVersionList());
+
+watch(
+  () => project.value,
+  () => updateVersionList()
+);
 </script>

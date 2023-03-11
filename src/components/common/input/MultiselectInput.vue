@@ -1,0 +1,123 @@
+<template>
+  <q-select
+    v-model="model"
+    multiple
+    :filled="!props.outlined"
+    :outlined="props.outlined"
+    use-chips
+    use-input
+    :label="props.label"
+    :options="props.options"
+    :option-value="props.optionValue"
+    :option-label="props.optionLabel"
+    :map-options="props.optionToValue"
+    :emit-value="props.optionToValue"
+    :data-cy="props.dataCy"
+    :error-message="props.errorMessage || undefined"
+    :error="showError"
+    :class="className"
+    :hint="props.hint"
+    :new-value-mode="props.addValues ? 'add-unique' : ''"
+  >
+    <template #prepend>
+      <slot name="prepend" />
+    </template>
+  </q-select>
+</template>
+
+<script lang="ts">
+/**
+ * A generic multiselect input.
+ */
+export default {
+  name: "MultiselectInput",
+};
+</script>
+
+<script setup lang="ts">
+import { withDefaults, computed } from "vue";
+import { SizeType } from "@/types";
+import { useMargins, useVModel } from "@/hooks";
+
+const props = withDefaults(
+  defineProps<{
+    /**
+     * The model value.
+     */
+    modelValue: unknown[];
+    /**
+     * The options to select from.
+     */
+    options: unknown[];
+    /**
+     * The key of an option's id.
+     */
+    optionValue?: string;
+    /**
+     * The key of an option's display label.
+     */
+    optionLabel?: string;
+    /**
+     * Only saves the option's value, not the entire object.
+     */
+    optionToValue?: boolean;
+    /**
+     * An error message to display, if one exists.
+     */
+    errorMessage?: string | false;
+    /**
+     * The classnames to include on this component.
+     */
+    class?: string;
+    /**
+     * The label to display.
+     */
+    label?: string;
+    /**
+     * The bottom margin.
+     */
+    b?: SizeType;
+    /**
+     * A hint to display below the input.
+     */
+    hint?: string;
+    /**
+     * A testing selector.
+     */
+    dataCy?: string;
+    /**
+     * If true, new options can be created by pressing enter.
+     */
+    addValues?: boolean;
+    /**
+     * Whether to display as outlined, instead of the default filled.
+     */
+    outlined?: boolean;
+  }>(),
+  {
+    b: "1",
+    label: "",
+    errorMessage: "",
+    class: "",
+    hint: undefined,
+    dataCy: undefined,
+    optionLabel: undefined,
+    optionValue: undefined,
+  }
+);
+
+defineEmits<{
+  /**
+   * Called when the model is updated.
+   */
+  (e: "update:modelValue"): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+const className = useMargins(props, () => [[!!props.class, props.class]]);
+
+const showError = computed(
+  () => (!!props.errorMessage && props.errorMessage.length > 0) || undefined
+);
+</script>

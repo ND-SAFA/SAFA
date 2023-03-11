@@ -5,9 +5,8 @@ import {
   GenerationModelSchema,
   VersionSchema,
 } from "@/types";
-import { createProject } from "@/util";
+import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
-import sessionStore from "../core/useSession";
 import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
 import membersStore from "./useMembers";
@@ -79,16 +78,6 @@ export const useProject = defineStore("project", {
       return this.project.models;
     },
     /**
-     * @return A list of indexes for deletable projects.
-     */
-    deletableProjects(): number[] {
-      return this.allProjects
-        .map((project, projectIndex) =>
-          sessionStore.isAdmin(project) ? projectIndex : -1
-        )
-        .filter((idx) => idx !== -1);
-    },
-    /**
      * @return All projects that arent currently loaded.
      */
     unloadedProjects(): IdentifierSchema[] {
@@ -143,9 +132,7 @@ export const useProject = defineStore("project", {
     addProject(project: IdentifierSchema): void {
       this.allProjects = [
         project,
-        ...this.allProjects.filter(
-          ({ projectId }) => projectId !== project.projectId
-        ),
+        ...removeMatches(this.allProjects, "projectId", [project.projectId]),
       ];
     },
   },

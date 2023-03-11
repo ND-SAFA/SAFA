@@ -208,23 +208,26 @@ export const artifactTreeMenuItems: MenuItem[] = [
   safetyCaseMenuOption,
 ];
 
-function hasSubtree(
-  artifactData: ArtifactCytoElementData | undefined
-): boolean {
-  if (artifactData !== undefined) {
-    return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
-  }
-  return false;
-}
+/**
+ * Determines whether an artifact node has a subtree.
+ * @param artifactData - The artifact data to check.
+ * @return Whether the artifact has a subtree.
+ */
+function hasSubtree(artifactData?: ArtifactCytoElementData): boolean {
+  if (!artifactData) return false;
 
-type ArtifactHandler = (a: ArtifactSchema) => void | Promise<void>;
+  return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
+}
 
 /**
  * Handles an artifact on click event.
  * @param event - The event,
  * @param handler - The handler to call with the event's artifact.
  */
-function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
+function handleOnClick(
+  event: EventObject,
+  handler: (artifact: ArtifactSchema) => void
+): void {
   if (event.target !== null) {
     const artifactData: ArtifactCytoElementData = event.target.data();
     const artifact = artifactStore.getArtifactById(artifactData.id);

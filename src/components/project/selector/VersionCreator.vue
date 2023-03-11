@@ -1,151 +1,112 @@
 <template>
   <modal
-    :title="`Current Version: ${version}`"
-    size="xs"
-    :is-open="isOpen"
-    :actions-height="0"
-    v-bind:isLoading.sync="isLoading"
+    :title="`Current Version: ${versionName}`"
+    :open="props.open"
+    :loading="isLoading"
     data-cy="modal-version-create"
-    @close="handleClose"
+    @close="emit('close')"
   >
-    <template v-slot:body>
-      <v-container class="mt-2">
-        <v-row justify="center">
-          <v-btn
-            outlined
-            text
-            block
-            color="primary"
-            data-cy="button-create-major-version"
-            @click="() => handleClick('major')"
-          >
-            New Major Version: {{ nextVersion("major") }}
-          </v-btn>
-        </v-row>
-        <v-row justify="center" class="mt-5">
-          <v-btn
-            outlined
-            text
-            block
-            color="primary"
-            data-cy="button-create-minor-version"
-            @click="() => handleClick('minor')"
-          >
-            New Minor Version: {{ nextVersion("minor") }}
-          </v-btn>
-        </v-row>
-        <v-row justify="center" class="mt-5">
-          <v-btn
-            outlined
-            text
-            block
-            color="primary"
-            data-cy="button-create-revision-version"
-            @click="() => handleClick('revision')"
-          >
-            New Revision: {{ nextVersion("revision") }}
-          </v-btn>
-        </v-row>
-      </v-container>
-    </template>
+    <flex-box column align="center">
+      <text-button
+        text
+        :label="`New Major Version: ${nextVersion('major')}`"
+        color="primary"
+        data-cy="button-create-major-version"
+        @click="() => handleClick('major')"
+      />
+      <text-button
+        text
+        :label="`New Minor Version: ${nextVersion('minor')}`"
+        color="primary"
+        data-cy="button-create-minor-version"
+        @click="() => handleClick('minor')"
+      />
+      <text-button
+        text
+        :label="`New Revision: ${nextVersion('revision')}`"
+        color="primary"
+        data-cy="button-create-revision-version"
+        @click="() => handleClick('revision')"
+      />
+    </flex-box>
   </modal>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * A modal for creating new versions.
+ */
+export default {
+  name: "VersionCreator",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, watch, computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";
-import { Modal } from "@/components/common";
+import { Modal, TextButton, FlexBox } from "@/components/common";
+
+const props = defineProps<{
+  open: boolean;
+  project?: IdentifierSchema;
+}>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "create", version: VersionSchema): void;
+}>();
+
+const isLoading = ref(false);
+const currentVersion = ref<VersionSchema | undefined>();
+
+const versionName = computed(() => versionToString(currentVersion.value));
 
 /**
- * A modal for creating new versions.
- *
- * @emits-1 `create` (ProjectVersion) - On version creation.
- * @emits-2 `close` - On close.
+ * Returns the next version name.
+ * @param type - The type of new version.
  */
-export default Vue.extend({
-  name: "VersionCreator",
-  components: {
-    Modal,
-  },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    project: {
-      type: Object as PropType<IdentifierSchema>,
-      required: false,
-    },
-  },
-  data() {
-    return {
-      isLoading: false,
-      currentVersion: undefined as VersionSchema | undefined,
-    };
-  },
-  computed: {
-    /**
-     * @return The version name.
-     */
-    version(): string {
-      return versionToString(this.currentVersion);
-    },
-  },
-  methods: {
-    /**
-     * Returns the next version name.
-     * @param type - The type of new version.
-     */
-    nextVersion(type: VersionType): string {
-      if (this.currentVersion === undefined) {
-        return "X.X.X";
-      }
-      const { majorVersion, minorVersion, revision } = this.currentVersion;
-      switch (type) {
-        case "major":
-          return `${majorVersion + 1}.${minorVersion}.${revision}`;
-        case "minor":
-          return `${majorVersion}.${minorVersion + 1}.${revision}`;
-        case "revision":
-          return `${majorVersion}.${minorVersion}.${revision + 1}`;
-        default:
-          return "X.X.X";
-      }
-    },
-    /**
-     * Creates a new version.
-     * @param versionType - The version type to create.
-     */
-    handleClick(versionType: VersionType) {
-      if (!this.project) return;
+function nextVersion(type: VersionType): string {
+  if (currentVersion.value === undefined) {
+    return "X.X.X";
+  }
 
-      this.isLoading = true;
+  const { majorVersion, minorVersion, revision } = currentVersion.value;
 
-      handleCreateVersion(this.project.projectId, versionType, {
-        onSuccess: (version) => this.$emit("create", version),
-        onComplete: () => (this.isLoading = false),
-      });
-    },
-    /**
-     * Emits a request to close the modal.
-     */
-    handleClose() {
-      this.$emit("close");
-    },
-  },
-  watch: {
-    /**
-     * Gets the current version when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open || !this.project) return;
+  switch (type) {
+    case "major":
+      return `${majorVersion + 1}.${minorVersion}.${revision}`;
+    case "minor":
+      return `${majorVersion}.${minorVersion + 1}.${revision}`;
+    case "revision":
+      return `${majorVersion}.${minorVersion}.${revision + 1}`;
+  }
+}
 
-      getCurrentVersion(this.project.projectId).then(
-        (version) => (this.currentVersion = version)
-      );
-    },
-  },
-});
+/**
+ * Creates a new version.
+ * @param versionType - The version type to create.
+ */
+function handleClick(versionType: VersionType) {
+  if (!props.project) return;
+
+  isLoading.value = true;
+
+  handleCreateVersion(props.project.projectId, versionType, {
+    onSuccess: (version) => emit("create", version),
+    onComplete: () => (isLoading.value = false),
+  });
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open || !props.project) return;
+
+    getCurrentVersion(props.project.projectId).then(
+      (version) => (currentVersion.value = version)
+    );
+  }
+);
 </script>

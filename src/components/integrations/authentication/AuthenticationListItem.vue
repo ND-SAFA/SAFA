@@ -1,103 +1,71 @@
 <template>
-  <v-list-item :inactive="inactive || !hasCredentials" @click="handleClick">
-    <v-list-item-icon style="align-self: center">
-      <v-icon v-if="!isLoading" :color="color">
-        mdi-transit-connection-variant
-      </v-icon>
-      <v-progress-circular v-else indeterminate />
-    </v-list-item-icon>
-    <v-list-item-title>
-      <typography variant="subtitle" :value="title" />
-      <typography
-        el="div"
-        :value="hasCredentials ? 'Connected' : 'Not Connected'"
-        :color="color"
-      />
-    </v-list-item-title>
-    <v-list-item-action style="min-width: unset">
-      <text-button
-        v-if="!hasCredentials"
-        color="primary"
-        outlined
-        icon-id="mdi-transit-connection-variant"
-        @click="handleConnect"
-      >
-        Connect
-      </text-button>
-      <flex-box v-else column align="end">
+  <list-item
+    :clickable="clickable"
+    :color="color"
+    :title="props.title"
+    :subtitle="props.hasCredentials ? 'Connected' : 'Not Connected'"
+    @click="emit('click')"
+  >
+    <template #icon>
+      <icon v-if="!props.loading" :color="color" variant="integrate" />
+      <q-circular-progress v-else indeterminate />
+    </template>
+    <template #actions>
+      <flex-box full-width justify="end">
         <text-button
+          v-if="!props.hasCredentials"
+          label="Connect"
+          color="primary"
           outlined
-          variant="add"
-          classes="mb-2"
-          @click="handleConnect"
-        >
-          Installation
-        </text-button>
-        <text-button outlined variant="delete" @click="handleDisconnect">
-          Disconnect
-        </text-button>
+          icon="integrate"
+          @click="emit('connect')"
+        />
+        <flex-box v-else column align="end">
+          <text-button
+            outlined
+            label="Installation"
+            icon="add"
+            b="2"
+            @click="emit('connect')"
+          />
+          <text-button
+            outlined
+            label="Disconnect"
+            icon="delete"
+            @click="emit('disconnect')"
+          />
+        </flex-box>
       </flex-box>
-    </v-list-item-action>
-  </v-list-item>
+    </template>
+  </list-item>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Typography, TextButton } from "@/components/common";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
-
 /**
  * Displays a list item & buttons for authenticating an integration.
- *
- * @emits `select` - On list item select.
- * @emits `connect` - On connect button click.
- * @emits `disconnect` - On disconnect button click.
  */
-export default Vue.extend({
+export default {
   name: "AuthenticationListItem",
-  components: { FlexBox, TextButton, Typography },
-  props: {
-    hasCredentials: {
-      type: Boolean,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    inactive: Boolean,
-  },
-  computed: {
-    /**
-     * @return The color to render based on whether this source is connected.
-     */
-    color(): string {
-      return this.hasCredentials ? "success" : "grey";
-    },
-  },
-  methods: {
-    /**
-     * Opens the authentication window.
-     */
-    handleClick(): void {
-      this.$emit("click");
-    },
-    /**
-     * Opens the authentication window.
-     */
-    handleConnect(): void {
-      this.$emit("connect");
-    },
-    /**
-     * Disconnects the integration source
-     */
-    handleDisconnect(): void {
-      this.$emit("disconnect");
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { TextButton, FlexBox, Icon, ListItem } from "@/components/common";
+
+const props = defineProps<{
+  hasCredentials: boolean;
+  loading?: boolean;
+  title: string;
+  inactive?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "click"): void;
+  (e: "connect"): void;
+  (e: "disconnect"): void;
+}>();
+
+const color = computed(() => (props.hasCredentials ? "positive" : "grey"));
+const clickable = computed(() => !props.inactive && props.hasCredentials);
 </script>

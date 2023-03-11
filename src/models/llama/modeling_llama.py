@@ -820,12 +820,22 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         config: LLaMAConfig
     """
 
-    def __init__(self, config: LLaMAConfig):
+    def __init__(self, config: LLaMAConfig, model: LLaMAModel = None):
         super().__init__(config)
-        self.model = LLaMAModel(config)
+        self.model = LLaMAModel(config) if model is None else model
         self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
         # Initialize weights and apply final processing
         self.post_init()
+
+
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+        try:
+            return super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+        except RuntimeError:
+            model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+            config = kwargs.pop("config")
+            return LLaMAForSequenceClassification(config, model)
 
     def forward(
             self,
@@ -909,12 +919,21 @@ class LLaMAForSequenceSimilarity(LLaMAPreTrainedModel):
         config: LLaMAConfig
     """
 
-    def __init__(self, config: LLaMAConfig):
+    def __init__(self, config: LLaMAConfig, model: LLaMAModel = None):
         super().__init__(config)
-        self.model = LLaMAModel(config)
+        self.model = LLaMAModel(config) if model is None else model
         self.lm_head = nn.Linear(config.hidden_size * 2, config.num_labels, bias=False)
         # Initialize weights and apply final processing
         self.post_init()
+
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+        try:
+            return super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+        except RuntimeError:
+            model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+            config = kwargs.pop("config")
+            return LLaMAForSequenceSimilarity(config, model)
 
     def forward(
             self,

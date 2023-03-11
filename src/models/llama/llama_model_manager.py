@@ -1,4 +1,4 @@
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 from transformers.configuration_utils import PretrainedConfig
 from transformers.tokenization_utils_base import BatchEncoding
@@ -31,7 +31,7 @@ class LLaMAModelManager(ModelManager):
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
+        model = self.model_task.value.from_pretrained(self.model_path, config=self._config, ignore_mismatched_sizes=True)
         return model
 
     def get_config(self) -> PretrainedConfig:

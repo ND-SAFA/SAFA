@@ -5,16 +5,16 @@
         {
           "object_type": "LLAMA_TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                23
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
-            "model_path": "decapoda-research/llama-65b-hf",
-            "model_task": "SEQUENCE_SIMILARITY"
+            "model_path": "decapoda-research/llama-7b-hf",
+            "model_task": {
+              "*": [
+                "SEQUENCE_SIMILARITY",
+                "SEQUENCE_CLASSIFICATION"
+              ]
+            }
           },
           "trainer_args": {
             "evaluation_strategy": "steps",
@@ -23,7 +23,7 @@
             "save_steps": 1,
             "eval_steps": 1,
             "logging_steps": 1,
-            "num_train_epochs": 3,
+            "num_train_epochs": 1,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
@@ -40,8 +40,8 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
+                "object_type": "HUB",
+                "name": "cm1"
               }
             },
             "val_dataset_creator": {

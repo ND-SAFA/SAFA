@@ -3,9 +3,9 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Type, Union
-from typing_extensions import get_args
 
 from typeguard import check_type
+from typing_extensions import get_args
 
 from util.enum_util import get_enum_from_name
 from util.logging.logger_manager import logger
@@ -128,7 +128,7 @@ class BaseObject(ABC):
             val = variable.value
         else:
             val = variable
-        if ReflectionUtil.is_instance_or_subclass(expected_type, Enum):
+        if ReflectionUtil.is_instance_or_subclass(expected_type, Enum) and isinstance(val, str):
             val = get_enum_from_name(expected_type, val)
         return val
 

@@ -9,7 +9,12 @@
           },
           "model_manager": {
             "model_path": "decapoda-research/llama-7b-hf",
-            "model_task": "SEQUENCE_SIMILARITY"
+            "model_task": {
+              "*": [
+                "SEQUENCE_SIMILARITY",
+                "SEQUENCE_CLASSIFICATION"
+              ]
+            }
           },
           "trainer_args": {
             "evaluation_strategy": "steps",

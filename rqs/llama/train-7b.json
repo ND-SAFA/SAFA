@@ -12,6 +12,7 @@
             "model_task": "SEQUENCE_CLASSIFICATION"
           },
           "trainer_args": {
+            "max_seq_length": 256,
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",

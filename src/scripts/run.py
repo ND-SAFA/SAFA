@@ -18,6 +18,7 @@ if __name__ == "__main__":
         prog='Experiment',
         description='Runs experiment definitions')
     parser.add_argument('file')
+    parser.add_argument('--local_rank', default=0)
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
     script_runner = ScriptRunner(file_path)

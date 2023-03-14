@@ -5,6 +5,7 @@ from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.create_model_job import CreateModelJob
 from jobs.create_source_splits import CreateSourceSplits
 from jobs.delete_model_job import DeleteModelJob
+from jobs.distill_job import DistillJob
 from jobs.download_repository_job import DownloadRepositoryJob
 from jobs.export_artifacts_job import ExportArtifactsJob
 from jobs.export_dataset_job import ExportDatasetJob
@@ -24,6 +25,7 @@ class SupportedJobType(Enum):
     CREATE_DATASETS = CreateDatasetsJob
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
+    DISTILL = DistillJob
     GAN_TRAIN = GanTrainJob
     LLAMA_TRAIN = LLaMATrainJob
     MLM_PRE_TRAIN = MLMPreTrainJob

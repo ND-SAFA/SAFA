@@ -1,3 +1,5 @@
+from typing import Dict
+
 import datasets
 from sklearn.metrics import precision_recall_curve
 
@@ -23,11 +25,11 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class CalculateThreshold(AbstractTraceMetric):
-    metric_name = "threshold"
+class PrecisionAtRecallMetric(AbstractTraceMetric):
+    name = "precision_at_recall"
 
     # TODO
-    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the dataset.
@@ -45,13 +47,13 @@ class CalculateThreshold(AbstractTraceMetric):
             t = thresholds[index]
             p = precisions[index]
             r = recalls[index]
-            if r >= self.UPPER_RECALL_THRESHOLD and p > max_precision:
+            if r >= UPPER_RECALL_THRESHOLD and p > max_precision:
                 threshold = t
+                max_precision = p
 
         if threshold is None:
             logger.warning(f"Could not find threshold under {UPPER_RECALL_THRESHOLD} recall.")
-            threshold = 0.5
-        return threshold
+        return {"precision_at_recall": max_precision}
 
     def _info(self) -> datasets.MetricInfo:
         """

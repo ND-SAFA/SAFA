@@ -1,4 +1,3 @@
-import os.path
 from typing import Dict, Tuple
 
 import pandas as pd
@@ -33,8 +32,7 @@ class HubProjectReader(AbstractProjectReader):
         downloader = TraceDatasetDownloader(descriptor)
         data_dir = downloader.download()
         project_reader_class = descriptor.get_project_reader()
-        project_definition_path = descriptor.get_definition_path(data_dir)
-        project_path = os.path.split(project_definition_path)[0]
+        project_path = descriptor.get_project_path(data_dir)
         self.project_reader = project_reader_class(project_path)
         return self.project_reader.read_project()
 
@@ -49,3 +47,6 @@ class HubProjectReader(AbstractProjectReader):
         :return: Returns the overrides of the project reader.
         """
         return self.project_reader.get_overrides()
+
+    def should_generate_negative_links(self) -> bool:
+        return self.project_reader.should_generate_negative_links()

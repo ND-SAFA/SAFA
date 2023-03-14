@@ -45,7 +45,8 @@ class GIssue(AbstractGithubArtifact):
         :param kwargs: Additional parameters for modifying export process.
         :return: Dictionary entry.
         """
-        return {"id": self.issue_id, "content": " ".join([self.title, self.body])}
+        texts = [t for t in [self.title, self.body] if t is not None]
+        return {"id": self.issue_id, "content": " ".join(texts)}
 
     @overrides(AbstractGithubArtifact)
     def get_id(self) -> str:

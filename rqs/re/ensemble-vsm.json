@@ -17,12 +17,6 @@
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 250,
             "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
             "skip_save": false,
             "load_best_model_at_end": true
           },
@@ -68,12 +62,6 @@
           "job_args": {
             "random_seed": 812
           },
-          "metrics": [
-            "map",
-            "map_at_k",
-            "f",
-            "precision"
-          ],
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",

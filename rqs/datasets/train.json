@@ -8,26 +8,20 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/nl-bert"
+            "model_path": "thearod5/git-tiny"
           },
           "trainer_args": {
             "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 250,
             "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
             "skip_save": false,
             "load_best_model_at_end": true,
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",
-            "save_steps": 1,
-            "eval_steps": 1,
+            "save_steps": 5,
+            "eval_steps": 5,
             "logging_steps": 1
           },
           "trainer_dataset_manager": {
@@ -41,10 +35,6 @@
                 {
                   "object_type": "HUB",
                   "name": "itrust"
-                },
-                {
-                  "object_type": "HUB",
-                  "name": "cm1"
                 },
                 {
                   "object_type": "HUB",
@@ -63,12 +53,14 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.02
+              "val_percentage": 0.10
             },
             "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.75
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "cm1"
+              }
             },
             "augmenter": {
               "steps": [

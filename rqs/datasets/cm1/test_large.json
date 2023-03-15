@@ -1,0 +1,52 @@
+{
+  "experiment_type": "ENSEMBLE",
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": 812
+          },
+          "model_manager": {
+            "model_path": "google/flan-t5-xxl"
+          },
+          "trainer_args": {
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 1,
+            "gradient_accumulation_steps": 1,
+            "learning_rate": 5e-5,
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "cm1"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.30
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.30
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

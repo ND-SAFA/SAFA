@@ -97,7 +97,7 @@ class TraceMatrix:
         :param pred: the prediction associated with the link
         :return: None
         """
-        if link[TraceKeys.LINK_ID] not in self.query_matrix:
+        if link[TraceKeys.SOURCE] not in self.query_matrix:
             self.query_matrix[link[TraceKeys.SOURCE]] = Query(links=[], preds=[])
             self.source_ids.append(link[TraceKeys.SOURCE])
         self.query_matrix[link[TraceKeys.SOURCE]].links.append(link)

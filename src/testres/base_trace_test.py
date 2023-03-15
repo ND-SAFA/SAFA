@@ -26,7 +26,7 @@ class BaseTraceTest(BaseTest):
         negative_link_ids = []
         for index, link in trace_df.iterrows():
             if index in pos_links_ids:
-                link[TraceKeys.LABEl] = 1
+                link[TraceKeys.LABEL.value] = 1
             else:
                 negative_link_ids.append(index)
         return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_mapping_df=LayerDataFrame(),

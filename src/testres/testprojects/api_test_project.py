@@ -134,4 +134,4 @@ class ApiTestProject(AbstractTestProject):
         :param links_list: Link entries containing tuples between source id and target id.
         :return: List of ids.
         """
-        return list(TestDataManager.create_trace_dataframe(links_list).keys())
+        return list(TestDataManager.create_trace_dataframe(links_list).index)

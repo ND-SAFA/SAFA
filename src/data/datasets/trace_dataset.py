@@ -248,12 +248,11 @@ class TraceDataset(iDataset):
         Gets the data entries (link source, target, token pairs) for the augmentation
         :return: all links being used for augmentation and the data entries
         """
-        pos_links = [self.trace_df.get_link(link_id) for link_id in self.pos_link_ids]
         source_target_pairs = []
         for link_id in self.pos_link_ids:
             source, target = self.get_link_source_target_artifact(link_id)
             source_target_pairs.append((source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]))
-        return pos_links, source_target_pairs
+        return self.pos_link_ids, source_target_pairs
 
     def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
                                         orig_link_ids: List[int]) -> None:
@@ -293,7 +292,7 @@ class TraceDataset(iDataset):
         new_id = TraceDataFrame.generate_link_id(aug_source_id, aug_target_id)
         if self.trace_df.get_link(new_id) is not None:
             source, target = self.get_link_source_target_artifact(new_id)
-            if source.body != aug_source_tokens or target.body != aug_target_tokens:
+            if source[ArtifactKeys.CONTENT] != aug_source_tokens or target[ArtifactKeys.CONTENT] != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id

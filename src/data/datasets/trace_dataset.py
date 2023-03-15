@@ -65,7 +65,7 @@ class TraceDataset(AbstractDataset):
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
-    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=10) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=1) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.

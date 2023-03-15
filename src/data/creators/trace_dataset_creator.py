@@ -225,7 +225,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
     @staticmethod
     def _generate_negative_links(layer_mapping_df: pd.DataFrame, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact,
-                                 trace_dataset: TraceDataset, n_threads=10) -> None:
+                                 trace_dataset: TraceDataset, n_threads=1) -> None:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.

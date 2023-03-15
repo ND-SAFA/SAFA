@@ -30,7 +30,7 @@ class CsvProjectReader(AbstractProjectReader):
         self.project_path = project_path
         self.overrides["allowed_orphans"] = NO_ORPHAN_CHECK_VALUE
 
-    def read_project(self, n_threads: int = 10) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self, n_threads: int = 1) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame

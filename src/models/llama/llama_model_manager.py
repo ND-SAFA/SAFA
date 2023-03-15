@@ -32,6 +32,7 @@ class LLaMAModelManager(ModelManager):
         :return: the PreTrainedModel object
         """
         model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
+        model._set_gradient_checkpointing(model, True)
         return model
 
     def get_config(self) -> PretrainedConfig:

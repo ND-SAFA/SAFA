@@ -40,8 +40,8 @@
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
+                "object_type": "HUB",
+                "name": "CM1"
               }
             },
             "val_dataset_creator": {

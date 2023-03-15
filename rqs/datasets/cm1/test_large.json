@@ -9,7 +9,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "google/flan-t5-xxl"
+            "model_path": "bigscience/bloom"
           },
           "trainer_args": {
             "num_train_epochs": 1,

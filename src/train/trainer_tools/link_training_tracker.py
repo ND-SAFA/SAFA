@@ -96,13 +96,13 @@ class LinkTrainingTracker:
         """
         return os.path.join(output_dir, self.SAVE_DIR, str(epoch_iteration), self.SAVE_FILENAME)
 
-    def get_link_by_id(self, link_id: int) -> TraceDataFrame:
+    def get_link_by_id(self, link_id: int) -> Dict:
         """
         Gets a TraceLink by its ID
         :param link_id: The ID of the TraceLink
         :return: The TrackLink
         """
-        return self.dataset.links[link_id]
+        return self.dataset.trace_df.get_link(link_id)
 
     def get_epoch_training_result(self, epoch_iteration: int = None) -> EpochTrainingResult:
         """
@@ -141,7 +141,7 @@ class LinkTrainingTracker:
         pos_link_ids_worst_to_best = []
         neg_link_ids_worst_to_best = []
         for link_id in link_ids_worst_to_best:
-            if self.get_link_by_id(link_id).is_true_link:
+            if self.get_link_by_id(link_id)[TraceKeys.LABEL] == 1:
                 pos_link_ids_worst_to_best.append(link_id)
             else:
                 neg_link_ids_worst_to_best.append(link_id)
@@ -167,4 +167,5 @@ class LinkTrainingTracker:
         :param sim_score: The similarity score associated with the given link for an epoch
         :return: The link's loss
         """
-        return abs(link[TraceKeys.LABEl] - sim_score)
+        label = link[TraceKeys.LABEL]
+        return abs(label - sim_score)

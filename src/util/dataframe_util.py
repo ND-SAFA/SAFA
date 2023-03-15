@@ -54,7 +54,10 @@ class DataFrameUtil:
     def query_df(df: pd.DataFrame, query: Dict):
         query_df = df
         for k, v in query.items():
-            query_df = query_df[query_df[k] == v]
+            if k == df.index.name:
+                query_df = df.loc[[v]]
+            else:
+                query_df = query_df[query_df[k] == v]
         return query_df
 
     @staticmethod

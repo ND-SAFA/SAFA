@@ -18,11 +18,11 @@ class TestLinkTrainingTracker(BaseTraceTest):
     def test_track_batch_and_eval_epoch(self):
         tracker = self.get_link_training_tracker()
         tracker.track_batch(self.BATCH_INDICES, self.BATCH_LOGITS)
-        ordered_links = self.DATASET.get_ordered_link_ids()
+        ordered_links = [self.DATASET.trace_df.get_link(link_id) for link_id in self.DATASET.get_ordered_link_ids()]
         for i, batch_index in enumerate(self.BATCH_INDICES):
             link = ordered_links[batch_index]
-            self.assertIn(link.id, tracker._link_id_to_epoch_logits)
-            self.assertEquals(tracker._link_id_to_epoch_logits[link.id], self.BATCH_LOGITS[i])
+            self.assertIn(link[TraceKeys.LINK_ID], tracker._link_id_to_epoch_logits)
+            self.assertEquals(tracker._link_id_to_epoch_logits[link[TraceKeys.LINK_ID]], self.BATCH_LOGITS[i])
 
     @patch.object(LinkTrainingTracker, "save_epoch_result")
     def test_eval_epoch(self, save_epoch_result_mock):
@@ -63,17 +63,17 @@ class TestLinkTrainingTracker(BaseTraceTest):
         epoch_link_losses = tracker._calculate_epoch_link_losses()
         ordered_links = self.DATASET.get_ordered_link_ids()
         for i, batch_index in enumerate(self.BATCH_INDICES):
-            link = ordered_links[batch_index]
-            self.assertIn(link.id, epoch_link_losses)
-            self.assertLess(self.EXPECTED_SIM_SCORE - epoch_link_losses[link.id], 0.1)
+            link = self.DATASET.trace_df.get_link(ordered_links[batch_index])
+            self.assertIn(link[TraceKeys.LINK_ID], epoch_link_losses)
+            self.assertLess(self.EXPECTED_SIM_SCORE - epoch_link_losses[link[TraceKeys.LINK_ID]], 0.1)
 
     @patch.object(LinkTrainingTracker, "get_link_by_id")
-    def test_sort_link_ids_from_worst_to_best(self, mock_get_link_by_id, mock_artifact):
+    def test_sort_link_ids_from_worst_to_best(self, mock_get_link_by_id):
         def is_true_link(link_id):
             if link_id % 2 == 0:
-                return TraceDataFrame(mock_artifact, mock_artifact, is_true_link=True)
+                return EnumDict({TraceKeys.LABEL: 1})
             else:
-                return TraceDataFrame(mock_artifact, mock_artifact, is_true_link=False)
+                return EnumDict({TraceKeys.LABEL: 0})
 
         mock_get_link_by_id.side_effect = is_true_link
         epoch_link_losses = {123: 0.5, 456: 0.4, 789: 0.6}
@@ -85,7 +85,7 @@ class TestLinkTrainingTracker(BaseTraceTest):
         self.assertLess(expected_worst_to_best.index(neg_links[0]), expected_worst_to_best.index(neg_links[1]))
 
     def test_get_worst_and_best_result(self):
-        test_worst_to_best = list(self.DATASET.trace_df.index_name())
+        test_worst_to_best = list(self.DATASET.trace_df.index)
         source_target = self.DATASET.get_source_target_pairs(test_worst_to_best)
         tracker = self.get_link_training_tracker()
         result = tracker._get_worst_and_best_result(test_worst_to_best)

@@ -17,7 +17,7 @@ class BaseSplitTest(BaseTraceTest):
         percent_splits = OrderedDict({DatasetRole.TRAIN: 0.5, DatasetRole.VAL: 0.3, DatasetRole.EVAL: 0.2})
         splitter = DatasetSplitter(trace_dataset, percent_splits, strategies=[strategy] * (len(percent_splits)-1))
         splits = splitter.split_dataset()
-        split_link_ids = [set(split.links.keys()) for split in splits.values()]
+        split_link_ids = [set(split.trace_df.index) for split in splits.values()]
         self.assertEquals(sum([len(split) for split in splits.values()]), n_orig_links)
         for dataset_role, split in splits.items():
             self.assertLessEqual(abs(len(split) - round(n_orig_links * percent_splits[dataset_role])), 1)

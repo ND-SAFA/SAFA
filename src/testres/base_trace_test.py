@@ -24,10 +24,9 @@ class BaseTraceTest(BaseTest):
         artifacts_df = TestDataManager.create_artifact_dataframe()
         pos_links_ids = ApiTestProject.get_positive_link_ids()
         negative_link_ids = []
-        for index, link in trace_df.iterrows():
+        for index in trace_df.index:
             if index in pos_links_ids:
-                link[TraceKeys.LABEL.value] = 1
+                trace_df.at[index, TraceKeys.LABEL.value] = 1
             else:
                 negative_link_ids.append(index)
-        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_mapping_df=LayerDataFrame(),
-                            pos_link_ids=pos_links_ids, neg_link_ids=negative_link_ids)
+        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_mapping_df=LayerDataFrame())

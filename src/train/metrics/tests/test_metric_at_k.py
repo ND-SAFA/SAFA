@@ -3,6 +3,7 @@ from typing import List, Type
 
 import numpy as np
 
+from data.dataframes.trace_dataframe import TraceKeys
 from data.datasets.trace_matrix import TraceMatrix
 from testres.base_test import BaseTest
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -40,10 +41,12 @@ class TestMetricAtK(BaseTest, ABC):
         n_artifacts = (self.n_sources, self.n_targets)
         trace_links = self.create_trace_links(prefix, n_artifacts, self.labels)
         targets = [self.TARGET_PREFIX + str(i) for i in range(self.n_targets)]
-        for i, trace_link in enumerate(trace_links):
-            self.assertEqual(trace_link.source, "S0")
-            self.assertEqual(trace_link.target, targets[i])
-            self.assertEqual(trace_link.label, self.labels[i])
+        i = 0
+        for _, trace_link in trace_links.iterrows():
+            self.assertEqual(trace_link[TraceKeys.SOURCE.value], "S0")
+            self.assertEqual(trace_link[TraceKeys.TARGET.value], targets[i])
+            self.assertEqual(trace_link[TraceKeys.LABEL.value], self.labels[i])
+            i += 1
 
     @property
     @abstractmethod

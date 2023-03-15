@@ -85,7 +85,7 @@ class TraceMatrix:
         :return: None
         """
         link_ids = trace_df.index if link_ids is None else link_ids
-        predicted_scores = [None for link in range(len(link_ids))] if not predicted_scores else predicted_scores
+        predicted_scores = [None for link in range(len(link_ids))] if predicted_scores is None else predicted_scores
         for i, link_id in enumerate(link_ids):
             link = trace_df.get_link(link_id)
             self.add_link(link, predicted_scores[i])

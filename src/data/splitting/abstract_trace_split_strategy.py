@@ -30,7 +30,7 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
             trace_link = trace_dataset.trace_df.get_link(link_id)
             source = trace_dataset.artifact_df.get_artifact(trace_link[TraceKeys.SOURCE])
             target = trace_dataset.artifact_df.get_artifact(trace_link[TraceKeys.TARGET])
-            if trace_link[TraceKeys.LABEL]:
+            if trace_link[TraceKeys.LABEL] == 1:
                 slice_pos_link_ids.append(trace_link[TraceKeys.LINK_ID])
             else:
                 slice_neg_link_ids.append(trace_link[TraceKeys.LINK_ID])

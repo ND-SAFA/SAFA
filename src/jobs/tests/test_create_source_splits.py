@@ -16,7 +16,7 @@ from util.object_creator import ObjectCreator
 ARTIFACT_TYPE = "source_type_0"
 SPLITS = [0.2, 0.2]
 
-@skip("Skip for now. Needs refactored.")
+
 class TestCreateSourceSplits(BaseJobTest):
     """
     Tests job's ability to slice sources and create new datasets while avoiding

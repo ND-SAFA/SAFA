@@ -9,7 +9,6 @@ from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 
 
-@skip("Skip for now. Needs refactored.")
 class TestExportDatasetJob(BaseJobTest):
     """
     Tests ability to export dataset as SAFA.

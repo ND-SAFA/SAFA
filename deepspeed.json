@@ -3,11 +3,11 @@
     "stage": 3,
     "offload_optimizer": {
       "device": "nvme",
-      "nvme_path": "/dev/nvme0n1"
+      "nvme_path": "/dev/xvda"
     },
     "offload_param": {
       "device": "nvme",
-      "nvme_path": "/dev/nvme0n1"
+      "nvme_path": "/dev/xvda"
     }
   },
   "fp16": {

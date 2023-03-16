@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/git-tiny"
+            "model_path": "xlm-roberta-large"
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -56,11 +56,9 @@
               "val_percentage": 0.10
             },
             "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "HUB",
-                "name": "cm1"
-              }
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.10
             },
             "augmenter": {
               "steps": [

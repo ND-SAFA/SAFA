@@ -118,7 +118,7 @@ class ModelManager(BaseObject):
         tokenizer = self.get_tokenizer()
         feature = tokenizer(truncation=True, return_attention_mask=True,
                             max_length=self._max_seq_length,
-                            return_token_type_ids=return_token_type_ids, **kwargs)
+                            padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)
         return feature
 
     @staticmethod

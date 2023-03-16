@@ -1,7 +1,6 @@
 import os
 import sys
 
-import deepspeed
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,11 +13,12 @@ RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 if __name__ == "__main__":
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
+    from deepspeed.runtime.zero.stage3 import estimate_zero3_model_states_mem_needs_all_live
 
     models = ["gpt2"]
-    with deepspeed.zero.Init():
-        model = models[0]
-        print("-" * 10, model, "-" * 10)
-        model_manager = ModelManager(model, model_task=ModelTask.AUTO)
-        model = model_manager.get_model()
-        print("Done!")
+    model = models[0]
+    print("-" * 10, model, "-" * 10)
+    model_manager = ModelManager(model, model_task=ModelTask.AUTO)
+    model = model_manager.get_model()
+    estimate_zero3_model_states_mem_needs_all_live(model, num_gpus_per_node=4, num_nodes=1)
+    print("Done!")

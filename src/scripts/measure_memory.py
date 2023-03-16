@@ -16,10 +16,10 @@ if __name__ == "__main__":
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
 
-    models = ["bert-base-uncased", "bert-large-uncased"]
+    models = ["bert-base-uncased"]
     for model in models:
         print("-" * 10, model, "-" * 10)
         with deepspeed.zero.Init():
-            model_manager = ModelManager("bert-large-uncased", model_task=ModelTask.AUTO)
+            model_manager = ModelManager(model, model_task=ModelTask.AUTO)
             model = model_manager.get_model()
             estimate_zero3_model_states_mem_needs_all_live(model, num_gpus_per_node=4, num_nodes=1)

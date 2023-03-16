@@ -8,12 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "thearod5/nl-bert",
-                "bert-large-uncased"
-              ]
-            }
+            "model_path": "bert-large-uncased"
           },
           "trainer_args": {
             "num_train_epochs": 1,

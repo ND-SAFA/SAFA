@@ -15,7 +15,7 @@ if __name__ == "__main__":
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
 
-    models = ["bert-base-uncased"]
+    models = ["bert-base-uncased", "bert-large-uncased"]
     for model in models:
         print("-" * 10, model, "-" * 10)
         model_manager = ModelManager(model, model_task=ModelTask.AUTO)

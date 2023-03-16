@@ -98,6 +98,7 @@ class ModelManager(BaseObject):
         """
         if self._tokenizer is None:
             self._tokenizer = AutoTokenizer.from_pretrained(self.model_path, eos_token='[EOS]')
+            self._tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         return self._tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:

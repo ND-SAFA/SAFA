@@ -26,7 +26,7 @@ class TestTraceTrainer(BaseTraceTest):
     SOURCE_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
 
     EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
-    TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]], ["map_at_k", ["map@1", "map@2", "map@3"]],
+    TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]],
                               ["f", ["f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]
 

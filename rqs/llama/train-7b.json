@@ -12,7 +12,10 @@
             "model_task": "SEQUENCE_CLASSIFICATION"
           },
           "trainer_args": {
-            "max_seq_length": 256,
+            "gradient_checkpointing": true,
+            "fp16": true,
+            "deepspeed_path": "~/tgen/deepspeed.json",
+            "max_seq_length": 512,
             "evaluation_strategy": "steps",
             "save_strategy": "steps",
             "logging_strategy": "steps",

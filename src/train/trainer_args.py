@@ -84,7 +84,8 @@ class TrainerArgs(TrainingArguments, BaseObject):
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
                          load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,
                          logging_steps=self.logging_steps, report_to="wandb", weight_decay=self.weight_decay,
-                         learning_rate=self.learning_rate, deepspeed=self.deepspeed_path, gradient_checkpointing=True)
+                         learning_rate=self.learning_rate, deepspeed=self.deepspeed_path,
+                         gradient_checkpointing=self.gradient_checkpointing, fp16=self.fp16)
         self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:

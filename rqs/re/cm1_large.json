@@ -34,11 +34,11 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.10
+              "val_percentage": 0.25
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.70
+              "val_percentage": 0.25
             },
             "augmenter": {
               "steps": [

@@ -50,7 +50,7 @@ class LLaMAModelManager(ModelManager):
         :return: the Tokenizer
         """
         if self._tokenizer is None:
-            self._tokenizer = LLaMATokenizer.from_pretrained(self.model_path)
+            self._tokenizer = LLaMATokenizer.from_pretrained("decapoda-research/llama-7b-hf")
             if self._tokenizer.pad_token is None:
                 vocab = self._tokenizer.get_vocab()
                 vocab_tokens, vocab_indices = list(vocab.keys()), list(vocab.values())

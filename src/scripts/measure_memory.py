@@ -15,7 +15,7 @@ if __name__ == "__main__":
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
 
-    models = ["bigscience/bloom"]
+    models = ["gpt2"]
     with deepspeed.zero.Init():
         model = models[0]
         print("-" * 10, model, "-" * 10)

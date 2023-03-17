@@ -17,12 +17,22 @@ class AbstractDatasetExporter(BaseObject):
         Responsible for exporting datasets
         :param export_path: Path to export project to.
         :param dataset_creator: The creator in charge of making the dataset to export
+        :param dataset: The dataset to export if creator is not supplied
         """
         assert dataset_creator is not None or dataset is not None, "Must supply either a dataset creator or a dataset"
         self.dataset_creator = dataset_creator
-        self.export_path = export_path
         self.dataset = dataset
+        self.export_path = self.update_export_path(export_path)
+
+    def update_export_path(self, export_path: str) -> str:
+        """
+        Updates the path to export to
+        :param export_path: New path to export to
+        :return: Export path
+        """
+        self.export_path = export_path
         os.makedirs(self.export_path, exist_ok=True)
+        return export_path
 
     def get_dataset(self) -> TraceDataset:
         """
@@ -39,6 +49,18 @@ class AbstractDatasetExporter(BaseObject):
         Exports entities as a project in the appropriate format.
         :return: None
         """
+
+    @classmethod
+    def make_new(cls, export_path: str, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None) -> \
+            "AbstractDatasetExporter":
+        """
+        Initializes a new class instance
+        :param export_path: Path to export project to.
+        :param dataset_creator: The creator in charge of making the dataset to export
+        :param dataset: The dataset to export if creator is not supplied
+        :return: A new dataset exporter of same type
+        """
+        return cls(export_path=export_path, dataset_creator=dataset_creator, dataset=dataset)
 
     @classmethod
     @overrides(BaseObject)

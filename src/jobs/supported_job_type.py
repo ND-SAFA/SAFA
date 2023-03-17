@@ -3,7 +3,7 @@ from enum import Enum
 from jobs.analyze_dataset_job import AnalyzeDatasetJob
 from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.create_model_job import CreateModelJob
-from jobs.create_source_splits import CreateSourceSplits
+from jobs.create_source_splits_job import CreateSourceSplitsJob
 from jobs.delete_model_job import DeleteModelJob
 from jobs.download_repository_job import DownloadRepositoryJob
 from jobs.export_artifacts_job import ExportArtifactsJob
@@ -31,4 +31,4 @@ class SupportedJobType(Enum):
     VSM = VSMJob
     DATASET_ANALYSIS = AnalyzeDatasetJob
     DOWNLOAD_REPO = DownloadRepositoryJob
-    CREATE_SOURCE_SPLITS = CreateSourceSplits
+    CREATE_SOURCE_SPLITS = CreateSourceSplitsJob

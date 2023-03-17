@@ -58,12 +58,12 @@ class FunctionalWrapper:
 
 class EnumDict(OrderedDict):
 
-    def __init__(self, dict_: Dict[Union[str, Enum], Any]):
+    def __init__(self, dict_: Dict[Union[str, Enum], Any] = None):
         """
         Dictionary that accepts enum or enum value as key
         :param dict_: A dictionary containing enum or enum value as key
         """
-        dict_ = {to_string(key): val for key, val in dict_.items()}
+        dict_ = [(to_string(key), val) for key, val in dict_.items()] if dict_ is not None else []
         super().__init__(dict_)
 
     def __contains__(self, item: Union[str, Enum]) -> bool:

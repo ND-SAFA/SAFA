@@ -9,7 +9,8 @@ import time
 from typing import Callable, List, Union
 
 import git as local_git
-from github import Github, Repository
+from \
+    github import Github, Repository
 from github.Issue import Issue
 from tqdm import tqdm
 

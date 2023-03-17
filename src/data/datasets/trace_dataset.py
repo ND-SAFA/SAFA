@@ -40,6 +40,7 @@ class TraceDataset(iDataset):
         :param neg_link_ids: List of link ids for False links
         :param randomize: Whether to randomize the trace links.
         """
+        self.__assert_dataframe_types(artifact_df, trace_df, layer_mapping_df)
         self.layer_mapping_df = layer_mapping_df
         self.artifact_df = artifact_df
         self.trace_df = trace_df
@@ -363,6 +364,19 @@ class TraceDataset(iDataset):
             else:
                 neg_link_ids.append(index)
         return pos_link_ids, neg_link_ids
+
+    @staticmethod
+    def __assert_dataframe_types(artifact_df: Any, trace_df: Any, layer_mapping_df: Any) -> None:
+        """
+        Asserts that all dataframes are of the proper type
+        :param artifact_df: The dataframe containing artifacts
+        :param trace_df: The dataframe containing traces
+        :param layer_mapping_df: The artifact containing layer mappings
+        :return: None
+        """
+        types = [(artifact_df, ArtifactDataFrame), (trace_df, TraceDataFrame), (layer_mapping_df, LayerDataFrame)]
+        for var_and_type in types:
+            assert isinstance(*var_and_type), f"Dataframe must be of type {var_and_type[1]}"
 
     def __len__(self) -> int:
         """

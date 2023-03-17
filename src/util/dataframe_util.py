@@ -52,6 +52,12 @@ class DataFrameUtil:
 
     @staticmethod
     def query_df(df: pd.DataFrame, query: Dict):
+        """
+        Filters the dataframe to match the given query
+        :param df: The dataframe to query
+        :param query: Dictionary mapping query key to the desired value.
+        :return: The filtered dataframe
+        """
         query_df = df
         for k, v in query.items():
             if k == df.index.name:

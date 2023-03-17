@@ -8,7 +8,7 @@ from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.keys.structure_keys import StructuredKeys
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
-from jobs.create_source_splits import CreateSourceSplits
+from jobs.create_source_splits_job import CreateSourceSplitsJob
 from jobs.tests.base_job_test import BaseJobTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
@@ -57,4 +57,4 @@ class TestCreateSourceSplits(BaseJobTest):
         """
         job_args = JobArgs()
         trace_dataset_creator = ObjectCreator.create(TraceDatasetCreator)
-        return CreateSourceSplits(job_args, trace_dataset_creator, TEST_OUTPUT_DIR, SPLITS, artifact_type)
+        return CreateSourceSplitsJob(job_args, trace_dataset_creator, TEST_OUTPUT_DIR, SPLITS, artifact_type)

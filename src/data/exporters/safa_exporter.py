@@ -4,80 +4,84 @@ from typing import Dict, List
 import pandas as pd
 
 from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from data.datasets.trace_dataset import TraceDataset
+from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
-from data.dataframes.trace_dataframe import TraceDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from util.dataframe_util import DataFrameUtil
+from util.enum_util import EnumDict
 from util.file_util import FileUtil
+from util.override import overrides
 
 
-class SafaExporter:
+class SafaExporter(AbstractDatasetExporter):
     """
     Exports trace dataset as a SAFA one.
     """
 
-    def __init__(self):
+    def __init__(self, export_path: str, dataset_creator: TraceDatasetCreator = None, dataset: TraceDataset = None):
         """
         Initializes exporter for given trace dataset.
-        :param trace_dataset_creator: The creator responsible for creating trace dataset.
+        :param export_path: Path to export project to.
+        :param dataset_creator: The creator in charge of making the dataset to export
         """
+        super().__init__(export_path, dataset_creator, dataset)
         self.artifact_definitions = {}
         self.trace_definitions = {}
-        self.artifact_type_2_id = None
-        self.id_2_artifact = None
+        self.artifact_type_to_artifacts = None
 
-    def export(self, export_path, links: Dict[int, TraceDataFrame], artifact_df: pd.DataFrame, layer_mapping_df: pd.DataFrame):
+    @overrides(AbstractDatasetExporter)
+    def export(self) -> None:
         """
         Exports entities as a project in the safa format.
-        :param export_path: Path to export project to.
-        :param links: Links present in the project.
-        :param artifact_df: DataFrame containing artifacts.
-        :param layer_mapping_df: DataFrame containing trace queries in project.
         :return: None
         """
-        self.create_artifact_definitions(layer_mapping_df, export_path)
-        self.create_trace_definitions(links, layer_mapping_df, export_path)
-        self.create_tim(export_path)
+        self.artifact_type_to_artifacts = self.create_artifact_definitions()
+        self.create_trace_definitions()
+        self.create_tim()
 
-    def create_artifact_definitions(self, layer_mapping_df: pd.DataFrame, export_path: str) -> None:
+    def create_artifact_definitions(self) -> Dict[str, ArtifactDataFrame]:
         """
         Creates dataframe for each artifact grouped by type.
         :return: None
         """
         artifact_types = set()
-        for _, row in layer_mapping_df.iterrows():
+        for _, row in self.get_dataset().layer_mapping_df.iterrows():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
             artifact_types.update({source_type, target_type})
 
+        artifact_type_to_artifacts = {}
         for artifact_type in artifact_types:
             entries: List[Dict] = []
-            for artifact_id in self.artifact_type_2_id[artifact_type]:
-                artifact: Artifact = self.id_2_artifact[artifact_id]
-                entries.append({
-                    StructuredKeys.Artifact.ID.value: artifact.id,
-                    StructuredKeys.Artifact.CONTENT.value: artifact.token,
-                })
+            artifact_type_to_artifacts[artifact_type] = self.get_artifacts_of_type(artifact_type)
+            for id_, artifact in artifact_type_to_artifacts[artifact_type].iterrows():
+                entries.append(EnumDict({
+                    StructuredKeys.Artifact.ID: id_,
+                    StructuredKeys.Artifact.CONTENT: artifact[ArtifactKeys.CONTENT.value],
+                }))
             file_name = artifact_type + ".csv"
-            local_export_path = os.path.join(export_path, file_name)
+            local_export_path = os.path.join(self.export_path, file_name)
             pd.DataFrame(entries).to_csv(local_export_path, index=False)
             self.artifact_definitions[artifact_type] = {
                 SafaKeys.FILE: file_name
             }
+        return artifact_type_to_artifacts
 
-    def create_trace_definitions(self, links: Dict[int, TraceDataFrame], layer_mapping_df: pd.DataFrame, export_path: str) -> None:
+    def create_trace_definitions(self) -> None:
         """
         Create trace definition between each layer in trace creator.
-        :param links: The trace links to save.
-        :param layer_mapping_df: DataFrame mapping trace queries in project.
         :return: None
         """
-        for _, row in layer_mapping_df.iterrows():
+        for _, row in self.get_dataset().layer_mapping_df.iterrows():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
             matrix_name = f"{source_type}2{target_type}"
             file_name = matrix_name + ".csv"
-            export_file_path = os.path.join(export_path, file_name)
-            trace_df = self.create_trace_df(links, source_type, target_type)
+            export_file_path = os.path.join(self.export_path, file_name)
+            trace_df = self.create_trace_df_for_layer(source_type, target_type)
             self.trace_definitions[matrix_name] = {
                 "File": file_name,
                 "Source": source_type,
@@ -85,29 +89,28 @@ class SafaExporter:
             }
             trace_df.to_csv(export_file_path, index=False)
 
-    def create_trace_df(self, links: Dict[int, TraceDataFrame], source_type, target_type) -> pd.DataFrame:
+    def create_trace_df_for_layer(self, source_type, target_type) -> pd.DataFrame:
         """
         Creates data frame containing positive traces between source and target types.
-        :param links: The links to save.
         :param source_type: The name of the source type.
         :param target_type: The name of the target type.
         :return: DataFrame with positive links.
         """
-        source_artifact_ids = self.artifact_type_2_id[source_type]
-        target_artifact_ids = self.artifact_type_2_id[target_type]
+        source_artifacts = self.artifact_type_to_artifacts[source_type]
+        target_artifacts = self.artifact_type_to_artifacts[target_type]
         entries = []
-        for source_id in source_artifact_ids:
-            for target_id in target_artifact_ids:
+        for source_id in source_artifacts.index:
+            for target_id in target_artifacts.index:
                 trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
-                trace_link: TraceDataFrame = links[trace_link_id]
-                if trace_link.is_true_link:
-                    entries.append({
-                        StructuredKeys.Trace.TARGET.value: target_id,
-                        StructuredKeys.Trace.SOURCE.value: source_id
-                    })
+                trace_link: EnumDict = self.get_dataset().trace_df.get_link(trace_link_id)
+                if trace_link[TraceKeys.LABEL] == 1:
+                    entries.append(EnumDict({
+                        StructuredKeys.Trace.TARGET: target_id,
+                        StructuredKeys.Trace.SOURCE: source_id
+                    }))
         return pd.DataFrame(entries)
 
-    def create_tim(self, export_path) -> None:
+    def create_tim(self) -> None:
         """
         Writes TIM file to export path.
         :return: None
@@ -118,5 +121,13 @@ class SafaExporter:
             },
             **self.trace_definitions
         }
-        export_path = os.path.join(export_path, "tim.json")
-        FileUtil.write(tim_definition, export_path)
+        tim_export_path = os.path.join(self.export_path, "tim.json")
+        FileUtil.write(tim_definition, tim_export_path)
+
+    def get_artifacts_of_type(self, artifact_type: str) -> ArtifactDataFrame:
+        """
+        Gets a dataframe of artifacts of a given type
+        :param artifact_type: The artifact type
+        :return: A dataframe of artifacts of a given type
+        """
+        return DataFrameUtil.query_df(self.get_dataset().artifact_df, {ArtifactKeys.LAYER_ID: artifact_type})

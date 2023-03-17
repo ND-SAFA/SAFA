@@ -1,19 +1,24 @@
 import os
-from typing import List
+from typing import List, Union
 
 from sklearn.model_selection import train_test_split
 
 from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.dataframes.artifact_dataframe import ArtifactDataFrame
+from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from data.datasets.trace_dataset import TraceDataset
 from data.exporters.safa_exporter import SafaExporter
 from data.keys.structure_keys import StructuredKeys
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
+from util.dataframe_util import DataFrameUtil
 
 STAGES = ["train", "val", "eval"]
 
 
-class CreateSourceSplits(AbstractJob):
+class CreateSourceSplitsJob(AbstractJob):
     """
     Split dataset by source and export splits as structured datasets.
     """
@@ -33,8 +38,6 @@ class CreateSourceSplits(AbstractJob):
         self.export_path = export_path
         self.splits = splits
         self.artifact_type = artifact_type
-        self.artifact_df = None
-        self.layer_mapping_df = None
 
     def _run(self) -> JobResult:
         """
@@ -42,12 +45,11 @@ class CreateSourceSplits(AbstractJob):
         :return: JobResult containing empty message.
         """
         trace_dataset = self.trace_dataset_creator.create()
-        self.artifacts_df = self.trace_dataset_creator.artifact_df
-        self.layer_mapping_df = self.trace_dataset_creator.layer_mapping_df
-        types_defined = list(self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value].unique())
+        types_defined = list(trace_dataset.artifact_df[StructuredKeys.Artifact.LAYER_ID.value].unique())
         assert self.artifact_type in types_defined, f"{self.artifact_type} is not in: {types_defined}"
 
-        target_artifacts = self.artifacts_df[self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type]
+        target_artifacts = trace_dataset.artifact_df[
+            trace_dataset.artifact_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type]
         target_ids = list(target_artifacts.index)
 
         val_total = self.splits[0] + self.splits[1]
@@ -60,7 +62,8 @@ class CreateSourceSplits(AbstractJob):
 
         return JobResult.from_dict({"status": "ok"})
 
-    def create_splits(self, split_artifact_id_batches, trace_dataset, type_artifact_ids) -> None:
+    def create_splits(self, split_artifact_id_batches: List[List], trace_dataset: TraceDataset,
+                      type_artifact_ids: List[Union[str, int]]) -> None:
         """
         Creates each split by filtering only selected artifacts.
         :param split_artifact_id_batches: Batches containing artifact ids to target in each split.
@@ -72,14 +75,14 @@ class CreateSourceSplits(AbstractJob):
             all_ids = set(type_artifact_ids)
             other_ids = all_ids - set(split_ids)
 
-            split_artifact_ids_mask = self.artifact_df.index.isin(other_ids)
-            layer_mask = self.artifacts_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type
-            split_artifact_df = self.artifacts_df[~(split_artifact_ids_mask & layer_mask)]
-            split_links = {trace.id: trace for trace in
-                           list(filter(lambda t: t.source not in other_ids and t.target not in other_ids,
-                                       trace_dataset.links.values()))}
-
-            exporter = SafaExporter()
+            split_artifact_ids_mask = trace_dataset.artifact_df.index.isin(other_ids)
+            layer_mask = trace_dataset.artifact_df[StructuredKeys.Artifact.LAYER_ID.value] == self.artifact_type
+            split_artifact_df = trace_dataset.artifact_df[~(split_artifact_ids_mask & layer_mask)]
+            split_trace_df = DataFrameUtil.filter_df_by_row(trace_dataset.trace_df,
+                                                            lambda t: t[TraceKeys.SOURCE.value] not in other_ids
+                                                                      and t[TraceKeys.TARGET.value] not in other_ids)
             export_path = os.path.join(self.export_path, f"{stage}")
-            os.makedirs(export_path, exist_ok=True)
-            exporter.export(export_path, split_links, split_artifact_df, self.layer_mapping_df)
+            dataset = TraceDataset(ArtifactDataFrame(split_artifact_df), TraceDataFrame(split_trace_df),
+                                   LayerDataFrame(trace_dataset.layer_mapping_df))
+            exporter = SafaExporter(export_path, dataset=dataset)
+            exporter.export()

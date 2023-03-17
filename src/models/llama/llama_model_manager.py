@@ -41,7 +41,7 @@ class LLaMAModelManager(ModelManager):
         :return: the PreTrainedModel object
         """
         if self._config is None:
-            self._config = LLaMAConfig.from_pretrained(self.model_path)
+            self._config = LLaMAConfig.from_pretrained("decapoda-research/llama-7b-hf")
         return self._config
 
     def get_tokenizer(self) -> LLaMATokenizer:

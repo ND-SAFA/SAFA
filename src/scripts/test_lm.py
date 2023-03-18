@@ -32,14 +32,12 @@ if __name__ == "__main__":
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     args = TrainerArgs("~/output/test_lm")
-    trainer = Trainer(model=model, args=args, data_collator=data_collator)
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)
-    test_dataset = dataset["test"]["text"]
-    tokenized_dataset = tokenizer(test_dataset, padding="max_length", truncation=True)
+    trainer = Trainer(model=model, args=args, data_collator=data_collator, eval_dataset=dataset["test"])
 
     # Predict
-    outputs = trainer.predict(tokenized_dataset)
+    outputs = trainer.predict()
     response = outputs.predictions
     print("Predictions: \n", response)

@@ -1,8 +1,11 @@
 import os
 import sys
 
+from datasets import load_dataset
 from dotenv import load_dotenv
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding, Trainer
+
+from train.trainer_args import TrainerArgs
 
 load_dotenv()
 
@@ -14,14 +17,15 @@ RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
     model_path = "gpt2-xl"
-    sentence_a = "The system should have a singleton database connection."
-    sentence_b = "The database should be initialized before allowing any endpoints to be served."
-    prompt = "A similarity score is a continuous value between 0 and 1 representing how similar two sentences are. What is " \
-             f"the similarity score between \"{sentence_a}\" and \"{sentence_b}\""
 
+    dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
-    inputs = tokenizer(prompt, return_tensors="pt").input_ids
-    model = AutoModelForCausalLM.from_pretrained(model_path)
-    outputs = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
+    model = AutoModelForSequenceClassification.from_pretrained(model_path)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    args = TrainerArgs("~/output/test_lm")
+
+    trainer = Trainer(model=model, args=args, data_collator=data_collator)
+
+    outputs = trainer.predict(dataset)
     response = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     print("Response: \n", response)

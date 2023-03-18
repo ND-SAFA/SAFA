@@ -18,5 +18,6 @@
       "eps": "auto",
       "weight_decay": "auto"
     }
-  }
+  },
+  "train_batch_size": 4
 }

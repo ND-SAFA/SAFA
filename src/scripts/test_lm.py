@@ -26,6 +26,6 @@ if __name__ == "__main__":
 
     trainer = Trainer(model=model, args=args, data_collator=data_collator)
 
-    outputs = trainer.predict(dataset)
+    outputs = trainer.predict(dataset["test"])
     response = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     print("Response: \n", response)

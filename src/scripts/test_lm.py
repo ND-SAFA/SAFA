@@ -31,7 +31,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    args = TrainerArgs("~/output/test_lm")
+    args = TrainerArgs("~/output/test_lm", deepspeed=os.path.expanduser("~/tgen/deepspeed.json"))
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)

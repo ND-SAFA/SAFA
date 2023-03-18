@@ -5,8 +5,6 @@ from datasets import load_dataset
 from dotenv import load_dotenv
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding, Trainer
 
-from train.trainer_args import TrainerArgs
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -16,6 +14,8 @@ sys.path.append(ROOT_PATH)
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
+    from train.trainer_args import TrainerArgs
+
     model_path = "gpt2-xl"
 
     dataset = load_dataset("rotten_tomatoes")

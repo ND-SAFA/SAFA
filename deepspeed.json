@@ -2,27 +2,21 @@
   "zero_optimization": {
     "stage": 3,
     "offload_optimizer": {
-      "device": "nvme",
-      "nvme_path": "/dev/xvda"
+      "device": "cpu",
+      "pin_memory": true
     },
     "offload_param": {
-      "device": "nvme",
-      "nvme_path": "/dev/xvda"
+      "device": "cpu",
+      "pin_memory": true
     }
-  },
-  "fp16": {
-    "enabled": true
   },
   "optimizer": {
     "type": "AdamW",
     "params": {
-      "lr": 0.001,
-      "betas": [
-        0.8,
-        0.999
-      ],
-      "eps": 1e-8,
-      "weight_decay": 3e-7
+      "lr": "auto",
+      "betas": "auto",
+      "eps": "auto",
+      "weight_decay": "auto"
     }
   }
 }

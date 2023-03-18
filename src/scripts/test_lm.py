@@ -26,7 +26,7 @@ if __name__ == "__main__":
     from constants import PROJ_PATH
 
     model_path = "gpt2-xl"
-    # model_path = "hf-internal-testing/tiny-random-bert"
+    model_path = "hf-internal-testing/tiny-random-bert"
     # Construct objects
     dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -34,6 +34,7 @@ if __name__ == "__main__":
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
     args = TrainerArgs("~/output/test_lm", deepspeed=deepspeed_path)
+    args.__post_init__()
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)

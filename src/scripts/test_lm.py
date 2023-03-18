@@ -26,7 +26,7 @@ if __name__ == "__main__":
     from constants import PROJ_PATH
 
     model_path = "gpt2-xl"
-    model_path = "hf-internal-testing/tiny-random-bert"
+    # model_path = "hf-internal-testing/tiny-random-bert"
     # Construct objects
     dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)

@@ -35,9 +35,8 @@ if __name__ == "__main__":
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)
-    trainer = Trainer(model=model, args=args, data_collator=data_collator, eval_dataset=dataset["test"])
-
+    trainer = Trainer(model=model, args=args, data_collator=data_collator)
     # Predict
-    outputs = trainer.predict()
+    outputs = trainer.predict(dataset["test"])
     response = outputs.predictions
     print("Predictions: \n", response)

@@ -13,7 +13,7 @@ sys.path.append(ROOT_PATH)
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
-    model_path = "nvidia/nemo-megatron-gpt-5B"
+    model_path = "gpt2-xl"
     sentence_a = "The system should have a singleton database connection."
     sentence_b = "The database should be initialized before allowing any endpoints to be served."
     prompt = "A similarity score is a continuous value between 0 and 1 representing how similar two sentences are. What is " \

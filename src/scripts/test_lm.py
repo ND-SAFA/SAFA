@@ -25,7 +25,8 @@ if __name__ == "__main__":
     args = TrainerArgs("~/output/test_lm")
 
     trainer = Trainer(model=model, args=args, data_collator=data_collator)
-
-    outputs = trainer.predict(dataset["test"])
+    test_dataset = dataset["test"]["textx"]
+    tokenized_dataset = tokenizer(test_dataset, padding="max_length", truncation=True)
+    outputs = trainer.predict(tokenized_dataset)
     response = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     print("Response: \n", response)

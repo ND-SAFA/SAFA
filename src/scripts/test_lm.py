@@ -13,20 +13,33 @@ sys.path.append(ROOT_PATH)
 
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
+
+def add_padding_token(tokenizer, config):
+    config.pad_token_id = -1 if config.pad_token_id is None else config.pad_token_id
+    vocab = tokenizer.get_vocab()
+    vocab_tokens, vocab_indices = list(vocab.keys()), list(vocab.values())
+    tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
+
+
 if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
 
     model_path = "gpt2-xl"
 
+    # Construct objects
     dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     args = TrainerArgs("~/output/test_lm")
-
     trainer = Trainer(model=model, args=args, data_collator=data_collator)
+
+    # Prepare dataset
+    add_padding_token(tokenizer, model.config)
     test_dataset = dataset["test"]["text"]
     tokenized_dataset = tokenizer(test_dataset, padding="max_length", truncation=True)
+
+    # Predict
     outputs = trainer.predict(tokenized_dataset)
-    response = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-    print("Response: \n", response)
+    response = outputs.predictions
+    print("Predictions: \n", response)

@@ -23,6 +23,7 @@ def add_padding_token(tokenizer, config):
 
 if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
+    from constants import PROJ_PATH
 
     model_path = "gpt2-xl"
     # model_path = "hf-internal-testing/tiny-random-bert"
@@ -31,7 +32,8 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForSequenceClassification.from_pretrained(model_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    args = TrainerArgs("~/output/test_lm", deepspeed=os.path.expanduser("~/tgen/deepspeed.json"))
+    deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
+    args = TrainerArgs("~/output/test_lm", deepspeed=deepspeed_path)
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)

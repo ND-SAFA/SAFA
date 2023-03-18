@@ -25,7 +25,7 @@ if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
 
     model_path = "gpt2-xl"
-    model_path = "hf-internal-testing/tiny-random-bert"
+    # model_path = "hf-internal-testing/tiny-random-bert"
     # Construct objects
     dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -35,9 +35,16 @@ if __name__ == "__main__":
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)
-    trainer = Trainer(model=model, args=args, data_collator=data_collator)
+
+
+    def preprocess_function(examples):
+        return tokenizer(examples["text"], truncation=True)
+
+
+    tokenized_dataset = dataset["train"].map(preprocess_function, batched=True)
+    trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=tokenized_dataset)
 
     # Predict
-    outputs = trainer.train(dataset["train"])
+    outputs = trainer.train()
     response = outputs.predictions
     print("Predictions: \n", response)

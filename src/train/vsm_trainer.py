@@ -7,13 +7,14 @@ from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
+from transformers.trainer_utils import PredictionOutput
 
 from constants import VSM_THRESHOLD_DEFAULT
 from data.dataframes.artifact_dataframe import ArtifactKeys
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from train.itrainer import iTrainer
 from train.metrics.metrics_manager import MetricsManager
 from train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -121,20 +122,15 @@ class VSMTrainer(iTrainer):
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target
 
-    def calculate_similarity_matrix_from_term_frequencies(self, dataset: TraceDataset) -> List[float]:
+    @staticmethod
+    def calculate_similarity_matrix_from_term_frequencies(tf_source: csr_matrix, tf_target: csr_matrix) -> SimilarityMatrix:
         """
         Calculates the similarity matrix used for predicting traces from the term frequencies of the sources and targets
         :param tf_source: The term frequencies of the sources
         :param tf_target: The term frequencies of the targets
         :return: The similarity matrix where each cell contains the similarity of the corresponding source (row) and target (col)
         """
-        scores = []
-        for link in dataset.get_ordered_links():
-            source_vector = self.model.transform([link.source.token])
-            target_vector = self.model.transform([link.target.token])
-            score = 1 - pairwise_distances(source_vector, Y=target_vector, metric="cosine", n_jobs=-1).item()
-            scores.append(score)
-        return scores
+        return 1 - pairwise_distances(tf_source, Y=tf_target, metric="cosine", n_jobs=-1)
 
     @staticmethod
     def get_raw_sources_and_targets(dataset: TraceDataset) -> Tuple[pd.Series, pd.Series, List[Tuple[str, str]]]:

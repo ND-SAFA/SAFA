@@ -242,8 +242,8 @@ class KalTrainer(TraceTrainer):
         :param model: The model used to initialize the optimizer.
         :return: None
         """
-        self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
-        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
+        self.optimizer = SupportedOptimizers.create(self.trainer_args.optim, model)
+        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.lr_scheduler_type, self.optimizer)
 
     def _select_random_epoch(self) -> Tuple[int, str]:
         """

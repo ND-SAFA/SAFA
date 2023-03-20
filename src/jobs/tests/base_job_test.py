@@ -12,7 +12,7 @@ from util.status import Status
 
 class BaseJobTest(BaseTraceTest, ABC):
 
-    @patch.object(ModelManager, '_ModelManager__load_model')
+    @patch.object(ModelManager, '_load_model')
     @patch.object(ModelManager, 'get_tokenizer')
     def _test_run_success(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
         load_model_mock.return_value = self.get_test_model()

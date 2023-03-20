@@ -73,6 +73,7 @@ class GLinkStore:
         self.add_artifacts_links(pulls.artifacts, LinkFinder.search_issue_links, GArtifactType.PULL)
         self.add_commits_to_pr(pulls.artifacts)
         self.add_artifacts_links(commits.artifacts, lambda commit: LinkFinder.search_links(commit.content), GArtifactType.COMMIT)
+        print("Hello")
 
     def get_source_types(self) -> List[GArtifactType]:
         """

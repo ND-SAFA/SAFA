@@ -22,7 +22,7 @@ GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Merge branch.*into.*",
                           "Merge branch.*of.*"]
 MIN_WORD_LENGTH = 5
-MIN_CODE_LENGTH = 5
+MIN_CODE_LENGTH = 3
 
 COMMIT_CLEANING_REGEX = {
     "Signed-off-by.+$": "",
@@ -143,6 +143,8 @@ class RepositoryExporter:
                     self.OBJ: entity_instructions[k][self.OBJ] + v[self.OBJ],
                     self.COL_ID: "trace"
                 }
+            else:
+                entity_instructions[k] = v
 
         entity_instructions[ISSUE2CODE_EXPORT_FILE] = {
             self.OBJ: self.__create_issue_2_code(self.commit2issue),

@@ -1,20 +1,19 @@
 from collections import Counter
-from typing import Dict, List, Set, Tuple, Type, Any
+from typing import Any, Dict, List, Set, Type
 
 import pandas as pd
-from tqdm import tqdm
 
 from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.supported_dataset_reader import SupportedDatasetReader
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
 from util.dict_util import ListUtil
@@ -22,6 +21,9 @@ from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from util.thread_util import ThreadUtil
+
+ArtifactType2Id = Dict[str, List[str]]
+Id2Artifact = Dict[str, pd.Series]
 
 
 class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
@@ -233,64 +235,19 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         valid_artifact_ids = set(artifact_df.index)
         missing_sources = []
         missing_targets = []
-
-        def verify_col(artifact_id_col: str) -> Tuple[List[str], pd.Series]:
-            artifact_ids = trace_df[artifact_id_col]
-            missing_ids = []
-            id_mask = []
-            for a_id in artifact_ids:
-                is_missing = a_id not in valid_artifact_ids
-                if is_missing:
-                    missing_ids.append(a_id)
-                id_mask.append(not is_missing)
-            return missing_ids, pd.Series(id_mask)
-
-        missing_sources, source_mask = verify_col(StructuredKeys.Trace.SOURCE)
-        missing_targets, target_mask = verify_col(StructuredKeys.Trace.TARGET)
+        for _, row in trace_df.iterrows():
+            source_id = row[StructuredKeys.Trace.SOURCE.value]
+            target_id = row[StructuredKeys.Trace.TARGET.value]
+            if source_id not in valid_artifact_ids:
+                missing_sources.append(source_id)
+            elif target_id not in valid_artifact_ids:
+                missing_targets.append(target_id)
+            else:
+                valid_traces.append(row.to_dict())
 
         TraceDatasetCreator.assert_missing_artifact_ids(missing_sources, max_missing_sources, "source")
         TraceDatasetCreator.assert_missing_artifact_ids(missing_targets, max_missing_targets, "target")
-
-        valid_traces = trace_df[source_mask & target_mask].reset_index()
-        return valid_traces
-
-    @staticmethod
-    def create_artifact_maps(artifact_df: pd.DataFrame) -> Tuple[ArtifactType2Id, Id2Artifact]:
-        """
-        Create mapping between artifact types and their associated artifacts and between artifact ids and their associated artifact.
-        :param artifact_df: The data frame containing artifact data.
-        :return: Map containing artifacts types and their associated artifacts.
-        """
-        artifact_type_2_id: ArtifactType2Id = UncasedDict()
-        id_2_artifact: Id2Artifact = UncasedDict()
-        for row in tqdm(artifact_df.to_dict("records"), desc="Creating artifact map"):
-            TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
-
-        artifact_type_summary = []
-        for artifact_type, artifact_ids in artifact_type_2_id.items():
-            artifact_type_summary.append(f"[{artifact_type.title()}: {len(artifact_ids)}]")
-        logger.info(",".join(artifact_type_summary))
-        return artifact_type_2_id, id_2_artifact
-
-    @staticmethod
-    def _add_artifact_to_maps(artifact_row: pd.Series, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact) -> Artifact:
-        """
-        If non-existent, creates artifact and adds it to artifact map.
-        :param artifact_row: The row in the artifact dataframe to create.
-        :param artifact_type_2_id: The map of type to artifact id.
-        :param id_2_artifact: The map between artifact ids and their associated artifact.
-        :return: Artifact created or retrieved if existent.
-        """
-        artifact_id: str = artifact_row[StructuredKeys.Artifact.ID]
-        artifact_type = artifact_row[StructuredKeys.Artifact.LAYER_ID]
-        if artifact_type not in artifact_type_2_id:
-            artifact_type_2_id[artifact_type] = []
-
-        if artifact_id not in id_2_artifact:
-            artifact_body = artifact_row[StructuredKeys.Artifact.BODY]
-            artifact_type_2_id[artifact_type].append(artifact_id)
-            id_2_artifact[artifact_id] = Artifact(artifact_id, artifact_body)
-        return id_2_artifact[artifact_id]
+        return TraceDataFrame(valid_traces)
 
     @staticmethod
     def assert_missing_artifact_ids(missing_artifact_ids: List[str], max_missing_allowed: int, label: str) -> None:

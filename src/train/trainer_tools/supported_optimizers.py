@@ -2,15 +2,15 @@ import torch
 from torch.optim import Optimizer
 from transformers import PreTrainedModel
 
-from util.supported_enum import SupportedEnum
 from util.enum_util import FunctionalWrapper
+from util.supported_enum import SupportedEnum
 
 
 class SupportedOptimizers(SupportedEnum):
     """
     Represents set of optimizers that can be selected from job configuration.
     """
-    ADAM = FunctionalWrapper(torch.optim.Adam)
+    ADAMW_HF = FunctionalWrapper(torch.optim.Adam)
 
     @classmethod
     def create(cls, optimizer_name: str, model: PreTrainedModel, **kwargs) -> Optimizer:

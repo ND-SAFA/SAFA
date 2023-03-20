@@ -1,15 +1,16 @@
 {
   "steps": [
     {
-      "jobs": [
+            "jobs": [
         {
-          "object_type": "LLAMA_TRAIN",
+          "object_type": "TRAIN",
           "job_args": {
             "random_seed": 812
           },
           "model_manager": {
+            "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-65b-hf",
-            "model_task": "SEQUENCE_SIMILARITY"
+            "model_task": "SEQUENCE_CLASSIFICATION"
           },
           "trainer_args": {
             "evaluation_strategy": "steps",

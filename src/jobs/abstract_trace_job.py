@@ -9,6 +9,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.create_datasets_job import CreateDatasetsJob
 from models.model_manager import ModelManager
+from models.supported_model_manager import SupportedModelManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
@@ -65,6 +66,17 @@ class AbstractTraceJob(AbstractJob, ABC):
         self._trainer = None
         if self.trainer_dataset_manager:  # push model job has not dataset
             self.trainer_dataset_manager.cleanup()
+
+    @classmethod
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        if ReflectionUtil.is_instance_or_subclass(abstract_class, ModelManager):
+            return SupportedModelManager
 
     @classmethod
     @overrides(BaseObject)

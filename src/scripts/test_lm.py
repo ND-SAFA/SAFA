@@ -4,9 +4,6 @@ import sys
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
 
-from util.logging.logger_config import LoggerConfig
-from util.logging.logger_manager import LoggerManager
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -29,6 +26,8 @@ if __name__ == "__main__":
     from data.creators.trace_dataset_creator import TraceDatasetCreator
     from data.readers.hub_project_reader import HubProjectReader
     from models.model_manager import ModelManager
+    from util.logging.logger_config import LoggerConfig
+    from util.logging.logger_manager import LoggerManager
 
     # import deepspeed
     #

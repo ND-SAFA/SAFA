@@ -1,9 +1,12 @@
 import os
 import sys
 
-from datasets import load_dataset
 from dotenv import load_dotenv
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding, Trainer
+from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
+
+from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.readers.hub_project_reader import HubProjectReader
+from models.model_manager import ModelManager
 
 load_dotenv()
 
@@ -29,11 +32,20 @@ if __name__ == "__main__":
     #
     # deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
-    # model_path = "hf-internal-testing/tiny-random-bert"
+    dataset_name = "cm1"
+
+    # Model
+    model_manager = ModelManager(model_path)
+
+    # Dataset
+    project_reader = HubProjectReader(dataset_name)
+    trace_dataset_creator = TraceDatasetCreator(project_reader)
+    trace_dataset = trace_dataset_creator.create()
+    dataset = trace_dataset.to_hf_dataset(model_manager)
+
     # Construct objects
-    dataset = load_dataset("rotten_tomatoes")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForSequenceClassification.from_pretrained(model_path)
+    model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
     args = TrainerArgs("~/output/test_lm", deepspeed=deepspeed_path)
@@ -47,7 +59,7 @@ if __name__ == "__main__":
         return tokenizer(examples["text"], truncation=True)
 
 
-    tokenized_dataset = dataset["train"].map(preprocess_function, batched=True)
+    tokenized_dataset = dataset.map(preprocess_function, batched=True)
     trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=tokenized_dataset)
 
     # Predict

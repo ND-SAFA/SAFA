@@ -16,9 +16,6 @@
           "splits": [
             0.10,
             0.30
-          ],
-          "artifact_type": [
-            "ARTIFACT_TYPE"
           ]
         }
       ]

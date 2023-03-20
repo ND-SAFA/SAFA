@@ -34,17 +34,18 @@ class Experiment(BaseObject):
         self.experiment_index = experiment_id
         self.experiment_index = experiment_id
 
-    def run(self):
+    def run(self) -> List[AbstractJob]:
         """
         Runs all steps in the experiment
         :return: None
         """
-        jobs_for_undetermined_vals = None
+        jobs_for_undetermined_vals = []
         for i, step in enumerate(self.steps):
             step_output_dir = self.get_step_output_dir(self.experiment_index, i)
-            jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
+            jobs_for_undetermined_vals.extend(step.run(step_output_dir, jobs_for_undetermined_vals))
             if step.status == Status.FAILURE:
                 break
+        return jobs_for_undetermined_vals
 
     def get_all_jobs(self) -> List[AbstractJob]:
         """

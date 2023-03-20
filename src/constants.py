@@ -26,6 +26,7 @@ BASE_EXPERIMENT_NAME = "base_experiment"
 BEST_MODEL_NAME = "best"
 EXPERIMENT_ID_DEFAULT = 0
 OUTPUT_FILENAME = "output.json"
+STAGES = ["train", "val", "eval"]
 
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
@@ -78,11 +79,13 @@ DELETE_TEST_OUTPUT = os.getenv("DELETE_TEST_OUTPUT", "true").capitalize() == "Tr
 MNT_DIR = os.environ.get('MNT_DIR', "")
 
 # -------------- PATHS --------------
-PROJ_PATH = dirname(dirname(dirname(abspath(__file__))))
+PROJ_PATH = dirname(dirname(abspath(__file__)))
+RES_PATH = os.path.join(PROJ_PATH, "res")
+JAVA_KEYWORDS_PATH = os.path.join(RES_PATH, "JavaReservedKeywords.txt")
 
 # -------------- SCRIPT PATHS --------------
-METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
-DISPLAY_METRICS = ["map", "f2"]
+METRIC_NAMES = ["avg_true_links", "lag", "f2", "f1", "precision@1", "precision@2", "precision@3", "map", "ap", "precision_at_recall"]
+DISPLAY_METRICS = ["avg_true_links", "lag", "f2", "map", "precision_at_recall"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
                             "trainer_dataset_manager", "trainer_args", "dataset_creator"]

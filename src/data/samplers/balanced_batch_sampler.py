@@ -1,10 +1,10 @@
 import random
+from typing import Any, Dict, Iterator, List, Tuple
 
 from torch.utils.data.sampler import Sampler
-from typing import Iterator, List, Tuple, Any, Dict
 
 from data.datasets.data_key import DataKey
-from util.general_util import ListUtil
+from util.dict_util import ListUtil
 
 
 class BalancedBatchSampler(Sampler[int]):

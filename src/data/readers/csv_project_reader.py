@@ -13,7 +13,6 @@ from data.readers.abstract_project_reader import AbstractProjectReader
 from util.dataframe_util import DataFrameUtil
 from util.enum_util import EnumDict
 from util.file_util import FileUtil
-from util.general_util import ListUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
 

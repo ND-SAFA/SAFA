@@ -1,4 +1,8 @@
+from typing import Dict, List
+
+from data.github.gartifacts.gartifact_set import GArtifactSet
 from data.github.gartifacts.gartifact_type import GArtifactType
+from data.github.gtraces.glink import GLink
 from data.github.gtraces.glink_store import GLinkStore
 
 
@@ -35,3 +39,40 @@ class GLinkProcessor:
         linked_pulls = linked_artifact_ids[GArtifactType.PULL]
         linked_commits = linked_artifact_ids[GArtifactType.COMMIT]
         return linked_issues, linked_pulls, linked_commits
+
+    @staticmethod
+    def get_transitive_traces(level_1: GArtifactSet[GLink], level_2: GArtifactSet[GLink]):
+        """
+        Creates transitive traces between target layer of level 1 and source of level 2.
+        :param level_1: Set of trace links in upper level of hierarchy.
+        :param level_2: Set of trace links in lower level of hierarchy.
+        :return: Set of transitive trace links.
+        """
+
+        def add_link(store, link: GLink):
+            if link.target in store:
+                store[link.target].append(link)
+            else:
+                store[link.target] = [link]
+
+        level_1_store: Dict[str, List[GLink]] = {}
+
+        for t in level_1:
+            add_link(level_1_store, t)
+
+        transitive_traces = []
+        for t2 in level_2:
+            connecting_traces: List[GLink] = level_1_store.get(t2.source, [])
+            for t in connecting_traces:
+                transitive_traces.append(GLink(t.source, t2.target))
+        return GArtifactSet(transitive_traces, GArtifactType.LINK)
+
+    @staticmethod
+    def flip(link_set: GArtifactSet[GLink]):
+        """
+        Creates artifact set with reverse direction of link.
+        :param link_set: Set of links.
+        :return: Artifact set of flipped links.
+        """
+        flipped_set = list(map(lambda t: GLink(t.target, t.source), link_set))
+        return GArtifactSet(flipped_set, GArtifactType.LINK)

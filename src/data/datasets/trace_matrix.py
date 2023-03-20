@@ -6,8 +6,6 @@ from typing import Callable, Iterable, List, Union
 import numpy as np
 
 from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-import pandas as pd
-
 from util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
@@ -30,6 +28,7 @@ class TraceMatrix:
         self.query_matrix = {}
         self.source_ids = []
         self.labels = []
+        self.entries = []
         self.scores = predicted_scores
         self._fill_trace_matrix(trace_df, predicted_scores, link_ids)
         if randomize:
@@ -102,6 +101,7 @@ class TraceMatrix:
             self.source_ids.append(link[TraceKeys.SOURCE])
         self.query_matrix[link[TraceKeys.SOURCE]].links.append(link)
         self.labels.append(link[TraceKeys.LABEL])
+        self.entries.append({"source": link[TraceKeys.SOURCE], "target": link[TraceKeys.TARGET]})
         if pred is not None:
             self.query_matrix[link[TraceKeys.SOURCE]].preds.append(pred)
 

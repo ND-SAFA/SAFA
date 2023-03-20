@@ -1,9 +1,12 @@
 from typing import Dict, List
 
-from data.processing.abstract_data_processing_step import ProcessingOrder, AbstractDataProcessingStep
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class ManualReplaceWordsStep(AbstractDataProcessingStep):
+    """
+    Performs replacements based on word matchings.
+    """
     ORDER = ProcessingOrder.NEXT
     word_replace_mappings = None
 

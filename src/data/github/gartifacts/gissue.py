@@ -1,9 +1,7 @@
-import re
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
 
 from github import Issue
-from nltk import word_tokenize
 
 from data.github.abstract_github_entity import AbstractGithubArtifact
 from data.github.gartifacts.gartifact_type import GArtifactType
@@ -47,13 +45,8 @@ class GIssue(AbstractGithubArtifact):
         :param kwargs: Additional parameters for modifying export process.
         :return: Dictionary entry.
         """
-        if self.body is None:
-            self.body = ""
-        # TODO : Merge  into basic data cleaning
-        self.body = re.sub("<!-.*->", "", self.body)
-        self.body = re.sub("```.*```", "", self.body, flags=re.DOTALL)
-        self.body = " ".join(word_tokenize(self.body))
-        return {"id": self.issue_id, "content": " ".join([self.title, self.body])}
+        texts = [t for t in [self.title, self.body] if t is not None]
+        return {"id": self.issue_id, "content": " ".join(texts)}
 
     @overrides(AbstractGithubArtifact)
     def get_id(self) -> str:
@@ -106,3 +99,12 @@ class GIssue(AbstractGithubArtifact):
                       comments,
                       issue.created_at,
                       issue.closed_at)
+
+    def clean_content(self, cleaner: Callable[[str], str]) -> None:
+        """
+        Cleans the issue title and body.
+        :param cleaner: The cleaning function to perform over content.
+        :return: None
+        """
+        self.title = cleaner(self.title)
+        self.body = cleaner(self.body)

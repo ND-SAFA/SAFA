@@ -13,6 +13,7 @@ from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trace_output.stage_eval import Metrics, TracePredictions
+from train.trace_output.trace_prediction_output import TracePredictionEntry
 
 warnings.filterwarnings('ignore')
 ArtifactQuery = Dict[str, List[TraceDataFrame]]
@@ -45,8 +46,7 @@ class MetricsManager:
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
-        trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                                RecallAtThresholdMetric.name]
+        trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
         scores = self.trace_matrix.scores
         labels = self.trace_matrix.labels
         for metric_path in metric_paths:
@@ -66,6 +66,21 @@ class MetricsManager:
         :return: Returns the similarity scores of the prediction output.
         """
         return self.trace_matrix.scores
+
+    def get_trace_predictions(self) -> List[TracePredictionEntry]:
+        """
+        Constructs trace predictions for trace matrix.
+        :return: Trace predictions used in evaluation.
+        """
+        entries = []
+        for score, label, source_target_pair in zip(self.trace_matrix.scores, self.trace_matrix.labels, self.trace_matrix.entries):
+            entry: TracePredictionEntry = {
+                **source_target_pair,
+                "score": score,
+                "label": label
+            }
+            entries.append(entry)
+        return entries
 
     @staticmethod
     def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:

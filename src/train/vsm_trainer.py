@@ -1,3 +1,4 @@
+import time
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -6,7 +7,6 @@ from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
-from transformers.trainer_utils import PredictionOutput
 
 from constants import VSM_THRESHOLD_DEFAULT
 from data.dataframes.artifact_dataframe import ArtifactKeys
@@ -16,11 +16,11 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from train.itrainer import iTrainer
 from train.metrics.metrics_manager import MetricsManager
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from util.override import overrides
-import time
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
@@ -38,6 +38,8 @@ class VSMTrainer(iTrainer):
         :param vectorizer: vectorizer for assigning weights to words, must be one of sklearn.text.extraction
         :param metrics: A list of metric names to use for evaluation
         """
+        if metrics is None:
+            metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics
@@ -119,15 +121,20 @@ class VSMTrainer(iTrainer):
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target
 
-    @staticmethod
-    def calculate_similarity_matrix_from_term_frequencies(tf_source: csr_matrix, tf_target: csr_matrix) -> SimilarityMatrix:
+    def calculate_similarity_matrix_from_term_frequencies(self, dataset: TraceDataset) -> List[float]:
         """
         Calculates the similarity matrix used for predicting traces from the term frequencies of the sources and targets
         :param tf_source: The term frequencies of the sources
         :param tf_target: The term frequencies of the targets
         :return: The similarity matrix where each cell contains the similarity of the corresponding source (row) and target (col)
         """
-        return 1 - pairwise_distances(tf_source, Y=tf_target, metric="cosine", n_jobs=-1)
+        scores = []
+        for link in dataset.get_ordered_links():
+            source_vector = self.model.transform([link.source.token])
+            target_vector = self.model.transform([link.target.token])
+            score = 1 - pairwise_distances(source_vector, Y=target_vector, metric="cosine", n_jobs=-1).item()
+            scores.append(score)
+        return scores
 
     @staticmethod
     def get_raw_sources_and_targets(dataset: TraceDataset) -> Tuple[pd.Series, pd.Series, List[Tuple[str, str]]]:

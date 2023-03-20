@@ -1,31 +1,41 @@
 import inspect
-from enum import Enum
-from typing import Type
+from typing import List, Type
 
 from datasets import Metric, list_metrics
 
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
-from train.metrics.calculate_threshold import CalculateThreshold
+from train.metrics.average_true_links_metrics import AverageTrueLinksMetric
 from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
 from train.metrics.f1_metric import FMetric
+from train.metrics.lag_metric import LagMetric
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.map_metric import MapMetric
-from train.metrics.mrr_metric import MRRMetric
+from train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
+from util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"
 
 
-class SupportedTraceMetric(Enum):
-    MAP_AT_K = MapAtKMetric
+class SupportedTraceMetric(SupportedEnum):
+    """
+    Enumerates trace metrics.
+    """
+    LAG = LagMetric
     MAP = MapMetric
     PRECISION = PrecisionAtKMetric
-    RECALL = RecallAtThresholdMetric
-    THRESHOLD = CalculateThreshold
+    PRECISION_AT_RECALL = PrecisionAtRecallMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
-    MRR = MRRMetric
+    AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     F = FMetric
+
+    @staticmethod
+    def get_query_metrics() -> List[str]:
+        """
+        :return: Returns the metrics that are applied on a per query basis.
+        """
+        return [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
+                PrecisionAtRecallMetric.name, LagMetric.name, AverageTrueLinksMetric.name]
 
 
 def get_metric_path(metric_name: str) -> str:

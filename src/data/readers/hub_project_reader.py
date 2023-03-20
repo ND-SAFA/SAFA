@@ -2,6 +2,7 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from data.hub.abstract_hub_id import AbstractHubId
 from data.hub.supported_datasets import SupportedDatasets
 from data.hub.trace_dataset_downloader import TraceDatasetDownloader
 from data.readers.abstract_project_reader import AbstractProjectReader
@@ -16,6 +17,7 @@ class HubProjectReader(AbstractProjectReader):
         """
         Initializes reader for supported project.
         :param name: Name of supported project.
+        :param kwargs: Additional parameters passed to project identifiers.
         """
         super().__init__()
         self.project_name = name
@@ -26,10 +28,12 @@ class HubProjectReader(AbstractProjectReader):
         """
         :return: Reads the dataframes of the project.
         """
-        descriptor = SupportedDatasets.get_value(self.project_name)
+        descriptor: AbstractHubId = SupportedDatasets.get_value(self.project_name)(**self.kwargs)
         downloader = TraceDatasetDownloader(descriptor)
-        project_path = downloader.download()
-        self.project_reader = descriptor.get_project_reader()(project_path, **self.kwargs)
+        data_dir = downloader.download()
+        project_reader_class = descriptor.get_project_reader()
+        project_path = descriptor.get_project_path(data_dir)
+        self.project_reader = project_reader_class(project_path)
         return self.project_reader.read_project()
 
     def get_project_name(self) -> str:
@@ -43,3 +47,6 @@ class HubProjectReader(AbstractProjectReader):
         :return: Returns the overrides of the project reader.
         """
         return self.project_reader.get_overrides()
+
+    def should_generate_negative_links(self) -> bool:
+        return self.project_reader.should_generate_negative_links()

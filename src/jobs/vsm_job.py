@@ -1,12 +1,12 @@
 from typing import List, Optional
 
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
 from train.itrainer import iTrainer
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from train.vsm_trainer import VSMTrainer
@@ -17,14 +17,17 @@ class VSMJob(AbstractTraceJob):
     Handles VSM training + prediction
     """
 
-    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager, metrics: List[str] = None):
+    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager,
+                 metrics: List[str] = None):
         """
         Handles VSM training + prediction
         :param job_args: the arguments for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param metrics: List of metric names to use for evaluation
         """
-        super().__init__(job_args=job_args, model_manager=None, trainer_dataset_manager=trainer_dataset_manager,
+        if metrics is None:
+            metrics = SupportedTraceMetric.get_keys()
+        super().__init__(job_args=job_args, model_manager=ModelManager("VSM"), trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=TrainerArgs(output_dir=job_args.output_dir))
         self.metrics = metrics
         self._trainer: Optional[VSMTrainer] = None

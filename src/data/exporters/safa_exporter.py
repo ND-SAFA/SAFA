@@ -1,7 +1,8 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 
 import pandas as pd
+from tqdm import tqdm
 
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
@@ -95,7 +96,7 @@ class SafaExporter(AbstractDatasetExporter):
                 "Source": source_type,
                 "Target": target_type
             }
-            trace_df.to_csv(export_file_path, index=False)
+            trace_df.to_csv(export_file_path, index=False, encoding="utf-8")
 
     def create_trace_df_for_layer(self, source_type, target_type) -> pd.DataFrame:
         """

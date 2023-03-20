@@ -5,13 +5,9 @@ import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 
-from data.datasets.trace_matrix import TraceMatrix
 from data.dataframes.trace_dataframe import TraceDataFrame
-from train.metrics.map_at_k_metric import MapAtKMetric
-from train.metrics.map_metric import MapMetric
-from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
-from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
+from data.datasets.trace_matrix import TraceMatrix
+from train.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
 from train.trace_output.stage_eval import Metrics, TracePredictions
 from train.trace_output.trace_prediction_output import TracePredictionEntry
 

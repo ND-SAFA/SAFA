@@ -32,7 +32,7 @@ class TestModelManager(BaseTest):
             for param in layer:
                 self.assertFalse(param.requires_grad)
 
-    @patch.object(ModelManager, '_ModelManager__load_model')
+    @patch.object(ModelManager, '_load_model')
     def test_get_model(self, load_model_mock: mock.MagicMock):
         load_model_mock.return_value = PreTrainedModel
         test_generator = self.get_model_manager()

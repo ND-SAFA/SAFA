@@ -2,7 +2,7 @@ from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union, get_origin, get_args, Optional
 
 from typeguard import check_type
 from typing_extensions import get_args
@@ -198,7 +198,22 @@ class BaseObject(ABC):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
+        abstract_class = cls._get_base_class(abstract_class)
         return get_enum_from_name(cls._get_child_enum_class(abstract_class, child_class_name), child_class_name).value
+
+    @staticmethod
+    def _get_base_class(typing_obj: Any) -> Optional[Type["BaseObject"]]:
+        """
+        Gets the base object child class nested within a typing object
+        :param typing_obj: A typing object
+        :return: The base object child class
+        """
+        children = get_args(typing_obj)
+        while len(children) > 0:
+            if ReflectionUtil.is_instance_or_subclass(children[0], BaseObject):
+                return children[0]
+            children = get_args(children[0])
+        return typing_obj
 
     @classmethod
     def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:

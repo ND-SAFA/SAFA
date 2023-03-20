@@ -17,6 +17,8 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -26,6 +28,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,6 +37,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope("singleton")
 public class JobService {
+    /**
+     * Logger used for job services.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(JobService.class);
+
     /**
      * Repository for creating job entities in the database.
      */
@@ -180,20 +188,22 @@ public class JobService {
 
     public void executeJob(JobDbEntity jobDbEntity,
                            ServiceProvider serviceProvider,
-                           AbstractJob jobCreationThread) throws
+                           AbstractJob abstractJob) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         JobParameters jobParameters = new JobParametersBuilder()
             .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         try {
-            jobCreationThread.initJobData();
+            abstractJob.initJobData();
+            abstractJob.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
+            logger.info("Authentication in job has been set.");
         } catch (Exception e) {
             e.printStackTrace();
             serviceProvider.getJobService().failJob(jobDbEntity);
             throw new SafaError("Failed to start job. %s", e.getMessage());
         }
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
-        jobLauncher.run(jobCreationThread, jobParameters);
+        jobLauncher.run(abstractJob, jobParameters);
     }
 }

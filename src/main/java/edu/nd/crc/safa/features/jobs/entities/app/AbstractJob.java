@@ -27,6 +27,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Responsible for finding methods corresponding to steps in job and running them
@@ -52,10 +54,15 @@ public abstract class AbstractJob implements Job {
      * List of step indices to skip.
      */
     List<Integer> skipSteps = new ArrayList<>();
+    /**
+     * The authentication to execute job with.
+     */
+    Authentication authentication;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
         this.serviceProvider = serviceProvider;
+        this.authentication = null;
     }
 
     /**
@@ -110,12 +117,26 @@ public abstract class AbstractJob implements Job {
     }
 
     /**
+     * Sets the authentication to perform the job with.
+     *
+     * @param authentication The authentication used to perform job.
+     */
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
+    }
+
+    /**
      * For job steps updating the job status as the steps progress.
      *
      * @param execution JobExecution used for restarting jobs (WIP).
      */
     @Override
     public void execute(@NonNull JobExecution execution) {
+        if (this.authentication != null) {
+            SecurityContextHolder.getContext().setAuthentication(this.authentication);
+            log.info("Security context has been set in thread.");
+        }
+
         JobService jobService = this.serviceProvider.getJobService();
         NotificationService notificationService = this.serviceProvider.getNotificationService();
 
@@ -135,7 +156,7 @@ public abstract class AbstractJob implements Job {
                 notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
 
                 // Pre-step
-                log.info("Running job step " + stepImplementation.method.getName());
+                log.info(String.format("Running job step %s.", stepImplementation.method.getName()));
                 invokeStep(stepImplementation, logger);
 
                 // Post-step
@@ -153,12 +174,12 @@ public abstract class AbstractJob implements Job {
      * Runs a step, giving it the job logger if necessary.
      *
      * @param stepImplementation The step to run
-     * @param logger The logger to give to the step if it wants it
+     * @param logger             The logger to give to the step if it wants it
      * @throws InvocationTargetException If there is a problem invoking the method
-     * @throws IllegalAccessException If there is a problem invoking the method
+     * @throws IllegalAccessException    If there is a problem invoking the method
      */
     private void invokeStep(JobStepImplementation stepImplementation, JobLogger logger)
-            throws InvocationTargetException, IllegalAccessException {
+        throws InvocationTargetException, IllegalAccessException {
 
         Method method = stepImplementation.method;
 
@@ -171,11 +192,11 @@ public abstract class AbstractJob implements Job {
                 method.invoke(this, logger);
             } else {
                 throw new SafaError("Unsure how to invoke method %s of %s. Parameter 1 is not a JobLogger",
-                        method.getName(), method.getDeclaringClass().getName());
+                    method.getName(), method.getDeclaringClass().getName());
             }
         } else {
             throw new SafaError("Unsure how to invoke method %s of %s. Too many parameters found",
-                    method.getName(), method.getDeclaringClass().getName());
+                method.getName(), method.getDeclaringClass().getName());
         }
     }
 

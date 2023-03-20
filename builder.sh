@@ -50,6 +50,7 @@ function build {
 }
 
 function run {
+  setGoogleCredentials
   java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
   return $?
 }

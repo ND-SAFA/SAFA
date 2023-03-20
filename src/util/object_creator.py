@@ -16,7 +16,7 @@ from models.llama.llama_model_manager import LLaMAModelManager
 from models.model_manager import ModelManager
 from models.supported_model_manager import SupportedModelManager
 from testres.base_test import BaseTest
-from testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR, TEST_MODELS_DIR
+from testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from testres.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
 from util.definition_creator import DefinitionCreator
@@ -77,7 +77,7 @@ class ObjectCreator:
 
     llama_model_manager_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedModelManager.LLAMA.name,
-        "model_path": os.path.join(TEST_MODELS_DIR, "llama"),
+        "model_path": "kdearsty/llama-testing",
         "model_output_path": TEST_OUTPUT_DIR
     }
 

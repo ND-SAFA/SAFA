@@ -31,7 +31,7 @@ if __name__ == "__main__":
     #
     # deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
-    dataset_name = "cm1"
+    dataset_name = "drone"
 
     # Model
     model_manager = ModelManager(model_path)

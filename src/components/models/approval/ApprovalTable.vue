@@ -92,7 +92,6 @@ import {
   GroupableTable,
   MultiselectInput,
   TextButton,
-  FlexBox,
   AttributeChip,
 } from "@/components/common";
 import { TraceLinkApproval, TraceLinkDisplay } from "@/components/traceLink";

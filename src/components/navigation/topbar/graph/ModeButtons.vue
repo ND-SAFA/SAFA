@@ -1,7 +1,8 @@
 <template>
-  <q-btn-group flat class="q-mx-sm">
+  <q-btn-group flat class="q-mx-sm nav-mode-select">
     <text-button
       v-bind="buttonProps(options.tim)"
+      :hide-label="smallWindow"
       label="TIM"
       data-cy="button-nav-tim"
       icon="view-tim"
@@ -10,6 +11,7 @@
     <text-button
       v-bind="buttonProps(options.tree)"
       :disabled="isTreeDisabled"
+      :hide-label="smallWindow"
       label="Tree"
       data-cy="button-nav-tree"
       icon="view-tree"
@@ -17,6 +19,7 @@
     />
     <text-button
       v-bind="buttonProps(options.table)"
+      :hide-label="smallWindow"
       label="Table"
       data-cy="button-nav-table"
       icon="view-table"
@@ -25,6 +28,7 @@
     <text-button
       v-bind="buttonProps(options.delta)"
       :disabled="isDeltaDisabled"
+      :hide-label="smallWindow"
       label="Delta"
       data-cy="button-nav-delta"
       icon="view-delta"
@@ -45,7 +49,13 @@ export default {
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from "vue";
 import { GraphMode } from "@/types";
-import { appStore, deltaStore, documentStore, layoutStore } from "@/hooks";
+import {
+  appStore,
+  deltaStore,
+  documentStore,
+  layoutStore,
+  useScreen,
+} from "@/hooks";
 import { TextButton } from "@/components/common";
 
 const options = {
@@ -54,6 +64,8 @@ const options = {
   table: GraphMode.table,
   delta: GraphMode.delta,
 };
+
+const { smallWindow } = useScreen();
 
 const value = ref<GraphMode[]>([]);
 

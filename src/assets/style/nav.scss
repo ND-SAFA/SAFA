@@ -29,7 +29,8 @@
   }
 
   &.nav-version {
-    width: 120px;
+    width: 100px;
+    min-width: 100px;
   }
 }
 
@@ -42,6 +43,12 @@
 .nav-saving-icon {
   position: relative;
   right: 23px;
+}
+
+.nav-mode-select {
+  .q-btn--outline:before {
+    border-radius: 4px;
+  }
 }
 
 // Navigation - Sidebar

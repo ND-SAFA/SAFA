@@ -1,14 +1,15 @@
 import { ComputedRef, Ref, WritableComputedRef } from "vue";
+import { QVueGlobals, Screen } from "quasar/dist/types";
 import { TableColumn } from "@/types";
 
 /**
  * Defines a hook for using the app theme.
  */
-export interface ThemeHook<Theme> {
+export interface ThemeHook {
   /**
    * The current theme.
    */
-  theme: Theme;
+  theme: QVueGlobals;
   /**
    * Whether the app is in dark mode.
    */
@@ -19,6 +20,21 @@ export interface ThemeHook<Theme> {
    *        If none is given, the current mode is toggled.
    */
   toggleDarkMode(dark?: boolean): void;
+}
+
+/**
+ * Defines a hook for managing changes with the screen size.
+ */
+export interface ScreenHook {
+  /**
+   * Whether the current window is small enough to
+   * collapse content vertically.
+   */
+  smallWindow: ComputedRef<boolean>;
+  /**
+   * The quasar screen hook.
+   */
+  screen: ComputedRef<Screen>;
 }
 
 /**

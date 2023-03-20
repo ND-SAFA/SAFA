@@ -31,13 +31,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useQuasar } from "quasar";
-import { computed } from "vue";
+import { useScreen } from "@/hooks";
 import { PanelCard } from "@/components/common";
 import AttributeEditor from "./AttributeEditor.vue";
 import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
 
-const $q = useQuasar();
-
-const smallWindow = computed(() => $q.screen.lt.lg);
+const { smallWindow } = useScreen();
 </script>

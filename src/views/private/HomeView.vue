@@ -64,9 +64,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useQuasar } from "quasar";
 import { computed } from "vue";
 import { CreatorTabTypes } from "@/types";
+import { useScreen } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PrivatePage,
@@ -78,9 +78,8 @@ import {
   FlexItem,
 } from "@/components";
 
-const $q = useQuasar();
+const { smallWindow } = useScreen();
 
-const smallWindow = computed(() => $q.screen.lt.md);
 const parts = computed(() => (smallWindow.value ? "12" : "6"));
 
 function handleOpenStandard() {

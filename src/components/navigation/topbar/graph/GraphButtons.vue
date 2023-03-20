@@ -1,15 +1,15 @@
 <template>
-  <flex-box>
-    <template v-for="definition in viewButtons" :key="definition.label">
-      <icon-button
-        color="accent"
-        :tooltip="definition.label"
-        :icon="definition.icon"
-        :disabled="isDisabled"
-        :data-cy="definition.dataCy"
-        @click="definition.handler"
-      />
-    </template>
+  <flex-box v-if="!isDisabled">
+    <icon-button
+      v-for="definition in viewButtons"
+      :key="definition.label"
+      color="accent"
+      :tooltip="definition.label"
+      :icon="definition.icon"
+      :data-cy="definition.dataCy"
+      @click="definition.handler"
+    />
+    <separator vertical inset nav x="1" />
   </flex-box>
 </template>
 
@@ -27,7 +27,7 @@ import { computed } from "vue";
 import { layoutStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
-import { IconButton, FlexBox } from "@/components/common";
+import { IconButton, FlexBox, Separator } from "@/components/common";
 
 const viewButtons = [
   {
@@ -47,7 +47,13 @@ const viewButtons = [
     dataCy: "button-nav-graph-center",
   },
   {
-    handler: () => handleRegenerateLayout({}),
+    handler: () => {
+      if (layoutStore.isTreeMode) {
+        handleRegenerateLayout({});
+      } else {
+        layoutStore.resetLayout();
+      }
+    },
     label: "Regenerate Layout",
     icon: "graph-refresh",
   },

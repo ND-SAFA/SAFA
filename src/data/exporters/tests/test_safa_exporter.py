@@ -23,6 +23,6 @@ class TestSafaExporter(BaseTest):
         project_creator = TraceDatasetCreator(StructuredProjectReader(TEST_OUTPUT_DIR))
         other_dataset = project_creator.create()
 
-        self.assertEqual(len(safa_exporter.dataset.artifact_df), len(other_dataset.artifact_df))
-        self.assertEqual(len(safa_exporter.dataset.trace_df), len(other_dataset.trace_df))
-        self.assertEqual(len(safa_exporter.dataset.layer_mapping_df), len(other_dataset.layer_mapping_df))
+        self.assertEqual(len(safa_exporter._dataset.artifact_df), len(other_dataset.artifact_df))
+        self.assertEqual(len(safa_exporter._dataset.trace_df), len(other_dataset.trace_df))
+        self.assertEqual(len(safa_exporter._dataset.layer_mapping_df), len(other_dataset.layer_mapping_df))

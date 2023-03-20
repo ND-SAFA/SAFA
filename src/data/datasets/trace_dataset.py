@@ -223,19 +223,6 @@ class TraceDataset(iDataset):
         """
         self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
 
-    def save(self, output_dir: str, filename: str) -> str:
-        """
-        Saves the dataset to the output dir
-        :param output_dir: directory to save to
-        :param filename: name of the file (no ext)
-        :return: location the file was saved to
-        """
-        FileUtil.create_dir_safely(output_dir)
-        output_path = os.path.join(output_dir, filename)
-        df = self.to_dataframe()
-        df.to_csv(output_path, index=False)
-        return output_path
-
     def shuffle_link_ids(self) -> None:
         """
         Shuffles the positive and negative link ids.

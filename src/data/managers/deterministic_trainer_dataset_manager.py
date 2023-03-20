@@ -6,6 +6,7 @@ from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreato
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.readers.csv_project_reader import CsvProjectReader
@@ -48,7 +49,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
             self._datasets, reloaded = self._create_datasets_from_creators_deterministic(self._dataset_creators)
             if not reloaded:
                 self._prepare_datasets(self.augmenter)
-                self.save_dataset_splits(self.get_output_path())
+                self.export_dataset_splits(self.get_output_path(), SupportedDatasetExporter.CSV)
         return self._datasets
 
     def get_output_path(self) -> str:

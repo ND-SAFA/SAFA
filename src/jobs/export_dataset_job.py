@@ -1,7 +1,7 @@
 from typing import Type
 
 from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from data.exporters.supported_exporters import SupportedExporters
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
@@ -42,4 +42,4 @@ class ExportDatasetJob(AbstractJob):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        return SupportedExporters
+        return SupportedDatasetExporter

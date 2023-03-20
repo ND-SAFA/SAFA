@@ -36,7 +36,7 @@ class TestCreateSourceSplits(BaseJobTest):
         Verifies that source artifacts are not overlappign between splits.
         """
         stages = ["train", "val", "eval"]
-        for layer_mapping_i, layer_mapping_row in job.exporter.dataset.layer_mapping_df.iterrows():
+        for layer_mapping_i, layer_mapping_row in job.exporter._dataset.layer_mapping_df.iterrows():
             task_name = f"task_{layer_mapping_i}"
             source_artifacts = {}
             for stage in stages:

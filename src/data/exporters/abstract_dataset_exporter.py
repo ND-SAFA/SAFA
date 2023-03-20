@@ -21,7 +21,7 @@ class AbstractDatasetExporter(BaseObject):
         """
         assert dataset_creator is not None or dataset is not None, "Must supply either a dataset creator or a dataset"
         self.dataset_creator = dataset_creator
-        self.dataset = dataset
+        self._dataset = dataset
         self.export_path = self.update_export_path(export_path)
 
     def update_export_path(self, export_path: str) -> str:
@@ -31,17 +31,19 @@ class AbstractDatasetExporter(BaseObject):
         :return: Export path
         """
         self.export_path = export_path
-        os.makedirs(self.export_path, exist_ok=True)
-        return export_path
+        path, file_extension = os.path.splitext(self.export_path)
+        export_path = self.export_path if not file_extension else os.path.dirname(path)
+        os.makedirs(export_path, exist_ok=True)
+        return self.export_path
 
     def get_dataset(self) -> TraceDataset:
         """
         Gets the dataset to export
         :return: The dataset
         """
-        if self.dataset is None:
-            self.dataset = self.dataset_creator.create()
-        return self.dataset
+        if self._dataset is None:
+            self._dataset = self.dataset_creator.create()
+        return self._dataset
 
     @abstractmethod
     def export(self):

@@ -2,12 +2,12 @@
   "zero_optimization": {
     "stage": 3,
     "offload_optimizer": {
-      "device": "nvme",
-      "nvme_path": "/dev/xvda"
+      "device": "cpu",
+      "pin_memory": true
     },
     "offload_param": {
-      "device": "nvme",
-      "nvme_path": "/dev/xvda"
+      "device": "cpu",
+      "pin_memory": true
     }
   },
   "optimizer": {

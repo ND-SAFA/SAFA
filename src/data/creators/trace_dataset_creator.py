@@ -22,9 +22,6 @@ from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from util.thread_util import ThreadUtil
 
-ArtifactType2Id = Dict[str, List[str]]
-Id2Artifact = Dict[str, pd.Series]
-
 
 class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     """

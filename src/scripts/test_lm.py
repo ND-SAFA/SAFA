@@ -4,6 +4,9 @@ import sys
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
 
+from util.logging.logger_config import LoggerConfig
+from util.logging.logger_manager import LoggerManager
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -33,6 +36,7 @@ if __name__ == "__main__":
     model_path = "gpt2-xl"
     dataset_name = "drone"
     output_path = os.path.expanduser("~/output/test_lm")
+    LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Model
     model_manager = ModelManager(model_path)

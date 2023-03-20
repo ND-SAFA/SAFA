@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #
     # deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
-    dataset_name = "drone"
+    dataset_name = "cm1"
     output_path = os.path.expanduser("~/output/test_lm")
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
@@ -57,14 +57,7 @@ if __name__ == "__main__":
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)
-
-
-    def preprocess_function(examples):
-        return tokenizer(examples["text"], truncation=True)
-
-
-    tokenized_dataset = dataset.map(preprocess_function, batched=True)
-    trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=tokenized_dataset)
+    trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=dataset)
 
     # Predict
     outputs = trainer.train()

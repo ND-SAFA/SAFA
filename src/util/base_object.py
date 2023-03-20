@@ -199,7 +199,7 @@ class BaseObject(ABC):
         :return: the expected type
         """
         abstract_class = cls._get_base_class(abstract_class)
-        return get_enum_from_name(cls._get_child_enum_class(abstract_class, child_class_name), child_class_name).value
+        return get_enum_from_name(abstract_class._get_enum_class(child_class_name), child_class_name).value
 
     @staticmethod
     def _get_base_class(typing_obj: Any) -> Optional[Type["BaseObject"]]:
@@ -216,10 +216,9 @@ class BaseObject(ABC):
         return typing_obj
 
     @classmethod
-    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
+    def _get_enum_class(cls, child_class_name: str) -> Type:
         """
         Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param abstract_class: the abstract parent class type
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """

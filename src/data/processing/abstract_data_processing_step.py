@@ -1,11 +1,12 @@
 import enum
 from abc import ABC, abstractmethod
 from functools import total_ordering
-from typing import List
+from typing import List, Type
 
 import math
 
 from util.base_object import BaseObject
+from util.override import overrides
 
 
 class ProcessingOrder(enum.Enum):
@@ -52,6 +53,20 @@ class AbstractDataProcessingStep(BaseObject, ABC):
         :return: the content as a string
         """
         return AbstractDataProcessingStep.WORD_SEP.join(word_list)
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+        from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+        if child_class_name in SupportedDataCleaningStep.__members__:
+            return SupportedDataCleaningStep
+        return SupportedAugmentationStep
 
     def __eq__(self, other) -> bool:
         """

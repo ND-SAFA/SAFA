@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Type
 
 from data.datasets.idataset import iDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from util.base_object import BaseObject
+from util.override import overrides
 
 DatasetType = TypeVar("DatasetType", bound=iDataset)
 
@@ -16,6 +17,17 @@ class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):
         :param data_cleaner: the data cleaner to use on the data
         """
         self.data_cleaner = DataCleaner([]) if data_cleaner is None else data_cleaner
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from data.creators.supported_dataset_creator import SupportedDatasetCreator
+        return SupportedDatasetCreator
 
     @abstractmethod
     def create(self) -> DatasetType:

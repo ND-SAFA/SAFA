@@ -10,6 +10,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob
+from models.llama.llama_model_manager import LLaMAModelManager
 from models.model_manager import ModelManager
 from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions
@@ -36,6 +37,11 @@ class TestTrainJob(BaseJobTest):
         job = self._get_job()
         self.assertTrue(job.trainer_dataset_manager[self.EXPECTED_SPLIT_ROLE] is not None)
 
+    def test_llama_train(self):
+        job = self._get_job(use_llama=True)
+        job.run()
+        self.assert_output_on_success(job, job.result)
+
     def _assert_success(self, job: AbstractJob, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
@@ -45,7 +51,7 @@ class TestTrainJob(BaseJobTest):
         self.assertEquals(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR,
                                                                                       job.trainer_dataset_manager.dataset_name))
 
-    def _get_job(self, deterministic: bool = False) -> TrainJob:
+    def _get_job(self, deterministic: bool = False, use_llama: bool = False) -> TrainJob:
         dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
         trainer_dataset_manager = ObjectCreator.get_definition(TrainerDatasetManager)
         if deterministic:
@@ -57,7 +63,7 @@ class TestTrainJob(BaseJobTest):
                 "val_percentage": VALIDATION_PERCENTAGE_DEFAULT
             }})
         train_job_definition = {
-            "model_manager": ObjectCreator.get_definition(ModelManager),
+            "model_manager": ObjectCreator.get_definition(ModelManager if not use_llama else LLaMAModelManager),
             "job_args": ObjectCreator.get_definition(JobArgs),
             "trainer_dataset_manager": trainer_dataset_manager,
             "trainer_args": {

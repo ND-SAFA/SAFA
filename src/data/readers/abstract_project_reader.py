@@ -3,6 +3,9 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from data.dataframes.artifact_dataframe import ArtifactDataFrame
+from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame
 from util.base_object import BaseObject
 
 
@@ -19,7 +22,7 @@ class AbstractProjectReader(BaseObject, ABC):
         self.overrides = overrides if overrides else {}
 
     @abstractmethod
-    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self) -> Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]:
         """
         Reads artifact and trace links from files.
         :return: Returns data frames containing artifacts, trace links, and layer mappings.

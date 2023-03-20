@@ -2,10 +2,14 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from data.dataframes.artifact_dataframe import ArtifactDataFrame
+from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from server.api.api_definition import ApiDefinition
 from util.dataframe_util import DataFrameUtil
+from util.enum_util import EnumDict
 
 
 class ApiProjectReader(AbstractProjectReader):
@@ -35,26 +39,26 @@ class ApiProjectReader(AbstractProjectReader):
         links = self.api_definition["true_links"]  # TODO : need to rename back-end to thiss
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
-            source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE, i)
-            target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, i)
+            source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, i)
+            target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, i)
             artifact_map = self.add_artifact_layer(source_layer, source_layer_id, artifact_map)
             artifact_map = self.add_artifact_layer(target_layer, target_layer_id, artifact_map)
-            layer_mapping.append({
+            layer_mapping.append(EnumDict({
                 StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
                 StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
-            })
+            }))
 
         trace_df_entries = []
         for source_id, target_id in links:
-            trace_df_entries.append({
+            trace_df_entries.append(EnumDict({
                 StructuredKeys.Trace.SOURCE: source_id,
                 StructuredKeys.Trace.TARGET: target_id,
                 StructuredKeys.Trace.LABEL: 1
-            })
+            }))
 
-        artifact_df = pd.DataFrame(artifact_map)
-        layer_mapping_df = pd.DataFrame(layer_mapping)
-        trace_df = pd.DataFrame(trace_df_entries)
+        artifact_df = ArtifactDataFrame(artifact_map)
+        trace_df = TraceDataFrame(trace_df_entries)
+        layer_mapping_df = LayerDataFrame(layer_mapping)
         return artifact_df, trace_df, layer_mapping_df
 
     def get_project_name(self) -> str:
@@ -73,11 +77,11 @@ class ApiProjectReader(AbstractProjectReader):
         :return: Updated dictionary containing new artifacts.
         """
         for t_id, t_body in artifact_layer.items():
-            artifact_map = DataFrameUtil.append(artifact_map, {
+            artifact_map = DataFrameUtil.append(artifact_map, EnumDict({
                 StructuredKeys.Artifact.ID: t_id,
-                StructuredKeys.Artifact.BODY: t_body,
+                StructuredKeys.Artifact.CONTENT: t_body,
                 StructuredKeys.Artifact.LAYER_ID: layer_id
-            })
+            }))
         return artifact_map
 
     @staticmethod

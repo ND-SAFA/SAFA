@@ -58,7 +58,7 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         if not os.path.exists(TEST_OUTPUT_DIR):
             os.makedirs(TEST_OUTPUT_DIR)
         dataset_container_manager = self.create_dataset_manager([DatasetRole.VAL])
-        dataset_container_manager.save_dataset_splits(TEST_OUTPUT_DIR)
+        dataset_container_manager.export_dataset_splits(TEST_OUTPUT_DIR)
         dataset_files = [dataset_container_manager._get_dataset_filename(DatasetRole.TRAIN),
                          dataset_container_manager._get_dataset_filename(DatasetRole.VAL)]
         output_files = os.listdir(TEST_OUTPUT_DIR)

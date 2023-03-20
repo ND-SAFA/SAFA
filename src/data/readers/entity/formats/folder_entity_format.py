@@ -58,8 +58,8 @@ class FolderEntityFormat(AbstractEntityFormat):
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]
             entry = {
-                StructuredKeys.Artifact.ID: artifact_name,
-                StructuredKeys.Artifact.BODY: FileUtil.read_file(file_path)
+                StructuredKeys.Artifact.ID.value: artifact_name,
+                StructuredKeys.Artifact.CONTENT.value: FileUtil.read_file(file_path)
             }
             entries.append(entry)
-        return pd.DataFrame(entries).sort_values([StructuredKeys.Artifact.ID], ignore_index=True)
+        return pd.DataFrame(entries).sort_values([StructuredKeys.Artifact.ID.value], ignore_index=True)

@@ -26,7 +26,7 @@ class TestTraceTrainer(BaseTraceTest):
     SOURCE_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
 
     EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
-    TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]], ["map_at_k", ["map@1", "map@2", "map@3"]],
+    TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]],
                               ["f", ["f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]
 
@@ -60,7 +60,8 @@ class TestTraceTrainer(BaseTraceTest):
     def test_eval(self):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         test_trace_trainer = self.get_custom_trace_trainer(metrics=self.TEST_METRICS_NAMES)
-        metrics_manager = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
+        metrics_manager = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].trace_df,
+                                         test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].get_ordered_link_ids(),
                                          output.predictions)
         eval_metrics = metrics_manager.eval(self.TEST_METRICS_NAMES)
         self.assert_metrics(eval_metrics)

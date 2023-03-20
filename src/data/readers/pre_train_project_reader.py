@@ -31,7 +31,7 @@ class PreTrainProjectReader(BaseObject):
         entity_df = self.entity_reader.read_entities()
         examples = []
         for _, entity_row in entity_df.iterrows():
-            file_content = entity_row[StructuredKeys.Artifact.BODY]
+            file_content = entity_row[StructuredKeys.Artifact.CONTENT.value]
             for example in file_content.split(self.DELIMINATOR):
                 examples.append(example)
         return examples

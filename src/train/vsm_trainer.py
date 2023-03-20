@@ -7,12 +7,14 @@ from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
+from transformers.trainer_utils import PredictionOutput
 
 from constants import VSM_THRESHOLD_DEFAULT
+from data.dataframes.artifact_dataframe import ArtifactKeys
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.tree.trace_link import TraceLink
 from train.itrainer import iTrainer
 from train.metrics.metrics_manager import MetricsManager
 from train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -90,25 +92,22 @@ class VSMTrainer(iTrainer):
         :return: The output from the prediction
         """
         raw_sources, raw_targets, all_source_target_pairs = self.get_raw_sources_and_targets(eval_dataset)
-        predicted_scores = self.calculate_similarity_matrix_from_term_frequencies(eval_dataset)
-        scores, labels, links = [], [], []
-        for i, link in enumerate(eval_dataset.get_ordered_links()):
-            link_id = TraceLink.generate_link_id(source_id=link.source.id, target_id=link.target.id)
-            if link_id not in eval_dataset.links:  # source, target pair between layers that should not be linked
+        set_source, set_target = self.create_term_frequency_matrices(raw_sources, raw_targets)
+        similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(set_source, set_target)
+        predictions, label_ids, source_target_pairs, links = [], [], [], []
+        for i, pair in enumerate(all_source_target_pairs):
+            link_id = TraceDataFrame.generate_link_id(*pair)
+            if link_id not in eval_dataset.trace_df:  # source, target pair between layers that should not be linked
                 continue
-            score = predicted_scores[i]
-            link = eval_dataset.links[link_id]
-            label = 1 if link.is_true_link else 0
-
-            scores.append(score)
-            labels.append(label)
-            links.append(link)
-
-        metrics, metrics_manager = self.eval(links, scores, self.metrics) if self.metrics else None
-        trace_prediction_output = TracePredictionOutput(predictions=scores,
-                                                        label_ids=labels,
-                                                        metrics=metrics,
-                                                        prediction_entries=metrics_manager.get_trace_predictions())
+            row, col = divmod(i, len(raw_targets))
+            predictions.append(similarity_matrix[row][col])
+            label_ids.append(int(predictions[-1] > threshold))
+            links.append(eval_dataset.trace_df.get_link(link_id))
+            source_target_pairs.append(pair)
+        metrics = self.eval(eval_dataset.trace_df, predictions, eval_dataset.get_ordered_link_ids(), self.metrics) \
+            if self.metrics else None
+        prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=metrics)
+        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)
         return trace_prediction_output
 
     def create_term_frequency_matrices(self, raw_sources: pd.Series, raw_targets: pd.Series) -> Tuple[csr_matrix, csr_matrix]:
@@ -123,20 +122,15 @@ class VSMTrainer(iTrainer):
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target
 
-    def calculate_similarity_matrix_from_term_frequencies(self, dataset: TraceDataset) -> List[float]:
+    @staticmethod
+    def calculate_similarity_matrix_from_term_frequencies(tf_source: csr_matrix, tf_target: csr_matrix) -> SimilarityMatrix:
         """
         Calculates the similarity matrix used for predicting traces from the term frequencies of the sources and targets
         :param tf_source: The term frequencies of the sources
         :param tf_target: The term frequencies of the targets
         :return: The similarity matrix where each cell contains the similarity of the corresponding source (row) and target (col)
         """
-        scores = []
-        for link in dataset.get_ordered_links():
-            source_vector = self.model.transform([link.source.token])
-            target_vector = self.model.transform([link.target.token])
-            score = 1 - pairwise_distances(source_vector, Y=target_vector, metric="cosine", n_jobs=-1).item()
-            scores.append(score)
-        return scores
+        return 1 - pairwise_distances(tf_source, Y=tf_target, metric="cosine", n_jobs=-1)
 
     @staticmethod
     def get_raw_sources_and_targets(dataset: TraceDataset) -> Tuple[pd.Series, pd.Series, List[Tuple[str, str]]]:
@@ -145,26 +139,27 @@ class VSMTrainer(iTrainer):
         :param dataset: The dataset to use for sources and targets
         :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
         """
-        sources, targets = set(), set()
-        for link in dataset.get_ordered_links():
-            sources.add(link.source)
-            targets.add(link.target)
-        source_target_pairs = [(source.id, target.id) for source in sources for target in targets]
-        raw_sources = pd.Series([source.token for source in sources])
-        raw_targets = pd.Series([target.token for target in targets])
+        sources, targets = dict(), dict()
+        for index, link in dataset.trace_df.iterrows():
+            sources[link[TraceKeys.SOURCE.value]] = dataset.artifact_df.get_artifact(link[TraceKeys.SOURCE.value])
+            targets[link[TraceKeys.TARGET.value]] = dataset.artifact_df.get_artifact(link[TraceKeys.TARGET.value])
+        source_target_pairs = [(s_id, t_id) for s_id in sources.keys() for t_id in targets.keys()]
+        raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources.values()])
+        raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets.values()])
         return raw_sources, raw_targets, source_target_pairs
 
     @staticmethod
-    def eval(links: List[TraceLink], predictions: List[float], metrics: List[str]) -> Tuple[Metrics, MetricsManager]:
+    def eval(trace_df: TraceDataFrame, predictions: List[float], link_ids: List[int], metrics: List[str]) -> Metrics:
         """
         Evaluates the prediction results using the metrics
-        :param links: The links corresponding to the predictions
+        :param trace_df: The dataframe containing the trace links
         :param predictions: The similarity scores predicted by the model
+        :param link_ids: Specifies the links ids corresponding to the predictions
         :param metrics: The list of metric names to use for evaluation
         :return: A mapping between metric name and the result
         """
-        metrics_manager = MetricsManager(trace_links=links, predicted_similarities=predictions)
-        return metrics_manager.eval(metrics), metrics_manager
+        metrics_manager = MetricsManager(trace_df=trace_df, predicted_similarities=predictions, link_ids=link_ids)
+        return metrics_manager.eval(metrics)
 
     def cleanup(self) -> None:
         """

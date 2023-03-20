@@ -1,3 +1,4 @@
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
@@ -6,7 +7,9 @@ from jobs.components.job_result import JobResult
 
 class CreateDatasetsJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager):
+    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager,
+                 export_path: str,
+                 format_type: SupportedDatasetExporter = SupportedDatasetExporter.CSV):
         """
         Responsible for creating and saving new data
         :param job_args: the arguments for the job
@@ -15,12 +18,14 @@ class CreateDatasetsJob(AbstractJob):
         job_args.save_dataset_splits = True
         super().__init__(job_args=job_args)
         self.trainer_dataset_manager = trainer_dataset_manager
+        self.format_type = format_type
+        self.export_path = export_path
 
     def _run(self, **kwargs) -> JobResult:
         """
         Creates and saves the data
         :return: job results including location of saved data
         """
-        saved_dataset_paths = self.trainer_dataset_manager.save_dataset_splits(self.job_args.output_dir)
+        saved_dataset_paths = self.trainer_dataset_manager.export_dataset_splits(self.export_path, self.format_type)
         assert len(saved_dataset_paths) > 0, "Either unable to save data or no data creators were provided"
         return JobResult.from_dict({JobResult.SAVED_DATASET_PATHS: saved_dataset_paths})

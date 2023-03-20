@@ -3,11 +3,12 @@
     {
       "jobs": [
         {
-          "object_type": "LLAMA_TRAIN",
+          "object_type": "TRAIN",
           "job_args": {
             "random_seed": 812
           },
           "model_manager": {
+            "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
             "model_task": "SEQUENCE_CLASSIFICATION"
           },

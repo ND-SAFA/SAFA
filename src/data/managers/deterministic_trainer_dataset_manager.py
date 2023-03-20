@@ -4,8 +4,9 @@ from typing import Dict, Tuple
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.readers.csv_project_reader import CsvProjectReader
@@ -39,7 +40,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
             else "Unknown_Dataset"
         self.random_seed = random_seed
 
-    def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
+    def get_datasets(self) -> Dict[DatasetRole, iDataset]:
         """
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
@@ -48,7 +49,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
             self._datasets, reloaded = self._create_datasets_from_creators_deterministic(self._dataset_creators)
             if not reloaded:
                 self._prepare_datasets(self.augmenter)
-                self.save_dataset_splits(self.get_output_path())
+                self.export_dataset_splits(self.get_output_path(), SupportedDatasetExporter.CSV)
         return self._datasets
 
     def get_output_path(self) -> str:

@@ -5,8 +5,7 @@ from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.trace_matrix import TraceMatrix
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from testres.base_test import BaseTest
 from train.metrics.metrics_manager import MetricsManager
 
@@ -24,7 +23,8 @@ class TestTraceMatrix(BaseTest):
     trace_matrix = None
 
     def setUp(self):
-        self.trace_matrix = TraceMatrix(self.get_artifact_pairs(), MetricsManager.get_similarity_scores(self.PREDICTIONS))
+        trace_df, link_ids = self.get_trace_df()
+        self.trace_matrix = TraceMatrix(trace_df, MetricsManager.get_similarity_scores(self.PREDICTIONS), link_ids)
 
     def test_map_correctness(self) -> None:
         """
@@ -71,21 +71,24 @@ class TestTraceMatrix(BaseTest):
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
             assertion(predictions[i], self.THRESHOLD)
-            self.assertEqual(links[i].get_label(), expected_labels[i])
+            self.assertEqual(links[i][TraceKeys.LABEL], expected_labels[i])
 
-    def get_artifact_pairs(self) -> List[TraceLink]:
+    def get_trace_df(self) -> List[TraceDataFrame]:
         """
         Returns list of tuples for each combination of source and target artifacts.
         :return: List of tuples containing artifact ids.
         """
-        pairs = []
+        links = {TraceKeys.SOURCE.value: [], TraceKeys.TARGET.value: [], TraceKeys.LABEL.value: []}
+        link_ids = []
         i = 0
         for source_artifact in self.SOURCE_ARTIFACTS:
             for target_artifact in self.TARGET_ARTIFACTS:
-                pairs.append(TraceLink(Artifact(source_artifact, "token"), Artifact(target_artifact, "token"),
-                                       is_true_link=bool(self.LABEL_IDS[i])))
+                links[TraceKeys.SOURCE.value].append(source_artifact)
+                links[TraceKeys.TARGET.value].append(target_artifact)
+                links[TraceKeys.LABEL.value].append(self.LABEL_IDS[i])
+                link_ids.append(TraceDataFrame.generate_link_id(source_artifact, target_artifact))
                 i += 1
-        return pairs
+        return TraceDataFrame(links), link_ids
 
     def test_map(self):
         pass  # TODO: Where did this go??

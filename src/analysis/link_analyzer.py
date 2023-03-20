@@ -7,8 +7,7 @@ from nltk.corpus import wordnet as wn
 
 from analysis import word_tools
 from analysis.word_tools import WordCounter
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame
 from models.model_manager import ModelManager
 from scripts.modules.analysis_types import JobAnalysis, LinkMetrics
 from util.file_util import FileUtil
@@ -37,7 +36,7 @@ class LinkAnalyzer:
 
     OUTPUT_FILENAME = "link_{}_analysis.json"
 
-    def __init__(self, link: TraceLink, predicted_score: float, model_manager: ModelManager = None):
+    def __init__(self, link: TraceDataFrame, predicted_score: float, model_manager: ModelManager = None):
         """
          Initializes the analyzer for analysis of given link
         :param link: The link to analyze
@@ -158,7 +157,7 @@ class LinkAnalyzer:
         return shared_synonyms, shared_antonyms
 
     @staticmethod
-    def get_artifact_vocab(artifact: Artifact) -> List[str]:
+    def get_artifact_vocab(artifact) -> List[str]:
         """
         Gets the vocabulary of the artifact
         :param artifact: The artifact to get vocab of

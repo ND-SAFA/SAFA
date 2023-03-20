@@ -2,6 +2,7 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
+from data.dataframes.trace_dataframe import TraceKeys
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
@@ -25,9 +26,9 @@ class TestBalancedBatchSampler(BaseTraceTest):
 
     def test_get_pos_neg_link_indices(self):
         sampler = self.get_sampler()
-        ordered_links = self.DATASET.get_ordered_links()
-        expected_pos_link_indices = [i for i, link in enumerate(ordered_links) if link.is_true_link]
-        expected_neg_link_indices = [i for i, link in enumerate(ordered_links) if not link.is_true_link]
+        ordered_links = [self.DATASET.trace_df.get_link(link_id) for link_id in self.DATASET.get_ordered_link_ids()]
+        expected_pos_link_indices = [i for i, link in enumerate(ordered_links) if link[TraceKeys.LABEL] == 1]
+        expected_neg_link_indices = [i for i, link in enumerate(ordered_links) if link[TraceKeys.LABEL] == 0]
         pos_link_indices, neg_link_indices = sampler._get_pos_neg_link_indices(sampler.data_source)
         self.assertListEqual(expected_pos_link_indices, pos_link_indices)
         self.assertListEqual(expected_neg_link_indices, neg_link_indices)
@@ -42,7 +43,7 @@ class TestBalancedBatchSampler(BaseTraceTest):
     def assert_balanced_batches_in_sample(self, sample_indices, batch_size):
         neg_link_ids = deepcopy(self.DATASET.neg_link_ids)
         pos_link_ids = deepcopy(self.DATASET.pos_link_ids)
-        selected_link_ids = [link.id for link in self.DATASET.get_ordered_links()]
+        selected_link_ids = self.DATASET.get_ordered_link_ids()
         n_total_pos, n_total_neg = 0, 0
         n_batch_pos, n_batch_neg = 0, 0
         for i, link_index in enumerate(sample_indices):

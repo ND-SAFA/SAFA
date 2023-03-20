@@ -5,8 +5,9 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from data.datasets.trace_dataset import TraceDataset
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from train.metrics.metrics_manager import MetricsManager
+from util.enum_util import EnumDict
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_manager import logger
@@ -37,7 +38,7 @@ class LinkTrainingTracker:
         :param dataset: The dataset used for training
         """
         self.dataset = dataset
-        self.ordered_links = dataset.get_ordered_links()
+        self.ordered_link_ids =  dataset.get_ordered_link_ids()
         self._link_id_to_epoch_logits: Dict[int, List[float]] = {}
         self._training_results_for_epochs: List[EpochTrainingResult] = []
 
@@ -49,8 +50,8 @@ class LinkTrainingTracker:
         :return: None
         """
         for i, logits in zip(batch_indices, batch_logits):
-            link = self.ordered_links[i]
-            self._link_id_to_epoch_logits[link.id] = logits
+            link_id = self.ordered_link_ids[i]
+            self._link_id_to_epoch_logits[link_id] = logits
 
     def eval_last_epoch(self, save_path: str = None) -> Optional[EpochTrainingResult]:
         """
@@ -95,13 +96,13 @@ class LinkTrainingTracker:
         """
         return os.path.join(output_dir, self.SAVE_DIR, str(epoch_iteration), self.SAVE_FILENAME)
 
-    def get_link_by_id(self, link_id: int) -> TraceLink:
+    def get_link_by_id(self, link_id: int) -> Dict:
         """
         Gets a TraceLink by its ID
         :param link_id: The ID of the TraceLink
         :return: The TrackLink
         """
-        return self.dataset.links[link_id]
+        return self.dataset.trace_df.get_link(link_id)
 
     def get_epoch_training_result(self, epoch_iteration: int = None) -> EpochTrainingResult:
         """
@@ -140,7 +141,7 @@ class LinkTrainingTracker:
         pos_link_ids_worst_to_best = []
         neg_link_ids_worst_to_best = []
         for link_id in link_ids_worst_to_best:
-            if self.get_link_by_id(link_id).is_true_link:
+            if self.get_link_by_id(link_id)[TraceKeys.LABEL] == 1:
                 pos_link_ids_worst_to_best.append(link_id)
             else:
                 neg_link_ids_worst_to_best.append(link_id)
@@ -159,11 +160,12 @@ class LinkTrainingTracker:
         return epoch_link_losses
 
     @staticmethod
-    def _calculate_loss(link: TraceLink, sim_score: float) -> float:
+    def _calculate_loss(link: EnumDict, sim_score: float) -> float:
         """
         Calculates the link's loss for an epoch
         :param link: The TraceLink
         :param sim_score: The similarity score associated with the given link for an epoch
         :return: The link's loss
         """
-        return abs(link.get_label() - sim_score)
+        label = link[TraceKeys.LABEL]
+        return abs(label - sim_score)

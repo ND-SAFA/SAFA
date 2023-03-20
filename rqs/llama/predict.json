@@ -8,6 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
+            "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
             "model_task": "SEQUENCE_SIMILARITY"
           },

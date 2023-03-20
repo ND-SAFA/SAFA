@@ -23,12 +23,11 @@ class TestResultReader(BaseTest):
             1: {"a": 3, "b": 6, "c": 9}
         }
     }
-    EXPECTED_VAL_METRICS = {"map": 0.242, "ap": 0.0819, "map@1": 1.0, "map@2": 1.0,
-                            "map@3": 0.777, "f1": 0.177, "f2": 0.3497,
-                            "precision@1": 0.105, "precision@2": 0.053, "precision@3": 0.053}
-    EXPECTED_EVAL_METRICS = {"map": 0.194, "ap": 0.0769, "map@1": 1.0, "map@2": 1.0,
-                             "map@3": 1.0, "f1": 0.16, "f2": 0.314, "precision@1": 0.053,
-                             "precision@2": 0.053, "precision@3": 0.035}
+    EXPECTED_VAL_METRICS = {"map": 0.242, "ap": 0.0819, "f1": 0.177, "f2": 0.3497,
+                            "precision@1": 0.105, "precision@2": 0.053, "precision@3": 0.053, "avg_true_links": 1.2, "lag": 5,
+                            "precision_at_recall": 0.25}
+    EXPECTED_EVAL_METRICS = {"map": 0.194, "ap": 0.0769, "f1": 0.16, "f2": 0.314, "precision@1": 0.053,
+                             "precision@2": 0.053, "precision@3": 0.035, "avg_true_links": 1.1, "lag": 6, "precision_at_recall": 0.20}
 
     def test_read(self):
         result_reader = ScriptOutputReader(self.EXPERIMENT_PATH, export=False)

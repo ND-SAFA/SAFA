@@ -1,28 +1,21 @@
 from unittest import skip
 
+from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.create_datasets_job import CreateDatasetsJob
-from jobs.export_dataset_job import ExportDatasetJob
 from jobs.tests.base_job_test import BaseJobTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
-from variables.typed_definition_variable import TypedDefinitionVariable
 
 
-class TestExportDatasetJob(BaseJobTest):
+class TestCreateDatasetJobSAFA(BaseJobTest):
     """
     Tests ability to export dataset as SAFA.
     """
-    job_definition = {
-        "exporter": {
-            TypedDefinitionVariable.OBJECT_TYPE_KEY: "SAFA",
-            "dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
-                **ObjectCreator.dataset_creator_definition
-            },
-            "export_path": TEST_OUTPUT_DIR}
-    }
 
     def test_run_success(self):
         """
@@ -37,9 +30,12 @@ class TestExportDatasetJob(BaseJobTest):
         self.assertIn(JobResult.SAVED_DATASET_PATHS, job_result)
         self.assertGreater(len(job_result[JobResult.SAVED_DATASET_PATHS]), 0)
 
-    def _get_job(self, **kwargs) -> AbstractJob:
+    def _get_job(self, include_dataset=True) -> AbstractJob:
         """
-        Constructs job for testing.
+        Creates job.
         """
-        definition = {**self.job_definition, "job_args": {"output_dir": TEST_OUTPUT_DIR}}
-        return ObjectCreator.create(ExportDatasetJob, override=True, **definition)
+        job_args = ObjectCreator.create(JobArgs)
+        dataset_creator = ObjectCreator.create(TraceDatasetCreator)
+        trainer_dataset_manager = TrainerDatasetManager(train_dataset_creator=dataset_creator)
+        return CreateDatasetsJob(job_args=job_args, export_path=TEST_OUTPUT_DIR, trainer_dataset_manager=trainer_dataset_manager,
+                                 format_type=SupportedDatasetExporter.SAFA)

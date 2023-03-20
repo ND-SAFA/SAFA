@@ -67,7 +67,8 @@ class TrainerDatasetManager(BaseObject):
             if dataset_role in datasets and datasets[dataset_role] is not None:
                 dataset = datasets[dataset_role]
                 exporter: AbstractDatasetExporter = format_type.value
-                export_path = os.path.join(output_dir, self._get_dataset_filename(dataset_role))
+                export_path = os.path.join(output_dir, self._get_dataset_filename(dataset_role)) \
+                    if exporter.include_filename() else os.path.join(output_dir, dataset_role.value)
                 output_path = exporter(export_path=export_path, dataset=dataset).export()
                 output_paths.append(output_path)
         return output_paths

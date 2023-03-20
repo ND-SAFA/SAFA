@@ -32,6 +32,14 @@ class SafaExporter(AbstractDatasetExporter):
         self.trace_definitions = {}
         self.artifact_type_to_artifacts = None
 
+    @staticmethod
+    def include_filename() -> bool:
+        """
+        Returns True if the dataset exporter expects the export path to include the filename, else False
+        :return: True if the dataset exporter expects the export path to include the filename, else False
+        """
+        return False
+
     @overrides(AbstractDatasetExporter)
     def export(self) -> None:
         """

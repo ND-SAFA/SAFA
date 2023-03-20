@@ -44,4 +44,5 @@ class TestCreateDatasetsJob(BaseJobTest):
         else:
             trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager)
 
-        return CreateDatasetsJob(job_args=job_args, trainer_dataset_manager=trainer_dataset_manager)
+        return CreateDatasetsJob(job_args=job_args, export_path=job_args.output_dir,
+                                 trainer_dataset_manager=trainer_dataset_manager)

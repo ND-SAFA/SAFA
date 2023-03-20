@@ -45,6 +45,14 @@ class AbstractDatasetExporter(BaseObject):
             self._dataset = self.dataset_creator.create()
         return self._dataset
 
+    @staticmethod
+    @abstractmethod
+    def include_filename() -> bool:
+        """
+        Returns True if the dataset exporter expects the export path to include the filename, else False
+        :return: True if the dataset exporter expects the export path to include the filename, else False
+        """
+
     @abstractmethod
     def export(self):
         """

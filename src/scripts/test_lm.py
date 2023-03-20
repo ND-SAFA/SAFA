@@ -32,6 +32,7 @@ if __name__ == "__main__":
     # deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
     dataset_name = "drone"
+    output_path = os.path.expanduser("~/output/test_lm")
 
     # Model
     model_manager = ModelManager(model_path)
@@ -47,7 +48,8 @@ if __name__ == "__main__":
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
-    args = TrainerArgs("~/output/test_lm", deepspeed=deepspeed_path)
+
+    args = TrainerArgs(output_path, deepspeed=deepspeed_path)
     args.__post_init__()
 
     # Prepare dataset

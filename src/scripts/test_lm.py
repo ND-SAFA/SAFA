@@ -4,10 +4,6 @@ import sys
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
 
-from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.readers.hub_project_reader import HubProjectReader
-from models.model_manager import ModelManager
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -27,6 +23,9 @@ def add_padding_token(tokenizer, config):
 if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
     from constants import PROJ_PATH
+    from data.creators.trace_dataset_creator import TraceDatasetCreator
+    from data.readers.hub_project_reader import HubProjectReader
+    from models.model_manager import ModelManager
 
     # import deepspeed
     #

@@ -24,7 +24,9 @@ def add_padding_token(tokenizer, config):
 if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
     from constants import PROJ_PATH
+    import deepspeed
 
+    deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
     # model_path = "hf-internal-testing/tiny-random-bert"
     # Construct objects

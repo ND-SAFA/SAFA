@@ -18,22 +18,22 @@ class TimProjectDefinition(AbstractProjectDefinition):
     CONVERSIONS = {
         JSON: {
             StructuredKeys.ARTIFACTS: {
-                "name": StructuredKeys.Artifact.ID,
-                "body": StructuredKeys.Artifact.BODY
+                "name": StructuredKeys.Artifact.ID.value,
+                "body": StructuredKeys.Artifact.CONTENT.value
             },
             StructuredKeys.TRACES: {
-                "sourceName": StructuredKeys.Trace.SOURCE,
-                "targetName": StructuredKeys.Trace.TARGET,
+                "sourceName": StructuredKeys.Trace.SOURCE.value,
+                "targetName": StructuredKeys.Trace.TARGET.value,
             }
         },
         CSV: {
             StructuredKeys.ARTIFACTS: {
-                "id": StructuredKeys.Artifact.ID,
-                "content": StructuredKeys.Artifact.BODY
+                "id": StructuredKeys.Artifact.ID.value,
+                "content": StructuredKeys.Artifact.CONTENT.value
             },
             StructuredKeys.TRACES: {
-                "source": StructuredKeys.Trace.SOURCE,
-                "target": StructuredKeys.Trace.TARGET,
+                "source": StructuredKeys.Trace.SOURCE.value,
+                "target": StructuredKeys.Trace.TARGET.value,
             }
         }
     }
@@ -88,8 +88,8 @@ class TimProjectDefinition(AbstractProjectDefinition):
         return {
             key: {
                 StructuredKeys.PATH: definition[SafaKeys.FILE],
-                StructuredKeys.Trace.SOURCE: definition[SafaKeys.SOURCE_ID],
-                StructuredKeys.Trace.TARGET: definition[SafaKeys.TARGET_ID],
+                StructuredKeys.Trace.SOURCE.value: definition[SafaKeys.SOURCE_ID],
+                StructuredKeys.Trace.TARGET.value: definition[SafaKeys.TARGET_ID],
                 StructuredKeys.COLS: TimProjectDefinition.get_conversion_id(
                     TimProjectDefinition.get_file_format(definition[SafaKeys.FILE]),
                     StructuredKeys.TRACES)

@@ -33,7 +33,7 @@ class ExportArtifactsJob(AbstractJob):
         :return: JobResult containing export path.
         """
         self.trace_dataset_creator.create()
-        artifacts: Iterable[str] = self.trace_dataset_creator.artifact_df[StructuredKeys.Artifact.BODY]
+        artifacts: Iterable[str] = self.trace_dataset_creator.artifact_df[StructuredKeys.Artifact.CONTENT.value]
         artifacts = [a.replace(self.delimiter, "") for a in artifacts]
         content = self.delimiter.join(artifacts)
         file_path = os.path.join(self.job_args.output_dir, self.file_name)

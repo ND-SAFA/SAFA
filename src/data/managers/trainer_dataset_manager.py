@@ -1,3 +1,4 @@
+import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
@@ -5,10 +6,12 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
+from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.splitting.dataset_splitter import DatasetSplitter
@@ -20,7 +23,7 @@ from variables.undetermined_variable import UndeterminedVariable
 
 
 class TrainerDatasetManager(BaseObject):
-    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
+    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, iDataset]
 
     def __init__(self,
                  pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,
@@ -51,7 +54,8 @@ class TrainerDatasetManager(BaseObject):
         """
         return self._dataset_creators[dataset_role]
 
-    def save_dataset_splits(self, output_dir: str) -> List[str]:
+    def export_dataset_splits(self, output_dir: str, format_type: SupportedDatasetExporter = SupportedDatasetExporter.CSV) \
+            -> List[str]:
         """
         Saves all dataset splits to the output dir
         :param output_dir: directory to save to
@@ -62,7 +66,10 @@ class TrainerDatasetManager(BaseObject):
         for dataset_role in DatasetRole:
             if dataset_role in datasets and datasets[dataset_role] is not None:
                 dataset = datasets[dataset_role]
-                output_path = dataset.save(output_dir, self._get_dataset_filename(dataset_role))
+                exporter: AbstractDatasetExporter = format_type.value
+                export_path = os.path.join(output_dir, self._get_dataset_filename(dataset_role)) \
+                    if exporter.include_filename() else os.path.join(output_dir, dataset_role.value)
+                output_path = exporter(export_path=export_path, dataset=dataset).export()
                 output_paths.append(output_path)
         return output_paths
 
@@ -96,7 +103,7 @@ class TrainerDatasetManager(BaseObject):
                 self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(creator)
         super().use_values_from_object_for_undetermined(obj)
 
-    def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
+    def get_datasets(self) -> Dict[DatasetRole, iDataset]:
         """
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
@@ -148,7 +155,7 @@ class TrainerDatasetManager(BaseObject):
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
-                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, AbstractDataset]:
+                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, iDataset]:
         """
         Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split data
         :param train_dataset: the train dataset
@@ -166,7 +173,7 @@ class TrainerDatasetManager(BaseObject):
                 dataset_role_to_split_percentage[dataset_role] = dataset_creator.val_percentage
         if len(dataset_role_to_split_percentage) < 1:
             return {}
-        dataset_role_to_split_percentage[DatasetRole.TRAIN] = 1-sum(dataset_role_to_split_percentage.values())
+        dataset_role_to_split_percentage[DatasetRole.TRAIN] = 1 - sum(dataset_role_to_split_percentage.values())
         dataset_role_to_split_percentage.move_to_end(DatasetRole.TRAIN, last=False)
         splitter = DatasetSplitter(train_dataset, dataset_role_to_split_percentage, strategies)
         return splitter.split_dataset()

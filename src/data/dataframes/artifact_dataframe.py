@@ -1,0 +1,48 @@
+from typing import Any, Type
+
+from data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
+from data.keys.structure_keys import StructuredKeys
+from util.enum_util import EnumDict
+
+ArtifactKeys = StructuredKeys.Artifact
+
+
+class ArtifactDataFrame(AbstractProjectDataFrame):
+    """
+    Contains the artifacts found in a project
+    """
+
+    @classmethod
+    def index_name(cls) -> str:
+        """
+        Returns the name of the index of the dataframe
+        :return: The name of the index of the dataframe
+        """
+        return ArtifactKeys.ID.value
+
+    @classmethod
+    def data_keys(cls) -> Type:
+        """
+        Returns the class containing the names of all columns in the dataframe
+        :return: The class containing the names of all columns in the dataframe
+        """
+        return ArtifactKeys
+
+    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1) -> EnumDict:
+        """
+        Adds artifact to dataframe
+        :param artifact_id: The id of the Artifact
+        :param content: The body of the artifact
+        :param layer_id: The id of the layer that the artifact is part of
+        :return: The newly added artifact
+        """
+        return self.add_new_row({ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content,
+                                 ArtifactKeys.LAYER_ID: layer_id})
+
+    def get_artifact(self, artifact_id: Any) -> EnumDict:
+        """
+        Gets the row of the dataframe with the associated artifact_id
+        :param artifact_id: The id of the artifact to get
+        :return: The artifact if one is found with the specified params, else None
+        """
+        return self.get_row(artifact_id)

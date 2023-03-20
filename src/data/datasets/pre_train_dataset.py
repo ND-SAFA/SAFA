@@ -5,11 +5,11 @@ from typing import Any
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
-from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.idataset import iDataset
 from models.model_manager import ModelManager
 
 
-class PreTrainDataset(AbstractDataset):
+class PreTrainDataset(iDataset):
 
     def __init__(self, training_file_path: str, block_size: int, **kwargs):
         """
@@ -52,14 +52,3 @@ class PreTrainDataset(AbstractDataset):
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
         dataset = dataset.map(tokenize_and_chunk, batched=True, remove_columns=["text"], desc="Tokenizing dataset")
         return dataset["train"]
-
-    def save(self, output_dir: str, filename: str) -> str:
-        """
-        Saves the dataset to the output dir
-        :param output_dir: directory to save to
-        :param filename: name of the file (no ext)
-        :return: location the file was saved to
-        """
-        filepath = os.path.join(output_dir, filename)
-        shutil.copy(self.training_file_path, filepath)
-        return filepath

@@ -4,10 +4,14 @@ from typing import Dict, Tuple
 import pandas as pd
 
 from constants import NO_ORPHAN_CHECK_VALUE
+from data.dataframes.artifact_dataframe import ArtifactDataFrame
+from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame
 from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
-from util.dict_util import ListUtil
+from util.dataframe_util import DataFrameUtil
+from util.enum_util import EnumDict
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
@@ -55,20 +59,20 @@ class CsvProjectReader(AbstractProjectReader):
                                   CSVKeys.TARGET,
                                   artifact_df_entries)
                 trace_df_entries.append({
-                    StructuredKeys.Trace.SOURCE: source_id,
-                    StructuredKeys.Trace.TARGET: target_id,
-                    StructuredKeys.Trace.LABEL: row[CSVKeys.LABEL]
+                    StructuredKeys.Trace.SOURCE.value: source_id,
+                    StructuredKeys.Trace.TARGET.value: target_id,
+                    StructuredKeys.Trace.LABEL.value: row[CSVKeys.LABEL]
                 })
 
         index_batches = ListUtil.batch(list(range(len(entity_df))), 1000)
         ThreadUtil.multi_thread_process(f"Reading {project_name}", index_batches, read_artifact, n_threads)
 
-        trace_df = pd.DataFrame(trace_df_entries)
-        layer_mapping_df = pd.DataFrame([{
+        artifact_df = ArtifactDataFrame(artifact_df_entries)
+        trace_df = TraceDataFrame(trace_df_entries)
+        layer_mapping_df = LayerDataFrame([EnumDict({
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
-        }])
-        artifact_df = pd.DataFrame(artifact_df_entries.values())
+        })])
         entity_df = None
         return artifact_df, trace_df, layer_mapping_df
 
@@ -95,12 +99,13 @@ class CsvProjectReader(AbstractProjectReader):
         :param artifact_type: The name of type of artifact.
         :param artifact_df_entries: DataFrame containing entries for each artifact processed.
         """
-        if a_id not in artifact_df_entries:
-            artifact_df_entries[a_id] = {
+        if StructuredKeys.Artifact.ID.value not in artifact_df_entries \
+                or a_id not in artifact_df_entries[StructuredKeys.Artifact.ID.value]:
+            DataFrameUtil.append(artifact_df_entries, EnumDict({
                 StructuredKeys.Artifact.ID: a_id,
-                StructuredKeys.Artifact.BODY: a_body,
+                StructuredKeys.Artifact.CONTENT: a_body,
                 StructuredKeys.Artifact.LAYER_ID: CsvProjectReader.get_layer_id(artifact_type)
-            }
+            }))
 
     @staticmethod
     def get_layer_id(artifact_type: str) -> str:

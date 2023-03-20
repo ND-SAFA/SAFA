@@ -3,8 +3,8 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
+from data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 
 
 class TestDataManager:
@@ -35,7 +35,8 @@ class TestDataManager:
 
     _EXAMPLE_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
     _EXAMPLE_PREDICTIONS = np.array(
-        [[0.4, 0.6], [0.6, 0.4], [0.7, 0.3], [0.2, 0.8], [0.9, 0.1], [0.99, 0.01], [0.8, 0.2], [0.6, 0.4], [0.6, 0.4]])
+        [[0.4, 0.6], [0.6, 0.4], [0.7, 0.3], [0.2, 0.8], [0.9, 0.1], [0.99, 0.01], [0.8, 0.2], [0.6, 0.4], [0.6, 0.4],
+         [0.4, 0.6], [0.6, 0.4], [0.7, 0.3], [0.2, 0.8], [0.9, 0.1], [0.99, 0.01], [0.8, 0.2], [0.6, 0.4], [0.6, 0.4]])
     _EXAMPLE_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
     EXAMPLE_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
                                                  label_ids=_EXAMPLE_LABEL_IDS,
@@ -67,22 +68,37 @@ class TestDataManager:
         return TestDataManager.get_path(paths[1:], export_data)
 
     @staticmethod
-    def create_link_map(link_list):
-        links = {}
-        for source, target in link_list:
-            link = TestDataManager._create_test_link(source, target)
-            links[link.id] = link
-        return links
+    def create_artifact_dataframe():
+        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
+        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+        artifact_df = ArtifactDataFrame()
+        for layer_num, layer_sources in enumerate(sources):
+            for s_id, s_body in layer_sources.items():
+                artifact_df.add_artifact(s_id, s_body, layer_num)
+        for layer_num, layer_targets in enumerate(targets):
+            for t_id, t_body in layer_targets.items():
+                artifact_df.add_artifact(t_id, t_body, layer_num)
+        return artifact_df
 
     @staticmethod
-    def _create_test_link(source: str, target: str):
-        s = Artifact(source, TestDataManager._get_artifact_body(source))
-        t = Artifact(target, TestDataManager._get_artifact_body(target))
-        return TraceLink(s, t)
+    def create_trace_dataframe(link_list):
+        trace_df = TraceDataFrame()
+        for source, target in link_list:
+            link = TestDataManager._create_test_link(trace_df, source, target)
+        return trace_df
+
+    @staticmethod
+    def _create_test_link(trace_dataframe: TraceDataFrame, source: str, target: str):
+        return trace_dataframe.add_link(source, target)
 
     @staticmethod
     def _create_test_artifact(artifacts_dict):
-        return [Artifact(id_, token) for id_, token in artifacts_dict.items()]
+        artifacts = {ArtifactKeys.ID.value: [], ArtifactKeys.CONTENT.value: [], ArtifactKeys.LAYER_ID.value: []}
+        for id_, token in artifacts_dict.items():
+            artifacts[ArtifactKeys.ID.value].append(id_)
+            artifacts[ArtifactKeys.CONTENT.value].append(token)
+            artifacts[ArtifactKeys.LAYER_ID.value].append(1)
+        return artifacts
 
     @staticmethod
     def _get_artifact_body(artifact_id: str):

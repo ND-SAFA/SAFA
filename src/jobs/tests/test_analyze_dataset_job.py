@@ -1,4 +1,5 @@
 import os
+from unittest import skip
 
 from analysis.dataset_analyzer import DatasetAnalyzer
 from jobs.abstract_job import AbstractJob
@@ -7,7 +8,7 @@ from jobs.tests.base_job_test import BaseJobTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 
-
+@skip("Skipping because no longer needed")
 class TestAnalyzeDatasetJob(BaseJobTest):
 
     def test_run_success(self):

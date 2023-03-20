@@ -41,8 +41,8 @@ class TestTimProjectDefinition(BaseTest):
             trace_matrix_name: {
                 StructuredKeys.PATH: file_name,
                 StructuredKeys.COLS: "csv-traces",
-                StructuredKeys.Trace.SOURCE: source,
-                StructuredKeys.Trace.TARGET: target
+                StructuredKeys.Trace.SOURCE.value: source,
+                StructuredKeys.Trace.TARGET.value: target
             }
         },
         StructuredKeys.CONVERSIONS: {

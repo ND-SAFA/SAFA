@@ -29,8 +29,8 @@ class RepositoryProjectDefinition(AbstractProjectDefinition):
             },
             StructuredKeys.TRACES: {
                 "commit2issue": {
-                    StructuredKeys.Trace.SOURCE: "Commit",
-                    StructuredKeys.Trace.TARGET: "Issue",
+                    StructuredKeys.Trace.SOURCE.value: "Commit",
+                    StructuredKeys.Trace.TARGET.value: "Issue",
                     StructuredKeys.PATH: "commit2issue.csv",
                     StructuredKeys.COLS: StructuredKeys.TRACES
                 }

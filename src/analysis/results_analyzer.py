@@ -7,7 +7,7 @@ from tqdm import tqdm
 from analysis.link_analyzer import LinkAnalyzer
 from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
-from data.tree.trace_link import TraceLink
+from data.tree.trace_dataframe import TraceDataFrame
 from models.model_manager import ModelManager
 from scripts.modules.analysis_types import JobAnalysis, JobSummaryMetrics, LinkCollectionAnalysis
 from train.trace_output.trace_prediction_output import TracePredictionOutput
@@ -15,8 +15,8 @@ from train.trace_output.trace_prediction_output import TracePredictionOutput
 
 @dataclass
 class MisPredictedLinks:
-    false_positives: Set[TraceLink] = field(default_factory=set)
-    false_negatives: Set[TraceLink] = field(default_factory=set)
+    false_positives: Set[TraceDataFrame] = field(default_factory=set)
+    false_negatives: Set[TraceDataFrame] = field(default_factory=set)
 
     def get_link_ids(self) -> Set[int]:
         """
@@ -94,7 +94,7 @@ class ResultsAnalyzer:
                 n_per_category[category] += 1
         return n_per_category
 
-    def _analyze_link_collection(self, links: Set[TraceLink], common_words_threshold: float) -> LinkCollectionAnalysis:
+    def _analyze_link_collection(self, links: Set[TraceDataFrame], common_words_threshold: float) -> LinkCollectionAnalysis:
         """
         Analyzes all mis predicted trace links.
         :param links: trace links. to analyze
@@ -121,7 +121,7 @@ class ResultsAnalyzer:
 
         return link_collection_analysis
 
-    def _get_mis_and_correctly_predicted_links(self, dataset: TraceDataset) -> Tuple[MisPredictedLinks, Set[TraceLink]]:
+    def _get_mis_and_correctly_predicted_links(self, dataset: TraceDataset) -> Tuple[MisPredictedLinks, Set[TraceDataFrame]]:
         """
         Gets all mis and correctly predicted links from the output
         :param dataset: The dataset containing the original links
@@ -130,7 +130,7 @@ class ResultsAnalyzer:
         mis_predicted_links = MisPredictedLinks()
         correctly_predicted_links = set()
         for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs):
-            trace_link_id = TraceLink.generate_link_id(source_id, target_id)
+            trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
             link = dataset.links[trace_link_id]
             pred_label = self.prediction_output.predictions[i] > THRESHOLD_DEFAULT
             if pred_label != link.get_label():

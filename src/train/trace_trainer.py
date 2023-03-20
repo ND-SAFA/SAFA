@@ -131,7 +131,9 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         n_predictions, n_expected = len(output.predictions), len(self.eval_dataset)
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
-        metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
+        metrics_manager = MetricsManager(trace_df=dataset.trace_df,
+                                         link_ids=dataset.get_ordered_link_ids(),
+                                         trace_predictions=output.predictions)
         trace_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
         return trace_metrics, metrics_manager
 

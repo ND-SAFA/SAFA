@@ -70,4 +70,4 @@ class TestDefinitionCreator(BaseTest):
 
         self.assertEquals(len(dataset.pos_link_ids), 4)
         self.assertEquals(len(dataset.neg_link_ids), 4)
-        self.assertEquals(len(dataset.links), 8)
+        self.assertEquals(len(dataset.trace_df), 8)

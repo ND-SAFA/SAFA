@@ -5,7 +5,7 @@ import math
 from data.datasets.trace_dataset import TraceDataset
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.splitting.abstract_trace_split_strategy import AbstractTraceSplitStrategy
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from util.override import overrides
 
 
@@ -27,13 +27,13 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
         links = SourceSplitStrategy.create_trace_link_array_by_source(dataset)
         first_slice_links, second_slice_links = AbstractTraceSplitStrategy.split_data(links, second_split_percentage,
                                                                                       shuffle=False)
-        slice1 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t.id for t in first_slice_links])
-        slice2 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t.id for t in second_slice_links])
+        slice1 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t[TraceKeys.LINK_ID] for t in first_slice_links])
+        slice2 = AbstractTraceSplitStrategy.create_dataset_slice(dataset, [t[TraceKeys.LINK_ID] for t in second_slice_links])
         return slice1, slice2
 
     @staticmethod
     def create_trace_link_array_by_source(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \
-            -> List[TraceLink]:
+            -> List[TraceDataFrame]:
         """
         Creates an array of trace links constructed by contiguously placing trace links
         associated with a source artifact. Note, source artifacts are randomly selected.

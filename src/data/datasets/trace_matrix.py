@@ -5,7 +5,8 @@ from typing import Callable, Iterable, List, Union
 
 import numpy as np
 
-from data.tree.trace_link import TraceLink
+from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
 
@@ -15,11 +16,13 @@ class TraceMatrix:
     Contains trace and similarity matrices for computing query-based metrics.
     """
 
-    def __init__(self, links: Iterable[TraceLink], predicted_scores: Union[List[float], np.ndarray] = None, randomize: bool = False):
+    def __init__(self, trace_df: TraceDataFrame, predicted_scores: Union[List[float], np.ndarray] = None, link_ids: List[int] = None,
+                 randomize: bool = False):
         """
         Constructs similarity and trace matrices using predictions output.
-        :param links: The list of trace links.
+        :param trace_df: The dataframe of trace links.
         :param predicted_scores: The prediction scores on the links.
+        :param link_ids: If provided, specifies the order of the predicted_scores
         :param randomize: if True, randomizes the order of links in the matrix
         """
         self.query_matrix = {}
@@ -27,7 +30,7 @@ class TraceMatrix:
         self.labels = []
         self.entries = []
         self.scores = predicted_scores
-        self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
+        self._fill_trace_matrix(trace_df, predicted_scores, link_ids)
         if randomize:
             self._do_randomize()
 
@@ -41,7 +44,7 @@ class TraceMatrix:
         metric_values = []
         for source, query in self.query_matrix.items():
             query_predictions = query.preds
-            query_labels = [link.get_label() for link in query.links]
+            query_labels = [link[TraceKeys.LABEL] for link in query.links]
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
@@ -72,31 +75,35 @@ class TraceMatrix:
 
         return self.calculate_query_metric(metric_at_k, **kwargs)
 
-    def _fill_trace_matrix(self, links: Iterable[TraceLink], predicted_scores: List[float]) -> None:
+    def _fill_trace_matrix(self, trace_df: TraceDataFrame, predicted_scores: List[float] = None, link_ids: List[int] = None) -> None:
         """
         Adds all links to the map between source artifacts and their associated trace links.
-        :param links: The list of trace links.
+        :param trace_df: The dataframe of trace links.
         :param predicted_scores: the list of similarity scores for each link
+        :param link_ids: If provided, specifies the order of the predicted_scores
         :return: None
         """
-        for link, pred in zip(links, predicted_scores):
-            self.add_link(link, pred)
+        link_ids = trace_df.index if link_ids is None else link_ids
+        predicted_scores = [None for link in range(len(link_ids))] if predicted_scores is None else predicted_scores
+        for i, link_id in enumerate(link_ids):
+            link = trace_df.get_link(link_id)
+            self.add_link(link, predicted_scores[i])
 
-    def add_link(self, link: TraceLink, pred: float = None) -> None:
+    def add_link(self, link: EnumDict, pred: float = None) -> None:
         """
         Adds a new link to the trace matrix
         :param link: the trace link
         :param pred: the prediction associated with the link
         :return: None
         """
-        if link.source.id not in self.query_matrix:
-            self.query_matrix[link.source.id] = Query(links=[], preds=[])
-            self.source_ids.append(link.source.id)
-        self.query_matrix[link.source.id].links.append(link)
-        self.labels.append(link.get_label())
-        self.entries.append({"source": link.source.id, "target": link.target.id})
+        if link[TraceKeys.SOURCE] not in self.query_matrix:
+            self.query_matrix[link[TraceKeys.SOURCE]] = Query(links=[], preds=[])
+            self.source_ids.append(link[TraceKeys.SOURCE])
+        self.query_matrix[link[TraceKeys.SOURCE]].links.append(link)
+        self.labels.append(link[TraceKeys.LABEL])
+        self.entries.append({"source": link[TraceKeys.SOURCE], "target": link[TraceKeys.TARGET]})
         if pred is not None:
-            self.query_matrix[link.source.id].preds.append(pred)
+            self.query_matrix[link[TraceKeys.SOURCE]].preds.append(pred)
 
     def _do_randomize(self) -> None:
         """

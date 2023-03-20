@@ -3,6 +3,9 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from data.dataframes.artifact_dataframe import ArtifactDataFrame
+from data.dataframes.layer_dataframe import LayerDataFrame
+from data.dataframes.trace_dataframe import TraceDataFrame
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
@@ -10,6 +13,7 @@ from data.readers.definitions.abstract_project_definition import AbstractProject
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.readers.entity.entity_reader import EntityReader
+from util.enum_util import EnumDict
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_manager import logger
@@ -62,27 +66,28 @@ class StructuredProjectReader(AbstractProjectReader):
         :param type2definition: Mapping between artifacts' name and definition.
         :return:  Mapping between artifacts' name and its reader.
         """
-        artifacts_df = pd.DataFrame()
+        artifacts_df = ArtifactDataFrame()
         for artifact_type, artifact_definition in type2definition.items():
             artifact_reader = EntityReader(project_path,
                                            artifact_definition,
                                            conversions=self.conversions)
             artifact_type_df = artifact_reader.read_entities()
-            artifact_type_df[StructuredKeys.Artifact.LAYER_ID] = artifact_type
+            artifact_type_df[StructuredKeys.Artifact.LAYER_ID.value] = artifact_type
             artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
-        return artifacts_df
+        return ArtifactDataFrame(artifacts_df)
 
     def _read_trace_df(self) -> pd.DataFrame:
         """
         Reads trace matrix files and aggregates them into single data frame.
         :return: DataFrame containing all trace links read from project.
         """
-        trace_links = pd.DataFrame()
+        trace_links = TraceDataFrame()
         for _, trace_definition_json in self._get_trace_definitions().items():
             trace_reader = EntityReader(self.project_path, trace_definition_json,
                                         conversions=self.conversions)
             trace_links = pd.concat([trace_links, trace_reader.read_entities()], ignore_index=True)
-        return trace_links
+        trace_links[StructuredKeys.Trace.LABEL.value] = [1 for link in trace_links.index]
+        return TraceDataFrame(trace_links)
 
     def _read_layer_mapping_df(self) -> pd.DataFrame:
         """
@@ -91,13 +96,14 @@ class StructuredProjectReader(AbstractProjectReader):
         """
         entries = []
         for _, trace_definition_json in self._get_trace_definitions().items():
+            trace_definition_json = EnumDict(trace_definition_json)
             source_layer_id = trace_definition_json[StructuredKeys.Trace.SOURCE]
             target_layer_id = trace_definition_json[StructuredKeys.Trace.TARGET]
-            entries.append({
+            entries.append(EnumDict({
                 StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
                 StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
-            })
-        return pd.DataFrame(entries)
+            }))
+        return LayerDataFrame(entries)
 
     def _get_artifact_definitions(self) -> Dict[str, Dict]:
         """

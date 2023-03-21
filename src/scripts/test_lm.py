@@ -91,7 +91,7 @@ if __name__ == "__main__":
     tokenizer = model_manager.get_tokenizer()
     dataset = modes[mode]["dataset"](create=True)
     model = model_manager.get_model()
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=256)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
     arg_params = {"deepspeed": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False}
     arg_params = {k: v for k, v in arg_params.items() if k in modes[mode]["params"]}

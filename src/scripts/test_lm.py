@@ -33,6 +33,7 @@ if __name__ == "__main__":
     #
     # deepspeed.ops.op_builder.CPUAdamBuilder().load()
     model_path = "gpt2-xl"
+    # model_path = "hf-internal-testing/tiny-random-bert"
     dataset_name = "cm1"
     output_path = os.path.expanduser("~/output/test_lm")
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
@@ -52,7 +53,8 @@ if __name__ == "__main__":
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
 
-    args = TrainerArgs(output_path, deepspeed=deepspeed_path)
+    args = TrainerArgs(output_path)  # , deepspeed=deepspeed_path)
+    args.remove_unused_columns = False
     args.__post_init__()
 
     # Prepare dataset

@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -58,7 +57,7 @@ public class AttributeValueDate {
 
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueDate.DEFINITION definition;
+    protected Definition definition;
     @XmlAttribute(name = "THE-VALUE", required = true)
     @XmlSchemaType(name = "dateTime")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -69,11 +68,11 @@ public class AttributeValueDate {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueDate.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueDate.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -82,11 +81,11 @@ public class AttributeValueDate {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueDate.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueDate.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -99,7 +98,7 @@ public class AttributeValueDate {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getTHEVALUE() {
+    public XMLGregorianCalendar getTheValue() {
         return thevalue;
     }
 
@@ -112,7 +111,7 @@ public class AttributeValueDate {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEVALUE(XMLGregorianCalendar value) {
+    public void setTheValue(XMLGregorianCalendar value) {
         this.thevalue = value;
     }
 
@@ -141,7 +140,7 @@ public class AttributeValueDate {
         "attributedefinitiondateref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-DATE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -158,7 +157,7 @@ public class AttributeValueDate {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONDATEREF() {
+        public Object getAttributeDefinitionDateRef() {
             return attributedefinitiondateref;
         }
 
@@ -171,7 +170,7 @@ public class AttributeValueDate {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONDATEREF(Object value) {
+        public void setAttributeDefinitionDateRef(Object value) {
             this.attributedefinitiondateref = value;
         }
 

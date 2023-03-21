@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlType;
+
 import org.w3c.dom.Element;
 
 
@@ -72,7 +72,7 @@ public class ReqIfToolExtension {
      * 
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public List<Object> getAny() {
+    public List<Object> getToolExtensions() {
         if (any == null) {
             any = new ArrayList<Object>();
         }

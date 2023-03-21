@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -125,33 +124,33 @@ public class ReqIfContent {
 
     @XmlElement(name = "DATATYPES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.DATATYPES datatypes;
+    protected Datatypes datatypes;
     @XmlElement(name = "SPEC-TYPES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.SPECTYPES spectypes;
+    protected SpecTypes spectypes;
     @XmlElement(name = "SPEC-OBJECTS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.SPECOBJECTS specobjects;
+    protected SpecObjects specobjects;
     @XmlElement(name = "SPEC-RELATIONS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.SPECRELATIONS specrelations;
+    protected SpecRelations specrelations;
     @XmlElement(name = "SPECIFICATIONS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.SPECIFICATIONS specifications;
+    protected Specifications specifications;
     @XmlElement(name = "SPEC-RELATION-GROUPS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIfContent.SPECRELATIONGROUPS specrelationgroups;
+    protected SpecRelationGroups specrelationgroups;
 
     /**
      * Gets the value of the datatypes property.
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.DATATYPES }
+     *     {@link Datatypes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.DATATYPES getDATATYPES() {
+    public Datatypes getDatatypes() {
         return datatypes;
     }
 
@@ -160,11 +159,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.DATATYPES }
+     *     {@link Datatypes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDATATYPES(ReqIfContent.DATATYPES value) {
+    public void setDatatypes(Datatypes value) {
         this.datatypes = value;
     }
 
@@ -173,11 +172,11 @@ public class ReqIfContent {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.SPECTYPES }
+     *     {@link SpecTypes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.SPECTYPES getSPECTYPES() {
+    public SpecTypes getSpecTypes() {
         return spectypes;
     }
 
@@ -186,11 +185,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.SPECTYPES }
+     *     {@link SpecTypes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECTYPES(ReqIfContent.SPECTYPES value) {
+    public void setSpecTypes(SpecTypes value) {
         this.spectypes = value;
     }
 
@@ -199,11 +198,11 @@ public class ReqIfContent {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.SPECOBJECTS }
+     *     {@link SpecObjects }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.SPECOBJECTS getSPECOBJECTS() {
+    public SpecObjects getSpecObjects() {
         return specobjects;
     }
 
@@ -212,11 +211,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.SPECOBJECTS }
+     *     {@link SpecObjects }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECOBJECTS(ReqIfContent.SPECOBJECTS value) {
+    public void setSpecObjects(SpecObjects value) {
         this.specobjects = value;
     }
 
@@ -225,11 +224,11 @@ public class ReqIfContent {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.SPECRELATIONS }
+     *     {@link SpecRelations }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.SPECRELATIONS getSPECRELATIONS() {
+    public SpecRelations getSpecRelations() {
         return specrelations;
     }
 
@@ -238,11 +237,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.SPECRELATIONS }
+     *     {@link SpecRelations }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECRELATIONS(ReqIfContent.SPECRELATIONS value) {
+    public void setSpecRelations(SpecRelations value) {
         this.specrelations = value;
     }
 
@@ -251,11 +250,11 @@ public class ReqIfContent {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.SPECIFICATIONS }
+     *     {@link Specifications }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.SPECIFICATIONS getSPECIFICATIONS() {
+    public Specifications getSpecifications() {
         return specifications;
     }
 
@@ -264,11 +263,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.SPECIFICATIONS }
+     *     {@link Specifications }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECIFICATIONS(ReqIfContent.SPECIFICATIONS value) {
+    public void setSpecifications(Specifications value) {
         this.specifications = value;
     }
 
@@ -277,11 +276,11 @@ public class ReqIfContent {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIfContent.SPECRELATIONGROUPS }
+     *     {@link SpecRelationGroups }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIfContent.SPECRELATIONGROUPS getSPECRELATIONGROUPS() {
+    public SpecRelationGroups getSpecRelationGroups() {
         return specrelationgroups;
     }
 
@@ -290,11 +289,11 @@ public class ReqIfContent {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIfContent.SPECRELATIONGROUPS }
+     *     {@link SpecRelationGroups }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECRELATIONGROUPS(ReqIfContent.SPECRELATIONGROUPS value) {
+    public void setSpecRelationGroups(SpecRelationGroups value) {
         this.specrelationgroups = value;
     }
 
@@ -329,7 +328,7 @@ public class ReqIfContent {
         "datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DATATYPES {
+    public static class Datatypes {
 
         @XmlElements({
             @XmlElement(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionBoolean.class),
@@ -372,7 +371,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getDATATYPEDEFINITIONBOOLEANOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION() {
+        public List<Object> getDatatypeDefinitions() {
             if (datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION == null) {
                 datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION = new ArrayList<Object>();
             }
@@ -406,7 +405,7 @@ public class ReqIfContent {
         "specification"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECIFICATIONS {
+    public static class Specifications {
 
         @XmlElement(name = "SPECIFICATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -435,7 +434,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Specification> getSPECIFICATION() {
+        public List<Specification> getSpecifications() {
             if (specification == null) {
                 specification = new ArrayList<Specification>();
             }
@@ -469,7 +468,7 @@ public class ReqIfContent {
         "specobject"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECOBJECTS {
+    public static class SpecObjects {
 
         @XmlElement(name = "SPEC-OBJECT", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -498,7 +497,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecObject> getSPECOBJECT() {
+        public List<SpecObject> getSpecObjects() {
             if (specobject == null) {
                 specobject = new ArrayList<SpecObject>();
             }
@@ -532,7 +531,7 @@ public class ReqIfContent {
         "relationgroup"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECRELATIONGROUPS {
+    public static class SpecRelationGroups {
 
         @XmlElement(name = "RELATION-GROUP", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -561,7 +560,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<RelationGroup> getRELATIONGROUP() {
+        public List<RelationGroup> getRelationGroups() {
             if (relationgroup == null) {
                 relationgroup = new ArrayList<RelationGroup>();
             }
@@ -595,7 +594,7 @@ public class ReqIfContent {
         "specrelation"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECRELATIONS {
+    public static class SpecRelations {
 
         @XmlElement(name = "SPEC-RELATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -624,7 +623,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecRelation> getSPECRELATION() {
+        public List<SpecRelation> getSpecRelations() {
             if (specrelation == null) {
                 specrelation = new ArrayList<SpecRelation>();
             }
@@ -661,7 +660,7 @@ public class ReqIfContent {
         "relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECTYPES {
+    public static class SpecTypes {
 
         @XmlElements({
             @XmlElement(name = "RELATION-GROUP-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = RelationGroupType.class),
@@ -698,7 +697,7 @@ public class ReqIfContent {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getRELATIONGROUPTYPEOrSPECOBJECTTYPEOrSPECRELATIONTYPE() {
+        public List<Object> getSpecTypes() {
             if (relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE == null) {
                 relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE = new ArrayList<Object>();
             }

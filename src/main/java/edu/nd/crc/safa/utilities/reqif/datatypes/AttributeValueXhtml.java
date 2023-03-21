@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -59,13 +58,13 @@ public class AttributeValueXhtml {
 
     @XmlElement(name = "THE-VALUE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected XHTMLCONTENT thevalue;
+    protected XhtmlContent thevalue;
     @XmlElement(name = "THE-ORIGINAL-VALUE")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected XHTMLCONTENT theoriginalvalue;
+    protected XhtmlContent theoriginalvalue;
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueXhtml.DEFINITION definition;
+    protected Definition definition;
     @XmlAttribute(name = "IS-SIMPLIFIED")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Boolean issimplified;
@@ -75,11 +74,11 @@ public class AttributeValueXhtml {
      * 
      * @return
      *     possible object is
-     *     {@link XHTMLCONTENT }
+     *     {@link XhtmlContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XHTMLCONTENT getTHEVALUE() {
+    public XhtmlContent getTheValue() {
         return thevalue;
     }
 
@@ -88,11 +87,11 @@ public class AttributeValueXhtml {
      * 
      * @param value
      *     allowed object is
-     *     {@link XHTMLCONTENT }
+     *     {@link XhtmlContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEVALUE(XHTMLCONTENT value) {
+    public void setTheValue(XhtmlContent value) {
         this.thevalue = value;
     }
 
@@ -101,11 +100,11 @@ public class AttributeValueXhtml {
      * 
      * @return
      *     possible object is
-     *     {@link XHTMLCONTENT }
+     *     {@link XhtmlContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XHTMLCONTENT getTHEORIGINALVALUE() {
+    public XhtmlContent getTheOriginalValue() {
         return theoriginalvalue;
     }
 
@@ -114,11 +113,11 @@ public class AttributeValueXhtml {
      * 
      * @param value
      *     allowed object is
-     *     {@link XHTMLCONTENT }
+     *     {@link XhtmlContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEORIGINALVALUE(XHTMLCONTENT value) {
+    public void setTheOriginalValue(XhtmlContent value) {
         this.theoriginalvalue = value;
     }
 
@@ -127,11 +126,11 @@ public class AttributeValueXhtml {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueXhtml.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueXhtml.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -140,11 +139,11 @@ public class AttributeValueXhtml {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueXhtml.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueXhtml.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -157,7 +156,7 @@ public class AttributeValueXhtml {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean isISSIMPLIFIED() {
+    public Boolean getIsSimplified() {
         return issimplified;
     }
 
@@ -170,7 +169,7 @@ public class AttributeValueXhtml {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setISSIMPLIFIED(Boolean value) {
+    public void setIsSimplified(Boolean value) {
         this.issimplified = value;
     }
 
@@ -199,7 +198,7 @@ public class AttributeValueXhtml {
         "attributedefinitionxhtmlref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-XHTML-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -216,7 +215,7 @@ public class AttributeValueXhtml {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONXHTMLREF() {
+        public Object getAttributeDefinitionXhtmlRef() {
             return attributedefinitionxhtmlref;
         }
 
@@ -229,7 +228,7 @@ public class AttributeValueXhtml {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONXHTMLREF(Object value) {
+        public void setAttributeDefinitionXhtmlRef(Object value) {
             this.attributedefinitionxhtmlref = value;
         }
 

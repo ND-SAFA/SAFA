@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -98,7 +97,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getCOMMENT() {
+    public String getComment() {
         return comment;
     }
 
@@ -111,7 +110,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCOMMENT(String value) {
+    public void setComment(String value) {
         this.comment = value;
     }
 
@@ -124,7 +123,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getCREATIONTIME() {
+    public XMLGregorianCalendar getCreationTime() {
         return creationtime;
     }
 
@@ -137,7 +136,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCREATIONTIME(XMLGregorianCalendar value) {
+    public void setCreationTime(XMLGregorianCalendar value) {
         this.creationtime = value;
     }
 
@@ -150,7 +149,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getREPOSITORYID() {
+    public String getRepositoryId() {
         return repositoryid;
     }
 
@@ -163,7 +162,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setREPOSITORYID(String value) {
+    public void setRepositoryId(String value) {
         this.repositoryid = value;
     }
 
@@ -176,7 +175,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getREQIFTOOLID() {
+    public String getReqIfToolId() {
         return reqiftoolid;
     }
 
@@ -189,7 +188,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setREQIFTOOLID(String value) {
+    public void setReqIfToolId(String value) {
         this.reqiftoolid = value;
     }
 
@@ -202,7 +201,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getREQIFVERSION() {
+    public String getReqIfVersion() {
         return reqifversion;
     }
 
@@ -215,7 +214,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setREQIFVERSION(String value) {
+    public void setReqIfVersion(String value) {
         this.reqifversion = value;
     }
 
@@ -228,7 +227,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getSOURCETOOLID() {
+    public String getSourceToolId() {
         return sourcetoolid;
     }
 
@@ -241,7 +240,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSOURCETOOLID(String value) {
+    public void setSourceToolId(String value) {
         this.sourcetoolid = value;
     }
 
@@ -254,7 +253,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getTITLE() {
+    public String getTitle() {
         return title;
     }
 
@@ -267,7 +266,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTITLE(String value) {
+    public void setTitle(String value) {
         this.title = value;
     }
 
@@ -280,7 +279,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIDENTIFIER() {
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -293,7 +292,7 @@ public class ReqIfHeader {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIDENTIFIER(String value) {
+    public void setIdentifier(String value) {
         this.identifier = value;
     }
 

@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -83,10 +82,10 @@ public class SpecObjectType {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecObjectType.ALTERNATIVEID alternativeid;
+    protected AlternativeId alternativeid;
     @XmlElement(name = "SPEC-ATTRIBUTES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecObjectType.SPECATTRIBUTES specattributes;
+    protected SpecAttributes specattributes;
     @XmlAttribute(name = "DESC")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String desc;
@@ -109,11 +108,11 @@ public class SpecObjectType {
      * 
      * @return
      *     possible object is
-     *     {@link SpecObjectType.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecObjectType.ALTERNATIVEID getALTERNATIVEID() {
+    public AlternativeId getALTERNATIVEID() {
         return alternativeid;
     }
 
@@ -122,11 +121,11 @@ public class SpecObjectType {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecObjectType.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setALTERNATIVEID(SpecObjectType.ALTERNATIVEID value) {
+    public void setALTERNATIVEID(AlternativeId value) {
         this.alternativeid = value;
     }
 
@@ -135,11 +134,11 @@ public class SpecObjectType {
      * 
      * @return
      *     possible object is
-     *     {@link SpecObjectType.SPECATTRIBUTES }
+     *     {@link SpecAttributes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecObjectType.SPECATTRIBUTES getSPECATTRIBUTES() {
+    public SpecAttributes getSPECATTRIBUTES() {
         return specattributes;
     }
 
@@ -148,11 +147,11 @@ public class SpecObjectType {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecObjectType.SPECATTRIBUTES }
+     *     {@link SpecAttributes }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECATTRIBUTES(SpecObjectType.SPECATTRIBUTES value) {
+    public void setSPECATTRIBUTES(SpecAttributes value) {
         this.specattributes = value;
     }
 
@@ -285,22 +284,22 @@ public class SpecObjectType {
         "alternativeid"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class ALTERNATIVEID {
+    public static class AlternativeId {
 
         @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AlternativeId alternativeid;
+        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
         /**
          * Gets the value of the alternativeid property.
          * 
          * @return
          *     possible object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AlternativeId getALTERNATIVEID() {
+        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getALTERNATIVEID() {
             return alternativeid;
         }
 
@@ -309,11 +308,11 @@ public class SpecObjectType {
          * 
          * @param value
          *     allowed object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setALTERNATIVEID(AlternativeId value) {
+        public void setALTERNATIVEID(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
             this.alternativeid = value;
         }
 
@@ -350,7 +349,7 @@ public class SpecObjectType {
         "attributedefinitionbooleanOrATTRIBUTEDEFINITIONDATEOrATTRIBUTEDEFINITIONENUMERATION"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SPECATTRIBUTES {
+    public static class SpecAttributes {
 
         @XmlElements({
             @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionBoolean.class),

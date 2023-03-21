@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -57,7 +56,7 @@ public class AttributeValueString {
 
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueString.DEFINITION definition;
+    protected Definition definition;
     @XmlAttribute(name = "THE-VALUE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String thevalue;
@@ -67,11 +66,11 @@ public class AttributeValueString {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueString.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueString.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -80,11 +79,11 @@ public class AttributeValueString {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueString.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueString.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -97,7 +96,7 @@ public class AttributeValueString {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getTHEVALUE() {
+    public String getTheValue() {
         return thevalue;
     }
 
@@ -110,7 +109,7 @@ public class AttributeValueString {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEVALUE(String value) {
+    public void setTheValue(String value) {
         this.thevalue = value;
     }
 
@@ -139,7 +138,7 @@ public class AttributeValueString {
         "attributedefinitionstringref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-STRING-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -156,7 +155,7 @@ public class AttributeValueString {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONSTRINGREF() {
+        public Object getAttributeDefinitionStringRef() {
             return attributedefinitionstringref;
         }
 
@@ -169,7 +168,7 @@ public class AttributeValueString {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONSTRINGREF(Object value) {
+        public void setAttributeDefinitionStringRef(Object value) {
             this.attributedefinitionstringref = value;
         }
 

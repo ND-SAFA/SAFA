@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -110,16 +109,16 @@ public class SpecHierarchy {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecHierarchy.ALTERNATIVEID alternativeid;
+    protected AlternativeId alternativeid;
     @XmlElement(name = "CHILDREN")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecHierarchy.CHILDREN children;
+    protected Children children;
     @XmlElement(name = "EDITABLE-ATTS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecHierarchy.EDITABLEATTS editableatts;
+    protected EditableAtts editableatts;
     @XmlElement(name = "OBJECT", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecHierarchy.OBJECT object;
+    protected ObjectRef objectRef;
     @XmlAttribute(name = "DESC")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String desc;
@@ -148,11 +147,11 @@ public class SpecHierarchy {
      * 
      * @return
      *     possible object is
-     *     {@link SpecHierarchy.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecHierarchy.ALTERNATIVEID getALTERNATIVEID() {
+    public AlternativeId getAlternativeId() {
         return alternativeid;
     }
 
@@ -161,11 +160,11 @@ public class SpecHierarchy {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecHierarchy.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setALTERNATIVEID(SpecHierarchy.ALTERNATIVEID value) {
+    public void setAlternativeId(AlternativeId value) {
         this.alternativeid = value;
     }
 
@@ -174,11 +173,11 @@ public class SpecHierarchy {
      * 
      * @return
      *     possible object is
-     *     {@link SpecHierarchy.CHILDREN }
+     *     {@link Children }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecHierarchy.CHILDREN getCHILDREN() {
+    public Children getChildren() {
         return children;
     }
 
@@ -187,11 +186,11 @@ public class SpecHierarchy {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecHierarchy.CHILDREN }
+     *     {@link Children }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCHILDREN(SpecHierarchy.CHILDREN value) {
+    public void setChildren(Children value) {
         this.children = value;
     }
 
@@ -200,11 +199,11 @@ public class SpecHierarchy {
      * 
      * @return
      *     possible object is
-     *     {@link SpecHierarchy.EDITABLEATTS }
+     *     {@link EditableAtts }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecHierarchy.EDITABLEATTS getEDITABLEATTS() {
+    public EditableAtts getEditableAtts() {
         return editableatts;
     }
 
@@ -213,11 +212,11 @@ public class SpecHierarchy {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecHierarchy.EDITABLEATTS }
+     *     {@link EditableAtts }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setEDITABLEATTS(SpecHierarchy.EDITABLEATTS value) {
+    public void setEditableAtts(EditableAtts value) {
         this.editableatts = value;
     }
 
@@ -226,12 +225,12 @@ public class SpecHierarchy {
      * 
      * @return
      *     possible object is
-     *     {@link SpecHierarchy.OBJECT }
+     *     {@link ObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecHierarchy.OBJECT getOBJECT() {
-        return object;
+    public ObjectRef getObject() {
+        return objectRef;
     }
 
     /**
@@ -239,12 +238,12 @@ public class SpecHierarchy {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecHierarchy.OBJECT }
+     *     {@link ObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setOBJECT(SpecHierarchy.OBJECT value) {
-        this.object = value;
+    public void setObject(ObjectRef value) {
+        this.objectRef = value;
     }
 
     /**
@@ -256,7 +255,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDESC() {
+    public String getDesc() {
         return desc;
     }
 
@@ -269,7 +268,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDESC(String value) {
+    public void setDesc(String value) {
         this.desc = value;
     }
 
@@ -282,7 +281,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIDENTIFIER() {
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -295,7 +294,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIDENTIFIER(String value) {
+    public void setIdentifier(String value) {
         this.identifier = value;
     }
 
@@ -308,7 +307,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean isISEDITABLE() {
+    public Boolean getIsEditable() {
         return iseditable;
     }
 
@@ -321,7 +320,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setISEDITABLE(Boolean value) {
+    public void setIsEditable(Boolean value) {
         this.iseditable = value;
     }
 
@@ -334,7 +333,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean isISTABLEINTERNAL() {
+    public Boolean getIsTableInternal() {
         return istableinternal;
     }
 
@@ -347,7 +346,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setISTABLEINTERNAL(Boolean value) {
+    public void setIsTableInternal(Boolean value) {
         this.istableinternal = value;
     }
 
@@ -360,7 +359,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLASTCHANGE() {
+    public XMLGregorianCalendar getLastChange() {
         return lastchange;
     }
 
@@ -373,7 +372,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLASTCHANGE(XMLGregorianCalendar value) {
+    public void setLastChange(XMLGregorianCalendar value) {
         this.lastchange = value;
     }
 
@@ -386,7 +385,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLONGNAME() {
+    public String getLongName() {
         return longname;
     }
 
@@ -399,7 +398,7 @@ public class SpecHierarchy {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLONGNAME(String value) {
+    public void setLongName(String value) {
         this.longname = value;
     }
 
@@ -428,22 +427,22 @@ public class SpecHierarchy {
         "alternativeid"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class ALTERNATIVEID {
+    public static class AlternativeId {
 
         @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AlternativeId alternativeid;
+        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
         /**
          * Gets the value of the alternativeid property.
          * 
          * @return
          *     possible object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AlternativeId getALTERNATIVEID() {
+        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
             return alternativeid;
         }
 
@@ -452,11 +451,11 @@ public class SpecHierarchy {
          * 
          * @param value
          *     allowed object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setALTERNATIVEID(AlternativeId value) {
+        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
             this.alternativeid = value;
         }
 
@@ -487,7 +486,7 @@ public class SpecHierarchy {
         "spechierarchy"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class CHILDREN {
+    public static class Children {
 
         @XmlElement(name = "SPEC-HIERARCHY", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -516,7 +515,7 @@ public class SpecHierarchy {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecHierarchy> getSPECHIERARCHY() {
+        public List<SpecHierarchy> getChildren() {
             if (spechierarchy == null) {
                 spechierarchy = new ArrayList<SpecHierarchy>();
             }
@@ -556,7 +555,7 @@ public class SpecHierarchy {
         "attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class EDITABLEATTS {
+    public static class EditableAtts {
 
         @XmlElementRefs({
             @XmlElementRef(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
@@ -568,7 +567,7 @@ public class SpecHierarchy {
             @XmlElementRef(name = "ATTRIBUTE-DEFINITION-XHTML-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false)
         })
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<JAXBElement<Object>> attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF;
+        protected List<JAXBElement<java.lang.Object>> attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF;
 
         /**
          * Gets the value of the attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF property.
@@ -588,20 +587,20 @@ public class SpecHierarchy {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
+         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
          * 
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<JAXBElement<Object>> getATTRIBUTEDEFINITIONBOOLEANREFOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF() {
+        public List<JAXBElement<java.lang.Object>> getEditableAtts() {
             if (attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF == null) {
-                attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF = new ArrayList<JAXBElement<Object>>();
+                attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF = new ArrayList<JAXBElement<java.lang.Object>>();
             }
             return this.attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF;
         }
@@ -633,24 +632,24 @@ public class SpecHierarchy {
         "specobjectref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class OBJECT {
+    public static class ObjectRef {
 
         @XmlElement(name = "SPEC-OBJECT-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object specobjectref;
+        protected java.lang.Object specobjectref;
 
         /**
          * Gets the value of the specobjectref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link java.lang.Object }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getSPECOBJECTREF() {
+        public java.lang.Object getSpecObjectRef() {
             return specobjectref;
         }
 
@@ -659,11 +658,11 @@ public class SpecHierarchy {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link java.lang.Object }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSPECOBJECTREF(Object value) {
+        public void setSpecObjectRef(java.lang.Object value) {
             this.specobjectref = value;
         }
 

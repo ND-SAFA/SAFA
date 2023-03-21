@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.math.BigInteger;
@@ -59,7 +58,7 @@ public class EmbeddedValue {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public BigInteger getKEY() {
+    public BigInteger getKey() {
         return key;
     }
 
@@ -72,7 +71,7 @@ public class EmbeddedValue {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setKEY(BigInteger value) {
+    public void setKey(BigInteger value) {
         this.key = value;
     }
 
@@ -85,7 +84,7 @@ public class EmbeddedValue {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getOTHERCONTENT() {
+    public String getOtherContent() {
         return othercontent;
     }
 
@@ -98,7 +97,7 @@ public class EmbeddedValue {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setOTHERCONTENT(String value) {
+    public void setOtherContent(String value) {
         this.othercontent = value;
     }
 

@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
     "div"
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-public class XHTMLCONTENT {
+public class XhtmlContent {
 
     @XmlElement(namespace = "http://www.w3.org/1999/xhtml")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")

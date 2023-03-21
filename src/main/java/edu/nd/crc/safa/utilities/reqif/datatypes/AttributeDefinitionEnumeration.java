@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -88,13 +87,13 @@ public class AttributeDefinitionEnumeration {
 
     @XmlElement(name = "DEFAULT-VALUE")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeDefinitionEnumeration.DEFAULTVALUE defaultvalue;
+    protected DefaultValue defaultvalue;
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeDefinitionEnumeration.ALTERNATIVEID alternativeid;
+    protected AlternativeId alternativeid;
     @XmlElement(name = "TYPE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeDefinitionEnumeration.TYPE type;
+    protected Type type;
     @XmlAttribute(name = "DESC")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String desc;
@@ -123,11 +122,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeDefinitionEnumeration.DEFAULTVALUE }
+     *     {@link DefaultValue }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeDefinitionEnumeration.DEFAULTVALUE getDEFAULTVALUE() {
+    public DefaultValue getDefaultValue() {
         return defaultvalue;
     }
 
@@ -136,11 +135,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeDefinitionEnumeration.DEFAULTVALUE }
+     *     {@link DefaultValue }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFAULTVALUE(AttributeDefinitionEnumeration.DEFAULTVALUE value) {
+    public void setDefaultValue(DefaultValue value) {
         this.defaultvalue = value;
     }
 
@@ -149,11 +148,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeDefinitionEnumeration.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeDefinitionEnumeration.ALTERNATIVEID getALTERNATIVEID() {
+    public AlternativeId getAlternativeId() {
         return alternativeid;
     }
 
@@ -162,11 +161,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeDefinitionEnumeration.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setALTERNATIVEID(AttributeDefinitionEnumeration.ALTERNATIVEID value) {
+    public void setAlternativeId(AlternativeId value) {
         this.alternativeid = value;
     }
 
@@ -175,11 +174,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeDefinitionEnumeration.TYPE }
+     *     {@link Type }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeDefinitionEnumeration.TYPE getTYPE() {
+    public Type getType() {
         return type;
     }
 
@@ -188,11 +187,11 @@ public class AttributeDefinitionEnumeration {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeDefinitionEnumeration.TYPE }
+     *     {@link Type }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTYPE(AttributeDefinitionEnumeration.TYPE value) {
+    public void setType(Type value) {
         this.type = value;
     }
 
@@ -205,7 +204,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDESC() {
+    public String getDesc() {
         return desc;
     }
 
@@ -218,7 +217,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDESC(String value) {
+    public void setDesc(String value) {
         this.desc = value;
     }
 
@@ -231,7 +230,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIDENTIFIER() {
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -244,7 +243,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIDENTIFIER(String value) {
+    public void setIdentifier(String value) {
         this.identifier = value;
     }
 
@@ -257,7 +256,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean isISEDITABLE() {
+    public Boolean getIsEditable() {
         return iseditable;
     }
 
@@ -270,7 +269,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setISEDITABLE(Boolean value) {
+    public void setIsEditable(Boolean value) {
         this.iseditable = value;
     }
 
@@ -283,7 +282,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLASTCHANGE() {
+    public XMLGregorianCalendar getLastChange() {
         return lastchange;
     }
 
@@ -296,7 +295,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLASTCHANGE(XMLGregorianCalendar value) {
+    public void setLastChange(XMLGregorianCalendar value) {
         this.lastchange = value;
     }
 
@@ -309,7 +308,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLONGNAME() {
+    public String getLongName() {
         return longname;
     }
 
@@ -322,7 +321,7 @@ public class AttributeDefinitionEnumeration {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLONGNAME(String value) {
+    public void setLongName(String value) {
         this.longname = value;
     }
 
@@ -331,7 +330,7 @@ public class AttributeDefinitionEnumeration {
      * 
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public boolean isMULTIVALUED() {
+    public boolean getMultiValued() {
         return multivalued;
     }
 
@@ -340,7 +339,7 @@ public class AttributeDefinitionEnumeration {
      * 
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setMULTIVALUED(boolean value) {
+    public void setMultiValued(boolean value) {
         this.multivalued = value;
     }
 
@@ -369,22 +368,22 @@ public class AttributeDefinitionEnumeration {
         "alternativeid"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class ALTERNATIVEID {
+    public static class AlternativeId {
 
         @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AlternativeId alternativeid;
+        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
         /**
          * Gets the value of the alternativeid property.
          * 
          * @return
          *     possible object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AlternativeId getALTERNATIVEID() {
+        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
             return alternativeid;
         }
 
@@ -393,11 +392,11 @@ public class AttributeDefinitionEnumeration {
          * 
          * @param value
          *     allowed object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setALTERNATIVEID(AlternativeId value) {
+        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
             this.alternativeid = value;
         }
 
@@ -428,7 +427,7 @@ public class AttributeDefinitionEnumeration {
         "attributevalueenumeration"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFAULTVALUE {
+    public static class DefaultValue {
 
         @XmlElement(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -443,7 +442,7 @@ public class AttributeDefinitionEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AttributeValueEnumeration getATTRIBUTEVALUEENUMERATION() {
+        public AttributeValueEnumeration getAttributeValueEnumeration() {
             return attributevalueenumeration;
         }
 
@@ -456,7 +455,7 @@ public class AttributeDefinitionEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEVALUEENUMERATION(AttributeValueEnumeration value) {
+        public void setAttributeValueEnumeration(AttributeValueEnumeration value) {
             this.attributevalueenumeration = value;
         }
 
@@ -487,7 +486,7 @@ public class AttributeDefinitionEnumeration {
         "datatypedefinitionenumerationref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class TYPE {
+    public static class Type {
 
         @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -504,7 +503,7 @@ public class AttributeDefinitionEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getDATATYPEDEFINITIONENUMERATIONREF() {
+        public Object getDatatypeDefinitionEnumerationRef() {
             return datatypedefinitionenumerationref;
         }
 
@@ -517,7 +516,7 @@ public class AttributeDefinitionEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setDATATYPEDEFINITIONENUMERATIONREF(Object value) {
+        public void setDatatypeDefinitionEnumerationRef(Object value) {
             this.datatypedefinitionenumerationref = value;
         }
 

@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -70,21 +69,21 @@ public class AttributeValueEnumeration {
 
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueEnumeration.DEFINITION definition;
+    protected Definition definition;
     @XmlElement(name = "VALUES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueEnumeration.VALUES values;
+    protected Values values;
 
     /**
      * Gets the value of the definition property.
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueEnumeration.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueEnumeration.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -93,11 +92,11 @@ public class AttributeValueEnumeration {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueEnumeration.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueEnumeration.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -106,11 +105,11 @@ public class AttributeValueEnumeration {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueEnumeration.VALUES }
+     *     {@link Values }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueEnumeration.VALUES getVALUES() {
+    public Values getValues() {
         return values;
     }
 
@@ -119,11 +118,11 @@ public class AttributeValueEnumeration {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueEnumeration.VALUES }
+     *     {@link Values }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setVALUES(AttributeValueEnumeration.VALUES value) {
+    public void setValues(Values value) {
         this.values = value;
     }
 
@@ -152,7 +151,7 @@ public class AttributeValueEnumeration {
         "attributedefinitionenumerationref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -169,7 +168,7 @@ public class AttributeValueEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONENUMERATIONREF() {
+        public Object getAttributeDefinitionEnumerationRef() {
             return attributedefinitionenumerationref;
         }
 
@@ -182,7 +181,7 @@ public class AttributeValueEnumeration {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONENUMERATIONREF(Object value) {
+        public void setAttributeDefinitionEnumerationRef(Object value) {
             this.attributedefinitionenumerationref = value;
         }
 
@@ -213,7 +212,7 @@ public class AttributeValueEnumeration {
         "enumvalueref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class VALUES {
+    public static class Values {
 
         @XmlElementRef(name = "ENUM-VALUE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false)
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")

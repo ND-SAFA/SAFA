@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -117,19 +116,19 @@ public class SpecRelation {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelation.ALTERNATIVEID alternativeid;
+    protected AlternativeId alternativeid;
     @XmlElement(name = "VALUES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelation.VALUES values;
+    protected Values values;
     @XmlElement(name = "SOURCE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelation.SOURCE source;
+    protected Source source;
     @XmlElement(name = "TARGET", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelation.TARGET target;
+    protected Target target;
     @XmlElement(name = "TYPE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelation.TYPE type;
+    protected Type type;
     @XmlAttribute(name = "DESC")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String desc;
@@ -152,11 +151,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link SpecRelation.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelation.ALTERNATIVEID getALTERNATIVEID() {
+    public AlternativeId getAlternativeId() {
         return alternativeid;
     }
 
@@ -165,11 +164,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecRelation.ALTERNATIVEID }
+     *     {@link AlternativeId }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setALTERNATIVEID(SpecRelation.ALTERNATIVEID value) {
+    public void setAlternativeId(AlternativeId value) {
         this.alternativeid = value;
     }
 
@@ -178,11 +177,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link SpecRelation.VALUES }
+     *     {@link Values }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelation.VALUES getVALUES() {
+    public Values getValues() {
         return values;
     }
 
@@ -191,11 +190,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecRelation.VALUES }
+     *     {@link Values }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setVALUES(SpecRelation.VALUES value) {
+    public void setValues(Values value) {
         this.values = value;
     }
 
@@ -204,11 +203,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link SpecRelation.SOURCE }
+     *     {@link Source }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelation.SOURCE getSOURCE() {
+    public Source getSource() {
         return source;
     }
 
@@ -217,11 +216,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecRelation.SOURCE }
+     *     {@link Source }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSOURCE(SpecRelation.SOURCE value) {
+    public void setSource(Source value) {
         this.source = value;
     }
 
@@ -230,11 +229,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link SpecRelation.TARGET }
+     *     {@link Target }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelation.TARGET getTARGET() {
+    public Target getTarget() {
         return target;
     }
 
@@ -243,11 +242,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecRelation.TARGET }
+     *     {@link Target }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTARGET(SpecRelation.TARGET value) {
+    public void setTarget(Target value) {
         this.target = value;
     }
 
@@ -256,11 +255,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link SpecRelation.TYPE }
+     *     {@link Type }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelation.TYPE getTYPE() {
+    public Type getType() {
         return type;
     }
 
@@ -269,11 +268,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link SpecRelation.TYPE }
+     *     {@link Type }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTYPE(SpecRelation.TYPE value) {
+    public void setType(Type value) {
         this.type = value;
     }
 
@@ -286,7 +285,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDESC() {
+    public String getDesc() {
         return desc;
     }
 
@@ -299,7 +298,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDESC(String value) {
+    public void setDesc(String value) {
         this.desc = value;
     }
 
@@ -312,7 +311,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIDENTIFIER() {
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -325,7 +324,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIDENTIFIER(String value) {
+    public void setIdentifier(String value) {
         this.identifier = value;
     }
 
@@ -338,7 +337,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLASTCHANGE() {
+    public XMLGregorianCalendar getLastChange() {
         return lastchange;
     }
 
@@ -351,7 +350,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLASTCHANGE(XMLGregorianCalendar value) {
+    public void setLastChange(XMLGregorianCalendar value) {
         this.lastchange = value;
     }
 
@@ -364,7 +363,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLONGNAME() {
+    public String getLongName() {
         return longname;
     }
 
@@ -377,7 +376,7 @@ public class SpecRelation {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLONGNAME(String value) {
+    public void setLongName(String value) {
         this.longname = value;
     }
 
@@ -406,22 +405,22 @@ public class SpecRelation {
         "alternativeid"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class ALTERNATIVEID {
+    public static class AlternativeId {
 
         @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AlternativeId alternativeid;
+        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
         /**
          * Gets the value of the alternativeid property.
          * 
          * @return
          *     possible object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AlternativeId getALTERNATIVEID() {
+        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
             return alternativeid;
         }
 
@@ -430,11 +429,11 @@ public class SpecRelation {
          * 
          * @param value
          *     allowed object is
-         *     {@link AlternativeId }
+         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setALTERNATIVEID(AlternativeId value) {
+        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
             this.alternativeid = value;
         }
 
@@ -465,7 +464,7 @@ public class SpecRelation {
         "specobjectref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class SOURCE {
+    public static class Source {
 
         @XmlElement(name = "SPEC-OBJECT-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -480,7 +479,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public String getSPECOBJECTREF() {
+        public String getSpecObjectRef() {
             return specobjectref;
         }
 
@@ -493,7 +492,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSPECOBJECTREF(String value) {
+        public void setSpecObjectRef(String value) {
             this.specobjectref = value;
         }
 
@@ -524,7 +523,7 @@ public class SpecRelation {
         "specobjectref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class TARGET {
+    public static class Target {
 
         @XmlElement(name = "SPEC-OBJECT-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -539,7 +538,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public String getSPECOBJECTREF() {
+        public String getSpecObjectRef() {
             return specobjectref;
         }
 
@@ -552,7 +551,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSPECOBJECTREF(String value) {
+        public void setSpecObjectRef(String value) {
             this.specobjectref = value;
         }
 
@@ -583,7 +582,7 @@ public class SpecRelation {
         "specrelationtyperef"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class TYPE {
+    public static class Type {
 
         @XmlElement(name = "SPEC-RELATION-TYPE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -600,7 +599,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getSPECRELATIONTYPEREF() {
+        public Object getSpecRelationTypeRef() {
             return specrelationtyperef;
         }
 
@@ -613,7 +612,7 @@ public class SpecRelation {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSPECRELATIONTYPEREF(Object value) {
+        public void setSpecRelationTypeRef(Object value) {
             this.specrelationtyperef = value;
         }
 
@@ -650,7 +649,7 @@ public class SpecRelation {
         "attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class VALUES {
+    public static class Values {
 
         @XmlElements({
             @XmlElement(name = "ATTRIBUTE-VALUE-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeValueBoolean.class),
@@ -693,7 +692,7 @@ public class SpecRelation {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getATTRIBUTEVALUEBOOLEANOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION() {
+        public List<Object> getAttributeValues() {
             if (attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION == null) {
                 attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION = new ArrayList<Object>();
             }

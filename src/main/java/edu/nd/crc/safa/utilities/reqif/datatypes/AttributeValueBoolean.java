@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.annotation.Generated;
@@ -57,7 +56,7 @@ public class AttributeValueBoolean {
 
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueBoolean.DEFINITION definition;
+    protected Definition definition;
     @XmlAttribute(name = "THE-VALUE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected boolean thevalue;
@@ -67,11 +66,11 @@ public class AttributeValueBoolean {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueBoolean.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueBoolean.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -80,11 +79,11 @@ public class AttributeValueBoolean {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueBoolean.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueBoolean.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -93,7 +92,7 @@ public class AttributeValueBoolean {
      * 
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public boolean isTHEVALUE() {
+    public boolean getTheValue() {
         return thevalue;
     }
 
@@ -102,7 +101,7 @@ public class AttributeValueBoolean {
      * 
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEVALUE(boolean value) {
+    public void setTheValue(boolean value) {
         this.thevalue = value;
     }
 
@@ -131,7 +130,7 @@ public class AttributeValueBoolean {
         "attributedefinitionbooleanref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -148,7 +147,7 @@ public class AttributeValueBoolean {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONBOOLEANREF() {
+        public Object getAttributeDefinitionBooleanRef() {
             return attributedefinitionbooleanref;
         }
 
@@ -161,7 +160,7 @@ public class AttributeValueBoolean {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONBOOLEANREF(Object value) {
+        public void setAttributeDefinitionBooleanRef(Object value) {
             this.attributedefinitionbooleanref = value;
         }
 

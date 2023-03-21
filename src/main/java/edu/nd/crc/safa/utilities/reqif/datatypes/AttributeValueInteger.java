@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.math.BigInteger;
@@ -58,7 +57,7 @@ public class AttributeValueInteger {
 
     @XmlElement(name = "DEFINITION", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AttributeValueInteger.DEFINITION definition;
+    protected Definition definition;
     @XmlAttribute(name = "THE-VALUE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected BigInteger thevalue;
@@ -68,11 +67,11 @@ public class AttributeValueInteger {
      * 
      * @return
      *     possible object is
-     *     {@link AttributeValueInteger.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AttributeValueInteger.DEFINITION getDEFINITION() {
+    public Definition getDefinition() {
         return definition;
     }
 
@@ -81,11 +80,11 @@ public class AttributeValueInteger {
      * 
      * @param value
      *     allowed object is
-     *     {@link AttributeValueInteger.DEFINITION }
+     *     {@link Definition }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDEFINITION(AttributeValueInteger.DEFINITION value) {
+    public void setDefinition(Definition value) {
         this.definition = value;
     }
 
@@ -98,7 +97,7 @@ public class AttributeValueInteger {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public BigInteger getTHEVALUE() {
+    public BigInteger getTheValue() {
         return thevalue;
     }
 
@@ -111,7 +110,7 @@ public class AttributeValueInteger {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTHEVALUE(BigInteger value) {
+    public void setTheValue(BigInteger value) {
         this.thevalue = value;
     }
 
@@ -140,7 +139,7 @@ public class AttributeValueInteger {
         "attributedefinitionintegerref"
     })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class DEFINITION {
+    public static class Definition {
 
         @XmlElement(name = "ATTRIBUTE-DEFINITION-INTEGER-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
         @XmlIDREF
@@ -157,7 +156,7 @@ public class AttributeValueInteger {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getATTRIBUTEDEFINITIONINTEGERREF() {
+        public Object getAttributeDefinitionIntegerRef() {
             return attributedefinitionintegerref;
         }
 
@@ -170,7 +169,7 @@ public class AttributeValueInteger {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setATTRIBUTEDEFINITIONINTEGERREF(Object value) {
+        public void setAttributeDefinitionIntegerRef(Object value) {
             this.attributedefinitionintegerref = value;
         }
 

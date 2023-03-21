@@ -388,11 +388,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link XHTMLCONTENT }
+     * Create an instance of {@link XhtmlContent }
      * 
      */
-    public XHTMLCONTENT createXHTMLCONTENT() {
-        return new XHTMLCONTENT();
+    public XhtmlContent createXHTMLCONTENT() {
+        return new XhtmlContent();
     }
 
     /**
@@ -772,595 +772,595 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SpecificationType.ALTERNATIVEID }
+     * Create an instance of {@link SpecificationType.AlternativeId }
      * 
      */
-    public SpecificationType.ALTERNATIVEID createSpecificationTypeALTERNATIVEID() {
-        return new SpecificationType.ALTERNATIVEID();
+    public SpecificationType.AlternativeId createSpecificationTypeALTERNATIVEID() {
+        return new SpecificationType.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecificationType.SPECATTRIBUTES }
+     * Create an instance of {@link SpecificationType.SpecAttributes }
      * 
      */
-    public SpecificationType.SPECATTRIBUTES createSpecificationTypeSPECATTRIBUTES() {
-        return new SpecificationType.SPECATTRIBUTES();
+    public SpecificationType.SpecAttributes createSpecificationTypeSPECATTRIBUTES() {
+        return new SpecificationType.SpecAttributes();
     }
 
     /**
-     * Create an instance of {@link Specification.ALTERNATIVEID }
+     * Create an instance of {@link Specification.AlternativeId }
      * 
      */
-    public Specification.ALTERNATIVEID createSpecificationALTERNATIVEID() {
-        return new Specification.ALTERNATIVEID();
+    public Specification.AlternativeId createSpecificationALTERNATIVEID() {
+        return new Specification.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link Specification.VALUES }
+     * Create an instance of {@link Specification.Values }
      * 
      */
-    public Specification.VALUES createSpecificationVALUES() {
-        return new Specification.VALUES();
+    public Specification.Values createSpecificationVALUES() {
+        return new Specification.Values();
     }
 
     /**
-     * Create an instance of {@link Specification.CHILDREN }
+     * Create an instance of {@link Specification.Children }
      * 
      */
-    public Specification.CHILDREN createSpecificationCHILDREN() {
-        return new Specification.CHILDREN();
+    public Specification.Children createSpecificationCHILDREN() {
+        return new Specification.Children();
     }
 
     /**
-     * Create an instance of {@link Specification.TYPE }
+     * Create an instance of {@link Specification.Type }
      * 
      */
-    public Specification.TYPE createSpecificationTYPE() {
-        return new Specification.TYPE();
+    public Specification.Type createSpecificationTYPE() {
+        return new Specification.Type();
     }
 
     /**
-     * Create an instance of {@link SpecRelationType.ALTERNATIVEID }
+     * Create an instance of {@link SpecRelationType.AlternativeId }
      * 
      */
-    public SpecRelationType.ALTERNATIVEID createSpecRelationTypeALTERNATIVEID() {
-        return new SpecRelationType.ALTERNATIVEID();
+    public SpecRelationType.AlternativeId createSpecRelationTypeALTERNATIVEID() {
+        return new SpecRelationType.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecRelationType.SPECATTRIBUTES }
+     * Create an instance of {@link SpecRelationType.SpecAttributes }
      * 
      */
-    public SpecRelationType.SPECATTRIBUTES createSpecRelationTypeSPECATTRIBUTES() {
-        return new SpecRelationType.SPECATTRIBUTES();
+    public SpecRelationType.SpecAttributes createSpecRelationTypeSPECATTRIBUTES() {
+        return new SpecRelationType.SpecAttributes();
     }
 
     /**
-     * Create an instance of {@link SpecRelation.ALTERNATIVEID }
+     * Create an instance of {@link SpecRelation.AlternativeId }
      * 
      */
-    public SpecRelation.ALTERNATIVEID createSpecRelationALTERNATIVEID() {
-        return new SpecRelation.ALTERNATIVEID();
+    public SpecRelation.AlternativeId createSpecRelationALTERNATIVEID() {
+        return new SpecRelation.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecRelation.VALUES }
+     * Create an instance of {@link SpecRelation.Values }
      * 
      */
-    public SpecRelation.VALUES createSpecRelationVALUES() {
-        return new SpecRelation.VALUES();
+    public SpecRelation.Values createSpecRelationVALUES() {
+        return new SpecRelation.Values();
     }
 
     /**
-     * Create an instance of {@link SpecRelation.SOURCE }
+     * Create an instance of {@link SpecRelation.Source }
      * 
      */
-    public SpecRelation.SOURCE createSpecRelationSOURCE() {
-        return new SpecRelation.SOURCE();
+    public SpecRelation.Source createSpecRelationSOURCE() {
+        return new SpecRelation.Source();
     }
 
     /**
-     * Create an instance of {@link SpecRelation.TARGET }
+     * Create an instance of {@link SpecRelation.Target }
      * 
      */
-    public SpecRelation.TARGET createSpecRelationTARGET() {
-        return new SpecRelation.TARGET();
+    public SpecRelation.Target createSpecRelationTARGET() {
+        return new SpecRelation.Target();
     }
 
     /**
-     * Create an instance of {@link SpecRelation.TYPE }
+     * Create an instance of {@link SpecRelation.Type }
      * 
      */
-    public SpecRelation.TYPE createSpecRelationTYPE() {
-        return new SpecRelation.TYPE();
+    public SpecRelation.Type createSpecRelationTYPE() {
+        return new SpecRelation.Type();
     }
 
     /**
-     * Create an instance of {@link SpecObjectType.ALTERNATIVEID }
+     * Create an instance of {@link SpecObjectType.AlternativeId }
      * 
      */
-    public SpecObjectType.ALTERNATIVEID createSpecObjectTypeALTERNATIVEID() {
-        return new SpecObjectType.ALTERNATIVEID();
+    public SpecObjectType.AlternativeId createSpecObjectTypeALTERNATIVEID() {
+        return new SpecObjectType.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecObjectType.SPECATTRIBUTES }
+     * Create an instance of {@link SpecObjectType.SpecAttributes }
      * 
      */
-    public SpecObjectType.SPECATTRIBUTES createSpecObjectTypeSPECATTRIBUTES() {
-        return new SpecObjectType.SPECATTRIBUTES();
+    public SpecObjectType.SpecAttributes createSpecObjectTypeSPECATTRIBUTES() {
+        return new SpecObjectType.SpecAttributes();
     }
 
     /**
-     * Create an instance of {@link SpecObject.ALTERNATIVEID }
+     * Create an instance of {@link SpecObject.AlternativeId }
      * 
      */
-    public SpecObject.ALTERNATIVEID createSpecObjectALTERNATIVEID() {
-        return new SpecObject.ALTERNATIVEID();
+    public SpecObject.AlternativeId createSpecObjectALTERNATIVEID() {
+        return new SpecObject.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecObject.VALUES }
+     * Create an instance of {@link SpecObject.Values }
      * 
      */
-    public SpecObject.VALUES createSpecObjectVALUES() {
-        return new SpecObject.VALUES();
+    public SpecObject.Values createSpecObjectVALUES() {
+        return new SpecObject.Values();
     }
 
     /**
-     * Create an instance of {@link SpecObject.TYPE }
+     * Create an instance of {@link SpecObject.Type }
      * 
      */
-    public SpecObject.TYPE createSpecObjectTYPE() {
-        return new SpecObject.TYPE();
+    public SpecObject.Type createSpecObjectTYPE() {
+        return new SpecObject.Type();
     }
 
     /**
-     * Create an instance of {@link SpecHierarchy.ALTERNATIVEID }
+     * Create an instance of {@link SpecHierarchy.AlternativeId }
      * 
      */
-    public SpecHierarchy.ALTERNATIVEID createSpecHierarchyALTERNATIVEID() {
-        return new SpecHierarchy.ALTERNATIVEID();
+    public SpecHierarchy.AlternativeId createSpecHierarchyALTERNATIVEID() {
+        return new SpecHierarchy.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link SpecHierarchy.CHILDREN }
+     * Create an instance of {@link SpecHierarchy.Children }
      * 
      */
-    public SpecHierarchy.CHILDREN createSpecHierarchyCHILDREN() {
-        return new SpecHierarchy.CHILDREN();
+    public SpecHierarchy.Children createSpecHierarchyCHILDREN() {
+        return new SpecHierarchy.Children();
     }
 
     /**
-     * Create an instance of {@link SpecHierarchy.EDITABLEATTS }
+     * Create an instance of {@link SpecHierarchy.EditableAtts }
      * 
      */
-    public SpecHierarchy.EDITABLEATTS createSpecHierarchyEDITABLEATTS() {
-        return new SpecHierarchy.EDITABLEATTS();
+    public SpecHierarchy.EditableAtts createSpecHierarchyEDITABLEATTS() {
+        return new SpecHierarchy.EditableAtts();
     }
 
     /**
-     * Create an instance of {@link SpecHierarchy.OBJECT }
+     * Create an instance of {@link SpecHierarchy.ObjectRef }
      * 
      */
-    public SpecHierarchy.OBJECT createSpecHierarchyOBJECT() {
-        return new SpecHierarchy.OBJECT();
+    public SpecHierarchy.ObjectRef createSpecHierarchyOBJECT() {
+        return new SpecHierarchy.ObjectRef();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.DATATYPES }
+     * Create an instance of {@link ReqIfContent.Datatypes }
      * 
      */
-    public ReqIfContent.DATATYPES createReqIfContentDATATYPES() {
-        return new ReqIfContent.DATATYPES();
+    public ReqIfContent.Datatypes createReqIfContentDATATYPES() {
+        return new ReqIfContent.Datatypes();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.SPECTYPES }
+     * Create an instance of {@link ReqIfContent.SpecTypes }
      * 
      */
-    public ReqIfContent.SPECTYPES createReqIfContentSPECTYPES() {
-        return new ReqIfContent.SPECTYPES();
+    public ReqIfContent.SpecTypes createReqIfContentSPECTYPES() {
+        return new ReqIfContent.SpecTypes();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.SPECOBJECTS }
+     * Create an instance of {@link ReqIfContent.SpecObjects }
      * 
      */
-    public ReqIfContent.SPECOBJECTS createReqIfContentSPECOBJECTS() {
-        return new ReqIfContent.SPECOBJECTS();
+    public ReqIfContent.SpecObjects createReqIfContentSPECOBJECTS() {
+        return new ReqIfContent.SpecObjects();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.SPECRELATIONS }
+     * Create an instance of {@link ReqIfContent.SpecRelations }
      * 
      */
-    public ReqIfContent.SPECRELATIONS createReqIfContentSPECRELATIONS() {
-        return new ReqIfContent.SPECRELATIONS();
+    public ReqIfContent.SpecRelations createReqIfContentSPECRELATIONS() {
+        return new ReqIfContent.SpecRelations();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.SPECIFICATIONS }
+     * Create an instance of {@link ReqIfContent.Specifications }
      * 
      */
-    public ReqIfContent.SPECIFICATIONS createReqIfContentSPECIFICATIONS() {
-        return new ReqIfContent.SPECIFICATIONS();
+    public ReqIfContent.Specifications createReqIfContentSPECIFICATIONS() {
+        return new ReqIfContent.Specifications();
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.SPECRELATIONGROUPS }
+     * Create an instance of {@link ReqIfContent.SpecRelationGroups }
      * 
      */
-    public ReqIfContent.SPECRELATIONGROUPS createReqIfContentSPECRELATIONGROUPS() {
-        return new ReqIfContent.SPECRELATIONGROUPS();
+    public ReqIfContent.SpecRelationGroups createReqIfContentSPECRELATIONGROUPS() {
+        return new ReqIfContent.SpecRelationGroups();
     }
 
     /**
-     * Create an instance of {@link RelationGroupType.ALTERNATIVEID }
+     * Create an instance of {@link RelationGroupType.AlternativeId }
      * 
      */
-    public RelationGroupType.ALTERNATIVEID createRelationGroupTypeALTERNATIVEID() {
-        return new RelationGroupType.ALTERNATIVEID();
+    public RelationGroupType.AlternativeId createRelationGroupTypeALTERNATIVEID() {
+        return new RelationGroupType.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link RelationGroupType.SPECATTRIBUTES }
+     * Create an instance of {@link RelationGroupType.SpecAttributes }
      * 
      */
-    public RelationGroupType.SPECATTRIBUTES createRelationGroupTypeSPECATTRIBUTES() {
-        return new RelationGroupType.SPECATTRIBUTES();
+    public RelationGroupType.SpecAttributes createRelationGroupTypeSPECATTRIBUTES() {
+        return new RelationGroupType.SpecAttributes();
     }
 
     /**
-     * Create an instance of {@link RelationGroup.ALTERNATIVEID }
+     * Create an instance of {@link RelationGroup.AlternativeId }
      * 
      */
-    public RelationGroup.ALTERNATIVEID createRelationGroupALTERNATIVEID() {
-        return new RelationGroup.ALTERNATIVEID();
+    public RelationGroup.AlternativeId createRelationGroupALTERNATIVEID() {
+        return new RelationGroup.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link RelationGroup.SOURCESPECIFICATION }
+     * Create an instance of {@link RelationGroup.SourceSpecification }
      * 
      */
-    public RelationGroup.SOURCESPECIFICATION createRelationGroupSOURCESPECIFICATION() {
-        return new RelationGroup.SOURCESPECIFICATION();
+    public RelationGroup.SourceSpecification createRelationGroupSOURCESPECIFICATION() {
+        return new RelationGroup.SourceSpecification();
     }
 
     /**
-     * Create an instance of {@link RelationGroup.SPECRELATIONS }
+     * Create an instance of {@link RelationGroup.SpecRelations }
      * 
      */
-    public RelationGroup.SPECRELATIONS createRelationGroupSPECRELATIONS() {
-        return new RelationGroup.SPECRELATIONS();
+    public RelationGroup.SpecRelations createRelationGroupSPECRELATIONS() {
+        return new RelationGroup.SpecRelations();
     }
 
     /**
-     * Create an instance of {@link RelationGroup.TARGETSPECIFICATION }
+     * Create an instance of {@link RelationGroup.TargetSpecification }
      * 
      */
-    public RelationGroup.TARGETSPECIFICATION createRelationGroupTARGETSPECIFICATION() {
-        return new RelationGroup.TARGETSPECIFICATION();
+    public RelationGroup.TargetSpecification createRelationGroupTARGETSPECIFICATION() {
+        return new RelationGroup.TargetSpecification();
     }
 
     /**
-     * Create an instance of {@link RelationGroup.TYPE }
+     * Create an instance of {@link RelationGroup.Type }
      * 
      */
-    public RelationGroup.TYPE createRelationGroupTYPE() {
-        return new RelationGroup.TYPE();
+    public RelationGroup.Type createRelationGroupTYPE() {
+        return new RelationGroup.Type();
     }
 
     /**
-     * Create an instance of {@link EnumValue.ALTERNATIVEID }
+     * Create an instance of {@link EnumValue.AlternativeId }
      * 
      */
-    public EnumValue.ALTERNATIVEID createEnumValueALTERNATIVEID() {
-        return new EnumValue.ALTERNATIVEID();
+    public EnumValue.AlternativeId createEnumValueALTERNATIVEID() {
+        return new EnumValue.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link EnumValue.PROPERTIES }
+     * Create an instance of {@link EnumValue.Properties }
      * 
      */
-    public EnumValue.PROPERTIES createEnumValuePROPERTIES() {
-        return new EnumValue.PROPERTIES();
+    public EnumValue.Properties createEnumValuePROPERTIES() {
+        return new EnumValue.Properties();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionXhtml.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionXhtml.AlternativeId }
      * 
      */
-    public DatatypeDefinitionXhtml.ALTERNATIVEID createDatatypeDefinitionXhtmlALTERNATIVEID() {
-        return new DatatypeDefinitionXhtml.ALTERNATIVEID();
+    public DatatypeDefinitionXhtml.AlternativeId createDatatypeDefinitionXhtmlALTERNATIVEID() {
+        return new DatatypeDefinitionXhtml.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionString.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionString.AlternativeId }
      * 
      */
-    public DatatypeDefinitionString.ALTERNATIVEID createDatatypeDefinitionStringALTERNATIVEID() {
-        return new DatatypeDefinitionString.ALTERNATIVEID();
+    public DatatypeDefinitionString.AlternativeId createDatatypeDefinitionStringALTERNATIVEID() {
+        return new DatatypeDefinitionString.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionReal.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionReal.AlternativeId }
      * 
      */
-    public DatatypeDefinitionReal.ALTERNATIVEID createDatatypeDefinitionRealALTERNATIVEID() {
-        return new DatatypeDefinitionReal.ALTERNATIVEID();
+    public DatatypeDefinitionReal.AlternativeId createDatatypeDefinitionRealALTERNATIVEID() {
+        return new DatatypeDefinitionReal.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionInteger.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionInteger.AlternativeId }
      * 
      */
-    public DatatypeDefinitionInteger.ALTERNATIVEID createDatatypeDefinitionIntegerALTERNATIVEID() {
-        return new DatatypeDefinitionInteger.ALTERNATIVEID();
+    public DatatypeDefinitionInteger.AlternativeId createDatatypeDefinitionIntegerALTERNATIVEID() {
+        return new DatatypeDefinitionInteger.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionEnumeration.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionEnumeration.AlternativeId }
      * 
      */
-    public DatatypeDefinitionEnumeration.ALTERNATIVEID createDatatypeDefinitionEnumerationALTERNATIVEID() {
-        return new DatatypeDefinitionEnumeration.ALTERNATIVEID();
+    public DatatypeDefinitionEnumeration.AlternativeId createDatatypeDefinitionEnumerationALTERNATIVEID() {
+        return new DatatypeDefinitionEnumeration.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionEnumeration.SPECIFIEDVALUES }
+     * Create an instance of {@link DatatypeDefinitionEnumeration.SpecifiedValues }
      * 
      */
-    public DatatypeDefinitionEnumeration.SPECIFIEDVALUES createDatatypeDefinitionEnumerationSPECIFIEDVALUES() {
-        return new DatatypeDefinitionEnumeration.SPECIFIEDVALUES();
+    public DatatypeDefinitionEnumeration.SpecifiedValues createDatatypeDefinitionEnumerationSPECIFIEDVALUES() {
+        return new DatatypeDefinitionEnumeration.SpecifiedValues();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionDate.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionDate.AlternativeId }
      * 
      */
-    public DatatypeDefinitionDate.ALTERNATIVEID createDatatypeDefinitionDateALTERNATIVEID() {
-        return new DatatypeDefinitionDate.ALTERNATIVEID();
+    public DatatypeDefinitionDate.AlternativeId createDatatypeDefinitionDateALTERNATIVEID() {
+        return new DatatypeDefinitionDate.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link DatatypeDefinitionBoolean.ALTERNATIVEID }
+     * Create an instance of {@link DatatypeDefinitionBoolean.AlternativeId }
      * 
      */
-    public DatatypeDefinitionBoolean.ALTERNATIVEID createDatatypeDefinitionBooleanALTERNATIVEID() {
-        return new DatatypeDefinitionBoolean.ALTERNATIVEID();
+    public DatatypeDefinitionBoolean.AlternativeId createDatatypeDefinitionBooleanALTERNATIVEID() {
+        return new DatatypeDefinitionBoolean.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeValueXhtml.DEFINITION }
+     * Create an instance of {@link AttributeValueXhtml.Definition }
      * 
      */
-    public AttributeValueXhtml.DEFINITION createAttributeValueXhtmlDEFINITION() {
-        return new AttributeValueXhtml.DEFINITION();
+    public AttributeValueXhtml.Definition createAttributeValueXhtmlDEFINITION() {
+        return new AttributeValueXhtml.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueString.DEFINITION }
+     * Create an instance of {@link AttributeValueString.Definition }
      * 
      */
-    public AttributeValueString.DEFINITION createAttributeValueStringDEFINITION() {
-        return new AttributeValueString.DEFINITION();
+    public AttributeValueString.Definition createAttributeValueStringDEFINITION() {
+        return new AttributeValueString.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueReal.DEFINITION }
+     * Create an instance of {@link AttributeValueReal.Definition }
      * 
      */
-    public AttributeValueReal.DEFINITION createAttributeValueRealDEFINITION() {
-        return new AttributeValueReal.DEFINITION();
+    public AttributeValueReal.Definition createAttributeValueRealDEFINITION() {
+        return new AttributeValueReal.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueInteger.DEFINITION }
+     * Create an instance of {@link AttributeValueInteger.Definition }
      * 
      */
-    public AttributeValueInteger.DEFINITION createAttributeValueIntegerDEFINITION() {
-        return new AttributeValueInteger.DEFINITION();
+    public AttributeValueInteger.Definition createAttributeValueIntegerDEFINITION() {
+        return new AttributeValueInteger.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueEnumeration.DEFINITION }
+     * Create an instance of {@link AttributeValueEnumeration.Definition }
      * 
      */
-    public AttributeValueEnumeration.DEFINITION createAttributeValueEnumerationDEFINITION() {
-        return new AttributeValueEnumeration.DEFINITION();
+    public AttributeValueEnumeration.Definition createAttributeValueEnumerationDEFINITION() {
+        return new AttributeValueEnumeration.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueEnumeration.VALUES }
+     * Create an instance of {@link AttributeValueEnumeration.Values }
      * 
      */
-    public AttributeValueEnumeration.VALUES createAttributeValueEnumerationVALUES() {
-        return new AttributeValueEnumeration.VALUES();
+    public AttributeValueEnumeration.Values createAttributeValueEnumerationVALUES() {
+        return new AttributeValueEnumeration.Values();
     }
 
     /**
-     * Create an instance of {@link AttributeValueDate.DEFINITION }
+     * Create an instance of {@link AttributeValueDate.Definition }
      * 
      */
-    public AttributeValueDate.DEFINITION createAttributeValueDateDEFINITION() {
-        return new AttributeValueDate.DEFINITION();
+    public AttributeValueDate.Definition createAttributeValueDateDEFINITION() {
+        return new AttributeValueDate.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeValueBoolean.DEFINITION }
+     * Create an instance of {@link AttributeValueBoolean.Definition }
      * 
      */
-    public AttributeValueBoolean.DEFINITION createAttributeValueBooleanDEFINITION() {
-        return new AttributeValueBoolean.DEFINITION();
+    public AttributeValueBoolean.Definition createAttributeValueBooleanDEFINITION() {
+        return new AttributeValueBoolean.Definition();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionXhtml.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionXhtml.AlternativeId }
      * 
      */
-    public AttributeDefinitionXhtml.ALTERNATIVEID createAttributeDefinitionXhtmlALTERNATIVEID() {
-        return new AttributeDefinitionXhtml.ALTERNATIVEID();
+    public AttributeDefinitionXhtml.AlternativeId createAttributeDefinitionXhtmlALTERNATIVEID() {
+        return new AttributeDefinitionXhtml.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionXhtml.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionXhtml.DefaultValue }
      * 
      */
-    public AttributeDefinitionXhtml.DEFAULTVALUE createAttributeDefinitionXhtmlDEFAULTVALUE() {
-        return new AttributeDefinitionXhtml.DEFAULTVALUE();
+    public AttributeDefinitionXhtml.DefaultValue createAttributeDefinitionXhtmlDEFAULTVALUE() {
+        return new AttributeDefinitionXhtml.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionXhtml.TYPE }
+     * Create an instance of {@link AttributeDefinitionXhtml.Type }
      * 
      */
-    public AttributeDefinitionXhtml.TYPE createAttributeDefinitionXhtmlTYPE() {
-        return new AttributeDefinitionXhtml.TYPE();
+    public AttributeDefinitionXhtml.Type createAttributeDefinitionXhtmlTYPE() {
+        return new AttributeDefinitionXhtml.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionString.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionString.AlternativeId }
      * 
      */
-    public AttributeDefinitionString.ALTERNATIVEID createAttributeDefinitionStringALTERNATIVEID() {
-        return new AttributeDefinitionString.ALTERNATIVEID();
+    public AttributeDefinitionString.AlternativeId createAttributeDefinitionStringALTERNATIVEID() {
+        return new AttributeDefinitionString.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionString.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionString.DefaultValue }
      * 
      */
-    public AttributeDefinitionString.DEFAULTVALUE createAttributeDefinitionStringDEFAULTVALUE() {
-        return new AttributeDefinitionString.DEFAULTVALUE();
+    public AttributeDefinitionString.DefaultValue createAttributeDefinitionStringDEFAULTVALUE() {
+        return new AttributeDefinitionString.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionString.TYPE }
+     * Create an instance of {@link AttributeDefinitionString.Type }
      * 
      */
-    public AttributeDefinitionString.TYPE createAttributeDefinitionStringTYPE() {
-        return new AttributeDefinitionString.TYPE();
+    public AttributeDefinitionString.Type createAttributeDefinitionStringTYPE() {
+        return new AttributeDefinitionString.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionReal.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionReal.AlternativeId }
      * 
      */
-    public AttributeDefinitionReal.ALTERNATIVEID createAttributeDefinitionRealALTERNATIVEID() {
-        return new AttributeDefinitionReal.ALTERNATIVEID();
+    public AttributeDefinitionReal.AlternativeId createAttributeDefinitionRealALTERNATIVEID() {
+        return new AttributeDefinitionReal.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionReal.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionReal.DefaultValue }
      * 
      */
-    public AttributeDefinitionReal.DEFAULTVALUE createAttributeDefinitionRealDEFAULTVALUE() {
-        return new AttributeDefinitionReal.DEFAULTVALUE();
+    public AttributeDefinitionReal.DefaultValue createAttributeDefinitionRealDEFAULTVALUE() {
+        return new AttributeDefinitionReal.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionReal.TYPE }
+     * Create an instance of {@link AttributeDefinitionReal.Type }
      * 
      */
-    public AttributeDefinitionReal.TYPE createAttributeDefinitionRealTYPE() {
-        return new AttributeDefinitionReal.TYPE();
+    public AttributeDefinitionReal.Type createAttributeDefinitionRealTYPE() {
+        return new AttributeDefinitionReal.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionInteger.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionInteger.AlternativeId }
      * 
      */
-    public AttributeDefinitionInteger.ALTERNATIVEID createAttributeDefinitionIntegerALTERNATIVEID() {
-        return new AttributeDefinitionInteger.ALTERNATIVEID();
+    public AttributeDefinitionInteger.AlternativeId createAttributeDefinitionIntegerALTERNATIVEID() {
+        return new AttributeDefinitionInteger.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionInteger.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionInteger.DefaultValue }
      * 
      */
-    public AttributeDefinitionInteger.DEFAULTVALUE createAttributeDefinitionIntegerDEFAULTVALUE() {
-        return new AttributeDefinitionInteger.DEFAULTVALUE();
+    public AttributeDefinitionInteger.DefaultValue createAttributeDefinitionIntegerDEFAULTVALUE() {
+        return new AttributeDefinitionInteger.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionInteger.TYPE }
+     * Create an instance of {@link AttributeDefinitionInteger.Type }
      * 
      */
-    public AttributeDefinitionInteger.TYPE createAttributeDefinitionIntegerTYPE() {
-        return new AttributeDefinitionInteger.TYPE();
+    public AttributeDefinitionInteger.Type createAttributeDefinitionIntegerTYPE() {
+        return new AttributeDefinitionInteger.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionEnumeration.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionEnumeration.DefaultValue }
      * 
      */
-    public AttributeDefinitionEnumeration.DEFAULTVALUE createAttributeDefinitionEnumerationDEFAULTVALUE() {
-        return new AttributeDefinitionEnumeration.DEFAULTVALUE();
+    public AttributeDefinitionEnumeration.DefaultValue createAttributeDefinitionEnumerationDEFAULTVALUE() {
+        return new AttributeDefinitionEnumeration.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionEnumeration.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionEnumeration.AlternativeId }
      * 
      */
-    public AttributeDefinitionEnumeration.ALTERNATIVEID createAttributeDefinitionEnumerationALTERNATIVEID() {
-        return new AttributeDefinitionEnumeration.ALTERNATIVEID();
+    public AttributeDefinitionEnumeration.AlternativeId createAttributeDefinitionEnumerationALTERNATIVEID() {
+        return new AttributeDefinitionEnumeration.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionEnumeration.TYPE }
+     * Create an instance of {@link AttributeDefinitionEnumeration.Type }
      * 
      */
-    public AttributeDefinitionEnumeration.TYPE createAttributeDefinitionEnumerationTYPE() {
-        return new AttributeDefinitionEnumeration.TYPE();
+    public AttributeDefinitionEnumeration.Type createAttributeDefinitionEnumerationTYPE() {
+        return new AttributeDefinitionEnumeration.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionDate.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionDate.AlternativeId }
      * 
      */
-    public AttributeDefinitionDate.ALTERNATIVEID createAttributeDefinitionDateALTERNATIVEID() {
-        return new AttributeDefinitionDate.ALTERNATIVEID();
+    public AttributeDefinitionDate.AlternativeId createAttributeDefinitionDateALTERNATIVEID() {
+        return new AttributeDefinitionDate.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionDate.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionDate.DefaultValue }
      * 
      */
-    public AttributeDefinitionDate.DEFAULTVALUE createAttributeDefinitionDateDEFAULTVALUE() {
-        return new AttributeDefinitionDate.DEFAULTVALUE();
+    public AttributeDefinitionDate.DefaultValue createAttributeDefinitionDateDEFAULTVALUE() {
+        return new AttributeDefinitionDate.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionDate.TYPE }
+     * Create an instance of {@link AttributeDefinitionDate.Type }
      * 
      */
-    public AttributeDefinitionDate.TYPE createAttributeDefinitionDateTYPE() {
-        return new AttributeDefinitionDate.TYPE();
+    public AttributeDefinitionDate.Type createAttributeDefinitionDateTYPE() {
+        return new AttributeDefinitionDate.Type();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionBoolean.ALTERNATIVEID }
+     * Create an instance of {@link AttributeDefinitionBoolean.AlternativeId }
      * 
      */
-    public AttributeDefinitionBoolean.ALTERNATIVEID createAttributeDefinitionBooleanALTERNATIVEID() {
-        return new AttributeDefinitionBoolean.ALTERNATIVEID();
+    public AttributeDefinitionBoolean.AlternativeId createAttributeDefinitionBooleanALTERNATIVEID() {
+        return new AttributeDefinitionBoolean.AlternativeId();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionBoolean.DEFAULTVALUE }
+     * Create an instance of {@link AttributeDefinitionBoolean.DefaultValue }
      * 
      */
-    public AttributeDefinitionBoolean.DEFAULTVALUE createAttributeDefinitionBooleanDEFAULTVALUE() {
-        return new AttributeDefinitionBoolean.DEFAULTVALUE();
+    public AttributeDefinitionBoolean.DefaultValue createAttributeDefinitionBooleanDEFAULTVALUE() {
+        return new AttributeDefinitionBoolean.DefaultValue();
     }
 
     /**
-     * Create an instance of {@link AttributeDefinitionBoolean.TYPE }
+     * Create an instance of {@link AttributeDefinitionBoolean.Type }
      * 
      */
-    public AttributeDefinitionBoolean.TYPE createAttributeDefinitionBooleanTYPE() {
-        return new AttributeDefinitionBoolean.TYPE();
+    public AttributeDefinitionBoolean.Type createAttributeDefinitionBooleanTYPE() {
+        return new AttributeDefinitionBoolean.Type();
     }
 
     /**
@@ -13329,10 +13329,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13343,10 +13343,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-DATE-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-DATE-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13357,10 +13357,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13371,10 +13371,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-INTEGER-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-INTEGER-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13385,10 +13385,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-REAL-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-REAL-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13399,10 +13399,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-STRING-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-STRING-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13413,10 +13413,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-XHTML-REF", scope = SpecHierarchy.EDITABLEATTS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-XHTML-REF", scope = SpecHierarchy.EditableAtts.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF_QNAME, Object.class, SpecHierarchy.EDITABLEATTS.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
     }
 
     /**
@@ -13427,10 +13427,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "SPEC-RELATION-REF", scope = RelationGroup.SPECRELATIONS.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "SPEC-RELATION-REF", scope = RelationGroup.SpecRelations.class)
     @XmlIDREF
     public JAXBElement<Object> createRelationGroupSPECRELATIONSSPECRELATIONREF(Object value) {
-        return new JAXBElement<Object>(_RelationGroupSPECRELATIONSSPECRELATIONREF_QNAME, Object.class, RelationGroup.SPECRELATIONS.class, value);
+        return new JAXBElement<Object>(_RelationGroupSPECRELATIONSSPECRELATIONREF_QNAME, Object.class, RelationGroup.SpecRelations.class, value);
     }
 
     /**
@@ -13441,10 +13441,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ENUM-VALUE-REF", scope = AttributeValueEnumeration.VALUES.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ENUM-VALUE-REF", scope = AttributeValueEnumeration.Values.class)
     @XmlIDREF
     public JAXBElement<Object> createAttributeValueEnumerationVALUESENUMVALUEREF(Object value) {
-        return new JAXBElement<Object>(_AttributeValueEnumerationVALUESENUMVALUEREF_QNAME, Object.class, AttributeValueEnumeration.VALUES.class, value);
+        return new JAXBElement<Object>(_AttributeValueEnumerationVALUESENUMVALUEREF_QNAME, Object.class, AttributeValueEnumeration.Values.class, value);
     }
 
 }

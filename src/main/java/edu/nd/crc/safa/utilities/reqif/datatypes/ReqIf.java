@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
@@ -81,13 +80,13 @@ public class ReqIf {
 
     @XmlElement(name = "THE-HEADER", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIf.TheHeader theHeader;
+    protected TheHeader theHeader;
     @XmlElement(name = "CORE-CONTENT", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIf.CoreContent coreContent;
+    protected CoreContent coreContent;
     @XmlElement(name = "TOOL-EXTENSIONS")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ReqIf.ToolExtensions toolExtensions;
+    protected ToolExtensions toolExtensions;
     @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String lang;
@@ -97,11 +96,11 @@ public class ReqIf {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIf.TheHeader }
+     *     {@link TheHeader }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIf.TheHeader getTheHeader() {
+    public TheHeader getTheHeader() {
         return theHeader;
     }
 
@@ -110,11 +109,11 @@ public class ReqIf {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIf.TheHeader }
+     *     {@link TheHeader }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTheHeader(ReqIf.TheHeader value) {
+    public void setTheHeader(TheHeader value) {
         this.theHeader = value;
     }
 
@@ -123,11 +122,11 @@ public class ReqIf {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIf.CoreContent }
+     *     {@link CoreContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIf.CoreContent getCoreContent() {
+    public CoreContent getCoreContent() {
         return coreContent;
     }
 
@@ -136,11 +135,11 @@ public class ReqIf {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIf.CoreContent }
+     *     {@link CoreContent }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCoreContent(ReqIf.CoreContent value) {
+    public void setCoreContent(CoreContent value) {
         this.coreContent = value;
     }
 
@@ -149,11 +148,11 @@ public class ReqIf {
      * 
      * @return
      *     possible object is
-     *     {@link ReqIf.ToolExtensions }
+     *     {@link ToolExtensions }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ReqIf.ToolExtensions getToolExtensions() {
+    public ToolExtensions getToolExtensions() {
         return toolExtensions;
     }
 
@@ -162,11 +161,11 @@ public class ReqIf {
      * 
      * @param value
      *     allowed object is
-     *     {@link ReqIf.ToolExtensions }
+     *     {@link ToolExtensions }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setToolExtensions(ReqIf.ToolExtensions value) {
+    public void setToolExtensions(ToolExtensions value) {
         this.toolExtensions = value;
     }
 
@@ -368,7 +367,7 @@ public class ReqIf {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<ReqIfToolExtension> getREQIFTOOLEXTENSION() {
+        public List<ReqIfToolExtension> getReqIfToolExtensions() {
             if (reqiftoolextension == null) {
                 reqiftoolextension = new ArrayList<ReqIfToolExtension>();
             }

@@ -1,8 +1,10 @@
 import os
 import sys
 
+from datasets import load_dataset
 from dotenv import load_dotenv
-from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
+from memory_profiler import profile
+from transformers import DataCollatorWithPadding, Trainer
 
 load_dotenv()
 
@@ -20,58 +22,67 @@ def add_padding_token(tokenizer, config):
     tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
 
 
-if __name__ == "__main__":
-    from train.trainer_args import TrainerArgs
-    from constants import PROJ_PATH
-    from data.creators.trace_dataset_creator import TraceDatasetCreator
-    from data.readers.hub_project_reader import HubProjectReader
-    from models.model_manager import ModelManager
-    from util.logging.logger_config import LoggerConfig
-    from util.logging.logger_manager import LoggerManager
-    from data.creators.split_dataset_creator import SplitDatasetCreator
-    from data.datasets.dataset_role import DatasetRole
-    from data.managers.trainer_dataset_manager import TrainerDatasetManager
-    from data.readers.csv_project_reader import CsvProjectReader
-
-    # import deepspeed
-    #
-    # deepspeed.ops.op_builder.CPUAdamBuilder().load()
-    model_path = "gpt2-xl"
-    # model_path = "hf-internal-testing/tiny-random-bert"
-    dataset_name = "cm1"
-    output_path = os.path.expanduser("~/output/test_lm")
-    dataset_output_path = os.path.join(output_path, "data")
-    LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
-
-    # Model
-    model_manager = ModelManager(model_path)
-
+@profile
+def create_trace_dataset(dataset_name="cm1", create=True):
     # Export Dataset Split
-    project_reader = HubProjectReader(dataset_name)
-    trace_dataset_creator = TraceDatasetCreator(project_reader)
-    split_dataset_creator = SplitDatasetCreator(val_percentage=0.80)
-    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
-                                                  val_dataset_creator=split_dataset_creator)
-    trace_dataset_manager.export_dataset_splits(dataset_output_path)
-
-    # Create communication channel (file)
-    dataset_path = os.path.join(dataset_output_path, trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN))
-    del trace_dataset_manager
+    if create:
+        project_reader = HubProjectReader(dataset_name)
+        trace_dataset_creator = TraceDatasetCreator(project_reader)
+        split_dataset_creator = SplitDatasetCreator(val_percentage=0.80)
+        trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
+                                                      val_dataset_creator=split_dataset_creator)
+        trace_dataset_manager.export_dataset_splits(dataset_output_path)
+        dataset_name = trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN)
+    dataset_name = "cm1_train.csv"
+    dataset_path = os.path.join(dataset_output_path, dataset_name)
+    # del trace_dataset_manager
 
     # Load split as CSV
     project_reader = CsvProjectReader(dataset_path)
     trace_dataset_creator = TraceDatasetCreator(project_reader)
     trace_dataset = trace_dataset_creator.create()
     dataset = trace_dataset.to_hf_dataset(model_manager)
+    return dataset
+
+
+def create_test_dataset():
+    full_dataset = load_dataset("rotten_tomatoes")
+
+    def preprocess_function(examples):
+        return tokenizer(examples["text"], truncation=True)
+
+    return full_dataset["train"].map(preprocess_function, batched=True)
+
+
+if __name__ == "__main__":
+    from train.trainer_args import TrainerArgs
+    from constants import PROJ_PATH
+    from data.creators.trace_dataset_creator import TraceDatasetCreator
+    from models.model_manager import ModelManager
+    from util.logging.logger_config import LoggerConfig
+    from util.logging.logger_manager import LoggerManager
+    from data.readers.csv_project_reader import CsvProjectReader
+    from data.creators.split_dataset_creator import SplitDatasetCreator
+    from data.datasets.dataset_role import DatasetRole
+    from data.managers.trainer_dataset_manager import TrainerDatasetManager
+    from data.readers.hub_project_reader import HubProjectReader
+
+    model_path = "gpt2-xl"
+    # model_path = "hf-internal-testing/tiny-random-bert"
+    output_path = os.path.expanduser("~/output/test_lm")
+    dataset_output_path = os.path.join(output_path, "data")
+    LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model_manager = ModelManager(model_path)
+    tokenizer = model_manager.get_tokenizer()
+    dataset = create_test_dataset()
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
 
-    args = TrainerArgs(output_path, deepspeed=deepspeed_path)
-    args.remove_unused_columns = False
+    args = TrainerArgs(output_path)  # , deepspeed=deepspeed_path)
+    # args.remove_unused_columns = False
     args.__post_init__()
 
     # Prepare dataset

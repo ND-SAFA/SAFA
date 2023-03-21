@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "nvidia/nemo-megatron-gpt-5B"
+            "model_path": "xlm-roberta-large"
           },
           "trainer_args": {
             "num_train_epochs": 1,

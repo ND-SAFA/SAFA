@@ -78,7 +78,7 @@ if __name__ == "__main__":
     tokenizer = model_manager.get_tokenizer()
     dataset = create_trace_dataset(create=True)
     model = model_manager.get_model()
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=256)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
 
     args = TrainerArgs(output_path, deepspeed=deepspeed_path, per_device_train_batch_size=1)

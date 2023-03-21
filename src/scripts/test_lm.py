@@ -3,7 +3,7 @@ import sys
 
 from datasets import load_dataset
 from dotenv import load_dotenv
-from transformers import DataCollatorWithPadding, Trainer
+from transformers import DataCollatorWithPadding
 
 load_dotenv()
 
@@ -21,12 +21,17 @@ def add_padding_token(tokenizer, config):
     tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
 
 
+def create_dataset_manager(dataset_name="cm1"):
+    project_reader = HubProjectReader(dataset_name)
+    trace_dataset_creator = TraceDatasetCreator(project_reader)
+    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator)
+    return trace_dataset_manager
+
+
 def create_trace_dataset(dataset_name="cm1", create=True):
     # Export Dataset Split
     if create:
-        project_reader = HubProjectReader(dataset_name)
-        trace_dataset_creator = TraceDatasetCreator(project_reader)
-        trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator)
+        trace_dataset_manager = create_dataset_manager(dataset_name)
         trace_dataset_manager.export_dataset_splits(dataset_output_path)
         dataset_name = trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN)
         del trace_dataset_manager
@@ -75,6 +80,8 @@ if __name__ == "__main__":
     from data.datasets.dataset_role import DatasetRole
     from data.managers.trainer_dataset_manager import TrainerDatasetManager
     from data.readers.hub_project_reader import HubProjectReader
+    from train.trace_trainer import TraceTrainer
+
     import gc
 
     mode = "prod"
@@ -86,7 +93,8 @@ if __name__ == "__main__":
     # Construct objects
     model_manager = ModelManager(modes[mode]["model"])
     tokenizer = model_manager.get_tokenizer()
-    dataset = modes[mode]["dataset"](create=True)
+    # dataset = modes[mode]["dataset"](create=True)
+    trainer_dataset_manager = create_dataset_manager()
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
@@ -97,10 +105,12 @@ if __name__ == "__main__":
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)
-    trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=dataset)
+    trainer = TraceTrainer(model_manager=model_manager,
+                           trainer_args=args,
+                           trainer_dataset_manager=trainer_dataset_manager)
 
     # Predict
     gc.collect()
-    outputs = trainer.train()
-    response = outputs.predictions
+    outputs = trainer.perform_training()
+    response = outputs.prediction_output
     print("Predictions: \n", response)

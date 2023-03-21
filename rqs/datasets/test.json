@@ -8,7 +8,7 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "gpt2-xl"
+            "model_path": "nvidia/nemo-megatron-gpt-5B"
           },
           "trainer_args": {
             "num_train_epochs": 1,
@@ -19,9 +19,9 @@
             "skip_save": false,
             "load_best_model_at_end": true,
             "evaluation_strategy": "steps",
-            "save_strategy": "steps",
+            "save_strategy": null,
             "logging_strategy": "steps",
-            "save_steps": 5,
+            "save_steps": null,
             "eval_steps": 5,
             "logging_steps": 1
           },

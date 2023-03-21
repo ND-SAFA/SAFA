@@ -4,6 +4,11 @@ import sys
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
 
+from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.dataset_role import DatasetRole
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.readers.csv_project_reader import CsvProjectReader
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -36,13 +41,26 @@ if __name__ == "__main__":
     # model_path = "hf-internal-testing/tiny-random-bert"
     dataset_name = "cm1"
     output_path = os.path.expanduser("~/output/test_lm")
+    dataset_output_path = os.path.join(output_path, "data")
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Model
     model_manager = ModelManager(model_path)
 
-    # Dataset
+    # Export Dataset Split
     project_reader = HubProjectReader(dataset_name)
+    trace_dataset_creator = TraceDatasetCreator(project_reader)
+    split_dataset_creator = SplitDatasetCreator(val_percentage=0.80)
+    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
+                                                  val_dataset_creator=split_dataset_creator)
+    trace_dataset_manager.export_dataset_splits(dataset_output_path)
+
+    # Create communication channel (file)
+    dataset_path = os.path.join(dataset_output_path, trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN))
+    del trace_dataset_manager
+
+    # Load split as CSV
+    project_reader = CsvProjectReader(dataset_path)
     trace_dataset_creator = TraceDatasetCreator(project_reader)
     trace_dataset = trace_dataset_creator.create()
     dataset = trace_dataset.to_hf_dataset(model_manager)

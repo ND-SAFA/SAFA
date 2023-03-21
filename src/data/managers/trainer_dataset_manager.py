@@ -6,8 +6,8 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.idataset import iDataset
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
@@ -67,7 +67,7 @@ class TrainerDatasetManager(BaseObject):
             if dataset_role in datasets and datasets[dataset_role] is not None:
                 dataset = datasets[dataset_role]
                 exporter: AbstractDatasetExporter = format_type.value
-                export_path = os.path.join(output_dir, self._get_dataset_filename(dataset_role)) \
+                export_path = os.path.join(output_dir, self.get_dataset_filename(dataset_role)) \
                     if exporter.include_filename() else os.path.join(output_dir, dataset_role.value)
                 output_path = exporter(export_path=export_path, dataset=dataset).export()
                 output_paths.append(output_path)
@@ -120,7 +120,7 @@ class TrainerDatasetManager(BaseObject):
         """
         self._datasets = None
 
-    def _get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
+    def get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
         """
         Returns the filename associated with the dataset corresponding to the given role
         :param dataset_role: the role of the dataset

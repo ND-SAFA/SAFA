@@ -22,8 +22,8 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         self.assertTrue(os.path.exists(dataset_container_manager_first.get_output_path()))
         dataset_files = os.listdir(dataset_container_manager_first.get_output_path())
         for dataset_role in expected_dataset_roles:
-            self.assertIn(dataset_container_manager_first._get_dataset_filename(dataset_role,
-                                                                                dataset_container_manager_first.dataset_name),
+            self.assertIn(dataset_container_manager_first.get_dataset_filename(dataset_role,
+                                                                               dataset_container_manager_first.dataset_name),
                           dataset_files)
         dataset_container_manager_second = self.create_dataset_manager(expected_dataset_roles[1:])
         datasets2 = dataset_container_manager_second.get_datasets()

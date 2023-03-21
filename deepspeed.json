@@ -13,7 +13,7 @@
       "pin_memory": true,
       "buffer_count": 4,
       "buffer_size": 1e8,
-      "max_in_cpu": 2e9
+      "max_in_cpu": 1e9
     }
   },
   "optimizer": {

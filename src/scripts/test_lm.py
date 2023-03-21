@@ -4,11 +4,6 @@ import sys
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, DataCollatorWithPadding, Trainer
 
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.datasets.dataset_role import DatasetRole
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.readers.csv_project_reader import CsvProjectReader
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -33,6 +28,10 @@ if __name__ == "__main__":
     from models.model_manager import ModelManager
     from util.logging.logger_config import LoggerConfig
     from util.logging.logger_manager import LoggerManager
+    from data.creators.split_dataset_creator import SplitDatasetCreator
+    from data.datasets.dataset_role import DatasetRole
+    from data.managers.trainer_dataset_manager import TrainerDatasetManager
+    from data.readers.csv_project_reader import CsvProjectReader
 
     # import deepspeed
     #

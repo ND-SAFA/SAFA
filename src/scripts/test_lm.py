@@ -65,6 +65,7 @@ if __name__ == "__main__":
     from data.datasets.dataset_role import DatasetRole
     from data.managers.trainer_dataset_manager import TrainerDatasetManager
     from data.readers.hub_project_reader import HubProjectReader
+    import gc
 
     model_path = "gpt2-xl"
     # model_path = "hf-internal-testing/tiny-random-bert"
@@ -89,6 +90,7 @@ if __name__ == "__main__":
     trainer = Trainer(model=model, args=args, data_collator=data_collator, train_dataset=dataset)
 
     # Predict
+    gc.collect()
     outputs = trainer.train()
     response = outputs.predictions
     print("Predictions: \n", response)

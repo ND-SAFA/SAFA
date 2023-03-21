@@ -62,7 +62,7 @@ modes = {
     "prod": {
         "model": "gpt2-xl",
         "dataset": create_trace_dataset,
-        "params": ["deepspeed", "per_device_train_batch_size"]
+        "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns"]
     }
 }
 

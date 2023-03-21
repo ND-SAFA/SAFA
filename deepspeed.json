@@ -5,15 +5,13 @@
       "device": "nvme",
       "nvme_path": "/dev/nvme0n1",
       "pin_memory": true,
-      "buffer_count": 4,
-      "fast_init": false
+      "buffer_count": 4
     },
     "offload_param": {
       "device": "nvme",
       "nvme_path": "/dev/nvme0n1",
       "pin_memory": true,
-      "buffer_count": 4,
-      "fast_init": false
+      "buffer_count": 4
     }
   },
   "optimizer": {

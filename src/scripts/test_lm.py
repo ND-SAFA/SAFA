@@ -74,13 +74,13 @@ if __name__ == "__main__":
     # Construct objects
     model_manager = ModelManager(model_path)
     tokenizer = model_manager.get_tokenizer()
-    dataset = create_test_dataset()
+    dataset = create_trace_dataset(create=False)
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
 
     args = TrainerArgs(output_path, deepspeed=deepspeed_path)
-    # args.remove_unused_columns = False
+    args.remove_unused_columns = False
     args.__post_init__()
 
     # Prepare dataset

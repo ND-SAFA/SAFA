@@ -2,12 +2,18 @@
   "zero_optimization": {
     "stage": 3,
     "offload_optimizer": {
-      "device": "cpu",
-      "pin_memory": true
+      "device": "nvme",
+      "nvme_path": "/dev/nvme0n1",
+      "pin_memory": true,
+      "buffer_count": 4,
+      "fast_init": false
     },
     "offload_param": {
-      "device": "cpu",
-      "pin_memory": true
+      "device": "nvme",
+      "nvme_path": "/dev/nvme0n1",
+      "pin_memory": true,
+      "buffer_count": 4,
+      "fast_init": false
     }
   },
   "optimizer": {

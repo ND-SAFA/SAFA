@@ -3,7 +3,6 @@ import sys
 
 from datasets import load_dataset
 from dotenv import load_dotenv
-from memory_profiler import profile
 from transformers import DataCollatorWithPadding, Trainer
 
 load_dotenv()
@@ -22,7 +21,6 @@ def add_padding_token(tokenizer, config):
     tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
 
 
-@profile
 def create_trace_dataset(dataset_name="cm1", create=True):
     # Export Dataset Split
     if create:

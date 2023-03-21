@@ -44,7 +44,7 @@ def create_trace_dataset(dataset_name="cm1", create=True):
     return dataset
 
 
-def create_test_dataset():
+def create_test_dataset(**kwargs):
     full_dataset = load_dataset("rotten_tomatoes")
 
     def preprocess_function(examples):
@@ -52,6 +52,19 @@ def create_test_dataset():
 
     return full_dataset["train"].map(preprocess_function, batched=True)
 
+
+modes = {
+    "test": {
+        "model": "hf-internal-testing/tiny-random-bert",
+        "dataset": create_test_dataset,
+        "params": ["per_device_train_batch_size"]
+    },
+    "prod": {
+        "model": "gpt2-xl",
+        "dataset": create_trace_dataset,
+        "params": ["deepspeed", "per_device_train_batch_size"]
+    }
+}
 
 if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
@@ -67,22 +80,22 @@ if __name__ == "__main__":
     from data.readers.hub_project_reader import HubProjectReader
     import gc
 
-    model_path = "gpt2-xl"
-    # model_path = "hf-internal-testing/tiny-random-bert"
+    mode = "prod"
+    # Paths
     output_path = os.path.expanduser("~/output/test_lm")
     dataset_output_path = os.path.join(output_path, "data")
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    model_manager = ModelManager(model_path)
+    model_manager = ModelManager(modes[mode]["model"])
     tokenizer = model_manager.get_tokenizer()
-    dataset = create_trace_dataset(create=True)
+    dataset = modes[mode]["dataset"](create=True)
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=256)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
-
-    args = TrainerArgs(output_path, deepspeed=deepspeed_path, per_device_train_batch_size=1)
-    args.remove_unused_columns = False
+    arg_params = {"deepspeed": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False}
+    arg_params = {k: v for k, v in arg_params.items() if k in modes[mode]["params"]}
+    args = TrainerArgs(output_path, **arg_params)
     args.__post_init__()
 
     # Prepare dataset

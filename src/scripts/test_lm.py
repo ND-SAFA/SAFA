@@ -26,9 +26,7 @@ def create_trace_dataset(dataset_name="cm1", create=True):
     if create:
         project_reader = HubProjectReader(dataset_name)
         trace_dataset_creator = TraceDatasetCreator(project_reader)
-        split_dataset_creator = SplitDatasetCreator(val_percentage=0.80)
-        trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
-                                                      val_dataset_creator=split_dataset_creator)
+        trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator)
         trace_dataset_manager.export_dataset_splits(dataset_output_path)
         dataset_name = trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN)
     dataset_name = "cm1_train.csv"
@@ -60,7 +58,6 @@ if __name__ == "__main__":
     from util.logging.logger_config import LoggerConfig
     from util.logging.logger_manager import LoggerManager
     from data.readers.csv_project_reader import CsvProjectReader
-    from data.creators.split_dataset_creator import SplitDatasetCreator
     from data.datasets.dataset_role import DatasetRole
     from data.managers.trainer_dataset_manager import TrainerDatasetManager
     from data.readers.hub_project_reader import HubProjectReader
@@ -74,7 +71,7 @@ if __name__ == "__main__":
     # Construct objects
     model_manager = ModelManager(model_path)
     tokenizer = model_manager.get_tokenizer()
-    dataset = create_trace_dataset(create=False)
+    dataset = create_trace_dataset(create=True)
     model = model_manager.get_model()
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")

@@ -30,8 +30,8 @@ from transformers.activations import ACT2FN
 from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast, SequenceClassifierOutput
 from transformers.modeling_utils import PreTrainedModel
 from transformers.utils import add_start_docstrings, replace_return_docstrings
-from util.logging.logger_manager import logger
 
+from util.logging.logger_manager import logger
 from .configuration_llama import LLaMAConfig
 
 _CHECKPOINT_FOR_DOC = "llama-7b"
@@ -827,15 +827,18 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         # Initialize weights and apply final processing
         self.post_init()
 
-
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
         try:
             return super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
         except RuntimeError:
+            print("Starting to load model...")
             model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+            print("Base llama model has been loaded...")
             config = kwargs.pop("config")
-            return LLaMAForSequenceClassification(config, model)
+            sequence_model = LLaMAForSequenceClassification(config, model)
+            print("Sequence Classification Model has been loaded...")
+            return sequence_model
 
     def forward(
             self,

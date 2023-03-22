@@ -27,15 +27,6 @@ class LLaMAModelManager(ModelManager):
         """
         super().__init__(model_path, model_output_path, model_task, model_size, model_architecture, layers_to_freeze=layers_to_freeze)
 
-    def _load_model(self):
-        """
-        Loads the model from the pretrained model path
-        :return: the PreTrainedModel object
-        """
-        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
-        model._set_gradient_checkpointing(model, True)
-        return model
-
     def get_config(self) -> PretrainedConfig:
         """
         Gets the PreTrainedModel configuration.

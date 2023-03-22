@@ -112,7 +112,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeId getALTERNATIVEID() {
+    public AlternativeId getAlternativeId() {
         return alternativeid;
     }
 
@@ -125,7 +125,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setALTERNATIVEID(AlternativeId value) {
+    public void setAlternativeId(AlternativeId value) {
         this.alternativeid = value;
     }
 
@@ -138,7 +138,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecAttributes getSPECATTRIBUTES() {
+    public SpecAttributes getSpecAttributes() {
         return specattributes;
     }
 
@@ -151,7 +151,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSPECATTRIBUTES(SpecAttributes value) {
+    public void setSpecAttributes(SpecAttributes value) {
         this.specattributes = value;
     }
 
@@ -164,7 +164,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDESC() {
+    public String getDesc() {
         return desc;
     }
 
@@ -177,7 +177,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDESC(String value) {
+    public void setDesc(String value) {
         this.desc = value;
     }
 
@@ -190,7 +190,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIDENTIFIER() {
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -203,7 +203,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIDENTIFIER(String value) {
+    public void setIdentifier(String value) {
         this.identifier = value;
     }
 
@@ -216,7 +216,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLASTCHANGE() {
+    public XMLGregorianCalendar getLastChange() {
         return lastchange;
     }
 
@@ -229,7 +229,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLASTCHANGE(XMLGregorianCalendar value) {
+    public void setLastChange(XMLGregorianCalendar value) {
         this.lastchange = value;
     }
 
@@ -242,7 +242,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLONGNAME() {
+    public String getLongName() {
         return longname;
     }
 
@@ -255,7 +255,7 @@ public class SpecObjectType {
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLONGNAME(String value) {
+    public void setLongName(String value) {
         this.longname = value;
     }
 
@@ -299,7 +299,7 @@ public class SpecObjectType {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getALTERNATIVEID() {
+        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
             return alternativeid;
         }
 
@@ -312,7 +312,7 @@ public class SpecObjectType {
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setALTERNATIVEID(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
+        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
             this.alternativeid = value;
         }
 
@@ -392,7 +392,7 @@ public class SpecObjectType {
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getATTRIBUTEDEFINITIONBOOLEANOrATTRIBUTEDEFINITIONDATEOrATTRIBUTEDEFINITIONENUMERATION() {
+        public List<Object> getAttributeDefinitions() {
             if (attributedefinitionbooleanOrATTRIBUTEDEFINITIONDATEOrATTRIBUTEDEFINITIONENUMERATION == null) {
                 attributedefinitionbooleanOrATTRIBUTEDEFINITIONDATEOrATTRIBUTEDEFINITIONENUMERATION = new ArrayList<Object>();
             }

@@ -65,8 +65,8 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
-        self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager)
+        self.model = self.model_manager.get_model()
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)

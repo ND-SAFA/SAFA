@@ -97,6 +97,8 @@ if __name__ == "__main__":
     # dataset = modes[mode]["dataset"](create=True)
     trainer_dataset_manager = create_dataset_manager()
     model = model_manager.get_model()
+    print("-" * 10, "Model", "-" * 10)
+    print(model)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
     arg_params = {"deepspeed": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False}
@@ -109,11 +111,11 @@ if __name__ == "__main__":
     trainer = TraceTrainer(model_manager=model_manager,
                            trainer_args=args,
                            trainer_dataset_manager=trainer_dataset_manager)
+    print("Trace trainer created...")
 
     # Predict
     gc.collect()
-    print("-" * 10, "Model", "-" * 10)
-    print(model)
+
     print("Starting to perform training...")
     outputs = trainer.perform_training()
     response = outputs.prediction_output

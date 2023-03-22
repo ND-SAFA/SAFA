@@ -151,6 +151,7 @@ class ModelManager(BaseObject):
         :return: None
         """
         layers = self.get_encoder_layers(model)
+        logger.info(f"Layers: {len(layers)}")
         for layer_no in layers_to_freeze:
             layer = layers[layer_no]
             for param in layer:

@@ -60,6 +60,7 @@ class TraceDataset(iDataset):
             """
             Encodes the batch.
             """
+            logger.info("Encode is being called!!!")
             features = model_generator.get_feature(text=batch[CSVKeys.SOURCE],
                                                    text_pair=batch[CSVKeys.TARGET],
                                                    return_token_type_ids=True,

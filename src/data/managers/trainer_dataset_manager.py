@@ -18,6 +18,7 @@ from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.splitting.dataset_splitter import DatasetSplitter
 from data.splitting.supported_split_strategy import SupportedSplitStrategy
+from models.model_manager import ModelManager
 from util.base_object import BaseObject
 from util.enum_util import get_enum_from_name
 from util.override import overrides
@@ -48,6 +49,7 @@ class TrainerDatasetManager(BaseObject):
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self._datasets = None
+        self._hf_datasets = None
         self.augmenter = augmenter
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
@@ -116,6 +118,14 @@ class TrainerDatasetManager(BaseObject):
             self._datasets = self._create_datasets_from_creators(self._dataset_creators)
             self._prepare_datasets(self.augmenter)
         return self._datasets
+
+    def get_hf_datasets(self, model_manager: ModelManager):
+        if self._hf_datasets is None:
+            self._hf_datasets = {}
+            datasets = self.get_datasets()
+            for role, dataset in datasets.items():
+                self._hf_datasets[role] = dataset.to_hf_dataset(model_manager)
+        return self._hf_datasets
 
     def cleanup(self) -> None:
         """

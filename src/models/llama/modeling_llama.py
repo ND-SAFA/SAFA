@@ -830,7 +830,10 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
         try:
-            return super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+            print("original pretrained method...")
+            original_model = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+            print("finished loading from original pretrained method")
+            return original_model
         except RuntimeError:
             print("Starting to load model...")
             model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)

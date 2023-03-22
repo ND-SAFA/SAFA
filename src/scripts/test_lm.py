@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     trainer_dataset_manager = create_dataset_manager()
     logger.info("Created dataset manager! starting to loading model...")
-    model = model_manager.get_model()
+    # model = model_manager.get_model()
     logger.info("Model loaded! Creating collator and trainer args...")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     logger.info("Created trainer args! Creating trace trainer...")
 
     # Prepare dataset
-    add_padding_token(tokenizer, model.config)
+    # add_padding_token(tokenizer, model.config)
     trainer = TraceTrainer(model_manager=model_manager,
                            trainer_args=args,
                            trainer_dataset_manager=trainer_dataset_manager)

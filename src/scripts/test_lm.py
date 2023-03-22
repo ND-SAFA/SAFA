@@ -101,7 +101,8 @@ if __name__ == "__main__":
 
     trainer_dataset_manager = create_dataset_manager()
     logger.info("Created dataset manager! starting to loading model...")
-    # model = model_manager.get_model()
+    model = model_manager.get_model()
+    print(model.named_parameters())
     logger.info("Model loaded! Creating collator and trainer args...")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)

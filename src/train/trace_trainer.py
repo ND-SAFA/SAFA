@@ -47,6 +47,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param kwargs: Any additional arguments given to the HF Trainer
         """
         self.trainer_args = trainer_args
+        trainer_args.__post_init__()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)

@@ -642,7 +642,7 @@ class LLaMAModel(LLaMAPreTrainedModel):
 
 
 class LLaMAForCausalLM(LLaMAPreTrainedModel):
-    _keys_to_ignore_on_load_missing = [r"lm_head.weight"]
+    _keys_to_ignore_on_load_missing = [r"cls_head.weight"]
 
     def __init__(self, config):
         super().__init__(config)
@@ -812,7 +812,7 @@ class LLaMAForCausalLM(LLaMAPreTrainedModel):
         return reordered_past
 
 
-class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
+class LLaMAForSequenceClassification(LLaMAForCausalLM):
     """
     Transformer decoder consisting of *config.num_hidden_layers* layers. Each layer is a [`LLaMADecoderLayer`]
 
@@ -820,22 +820,12 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         config: LLaMAConfig
     """
 
-    def __init__(self, config: LLaMAConfig, model: LLaMAModel = None):
+    def __init__(self, config: LLaMAConfig):
         super().__init__(config)
-        self.model = LLaMAModel(config) if model is None else model
-        self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
+        # self.model = LLaMAModel(config) if model is None else model
+        self.cls_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
         # Initialize weights and apply final processing
         self.post_init()
-
-    @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
-        print("Starting to load model...")
-        model = LLaMAModel._load_state_dict_into_model(pretrained_model_name_or_path)  # , *model_args, **kwargs)
-        print("Base llama model has been loaded...")
-        config = kwargs.pop("config")
-        sequence_model = LLaMAForSequenceClassification(config, model)
-        print("Sequence Classification Model has been loaded...")
-        return sequence_model
 
     def forward(
             self,
@@ -869,7 +859,7 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         )
 
         hidden_states = outputs[0]
-        logits = self.lm_head(hidden_states)
+        logits = self.cls_head(hidden_states)
 
         if input_ids is not None:
             batch_size, sequence_length = input_ids.shape[:2]

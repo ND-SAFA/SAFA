@@ -11,18 +11,9 @@
       "device": "nvme",
       "nvme_path": "/local_nvme",
       "pin_memory": true,
-      "buffer_count": 4,
+      "buffer_count": 5,
       "buffer_size": 1e8,
       "max_in_cpu": 1e9
-    }
-  },
-  "optimizer": {
-    "type": "AdamW",
-    "params": {
-      "lr": "auto",
-      "betas": "auto",
-      "eps": "auto",
-      "weight_decay": "auto"
     }
   },
   "overlap_comm": true,

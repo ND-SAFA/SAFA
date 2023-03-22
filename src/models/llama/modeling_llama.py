@@ -647,7 +647,6 @@ class LLaMAForCausalLM(LLaMAPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.model = LLaMAModel(config)
-
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
@@ -821,84 +820,84 @@ class LLaMAForSequenceClassification(LLaMAForCausalLM):
     """
 
     def __init__(self, config: LLaMAConfig):
-        super().__init__(config)
-        # self.model = LLaMAModel(config) if model is None else model
-        self.cls_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
+        super(LLaMAPreTrainedModel).__init__(config)
+        self.model = LLaMAModel(config)
+        self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
         # Initialize weights and apply final processing
         self.post_init()
 
-    def forward(
-            self,
-            input_ids: torch.LongTensor = None,
-            attention_mask: Optional[torch.Tensor] = None,
-            past_key_values: Optional[List[torch.FloatTensor]] = None,
-            inputs_embeds: Optional[torch.FloatTensor] = None,
-            labels: Optional[torch.LongTensor] = None,
-            use_cache: Optional[bool] = None,
-            output_attentions: Optional[bool] = None,
-            output_hidden_states: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, SequenceClassifierOutput]:
-
-        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-        output_hidden_states = (
-            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
-        )
-        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
-
-        # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
-        outputs = self.model(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            past_key_values=past_key_values,
-            inputs_embeds=inputs_embeds,
-            use_cache=use_cache,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
-        )
-
-        hidden_states = outputs[0]
-        logits = self.cls_head(hidden_states)
-
-        if input_ids is not None:
-            batch_size, sequence_length = input_ids.shape[:2]
-        else:
-            batch_size, sequence_length = inputs_embeds.shape[:2]
-
-        assert (
-                self.config.pad_token_id is not None or batch_size == 1
-        ), "Cannot handle batch sizes > 1 if no padding token is defined."
-        if self.config.pad_token_id is None:
-            sequence_lengths = -1
-        else:
-            if input_ids is not None:
-                sequence_lengths = (torch.ne(input_ids, self.config.pad_token_id).sum(-1) - 1).to(logits.device)
-            else:
-                sequence_lengths = -1
-                logger.warning(
-                    f"{self.__class__.__name__} will not detect padding tokens in `inputs_embeds`. Results may be "
-                    "unexpected if using padding tokens in conjunction with `inputs_embeds.`"
-                )
-
-        pooled_logits = logits[torch.arange(batch_size, device=logits.device), sequence_lengths]
-
-        loss = None
-        if labels is not None:
-            # Flatten the tokens
-            loss_fct = CrossEntropyLoss()
-            loss = loss_fct(pooled_logits.view(-1, self.config.num_labels), labels.view(-1))
-
-        if not return_dict:
-            output = (logits,) + outputs[2:]
-            return ((loss,) + output) if loss is not None else output
-
-        return SequenceClassifierOutput(
-            loss=loss,
-            logits=pooled_logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+    # def forward(
+    #         self,
+    #         input_ids: torch.LongTensor = None,
+    #         attention_mask: Optional[torch.Tensor] = None,
+    #         past_key_values: Optional[List[torch.FloatTensor]] = None,
+    #         inputs_embeds: Optional[torch.FloatTensor] = None,
+    #         labels: Optional[torch.LongTensor] = None,
+    #         use_cache: Optional[bool] = None,
+    #         output_attentions: Optional[bool] = None,
+    #         output_hidden_states: Optional[bool] = None,
+    #         return_dict: Optional[bool] = None,
+    # ) -> Union[Tuple, SequenceClassifierOutput]:
+    #
+    #     output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+    #     output_hidden_states = (
+    #         output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+    #     )
+    #     return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+    #
+    #     # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
+    #     outputs = self.model(
+    #         input_ids=input_ids,
+    #         attention_mask=attention_mask,
+    #         past_key_values=past_key_values,
+    #         inputs_embeds=inputs_embeds,
+    #         use_cache=use_cache,
+    #         output_attentions=output_attentions,
+    #         output_hidden_states=output_hidden_states,
+    #         return_dict=return_dict,
+    #     )
+    #
+    #     hidden_states = outputs[0]
+    #     logits = self.cls_head(hidden_states)
+    #
+    #     if input_ids is not None:
+    #         batch_size, sequence_length = input_ids.shape[:2]
+    #     else:
+    #         batch_size, sequence_length = inputs_embeds.shape[:2]
+    #
+    #     assert (
+    #             self.config.pad_token_id is not None or batch_size == 1
+    #     ), "Cannot handle batch sizes > 1 if no padding token is defined."
+    #     if self.config.pad_token_id is None:
+    #         sequence_lengths = -1
+    #     else:
+    #         if input_ids is not None:
+    #             sequence_lengths = (torch.ne(input_ids, self.config.pad_token_id).sum(-1) - 1).to(logits.device)
+    #         else:
+    #             sequence_lengths = -1
+    #             logger.warning(
+    #                 f"{self.__class__.__name__} will not detect padding tokens in `inputs_embeds`. Results may be "
+    #                 "unexpected if using padding tokens in conjunction with `inputs_embeds.`"
+    #             )
+    #
+    #     pooled_logits = logits[torch.arange(batch_size, device=logits.device), sequence_lengths]
+    #
+    #     loss = None
+    #     if labels is not None:
+    #         # Flatten the tokens
+    #         loss_fct = CrossEntropyLoss()
+    #         loss = loss_fct(pooled_logits.view(-1, self.config.num_labels), labels.view(-1))
+    #
+    #     if not return_dict:
+    #         output = (logits,) + outputs[2:]
+    #         return ((loss,) + output) if loss is not None else output
+    #
+    #     return SequenceClassifierOutput(
+    #         loss=loss,
+    #         logits=pooled_logits,
+    #         hidden_states=outputs.hidden_states,
+    #         attentions=outputs.attentions,
+    #     )
 
 
 class LLaMAForSequenceSimilarity(LLaMAPreTrainedModel):

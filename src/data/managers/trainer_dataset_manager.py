@@ -2,6 +2,8 @@ import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
+from datasets import set_caching_enabled
+
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
@@ -20,6 +22,8 @@ from util.base_object import BaseObject
 from util.enum_util import get_enum_from_name
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
+
+set_caching_enabled(False)
 
 
 class TrainerDatasetManager(BaseObject):

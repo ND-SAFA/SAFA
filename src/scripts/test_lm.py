@@ -61,12 +61,10 @@ def create_test_dataset(**kwargs):
 modes = {
     "test": {
         "model": "hf-internal-testing/tiny-random-bert",
-        "dataset": create_test_dataset,
         "params": ["per_device_train_batch_size"]
     },
     "prod": {
         "model": "decapoda-research/llama-7b-hf",
-        "dataset": create_test_dataset,
         "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns"]
     }
 }
@@ -76,7 +74,7 @@ if __name__ == "__main__":
     from constants import PROJ_PATH
     from data.creators.trace_dataset_creator import TraceDatasetCreator
     from util.logging.logger_config import LoggerConfig
-    from util.logging.logger_manager import LoggerManager
+    from util.logging.logger_manager import LoggerManager, logger
     from data.readers.csv_project_reader import CsvProjectReader
     from data.datasets.dataset_role import DatasetRole
     from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -98,9 +96,11 @@ if __name__ == "__main__":
     model_manager = LLaMAModelManager(modes[mode]["model"], model_task=LLaMATask.SEQUENCE_CLASSIFICATION)
     tokenizer = model_manager.get_tokenizer()
     # dataset = modes[mode]["dataset"](create=True)
+
     trainer_dataset_manager = create_dataset_manager()
+    logger.info("Created dataset manager...")
     model = model_manager.get_model()
-    print(model)
+    logger.info("Model loaded...")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
@@ -114,12 +114,12 @@ if __name__ == "__main__":
     trainer = TraceTrainer(model_manager=model_manager,
                            trainer_args=args,
                            trainer_dataset_manager=trainer_dataset_manager)
-    print("Trace trainer created...")
+    logger.info("Trace trainer created...")
 
     # Predict
     gc.collect()
 
-    print("Starting to perform training...")
+    logger.info("Starting to perform training...")
     outputs = trainer.perform_training()
     response = outputs.prediction_output
-    print("Predictions: \n", response)
+    logger.info("Predictions: \n", response)

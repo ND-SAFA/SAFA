@@ -4,6 +4,7 @@ from data.readers.api_project_reader import ApiProjectReader
 from data.readers.csv_project_reader import CsvProjectReader
 from data.readers.hub_project_reader import HubProjectReader
 from data.readers.pre_train_project_reader import PreTrainProjectReader
+from data.readers.pre_train_trace_reader import PreTrainTraceReader
 from data.readers.repository_project_reader import RepositoryProjectReader
 from data.readers.structured_project_reader import StructuredProjectReader
 
@@ -15,4 +16,5 @@ class SupportedDatasetReader(Enum):
     SAFA = StructuredProjectReader
     API = ApiProjectReader
     MLM_PRETRAIN = PreTrainProjectReader
+    PRE_TRAIN_TRACE = PreTrainTraceReader
     HUB = HubProjectReader

@@ -20,7 +20,6 @@
 """ PyTorch LLaMA model."""
 import math
 import os
-import traceback
 from typing import List, Optional, Tuple, Union
 
 import torch
@@ -828,22 +827,22 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         # Initialize weights and apply final processing
         self.post_init()
 
-    @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
-        try:
-            print("original pretrained method...")
-            original_model = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
-            print("finished loading from original pretrained method")
-            return original_model
-        except RuntimeError as e:
-            print(traceback.format_exc())
-            print("Starting to load model...")
-            model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
-            print("Base llama model has been loaded...")
-            config = kwargs.pop("config")
-            sequence_model = LLaMAForSequenceClassification(config, model)
-            print("Sequence Classification Model has been loaded...")
-            return sequence_model
+    # @classmethod
+    # def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+    #     try:
+    #         print("original pretrained method...")
+    #         original_model = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+    #         print("finished loading from original pretrained method")
+    #         return original_model
+    #     except RuntimeError as e:
+    #         print(traceback.format_exc())
+    #         print("Starting to load model...")
+    #         model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+    #         print("Base llama model has been loaded...")
+    #         config = kwargs.pop("config")
+    #         sequence_model = LLaMAForSequenceClassification(config, model)
+    #         print("Sequence Classification Model has been loaded...")
+    #         return sequence_model
 
     def forward(
             self,

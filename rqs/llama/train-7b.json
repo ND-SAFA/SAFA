@@ -14,9 +14,8 @@
             "layers_to_freeze": 31
           },
           "trainer_args": {
-            "gradient_checkpointing": true,
+            "gradient_checkpointing": false,
             "fp16": true,
-            "deepspeed_path": "~/tgen/deepspeed.json",
             "max_seq_length": 512,
             "evaluation_strategy": "steps",
             "save_strategy": null,
@@ -28,14 +27,7 @@
             "gradient_accumulation_steps": 1,
             "per_device_train_batch_size": 1,
             "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
             "skip_save": false,
-            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {

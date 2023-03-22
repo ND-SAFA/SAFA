@@ -20,6 +20,7 @@
 """ PyTorch LLaMA model."""
 import math
 import os
+import traceback
 from typing import List, Optional, Tuple, Union
 
 import torch
@@ -834,7 +835,8 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
             original_model = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
             print("finished loading from original pretrained method")
             return original_model
-        except RuntimeError:
+        except RuntimeError as e:
+            print(traceback.format_exc())
             print("Starting to load model...")
             model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
             print("Base llama model has been loaded...")

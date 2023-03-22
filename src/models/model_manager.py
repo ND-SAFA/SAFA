@@ -10,6 +10,7 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 from util.base_object import BaseObject
+from util.logging.logger_manager import logger
 
 
 class ModelManager(BaseObject):
@@ -154,3 +155,4 @@ class ModelManager(BaseObject):
             layer = layers[layer_no]
             for param in layer:
                 param.requires_grad = False
+        logger.info(f"Successfully froze {len(layers)} layers.")

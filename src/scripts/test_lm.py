@@ -83,8 +83,10 @@ if __name__ == "__main__":
     from models.llama.llama_model_manager import LLaMAModelManager
     from models.llama.llama_task import LLaMATask
     from data.creators.split_dataset_creator import SplitDatasetCreator
-
+    from datasets import set_caching_enabled
     import gc
+
+    set_caching_enabled(False)
 
     mode = "prod"
     # Paths
@@ -98,9 +100,9 @@ if __name__ == "__main__":
     # dataset = modes[mode]["dataset"](create=True)
 
     trainer_dataset_manager = create_dataset_manager()
-    logger.info("Created dataset manager...")
+    logger.info("Created dataset manager! starting to loading model...")
     model = model_manager.get_model()
-    logger.info("Model loaded...")
+    logger.info("Model loaded! Creating collator and trainer args...")
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     arg_params = {k: v for k, v in arg_params.items() if k in modes[mode]["params"]}
     args = TrainerArgs(output_path, **arg_params)
     args.__post_init__()
+    logger.info("Created trainer args! Creating trace trainer...")
 
     # Prepare dataset
     add_padding_token(tokenizer, model.config)

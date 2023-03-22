@@ -81,6 +81,7 @@ if __name__ == "__main__":
     from data.readers.hub_project_reader import HubProjectReader
     from train.trace_trainer import TraceTrainer
     from models.llama.llama_model_manager import LLaMAModelManager
+    from models.llama.llama_task import LLaMATask
 
     import gc
 
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    model_manager = LLaMAModelManager(modes[mode]["model"])
+    model_manager = LLaMAModelManager(modes[mode]["model"], model_task=LLaMATask.CASUAL_LM)
     tokenizer = model_manager.get_tokenizer()
     # dataset = modes[mode]["dataset"](create=True)
     trainer_dataset_manager = create_dataset_manager()

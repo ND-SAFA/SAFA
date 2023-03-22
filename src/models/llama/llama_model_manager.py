@@ -1,5 +1,7 @@
 from typing import Dict, List, Union
 
+from torch.nn import Parameter
+from transformers import PreTrainedModel
 from transformers.configuration_utils import PretrainedConfig
 from transformers.tokenization_utils_base import BatchEncoding
 
@@ -12,6 +14,7 @@ from models.model_properties import ModelArchitectureType, ModelSize
 
 
 class LLaMAModelManager(ModelManager):
+    LAYER = List[Parameter]
 
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
@@ -103,3 +106,12 @@ class LLaMAModelManager(ModelManager):
             features1[DataKey.INPUT_IDS][i].extend(features2[DataKey.INPUT_IDS][i])
             features1[DataKey.ATTEN_MASK][i].extend(features2[DataKey.ATTEN_MASK][i])
         return features1
+
+    @staticmethod
+    def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:
+        """
+        Returns encoded layers for llama model using its own layer identifier.
+        :param model: The llama model to gather layers for.
+        :return: The list of layers
+        """
+        return super().get_encoder_layers(model, "layers")

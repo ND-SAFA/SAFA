@@ -129,16 +129,18 @@ class ModelManager(BaseObject):
         return feature
 
     @staticmethod
-    def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:
+    def get_encoder_layers(model: PreTrainedModel, layer_identifier: str = "layer") -> List[LAYER]:
         """
         Returns a list of layers represented by a list of their parameters
+        :param model: The model to gather layers for
+        :param layer_identifier: The identifier used to distinguish layers.
         :return: a list of layers represented by a list of their parameters
         """
         layers = {}
         for name, param in model.named_parameters():
             logger.info(f"Layer {name}")
             descr = name.split(".")
-            if "layer" in descr:
+            if layer_identifier in descr:
                 layer_no = int(descr[descr.index("layer") + 1])
                 if layer_no not in layers:
                     layers[layer_no] = []

@@ -100,6 +100,7 @@ if __name__ == "__main__":
     # dataset = modes[mode]["dataset"](create=True)
     trainer_dataset_manager = create_dataset_manager()
     model = model_manager.get_model()
+    print(model)
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")

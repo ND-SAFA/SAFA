@@ -1,9 +1,9 @@
 <template>
   <q-page :class="className">
-    <q-card flat bordered style="width: 30em" class="q-pa-sm">
+    <q-card flat bordered class="q-pa-sm card-page">
       <q-card-section class="q-pb-none">
         <div class="q-mx-auto width-max q-mb-md">
-          <safa-icon style="width: 14em" />
+          <safa-icon />
         </div>
         <slot name="form" />
       </q-card-section>

@@ -33,18 +33,14 @@
           data-cy="input-approval-type"
           b=""
         />
-      </template>
-
-      <template #header-bottom>
-        <flex-box full-width justify="end">
-          <text-button
-            text
-            label="Clear Unreviewed"
-            icon="trace-decline-all"
-            color="negative"
-            @click="handleDeclineAll"
-          />
-        </flex-box>
+        <text-button
+          text
+          small
+          label="Clear Unreviewed"
+          icon="trace-decline-all"
+          color="negative"
+          @click="handleDeclineAll"
+        />
       </template>
 
       <template #body-cell-sourceType="{ row }">
@@ -96,7 +92,6 @@ import {
   GroupableTable,
   MultiselectInput,
   TextButton,
-  FlexBox,
   AttributeChip,
 } from "@/components/common";
 import { TraceLinkApproval, TraceLinkDisplay } from "@/components/traceLink";

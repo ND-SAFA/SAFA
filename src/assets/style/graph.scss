@@ -21,6 +21,10 @@ $graph-border-radius: 8px;
   }
 }
 
+.artifact-fab {
+  z-index: 7000;
+}
+
 // Graph Nodes
 
 .artifact-svg-wrapper {
@@ -55,4 +59,8 @@ $graph-border-radius: 8px;
   text-align: center;
   font-weight: 800 !important;
   font-size: 1.2rem !important;
+}
+
+.tim-svg-wrapper {
+  margin-top: 7px;
 }

@@ -6,7 +6,7 @@
       :data-cy-name="props.dataCyName"
       :data-cy-description="props.dataCyDescription"
     />
-    <div style="max-width: 40em" class="q-mx-auto">
+    <div class="q-mx-auto long-input">
       <switch-input
         v-model="emptyFiles"
         label="Create an empty project"

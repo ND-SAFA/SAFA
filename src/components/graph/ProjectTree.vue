@@ -161,7 +161,7 @@ watch(
     appStore.onLoadStart();
 
     setTimeout(() => {
-      cyResetTree();
+      layoutStore.resetLayout();
       appStore.onLoadEnd();
     }, 200);
   }
@@ -169,6 +169,8 @@ watch(
 
 watch(
   () => isTreeMode.value,
-  () => layoutStore.resetLayout()
+  () => {
+    layoutStore.resetLayout();
+  }
 );
 </script>

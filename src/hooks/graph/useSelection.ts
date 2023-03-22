@@ -11,8 +11,6 @@ import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
   cyIfNotAnimated,
-  doesNotContainType,
-  isInSubtree,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
 import subtreeStore from "../project/useSubtree";
@@ -98,11 +96,14 @@ export const useSelection = defineStore("selection", {
       const subtree = this.selectedSubtreeIds;
       const ignoreTypes = this.ignoreTypes;
 
+      const isInSubtree = (id: string) =>
+        subtree.length === 0 || subtree.includes(id);
+      const doesNotContainType = (type: string) => !ignoreTypes.includes(type);
+
       return artifactStore.currentArtifacts
         .filter(
           (artifact) =>
-            isInSubtree(subtree, artifact) &&
-            doesNotContainType(ignoreTypes, artifact)
+            isInSubtree(artifact.id) && doesNotContainType(artifact.type)
         )
         .map(({ id }) => id);
     },

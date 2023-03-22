@@ -14,9 +14,15 @@ export function parseFilePanel(
 ): void {
   if (!panel.file) return;
 
+  const [fileType = "", fileTargetType = ""] =
+    panel.file.name?.split(".")[0]?.split("2") || [];
+
   const handleError = () => {
     panel.errorMessage = "Unable to parse this file";
   };
+
+  panel.loading = true;
+  panel.type = panel.type || fileType;
 
   if (panel.variant === "artifact") {
     parseArtifactFile(panel.type, panel.file)
@@ -30,8 +36,11 @@ export function parseFilePanel(
           artifactMap[artifact.name] = artifact;
         });
       })
-      .catch(handleError);
+      .catch(handleError)
+      .finally(() => (panel.loading = false));
   } else {
+    panel.toType = panel.toType || fileTargetType;
+
     parseTraceFile(panel.file)
       .then(({ entities, errors }) => {
         panel.traces = entities;
@@ -42,7 +51,8 @@ export function parseFilePanel(
           errors.length === 0 ? undefined : errors.join(", ");
         panel.itemNames = entities.map(extractTraceId);
       })
-      .catch(handleError);
+      .catch(handleError)
+      .finally(() => (panel.loading = false));
   }
 }
 

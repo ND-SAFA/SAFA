@@ -11,13 +11,20 @@
     :data-cy="props.dataCy"
     @click="emit('click')"
   >
-    <icon v-if="props.icon" :variant="props.icon" class="q-mr-sm" />
+    <icon
+      v-if="props.icon"
+      :variant="props.icon"
+      :class="!props.hideLabel ? 'q-mr-sm' : ''"
+    />
     <typography
-      v-if="!!props.label"
+      v-if="!!props.label && !props.hideLabel"
       :value="props.label"
       :small="props.small"
       :large="props.large"
     />
+    <q-tooltip v-if="props.hideLabel">
+      {{ props.label }}
+    </q-tooltip>
     <slot />
   </q-btn>
 </template>
@@ -110,6 +117,10 @@ const props = defineProps<{
    * The bottom margin.
    */
   b?: SizeType;
+  /**
+   * If true, the button label will be hidden.
+   */
+  hideLabel?: boolean;
   /**
    * The testing selector to set.
    */

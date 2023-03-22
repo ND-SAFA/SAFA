@@ -13,7 +13,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema, GraphElementType, GraphMode } from "@/types";
+import {
+  ArtifactCytoElement,
+  ArtifactSchema,
+  GraphElementType,
+  GraphMode,
+} from "@/types";
 import {
   useTheme,
   deltaStore,
@@ -31,7 +36,7 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
-const definition = computed(() => {
+const definition = computed<ArtifactCytoElement>(() => {
   const { id, body, type, name, safetyCaseType, logicType } = props.artifact;
   const warnings = warningStore.artifactWarnings[id] || [];
   const hiddenChildren = subtreeStore.getHiddenChildren(id);

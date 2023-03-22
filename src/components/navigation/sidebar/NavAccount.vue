@@ -1,5 +1,5 @@
 <template>
-  <div style="position: absolute; bottom: 0" class="full-width">
+  <div class="full-width nav-account">
     <list-item to="" title="Notifications">
       <template #icon>
         <notifications />

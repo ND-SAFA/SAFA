@@ -3,7 +3,7 @@
     <project-tree />
     <artifact-fab />
 
-    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-ma-lg">
+    <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-pa-lg">
       <template #artifacts>
         <artifact-table />
       </template>

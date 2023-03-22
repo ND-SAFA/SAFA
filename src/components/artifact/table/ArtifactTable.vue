@@ -24,9 +24,9 @@
           option-to-value
           option-value="id"
           option-label="name"
+          class="table-input"
           data-cy="input-delta-type"
           b=""
-          style="max-width: 300px"
         />
       </template>
 
@@ -131,10 +131,8 @@ function getDeltaType(row: FlatArtifact): ArtifactDeltaState {
  * @param row - The artifact to view.
  */
 function handleView(row: TableGroupRow | FlatArtifact) {
-  if ("id" in row && selectionStore.selectedArtifact?.id !== row.id) {
-    selectionStore.selectArtifact(String(row.id));
-  } else {
-    selectionStore.clearSelections();
+  if ("id" in row) {
+    selectionStore.toggleSelectArtifact(String(row.id));
   }
 }
 </script>

@@ -1,26 +1,18 @@
 <template>
-  <div v-if="isExpandable" style="width: 100%">
-    <div v-if="isExpanded" :class="className" style="white-space: normal">
+  <div v-if="isExpandable" class="width-100">
+    <div v-if="isExpanded" :class="className + ' text-white-space-normal'">
       {{ value }}
     </div>
-    <div
-      v-else
-      :class="className + ' text-ellipsis'"
-      style="white-space: nowrap; width: inherit; max-width: 60vw"
-    >
+    <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
     <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
-  <div v-else-if="variant === 'code'" style="width: 100%">
+  <div v-else-if="variant === 'code'" class="width-100">
     <pre v-if="isExpanded" :class="className">{{ value }}</pre>
-    <div
-      v-else
-      :class="className + ' text-ellipsis'"
-      style="white-space: nowrap; width: inherit; max-width: 60vw"
-    >
+    <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
     <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">

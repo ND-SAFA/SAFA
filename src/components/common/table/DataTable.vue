@@ -16,6 +16,7 @@
       :selection="props.selection"
       :sort-method="sort"
       :separator="props.separator"
+      :virtual-scroll="props.virtualScroll"
       :data-cy="props.dataCy"
       table-header-class="text-primary"
       class="data-table"
@@ -23,8 +24,8 @@
     >
       <slot />
 
-      <template v-if="slots.top" #top>
-        <slot name="top" />
+      <template v-if="slots.top" #top="scope">
+        <slot name="top" v-bind="scope" />
       </template>
 
       <template v-if="slots.header" #header="scope">
@@ -139,6 +140,10 @@ const props = defineProps<{
    * Whether to display densely.
    */
   dense?: boolean;
+  /**
+   * If true, virtual scroll will be enabled.
+   */
+  virtualScroll?: boolean;
   /**
    * The testing selector to set on this table.
    */

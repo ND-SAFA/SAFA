@@ -6,7 +6,6 @@
     :color="displayColor"
     :removable="props.removable"
     :data-cy="props.dataCy"
-    style="max-width: 200px"
     @remove="emit('remove')"
   >
     <q-tooltip :hidden="text.length < 10">
@@ -26,7 +25,7 @@
       :value="text"
     />
   </chip>
-  <flex-box v-else align="center">
+  <flex-box v-else align="center" class="attribute-bar">
     <q-linear-progress
       rounded
       :value="props.value"
@@ -34,7 +33,7 @@
       :track-color="trackColor"
       size="20px"
     />
-    <typography l="2" :value="progress + '%'" style="width: 50px" />
+    <typography l="2" :value="progress + '%'" class="attribute-bar-text" />
   </flex-box>
 </template>
 
@@ -174,6 +173,8 @@ const trackColor = computed(() => {
 });
 
 const chipClassName = computed(() =>
-  enumerated.value ? "q-mr-sm bg-neutral" : "qmr-sm bd-primary bg-neutral"
+  enumerated.value
+    ? "q-mr-sm bg-neutral attribute-chip"
+    : "qmr-sm bd-primary bg-neutral attribute-chip"
 );
 </script>

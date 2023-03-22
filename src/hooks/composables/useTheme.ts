@@ -3,7 +3,7 @@ import { setCssVar, useQuasar } from "quasar";
 import { LocalStorageKeys, ThemeHook } from "@/types";
 import { darkPalette, lightPalette } from "@/util";
 
-export function useTheme(): ThemeHook<ReturnType<typeof useQuasar>> {
+export function useTheme(): ThemeHook {
   const $q = useQuasar();
 
   const darkMode = computed({

@@ -74,6 +74,8 @@ function buildNotification() {
     },
     actions: actions,
     multiLine: false,
+    badgeColor: "secondary",
+    badgeTextColor: "black",
   };
 }
 

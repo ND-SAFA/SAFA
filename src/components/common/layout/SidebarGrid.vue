@@ -27,11 +27,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuasar } from "quasar";
+import { useScreen } from "@/hooks";
 import { FlexBox, FlexItem } from "@/components/common/display";
 
-const $q = useQuasar();
-
-const smallWindow = computed(() => $q.screen.lt.lg);
+const { smallWindow } = useScreen();
 </script>

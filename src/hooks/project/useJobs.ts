@@ -36,15 +36,6 @@ export const useJobs = defineStore("jobs", {
       this.jobs = [job, ...this.jobs.filter(({ id }) => id !== job.id)];
     },
     /**
-     * Finds a job.
-     *
-     * @param jobId - The job id to get.
-     * @returns The job with given id.
-     */
-    getJob(jobId: string): JobSchema | undefined {
-      return this.jobs.find(({ id }) => id === jobId);
-    },
-    /**
      * Removes job matching id of given job.
      *
      * @param job - The job, or id, to delete.

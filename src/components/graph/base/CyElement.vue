@@ -35,7 +35,7 @@ function add(): CollectionReturnValue | undefined {
   // }
 
   // strip observers from the original definition
-  let def = JSON.parse(JSON.stringify(props.definition));
+  const def = JSON.parse(JSON.stringify(props.definition));
 
   // add the element to cytoscape
   return instance.value?.add(def);

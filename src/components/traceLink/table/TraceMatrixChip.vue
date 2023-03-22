@@ -5,7 +5,7 @@
         clickable
         outline
         :color="color"
-        :style="style"
+        :class="className"
         @click="handleClick"
       >
         <typography :value="source.name" color="text" />
@@ -21,6 +21,7 @@
     <div v-else class="show-on-hover">
       <div class="width-fit" @click.stop>
         <icon-button
+          small
           icon="add"
           tooltip="Create trace link"
           @click="handleCreateLink"
@@ -73,20 +74,10 @@ const isUnreviewed = computed(
     traceLink.value?.approvalStatus === ApprovalType.UNREVIEWED
 );
 
-// Ignored until final decision is made on coloring logic.
-// const color = computed(() =>
-//   isGenerated.value
-//     ? isUnreviewed.value
-//       ? "secondary"
-//       : "positive"
-//     : "primary"
-// );
-
 const color = computed(() => (isGenerated.value ? "secondary" : "primary"));
-const style = computed(
-  () =>
-    "border-width: 2px; " +
-    (isUnreviewed.value ? "border-style: dashed;" : "border-style: solid;")
+
+const className = computed(() =>
+  isUnreviewed.value ? "trace-matrix-chip-unreviewed" : "trace-matrix-chip"
 );
 
 /**

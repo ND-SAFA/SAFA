@@ -127,19 +127,6 @@ export function cyApplyAutomove(
 }
 
 /**
- * Re-moves automove from all nodes.
- *
- * @param cyPromise - The cy instance.
- */
-export function cyRemoveAutomove(
-  cyPromise: CyPromise = artifactTreeCyPromise
-): void {
-  cyPromise.then((cy) => {
-    cy.automove("destroy");
-  });
-}
-
-/**
  * Moves the viewport such that given set of artifacts is in the middle of the viewport.
  * If no artifacts are given, the entire collection of nodes is centered.
  * Request is ignored if current animation is in progress to center the same collection of artifacts.

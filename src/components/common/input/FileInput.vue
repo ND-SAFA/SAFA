@@ -37,7 +37,7 @@ const props = withDefaults(
     /**
      * The synchronized files value.
      */
-    modelValue: File | File[] | null | undefined;
+    modelValue?: File | File[] | null;
     /**
      * Whether to allow multiple files to be uploaded.
      */
@@ -54,6 +54,7 @@ const props = withDefaults(
   {
     dataCy: "input-files",
     errorMessage: undefined,
+    modelValue: undefined,
   }
 );
 
@@ -67,5 +68,5 @@ const model = useVModel(props, "modelValue");
 const showError = computed(
   () => !!props.errorMessage && props.errorMessage.length > 0
 );
-const label = computed(() => (props.multiple ? "Upload Files" : "Upload FIle"));
+const label = computed(() => (props.multiple ? "Upload Files" : "Upload File"));
 </script>

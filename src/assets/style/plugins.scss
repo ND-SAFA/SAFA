@@ -16,3 +16,12 @@ code.hljs {
 .q-field {
   min-width: 200px;
 }
+
+// Quasar - Stepper
+
+.stepper-minimal {
+  .q-stepper__title {
+    white-space: pre-wrap;
+    width: min-content;
+  }
+}

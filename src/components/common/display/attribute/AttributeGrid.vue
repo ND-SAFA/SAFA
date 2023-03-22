@@ -35,10 +35,10 @@
       full-width
       justify="between"
     >
-      <div v-if="attrs[0]" :style="attrs[1] ? 'width: 50%' : 'width: 100%'">
+      <div v-if="attrs[0]" :class="attrs[1] ? 'width-50' : 'width-100'">
         <slot name="item" :attribute="attrs[0]" />
       </div>
-      <div v-if="attrs[1]" style="width: 50%">
+      <div v-if="attrs[1]" class="width-50">
         <slot name="item" :attribute="attrs[1]" />
       </div>
     </flex-box>

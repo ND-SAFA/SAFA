@@ -1,6 +1,6 @@
 <template>
   <q-dialog :model-value="props.open" @close="emit('close')">
-    <q-card :style="style">
+    <q-card :class="className">
       <q-card-section>
         <flex-box
           full-width
@@ -87,16 +87,5 @@ const emit = defineEmits<{
 
 const slots = useSlots();
 
-const style = computed(() => {
-  switch (props.size) {
-    case "sm":
-      return "width: 400px";
-    case "md":
-      return "width: 600px; max-width: unset;";
-    case "lg":
-      return "width: 800px; max-width: unset;";
-    default:
-      return "";
-  }
-});
+const className = computed(() => `modal-${props.size}`);
 </script>

@@ -3,6 +3,13 @@
     <flex-box full-width align="center">
       <searchbar v-model="searchText" :label="props.searchLabel" />
       <commit-buttons color="primary" class="q-ml-md" />
+      <icon-button
+        dense
+        :icon="props.inFullscreen ? 'fullscreen-exit' : 'fullscreen'"
+        :tooltip="props.inFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'"
+        class="q-ml-md"
+        @click="emit('toggle-fullscreen')"
+      />
     </flex-box>
     <flex-box align="center" t="2">
       <select-input
@@ -90,13 +97,18 @@ const props = defineProps<{
    * Whether to sort in descending order.
    */
   sortDesc: boolean;
+  /**
+   * Whether the table is in fullscreen mode.
+   */
+  inFullscreen: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:searchText", text: string): void;
   (e: "update:sortBy", values: string | undefined): void;
   (e: "update:sortDesc", descending: boolean): void;
   (e: "update:groupBy", value: string | undefined): void;
+  (e: "toggle-fullscreen"): void;
 }>();
 
 const searchText = useVModel(props, "searchText");

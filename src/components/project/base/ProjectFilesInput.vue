@@ -118,24 +118,26 @@ function handleClear(): void {
 
 /**
  * Creates a new tim file when the inputs change.
+ * Only creates a new file if there is no existing TIM file.
  */
 function handleTimChange(): void {
-  if (selectedFiles.value.length === 0) return;
+  if (
+    selectedFiles.value.length === 0 ||
+    selectedFiles.value.find(({ name }) => name == "tim.json")
+  )
+    return;
 
   tim.value = {
-    DataFiles: artifactTypes.value
-      .map((type) => ({ [type]: { File: `${type}.csv` } }))
-      .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-    ...traceMatrices.value
-      .map(({ source, target }) => ({
-        [`${source}2${target}`]: {
-          Source: source,
-          Target: target,
-          File: `${source}2${target}.csv`,
-        },
-      }))
-      .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-  } as TimJsonSchema;
+    artifacts: artifactTypes.value.map((type) => ({
+      type,
+      fileName: `${type}.csv`,
+    })),
+    traces: traceMatrices.value.map(({ source, target }) => ({
+      sourceType: source,
+      targetType: target,
+      fileName: `${source}2${target}.csv`,
+    })),
+  };
 
   selectedFiles.value = [
     ...selectedFiles.value.filter(({ name }) => name !== "tim.json"),
@@ -171,15 +173,15 @@ watch(
     reader.addEventListener("load", (event) => {
       tim.value = JSON.parse(String(event.target?.result));
 
-      artifactTypes.value = Object.values(tim.value?.DataFiles || {}).map(
-        ({ File }) => File.split(".")[0]
+      artifactTypes.value = (tim.value?.artifacts || []).map(
+        ({ fileName }) => fileName.split(".")[0]
       );
 
-      traceMatrices.value = Object.values(tim.value || {})
-        .filter(({ Source, Target }) => Source && Target)
-        .map(({ Source, Target }) => ({
-          source: String(Source),
-          target: String(Target),
+      traceMatrices.value = (tim.value?.traces || [])
+        .filter(({ sourceType, targetType }) => sourceType && targetType)
+        .map(({ sourceType, targetType }) => ({
+          source: sourceType,
+          target: targetType,
         }));
     });
 

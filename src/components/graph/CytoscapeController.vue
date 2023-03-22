@@ -58,10 +58,13 @@ async function afterCreated(cy: CytoCore) {
       `Unable to save cytoscape instance in: ${props.cytoCoreGraph.name}`
     );
   }
+
   props.cytoCoreGraph.plugins.forEach((plugin: CytoCorePlugin) => {
     plugin.afterInit(cy);
   });
+
   props.cytoCoreGraph.afterInit(cy);
+
   initialized.value = true;
 }
 </script>

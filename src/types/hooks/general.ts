@@ -6,11 +6,6 @@ import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
 export type ArtifactTypeDirections = Record<string, string[]>;
 
 /**
- * Enumerates the icons for each artifact type.
- */
-export type ArtifactTypeIcons = Record<string, string>;
-
-/**
  * Enumerates types of panels.
  */
 export enum PanelType {

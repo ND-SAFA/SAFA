@@ -69,10 +69,8 @@ const panels = computed(() =>
     : projectSaveStore.tracePanels
 );
 
-const isValid = computed(() =>
-  panels.value
-    .map(({ isValid }) => isValid)
-    .reduce((acc, cur) => acc && cur, true)
+const valid = computed(() =>
+  panels.value.map(({ valid }) => valid).reduce((acc, cur) => acc && cur, true)
 );
 
 /**
@@ -83,7 +81,7 @@ function handleAddPanel(): void {
 }
 
 watch(
-  () => isValid.value,
+  () => valid.value,
   (valid) => emit("validate", valid)
 );
 </script>

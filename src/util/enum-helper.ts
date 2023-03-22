@@ -6,7 +6,6 @@ import {
   DocumentType,
   FTANodeType,
   ModelShareType,
-  ModelTabTypes,
   ModelType,
   ProjectRole,
   SafetyCaseType,
@@ -183,18 +182,6 @@ export function creatorTabOptions(): SelectOption[] {
     createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
     createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
     createEnumOption(CreatorTabTypes.import, "Integrations Import"),
-  ];
-}
-
-/**
- * Returns display names for model editor tabs.
- *
- * @return The select option names and ids.
- */
-export function modelEditorTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(ModelTabTypes.training, "Training"),
-    createEnumOption(ModelTabTypes.evaluation, "Evaluation"),
   ];
 }
 

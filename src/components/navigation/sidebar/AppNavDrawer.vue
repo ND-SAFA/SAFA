@@ -14,9 +14,9 @@
       justify="between"
       align="center"
       y="3"
-      style="height: 40px; padding-left: 10px; padding-right: 10px"
+      class="nav-sidebar-header-open"
     >
-      <safa-icon style="width: 200px !important" />
+      <safa-icon />
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"
@@ -31,7 +31,7 @@
       align="center"
       full-width
       y="3"
-      style="height: 40px"
+      class="nav-sidebar-header"
     >
       <icon-button
         icon="nav-toggle"
@@ -59,15 +59,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import { useQuasar } from "quasar";
 import { ThemeColors } from "@/util";
-import { appStore, useTheme } from "@/hooks";
+import { appStore, useScreen, useTheme } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
 const { darkMode } = useTheme();
-const $q = useQuasar();
+const { smallWindow } = useScreen();
 
 const style = computed(() =>
   darkMode.value ? `background-color: ${ThemeColors.darkGrey}` : ""
@@ -83,8 +82,8 @@ const sidebarOpen = computed({
 });
 
 onMounted(() => {
-  if ($q.screen.lt.md) {
-    appStore.toggleAppPanel();
-  }
+  if (!smallWindow) return;
+
+  appStore.toggleAppPanel();
 });
 </script>

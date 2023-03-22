@@ -73,10 +73,10 @@
           class="q-mr-sm"
           data-cy="button-ignore-errors"
         />
-        <typography v-if="!isValid" :value="errorMessage" color="negative" />
+        <typography v-if="!valid" :value="errorMessage" color="negative" />
       </flex-box>
 
-      <list v-if="props.panel.itemNames.length > 0" bordered class="q-mb-md">
+      <list v-if="props.panel.itemNames.length > 0" class="q-mb-md">
         <expansion-item label="Parsed Entities">
           <div class="q-mx-md">
             <attribute-chip
@@ -153,14 +153,14 @@ const errorMessage = computed(() => {
   }
 });
 
-const isValid = computed(() => !errorMessage.value);
+const valid = computed(() => !errorMessage.value);
 
 const headerClass = computed(() =>
-  isValid.value ? "text-positive" : "text-negative"
+  valid.value ? "text-positive" : "text-negative"
 );
 
 const iconId = computed(() =>
-  isValid.value ? getIcon("success") : getIcon("error")
+  valid.value ? getIcon("success") : getIcon("error")
 );
 
 const artifactTypes = computed(() => projectSaveStore.artifactTypes);
@@ -210,11 +210,11 @@ watch(
 );
 
 watch(
-  () => isValid.value,
-  (valid) => {
-    props.panel.isValid = valid;
+  () => [valid.value, props.panel.loading],
+  () => {
+    props.panel.valid = valid.value;
 
-    if (!valid) return;
+    if (!valid.value || props.panel.loading) return;
 
     props.panel.open = false;
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="full-width">
-    <flex-box full-width :wrap="false" justify="between" align="center">
+    <flex-box full-width :wrap="false" justify="between" align="center" y="2">
       <project-searchbar v-if="graphVisible" />
       <q-space />
       <flex-box align="center">

@@ -80,7 +80,8 @@ function handleEdit(member: MembershipSchema): void {
 function handleDelete(member: MembershipSchema): void {
   if (
     member.role === ProjectRole.OWNER &&
-    rows.value.filter(({ role }) => role === ProjectRole.OWNER).length === 1
+    rows.value.filter((member) => member.role === ProjectRole.OWNER).length ===
+      1
   ) {
     logStore.onInfo("You cannot delete the only owner of this project.");
   } else {

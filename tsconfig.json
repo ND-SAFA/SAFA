@@ -12,7 +12,7 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "mocha", "chai"],
+    "types": ["webpack-env"],
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@/*": ["src/*"]

@@ -1,26 +1,30 @@
 {
-  "DataFiles": {
-    "Requirement": {
-      "File": "Requirement.csv"
+  "artifacts": [
+    {
+      "type": "Requirement",
+      "fileName": "Requirement.csv"
     },
-    "Design": {
-      "File": "Design.csv"
+    {
+      "type": "Design",
+      "fileName": "Design.csv"
     }
-  },
-  "DesignToDesign": {
-    "Source": "Design",
-    "Target": "Design",
-    "File": "Design2Design.csv"
-  },
-  "DesignToRequirement": {
-    "Source": "Design",
-    "Target": "Requirement",
-    "File": "Design2Requirement.csv",
-    "generateLinks": true
-  },
-  "RequirementToRequirement": {
-    "Source": "Requirement",
-    "Target": "Requirement",
-    "File": "Requirement2Requirement.csv"
-  }
+  ],
+  "traces": [
+    {
+      "sourceType": "Design",
+      "targetType": "Design",
+      "fileName": "Design2Design.csv"
+    },
+    {
+      "sourceType": "Design",
+      "targetType": "Requirement",
+      "fileName": "Design2Requirement.csv",
+      "generateLinks": true
+    },
+    {
+      "sourceType": "Requirement",
+      "targetType": "Requirement",
+      "fileName": "Requirement2Requirement.csv"
+    }
+  ]
 }

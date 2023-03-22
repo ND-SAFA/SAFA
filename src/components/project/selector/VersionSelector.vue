@@ -4,7 +4,7 @@
       el="h1"
       variant="subtitle"
       color="white"
-      style="white-space: nowrap"
+      class="text-expanded"
       :value="projectName"
       x="4"
     />
@@ -19,8 +19,7 @@
       label="Version"
       :options="versions"
       option-value="versionId"
-      style="width: 120px"
-      class="nav-input"
+      class="nav-input nav-version"
       color="accent"
     >
       <template #selected>

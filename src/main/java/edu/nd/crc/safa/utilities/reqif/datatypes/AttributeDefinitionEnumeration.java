@@ -79,7 +79,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ATTRIBUTE-DEFINITION-ENUMERATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "ATTRIBUTE-DEFINITION-ENUMERATION", namespace = "", propOrder = {
 
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -370,7 +370,7 @@ public class AttributeDefinitionEnumeration {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class AlternativeId {
 
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
@@ -429,7 +429,7 @@ public class AttributeDefinitionEnumeration {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class DefaultValue {
 
-        @XmlElement(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected AttributeValueEnumeration attributevalueenumeration;
 
@@ -488,7 +488,7 @@ public class AttributeDefinitionEnumeration {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class Type {
 
-        @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")

@@ -70,7 +70,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "REQ-IF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "REQ-IF", namespace = "", propOrder = {
     "theHeader",
     "coreContent",
     "toolExtensions"
@@ -222,7 +222,7 @@ public class ReqIf {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class CoreContent {
 
-        @XmlElement(name = "REQ-IF-CONTENT", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "REQ-IF-CONTENT", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected ReqIfContent reqIfContent;
 
@@ -281,7 +281,7 @@ public class ReqIf {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class TheHeader {
 
-        @XmlElement(name = "REQ-IF-HEADER", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "REQ-IF-HEADER", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected ReqIfHeader reqIfHeader;
 
@@ -340,7 +340,7 @@ public class ReqIf {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class ToolExtensions {
 
-        @XmlElement(name = "REQ-IF-TOOL-EXTENSION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "REQ-IF-TOOL-EXTENSION", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<ReqIfToolExtension> reqiftoolextension;
 

@@ -74,7 +74,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SPECIFICATION-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "SPECIFICATION-TYPE", namespace = "", propOrder = {
 
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -286,7 +286,7 @@ public class SpecificationType {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class AlternativeId {
 
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 
@@ -352,13 +352,13 @@ public class SpecificationType {
     public static class SpecAttributes {
 
         @XmlElements({
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionBoolean.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-DATE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionDate.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-ENUMERATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionEnumeration.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-INTEGER", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionInteger.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-REAL", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionReal.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-STRING", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionString.class),
-            @XmlElement(name = "ATTRIBUTE-DEFINITION-XHTML", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = AttributeDefinitionXhtml.class)
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN", namespace = "", type = AttributeDefinitionBoolean.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-DATE", namespace = "", type = AttributeDefinitionDate.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-ENUMERATION", namespace = "", type = AttributeDefinitionEnumeration.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-INTEGER", namespace = "", type = AttributeDefinitionInteger.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-REAL", namespace = "", type = AttributeDefinitionReal.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-STRING", namespace = "", type = AttributeDefinitionString.class),
+            @XmlElement(name = "ATTRIBUTE-DEFINITION-XHTML", namespace = "", type = AttributeDefinitionXhtml.class)
         })
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<Object> attributedefinitionbooleanOrATTRIBUTEDEFINITIONDATEOrATTRIBUTEDEFINITIONENUMERATION;

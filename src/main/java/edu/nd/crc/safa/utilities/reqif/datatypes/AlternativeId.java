@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "ALTERNATIVE-ID", namespace = "", propOrder = {
 
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")

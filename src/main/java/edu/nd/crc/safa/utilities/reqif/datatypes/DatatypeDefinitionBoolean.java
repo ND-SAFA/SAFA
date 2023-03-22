@@ -54,7 +54,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "", propOrder = {
 
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -237,7 +237,7 @@ public class DatatypeDefinitionBoolean {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class AlternativeId {
 
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
 

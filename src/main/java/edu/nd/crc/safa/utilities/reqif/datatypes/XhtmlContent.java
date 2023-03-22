@@ -33,17 +33,17 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "XHTML-CONTENT", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "XHTML-CONTENT", namespace = "", propOrder = {
     "p",
     "div"
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
 public class XhtmlContent {
 
-    @XmlElement(namespace = "http://www.w3.org/1999/xhtml")
+    @XmlElement(namespace = "")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected XhtmlPType p;
-    @XmlElement(namespace = "http://www.w3.org/1999/xhtml")
+    @XmlElement(namespace = "")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected XhtmlDivType div;
 

@@ -111,7 +111,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "REQ-IF-CONTENT", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "REQ-IF-CONTENT", namespace = "", propOrder = {
     "datatypes",
     "spectypes",
     "specobjects",
@@ -331,13 +331,13 @@ public class ReqIfContent {
     public static class Datatypes {
 
         @XmlElements({
-            @XmlElement(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionBoolean.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-DATE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionDate.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionEnumeration.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-INTEGER", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionInteger.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-REAL", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionReal.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-STRING", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionString.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-XHTML", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = DatatypeDefinitionXhtml.class)
+            @XmlElement(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "", type = DatatypeDefinitionBoolean.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-DATE", namespace = "", type = DatatypeDefinitionDate.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "", type = DatatypeDefinitionEnumeration.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-INTEGER", namespace = "", type = DatatypeDefinitionInteger.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-REAL", namespace = "", type = DatatypeDefinitionReal.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-STRING", namespace = "", type = DatatypeDefinitionString.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-XHTML", namespace = "", type = DatatypeDefinitionXhtml.class)
         })
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<Object> datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION;
@@ -407,7 +407,7 @@ public class ReqIfContent {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class Specifications {
 
-        @XmlElement(name = "SPECIFICATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "SPECIFICATION", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<Specification> specification;
 
@@ -470,7 +470,7 @@ public class ReqIfContent {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class SpecObjects {
 
-        @XmlElement(name = "SPEC-OBJECT", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "SPEC-OBJECT", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<SpecObject> specobject;
 
@@ -533,7 +533,7 @@ public class ReqIfContent {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class SpecRelationGroups {
 
-        @XmlElement(name = "RELATION-GROUP", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "RELATION-GROUP", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<RelationGroup> relationgroup;
 
@@ -596,7 +596,7 @@ public class ReqIfContent {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class SpecRelations {
 
-        @XmlElement(name = "SPEC-RELATION", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "SPEC-RELATION", namespace = "")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<SpecRelation> specrelation;
 
@@ -663,10 +663,10 @@ public class ReqIfContent {
     public static class SpecTypes {
 
         @XmlElements({
-            @XmlElement(name = "RELATION-GROUP-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = RelationGroupType.class),
-            @XmlElement(name = "SPEC-OBJECT-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = SpecObjectType.class),
-            @XmlElement(name = "SPEC-RELATION-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = SpecRelationType.class),
-            @XmlElement(name = "SPECIFICATION-TYPE", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = SpecificationType.class)
+            @XmlElement(name = "RELATION-GROUP-TYPE", namespace = "", type = RelationGroupType.class),
+            @XmlElement(name = "SPEC-OBJECT-TYPE", namespace = "", type = SpecObjectType.class),
+            @XmlElement(name = "SPEC-RELATION-TYPE", namespace = "", type = SpecRelationType.class),
+            @XmlElement(name = "SPECIFICATION-TYPE", namespace = "", type = SpecificationType.class)
         })
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected List<Object> relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE;

@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.util.StreamReaderDelegate;
 
 import edu.nd.crc.safa.utilities.reqif.datatypes.ReqIf;
 
@@ -35,7 +36,7 @@ public interface ReqIfFileParser {
         JAXBContext context = JAXBContext.newInstance(ReqIf.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
 
-        ReqIfXmlReader xmlReader = new ReqIfXmlReader(streamReader);
+        StreamReaderDelegate xmlReader = new StreamReaderDelegate(streamReader);
 
         return unmarshaller.unmarshal(xmlReader, ReqIf.class).getValue();
     }
@@ -47,7 +48,7 @@ public interface ReqIfFileParser {
      * @return Parsed ReqIf content
      */
     static ReqIf parseReqIfFile(String fileContents) throws XMLStreamException, JAXBException {
-        InputStream inputStream = new ByteArrayInputStream(fileContents.getBytes(Charset.defaultCharset()));
+        InputStream inputStream = new ByteArrayInputStream(fileContents.getBytes(StandardCharsets.UTF_8));
         return parseReqIfFile(inputStream);
     }
 

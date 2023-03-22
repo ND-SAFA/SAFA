@@ -47,7 +47,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "REQ-IF-HEADER", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "REQ-IF-HEADER", namespace = "", propOrder = {
     "comment",
     "creationtime",
     "repositoryid",

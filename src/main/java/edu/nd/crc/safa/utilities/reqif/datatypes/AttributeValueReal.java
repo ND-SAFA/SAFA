@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ATTRIBUTE-VALUE-REAL", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", propOrder = {
+@XmlType(name = "ATTRIBUTE-VALUE-REAL", namespace = "", propOrder = {
 
 })
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
@@ -132,7 +132,7 @@ public class AttributeValueReal {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     public static class Definition {
 
-        @XmlElement(name = "ATTRIBUTE-DEFINITION-REAL-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd")
+        @XmlElement(name = "ATTRIBUTE-DEFINITION-REAL-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")

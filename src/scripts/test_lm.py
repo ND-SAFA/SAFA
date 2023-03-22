@@ -5,8 +5,6 @@ from datasets import load_dataset
 from dotenv import load_dotenv
 from transformers import DataCollatorWithPadding
 
-from data.creators.split_dataset_creator import SplitDatasetCreator
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -86,6 +84,7 @@ if __name__ == "__main__":
     from train.trace_trainer import TraceTrainer
     from models.llama.llama_model_manager import LLaMAModelManager
     from models.llama.llama_task import LLaMATask
+    from data.creators.split_dataset_creator import SplitDatasetCreator
 
     import gc
 

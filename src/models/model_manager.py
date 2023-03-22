@@ -138,7 +138,6 @@ class ModelManager(BaseObject):
         """
         layers = {}
         for name, param in model.named_parameters():
-            logger.info(f"Layer {name}")
             descr = name.split(".")
             if layer_identifier in descr:
                 layer_no = int(descr[descr.index(layer_identifier) + 1])

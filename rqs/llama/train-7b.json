@@ -10,7 +10,8 @@
           "model_manager": {
             "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
-            "model_task": "SEQUENCE_CLASSIFICATION"
+            "model_task": "SEQUENCE_CLASSIFICATION",
+            "layers_to_freeze": 31
           },
           "trainer_args": {
             "gradient_checkpointing": true,
@@ -23,7 +24,7 @@
             "save_steps": null,
             "eval_steps": 1,
             "logging_steps": 1,
-            "num_train_epochs": 1,
+            "num_train_epochs": 3,
             "gradient_accumulation_steps": 1,
             "per_device_train_batch_size": 1,
             "learning_rate": 5e-5,
@@ -47,13 +48,13 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.25
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.25
             },
             "augmenter": {
               "steps": [

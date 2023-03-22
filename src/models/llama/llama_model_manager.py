@@ -20,7 +20,7 @@ class LLaMAModelManager(ModelManager):
                  model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
                  model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE,
-                 layers_to_freeze: List[int] = None):
+                 layers_to_freeze: Union[List[int], int] = None):
         """
         Handles loading model and related functions
         :param model_path: The path to the saved model
@@ -28,6 +28,8 @@ class LLaMAModelManager(ModelManager):
         :param model_size: The size of the model
         :param model_architecture: Whether the model should be siamese or single
         """
+        if isinstance(layers_to_freeze, int):
+            layers_to_freeze = list(range(layers_to_freeze))
         super().__init__(model_path, model_output_path, model_task, model_size, model_architecture, layers_to_freeze=layers_to_freeze)
 
     def get_config(self) -> PretrainedConfig:

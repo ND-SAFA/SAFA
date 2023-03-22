@@ -64,7 +64,7 @@ modes = {
     },
     "prod": {
         "model": "decapoda-research/llama-7b-hf",
-        "dataset": create_trace_dataset,
+        "dataset": create_test_dataset,
         "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns"]
     }
 }

@@ -95,7 +95,9 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    model_manager = LLaMAModelManager(modes[mode]["model"], model_task=LLaMATask.SEQUENCE_CLASSIFICATION)
+    layers_to_freeze = list(range(0, 32))
+    model_manager = LLaMAModelManager(modes[mode]["model"], model_task=LLaMATask.SEQUENCE_CLASSIFICATION,
+                                      layers_to_freeze=layers_to_freeze)
     tokenizer = model_manager.get_tokenizer()
     # dataset = modes[mode]["dataset"](create=True)
 

@@ -16,7 +16,8 @@ class LLaMAModelManager(ModelManager):
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
-                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
+                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE,
+                 layers_to_freeze: List[int] = None):
         """
         Handles loading model and related functions
         :param model_path: The path to the saved model
@@ -24,7 +25,7 @@ class LLaMAModelManager(ModelManager):
         :param model_size: The size of the model
         :param model_architecture: Whether the model should be siamese or single
         """
-        super().__init__(model_path, model_output_path, model_task, model_size, model_architecture)
+        super().__init__(model_path, model_output_path, model_task, model_size, model_architecture, layers_to_freeze=layers_to_freeze)
 
     def _load_model(self):
         """

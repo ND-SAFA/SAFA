@@ -114,4 +114,4 @@ class LLaMAModelManager(ModelManager):
         :param model: The llama model to gather layers for.
         :return: The list of layers
         """
-        return super().get_encoder_layers(model, "layers")
+        return ModelManager.get_encoder_layers(model, "layers")

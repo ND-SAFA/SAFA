@@ -820,7 +820,7 @@ class LLaMAForSequenceClassification(LLaMAForCausalLM):
     """
 
     def __init__(self, config: LLaMAConfig):
-        super(LLaMAPreTrainedModel).__init__(config)
+        super(LLaMAPreTrainedModel, self).__init__(config)
         self.model = LLaMAModel(config)
         self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
         # Initialize weights and apply final processing

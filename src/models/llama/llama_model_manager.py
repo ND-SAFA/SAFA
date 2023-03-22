@@ -31,7 +31,7 @@ class LLaMAModelManager(ModelManager):
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
+        model = self.model_task.value.from_pretrained(self.model_path, config=self._config, ignore_mismatched_sizes=True)
         model._set_gradient_checkpointing(model, True)
         return model
 

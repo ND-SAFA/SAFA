@@ -3,14 +3,14 @@
     {
       "jobs": [
         {
-          "object_type": "LLAMA_PREDICT",
+          "object_type": "PREDICT",
           "job_args": {
             "random_seed": 812
           },
           "model_manager": {
             "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
-            "model_task": "SEQUENCE_SIMILARITY"
+            "model_task": "SEQUENCE_CLASSIFICATION"
           },
           "trainer_args": {
             "evaluation_strategy": "steps",

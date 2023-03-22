@@ -63,7 +63,7 @@ modes = {
         "params": ["per_device_train_batch_size"]
     },
     "prod": {
-        "model": "gpt2-xl",
+        "model": "decapoda-research/llama-7b-hf",
         "dataset": create_trace_dataset,
         "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns"]
     }
@@ -73,7 +73,6 @@ if __name__ == "__main__":
     from train.trainer_args import TrainerArgs
     from constants import PROJ_PATH
     from data.creators.trace_dataset_creator import TraceDatasetCreator
-    from models.model_manager import ModelManager
     from util.logging.logger_config import LoggerConfig
     from util.logging.logger_manager import LoggerManager
     from data.readers.csv_project_reader import CsvProjectReader
@@ -81,6 +80,7 @@ if __name__ == "__main__":
     from data.managers.trainer_dataset_manager import TrainerDatasetManager
     from data.readers.hub_project_reader import HubProjectReader
     from train.trace_trainer import TraceTrainer
+    from models.llama.llama_model_manager import LLaMAModelManager
 
     import gc
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    model_manager = ModelManager(modes[mode]["model"])
+    model_manager = LLaMAModelManager(modes[mode]["model"])
     tokenizer = model_manager.get_tokenizer()
     # dataset = modes[mode]["dataset"](create=True)
     trainer_dataset_manager = create_dataset_manager()

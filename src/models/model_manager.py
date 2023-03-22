@@ -141,7 +141,7 @@ class ModelManager(BaseObject):
             logger.info(f"Layer {name}")
             descr = name.split(".")
             if layer_identifier in descr:
-                layer_no = int(descr[descr.index("layer") + 1])
+                layer_no = int(descr[descr.index(layer_identifier) + 1])
                 if layer_no not in layers:
                     layers[layer_no] = []
                 layers[layer_no].append(param)

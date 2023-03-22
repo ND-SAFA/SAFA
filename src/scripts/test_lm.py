@@ -112,6 +112,7 @@ if __name__ == "__main__":
 
     # Predict
     gc.collect()
+    print("Starting to perform training...")
     outputs = trainer.perform_training()
     response = outputs.prediction_output
     print("Predictions: \n", response)

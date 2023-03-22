@@ -124,6 +124,8 @@ class TrainerDatasetManager(BaseObject):
             self._hf_datasets = {}
             datasets = self.get_datasets()
             for role, dataset in datasets.items():
+                if dataset is None:
+                    continue
                 self._hf_datasets[role] = dataset.to_hf_dataset(model_manager)
         return self._hf_datasets
 

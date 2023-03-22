@@ -50,6 +50,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
         self.trainer_args = trainer_args
+        trainer_args.__post_init__()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)

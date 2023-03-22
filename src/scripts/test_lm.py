@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     import gc
 
-    mode = "prod"
+    mode = "test"
     # Paths
     output_path = os.path.expanduser("~/output/test_lm")
     dataset_output_path = os.path.join(output_path, "data")

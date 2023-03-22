@@ -80,7 +80,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
-        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
+        super().__init__(log_level="debug", log_level_replica="debug", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
                          load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,

@@ -37,7 +37,8 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
     """
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
+                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None,
+                 **kwargs):
         """
         Handles the training and evaluation of learning models
         :param trainer_args: The learning model arguments
@@ -46,7 +47,8 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param save_strategy: The strategy used to save the best model
         :param kwargs: Any additional arguments given to the HF Trainer
         """
-        trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
+        if trainer_args.eager_load_data:
+            trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager

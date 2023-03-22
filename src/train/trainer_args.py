@@ -71,6 +71,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     multi_gpu: bool = MULTI_GPU_DEFAULT
     experimental_vars: Dict = None
     deepspeed_path: str = os.path.join(PROJ_PATH, "deepspeed.json")
+    eager_load_data: bool = False
 
     def __init__(self, output_dir: str, **kwargs):
         """

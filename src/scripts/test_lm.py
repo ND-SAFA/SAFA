@@ -5,6 +5,8 @@ from datasets import load_dataset
 from dotenv import load_dotenv
 from transformers import DataCollatorWithPadding
 
+from data.creators.split_dataset_creator import SplitDatasetCreator
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -24,7 +26,9 @@ def add_padding_token(tokenizer, config):
 def create_dataset_manager(dataset_name="cm1"):
     project_reader = HubProjectReader(dataset_name)
     trace_dataset_creator = TraceDatasetCreator(project_reader)
-    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator)
+    split_dataset_creator = SplitDatasetCreator(val_percentage=0.8)
+    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
+                                                  val_dataset_creator=split_dataset_creator)
     return trace_dataset_manager
 
 

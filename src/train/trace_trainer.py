@@ -66,8 +66,8 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         """
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager)
-        self.model = self.model_manager.get_model()
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
+        self.model = self.model_manager.get_model()
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
         self.compute_metrics = None  # Turn off since prediction uses custom logic surrounding computing metrics.

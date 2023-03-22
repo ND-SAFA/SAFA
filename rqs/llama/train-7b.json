@@ -14,21 +14,9 @@
             "layers_to_freeze": 31
           },
           "trainer_args": {
-            "gradient_checkpointing": false,
-            "fp16": true,
-            "max_seq_length": 512,
-            "evaluation_strategy": "steps",
-            "save_strategy": null,
-            "logging_strategy": "steps",
-            "save_steps": null,
-            "eval_steps": 1,
-            "logging_steps": 1,
-            "num_train_epochs": 3,
-            "gradient_accumulation_steps": 1,
+            "deepspeed": "~/tgen/deepspeed.json",
             "per_device_train_batch_size": 1,
-            "learning_rate": 5e-5,
-            "skip_save": false,
-            "load_best_model_at_end": true
+            "remove_unused_columns": false
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

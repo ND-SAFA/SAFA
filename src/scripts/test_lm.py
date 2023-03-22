@@ -95,9 +95,8 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Construct objects
-    layers_to_freeze = list(range(0, 31))
     model_manager = LLaMAModelManager(modes[mode]["model"], model_task=LLaMATask.SEQUENCE_CLASSIFICATION,
-                                      layers_to_freeze=layers_to_freeze)
+                                      layers_to_freeze=31)
     tokenizer = model_manager.get_tokenizer()
     # dataset = modes[mode]["dataset"](create=True)
 
@@ -108,7 +107,7 @@ if __name__ == "__main__":
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
     arg_params = {"deepspeed": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False}
     arg_params = {k: v for k, v in arg_params.items() if k in modes[mode]["params"]}
-    args = TrainerArgs(output_path, **arg_params)
+    args = TrainerArgs(output_path, **arg_params, gradient_accumulation_steps=16)
     args.__post_init__()
     logger.info("Created trainer args! Creating trace trainer...")
 

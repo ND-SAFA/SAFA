@@ -1,9 +1,7 @@
 import os
 from abc import abstractmethod
-
 from typing import Type
 
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from util.base_object import BaseObject
@@ -45,6 +43,17 @@ class AbstractDatasetExporter(BaseObject):
             self._dataset = self.dataset_creator.create()
         return self._dataset
 
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+        return SupportedDatasetExporter
+
     @staticmethod
     @abstractmethod
     def include_filename() -> bool:
@@ -71,14 +80,3 @@ class AbstractDatasetExporter(BaseObject):
         :return: A new dataset exporter of same type
         """
         return cls(export_path=export_path, dataset_creator=dataset_creator, dataset=dataset)
-
-    @classmethod
-    @overrides(BaseObject)
-    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param abstract_class: the abstract parent class type
-        :param child_class_name: the name of the child class
-        :return: the enum class mapping name to class
-        """
-        return SupportedDatasetCreator

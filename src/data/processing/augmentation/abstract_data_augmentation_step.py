@@ -3,7 +3,10 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, List, Tuple
 
+from typing_extensions import Type
+
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from util.base_object import BaseObject
 from util.override import overrides
 
 
@@ -98,6 +101,17 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :return: the id
         """
         return str(hash(cls.__name__))[:8]
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+        return SupportedAugmentationStep
 
     @staticmethod
     def __remove_prefix(text, prefix):

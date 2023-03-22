@@ -1,5 +1,5 @@
 import gc
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Type
 
 from torch.nn.parameter import Parameter
 from transformers import AutoConfig, PretrainedConfig
@@ -10,6 +10,7 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 from util.base_object import BaseObject
+from util.override import overrides
 
 
 class ModelManager(BaseObject):
@@ -136,6 +137,17 @@ class ModelManager(BaseObject):
                     layers[layer_no] = []
                 layers[layer_no].append(param)
         return [layers[i] for i in range(len(layers))]
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from models.supported_model_manager import SupportedModelManager
+        return SupportedModelManager
 
     def _freeze_layers(self, model: PreTrainedModel, layers_to_freeze: List[int]) -> None:
         """

@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Any, Dict, List, Set, Type
+from typing import Any, Dict, List, Set
 
 import pandas as pd
 
@@ -13,12 +13,9 @@ from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.readers.abstract_project_reader import AbstractProjectReader
-from data.readers.supported_dataset_reader import SupportedDatasetReader
-from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
 from util.dict_util import ListUtil
 from util.logging.logger_manager import logger
-from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from util.thread_util import ThreadUtil
 
@@ -87,17 +84,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: Returns the name of the project read in.
         """
         return self.project_reader.get_project_name()
-
-    @classmethod
-    @overrides(BaseObject)
-    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param abstract_class: the abstract parent class type
-        :param child_class_name: the name of the child class
-        :return: the enum class mapping name to class
-        """
-        return SupportedDatasetReader
 
     def _remove_orphans(self):
         """

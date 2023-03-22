@@ -123,6 +123,6 @@ if __name__ == "__main__":
     gc.collect()
 
     logger.info("Starting to perform training...")
-    outputs = trainer.perform_training()
-    response = outputs.prediction_output
-    logger.info("Predictions: \n", response)
+    trainer.perform_training()
+    outputs = trainer.perform_prediction()
+    logger.info("Predictions: \n", outputs.metrics)

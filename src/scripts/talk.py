@@ -3,12 +3,7 @@ import sys
 
 import deepspeed
 import torch
-from datasets import load_dataset
 from dotenv import load_dotenv
-
-from models.model_manager import ModelManager
-from models.model_properties import ModelTask
-from util.json_util import JsonUtil
 
 load_dotenv()
 
@@ -18,64 +13,16 @@ sys.path.append(ROOT_PATH)
 
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
-
-def add_padding_token(tokenizer, config):
-    config.pad_token_id = -1 if config.pad_token_id is None else config.pad_token_id
-    vocab = tokenizer.get_vocab()
-    vocab_tokens, vocab_indices = list(vocab.keys()), list(vocab.values())
-    tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
-
-
-def create_dataset_manager(dataset_name="cm1"):
-    project_reader = HubProjectReader(dataset_name)
-    trace_dataset_creator = TraceDatasetCreator(project_reader)
-    split_dataset_creator = SplitDatasetCreator(val_percentage=0.8)
-    trace_dataset_manager = TrainerDatasetManager(train_dataset_creator=trace_dataset_creator,
-                                                  val_dataset_creator=split_dataset_creator)
-    return trace_dataset_manager
-
-
-def create_trace_dataset(dataset_name="cm1", create=True):
-    # Export Dataset Split
-    if create:
-        trace_dataset_manager = create_dataset_manager(dataset_name)
-        trace_dataset_manager.export_dataset_splits(dataset_output_path)
-        dataset_name = trace_dataset_manager.get_dataset_filename(DatasetRole.TRAIN)
-        del trace_dataset_manager
-    dataset_name = "cm1_train.csv"
-    dataset_path = os.path.join(dataset_output_path, dataset_name)
-    # del trace_dataset_manager
-
-    # Load split as CSV
-    project_reader = CsvProjectReader(dataset_path)
-    trace_dataset_creator = TraceDatasetCreator(project_reader)
-    trace_dataset = trace_dataset_creator.create()
-    dataset = trace_dataset.to_hf_dataset(model_manager)
-    return dataset
-
-
-def create_test_dataset(**kwargs):
-    full_dataset = load_dataset("rotten_tomatoes")
-
-    def preprocess_function(examples):
-        return tokenizer(examples["text"], truncation=True)
-
-    return full_dataset["train"].map(preprocess_function, batched=True)
-
-
 if __name__ == "__main__":
     from constants import PROJ_PATH
-    from data.creators.trace_dataset_creator import TraceDatasetCreator
     from util.logging.logger_config import LoggerConfig
     from util.logging.logger_manager import LoggerManager, logger
-    from data.readers.csv_project_reader import CsvProjectReader
-    from data.datasets.dataset_role import DatasetRole
-    from data.managers.trainer_dataset_manager import TrainerDatasetManager
-    from data.readers.hub_project_reader import HubProjectReader
     from models.llama.llama_model_manager import LLaMAModelManager
     from models.llama.llama_task import LLaMATask
-    from data.creators.split_dataset_creator import SplitDatasetCreator
     from datasets import set_caching_enabled
+    from models.model_manager import ModelManager
+    from models.model_properties import ModelTask
+    from util.json_util import JsonUtil
 
     modes = {
         "test": {

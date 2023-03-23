@@ -124,7 +124,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
             i += 1
 
     @classmethod
-    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame", ignore_index: bool =False) -> "AbstractProjectDataFrame":
+    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
+               ignore_index: bool = False) -> "AbstractProjectDataFrame":
         """
         Combines two dataframes
         :param dataframe1: The first dataframe
@@ -168,3 +169,11 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: True if item in dataframe else False
         """
         return enum_util.to_string(item) in self.index
+
+    def __deepcopy__(self, memodict={}) -> "AbstractProjectDataFrame":
+        """
+        Deepcopies the dataframe
+        :param memodict:
+        :return: A deepcopy of the dataframe
+        """
+        return self.__class__(super().__deepcopy__(self))

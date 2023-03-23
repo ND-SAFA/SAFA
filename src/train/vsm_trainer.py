@@ -94,7 +94,7 @@ class VSMTrainer(iTrainer):
         raw_sources, raw_targets, all_source_target_pairs = self.get_raw_sources_and_targets(eval_dataset)
         set_source, set_target = self.create_term_frequency_matrices(raw_sources, raw_targets)
         similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(set_source, set_target)
-        predictions, label_ids, source_target_pairs, links = [], [], [], []
+        predictions, label_ids, source_target_pairs, link_ids = [], [], [], []
         for i, pair in enumerate(all_source_target_pairs):
             link_id = TraceDataFrame.generate_link_id(*pair)
             if link_id not in eval_dataset.trace_df:  # source, target pair between layers that should not be linked
@@ -102,9 +102,9 @@ class VSMTrainer(iTrainer):
             row, col = divmod(i, len(raw_targets))
             predictions.append(similarity_matrix[row][col])
             label_ids.append(int(predictions[-1] > threshold))
-            links.append(eval_dataset.trace_df.get_link(link_id))
+            link_ids.append(link_id)
             source_target_pairs.append(pair)
-        metrics = self.eval(eval_dataset.trace_df, predictions, eval_dataset.get_ordered_link_ids(), self.metrics) \
+        metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
             if self.metrics else None
         prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=metrics)
         trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)
@@ -139,13 +139,11 @@ class VSMTrainer(iTrainer):
         :param dataset: The dataset to use for sources and targets
         :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
         """
-        sources, targets = dict(), dict()
-        for index, link in dataset.trace_df.iterrows():
-            sources[link[TraceKeys.SOURCE.value]] = dataset.artifact_df.get_artifact(link[TraceKeys.SOURCE.value])
-            targets[link[TraceKeys.TARGET.value]] = dataset.artifact_df.get_artifact(link[TraceKeys.TARGET.value])
-        source_target_pairs = [(s_id, t_id) for s_id in sources.keys() for t_id in targets.keys()]
-        raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources.values()])
-        raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets.values()])
+        source_target_pairs = dataset.get_source_target_pairs()
+        sources = [dataset.artifact_df.get_artifact(s_id) for s_id, _ in source_target_pairs]
+        targets = [dataset.artifact_df.get_artifact(t_id) for _, t_id in source_target_pairs]
+        raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources])
+        raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets])
         return raw_sources, raw_targets, source_target_pairs
 
     @staticmethod

@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from typing import Callable, List
 
 import numpy as np
@@ -8,11 +9,12 @@ from constants import OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
 from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
+from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
-from jobs.train_job import TrainJob
+from jobs.predict_job import PredictJob
+from jobs.vsm_job import VSMJob
+from models.single_layer.single_layer_model import train, SingleLayerModel, predict
 from train.metrics.metrics_manager import MetricsManager
-from train.trace_output.trace_prediction_output import TracePredictionEntry
-from util.dict_util import ListUtil
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 
@@ -28,6 +30,7 @@ def first(arr):
 EnsembleFunctions = {
     "max": max,
     "average": average,
+    "nn": None
     # "first": first
 }
 
@@ -44,25 +47,36 @@ class EnsembleExperiment(Experiment):
         :return:
         """
         self.set_cross_step_vars(self.steps)
-        jobs: List[TrainJob] = super().run()
-        job_prediction_entries = self.collect_job_predictions(jobs)
-        job_labels = [[entry["label"] for entry in job_entries] for job_entries in job_prediction_entries]
-        job_predictions = [[entry["score"] for entry in job_entries] for job_entries in job_prediction_entries]
+        train_step = self.steps[0]
+        self.steps.append(self._create_predict_on_train_step(train_step.jobs))
 
-        job_predictions = EnsembleExperiment.scale_predictions(job_predictions)
+        jobs: List[AbstractTraceJob] = super().run()
+        train_jobs, predict_on_train_jobs = jobs[:len(train_step.jobs)], jobs[len(train_step.jobs):]
 
-        ListUtil.assert_equal(job_labels)
-        ensemble_labels = job_labels[0]
-        ensemble_metrics = jobs[0].trainer_args.metrics
-        eval_dataset = jobs[0].trainer_dataset_manager[DatasetRole.EVAL]
+        train_dataset = train_jobs[0].trainer_dataset_manager[DatasetRole.TRAIN]
+        train_labels = train_dataset.get_ordered_labels()
+
+        eval_dataset = train_jobs[0].trainer_dataset_manager[DatasetRole.EVAL]
+        eval_labels = eval_dataset.get_ordered_labels()
+
+        train_job_predictions = self.collect_job_predictions(train_jobs)
+        predict_on_train_job_predictions = self.collect_job_predictions(predict_on_train_jobs)
+        model = self._train_ensemble_layer(predict_on_train_job_predictions, train_labels)
+
+        ensemble_metrics = train_jobs[0].trainer_args.metrics
         for func_name, agg_func in EnsembleFunctions.items():
-            ensemble_similarities = self.ensemble_predictions(job_predictions, agg_func)
-            metrics_manager = MetricsManager(eval_dataset.get_ordered_links(), predicted_similarities=ensemble_similarities)
+            if func_name == "nn":
+                ensemble_similarities = predict(model, self.transform_predictions_for_nn(train_job_predictions))
+            else:
+                ensemble_similarities = self.ensemble_predictions(train_job_predictions, agg_func)
+            metrics_manager = MetricsManager(trace_df=eval_dataset.trace_df,
+                                             link_ids=eval_dataset.get_ordered_link_ids(),
+                                             predicted_similarities=ensemble_similarities)
             agg_metrics = metrics_manager.eval(ensemble_metrics)
-            self.save_as_job_output(ensemble_similarities, ensemble_labels, agg_metrics, model_name=f"ensemble-{func_name}")
+            self.save_as_job_output(ensemble_similarities, eval_labels, agg_metrics, model_name=f"ensemble-{func_name}")
 
     @staticmethod
-    def collect_job_predictions(jobs) -> List[List[TracePredictionEntry]]:
+    def collect_job_predictions(jobs) -> List[List[float]]:
         """
         Gathers and aligns predictions for each job.
         :param jobs: The jobs whose predictions are read.
@@ -72,9 +86,10 @@ class EnsembleExperiment(Experiment):
         for job in jobs:
             job_output_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
             job_output = JsonUtil.read_json_file(job_output_path)
-            prediction_entries = job_output["prediction_output"]["prediction_entries"]
-            job_entries.append(prediction_entries)
-        return job_entries
+            prediction_output = job_output["prediction_output"] if "prediction_output" in job_output else job_output
+            job_entries.append(prediction_output["prediction_entries"])
+        job_predictions = [[entry["score"] for entry in job_entries] for job_entries in job_entries]
+        return EnsembleExperiment.scale_predictions(job_predictions)
 
     @staticmethod
     def ensemble_predictions(global_predictions: List[List[float]], agg_func: Callable[[np.array], float], technique_axis: int = 0):
@@ -137,3 +152,49 @@ class EnsembleExperiment(Experiment):
         job_output_path = os.path.join(job_output_dir, OUTPUT_FILENAME)
         json_output = JsonUtil.dict_to_json(job_result.as_dict())
         FileUtil.write(json_output, job_output_path)
+
+    @staticmethod
+    def _create_predict_on_train_step(train_step_jobs: List[AbstractTraceJob]) -> ExperimentStep:
+        """
+        Creates an experiment step to perform a prediction on the training data
+        :param train_step_jobs: The original train step jobs
+        :return: The experiment step to perform a prediction on the training data
+        """
+        predict_on_train_jobs = []
+        for train_job in train_step_jobs:
+            tmp_job = deepcopy(train_job)
+            predict_job = PredictJob(job_args=tmp_job.job_args, trainer_dataset_manager=tmp_job.trainer_dataset_manager,
+                                     model_manager=tmp_job.model_manager, trainer_args=tmp_job.trainer_args) \
+                if not isinstance(tmp_job, VSMJob) else deepcopy(tmp_job)
+            train_dataset = predict_job.trainer_dataset_manager.get_datasets()[DatasetRole.TRAIN]
+            predict_job.trainer_dataset_manager.replace_dataset(train_dataset, DatasetRole.EVAL)
+            predict_on_train_jobs.append(predict_job)
+        return ExperimentStep(predict_on_train_jobs)
+
+    @staticmethod
+    def transform_predictions_for_nn(original_predictions: List[List[float]]) -> List[List[float]]:
+        """
+        Transforms the predictions into the format expected by the NN
+        :param original_predictions: The original predictions from the models
+        :return: The predictions as input for the nn
+        """
+        transformed_predictions = [[] for i in range(len(original_predictions[0]))]
+        for model_prediction in original_predictions:
+            assert len(model_prediction) == len(transformed_predictions), "Number of model predictions are mismatched."
+            for i, pred in enumerate(model_prediction):
+                transformed_predictions[i].append(pred)
+        return transformed_predictions
+
+    @staticmethod
+    def _train_ensemble_layer(ensemble_preds: List[List[float]], labels: List[float]) -> SingleLayerModel:
+        """
+        Trains a single layer neural network that accepts model predictions as input and combines for a single output
+        :param ensemble_preds: The prediction from each models predictions
+        :param labels: Ground-truth labels
+        :return: The trained model
+        """
+        n_models = len(ensemble_preds)
+        input_data = EnsembleExperiment.transform_predictions_for_nn(ensemble_preds)
+        model = SingleLayerModel(n_models)
+        train(model, input_data, labels)
+        return model

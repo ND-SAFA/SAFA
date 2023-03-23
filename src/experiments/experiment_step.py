@@ -185,15 +185,12 @@ class ExperimentStep(BaseObject):
         :param jobs2use: the list of jobs to use for updating undetermined vals
         :return: the list of updated jobs
         """
-        final_jobs = []
+        jobs2update = deepcopy(jobs2update)
         for job in jobs2use:
-            jobs2update_tmp = deepcopy(jobs2update)
-            jobs2update = jobs2update_tmp
             if hasattr(job, "model_manager"):
                 job.model_manager.model_path = job.model_manager.model_output_path
             self._run_on_jobs(jobs2update, "use_values_from_object_for_undetermined", obj=job)
-            final_jobs.extend(jobs2update)
-        return final_jobs
+        return jobs2update
 
     def update_output_path(self, output_dir: str) -> None:
         """
@@ -226,3 +223,10 @@ class ExperimentStep(BaseObject):
         :return: list of results
         """
         return list(map(lambda job: getattr(job, method_name)(**method_params), jobs))
+
+    def __len__(self) -> int:
+        """
+        Returns the length of the step or number of jobs
+        :return: The length of the step or number of jobs
+        """
+        return len(self.jobs)

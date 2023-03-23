@@ -112,6 +112,16 @@ class TrainerDatasetManager(BaseObject):
             self._prepare_datasets(self.augmenter)
         return self._datasets
 
+    def replace_dataset(self, new_dataset: iDataset, dataset_role: DatasetRole) -> None:
+        """
+        Replaces the dataset for the given dataset role with the new dataset
+        :param new_dataset: The dataset to replace the original dataset with
+        :param dataset_role: The role of the dataset being replaced
+        :return: None
+        """
+        datasets = self.get_datasets()
+        datasets[dataset_role] = new_dataset
+
     def cleanup(self) -> None:
         """
         Clears datasets out of memory

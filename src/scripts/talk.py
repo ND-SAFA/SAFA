@@ -1,8 +1,6 @@
 import os
 import sys
 
-import deepspeed
-import torch
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,7 +12,6 @@ sys.path.append(ROOT_PATH)
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
-    from constants import PROJ_PATH
     from util.logging.logger_config import LoggerConfig
     from util.logging.logger_manager import LoggerManager, logger
     from models.llama.llama_model_manager import LLaMAModelManager
@@ -22,7 +19,6 @@ if __name__ == "__main__":
     from datasets import disable_caching
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
-    from util.json_util import JsonUtil
 
     modes = {
         "test": {
@@ -48,7 +44,7 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Paths
-    mode = "test"
+    mode = "prod"
     output_path = os.path.expanduser("~/output/test_lm")
     dataset_output_path = os.path.join(output_path, "data")
 
@@ -59,16 +55,11 @@ if __name__ == "__main__":
 
     # Prepare dataset
     model = model_manager.get_model()
-    deepspeed_config = JsonUtil.read_json_file(os.path.join(PROJ_PATH, "deepspeed.json"))
-    ds_engine = deepspeed.init_inference(model,
-                                         mp_size=4,
-                                         dtype=torch.float32,
-                                         replace_with_kernel_inject=True)
-    model = ds_engine.module
 
     # Generation
     prompt = "Hello, I am having a "
     tokenizer = model_manager.get_tokenizer()
-    inputs = tokenizer(prompt)
+    inputs = tokenizer(prompt, return_tensors="pt").input_ids
     model_output = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
-    print(model_output)
+    output = tokenizer.batch_decode(model_output, skip_special_tokens=True)
+    print("Model Response:", output)

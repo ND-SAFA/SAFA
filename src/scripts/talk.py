@@ -63,7 +63,7 @@ if __name__ == "__main__":
     ds_engine = deepspeed.init_inference(model,
                                          mp_size=4,
                                          dtype=torch.half,
-                                         replace_with_kernel_inject=True)
+                                         replace_with_kernel_inject=False)
     model = ds_engine.module
 
     # Generation

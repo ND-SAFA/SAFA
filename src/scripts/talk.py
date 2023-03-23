@@ -29,7 +29,7 @@ if __name__ == "__main__":
             "model": "hf-internal-testing/tiny-random-bert",
             "model_manager": ModelManager,
             "model_manager_args": {
-                "model_task": ModelTask.CASUAL_LM
+                "model_task": ModelTask.CAUSAL_LM
             },
             "params": ["per_device_train_batch_size"]
         },

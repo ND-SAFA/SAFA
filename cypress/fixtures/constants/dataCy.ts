@@ -96,7 +96,7 @@ export enum DataCy {
   creationCreatePanelButton = "button-create-panel",
   creationTypeInput = "input-artifact-type",
   creationTypeButton = "button-artifact-type",
-  creationArtifactDeleteButton = "button-delete-artifact",
+  creationArtifactDeleteButton = "button-delete-panel",
   creationEntitiesButton = "button-file-entities",
   creationIgnoreErrorsButton = "button-ignore-errors",
   creationDeletePanel = "button-delete-artifact",

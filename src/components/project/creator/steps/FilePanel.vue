@@ -5,6 +5,7 @@
     :caption="props.label"
     :icon="iconId"
     :header-class="headerClass"
+    data-cy="panel-files"
   >
     <div class="q-mx-md">
       <slot name="panel" :panel="props.panel" />

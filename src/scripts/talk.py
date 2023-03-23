@@ -70,6 +70,6 @@ if __name__ == "__main__":
     # Generation
     prompt = "Hello, I am having a "
     tokenizer = model_manager.get_tokenizer()
-    generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
+    generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device="cuda:1")
     model_response = generator(prompt)
     print(f"llama > {model_response}")

@@ -8,6 +8,7 @@ import {
 } from "@/fixtures";
 
 // TODO: There is a weird uncaught exception (ResizeObserver loop limit exceeded) that is thrown when running this test.
+// TODO: On Approval, delete all the commented out code in this file.
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();
@@ -50,11 +51,15 @@ describe("Bulk Project Creation", () => {
     it("Can create an empty project in the project selector", () => {
       cy.openProjectSelector().clickButton(DataCy.selectorAddButton);
 
-      cy.getCy(DataCy.projectEditModal).within(() => {
-        cy.setProjectIdentifier("modal")
-          .clickButton(DataCy.creationEmptyToggle)
-          .clickButton(DataCy.creationUploadButton);
-      });
+      // cy.getCy(DataCy.projectEditModal).within(() => {
+      //   cy.setProjectIdentifier("modal")
+      //     .clickButton(DataCy.creationEmptyToggle)
+      //     .clickButton(DataCy.creationUploadButton);
+      // });
+
+      cy.setProjectIdentifier("modal")
+        .clickButton(DataCy.creationEmptyToggle)
+        .clickButton(DataCy.creationUploadButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

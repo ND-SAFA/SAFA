@@ -1,10 +1,11 @@
 import { DataCy, Routes } from "@/fixtures";
 
 //TODO: Progress tracking will need to fixed as its broken rn =(
+//TODO: Find a new way of figuring out how to tell if a job is being uploaded
 describe("Job Status", () => {
   beforeEach(() => {
+    cy.viewport(1080, 1080);
     cy.initProject(false);
-
     cy.locationShouldEqual(Routes.UPLOAD_STATUS);
   });
 
@@ -14,7 +15,9 @@ describe("Job Status", () => {
 
   describe("I can see the current status of a job", () => {
     it("Shows in progress jobs", () => {
+      cy.contains("Project Uploads");
       cy.getCy(DataCy.jobStatus, "first").should("contain.text", "In Progress");
+      //cy.waitForJobLoad();
     });
 
     it("Shows completed jobs", () => {

@@ -7,6 +7,7 @@
       :loading="loading"
       :rows-per-page="10"
       :expanded="expanded"
+      data-cy="job-table"
     >
       <template #body="quasarProps">
         <job-row

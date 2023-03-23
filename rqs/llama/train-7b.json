@@ -19,7 +19,9 @@
             "remove_unused_columns": false,
             "gradient_accumulation_steps": 16,
             "evaluation_strategy": "steps",
+            "save_strategy": "steps",
             "logging_strategy": "steps",
+            "save_steps": 100,
             "eval_steps": 2,
             "logging_steps": 1,
             "num_train_epochs": 5

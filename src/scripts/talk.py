@@ -4,6 +4,7 @@ import sys
 import deepspeed
 import torch
 from dotenv import load_dotenv
+from transformers import pipeline
 
 load_dotenv()
 
@@ -69,7 +70,6 @@ if __name__ == "__main__":
     # Generation
     prompt = "Hello, I am having a "
     tokenizer = model_manager.get_tokenizer()
-    inputs = tokenizer(prompt, return_tensors="pt").input_ids
-    outputs = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
-    model_response = tokenizer.decode(outputs, skip_special_tokens=True)
+    generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
+    model_response = generator(prompt)
     print(f"llama > {model_response}")

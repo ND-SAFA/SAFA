@@ -136,18 +136,18 @@ public class AttributeValueBoolean {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionbooleanref;
+        protected AttributeDefinitionBoolean attributedefinitionbooleanref;
 
         /**
          * Gets the value of the attributedefinitionbooleanref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionBoolean }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionBooleanRef() {
+        public AttributeDefinitionBoolean getAttributeDefinitionBooleanRef() {
             return attributedefinitionbooleanref;
         }
 
@@ -156,11 +156,11 @@ public class AttributeValueBoolean {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionBoolean }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionBooleanRef(Object value) {
+        public void setAttributeDefinitionBooleanRef(AttributeDefinitionBoolean value) {
             this.attributedefinitionbooleanref = value;
         }
 

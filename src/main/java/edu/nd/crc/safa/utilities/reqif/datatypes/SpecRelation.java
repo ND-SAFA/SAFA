@@ -7,14 +7,11 @@
 
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
@@ -116,16 +113,16 @@ public class SpecRelation {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AlternativeId alternativeid;
+    protected AlternativeIdWrapper alternativeid;
     @XmlElement(name = "VALUES")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Values values;
     @XmlElement(name = "SOURCE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected Source source;
+    protected SpecObjectRef source;
     @XmlElement(name = "TARGET", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected Target target;
+    protected SpecObjectRef target;
     @XmlElement(name = "TYPE", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Type type;
@@ -151,11 +148,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeId getAlternativeId() {
+    public AlternativeIdWrapper getAlternativeId() {
         return alternativeid;
     }
 
@@ -164,11 +161,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlternativeId(AlternativeId value) {
+    public void setAlternativeId(AlternativeIdWrapper value) {
         this.alternativeid = value;
     }
 
@@ -203,11 +200,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link Source }
+     *     {@link SpecObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Source getSource() {
+    public SpecObjectRef getSource() {
         return source;
     }
 
@@ -216,11 +213,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link Source }
+     *     {@link SpecObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSource(Source value) {
+    public void setSource(SpecObjectRef value) {
         this.source = value;
     }
 
@@ -229,11 +226,11 @@ public class SpecRelation {
      * 
      * @return
      *     possible object is
-     *     {@link Target }
+     *     {@link SpecObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Target getTarget() {
+    public SpecObjectRef getTarget() {
         return target;
     }
 
@@ -242,11 +239,11 @@ public class SpecRelation {
      * 
      * @param value
      *     allowed object is
-     *     {@link Target }
+     *     {@link SpecObjectRef }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTarget(Target value) {
+    public void setTarget(SpecObjectRef value) {
         this.target = value;
     }
 
@@ -380,184 +377,6 @@ public class SpecRelation {
         this.longname = value;
     }
 
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice minOccurs="0"&gt;
-     *         &lt;element name="ALTERNATIVE-ID" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ALTERNATIVE-ID"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "alternativeid"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class AlternativeId {
-
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
-
-        /**
-         * Gets the value of the alternativeid property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
-            return alternativeid;
-        }
-
-        /**
-         * Sets the value of the alternativeid property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
-            this.alternativeid = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="SPEC-OBJECT-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}GLOBAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "specobjectref"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class Source {
-
-        @XmlElement(name = "SPEC-OBJECT-REF", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected String specobjectref;
-
-        /**
-         * Gets the value of the specobjectref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public String getSpecObjectRef() {
-            return specobjectref;
-        }
-
-        /**
-         * Sets the value of the specobjectref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSpecObjectRef(String value) {
-            this.specobjectref = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="SPEC-OBJECT-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}GLOBAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "specobjectref"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class Target {
-
-        @XmlElement(name = "SPEC-OBJECT-REF", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected String specobjectref;
-
-        /**
-         * Gets the value of the specobjectref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public String getSpecObjectRef() {
-            return specobjectref;
-        }
-
-        /**
-         * Sets the value of the specobjectref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSpecObjectRef(String value) {
-            this.specobjectref = value;
-        }
-
-    }
-
-
     /**
      * <p>Java class for anonymous complex type.
      * 
@@ -588,18 +407,18 @@ public class SpecRelation {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object specrelationtyperef;
+        protected SpecRelationType specrelationtyperef;
 
         /**
          * Gets the value of the specrelationtyperef property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link SpecRelationType }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getSpecRelationTypeRef() {
+        public SpecRelationType getSpecRelationTypeRef() {
             return specrelationtyperef;
         }
 
@@ -608,95 +427,12 @@ public class SpecRelation {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link SpecRelationType }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSpecRelationTypeRef(Object value) {
+        public void setSpecRelationTypeRef(SpecRelationType value) {
             this.specrelationtyperef = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-BOOLEAN" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-BOOLEAN"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-DATE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-DATE"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-ENUMERATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-ENUMERATION"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-INTEGER" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-INTEGER"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-REAL" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-REAL"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-STRING" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-STRING"/&gt;
-     *         &lt;element name="ATTRIBUTE-VALUE-XHTML" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ATTRIBUTE-VALUE-XHTML"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class Values {
-
-        @XmlElements({
-            @XmlElement(name = "ATTRIBUTE-VALUE-BOOLEAN", namespace = "", type = AttributeValueBoolean.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-DATE", namespace = "", type = AttributeValueDate.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "", type = AttributeValueEnumeration.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-INTEGER", namespace = "", type = AttributeValueInteger.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-REAL", namespace = "", type = AttributeValueReal.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-STRING", namespace = "", type = AttributeValueString.class),
-            @XmlElement(name = "ATTRIBUTE-VALUE-XHTML", namespace = "", type = AttributeValueXhtml.class)
-        })
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<Object> attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION;
-
-        /**
-         * Gets the value of the attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getATTRIBUTEVALUEBOOLEANOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link AttributeValueBoolean }
-         * {@link AttributeValueDate }
-         * {@link AttributeValueEnumeration }
-         * {@link AttributeValueInteger }
-         * {@link AttributeValueReal }
-         * {@link AttributeValueString }
-         * {@link AttributeValueXhtml }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getAttributeValues() {
-            if (attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION == null) {
-                attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION = new ArrayList<Object>();
-            }
-            return this.attributevaluebooleanOrATTRIBUTEVALUEDATEOrATTRIBUTEVALUEENUMERATION;
         }
 
     }

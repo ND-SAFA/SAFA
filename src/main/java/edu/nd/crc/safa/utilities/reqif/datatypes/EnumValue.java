@@ -73,7 +73,7 @@ public class EnumValue {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AlternativeId alternativeid;
+    protected AlternativeIdWrapper alternativeid;
     @XmlElement(name = "PROPERTIES", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Properties properties;
@@ -99,11 +99,11 @@ public class EnumValue {
      * 
      * @return
      *     possible object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeId getAlternativeId() {
+    public AlternativeIdWrapper getAlternativeId() {
         return alternativeid;
     }
 
@@ -112,11 +112,11 @@ public class EnumValue {
      * 
      * @param value
      *     allowed object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlternativeId(AlternativeId value) {
+    public void setAlternativeId(AlternativeIdWrapper value) {
         this.alternativeid = value;
     }
 
@@ -249,66 +249,6 @@ public class EnumValue {
     public void setLongName(String value) {
         this.longname = value;
     }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice minOccurs="0"&gt;
-     *         &lt;element name="ALTERNATIVE-ID" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ALTERNATIVE-ID"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "alternativeid"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class AlternativeId {
-
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
-
-        /**
-         * Gets the value of the alternativeid property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
-            return alternativeid;
-        }
-
-        /**
-         * Sets the value of the alternativeid property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
-            this.alternativeid = value;
-        }
-
-    }
-
 
     /**
      * <p>Java class for anonymous complex type.

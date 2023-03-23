@@ -109,7 +109,7 @@ public class SpecHierarchy {
 
     @XmlElement(name = "ALTERNATIVE-ID")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AlternativeId alternativeid;
+    protected AlternativeIdWrapper alternativeid;
     @XmlElement(name = "CHILDREN")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Children children;
@@ -147,11 +147,11 @@ public class SpecHierarchy {
      * 
      * @return
      *     possible object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeId getAlternativeId() {
+    public AlternativeIdWrapper getAlternativeId() {
         return alternativeid;
     }
 
@@ -160,11 +160,11 @@ public class SpecHierarchy {
      * 
      * @param value
      *     allowed object is
-     *     {@link AlternativeId }
+     *     {@link AlternativeIdWrapper }
      *     
      */
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlternativeId(AlternativeId value) {
+    public void setAlternativeId(AlternativeIdWrapper value) {
         this.alternativeid = value;
     }
 
@@ -402,129 +402,6 @@ public class SpecHierarchy {
         this.longname = value;
     }
 
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice minOccurs="0"&gt;
-     *         &lt;element name="ALTERNATIVE-ID" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ALTERNATIVE-ID"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "alternativeid"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class AlternativeId {
-
-        @XmlElement(name = "ALTERNATIVE-ID", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId alternativeid;
-
-        /**
-         * Gets the value of the alternativeid property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId getAlternativeId() {
-            return alternativeid;
-        }
-
-        /**
-         * Sets the value of the alternativeid property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAlternativeId(edu.nd.crc.safa.utilities.reqif.datatypes.AlternativeId value) {
-            this.alternativeid = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="SPEC-HIERARCHY" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-HIERARCHY"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "spechierarchy"
-    })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class Children {
-
-        @XmlElement(name = "SPEC-HIERARCHY", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<SpecHierarchy> spechierarchy;
-
-        /**
-         * Gets the value of the spechierarchy property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the spechierarchy property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getSPECHIERARCHY().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link SpecHierarchy }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecHierarchy> getChildren() {
-            if (spechierarchy == null) {
-                spechierarchy = new ArrayList<SpecHierarchy>();
-            }
-            return this.spechierarchy;
-        }
-
-    }
-
-
     /**
      * <p>Java class for anonymous complex type.
      * 
@@ -638,18 +515,18 @@ public class SpecHierarchy {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected java.lang.Object specobjectref;
+        protected SpecObject specobjectref;
 
         /**
          * Gets the value of the specobjectref property.
          * 
          * @return
          *     possible object is
-         *     {@link java.lang.Object }
+         *     {@link SpecObject }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public java.lang.Object getSpecObjectRef() {
+        public SpecObject getSpecObjectRef() {
             return specobjectref;
         }
 
@@ -658,11 +535,11 @@ public class SpecHierarchy {
          * 
          * @param value
          *     allowed object is
-         *     {@link java.lang.Object }
+         *     {@link SpecObject }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSpecObjectRef(java.lang.Object value) {
+        public void setSpecObjectRef(SpecObject value) {
             this.specobjectref = value;
         }
 

@@ -145,18 +145,18 @@ public class AttributeValueInteger {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionintegerref;
+        protected AttributeDefinitionInteger attributedefinitionintegerref;
 
         /**
          * Gets the value of the attributedefinitionintegerref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionInteger }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionIntegerRef() {
+        public AttributeDefinitionInteger getAttributeDefinitionIntegerRef() {
             return attributedefinitionintegerref;
         }
 
@@ -165,11 +165,11 @@ public class AttributeValueInteger {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionInteger }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionIntegerRef(Object value) {
+        public void setAttributeDefinitionIntegerRef(AttributeDefinitionInteger value) {
             this.attributedefinitionintegerref = value;
         }
 

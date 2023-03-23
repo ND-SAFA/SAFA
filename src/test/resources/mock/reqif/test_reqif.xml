@@ -13,7 +13,11 @@
             <REQ-IF-CONTENT>
                 <DATATYPES>
                     <DATATYPE-DEFINITION-STRING DESC="This is a standard string type." IDENTIFIER="3631dcd2-59d1-11da-beb2-6fbc179f63e3" LONG-NAME="Standard String Type" MAX-LENGTH="65535"/>
-                    <DATATYPE-DEFINITION-INTEGER DESC="This is a standard integer type." IDENTIFIER="3631dcd2-59d1-11da-beb2-6fbc179f63e4" LONG-NAME="Standard Integer Type"/>
+                    <DATATYPE-DEFINITION-INTEGER DESC="This is a standard integer type." IDENTIFIER="3631dcd2-59d1-11da-beb2-6fbc179f63e4" LONG-NAME="Standard Integer Type">
+                        <ALTERNATIVE-ID>
+                            <ALTERNATIVE-ID IDENTIFIER="abc-123"/>
+                        </ALTERNATIVE-ID>
+                    </DATATYPE-DEFINITION-INTEGER>
                 </DATATYPES>
                 <SPEC-TYPES>
                     <SPEC-OBJECT-TYPE DESC="This is an example SpecType with some common attributes." IDENTIFIER="3631dcd2-59d1-11da-beb2-6fbc179f63e2" LAST-CHANGE="2005-05-30T11:42:19+02:00" LONG-NAME="Example SpecType">

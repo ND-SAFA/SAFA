@@ -144,18 +144,18 @@ public class AttributeValueString {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionstringref;
+        protected AttributeDefinitionString attributedefinitionstringref;
 
         /**
          * Gets the value of the attributedefinitionstringref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionString }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionStringRef() {
+        public AttributeDefinitionString getAttributeDefinitionStringRef() {
             return attributedefinitionstringref;
         }
 
@@ -164,11 +164,11 @@ public class AttributeValueString {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionString }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionStringRef(Object value) {
+        public void setAttributeDefinitionStringRef(AttributeDefinitionString value) {
             this.attributedefinitionstringref = value;
         }
 

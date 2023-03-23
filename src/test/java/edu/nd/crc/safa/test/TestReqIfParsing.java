@@ -120,12 +120,14 @@ public class TestReqIfParsing {
         assertInstanceOf(AttributeValueString.class, values.get(0));
         AttributeValueString stringAttr = (AttributeValueString) values.get(0);
         assertEquals(author, stringAttr.getTheValue());
-        assertSame(objects.get("356b02ec-59d1-11da-afa6-6b90abdfb5db"), stringAttr.getDefinition().getAttributeDefinitionStringRef());
+        assertSame(objects.get("356b02ec-59d1-11da-afa6-6b90abdfb5db"),
+            stringAttr.getDefinition().getAttributeDefinitionStringRef());
 
         assertInstanceOf(AttributeValueInteger.class, values.get(1));
         AttributeValueInteger intAttr = (AttributeValueInteger) values.get(1);
         assertEquals(BigInteger.valueOf(idNum), intAttr.getTheValue());
-        assertSame(objects.get("356b02ec-59d1-11da-afa6-6b90abdfb5dc"), intAttr.getDefinition().getAttributeDefinitionIntegerRef());
+        assertSame(objects.get("356b02ec-59d1-11da-afa6-6b90abdfb5dc"),
+            intAttr.getDefinition().getAttributeDefinitionIntegerRef());
     }
 
     private void assertSpecTypes(ReqIfContent content) {
@@ -148,9 +150,9 @@ public class TestReqIfParsing {
 
     private void assertSpecTypeAttributes(SpecObjectType specType) {
         assertNotNull(specType.getSpecAttributes());
-        assertNotNull(specType.getSpecAttributes().getAttributeDefinitions());
+        assertNotNull(specType.getSpecAttributes().getAttributes());
 
-        List<Object> specAttributes = specType.getSpecAttributes().getAttributeDefinitions();
+        List<Object> specAttributes = specType.getSpecAttributes().getAttributes();
         assertEquals(2, specAttributes.size());
 
         assertInstanceOf(AttributeDefinitionString.class, specAttributes.get(0));
@@ -160,7 +162,8 @@ public class TestReqIfParsing {
         assertEquals(factory.newXMLGregorianCalendar("2005-05-30T11:51:25+02:00"), stringAttr.getLastChange());
         assertEquals("Author", stringAttr.getLongName());
         assertEquals("TBD", stringAttr.getDefaultValue().getAttributeValueString().getTheValue());
-        assertSame(objects.get("3631dcd2-59d1-11da-beb2-6fbc179f63e3"), stringAttr.getType().getDatatypeDefinitionStringRef());
+        assertSame(objects.get("3631dcd2-59d1-11da-beb2-6fbc179f63e3"),
+            stringAttr.getType().getDatatypeDefinitionStringRef());
         objects.put(stringAttr.getIdentifier(), stringAttr);
 
         assertInstanceOf(AttributeDefinitionInteger.class, specAttributes.get(1));
@@ -170,7 +173,8 @@ public class TestReqIfParsing {
         assertEquals(factory.newXMLGregorianCalendar("2005-05-30T11:51:25+02:00"), intAttr.getLastChange());
         assertEquals("Age", intAttr.getLongName());
         assertEquals(BigInteger.valueOf(0), intAttr.getDefaultValue().getAttributeValueInteger().getTheValue());
-        assertSame(objects.get("3631dcd2-59d1-11da-beb2-6fbc179f63e4"), intAttr.getType().getDatatypeDefinitionIntegerRef());
+        assertSame(objects.get("3631dcd2-59d1-11da-beb2-6fbc179f63e4"),
+            intAttr.getType().getDatatypeDefinitionIntegerRef());
         objects.put(intAttr.getIdentifier(), intAttr);
     }
 
@@ -194,6 +198,7 @@ public class TestReqIfParsing {
         assertEquals("This is a standard integer type.", intDef.getDesc());
         assertEquals("3631dcd2-59d1-11da-beb2-6fbc179f63e4", intDef.getIdentifier());
         assertEquals("Standard Integer Type", intDef.getLongName());
+        assertEquals("abc-123", intDef.getAlternativeId().getAlternativeId().getIdentifier());
         objects.put(intDef.getIdentifier(), intDef);
     }
 

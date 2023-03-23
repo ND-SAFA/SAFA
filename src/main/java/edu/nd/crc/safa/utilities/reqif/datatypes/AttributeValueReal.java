@@ -136,18 +136,18 @@ public class AttributeValueReal {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionrealref;
+        protected AttributeDefinitionReal attributedefinitionrealref;
 
         /**
          * Gets the value of the attributedefinitionrealref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionReal }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionRealRef() {
+        public AttributeDefinitionReal getAttributeDefinitionRealRef() {
             return attributedefinitionrealref;
         }
 
@@ -156,11 +156,11 @@ public class AttributeValueReal {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionReal }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionRealRef(Object value) {
+        public void setAttributeDefinitionRealRef(AttributeDefinitionReal value) {
             this.attributedefinitionrealref = value;
         }
 

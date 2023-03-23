@@ -157,18 +157,18 @@ public class AttributeValueEnumeration {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionenumerationref;
+        protected AttributeDefinitionEnumeration attributedefinitionenumerationref;
 
         /**
          * Gets the value of the attributedefinitionenumerationref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionEnumeration }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionEnumerationRef() {
+        public AttributeDefinitionEnumeration getAttributeDefinitionEnumerationRef() {
             return attributedefinitionenumerationref;
         }
 
@@ -177,11 +177,11 @@ public class AttributeValueEnumeration {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionEnumeration }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionEnumerationRef(Object value) {
+        public void setAttributeDefinitionEnumerationRef(AttributeDefinitionEnumeration value) {
             this.attributedefinitionenumerationref = value;
         }
 
@@ -216,7 +216,7 @@ public class AttributeValueEnumeration {
 
         @XmlElementRef(name = "ENUM-VALUE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false)
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<JAXBElement<Object>> enumvalueref;
+        protected List<EnumValue> enumvalueref;
 
         /**
          * Gets the value of the enumvalueref property.
@@ -236,14 +236,14 @@ public class AttributeValueEnumeration {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
+         * {@link EnumValue }
          * 
          * 
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<JAXBElement<Object>> getENUMVALUEREF() {
+        public List<EnumValue> getEnumValues() {
             if (enumvalueref == null) {
-                enumvalueref = new ArrayList<JAXBElement<Object>>();
+                enumvalueref = new ArrayList<EnumValue>();
             }
             return this.enumvalueref;
         }

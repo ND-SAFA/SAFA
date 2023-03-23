@@ -204,18 +204,18 @@ public class AttributeValueXhtml {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitionxhtmlref;
+        protected AttributeDefinitionXhtml attributedefinitionxhtmlref;
 
         /**
          * Gets the value of the attributedefinitionxhtmlref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionXhtml }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionXhtmlRef() {
+        public AttributeDefinitionXhtml getAttributeDefinitionXhtmlRef() {
             return attributedefinitionxhtmlref;
         }
 
@@ -224,11 +224,11 @@ public class AttributeValueXhtml {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionXhtml }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionXhtmlRef(Object value) {
+        public void setAttributeDefinitionXhtmlRef(AttributeDefinitionXhtml value) {
             this.attributedefinitionxhtmlref = value;
         }
 

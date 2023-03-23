@@ -146,18 +146,18 @@ public class AttributeValueDate {
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected Object attributedefinitiondateref;
+        protected AttributeDefinitionDate attributedefinitiondateref;
 
         /**
          * Gets the value of the attributedefinitiondateref property.
          * 
          * @return
          *     possible object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionDate }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public Object getAttributeDefinitionDateRef() {
+        public AttributeDefinitionDate getAttributeDefinitionDateRef() {
             return attributedefinitiondateref;
         }
 
@@ -166,11 +166,11 @@ public class AttributeValueDate {
          * 
          * @param value
          *     allowed object is
-         *     {@link Object }
+         *     {@link AttributeDefinitionDate }
          *     
          */
         @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionDateRef(Object value) {
+        public void setAttributeDefinitionDateRef(AttributeDefinitionDate value) {
             this.attributedefinitiondateref = value;
         }
 

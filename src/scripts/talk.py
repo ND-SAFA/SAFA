@@ -62,7 +62,7 @@ if __name__ == "__main__":
     deepspeed_config = JsonUtil.read_json_file(os.path.join(PROJ_PATH, "deepspeed.json"))
     ds_engine = deepspeed.init_inference(model,
                                          mp_size=4,
-                                         dtype=torch.half,
+                                         dtype=torch.float32,
                                          replace_with_kernel_inject=True)
     model = ds_engine.module
 

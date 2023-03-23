@@ -29,7 +29,7 @@ if __name__ == "__main__":
             }
         },
         "prod": {
-            "model": "decapoda-research/llama-7b-hf",
+            "model": "EleutherAI/gpt-neo-2.7B",
             "model_manager": LLaMAModelManager,
             "model_manager_args": {
                 "model_task": LLaMATask.CASUAL_LM,

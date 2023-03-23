@@ -30,8 +30,7 @@ if __name__ == "__main__":
             "model_manager": ModelManager,
             "model_manager_args": {
                 "model_task": ModelTask.CAUSAL_LM
-            },
-            "params": ["per_device_train_batch_size"]
+            }
         },
         "prod": {
             "model": "decapoda-research/llama-7b-hf",
@@ -39,27 +38,26 @@ if __name__ == "__main__":
             "model_manager_args": {
                 "model_task": LLaMATask.CASUAL_LM,
                 "layers_to_freeze": 31
-            },
-            "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns", "gradient_accumulation_steps"]
+            }
         }
     }
-    set_caching_enabled(False)
+    output_path = os.path.expanduser("~/desktop/safa/output")
 
-    mode = "prod"
-    # Paths
-    output_path = os.path.expanduser("~/output/test_lm")
-    dataset_output_path = os.path.join(output_path, "data")
+    # Setup
+    set_caching_enabled(False)
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
+    # Paths
+    mode = "test"
+    output_path = os.path.expanduser("~/output/test_lm")
+    dataset_output_path = os.path.join(output_path, "data")
+
     # Model Manager
-    logger.info("Creating model manager...")
     model_name = modes[mode]["model"]
     model_manager = modes[mode]["model_manager"](model_name, **modes[mode]["model_manager_args"])
-    tokenizer = model_manager.get_tokenizer()
-    logger.info("Done.")
+    logger.info("Created model manager.")
 
     # Prepare dataset
-    logger.info("Creating trainer...")
     model = model_manager.get_model()
     deepspeed_config = JsonUtil.read_json_file(os.path.join(PROJ_PATH, "deepspeed.json"))
     ds_engine = deepspeed.init_inference(model,
@@ -70,6 +68,7 @@ if __name__ == "__main__":
 
     # Generation
     prompt = "Hello, I am having a "
+    tokenizer = model_manager.get_tokenizer()
     inputs = tokenizer(prompt, return_tensors="pt").input_ids
     outputs = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
     model_response = tokenizer.decode(outputs, skip_special_tokens=True)

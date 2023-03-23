@@ -45,7 +45,7 @@ if __name__ == "__main__":
     }
     set_caching_enabled(False)
 
-    mode = "test"
+    mode = "prod"
     # Paths
     output_path = os.path.expanduser("~/output/test_lm")
     dataset_output_path = os.path.join(output_path, "data")
@@ -72,5 +72,5 @@ if __name__ == "__main__":
     prompt = "Hello, I am having a "
     inputs = tokenizer(prompt, return_tensors="pt").input_ids
     outputs = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
-    model_response = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+    model_response = tokenizer.decode(outputs, skip_special_tokens=True)
     print(f"llama > {model_response}")

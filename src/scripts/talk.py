@@ -19,14 +19,14 @@ if __name__ == "__main__":
     from util.logging.logger_manager import LoggerManager, logger
     from models.llama.llama_model_manager import LLaMAModelManager
     from models.llama.llama_task import LLaMATask
-    from datasets import set_caching_enabled
+    from datasets import disable_caching
     from models.model_manager import ModelManager
     from models.model_properties import ModelTask
     from util.json_util import JsonUtil
 
     modes = {
         "test": {
-            "model": "hf-internal-testing/tiny-random-bert",
+            "model": "microsoft/DialoGPT-small",
             "model_manager": ModelManager,
             "model_manager_args": {
                 "model_task": ModelTask.CAUSAL_LM
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     output_path = os.path.expanduser("~/desktop/safa/output")
 
     # Setup
-    set_caching_enabled(False)
+    disable_caching()
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Paths

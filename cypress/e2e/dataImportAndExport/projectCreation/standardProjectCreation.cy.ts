@@ -40,8 +40,7 @@ describe("Standard Project Creation", () => {
       it("Can create a new panel of artifacts", () => {
         cy.setProjectIdentifier("standard").createArtifactPanel(
           "hazard",
-          simpleProjectFilesMap.hazard,
-          true
+          simpleProjectFilesMap.hazard
         );
 
         cy.getCy(DataCy.creationFilePanel).should("be.visible");

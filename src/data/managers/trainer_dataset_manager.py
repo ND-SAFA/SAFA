@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
-from datasets import set_caching_enabled
+from datasets import disable_caching
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -24,7 +24,7 @@ from util.enum_util import get_enum_from_name
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
 
-set_caching_enabled(False)
+disable_caching()
 
 
 class TrainerDatasetManager(BaseObject):

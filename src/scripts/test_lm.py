@@ -1,7 +1,6 @@
 import os
 import sys
 
-from datasets import load_dataset
 from dotenv import load_dotenv
 from transformers import DataCollatorWithPadding
 
@@ -83,10 +82,11 @@ if __name__ == "__main__":
     from models.llama.llama_model_manager import LLaMAModelManager
     from models.llama.llama_task import LLaMATask
     from data.creators.split_dataset_creator import SplitDatasetCreator
-    from datasets import set_caching_enabled
+    from datasets import disable_caching, load_dataset
+
     import gc
 
-    set_caching_enabled(False)
+    disable_caching()
 
     mode = "prod"
     # Paths

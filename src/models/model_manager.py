@@ -61,6 +61,9 @@ class ModelManager(BaseObject):
             self._model = self._load_model()
         return self._model
 
+    def set_model(self, model):
+        self._model = model
+
     def get_config(self) -> PretrainedConfig:
         """
         Gets the PreTrainedModel configuration.

@@ -81,7 +81,7 @@ class LLaMAModelManager(ModelManager):
         :param text_pair:
         :return:
         """
-        return f"Source: {text} \nTarget: {text_pair}"
+        return f"What is the similarity score between \"{text}\" and \"{text_pair}\"?"
 
     def get_classification_feature(self, text: List[str] = None, text_pair: List[str] = None, **kwargs) -> BatchEncoding:
         """

@@ -811,6 +811,26 @@ class LLaMAForCausalLM(LLaMAPreTrainedModel):
         return reordered_past
 
 
+class ClsHead(nn.Module):
+    def __init__(self, input_size: int, layer1_hidden_size: int = 20, layer2_hidden_size: int = 100, n_labels: int = 2):
+        super().__init__()
+        self.cls_layer1 = nn.Linear(input_size, layer1_hidden_size)
+        self.relu = nn.ReLU()
+        self.cls_layer2 = nn.Linear(layer1_hidden_size, layer2_hidden_size)
+        self.cls_head = nn.Linear(layer2_hidden_size, n_labels, bias=False)
+
+    def forward(
+            self,
+            input_ids: torch.LongTensor = None,
+    ) -> torch.Tensor:
+        x = self.cls_layer1(input_ids)
+        x = self.relu(x)
+        x = self.cls_layer2(x)
+        x = self.relu(x)
+        x = self.cls_head(x)
+        return x
+
+
 class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
     """
     Transformer decoder consisting of *config.num_hidden_layers* layers. Each layer is a [`LLaMADecoderLayer`]
@@ -822,7 +842,7 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
     def __init__(self, config: LLaMAConfig):
         super().__init__(config)
         self.model = LLaMAModel(config)
-        self.cls_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
+        self.cls_head = ClsHead(config.hidden_size)
         # Initialize weights and apply final processing
         self.post_init()
 

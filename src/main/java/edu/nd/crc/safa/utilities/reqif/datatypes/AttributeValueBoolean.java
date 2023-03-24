@@ -7,7 +7,6 @@
 
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,154 +15,36 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for ATTRIBUTE-VALUE-BOOLEAN complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ATTRIBUTE-VALUE-BOOLEAN"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="DEFINITION"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="THE-VALUE" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for ATTRIBUTE-VALUE-BOOLEAN complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ATTRIBUTE-VALUE-BOOLEAN", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-public class AttributeValueBoolean {
+@XmlType(name = "ATTRIBUTE-VALUE-BOOLEAN", namespace = "", propOrder = {})
+public class AttributeValueBoolean extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Definition definition;
+
     @XmlAttribute(name = "THE-VALUE", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected boolean thevalue;
+    protected boolean value;
 
     /**
-     * Gets the value of the definition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Definition getDefinition() {
-        return definition;
-    }
-
-    /**
-     * Sets the value of the definition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDefinition(Definition value) {
-        this.definition = value;
-    }
-
-    /**
-     * Gets the value of the thevalue property.
-     * 
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public boolean getTheValue() {
-        return thevalue;
-    }
-
-    /**
-     * Sets the value of the thevalue property.
-     * 
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTheValue(boolean value) {
-        this.thevalue = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "attributedefinitionbooleanref"
+        "attributeDefinition"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class Definition {
-
         @XmlElement(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AttributeDefinitionBoolean attributedefinitionbooleanref;
-
-        /**
-         * Gets the value of the attributedefinitionbooleanref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link AttributeDefinitionBoolean }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AttributeDefinitionBoolean getAttributeDefinitionBooleanRef() {
-            return attributedefinitionbooleanref;
-        }
-
-        /**
-         * Sets the value of the attributedefinitionbooleanref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link AttributeDefinitionBoolean }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionBooleanRef(AttributeDefinitionBoolean value) {
-            this.attributedefinitionbooleanref = value;
-        }
-
+        protected AttributeDefinitionBoolean attributeDefinition;
     }
 
 }

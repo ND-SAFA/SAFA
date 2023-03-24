@@ -9,8 +9,6 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,524 +23,96 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for SPEC-HIERARCHY complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="SPEC-HIERARCHY"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="ALTERNATIVE-ID" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice minOccurs="0"&gt;
- *                   &lt;element name="ALTERNATIVE-ID" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ALTERNATIVE-ID"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="CHILDREN" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="SPEC-HIERARCHY" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-HIERARCHY"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="EDITABLE-ATTS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-DATE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-INTEGER-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-REAL-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-STRING-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-XHTML-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="OBJECT"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="SPEC-OBJECT-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="DESC" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="IDENTIFIER" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
- *       &lt;attribute name="IS-EDITABLE" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
- *       &lt;attribute name="IS-TABLE-INTERNAL" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
- *       &lt;attribute name="LAST-CHANGE" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
- *       &lt;attribute name="LONG-NAME" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for SPEC-HIERARCHY complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SPEC-HIERARCHY", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@XmlType(name = "SPEC-HIERARCHY", namespace = "", propOrder = {})
+@Getter
+@Setter
 public class SpecHierarchy {
 
     @XmlElement(name = "ALTERNATIVE-ID")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AlternativeIdWrapper alternativeid;
+    protected AlternativeIdWrapper alternativeId;
+
     @XmlElement(name = "CHILDREN")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Children children;
+
     @XmlElement(name = "EDITABLE-ATTS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected EditableAtts editableatts;
+    protected EditableAttributes editableAttributes;
+
     @XmlElement(name = "OBJECT", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected ObjectRef objectRef;
+    protected ObjectRef object;
+
     @XmlAttribute(name = "DESC")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String desc;
+
     @XmlAttribute(name = "IDENTIFIER", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String identifier;
+
     @XmlAttribute(name = "IS-EDITABLE")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected Boolean iseditable;
+    protected Boolean editable;
+
     @XmlAttribute(name = "IS-TABLE-INTERNAL")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected Boolean istableinternal;
+    protected Boolean tableInternal;
+
     @XmlAttribute(name = "LAST-CHANGE", required = true)
     @XmlSchemaType(name = "dateTime")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected XMLGregorianCalendar lastchange;
+    protected XMLGregorianCalendar lastChange;
+
     @XmlAttribute(name = "LONG-NAME")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String longname;
+    protected String longName;
 
     /**
-     * Gets the value of the alternativeid property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AlternativeIdWrapper }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeIdWrapper getAlternativeId() {
-        return alternativeid;
-    }
-
-    /**
-     * Sets the value of the alternativeid property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AlternativeIdWrapper }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlternativeId(AlternativeIdWrapper value) {
-        this.alternativeid = value;
-    }
-
-    /**
-     * Gets the value of the children property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Children }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Children getChildren() {
-        return children;
-    }
-
-    /**
-     * Sets the value of the children property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Children }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setChildren(Children value) {
-        this.children = value;
-    }
-
-    /**
-     * Gets the value of the editableatts property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EditableAtts }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public EditableAtts getEditableAtts() {
-        return editableatts;
-    }
-
-    /**
-     * Sets the value of the editableatts property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EditableAtts }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setEditableAtts(EditableAtts value) {
-        this.editableatts = value;
-    }
-
-    /**
-     * Gets the value of the object property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ObjectRef }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ObjectRef getObject() {
-        return objectRef;
-    }
-
-    /**
-     * Sets the value of the object property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ObjectRef }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setObject(ObjectRef value) {
-        this.objectRef = value;
-    }
-
-    /**
-     * Gets the value of the desc property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets the value of the desc property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDesc(String value) {
-        this.desc = value;
-    }
-
-    /**
-     * Gets the value of the identifier property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    /**
-     * Sets the value of the identifier property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIdentifier(String value) {
-        this.identifier = value;
-    }
-
-    /**
-     * Gets the value of the iseditable property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean getIsEditable() {
-        return iseditable;
-    }
-
-    /**
-     * Sets the value of the iseditable property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIsEditable(Boolean value) {
-        this.iseditable = value;
-    }
-
-    /**
-     * Gets the value of the istableinternal property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Boolean getIsTableInternal() {
-        return istableinternal;
-    }
-
-    /**
-     * Sets the value of the istableinternal property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIsTableInternal(Boolean value) {
-        this.istableinternal = value;
-    }
-
-    /**
-     * Gets the value of the lastchange property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLastChange() {
-        return lastchange;
-    }
-
-    /**
-     * Sets the value of the lastchange property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLastChange(XMLGregorianCalendar value) {
-        this.lastchange = value;
-    }
-
-    /**
-     * Gets the value of the longname property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLongName() {
-        return longname;
-    }
-
-    /**
-     * Sets the value of the longname property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLongName(String value) {
-        this.longname = value;
-    }
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-BOOLEAN-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-DATE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-INTEGER-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-REAL-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-STRING-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-XHTML-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF"
+        "attributeDefinitions"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class EditableAtts {
+    @Getter
+    public static class EditableAttributes {
 
         @XmlElementRefs({
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-DATE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-INTEGER-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-REAL-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-STRING-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-XHTML-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false)
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF",
+                type = AttributeDefinitionBooleanRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-DATE-REF",
+                type = AttributeDefinitionDateRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF",
+                type = AttributeDefinitionEnumerationRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-INTEGER-REF",
+                type = AttributeDefinitionIntegerRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-REAL-REF",
+                type = AttributeDefinitionRealRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-STRING-REF",
+                type = AttributeDefinitionStringRef.class, required = false),
+            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-XHTML-REF",
+                type = AttributeDefinitionXhtmlRef.class, required = false)
         })
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<JAXBElement<java.lang.Object>> attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF;
-
-        /**
-         * Gets the value of the attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getATTRIBUTEDEFINITIONBOOLEANREFOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * {@link JAXBElement }{@code <}{@link java.lang.Object }{@code >}
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<JAXBElement<java.lang.Object>> getEditableAtts() {
-            if (attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF == null) {
-                attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF = new ArrayList<JAXBElement<java.lang.Object>>();
-            }
-            return this.attributedefinitionbooleanrefOrATTRIBUTEDEFINITIONDATEREFOrATTRIBUTEDEFINITIONENUMERATIONREF;
-        }
-
+        protected List<AttributeDefinitionRef> attributeDefinitions = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="SPEC-OBJECT-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "specobjectref"
+        "specObject"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class ObjectRef {
 
         @XmlElement(name = "SPEC-OBJECT-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected SpecObject specobjectref;
-
-        /**
-         * Gets the value of the specobjectref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SpecObject }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public SpecObject getSpecObjectRef() {
-            return specobjectref;
-        }
-
-        /**
-         * Sets the value of the specobjectref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SpecObject }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setSpecObjectRef(SpecObject value) {
-            this.specobjectref = value;
-        }
-
+        protected SpecObject specObject;
     }
 
 }

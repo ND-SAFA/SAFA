@@ -8,97 +8,26 @@
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.math.BigInteger;
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for EMBEDDED-VALUE complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="EMBEDDED-VALUE"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="KEY" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
- *       &lt;attribute name="OTHER-CONTENT" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for EMBEDDED-VALUE complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EMBEDDED-VALUE", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@XmlType(name = "EMBEDDED-VALUE", namespace = "", propOrder = {})
+@Getter
+@Setter
 public class EmbeddedValue {
 
     @XmlAttribute(name = "KEY", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected BigInteger key;
+
     @XmlAttribute(name = "OTHER-CONTENT", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String othercontent;
-
-    /**
-     * Gets the value of the key property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public BigInteger getKey() {
-        return key;
-    }
-
-    /**
-     * Sets the value of the key property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setKey(BigInteger value) {
-        this.key = value;
-    }
-
-    /**
-     * Gets the value of the othercontent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getOtherContent() {
-        return othercontent;
-    }
-
-    /**
-     * Sets the value of the othercontent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setOtherContent(String value) {
-        this.othercontent = value;
-    }
-
+    protected String otherContent;
 }

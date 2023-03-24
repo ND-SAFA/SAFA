@@ -7,67 +7,22 @@
 
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for ALTERNATIVE-ID complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ALTERNATIVE-ID"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="IDENTIFIER" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for ALTERNATIVE-ID complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ALTERNATIVE-ID", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@XmlType(name = "ALTERNATIVE-ID", namespace = "", propOrder = {})
+@Getter
+@Setter
 public class AlternativeId {
-
     @XmlAttribute(name = "IDENTIFIER", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String identifier;
-
-    /**
-     * Gets the value of the identifier property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    /**
-     * Sets the value of the identifier property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIdentifier(String value) {
-        this.identifier = value;
-    }
-
 }

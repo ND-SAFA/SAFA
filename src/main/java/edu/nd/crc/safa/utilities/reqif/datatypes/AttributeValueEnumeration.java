@@ -9,245 +9,74 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+
+import lombok.Getter;
+import lombok.Setter;
 
 
 /**
- * <p>Java class for ATTRIBUTE-VALUE-ENUMERATION complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ATTRIBUTE-VALUE-ENUMERATION"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="DEFINITION"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="VALUES" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="ENUM-VALUE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for ATTRIBUTE-VALUE-ENUMERATION complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-public class AttributeValueEnumeration {
+@XmlType(name = "ATTRIBUTE-VALUE-ENUMERATION", namespace = "", propOrder = {})
+@Getter
+@Setter
+public class AttributeValueEnumeration extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Definition definition;
+
     @XmlElement(name = "VALUES")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Values values;
 
     /**
-     * Gets the value of the definition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Definition getDefinition() {
-        return definition;
-    }
-
-    /**
-     * Sets the value of the definition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDefinition(Definition value) {
-        this.definition = value;
-    }
-
-    /**
-     * Gets the value of the values property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Values }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Values getValues() {
-        return values;
-    }
-
-    /**
-     * Sets the value of the values property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Values }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setValues(Values value) {
-        this.values = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-ENUMERATION-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "attributedefinitionenumerationref"
+        "attributeDefinition"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class Definition {
-
         @XmlElement(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AttributeDefinitionEnumeration attributedefinitionenumerationref;
-
-        /**
-         * Gets the value of the attributedefinitionenumerationref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link AttributeDefinitionEnumeration }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AttributeDefinitionEnumeration getAttributeDefinitionEnumerationRef() {
-            return attributedefinitionenumerationref;
-        }
-
-        /**
-         * Sets the value of the attributedefinitionenumerationref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link AttributeDefinitionEnumeration }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionEnumerationRef(AttributeDefinitionEnumeration value) {
-            this.attributedefinitionenumerationref = value;
-        }
-
+        protected AttributeDefinitionEnumeration attributeDefinition;
     }
 
 
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="ENUM-VALUE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "enumvalueref"
+        "values"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class Values {
+        @XmlElementRef(name = "ENUM-VALUE-REF", type = EnumValueRef.class, required = false)
+        protected List<EnumValueRef> values = new ArrayList<>();
+    }
 
-        @XmlElementRef(name = "ENUM-VALUE-REF", namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", type = JAXBElement.class, required = false)
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<EnumValue> enumvalueref;
-
-        /**
-         * Gets the value of the enumvalueref property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the enumvalueref property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getENUMVALUEREF().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link EnumValue }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<EnumValue> getEnumValues() {
-            if (enumvalueref == null) {
-                enumvalueref = new ArrayList<EnumValue>();
-            }
-            return this.enumvalueref;
-        }
-
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlRootElement(name = "ENUM-VALUE-REF", namespace = "")
+    @Getter
+    @Setter
+    public static class EnumValueRef {
+        @XmlValue
+        @XmlIDREF
+        @XmlSchemaType(name = "IDREF")
+        protected EnumValue enumValue;
     }
 
 }

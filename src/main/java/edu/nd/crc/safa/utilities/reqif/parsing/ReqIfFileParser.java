@@ -33,7 +33,7 @@ public interface ReqIfFileParser {
 
         XMLStreamReader streamReader = inputFactory.createXMLStreamReader(inputStream);
 
-        JAXBContext context = JAXBContext.newInstance(ReqIf.class);
+        JAXBContext context = JAXBContext.newInstance(ReqIf.class.getPackageName());
         Unmarshaller unmarshaller = context.createUnmarshaller();
 
         StreamReaderDelegate xmlReader = new StreamReaderDelegate(streamReader);

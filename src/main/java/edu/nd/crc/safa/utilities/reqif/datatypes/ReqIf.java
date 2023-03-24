@@ -9,65 +9,17 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for REQ-IF complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="REQ-IF"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="THE-HEADER"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="REQ-IF-HEADER" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-HEADER"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="CORE-CONTENT"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="REQ-IF-CONTENT" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-CONTENT"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="TOOL-EXTENSIONS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="REQ-IF-TOOL-EXTENSION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-TOOL-EXTENSION"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *       &lt;attribute ref="{http://www.w3.org/XML/1998/namespace}lang"/&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for REQ-IF complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "REQ-IF", namespace = "", propOrder = {
@@ -75,305 +27,61 @@ import javax.xml.bind.annotation.XmlType;
     "coreContent",
     "toolExtensions"
 })
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@Getter
+@Setter
 public class ReqIf {
 
     @XmlElement(name = "THE-HEADER", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected TheHeader theHeader;
+
     @XmlElement(name = "CORE-CONTENT", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected CoreContent coreContent;
+
     @XmlElement(name = "TOOL-EXTENSIONS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected ToolExtensions toolExtensions;
+
     @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String lang;
 
     /**
-     * Gets the value of the theHeader property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TheHeader }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public TheHeader getTheHeader() {
-        return theHeader;
-    }
-
-    /**
-     * Sets the value of the theHeader property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TheHeader }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTheHeader(TheHeader value) {
-        this.theHeader = value;
-    }
-
-    /**
-     * Gets the value of the coreContent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CoreContent }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public CoreContent getCoreContent() {
-        return coreContent;
-    }
-
-    /**
-     * Sets the value of the coreContent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CoreContent }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCoreContent(CoreContent value) {
-        this.coreContent = value;
-    }
-
-    /**
-     * Gets the value of the toolExtensions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ToolExtensions }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public ToolExtensions getToolExtensions() {
-        return toolExtensions;
-    }
-
-    /**
-     * Sets the value of the toolExtensions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ToolExtensions }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setToolExtensions(ToolExtensions value) {
-        this.toolExtensions = value;
-    }
-
-    /**
-     * Gets the value of the lang property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLang() {
-        return lang;
-    }
-
-    /**
-     * Sets the value of the lang property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLang(String value) {
-        this.lang = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="REQ-IF-CONTENT" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-CONTENT"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "reqIfContent"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class CoreContent {
-
         @XmlElement(name = "REQ-IF-CONTENT", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected ReqIfContent reqIfContent;
-
-        /**
-         * Gets the value of the reqIfContent property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link ReqIfContent }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public ReqIfContent getReqIfContent() {
-            return reqIfContent;
-        }
-
-        /**
-         * Sets the value of the reqIfContent property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link ReqIfContent }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setReqIfContent(ReqIfContent value) {
-            this.reqIfContent = value;
-        }
-
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="REQ-IF-HEADER" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-HEADER"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "reqIfHeader"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class TheHeader {
-
         @XmlElement(name = "REQ-IF-HEADER", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
         protected ReqIfHeader reqIfHeader;
-
-        /**
-         * Gets the value of the reqIfHeader property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link ReqIfHeader }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public ReqIfHeader getReqIfHeader() {
-            return reqIfHeader;
-        }
-
-        /**
-         * Sets the value of the reqIfHeader property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link ReqIfHeader }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setReqIfHeader(ReqIfHeader value) {
-            this.reqIfHeader = value;
-        }
-
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="REQ-IF-TOOL-EXTENSION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}REQ-IF-TOOL-EXTENSION"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "reqiftoolextension"
+        "reqIfToolExtensions"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class ToolExtensions {
-
         @XmlElement(name = "REQ-IF-TOOL-EXTENSION", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<ReqIfToolExtension> reqiftoolextension;
-
-        /**
-         * Gets the value of the reqiftoolextension property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the reqiftoolextension property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getREQIFTOOLEXTENSION().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link ReqIfToolExtension }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<ReqIfToolExtension> getReqIfToolExtensions() {
-            if (reqiftoolextension == null) {
-                reqiftoolextension = new ArrayList<ReqIfToolExtension>();
-            }
-            return this.reqiftoolextension;
-        }
-
+        protected List<ReqIfToolExtension> reqIfToolExtensions = new ArrayList<>();
     }
 
 }

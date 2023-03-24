@@ -9,309 +9,37 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for DATATYPE-DEFINITION-ENUMERATION complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="DATATYPE-DEFINITION-ENUMERATION"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="ALTERNATIVE-ID" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice minOccurs="0"&gt;
- *                   &lt;element name="ALTERNATIVE-ID" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ALTERNATIVE-ID"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPECIFIED-VALUES" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="ENUM-VALUE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ENUM-VALUE"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="DESC" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="IDENTIFIER" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
- *       &lt;attribute name="LAST-CHANGE" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
- *       &lt;attribute name="LONG-NAME" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for DATATYPE-DEFINITION-ENUMERATION complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "", propOrder = {
+@XmlType(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "", propOrder = {})
+@Getter
+@Setter
+public class DatatypeDefinitionEnumeration extends DatatypeDefinition {
 
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-public class DatatypeDefinitionEnumeration {
-
-    @XmlElement(name = "ALTERNATIVE-ID")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected AlternativeIdWrapper alternativeid;
     @XmlElement(name = "SPECIFIED-VALUES")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecifiedValues specifiedvalues;
-    @XmlAttribute(name = "DESC")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String desc;
-    @XmlAttribute(name = "IDENTIFIER", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String identifier;
-    @XmlAttribute(name = "LAST-CHANGE", required = true)
-    @XmlSchemaType(name = "dateTime")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected XMLGregorianCalendar lastchange;
-    @XmlAttribute(name = "LONG-NAME")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String longname;
+    protected SpecifiedValues specifiedValues;
 
     /**
-     * Gets the value of the alternativeid property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AlternativeIdWrapper }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public AlternativeIdWrapper getAlternativeId() {
-        return alternativeid;
-    }
-
-    /**
-     * Sets the value of the alternativeid property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AlternativeIdWrapper }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlternativeId(AlternativeIdWrapper value) {
-        this.alternativeid = value;
-    }
-
-    /**
-     * Gets the value of the specifiedvalues property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SpecifiedValues }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecifiedValues getSpecifiedValues() {
-        return specifiedvalues;
-    }
-
-    /**
-     * Sets the value of the specifiedvalues property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SpecifiedValues }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecifiedValues(SpecifiedValues value) {
-        this.specifiedvalues = value;
-    }
-
-    /**
-     * Gets the value of the desc property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets the value of the desc property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDesc(String value) {
-        this.desc = value;
-    }
-
-    /**
-     * Gets the value of the identifier property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    /**
-     * Sets the value of the identifier property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setIdentifier(String value) {
-        this.identifier = value;
-    }
-
-    /**
-     * Gets the value of the lastchange property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getLastChange() {
-        return lastchange;
-    }
-
-    /**
-     * Sets the value of the lastchange property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLastChange(XMLGregorianCalendar value) {
-        this.lastchange = value;
-    }
-
-    /**
-     * Gets the value of the longname property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLongName() {
-        return longname;
-    }
-
-    /**
-     * Sets the value of the longname property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLongName(String value) {
-        this.longname = value;
-    }
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="ENUM-VALUE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}ENUM-VALUE"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "enumvalue"
+        "values"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class SpecifiedValues {
-
         @XmlElement(name = "ENUM-VALUE", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<EnumValue> enumvalue;
-
-        /**
-         * Gets the value of the enumvalue property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the enumvalue property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getENUMVALUE().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link EnumValue }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<EnumValue> getEnumValues() {
-            if (enumvalue == null) {
-                enumvalue = new ArrayList<EnumValue>();
-            }
-            return this.enumvalue;
-        }
-
+        protected List<EnumValue> values = new ArrayList<>();
     }
 
 }

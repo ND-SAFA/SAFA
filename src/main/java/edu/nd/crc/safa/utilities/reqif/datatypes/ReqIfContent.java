@@ -9,701 +9,145 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for REQ-IF-CONTENT complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="REQ-IF-CONTENT"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="DATATYPES" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-BOOLEAN" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-BOOLEAN"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-DATE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-DATE"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-ENUMERATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-ENUMERATION"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-INTEGER" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-INTEGER"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-REAL" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-REAL"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-STRING" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-STRING"/&gt;
- *                   &lt;element name="DATATYPE-DEFINITION-XHTML" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-XHTML"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPEC-TYPES" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="RELATION-GROUP-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}RELATION-GROUP-TYPE"/&gt;
- *                   &lt;element name="SPEC-OBJECT-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-OBJECT-TYPE"/&gt;
- *                   &lt;element name="SPEC-RELATION-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-RELATION-TYPE"/&gt;
- *                   &lt;element name="SPECIFICATION-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPECIFICATION-TYPE"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPEC-OBJECTS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="SPEC-OBJECT" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-OBJECT"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPEC-RELATIONS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="SPEC-RELATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-RELATION"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPECIFICATIONS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="SPECIFICATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPECIFICATION"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *         &lt;element name="SPEC-RELATION-GROUPS" minOccurs="0"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
- *                   &lt;element name="RELATION-GROUP" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}RELATION-GROUP"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for REQ-IF-CONTENT complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "REQ-IF-CONTENT", namespace = "", propOrder = {
-    "datatypes",
-    "spectypes",
-    "specobjects",
-    "specrelations",
+    "dataTypes",
+    "specTypes",
+    "specObjects",
+    "specRelations",
     "specifications",
-    "specrelationgroups"
+    "specRelationGroups"
 })
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@Getter
+@Setter
 public class ReqIfContent {
 
     @XmlElement(name = "DATATYPES")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected Datatypes datatypes;
+    protected DataTypes dataTypes;
+
     @XmlElement(name = "SPEC-TYPES")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecTypes spectypes;
+    protected SpecTypes specTypes;
+
     @XmlElement(name = "SPEC-OBJECTS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecObjects specobjects;
+    protected SpecObjects specObjects;
+
     @XmlElement(name = "SPEC-RELATIONS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelations specrelations;
+    protected SpecRelations specRelations;
+
     @XmlElement(name = "SPECIFICATIONS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Specifications specifications;
+
     @XmlElement(name = "SPEC-RELATION-GROUPS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected SpecRelationGroups specrelationgroups;
+    protected SpecRelationGroups specRelationGroups;
 
     /**
-     * Gets the value of the datatypes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Datatypes }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Datatypes getDatatypes() {
-        return datatypes;
-    }
-
-    /**
-     * Sets the value of the datatypes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Datatypes }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDatatypes(Datatypes value) {
-        this.datatypes = value;
-    }
-
-    /**
-     * Gets the value of the spectypes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SpecTypes }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecTypes getSpecTypes() {
-        return spectypes;
-    }
-
-    /**
-     * Sets the value of the spectypes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SpecTypes }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecTypes(SpecTypes value) {
-        this.spectypes = value;
-    }
-
-    /**
-     * Gets the value of the specobjects property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SpecObjects }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecObjects getSpecObjects() {
-        return specobjects;
-    }
-
-    /**
-     * Sets the value of the specobjects property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SpecObjects }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecObjects(SpecObjects value) {
-        this.specobjects = value;
-    }
-
-    /**
-     * Gets the value of the specrelations property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SpecRelations }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelations getSpecRelations() {
-        return specrelations;
-    }
-
-    /**
-     * Sets the value of the specrelations property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SpecRelations }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecRelations(SpecRelations value) {
-        this.specrelations = value;
-    }
-
-    /**
-     * Gets the value of the specifications property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Specifications }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Specifications getSpecifications() {
-        return specifications;
-    }
-
-    /**
-     * Sets the value of the specifications property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Specifications }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecifications(Specifications value) {
-        this.specifications = value;
-    }
-
-    /**
-     * Gets the value of the specrelationgroups property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SpecRelationGroups }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public SpecRelationGroups getSpecRelationGroups() {
-        return specrelationgroups;
-    }
-
-    /**
-     * Sets the value of the specrelationgroups property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SpecRelationGroups }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpecRelationGroups(SpecRelationGroups value) {
-        this.specrelationgroups = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-BOOLEAN" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-BOOLEAN"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-DATE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-DATE"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-ENUMERATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-ENUMERATION"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-INTEGER" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-INTEGER"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-REAL" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-REAL"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-STRING" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-STRING"/&gt;
-     *         &lt;element name="DATATYPE-DEFINITION-XHTML" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}DATATYPE-DEFINITION-XHTML"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION"
+        "datatypeDefinitions"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public static class Datatypes {
-
+    @Getter
+    public static class DataTypes {
         @XmlElements({
-            @XmlElement(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "", type = DatatypeDefinitionBoolean.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-DATE", namespace = "", type = DatatypeDefinitionDate.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "", type = DatatypeDefinitionEnumeration.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-INTEGER", namespace = "", type = DatatypeDefinitionInteger.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-REAL", namespace = "", type = DatatypeDefinitionReal.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-STRING", namespace = "", type = DatatypeDefinitionString.class),
-            @XmlElement(name = "DATATYPE-DEFINITION-XHTML", namespace = "", type = DatatypeDefinitionXhtml.class)
+            @XmlElement(name = "DATATYPE-DEFINITION-BOOLEAN", namespace = "",
+                type = DatatypeDefinitionBoolean.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-DATE", namespace = "",
+                type = DatatypeDefinitionDate.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-ENUMERATION", namespace = "",
+                type = DatatypeDefinitionEnumeration.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-INTEGER", namespace = "",
+                type = DatatypeDefinitionInteger.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-REAL", namespace = "",
+                type = DatatypeDefinitionReal.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-STRING", namespace = "",
+                type = DatatypeDefinitionString.class),
+            @XmlElement(name = "DATATYPE-DEFINITION-XHTML", namespace = "",
+                type = DatatypeDefinitionXhtml.class)
         })
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<Object> datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION;
-
-        /**
-         * Gets the value of the datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getDATATYPEDEFINITIONBOOLEANOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link DatatypeDefinitionBoolean }
-         * {@link DatatypeDefinitionDate }
-         * {@link DatatypeDefinitionEnumeration }
-         * {@link DatatypeDefinitionInteger }
-         * {@link DatatypeDefinitionReal }
-         * {@link DatatypeDefinitionString }
-         * {@link DatatypeDefinitionXhtml }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getDatatypeDefinitions() {
-            if (datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION == null) {
-                datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION = new ArrayList<Object>();
-            }
-            return this.datatypedefinitionbooleanOrDATATYPEDEFINITIONDATEOrDATATYPEDEFINITIONENUMERATION;
-        }
-
+        protected List<DatatypeDefinition> datatypeDefinitions = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="SPECIFICATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPECIFICATION"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "specification"
+        "specifications"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class Specifications {
-
         @XmlElement(name = "SPECIFICATION", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<Specification> specification;
-
-        /**
-         * Gets the value of the specification property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the specification property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getSPECIFICATION().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Specification }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Specification> getSpecifications() {
-            if (specification == null) {
-                specification = new ArrayList<Specification>();
-            }
-            return this.specification;
-        }
-
+        protected List<Specification> specifications = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="SPEC-OBJECT" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-OBJECT"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "specobject"
+        "specObjects"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class SpecObjects {
-
         @XmlElement(name = "SPEC-OBJECT", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<SpecObject> specobject;
-
-        /**
-         * Gets the value of the specobject property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the specobject property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getSPECOBJECT().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link SpecObject }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecObject> getSpecObjects() {
-            if (specobject == null) {
-                specobject = new ArrayList<SpecObject>();
-            }
-            return this.specobject;
-        }
-
+        protected List<SpecObject> specObjects = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="RELATION-GROUP" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}RELATION-GROUP"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "relationgroup"
+        "relationGroups"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class SpecRelationGroups {
-
         @XmlElement(name = "RELATION-GROUP", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<RelationGroup> relationgroup;
-
-        /**
-         * Gets the value of the relationgroup property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the relationgroup property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getRELATIONGROUP().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link RelationGroup }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<RelationGroup> getRelationGroups() {
-            if (relationgroup == null) {
-                relationgroup = new ArrayList<RelationGroup>();
-            }
-            return this.relationgroup;
-        }
-
+        protected List<RelationGroup> relationGroups = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="SPEC-RELATION" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-RELATION"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "specrelation"
+        "specRelations"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class SpecRelations {
-
         @XmlElement(name = "SPEC-RELATION", namespace = "")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<SpecRelation> specrelation;
-
-        /**
-         * Gets the value of the specrelation property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the specrelation property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getSPECRELATION().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link SpecRelation }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<SpecRelation> getSpecRelations() {
-            if (specrelation == null) {
-                specrelation = new ArrayList<SpecRelation>();
-            }
-            return this.specrelation;
-        }
-
+        protected List<SpecRelation> specRelations = new ArrayList<>();
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
-     *         &lt;element name="RELATION-GROUP-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}RELATION-GROUP-TYPE"/&gt;
-     *         &lt;element name="SPEC-OBJECT-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-OBJECT-TYPE"/&gt;
-     *         &lt;element name="SPEC-RELATION-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPEC-RELATION-TYPE"/&gt;
-     *         &lt;element name="SPECIFICATION-TYPE" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}SPECIFICATION-TYPE"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE"
+        "specTypes"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
     public static class SpecTypes {
-
         @XmlElements({
             @XmlElement(name = "RELATION-GROUP-TYPE", namespace = "", type = RelationGroupType.class),
             @XmlElement(name = "SPEC-OBJECT-TYPE", namespace = "", type = SpecObjectType.class),
             @XmlElement(name = "SPEC-RELATION-TYPE", namespace = "", type = SpecRelationType.class),
             @XmlElement(name = "SPECIFICATION-TYPE", namespace = "", type = SpecificationType.class)
         })
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected List<Object> relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE;
-
-        /**
-         * Gets the value of the relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getRELATIONGROUPTYPEOrSPECOBJECTTYPEOrSPECRELATIONTYPE().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link RelationGroupType }
-         * {@link SpecObjectType }
-         * {@link SpecRelationType }
-         * {@link SpecificationType }
-         * 
-         * 
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public List<Object> getSpecTypes() {
-            if (relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE == null) {
-                relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE = new ArrayList<Object>();
-            }
-            return this.relationgrouptypeOrSPECOBJECTTYPEOrSPECRELATIONTYPE;
-        }
-
+        protected List<SpecType> specTypes = new ArrayList<>();
     }
 
 }

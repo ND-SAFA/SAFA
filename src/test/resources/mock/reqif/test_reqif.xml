@@ -91,6 +91,9 @@
                                 <OBJECT>
                                     <SPEC-OBJECT-REF>2c84e85a-59d1-11da-8ef5-afdbd01c7a79</SPEC-OBJECT-REF>
                                 </OBJECT>
+                                <EDITABLE-ATTS>
+                                    <ATTRIBUTE-DEFINITION-INTEGER-REF>356b02ec-59d1-11da-afa6-6b90abdfb5dc</ATTRIBUTE-DEFINITION-INTEGER-REF>
+                                </EDITABLE-ATTS>
                             </SPEC-HIERARCHY>
                         </CHILDREN>
                     </SPECIFICATION>

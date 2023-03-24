@@ -7,7 +7,6 @@
 
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
-import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -17,163 +16,39 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for ATTRIBUTE-VALUE-DATE complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ATTRIBUTE-VALUE-DATE"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
- *         &lt;element name="DEFINITION"&gt;
- *           &lt;complexType&gt;
- *             &lt;complexContent&gt;
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                 &lt;choice&gt;
- *                   &lt;element name="ATTRIBUTE-DEFINITION-DATE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
- *                 &lt;/choice&gt;
- *               &lt;/restriction&gt;
- *             &lt;/complexContent&gt;
- *           &lt;/complexType&gt;
- *         &lt;/element&gt;
- *       &lt;/all&gt;
- *       &lt;attribute name="THE-VALUE" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for ATTRIBUTE-VALUE-DATE complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ATTRIBUTE-VALUE-DATE", namespace = "", propOrder = {
-
-})
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-public class AttributeValueDate {
+@XmlType(name = "ATTRIBUTE-VALUE-DATE", namespace = "", propOrder = {})
+@Getter
+@Setter
+public class AttributeValueDate extends AttributeValue {
 
     @XmlElement(name = "DEFINITION", required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected Definition definition;
+
     @XmlAttribute(name = "THE-VALUE", required = true)
     @XmlSchemaType(name = "dateTime")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected XMLGregorianCalendar thevalue;
+    protected XMLGregorianCalendar value;
 
     /**
-     * Gets the value of the definition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public Definition getDefinition() {
-        return definition;
-    }
-
-    /**
-     * Sets the value of the definition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Definition }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setDefinition(Definition value) {
-        this.definition = value;
-    }
-
-    /**
-     * Gets the value of the thevalue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public XMLGregorianCalendar getTheValue() {
-        return thevalue;
-    }
-
-    /**
-     * Sets the value of the thevalue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTheValue(XMLGregorianCalendar value) {
-        this.thevalue = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;choice&gt;
-     *         &lt;element name="ATTRIBUTE-DEFINITION-DATE-REF" type="{http://www.omg.org/spec/ReqIF/20110401/reqif.xsd}LOCAL-REF"/&gt;
-     *       &lt;/choice&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
+     * Java class for anonymous complex type.
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "attributedefinitiondateref"
+        "attributeDefinition"
     })
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+    @Getter
+    @Setter
     public static class Definition {
-
         @XmlElement(name = "ATTRIBUTE-DEFINITION-DATE-REF", namespace = "")
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        protected AttributeDefinitionDate attributedefinitiondateref;
-
-        /**
-         * Gets the value of the attributedefinitiondateref property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link AttributeDefinitionDate }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public AttributeDefinitionDate getAttributeDefinitionDateRef() {
-            return attributedefinitiondateref;
-        }
-
-        /**
-         * Sets the value of the attributedefinitiondateref property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link AttributeDefinitionDate }
-         *     
-         */
-        @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-        public void setAttributeDefinitionDateRef(AttributeDefinitionDate value) {
-            this.attributedefinitiondateref = value;
-        }
-
+        protected AttributeDefinitionDate attributeDefinition;
     }
 
 }

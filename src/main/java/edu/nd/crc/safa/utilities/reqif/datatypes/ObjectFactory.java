@@ -829,11 +829,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SpecHierarchy.EditableAtts }
+     * Create an instance of {@link SpecHierarchy.EditableAttributes }
      * 
      */
-    public SpecHierarchy.EditableAtts createSpecHierarchyEDITABLEATTS() {
-        return new SpecHierarchy.EditableAtts();
+    public SpecHierarchy.EditableAttributes createSpecHierarchyEDITABLEATTS() {
+        return new SpecHierarchy.EditableAttributes();
     }
 
     /**
@@ -845,11 +845,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ReqIfContent.Datatypes }
+     * Create an instance of {@link ReqIfContent.DataTypes }
      * 
      */
-    public ReqIfContent.Datatypes createReqIfContentDATATYPES() {
-        return new ReqIfContent.Datatypes();
+    public ReqIfContent.DataTypes createReqIfContentDATATYPES() {
+        return new ReqIfContent.DataTypes();
     }
 
     /**
@@ -13082,10 +13082,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONBOOLEANREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13096,10 +13096,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-DATE-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-DATE-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONDATEREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13110,10 +13110,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONENUMERATIONREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13124,10 +13124,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-INTEGER-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-INTEGER-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONINTEGERREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13138,10 +13138,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-REAL-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-REAL-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONREALREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13152,10 +13152,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-STRING-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-STRING-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONSTRINGREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**
@@ -13166,10 +13166,10 @@ public class ObjectFactory {
      * @return
      *     the new instance of {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
-    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-XHTML-REF", scope = SpecHierarchy.EditableAtts.class)
+    @XmlElementDecl(namespace = "http://www.omg.org/spec/ReqIF/20110401/reqif.xsd", name = "ATTRIBUTE-DEFINITION-XHTML-REF", scope = SpecHierarchy.EditableAttributes.class)
     @XmlIDREF
     public JAXBElement<Object> createSpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF(Object value) {
-        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF_QNAME, Object.class, SpecHierarchy.EditableAtts.class, value);
+        return new JAXBElement<Object>(_SpecHierarchyEDITABLEATTSATTRIBUTEDEFINITIONXHTMLREF_QNAME, Object.class, SpecHierarchy.EditableAttributes.class, value);
     }
 
     /**

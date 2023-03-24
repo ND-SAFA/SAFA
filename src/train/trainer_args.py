@@ -81,6 +81,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
+        self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
@@ -88,7 +89,6 @@ class TrainerArgs(TrainingArguments, BaseObject):
                          logging_steps=self.logging_steps, report_to="wandb", weight_decay=self.weight_decay,
                          learning_rate=self.learning_rate, deepspeed=self.deepspeed_path,
                          gradient_checkpointing=self.gradient_checkpointing, fp16=self.fp16)
-        self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:
         """

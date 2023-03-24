@@ -11,7 +11,7 @@
             "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
             "model_task": "SEQUENCE_CLASSIFICATION",
-            "layers_to_freeze": 30
+            "layers_to_freeze": 29
           },
           "trainer_args": {
             "deepspeed": "~/tgen/deepspeed.json",

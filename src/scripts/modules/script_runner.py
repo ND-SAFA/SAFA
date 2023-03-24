@@ -96,7 +96,7 @@ class ScriptRunner:
         and loading django related application code.
         :return:
         """
-        if TraceAccelerator.is_main_process:
+        if TraceAccelerator.is_main_process and self.experiment.delete_prev_experiment_dir:
             FileUtil.delete_dir(self.experiment_dir)
             FileUtil.create_dir_safely(self.experiment_dir)
         TraceAccelerator.wait_for_everyone()

@@ -5,7 +5,7 @@ from typing import Callable, List
 import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
-from constants import OUTPUT_FILENAME
+from constants import OUTPUT_FILENAME, EXPERIMENT_ID_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
@@ -17,6 +17,8 @@ from models.single_layer.single_layer_model import train, SingleLayerModel, pred
 from train.metrics.metrics_manager import MetricsManager
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.logging.logger_config import LoggerConfig
+from util.status import Status
 
 
 def average(arr):
@@ -40,18 +42,37 @@ class EnsembleExperiment(Experiment):
     Aggregates a series of train jobs that produce predictions on the same dataset.
     """
 
+    def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
+                 experiment_id: int = EXPERIMENT_ID_DEFAULT, load_previous_predictions: bool = False):
+        """
+        Represents an experiment run
+        :param steps: List of all experiment steps to run
+        :param output_dir: The path to save output to
+        :param logger_config: Configures the logging for the project
+        :param experiment_id: The id (or index) of the experiment being run. Used for creating readable output directories.
+        :param load_previous_predictions: If True, loads predictions from a previous run instead of re-running
+        """
+        super().__init__(steps, output_dir, logger_config, experiment_id, delete_prev_experiment_dir=not load_previous_predictions)
+        self.load_previous_predictions = load_previous_predictions
+
     def run(self):
         """
         Runs training jobs and uses their output to create an ensemble model using defined agg function.
         Ensemble output is
         :return:
         """
-        self.set_cross_step_vars(self.steps)
         train_step = self.steps[0]
         self.steps.append(self._create_predict_on_train_step(train_step.jobs))
+        self.set_cross_step_vars(self.steps)
 
-        jobs: List[AbstractTraceJob] = super().run()
-        train_jobs, predict_on_train_jobs = jobs[:len(train_step.jobs)], jobs[len(train_step.jobs):]
+        if not self.load_previous_predictions:
+            jobs: List[AbstractTraceJob] = super().run()
+            assert self.status == Status.SUCCESS, "Experiment step has failed."
+            train_jobs, predict_on_train_jobs = jobs[:len(train_step.jobs)], jobs[len(train_step.jobs):]
+        else:
+            for i, step in enumerate(self.steps):
+                step.update_output_path(self.get_step_output_dir(self.experiment_index, i))
+            train_jobs, predict_on_train_jobs = self.steps[0].jobs, self.steps[1].jobs
 
         train_dataset = train_jobs[0].trainer_dataset_manager[DatasetRole.TRAIN]
         train_labels = train_dataset.get_ordered_labels()

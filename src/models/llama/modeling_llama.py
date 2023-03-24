@@ -625,6 +625,7 @@ class LLaMAModel(LLaMAPreTrainedModel):
                 all_self_attns += (layer_outputs[1],)
 
         hidden_states = self.norm(hidden_states)
+        print("Hidden States:", hidden_states.shape)
 
         # add hidden states from the last decoder layer
         if output_hidden_states:

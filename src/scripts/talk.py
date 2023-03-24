@@ -28,8 +28,15 @@ if __name__ == "__main__":
                 "model_task": ModelTask.CAUSAL_LM
             }
         },
-        "prod": {
+        "neo": {
             "model": "EleutherAI/gpt-neo-2.7B",
+            "model_manager": ModelManager,
+            "model_manager_args": {
+                "model_task": ModelTask.CAUSAL_LM
+            }
+        },
+        "llama": {
+            "model": "decapoda-research/llama-7b-hf",
             "model_manager": LLaMAModelManager,
             "model_manager_args": {
                 "model_task": LLaMATask.CASUAL_LM,
@@ -44,7 +51,7 @@ if __name__ == "__main__":
     LoggerManager.configure_logger(LoggerConfig(output_dir=os.path.join(output_path, "logs")))
 
     # Paths
-    mode = "prod"
+    mode = "llama"
     output_path = os.path.expanduser("~/output/test_lm")
     dataset_output_path = os.path.join(output_path, "data")
 

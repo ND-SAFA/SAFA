@@ -69,6 +69,6 @@ if __name__ == "__main__":
     while "exit" not in prompt:
         prompt = input("$ ")
         inputs = tokenizer(prompt, return_tensors="pt").input_ids
-        model_output = model.generate(inputs, max_new_tokens=100, do_sample=True, top_k=50, top_p=0.95)
+        model_output = model.generate(inputs, max_new_tokens=300, do_sample=True, top_k=50, top_p=0.95)
         output = tokenizer.batch_decode(model_output, skip_special_tokens=True)
-        print("> ", output)
+        print("> ", output[0])

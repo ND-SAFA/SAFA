@@ -900,7 +900,8 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
                     "unexpected if using padding tokens in conjunction with `inputs_embeds.`"
                 )
 
-        pooled_logits = logits[torch.arange(batch_size, device=logits.device), sequence_lengths]
+        logits_index = torch.arange(batch_size, device=logits.device)
+        pooled_logits = logits[logits_index, sequence_lengths]
 
         loss = None
         if labels is not None:

@@ -14,7 +14,7 @@
             "layers_to_freeze": 29
           },
           "trainer_args": {
-            "deepspeed": "~/tgen/deepspeed.json",
+            "deepspeed_path": "~/tgen/deepspeed.json",
             "per_device_train_batch_size": 1,
             "remove_unused_columns": false,
             "gradient_accumulation_steps": 16,

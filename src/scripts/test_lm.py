@@ -59,12 +59,12 @@ def create_test_dataset(**kwargs):
 
 modes = {
     "test": {
-        "model": "hf-internal-testing/tiny-random-bert",
-        "params": ["per_device_train_batch_size"]
+        "model": "kdearsty/llama-testing",
+        "params": ["per_device_train_batch_size", "deepspeed_path"]
     },
     "prod": {
         "model": "decapoda-research/llama-7b-hf",
-        "params": ["deepspeed", "per_device_train_batch_size", "remove_unused_columns"]
+        "params": ["deepspeed_path", "per_device_train_batch_size", "remove_unused_columns"]
     }
 }
 
@@ -105,9 +105,10 @@ if __name__ == "__main__":
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, padding="max_length", max_length=512)
     deepspeed_path = os.path.join(PROJ_PATH, "deepspeed.json")
-    arg_params = {"deepspeed": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False}
+    arg_params = {"deepspeed_path": deepspeed_path, "per_device_train_batch_size": 1, "remove_unused_columns": False,
+                  "gradient_accumulation_steps": 16}
     arg_params = {k: v for k, v in arg_params.items() if k in modes[mode]["params"]}
-    args = TrainerArgs(output_path, **arg_params, gradient_accumulation_steps=16)
+    args = TrainerArgs(output_path, **arg_params)
     args.__post_init__()
     logger.info("Created trainer args! Creating trace trainer...")
 

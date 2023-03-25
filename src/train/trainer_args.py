@@ -1,4 +1,3 @@
-import os
 from typing import Callable, Dict, List
 
 from torch.nn.functional import cross_entropy
@@ -9,7 +8,7 @@ from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_S
     GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, \
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
-    PROJ_PATH, SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
+    SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     USE_BALANCED_BATCHES_DEFAULT
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
@@ -70,7 +69,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT
     experimental_vars: Dict = None
-    deepspeed_path: str = os.path.join(PROJ_PATH, "deepspeed.json")
+    deepspeed_path: str = None
     eager_load_data: bool = False
 
     def __init__(self, output_dir: str, **kwargs):

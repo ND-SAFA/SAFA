@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import lombok.Getter;
@@ -27,6 +28,7 @@ import lombok.Setter;
     "coreContent",
     "toolExtensions"
 })
+@XmlRootElement(name = "REQ-IF", namespace = "")
 @Getter
 @Setter
 public class ReqIf {

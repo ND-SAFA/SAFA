@@ -16,12 +16,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlMixed;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +31,7 @@ import lombok.Setter;
 })
 @Getter
 @Setter
-public class XhtmlQType {
+public class XhtmlQType extends XhtmlBasicStyleableType {
 
     @XmlElementRefs({
         @XmlElementRef(name = "br", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
@@ -68,27 +64,5 @@ public class XhtmlQType {
 
     @XmlAttribute(name = "cite")
     protected String cite;
-
-    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
-
-    @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String space = "preserve";
-
-    @XmlAttribute(name = "class")
-    protected String clazz;
-
-    @XmlAttribute(name = "title")
-    protected String title;
-
-    @XmlAttribute(name = "id")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    protected String id;
-
-    @XmlAttribute(name = "style")
-    protected String style;
 
 }

@@ -10,8 +10,6 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -26,7 +24,7 @@ import lombok.Setter;
 @XmlType(name = "xhtml.param.type")
 @Getter
 @Setter
-public class XhtmlParamType {
+public class XhtmlParamType extends XhtmlBasicType {
 
     @XmlAttribute(name = "name", required = true)
     protected String name;
@@ -40,11 +38,5 @@ public class XhtmlParamType {
 
     @XmlAttribute(name = "type")
     protected String type;
-
-    @XmlAttribute(name = "id")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    protected String id;
 
 }

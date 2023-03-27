@@ -15,11 +15,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,11 +26,11 @@ import lombok.Setter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "xhtml.blockquote.type", propOrder = {
-    "xhtmlBlockMix"
+    "content"
 })
 @Getter
 @Setter
-public class XhtmlBlockquoteType {
+public class XhtmlBlockquoteType extends XhtmlBasicStyleableType {
 
     @XmlElementRefs({
         @XmlElementRef(name = "h1", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
@@ -57,31 +53,9 @@ public class XhtmlBlockquoteType {
         @XmlElementRef(name = "del", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false)
     })
     @Setter(AccessLevel.NONE)
-    protected List<JAXBElement<?>> xhtmlBlockMix = new ArrayList<>();
+    protected List<JAXBElement<?>> content = new ArrayList<>();
 
     @XmlAttribute(name = "cite")
     protected String cite;
-
-    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
-
-    @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String space = "preserve";
-
-    @XmlAttribute(name = "class")
-    protected String clazz;
-
-    @XmlAttribute(name = "title")
-    protected String title;
-
-    @XmlAttribute(name = "id")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    protected String id;
-
-    @XmlAttribute(name = "style")
-    protected String style;
 
 }

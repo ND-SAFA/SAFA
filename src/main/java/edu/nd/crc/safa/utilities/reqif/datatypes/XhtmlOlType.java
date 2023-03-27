@@ -11,13 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,36 +23,14 @@ import lombok.Setter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "xhtml.ol.type", propOrder = {
-    "li"
+    "content"
 })
 @Getter
 @Setter
-public class XhtmlOlType {
+public class XhtmlOlType extends XhtmlBasicStyleableType {
 
     @XmlElement(required = true)
     @Setter(AccessLevel.NONE)
-    protected List<XhtmlLiType> li = new ArrayList<>();
-
-    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
-
-    @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String space = "preserve";
-
-    @XmlAttribute(name = "class")
-    protected String clazz;
-
-    @XmlAttribute(name = "title")
-    protected String title;
-
-    @XmlAttribute(name = "id")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    protected String id;
-
-    @XmlAttribute(name = "style")
-    protected String style;
+    protected List<XhtmlLiType> content = new ArrayList<>();
 
 }

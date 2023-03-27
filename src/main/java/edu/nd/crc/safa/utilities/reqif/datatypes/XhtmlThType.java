@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlSchemaType;
@@ -38,7 +37,7 @@ import lombok.Setter;
 })
 @Getter
 @Setter
-public class XhtmlThType {
+public class XhtmlThType extends XhtmlBasicStyleableType {
 
     @XmlElementRefs({
         @XmlElementRef(name = "h1", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
@@ -103,28 +102,6 @@ public class XhtmlThType {
 
     @XmlAttribute(name = "colspan")
     protected BigInteger colspan = BigInteger.ONE;
-
-    @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
-
-    @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    protected String space = "preserve";
-
-    @XmlAttribute(name = "class")
-    protected String clazz;
-
-    @XmlAttribute(name = "title")
-    protected String title;
-
-    @XmlAttribute(name = "id")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlID
-    @XmlSchemaType(name = "ID")
-    protected String id;
-
-    @XmlAttribute(name = "style")
-    protected String style;
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

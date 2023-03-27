@@ -5,14 +5,12 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC 
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,30 +25,19 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * <p>Java class for xhtml.td.type complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="xhtml.td.type"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;group ref="{http://www.w3.org/1999/xhtml}xhtml.td.content"/&gt;
- *       &lt;attGroup ref="{http://www.w3.org/1999/xhtml}xhtml.td.attlist"/&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
+ * Java class for xhtml.td.type complex type.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "xhtml.td.type", propOrder = {
     "content"
 })
-@Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
+@Getter
+@Setter
 public class XhtmlTdType {
 
     @XmlElementRefs({
@@ -96,566 +83,65 @@ public class XhtmlTdType {
         @XmlElementRef(name = "del", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false)
     })
     @XmlMixed
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected List<Serializable> content;
+    @Setter(AccessLevel.NONE)
+    protected List<Serializable> content = new ArrayList<>();
+
     @XmlAttribute(name = "abbr")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String abbr;
+
     @XmlAttribute(name = "axis")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String axis;
+
     @XmlAttribute(name = "headers")
     @XmlIDREF
     @XmlSchemaType(name = "IDREFS")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected List<Object> headers;
+    @Setter(AccessLevel.NONE)
+    protected List<Object> headers = new ArrayList<>();
+
     @XmlAttribute(name = "rowspan")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected BigInteger rowspan;
+    protected BigInteger rowspan = BigInteger.ONE;
+
     @XmlAttribute(name = "colspan")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected BigInteger colspan;
+    protected BigInteger colspan = BigInteger.ONE;
+
     @XmlAttribute(name = "scope")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String scope;
+
     @XmlAttribute(name = "valign")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String valign;
+
     @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String lang;
+
     @XmlAttribute(name = "space", namespace = "http://www.w3.org/XML/1998/namespace")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String space;
+    protected String space = "preserve";
+
     @XmlAttribute(name = "class")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String clazz;
+
     @XmlAttribute(name = "title")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String title;
+
     @XmlAttribute(name = "id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String id;
+
     @XmlAttribute(name = "style")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String style;
+
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String align;
+
     @XmlAttribute(name = "char")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    protected String _char;
+    protected String alignChar;
+
     @XmlAttribute(name = "charoff")
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
     protected String charoff;
-
-    /**
-     * Gets the value of the content property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the content property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContent().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link XhtmlH1Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlH2Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlH3Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlH4Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlH5Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlH6Type }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlUlType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlOlType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlDlType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlPType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlDivType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlPreType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlBlockquoteType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlAddressType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlHrType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlTableType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlBrType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlSpanType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlEmType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlStrongType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlDfnType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlCodeType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlSampType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlKbdType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlVarType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlCiteType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlAbbrType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlAcronymType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlQType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlInlPresType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlAType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlObjectType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlEditType }{@code >}
-     * {@link JAXBElement }{@code <}{@link XhtmlEditType }{@code >}
-     * {@link String }
-     * 
-     * 
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public List<Serializable> getContent() {
-        if (content == null) {
-            content = new ArrayList<Serializable>();
-        }
-        return this.content;
-    }
-
-    /**
-     * Gets the value of the abbr property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getAbbr() {
-        return abbr;
-    }
-
-    /**
-     * Sets the value of the abbr property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAbbr(String value) {
-        this.abbr = value;
-    }
-
-    /**
-     * Gets the value of the axis property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getAxis() {
-        return axis;
-    }
-
-    /**
-     * Sets the value of the axis property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAxis(String value) {
-        this.axis = value;
-    }
-
-    /**
-     * Gets the value of the headers property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the headers property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getHeaders().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Object }
-     * 
-     * 
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public List<Object> getHeaders() {
-        if (headers == null) {
-            headers = new ArrayList<Object>();
-        }
-        return this.headers;
-    }
-
-    /**
-     * Gets the value of the rowspan property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public BigInteger getRowspan() {
-        if (rowspan == null) {
-            return new BigInteger("1");
-        } else {
-            return rowspan;
-        }
-    }
-
-    /**
-     * Sets the value of the rowspan property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setRowspan(BigInteger value) {
-        this.rowspan = value;
-    }
-
-    /**
-     * Gets the value of the colspan property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public BigInteger getColspan() {
-        if (colspan == null) {
-            return new BigInteger("1");
-        } else {
-            return colspan;
-        }
-    }
-
-    /**
-     * Sets the value of the colspan property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setColspan(BigInteger value) {
-        this.colspan = value;
-    }
-
-    /**
-     * Gets the value of the scope property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getScope() {
-        return scope;
-    }
-
-    /**
-     * Sets the value of the scope property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setScope(String value) {
-        this.scope = value;
-    }
-
-    /**
-     * Gets the value of the valign property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getValign() {
-        return valign;
-    }
-
-    /**
-     * Sets the value of the valign property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setValign(String value) {
-        this.valign = value;
-    }
-
-    /**
-     * Gets the value of the lang property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getLang() {
-        return lang;
-    }
-
-    /**
-     * Sets the value of the lang property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setLang(String value) {
-        this.lang = value;
-    }
-
-    /**
-     * Gets the value of the space property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getSpace() {
-        if (space == null) {
-            return "preserve";
-        } else {
-            return space;
-        }
-    }
-
-    /**
-     * Sets the value of the space property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setSpace(String value) {
-        this.space = value;
-    }
-
-    /**
-     * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getClazz() {
-        return clazz;
-    }
-
-    /**
-     * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setClazz(String value) {
-        this.clazz = value;
-    }
-
-    /**
-     * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setTitle(String value) {
-        this.title = value;
-    }
-
-    /**
-     * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setId(String value) {
-        this.id = value;
-    }
-
-    /**
-     * Gets the value of the style property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getStyle() {
-        return style;
-    }
-
-    /**
-     * Sets the value of the style property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setStyle(String value) {
-        this.style = value;
-    }
-
-    /**
-     * Gets the value of the align property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getAlign() {
-        return align;
-    }
-
-    /**
-     * Sets the value of the align property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setAlign(String value) {
-        this.align = value;
-    }
-
-    /**
-     * Gets the value of the char property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getChar() {
-        return _char;
-    }
-
-    /**
-     * Sets the value of the char property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setChar(String value) {
-        this._char = value;
-    }
-
-    /**
-     * Gets the value of the charoff property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public String getCharoff() {
-        return charoff;
-    }
-
-    /**
-     * Sets the value of the charoff property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    @Generated(value = "com.sun.tools.xjc.Driver", date = "2023-02-27T12:07:33-06:00", comments = "JAXB RI v2.3.0.1")
-    public void setCharoff(String value) {
-        this.charoff = value;
-    }
 
 }

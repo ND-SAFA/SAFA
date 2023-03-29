@@ -14,7 +14,7 @@ from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 class LlmModelManager(ModelManager):
 
     def __init__(self, model_path: str, model_output_path: str = None,
-                 model_task: ModelTask = LLaMATask.SEQUENCE_CLASSIFICATION,
+                 model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
                  model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
         """

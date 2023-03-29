@@ -100,7 +100,6 @@ export enum DataCy {
   creationEntitiesButton = "button-file-entities",
   creationIgnoreErrorsButton = "button-ignore-errors",
   creationDeletePanel = "button-delete-panel",
-  creationEntityButton = "button-created-entity",
   creationFilePanel = "panel-files",
   creationUploadButton = "button-create-project",
   creationTraceSourceInput = "input-source-type",

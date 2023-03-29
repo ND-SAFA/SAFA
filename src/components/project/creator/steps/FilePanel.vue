@@ -85,6 +85,7 @@
               :key="itemName"
               :value="itemName"
               :icon="props.variant"
+              data-cy="button-file-entities"
             />
           </div>
         </expansion-item>

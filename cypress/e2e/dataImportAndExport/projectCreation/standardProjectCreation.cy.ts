@@ -84,12 +84,12 @@ describe("Standard Project Creation", () => {
           simpleProjectFilesMap.hazard
         );
 
-        cy.openPanelAfterClose()
-          .getCy(DataCy.creationEntitiesButton)
-          .should("be.visible")
-          .clickButton(DataCy.creationEntitiesButton, "last");
+        cy.getCy(DataCy.creationDeletePanel).should("not.be.visible");
 
-        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
+        cy.openPanelAfterClose()
+          .clickButtonWithName("Parsed Entities")
+          .getCy(DataCy.creationEntitiesButton)
+          .should("have.length", 5);
       });
     });
 
@@ -148,12 +148,12 @@ describe("Standard Project Creation", () => {
       it("Displays buttons for all of the trace links in the file", () => {
         cy.createReqToHazardFiles(true);
 
-        cy.openPanelAfterClose()
-          .getCy(DataCy.creationEntitiesButton)
-          .should("be.visible")
-          .clickButton(DataCy.creationEntitiesButton, "last");
+        cy.getCy(DataCy.creationDeletePanel).should("not.be.visible");
 
-        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
+        cy.openPanelAfterClose()
+          .clickButtonWithName("Parsed Entities")
+          .getCy(DataCy.creationEntitiesButton)
+          .should("have.length", 5);
       });
     });
 

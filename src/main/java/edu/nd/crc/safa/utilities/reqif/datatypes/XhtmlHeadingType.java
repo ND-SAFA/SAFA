@@ -7,10 +7,8 @@
 
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
@@ -34,33 +32,33 @@ import lombok.Setter;
 public class XhtmlHeadingType extends XhtmlBasicStyleableType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "br", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "span", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "em", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "strong", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "dfn", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "code", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "samp", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "kbd", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "var", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "cite", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "abbr", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "acronym", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "q", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "tt", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "i", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "b", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "big", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "small", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "sub", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "sup", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "a", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "object", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "ins", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "del", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false)
+        @XmlElementRef(type = XhtmlBrType.class, required = false),
+        @XmlElementRef(type = XhtmlSpanType.class, required = false),
+        @XmlElementRef(type = XhtmlEmType.class, required = false),
+        @XmlElementRef(type = XhtmlStrongType.class, required = false),
+        @XmlElementRef(type = XhtmlDfnType.class, required = false),
+        @XmlElementRef(type = XhtmlCodeType.class, required = false),
+        @XmlElementRef(type = XhtmlSampType.class, required = false),
+        @XmlElementRef(type = XhtmlKbdType.class, required = false),
+        @XmlElementRef(type = XhtmlVarType.class, required = false),
+        @XmlElementRef(type = XhtmlCiteType.class, required = false),
+        @XmlElementRef(type = XhtmlAbbrType.class, required = false),
+        @XmlElementRef(type = XhtmlAcronymType.class, required = false),
+        @XmlElementRef(type = XhtmlQType.class, required = false),
+        @XmlElementRef(type = XhtmlTtType.class, required = false),
+        @XmlElementRef(type = XhtmlIType.class, required = false),
+        @XmlElementRef(type = XhtmlBType.class, required = false),
+        @XmlElementRef(type = XhtmlBigType.class, required = false),
+        @XmlElementRef(type = XhtmlSmallType.class, required = false),
+        @XmlElementRef(type = XhtmlSubType.class, required = false),
+        @XmlElementRef(type = XhtmlSupType.class, required = false),
+        @XmlElementRef(type = XhtmlAType.class, required = false),
+        @XmlElementRef(type = XhtmlObjectType.class, required = false),
+        @XmlElementRef(type = XhtmlInsType.class, required = false),
+        @XmlElementRef(type = XhtmlDelType.class, required = false)
     })
     @XmlMixed
     @Setter(AccessLevel.NONE)
-    protected List<Serializable> content = new ArrayList<>();
+    protected List<XhtmlBasicType> content = new ArrayList<>();
 
 }

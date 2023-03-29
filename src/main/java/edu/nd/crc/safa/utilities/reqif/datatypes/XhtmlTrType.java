@@ -38,7 +38,7 @@ public class XhtmlTrType extends XhtmlBasicStyleableType {
         @XmlElement(name = "td", type = XhtmlTdType.class)
     })
     @Setter(AccessLevel.NONE)
-    protected List<Object> content = new ArrayList<>();
+    protected List<XhtmlBasicStyleableType> content = new ArrayList<>();
 
     @XmlAttribute(name = "align")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)

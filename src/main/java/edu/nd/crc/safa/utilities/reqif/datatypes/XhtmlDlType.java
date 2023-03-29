@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ import lombok.Setter;
 @XmlType(name = "xhtml.dl.type", propOrder = {
     "content"
 })
+@XmlRootElement(name = "dl", namespace = "http://www.w3.org/1999/xhtml")
 @Getter
 @Setter
 public class XhtmlDlType extends XhtmlBasicStyleableType {
@@ -35,6 +37,6 @@ public class XhtmlDlType extends XhtmlBasicStyleableType {
         @XmlElement(name = "dd", type = XhtmlDdType.class)
     })
     @Setter(AccessLevel.NONE)
-    protected List<Object> content = new ArrayList<>();
+    protected List<XhtmlBasicStyleableType> content = new ArrayList<>();
 
 }

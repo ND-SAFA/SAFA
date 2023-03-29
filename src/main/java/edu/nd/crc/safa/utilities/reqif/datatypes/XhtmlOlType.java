@@ -12,6 +12,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import lombok.Setter;
 @XmlType(name = "xhtml.ol.type", propOrder = {
     "content"
 })
+@XmlRootElement(name = "ol", namespace = "http://www.w3.org/1999/xhtml")
 @Getter
 @Setter
 public class XhtmlOlType extends XhtmlBasicStyleableType {

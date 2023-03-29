@@ -9,12 +9,12 @@ package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import lombok.AccessLevel;
@@ -28,32 +28,33 @@ import lombok.Setter;
 @XmlType(name = "xhtml.blockquote.type", propOrder = {
     "content"
 })
+@XmlRootElement(name = "blockquote", namespace = "http://www.w3.org/1999/xhtml")
 @Getter
 @Setter
 public class XhtmlBlockquoteType extends XhtmlBasicStyleableType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "h1", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "h2", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "h3", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "h4", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "h5", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "h6", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "ul", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "ol", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "dl", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "p", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "div", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "pre", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "blockquote", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "address", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "hr", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "table", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "ins", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "del", namespace = "http://www.w3.org/1999/xhtml", type = JAXBElement.class, required = false)
+        @XmlElementRef(type = XhtmlH1Type.class, required = false),
+        @XmlElementRef(type = XhtmlH2Type.class, required = false),
+        @XmlElementRef(type = XhtmlH3Type.class, required = false),
+        @XmlElementRef(type = XhtmlH4Type.class, required = false),
+        @XmlElementRef(type = XhtmlH5Type.class, required = false),
+        @XmlElementRef(type = XhtmlH6Type.class, required = false),
+        @XmlElementRef(type = XhtmlUlType.class, required = false),
+        @XmlElementRef(type = XhtmlOlType.class, required = false),
+        @XmlElementRef(type = XhtmlDlType.class, required = false),
+        @XmlElementRef(type = XhtmlPType.class, required = false),
+        @XmlElementRef(type = XhtmlDivType.class, required = false),
+        @XmlElementRef(type = XhtmlPreType.class, required = false),
+        @XmlElementRef(type = XhtmlBlockquoteType.class, required = false),
+        @XmlElementRef(type = XhtmlAddressType.class, required = false),
+        @XmlElementRef(type = XhtmlHrType.class, required = false),
+        @XmlElementRef(type = XhtmlTableType.class, required = false),
+        @XmlElementRef(type = XhtmlInsType.class, required = false),
+        @XmlElementRef(type = XhtmlDelType.class, required = false)
     })
     @Setter(AccessLevel.NONE)
-    protected List<JAXBElement<?>> content = new ArrayList<>();
+    protected List<XhtmlBasicType> content = new ArrayList<>();
 
     @XmlAttribute(name = "cite")
     protected String cite;

@@ -76,7 +76,7 @@ Cypress.Commands.add("openPanelAfterClose", () => {
 Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
   //cy.clickButton(DataCy.creationCreatePanelButton);
   //cy.getCy(DataCy.creationTypeInput).type(name);
-  cy.inputText(DataCy.creationTypeInput, name);
+  cy.inputText(DataCy.creationTypeInput, name, false, true);
   //cy.clickButton(DataCy.creationTypeButton);
   cy.uploadFiles(DataCy.creationStandardFilesInput, file);
 
@@ -86,10 +86,12 @@ Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
 });
 
 Cypress.Commands.add("createTraceMatrix", (source, target, file, next) => {
-  cy.clickButtonWithName("Create new trace matrix")
-    .clickSelectOption(DataCy.creationTraceSourceInput, source)
+  /**cy.clickSelectOption(DataCy.creationTraceSourceInput, source)
     .clickSelectOption(DataCy.creationTraceTargetInput, target)
-    .clickButton(DataCy.creationTraceCreateButton);
+    .clickButton(DataCy.creationTraceCreateButton); // This is obsolete now
+**/
+  cy.getCy(DataCy.creationTraceSourceInput).click().clickButtonWithName(source);
+  cy.getCy(DataCy.creationTraceTargetInput).click().clickButtonWithName(target);
 
   if (file) {
     cy.uploadFiles(DataCy.creationStandardFilesInput, file);
@@ -103,6 +105,7 @@ Cypress.Commands.add("createTraceMatrix", (source, target, file, next) => {
 Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
   cy.setProjectIdentifier("standard");
   cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
+  cy.clickButtonWithName("New Artifact Type");
   cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard, true);
 
   if (createTraces) {

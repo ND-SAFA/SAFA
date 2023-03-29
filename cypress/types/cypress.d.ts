@@ -118,11 +118,13 @@ declare namespace Cypress {
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
      * @param clear - If true, the input will be cleared first.
+     * @param last - If true, the last element will be selected.
      */
     inputText(
       dataCy: string,
       inputValue: string,
-      clear?: boolean
+      clear?: boolean,
+      last?: boolean
     ): Chainable<void>;
 
     /**

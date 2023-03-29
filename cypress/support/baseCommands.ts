@@ -26,12 +26,14 @@ Cypress.Commands.add("doesExist", (dataCy) => {
   });
 });
 
-Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
+Cypress.Commands.add("inputText", (dataCy, inputValue, clear, last) => {
   if (clear) {
     cy.getCy(dataCy).clear();
   }
 
-  if (inputValue.length > 0) {
+  if (last === true && inputValue.length > 0) {
+    cy.getCy(dataCy, "last").type(inputValue);
+  } else if (inputValue.length > 0) {
     cy.getCy(dataCy).type(inputValue);
   }
 });
@@ -47,6 +49,7 @@ Cypress.Commands.add("clickButtonWithName", (name) => {
   cy.contains(name, { matchCase: false }).last().click();
 });
 
+// TODO: clickSelectOption is broken (.v-menu__content is not valid selector anymore)
 Cypress.Commands.add("clickSelectOption", (dataCy, optionName) => {
   cy.getCy(dataCy).parent().click();
   cy.get(".v-menu__content")

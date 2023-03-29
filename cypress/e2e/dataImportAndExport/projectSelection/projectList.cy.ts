@@ -2,15 +2,13 @@ import { DataCy, Routes, testProject, validUser } from "@/fixtures";
 
 describe("Project List", () => {
   before(() => {
+    cy.viewport(1080, 1080);
     cy.initEmptyProject().clearAllCookies();
   });
 
   beforeEach(() => {
-    cy.expandViewport().loginToPage(
-      validUser.email,
-      validUser.password,
-      Routes.MY_PROJECTS
-    );
+    cy.viewport(1080, 1080);
+    cy.loginToPage(validUser.email, validUser.password, Routes.MY_PROJECTS);
   });
 
   describe("I can search for projects by name", () => {

@@ -10,13 +10,10 @@ import {
 // TODO: A Lot of selectors are broken here, we will need to remap and fix them
 describe("Standard Project Creation", () => {
   beforeEach(() => {
+    cy.viewport(1080, 1080);
     cy.dbResetJobs().dbResetProjects();
 
-    cy.expandViewport().loginToPage(
-      validUser.email,
-      validUser.password,
-      Routes.PROJECT_CREATOR
-    );
+    cy.loginToPage(validUser.email, validUser.password, Routes.PROJECT_CREATOR);
   });
 
   describe("Project Artifact Uploading", () => {
@@ -128,11 +125,9 @@ describe("Standard Project Creation", () => {
       });
 
       it("Cannot create a new panel without selecting two artifact types", () => {
-        cy.createReqToHazardFiles().clickButtonWithName(
-          "Create new trace matrix"
-        );
+        cy.createReqToHazardFiles();
 
-        cy.contains("Create new trace matrix").should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
     });
 
@@ -140,12 +135,12 @@ describe("Standard Project Creation", () => {
       it("Can delete a set of trace links", () => {
         cy.createReqToHazardFiles(true);
 
-        cy.openPanelAfterClose().clickButton(
-          DataCy.creationDeletePanel,
-          "last"
-        );
+        cy.getCy(DataCy.creationDeletePanel)
+          .should("not.be.visible")
+          .openPanelAfterClose();
+        cy.clickButton(DataCy.creationDeletePanel);
 
-        cy.contains("requirement X hazard").should("not.exist");
+        cy.contains("requirement to hazard").should("not.exist");
       });
     });
 
@@ -189,9 +184,14 @@ describe("Standard Project Creation", () => {
       });
 
       it("Can continue with a bad file if errors are ignored", () => {
-        cy.createReqToHazardFiles().createTraceMatrix("hazard", "hazard");
+        cy.createReqToHazardFiles().createTraceMatrix("hazard", "requirement");
 
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.tim
+        );
 
         cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
 

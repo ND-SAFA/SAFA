@@ -70,7 +70,7 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
 
 Cypress.Commands.add("openPanelAfterClose", () => {
   // Wait is required for waiting until the close animation completes.
-  cy.wait(200).clickButton(DataCy.creationFilePanel, "last");
+  cy.wait(300).clickButton(DataCy.creationFilePanel, "last");
 });
 
 Cypress.Commands.add("createArtifactPanel", (name, file, next) => {

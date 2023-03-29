@@ -77,7 +77,7 @@ public class RelationGroup {
     })
     @Getter
     public static class SpecRelations {
-        @XmlElementRef(name = "SPEC-RELATION-REF", type = SpecRelationRef.class, required = false)
+        @XmlElementRef(type = SpecRelationRef.class, required = false)
         protected List<SpecRelationRef> specRelations = new ArrayList<>();
     }
 

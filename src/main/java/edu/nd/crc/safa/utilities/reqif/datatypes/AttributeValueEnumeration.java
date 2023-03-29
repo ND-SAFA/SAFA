@@ -64,7 +64,7 @@ public class AttributeValueEnumeration extends AttributeValue {
     })
     @Getter
     public static class Values {
-        @XmlElementRef(name = "ENUM-VALUE-REF", type = EnumValueRef.class, required = false)
+        @XmlElementRef(type = EnumValueRef.class, required = false)
         protected List<EnumValueRef> values = new ArrayList<>();
     }
 

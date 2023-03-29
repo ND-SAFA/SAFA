@@ -80,20 +80,13 @@ public class SpecHierarchy {
     public static class EditableAttributes {
 
         @XmlElementRefs({
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-BOOLEAN-REF",
-                type = AttributeDefinitionBooleanRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-DATE-REF",
-                type = AttributeDefinitionDateRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-ENUMERATION-REF",
-                type = AttributeDefinitionEnumerationRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-INTEGER-REF",
-                type = AttributeDefinitionIntegerRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-REAL-REF",
-                type = AttributeDefinitionRealRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-STRING-REF",
-                type = AttributeDefinitionStringRef.class, required = false),
-            @XmlElementRef(name = "ATTRIBUTE-DEFINITION-XHTML-REF",
-                type = AttributeDefinitionXhtmlRef.class, required = false)
+            @XmlElementRef(type = AttributeDefinitionBooleanRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionDateRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionEnumerationRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionIntegerRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionRealRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionStringRef.class, required = false),
+            @XmlElementRef(type = AttributeDefinitionXhtmlRef.class, required = false)
         })
         protected List<AttributeDefinitionRef> attributeDefinitions = new ArrayList<>();
     }

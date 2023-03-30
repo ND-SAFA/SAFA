@@ -2,7 +2,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
-from train.distill_trainer import DistillTrainer
+from train.distill.distill_trainer import DistillTrainer
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.override import overrides

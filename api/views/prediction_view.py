@@ -1,6 +1,7 @@
 import json
 from typing import Any, Dict, Union
 
+from api.serializers.experiment_serializer import PredictSerializer
 from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.openapi import Schema, TYPE_OBJECT
@@ -8,8 +9,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.views import APIView
 
-from api.serializers.experiment_serializer import ExperimentSerializer
 from tgen.src.jobs.components.job_result import JobResult
+from tgen.src.server.api.api_definition import ApiDefinition
 
 
 @staticmethod
@@ -24,18 +25,20 @@ def get_responses(response_keys: Union[str, list]) -> Dict:
                                    properties=JobResult.get_properties(response_keys))}
 
 
-class ExperimentView(APIView):
+class PredictView(APIView):
     """
     Allows users to run experiments.
     """
 
     @csrf_exempt
-    @swagger_auto_schema(request_body=ExperimentSerializer,
+    @swagger_auto_schema(request_body=PredictSerializer,
                          responses=get_responses([JobResult.MODEL_PATH, JobResult.STATUS, JobResult.EXCEPTION]))
     def post(self, request: HttpRequest):
-        experiment = self.read_request(request, ExperimentSerializer)
-        experiment.run()
-        experiment.output_dir
+        prediction_payload = self.read_request(request, PredictSerializer)
+        model = prediction_payload["model"]
+        dataset: ApiDefinition = prediction_payload["dataset"]
+        # TODO: Create definition JSON for experiment and run.
+        raise NotImplementedError("Current building out prediction endpoint.")
 
     @staticmethod
     def read_request(request: HttpRequest, serializer_class) -> Any:

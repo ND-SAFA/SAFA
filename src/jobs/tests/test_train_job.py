@@ -10,7 +10,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob
-from models.llama.llama_model_manager import LLaMAModelManager
+from models.llm_model_manager import LlmModelManager
 from models.model_manager import ModelManager
 from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions
@@ -63,7 +63,7 @@ class TestTrainJob(BaseJobTest):
                 "val_percentage": VALIDATION_PERCENTAGE_DEFAULT
             }})
         train_job_definition = {
-            "model_manager": ObjectCreator.get_definition(ModelManager if not use_llama else LLaMAModelManager),
+            "model_manager": ObjectCreator.get_definition(ModelManager if not use_llama else LlmModelManager),
             "job_args": ObjectCreator.get_definition(JobArgs),
             "trainer_dataset_manager": trainer_dataset_manager,
             "trainer_args": {

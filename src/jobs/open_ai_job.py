@@ -7,6 +7,7 @@ from train.open_ai.open_ai_args import OpenAIArgs
 from train.open_ai.open_ai_task import OpenAITask
 from train.open_ai.open_ai_trainer import OpenAITrainer
 from train.open_ai.prompt_generator import PromptGenerator
+from train.trace_output.abstract_trace_output import AbstractTraceOutput
 
 
 class OpenAIJob(AbstractTraceJob):
@@ -46,7 +47,7 @@ class OpenAIJob(AbstractTraceJob):
             res = self.get_trainer().perform_prediction()
         else:
             raise RuntimeError("Unknown Task %s" % self.task)
-        return JobResult.from_dict(res)
+        return JobResult.from_trace_output(res) if isinstance(res, AbstractTraceOutput) else JobResult.from_dict(res)
 
     def get_trainer(self, **kwargs) -> OpenAITrainer:
         """

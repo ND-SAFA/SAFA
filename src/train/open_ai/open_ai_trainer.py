@@ -1,25 +1,25 @@
 import os
-from typing import Dict
+from typing import Dict, Tuple, List
 
 import openai
 import pandas as pd
 
 from constants import OPEN_AI_ORG, OPEN_AI_KEY
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.dataframes.artifact_dataframe import ArtifactKeys
 from data.dataframes.trace_dataframe import TraceKeys
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.readers.structured_project_reader import StructuredProjectReader
-from testres.paths.paths import TEST_OUTPUT_DIR
 from train.itrainer import iTrainer
+from train.metrics.metrics_manager import MetricsManager
 from train.open_ai.open_ai_args import OpenAIArgs
 from train.open_ai.open_ai_task import OpenAITask
 from train.open_ai.prompt_generator import PromptGenerator
+from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
+from scipy.special import softmax
+from openai.openai_object import OpenAIObject
 
 assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
                                     f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
@@ -28,7 +28,6 @@ openai.api_key = OPEN_AI_KEY
 
 
 class OpenAITrainer(iTrainer):
-
     """
     Interfaces with open-ai server to fine-tune models and make predictions
     """
@@ -50,7 +49,7 @@ class OpenAITrainer(iTrainer):
         self.prompt_generator = prompt_generator
         FileUtil.create_dir_safely(self.data_output_path)
 
-    def perform_training(self, checkpoint: str = None) -> Dict:
+    def perform_training(self, checkpoint: str = None) -> OpenAIObject:
         """
         Handles training of the model
         :param checkpoint: If provided, will resume training from given checkpoint
@@ -68,7 +67,7 @@ class OpenAITrainer(iTrainer):
         return res
 
     @staticmethod
-    def check_fine_tune_status(fine_tune_id: str) -> Dict:
+    def check_fine_tune_status(fine_tune_id: str) -> OpenAIObject:
         """
         Checks on the status of a fine tune job
         :param fine_tune_id: The id of the fine tune job
@@ -78,16 +77,23 @@ class OpenAITrainer(iTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> OpenAIObject:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :return: THe prediction response
         """
-        eval_dataset_path = self.export_prompt_dataset(dataset_role)
-        res = openai.Completion.create(model=self.base_model, prompt=eval_dataset_path,
+        prompt_df = self.convert_to_prompts_dataset(self.trainer_dataset_manager[dataset_role])
+        res = openai.Completion.create(model=self.base_model, prompt=list(prompt_df[self.prompt_generator.PROMPT_KEY]),
                                        **self.trainer_args.to_params(OpenAITask.PREDICT))
-        return res
+        scores = list(map(lambda r: self._get_score(r["logprobs"]["top_logprobs"]), res["choices"]))
+        eval_metrics, metrics_manager = self._compute_trace_metrics(scores, dataset_role)
+        logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
+        return TracePredictionOutput(predictions=metrics_manager.get_scores(),
+                                     label_ids=metrics_manager.trace_matrix.labels,
+                                     metrics=eval_metrics,
+                                     prediction_entries=metrics_manager.get_trace_predictions(),
+                                     additional_output={"id": res["id"]})
 
     def cleanup(self) -> None:
         """
@@ -129,3 +135,35 @@ class OpenAITrainer(iTrainer):
                                                    row[TraceKeys.LABEL.value])
             entries.append(entry)
         return pd.DataFrame(entries)
+
+    def _compute_trace_metrics(self, predictions: List[float], dataset_role: DatasetRole) -> Tuple[Dict, MetricsManager]:
+        """
+        Computes the traces metric on given trace output using trace information from dataset role.
+        :param predictions: The predictions from openai.
+        :param dataset_role: The role of the trace dataset being predicted (used for source-target labels).
+        :return: Trace metrics and metrics manager used to calculate them.
+        """
+        dataset = self.trainer_dataset_manager[dataset_role]
+        n_predictions, n_expected = len(predictions), len(dataset)
+        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
+        assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
+        metrics_manager = MetricsManager(trace_df=dataset.trace_df,
+                                         link_ids=dataset.get_ordered_link_ids(),
+                                         predicted_similarities=predictions)
+        trace_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        return trace_metrics, metrics_manager
+
+    def _get_score(self, probs: List[Dict]) -> float:
+        """
+        Gets the score from the predicted completions
+        :param probs: The probabilities of each top completion
+        :return: The softmax score from the predicted completions
+        """
+        if len(probs) < 1:
+            return 0.5
+        probs = probs[0]
+        v0 = probs.get(self.prompt_generator.COMPLETION_START + self.prompt_generator.pos_class, 0)
+        v1 = probs.get(self.prompt_generator.COMPLETION_START + self.prompt_generator.neg_class, 0)
+        prob_v = [v0, v1]
+        score = softmax(prob_v)[1]
+        return score

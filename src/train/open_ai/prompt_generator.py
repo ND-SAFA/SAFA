@@ -6,6 +6,7 @@ from typing import Any, Dict
 class PromptGenerator:
     __PROMPT_SEPARATOR = "\n\n###\n\n"
     __COMPLETION_SEPARATOR = "###"
+    COMPLETION_START = " "
     PROMPT_KEY = "prompt"
     COMPLETION_KEY = "completion"
     pos_class = "yes"
@@ -21,7 +22,7 @@ class PromptGenerator:
         artifact_prompt = self.artifact_prompt_format.format(source_content, target_content, label)
         prompt = f"{self.base_prompt}{artifact_prompt}{self.__PROMPT_SEPARATOR}"
         class_ = self.pos_class if label == 1 else self.neg_class
-        completion = f" {class_}{self.__COMPLETION_SEPARATOR}"
+        completion = f"{self.COMPLETION_START}{class_}{self.__COMPLETION_SEPARATOR}"
         return {
             "prompt": prompt,
             "completion": completion

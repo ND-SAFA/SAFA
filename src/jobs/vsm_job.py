@@ -9,7 +9,7 @@ from train.itrainer import iTrainer
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
-from train.vsm_trainer import VSMTrainer
+from train.vsm.vsm_trainer import VSMTrainer
 
 
 class VSMJob(AbstractTraceJob):

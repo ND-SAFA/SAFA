@@ -7,7 +7,7 @@ from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from testres.test_data_manager import TestDataManager
 from train.trace_output.stage_eval import Metrics
-from train.vsm_trainer import VSMTrainer
+from train.vsm.vsm_trainer import VSMTrainer
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 

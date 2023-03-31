@@ -4,8 +4,8 @@ from typing import Dict, Tuple
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.idataset import iDataset
 from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
@@ -71,8 +71,8 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         deterministic_dataset_creators_map = {}
         reloaded = False
         for dataset_role in dataset_creators_map.keys():
-            dataset_filepath = os.path.join(self.get_output_path(), self._get_dataset_filename(dataset_role,
-                                                                                               dataset_name=self.dataset_name))
+            dataset_filepath = os.path.join(self.get_output_path(), self.get_dataset_filename(dataset_role,
+                                                                                              dataset_name=self.dataset_name))
             if os.path.exists(dataset_filepath):
                 deterministic_dataset_creators_map[dataset_role] = TraceDatasetCreator(CsvProjectReader(dataset_filepath),
                                                                                        allowed_orphans=5)

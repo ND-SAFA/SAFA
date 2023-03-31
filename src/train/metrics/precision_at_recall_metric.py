@@ -53,7 +53,7 @@ class PrecisionAtRecallMetric(AbstractTraceMetric):
 
         if threshold is None:
             logger.warning(f"Could not find threshold under {UPPER_RECALL_THRESHOLD} recall.")
-        return {"precision_at_recall": max_precision}
+        return {"precision_at_recall_95": max_precision, "best_threshold": threshold}
 
     def _info(self) -> datasets.MetricInfo:
         """

@@ -40,7 +40,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         """
         if self.job_args.save_dataset_splits:
             CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()
-        super().run()
+        return super().run()
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

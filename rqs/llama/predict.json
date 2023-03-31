@@ -3,19 +3,14 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "PREDICT",
           "job_args": {
             "random_seed": 812
           },
           "model_manager": {
             "object_type": "LLAMA",
             "model_path": "decapoda-research/llama-7b-hf",
-            "model_task": {
-              "*": [
-                "SEQUENCE_SIMILARITY",
-                "SEQUENCE_CLASSIFICATION"
-              ]
-            }
+            "model_task": "SEQUENCE_CLASSIFICATION"
           },
           "trainer_args": {
             "evaluation_strategy": "steps",
@@ -26,6 +21,7 @@
             "logging_steps": 1,
             "num_train_epochs": 1,
             "gradient_accumulation_steps": 1,
+            "per_device_train_batch_size": 1,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -42,7 +38,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "cm1"
+                "name": "CM1"
               }
             },
             "val_dataset_creator": {
@@ -53,7 +49,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.30
             },
             "augmenter": {
               "steps": [

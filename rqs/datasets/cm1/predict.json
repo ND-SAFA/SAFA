@@ -3,46 +3,38 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "PREDICT",
           "job_args": {
             "random_seed": 812
           },
           "model_manager": {
-            "object_type": "LLAMA",
-            "model_path": "decapoda-research/llama-7b-hf",
-            "model_task": "SEQUENCE_CLASSIFICATION",
-            "layers_to_freeze": 29
+            "model_path": "gpt2-xl"
           },
           "trainer_args": {
-            "deepspeed_path": "~/tgen/deepspeed.json",
+            "num_train_epochs": 1,
             "per_device_train_batch_size": 1,
-            "remove_unused_columns": false,
             "gradient_accumulation_steps": 1,
-            "evaluation_strategy": "steps",
-            "save_strategy": "steps",
-            "logging_strategy": "steps",
-            "save_steps": 100,
-            "eval_steps": 2,
-            "logging_steps": 1,
-            "num_train_epochs": 5
+            "learning_rate": 5e-5,
+            "skip_save": false,
+            "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "CM1"
+                "name": "cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.25
+              "val_percentage": 0.30
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.25
+              "val_percentage": 0.30
             },
             "augmenter": {
               "steps": [

@@ -28,7 +28,7 @@ class TracePredictionOutput(AbstractTraceOutput):
     def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray]]] = None,
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
                  prediction_entries: List[TracePredictionEntry] = None,
-                 prediction_output: PredictionOutput = None):
+                 prediction_output: PredictionOutput = None, additional_output: Dict = None):
         """
         Initializes the output with the various outputs from predictions
         :param predictions: List of 2-dimensional arrays representing similarity between each source-artifact pair.
@@ -45,6 +45,7 @@ class TracePredictionOutput(AbstractTraceOutput):
         self.prediction_entries = prediction_entries
         super().__init__(hf_output=prediction_output)
         self.set_prediction_entries()
+        self.additional_output = additional_output
 
     def set_prediction_entries(self) -> None:
         """
@@ -58,4 +59,8 @@ class TracePredictionOutput(AbstractTraceOutput):
                                    for pred_ids, pred_scores in zip(self.source_target_pairs, self.predictions)]
 
     def toJSON(self) -> Dict:
+        """
+        Converts the output to json
+        :return: The output as a dictionary
+        """
         return ReflectionUtil.get_fields(self)

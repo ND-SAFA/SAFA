@@ -1,5 +1,5 @@
 from data.datasets.data_key import DataKey
-from models.llama.llama_model_manager import LLaMAModelManager
+from models.llm_model_manager import LlmModelManager
 from models.llama.llama_task import LLaMATask
 from testres.base_test import BaseTest
 from util.object_creator import ObjectCreator
@@ -29,7 +29,7 @@ class TestLLaMAModelManager(BaseTest):
         self.assertEquals(len(sim_feature[DataKey.ATTEN_MASK][0]), 2 * len(cls_feature[DataKey.ATTEN_MASK][0]))
 
     def get_model_manager(self, task=LLaMATask.SEQUENCE_CLASSIFICATION, ):
-        model_manager_definition = ObjectCreator.get_definition(LLaMAModelManager)
+        model_manager_definition = ObjectCreator.get_definition(LlmModelManager)
         model_manager_definition.pop("object_type")
         model_manager_definition["model_task"] = task
-        return LLaMAModelManager.initialize_from_definition(model_manager_definition)
+        return LlmModelManager.initialize_from_definition(model_manager_definition)

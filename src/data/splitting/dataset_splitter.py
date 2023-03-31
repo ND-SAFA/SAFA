@@ -1,10 +1,8 @@
-from typing import List, Tuple, Type, Union, Dict, Iterable, OrderedDict
+from typing import Dict, List, OrderedDict
 
 from data.datasets.idataset import iDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
-from data.splitting.abstract_split_strategy import AbstractSplitStrategy
-from data.splitting.abstract_trace_split_strategy import AbstractTraceSplitStrategy
 from data.splitting.remainder_split_strategy import RemainderSplitStrategy
 from data.splitting.supported_split_strategy import SupportedSplitStrategy
 
@@ -37,10 +35,10 @@ class DatasetSplitter:
         for i, items in enumerate(self.dataset_role_to_split_percentage.items()):
             dataset_role, total_split_percentage = items
             split_strategy = self.strategies[i].value if i < len(self.strategies) else RemainderSplitStrategy
-            percent_to_split = total_split_percentage / (1-percent_already_split)
-            split1, dataset = split_strategy.create_split(dataset, 1-percent_to_split)
+            percent_to_split = total_split_percentage / (1 - percent_already_split)
+            split1, dataset = split_strategy.create_split(dataset, 1 - percent_to_split)
             splits[dataset_role] = split1
-            percent_already_split += percent_to_split
+            percent_already_split += total_split_percentage
         return splits
 
     def _get_default_split_strategies(self) -> List[SupportedSplitStrategy]:
@@ -50,4 +48,4 @@ class DatasetSplitter:
         """
         default = SupportedSplitStrategy.PRE_TRAIN if isinstance(self.dataset, PreTrainDataset) \
             else SupportedSplitStrategy.SPLIT_BY_LINK
-        return [default for i in range(len(self.dataset_role_to_split_percentage.keys())-1)]
+        return [default for i in range(len(self.dataset_role_to_split_percentage.keys()) - 1)]

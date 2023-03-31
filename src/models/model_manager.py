@@ -11,6 +11,7 @@ from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 from util.base_object import BaseObject
 from util.override import overrides
+from util.logging.logger_manager import logger
 
 
 class ModelManager(BaseObject):
@@ -61,6 +62,9 @@ class ModelManager(BaseObject):
             self._model = self._load_model()
         return self._model
 
+    def set_model(self, model):
+        self._model = model
+
     def get_config(self) -> PretrainedConfig:
         """
         Gets the PreTrainedModel configuration.
@@ -99,6 +103,12 @@ class ModelManager(BaseObject):
         """
         if self._tokenizer is None:
             self._tokenizer = AutoTokenizer.from_pretrained(self.model_path, eos_token='[EOS]')
+            if self._tokenizer.pad_token is None:
+                config = self.get_config()
+                config.pad_token_id = -1 if config.pad_token_id is None else config.pad_token_id
+                vocab = self._tokenizer.get_vocab()
+                vocab_tokens, vocab_indices = list(vocab.keys()), list(vocab.values())
+                self._tokenizer.add_special_tokens({'pad_token': vocab_tokens[config.pad_token_id]})
         return self._tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:
@@ -123,16 +133,18 @@ class ModelManager(BaseObject):
         return feature
 
     @staticmethod
-    def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:
+    def get_encoder_layers(model: PreTrainedModel, layer_identifier: str = "layer") -> List[LAYER]:
         """
         Returns a list of layers represented by a list of their parameters
+        :param model: The model to gather layers for
+        :param layer_identifier: The identifier used to distinguish layers.
         :return: a list of layers represented by a list of their parameters
         """
         layers = {}
         for name, param in model.named_parameters():
             descr = name.split(".")
-            if "layer" in descr:
-                layer_no = int(descr[descr.index("layer") + 1])
+            if layer_identifier in descr:
+                layer_no = int(descr[descr.index(layer_identifier) + 1])
                 if layer_no not in layers:
                     layers[layer_no] = []
                 layers[layer_no].append(param)
@@ -156,7 +168,9 @@ class ModelManager(BaseObject):
         :return: None
         """
         layers = self.get_encoder_layers(model)
+        logger.info(f"Layers: {len(layers)}")
         for layer_no in layers_to_freeze:
             layer = layers[layer_no]
             for param in layer:
                 param.requires_grad = False
+        logger.info(f"Successfully froze {len(layers)} layers.")

@@ -1,5 +1,7 @@
 from typing import Dict, List, Union
 
+from torch.nn import Parameter
+from transformers import PreTrainedModel
 from transformers.configuration_utils import PretrainedConfig
 from transformers.tokenization_utils_base import BatchEncoding
 
@@ -8,15 +10,16 @@ from models.llama.configuration_llama import LLaMAConfig
 from models.llama.llama_task import LLaMATask
 from models.llama.tokenization_llama import LLaMATokenizer
 from models.model_manager import ModelManager
-from models.model_properties import ModelArchitectureType, ModelSize
+from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 
-class LLaMAModelManager(ModelManager):
+class LlmModelManager(ModelManager):
 
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
-                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
+                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE,
+                 layers_to_freeze: Union[List[int], int] = None):
         """
         Handles loading model and related functions
         :param model_path: The path to the saved model
@@ -24,15 +27,9 @@ class LLaMAModelManager(ModelManager):
         :param model_size: The size of the model
         :param model_architecture: Whether the model should be siamese or single
         """
-        super().__init__(model_path, model_output_path, model_task, model_size, model_architecture)
-
-    def _load_model(self):
-        """
-        Loads the model from the pretrained model path
-        :return: the PreTrainedModel object
-        """
-        model = self.model_task.value.from_pretrained(self.model_path, config=self._config)
-        return model
+        if isinstance(layers_to_freeze, int):
+            layers_to_freeze = list(range(layers_to_freeze))
+        super().__init__(model_path, model_output_path, model_task, model_size, model_architecture, layers_to_freeze=layers_to_freeze)
 
     def get_config(self) -> PretrainedConfig:
         """
@@ -83,7 +80,7 @@ class LLaMAModelManager(ModelManager):
         :param text_pair:
         :return:
         """
-        return f"Source: {text} \nTarget: {text_pair}"
+        return f"What is the similarity score between \"{text}\" and \"{text_pair}\"?"
 
     def get_classification_feature(self, text: List[str] = None, text_pair: List[str] = None, **kwargs) -> BatchEncoding:
         """
@@ -92,7 +89,7 @@ class LLaMAModelManager(ModelManager):
         :param text_pair: The text of the 2nd artifact in the pair to encode
         :return: The features
         """
-        prompts = [LLaMAModelManager.get_prompt(source, text_pair[i]) for i, source in enumerate(text)]
+        prompts = [LlmModelManager.get_prompt(source, text_pair[i]) for i, source in enumerate(text)]
         tokenizer = self.get_tokenizer()
         return tokenizer(text=prompts, **kwargs)
 
@@ -110,3 +107,12 @@ class LLaMAModelManager(ModelManager):
             features1[DataKey.INPUT_IDS][i].extend(features2[DataKey.INPUT_IDS][i])
             features1[DataKey.ATTEN_MASK][i].extend(features2[DataKey.ATTEN_MASK][i])
         return features1
+
+    @staticmethod
+    def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:
+        """
+        Returns encoded layers for llama model using its own layer identifier.
+        :param model: The llama model to gather layers for.
+        :return: The list of layers
+        """
+        return ModelManager.get_encoder_layers(model, "layers")

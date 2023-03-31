@@ -1,17 +1,16 @@
-import os
 import random
 from copy import deepcopy
-from typing import Callable, Dict, List, Tuple, Any
+from typing import Any, Callable, Dict, List, Tuple
 
 import pandas as pd
 import torch
 from datasets import Dataset
 
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.datasets.idataset import iDataset
-from data.datasets.data_key import DataKey
 from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from data.dataframes.layer_dataframe import LayerDataFrame
 from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from data.datasets.data_key import DataKey
+from data.datasets.idataset import iDataset
 from data.datasets.trace_matrix import TraceMatrix
 from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -20,7 +19,6 @@ from data.processing.augmentation.source_target_swap_step import SourceTargetSwa
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.enum_util import EnumDict
-from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
 
@@ -70,12 +68,14 @@ class TraceDataset(iDataset):
             features[DataKey.LABELS_KEY] = torch.as_tensor(batch[CSVKeys.LABEL])
             return features
 
+        logger.info("Transforming to HF dataset...")
         hf_dataset = Dataset.from_pandas(self.to_dataframe(include_ids=False))
+        logger.info("Dataframe has been created....")
         hf_dataset.set_transform(encode)
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
-    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=10) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=1) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.

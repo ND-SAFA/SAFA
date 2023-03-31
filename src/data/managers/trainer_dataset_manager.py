@@ -2,6 +2,8 @@ import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Union
 
+from datasets import disable_caching
+
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
@@ -15,10 +17,14 @@ from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.splitting.dataset_splitter import DatasetSplitter
 from data.splitting.supported_split_strategy import SupportedSplitStrategy
+from models.model_manager import ModelManager
 from util.base_object import BaseObject
 from util.enum_util import get_enum_from_name
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
+import pandas as pd
+
+disable_caching()
 
 
 class TrainerDatasetManager(BaseObject):
@@ -43,6 +49,7 @@ class TrainerDatasetManager(BaseObject):
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self._datasets = None
+        self._hf_datasets = None
         self.augmenter = augmenter
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
@@ -66,7 +73,7 @@ class TrainerDatasetManager(BaseObject):
             if dataset_role in datasets and datasets[dataset_role] is not None:
                 dataset = datasets[dataset_role]
                 exporter: AbstractDatasetExporter = format_type.value
-                export_path = os.path.join(output_dir, self._get_dataset_filename(dataset_role)) \
+                export_path = os.path.join(output_dir, self.get_dataset_filename(dataset_role)) \
                     if exporter.include_filename() else os.path.join(output_dir, dataset_role.value)
                 output_path = exporter(export_path=export_path, dataset=dataset).export()
                 output_paths.append(output_path)
@@ -122,6 +129,21 @@ class TrainerDatasetManager(BaseObject):
         datasets = self.get_datasets()
         datasets[dataset_role] = new_dataset
 
+    def get_hf_datasets(self, model_manager: ModelManager) -> Dict[str, pd.DataFrame]:
+        """
+        Gets all datasets in the expected hugging face format
+        :param model_manager: The model manager to use for tokenization
+        :return: A dictionary mapping all dataset roles to their expected hugging face format
+        """
+        if self._hf_datasets is None:
+            self._hf_datasets = {}
+            datasets = self.get_datasets()
+            for role, dataset in datasets.items():
+                if dataset is None:
+                    continue
+                self._hf_datasets[role] = dataset.to_hf_dataset(model_manager)
+        return self._hf_datasets
+
     def cleanup(self) -> None:
         """
         Clears datasets out of memory
@@ -129,7 +151,7 @@ class TrainerDatasetManager(BaseObject):
         """
         self._datasets = None
 
-    def _get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
+    def get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
         """
         Returns the filename associated with the dataset corresponding to the given role
         :param dataset_role: the role of the dataset

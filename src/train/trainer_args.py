@@ -48,7 +48,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     gradient_accumulation_steps: int = GRADIENT_ACCUMULATION_DEFAULT
     skip_save: bool = False
     use_balanced_batches: bool = USE_BALANCED_BATCHES_DEFAULT
-    per_device_train_batch_size = None
+    per_device_train_batch_size = 1
     eval_on_each_epoch: bool = EVAL_ON_EPOCH_DEFAULT
     save_random_model: bool = SAVE_RANDOM_MODEL_DEFAULT
 
@@ -69,6 +69,8 @@ class TrainerArgs(TrainingArguments, BaseObject):
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT
     experimental_vars: Dict = None
+    deepspeed_path: str = None
+    eager_load_data: bool = False
 
     def __init__(self, output_dir: str, **kwargs):
         """
@@ -78,13 +80,14 @@ class TrainerArgs(TrainingArguments, BaseObject):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
+        self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
                          load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,
                          logging_steps=self.logging_steps, report_to="wandb", weight_decay=self.weight_decay,
-                         learning_rate=self.learning_rate)
-        self.__set_args(**kwargs)
+                         learning_rate=self.learning_rate, deepspeed=self.deepspeed_path,
+                         gradient_checkpointing=self.gradient_checkpointing, fp16=self.fp16)
 
     def __set_args(self, **kwargs) -> None:
         """

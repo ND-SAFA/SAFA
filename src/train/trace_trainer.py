@@ -37,7 +37,8 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
     """
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
+                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None,
+                 **kwargs):
         """
         Handles the training and evaluation of learning models
         :param trainer_args: The learning model arguments
@@ -46,7 +47,10 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param save_strategy: The strategy used to save the best model
         :param kwargs: Any additional arguments given to the HF Trainer
         """
+        if trainer_args.eager_load_data:
+            trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
         self.trainer_args = trainer_args
+        trainer_args.__post_init__()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
@@ -65,9 +69,9 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.compute_metrics = self._compute_validation_metrics  # Will compute trace metrics alongside default eval metrics
-        self.model = self.model_manager.get_model()
-        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_hf_dataset(self.model_manager)
+        self.train_dataset = self._get_dataset(DatasetRole.TRAIN)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
+        self.model = self.model_manager.get_model()
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
         self.compute_metrics = None  # Turn off since prediction uses custom logic surrounding computing metrics.
@@ -143,5 +147,6 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param dataset_role: The role of the dataset to return.
         :return: Dataset at dataset role if it exists.
         """
-        return self.trainer_dataset_manager[dataset_role].to_hf_dataset(
-            self.model_manager) if dataset_role in self.trainer_dataset_manager else None
+
+        return self.trainer_dataset_manager.get_hf_datasets(self.model_manager)[
+            dataset_role] if dataset_role in self.trainer_dataset_manager else None

@@ -8,19 +8,20 @@
             "random_seed": 812
           },
           "model_manager": {
-            "model_path": "thearod5/git-tiny"
+            "model_path": "gpt2-xl"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
-            "per_device_train_batch_size": 4,
-            "gradient_accumulation_steps": 250,
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 1,
+            "gradient_accumulation_steps": 16,
+            "deepspeed_path": "~/tgen/deepspeed.json",
             "learning_rate": 5e-5,
-            "skip_save": false,
+            "skip_save": true,
             "load_best_model_at_end": true,
             "evaluation_strategy": "steps",
-            "save_strategy": "steps",
+            "save_strategy": null,
             "logging_strategy": "steps",
-            "save_steps": 5,
+            "save_steps": null,
             "eval_steps": 5,
             "logging_steps": 1
           },
@@ -56,11 +57,9 @@
               "val_percentage": 0.10
             },
             "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "HUB",
-                "name": "cm1"
-              }
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_SOURCE",
+              "val_percentage": 0.10
             },
             "augmenter": {
               "steps": [

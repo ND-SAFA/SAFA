@@ -30,8 +30,8 @@ from transformers.activations import ACT2FN
 from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast, SequenceClassifierOutput
 from transformers.modeling_utils import PreTrainedModel
 from transformers.utils import add_start_docstrings, replace_return_docstrings
-from util.logging.logger_manager import logger
 
+from util.logging.logger_manager import logger
 from .configuration_llama import LLaMAConfig
 
 _CHECKPOINT_FOR_DOC = "llama-7b"
@@ -642,12 +642,11 @@ class LLaMAModel(LLaMAPreTrainedModel):
 
 
 class LLaMAForCausalLM(LLaMAPreTrainedModel):
-    _keys_to_ignore_on_load_missing = [r"lm_head.weight"]
+    _keys_to_ignore_on_load_missing = [r"cls_head.weight"]
 
     def __init__(self, config):
         super().__init__(config)
         self.model = LLaMAModel(config)
-
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
@@ -812,6 +811,26 @@ class LLaMAForCausalLM(LLaMAPreTrainedModel):
         return reordered_past
 
 
+class ClsHead(nn.Module):
+    def __init__(self, input_size: int, layer1_hidden_size: int = 20, layer2_hidden_size: int = 100, n_labels: int = 2):
+        super().__init__()
+        self.cls_layer1 = nn.Linear(input_size, layer1_hidden_size)
+        self.relu = nn.ReLU()
+        self.cls_layer2 = nn.Linear(layer1_hidden_size, layer2_hidden_size)
+        self.cls_head = nn.Linear(layer2_hidden_size, n_labels, bias=False)
+
+    def forward(
+            self,
+            input_ids: torch.LongTensor = None,
+    ) -> torch.Tensor:
+        x = self.cls_layer1(input_ids)
+        x = self.relu(x)
+        x = self.cls_layer2(x)
+        x = self.relu(x)
+        x = self.cls_head(x)
+        return x
+
+
 class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
     """
     Transformer decoder consisting of *config.num_hidden_layers* layers. Each layer is a [`LLaMADecoderLayer`]
@@ -820,22 +839,12 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         config: LLaMAConfig
     """
 
-    def __init__(self, config: LLaMAConfig, model: LLaMAModel = None):
+    def __init__(self, config: LLaMAConfig):
         super().__init__(config)
-        self.model = LLaMAModel(config) if model is None else model
-        self.lm_head = nn.Linear(config.hidden_size, config.num_labels, bias=False)
+        self.model = LLaMAModel(config)
+        self.cls_head = ClsHead(config.hidden_size)
         # Initialize weights and apply final processing
         self.post_init()
-
-
-    @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
-        try:
-            return super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
-        except RuntimeError:
-            model = LLaMAModel.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
-            config = kwargs.pop("config")
-            return LLaMAForSequenceClassification(config, model)
 
     def forward(
             self,
@@ -869,7 +878,7 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
         )
 
         hidden_states = outputs[0]
-        logits = self.lm_head(hidden_states)
+        logits = self.cls_head(hidden_states)
 
         if input_ids is not None:
             batch_size, sequence_length = input_ids.shape[:2]
@@ -891,7 +900,8 @@ class LLaMAForSequenceClassification(LLaMAPreTrainedModel):
                     "unexpected if using padding tokens in conjunction with `inputs_embeds.`"
                 )
 
-        pooled_logits = logits[torch.arange(batch_size, device=logits.device), sequence_lengths]
+        logits_index = torch.arange(batch_size, device=logits.device)
+        pooled_logits = logits[logits_index, sequence_lengths]
 
         loss = None
         if labels is not None:

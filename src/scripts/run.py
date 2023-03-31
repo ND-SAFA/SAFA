@@ -18,7 +18,8 @@ if __name__ == "__main__":
         prog='Experiment',
         description='Runs experiment definitions')
     parser.add_argument('file')
-    args = parser.parse_args()
+    parser.add_argument('--local_rank', default=0)
+    args, unknown = parser.parse_known_args()
     file_path = os.path.join(RQ_PATH, args.file)
     script_runner = ScriptRunner(file_path)
     script_runner.run()

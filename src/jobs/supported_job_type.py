@@ -1,6 +1,5 @@
 from enum import Enum
 
-from jobs.analyze_dataset_job import AnalyzeDatasetJob
 from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.create_model_job import CreateModelJob
 from jobs.create_source_splits_job import CreateSourceSplitsJob
@@ -31,6 +30,5 @@ class SupportedJobType(Enum):
     PREDICT = PredictJob
     TRAIN = TrainJob
     VSM = VSMJob
-    DATASET_ANALYSIS = AnalyzeDatasetJob
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob

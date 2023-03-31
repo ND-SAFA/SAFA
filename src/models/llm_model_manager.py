@@ -9,7 +9,7 @@ from data.datasets.data_key import DataKey
 from models.llama.configuration_llama import LLaMAConfig
 from models.llama.llama_task import LLaMATask
 from models.llama.tokenization_llama import LLaMATokenizer
-from models.model_manager import ModelManager
+from models.model_manager import ModelManager, LAYER
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 

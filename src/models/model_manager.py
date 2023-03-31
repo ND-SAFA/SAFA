@@ -13,10 +13,11 @@ from util.base_object import BaseObject
 from util.override import overrides
 from util.logging.logger_manager import logger
 
+LAYER = List[Parameter]
+
 
 class ModelManager(BaseObject):
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
-    LAYER = List[Parameter]
 
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,

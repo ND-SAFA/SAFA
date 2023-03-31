@@ -8,6 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.views import APIView
 
+from cloud.model_utility import CloudUtility
 from data.readers.definitions.api_definition import ApiDefinition
 from serializers.prediction_serializer import PredictionSerializer
 from tgen.src.jobs.components.job_result import JobResult
@@ -36,6 +37,8 @@ class PredictView(APIView):
         prediction_payload = self.read_request(request, PredictionSerializer)
         model = prediction_payload["model"]
         dataset: ApiDefinition = prediction_payload["dataset"]
+
+        model_path = CloudUtility.download_model(model)
         # TODO: Create definition JSON for experiment and run.
         raise NotImplementedError("Current building out prediction endpoint.")
 

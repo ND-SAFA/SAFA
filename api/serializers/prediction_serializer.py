@@ -2,7 +2,8 @@ from typing import Dict
 
 from rest_framework import serializers
 
-from api.serializers.serializer_utility import SerializerUtility
+from serializers.dataset_serializer import DatasetSerializer
+from serializers.serializer_utility import SerializerUtility
 from tgen.src.variables.variable import Variable
 
 
@@ -12,7 +13,7 @@ class PredictionSerializer(serializers.Serializer):
     """
     KEY = "definition"
     model = serializers.CharField(max_length=512)
-    definition = serializers.DictField(required=True)
+    dataset = DatasetSerializer()
 
     def update(self, instance, validated_data):
         """

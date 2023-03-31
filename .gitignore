@@ -16,6 +16,9 @@ src/tes/output/runs/**
 
 /**/output
 
+# Django
+/**/db.sqlite3
+
 # Deployment
 /deployment/**
 

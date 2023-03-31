@@ -42,19 +42,24 @@ class SerializerUtility:
         """
         kwargs = {}
         for field in fields.values():
-            field_name = field.source_body
+            field_name = field.field_name
             if field_name not in validated_data:
                 continue
             is_serializer = isinstance(field, serializers.Serializer)
             has_child_serializer = hasattr(field, "child") and isinstance(field.child, serializers.Serializer)
             if is_serializer or has_child_serializer:
-                kwargs[field_name] = field.read_project(validated_data[field_name])
+                kwargs[field_name] = field.to_internal_value(validated_data[field_name])
             else:
                 kwargs[field_name] = validated_data[field_name]
         return kwargs
 
     @staticmethod
     def to_camel_case(word: str):
+        """
+        Converts the given word to camel case format.
+        :param word: The word to process.
+        :return: Single word in camel case format.
+        """
         words = word.lower().split("_")
         words = words[:1] + [w.title() for w in words[1:]]
         return "".join(words)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.serializers.serializer_utility import SerializerUtility
+from serializers.serializer_utility import SerializerUtility
 from tgen.src.server.api.api_definition import ApiDefinition
 
 
@@ -8,8 +8,12 @@ class DatasetSerializer(serializers.Serializer):
     """
     Serializes datasets for trace link prediction.
     """
-    source_layers: serializers.ListSerializer(child=serializers.DictField(), help_text="List of source artifacts layers.")
-    target_layers: serializers.ListSerializer(child=serializers.DictField(), help_text="List of target artifacts layers.")
+    source_layers = serializers.ListField(child=serializers.DictField(),
+                                          help_text="List of source artifacts layers.",
+                                          required=True)
+    target_layers = serializers.ListField(child=serializers.DictField(),
+                                          help_text="List of target artifacts layers.",
+                                          required=True)
 
     def update(self, **kwargs):
         """
@@ -25,6 +29,7 @@ class DatasetSerializer(serializers.Serializer):
         :param validated_data: The data validated by django.
         :return:
         """
+        SerializerUtility.assert_no_unknown_fields(validated_data, self.fields.fields)
         SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
         n_source_layers = len(validated_data["source_layers"])
         n_target_layers = len(validated_data["target_layers"])

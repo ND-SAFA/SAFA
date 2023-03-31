@@ -5,7 +5,7 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
-from typing import Dict
+from typing import Dict, Type
 
 import torch
 import wandb
@@ -17,6 +17,7 @@ from models.model_manager import ModelManager
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
+from util.override import overrides
 from util.random_util import RandomUtil
 from util.status import Status
 
@@ -107,6 +108,17 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: The job name
         """
         return self.__class__.__name__.split("Job")[0]
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from jobs.supported_job_type import SupportedJobType
+        return SupportedJobType
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """

@@ -10,11 +10,10 @@ from models.llama.configuration_llama import LLaMAConfig
 from models.llama.llama_task import LLaMATask
 from models.llama.tokenization_llama import LLaMATokenizer
 from models.model_manager import ModelManager
-from models.model_properties import ModelArchitectureType, ModelSize
+from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 
-class LLaMAModelManager(ModelManager):
-    LAYER = List[Parameter]
+class LlmModelManager(ModelManager):
 
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: LLaMATask = LLaMATask.SEQUENCE_CLASSIFICATION,
@@ -90,7 +89,7 @@ class LLaMAModelManager(ModelManager):
         :param text_pair: The text of the 2nd artifact in the pair to encode
         :return: The features
         """
-        prompts = [LLaMAModelManager.get_prompt(source, text_pair[i]) for i, source in enumerate(text)]
+        prompts = [LlmModelManager.get_prompt(source, text_pair[i]) for i, source in enumerate(text)]
         tokenizer = self.get_tokenizer()
         return tokenizer(text=prompts, **kwargs)
 

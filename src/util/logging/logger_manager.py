@@ -29,26 +29,28 @@ class LoggerManager:
         LoggerManager.__logger_is_configured = True
         LoggerManager.__logger: TGenLogger = logging.getLogger("tgen")
         logger.setLevel(logger_config.log_level)
-        log_filepath = os.path.join(logger_config.output_dir, logger_config.log_filename) \
-            if logger_config.output_dir else logger_config.log_filename
-        FileUtil.create_dir_safely(dirname(log_filepath))
-        file_handler = logging.FileHandler(log_filepath)
+
         console_handler = logging.StreamHandler(sys.stdout)
+        handlers = [console_handler]
+        file_handler = None
+        if logger_config.output_dir:
+            log_filepath = os.path.join(logger_config.output_dir, logger_config.log_filename)
+            FileUtil.create_dir_safely(dirname(log_filepath))
+            file_handler = logging.FileHandler(log_filepath)
+            handlers.append(file_handler)
 
         default_formatter = logging.Formatter(LOG_FORMAT, datefmt='%m/%d %H:%M:%S')
-        formatters = [default_formatter]
-        if logger_config.verbose:
-            formatters.append(default_formatter)
-        else:
-            formatters.append(logging.Formatter("%(message)s"))
+        formatters = [default_formatter] if logger_config.verbose else [logging.Formatter("%(message)s")]
+        formatters.append(default_formatter)
 
-        for i, handler in enumerate([file_handler, console_handler]):
+        for i, handler in enumerate(handlers):
             handler.setLevel(logger_config.log_level)
             handler.setFormatter(formatters[i])
 
         if logger_config.log_to_console:
             LoggerManager.__logger.addHandler(console_handler)
-        LoggerManager.__logger.addHandler(file_handler)
+        if file_handler is not None:
+            LoggerManager.__logger.addHandler(file_handler)
 
         return LoggerManager.__logger
 

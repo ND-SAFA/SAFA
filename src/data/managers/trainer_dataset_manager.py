@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List, Optional, Union
 
 from datasets import disable_caching
 
@@ -144,17 +144,6 @@ class TrainerDatasetManager(BaseObject):
         """
         dataset_name = self.get_creator(dataset_role).get_name() if not dataset_name else dataset_name
         return f"{dataset_name}_{dataset_role.name.lower()}{CSVKeys.EXT}"
-
-    @classmethod
-    @overrides(BaseObject)
-    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param abstract_class: the abstract parent class type
-        :param child_class_name: the name of the child class
-        :return: the enum class mapping name to class
-        """
-        return SupportedDatasetCreator
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """

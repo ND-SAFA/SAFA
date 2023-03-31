@@ -1,10 +1,11 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
 
 from jobs.abstract_job import AbstractJob
 from server.serializers.experiment_serializer import ExperimentSerializer
 from testres.base_test import BaseTest
 from util.base_object import BaseObject
 from util.object_creator import ObjectCreator
+from util.reflection_util import ReflectionUtil
 from variables.definition_variable import DefinitionVariable
 from variables.experimental_variable import ExperimentalVariable
 from variables.variable import Variable
@@ -106,3 +107,12 @@ class TestBaseObject(BaseTest):
         for param_name, param_value in params.items():
             class_value = getattr(instance, param_name)
             self.assertEqual(param_value, class_value)
+
+    def test_get_base_class(self):
+        optional_param = BaseObject._get_base_class(Optional[AbstractJob])
+        nested_list_param = BaseObject._get_base_class(List[List[AbstractJob]])
+        base_object_param = BaseObject._get_base_class(AbstractJob)
+
+        for param in [optional_param, nested_list_param, base_object_param]:
+            self.assertTrue(ReflectionUtil.is_instance_or_subclass(param, AbstractJob))
+

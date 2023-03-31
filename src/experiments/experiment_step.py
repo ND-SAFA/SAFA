@@ -1,13 +1,12 @@
 import os
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Union
 
 from constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
-from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.wandb.Wandb import Wandb
@@ -15,7 +14,6 @@ from util.base_object import BaseObject
 from util.dict_util import ListUtil
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
-from util.override import overrides
 from util.status import Status
 from variables.experimental_variable import ExperimentalVariable
 
@@ -228,14 +226,3 @@ class ExperimentStep(BaseObject):
         :return: list of results
         """
         return list(map(lambda job: getattr(job, method_name)(**method_params), jobs))
-
-    @classmethod
-    @overrides(BaseObject)
-    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param abstract_class: the abstract parent class type
-        :param child_class_name: the name of the child class
-        :return: the enum class mapping name to class
-        """
-        return SupportedJobType

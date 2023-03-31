@@ -8,9 +8,9 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.views import APIView
 
+from data.readers.definitions.api_definition import ApiDefinition
 from serializers.prediction_serializer import PredictionSerializer
 from tgen.src.jobs.components.job_result import JobResult
-from tgen.src.server.api.api_definition import ApiDefinition
 
 
 def get_responses(response_keys: Union[str, list]) -> Dict:

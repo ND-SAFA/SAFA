@@ -1,4 +1,3 @@
-import os
 from copy import deepcopy
 from typing import Dict, Type, TypeVar
 
@@ -12,7 +11,7 @@ from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
 from jobs.supported_job_type import SupportedJobType
-from models.llama.llama_model_manager import LLaMAModelManager
+from models.llm_model_manager import LlmModelManager
 from models.model_manager import ModelManager
 from models.supported_model_manager import SupportedModelManager
 from testres.base_test import BaseTest
@@ -76,7 +75,7 @@ class ObjectCreator:
     }
 
     llama_model_manager_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedModelManager.LLAMA.name,
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedModelManager.LLM.name,
         "model_path": "kdearsty/llama-testing",
         "model_output_path": TEST_OUTPUT_DIR
     }
@@ -130,7 +129,7 @@ class ObjectCreator:
         TrainerDatasetManager: trainer_dataset_manager_definition,
         DataAugmenter: augmenter_definition,
         ModelManager: model_manager_definition,
-        LLaMAModelManager: llama_model_manager_definition,
+        LlmModelManager: llama_model_manager_definition,
         MLMPreTrainDatasetCreator: pretrain_dataset_definition,
         ExperimentStep: experiment_train_step_definition,
         Experiment: experiment_definition,

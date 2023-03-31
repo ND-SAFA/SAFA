@@ -128,7 +128,7 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: Trace metrics and metrics manager used to calculate them.
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-        n_predictions, n_expected = len(output.predictions), len(self.eval_dataset)
+        n_predictions, n_expected = len(output.predictions), len(dataset)
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
         metrics_manager = MetricsManager(trace_df=dataset.trace_df,

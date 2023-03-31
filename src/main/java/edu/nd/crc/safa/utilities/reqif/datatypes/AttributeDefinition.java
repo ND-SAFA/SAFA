@@ -5,7 +5,6 @@
 // Generated on: 2023.02.27 at 06:07:33 PM UTC
 //
 
-
 package edu.nd.crc.safa.utilities.reqif.datatypes;
 
 import javax.xml.bind.annotation.XmlAccessType;

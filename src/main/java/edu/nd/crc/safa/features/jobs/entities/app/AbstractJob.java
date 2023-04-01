@@ -113,8 +113,7 @@ public abstract class AbstractJob implements Job {
      * @throws InvocationTargetException When the job step throws an exception
      * @throws IllegalAccessException When the job step cannot be accessed
      */
-    private void executeJobStep(JobStepImplementation stepImplementation, int nSteps)
-        throws InvocationTargetException, IllegalAccessException {
+    private void executeJobStep(JobStepImplementation stepImplementation, int nSteps) throws Exception {
 
         int position = stepImplementation.getAnnotation().position();
         String stepName = stepImplementation.getAnnotation().value();
@@ -176,7 +175,7 @@ public abstract class AbstractJob implements Job {
     /**
      * Broadcast that the job is about to start.
      */
-    private void notifyBeforeJob() {
+    private void notifyBeforeJob() throws Exception {
         try {
             beforeJob();
         } catch (Exception e) {
@@ -206,7 +205,7 @@ public abstract class AbstractJob implements Job {
      * @param stepName The name of the step as defined by its annotation.
      * @param nSteps The number of steps in this job.
      */
-    private void notifyBeforeStep(int stepPosition, String stepName, int nSteps) {
+    private void notifyBeforeStep(int stepPosition, String stepName, int nSteps) throws Exception {
         try {
             dbLogger.setStepNum(JobExecutionUtilities.getStepIndex(stepPosition, nSteps));
             jobService.startStep(jobDbEntity, nSteps);
@@ -228,7 +227,7 @@ public abstract class AbstractJob implements Job {
      * @param stepName The name of the step as defined by its annotation.
      * @param success Whether the step finished successfully or not.
      */
-    private void notifyAfterStep(int stepPosition, String stepName, boolean success) {
+    private void notifyAfterStep(int stepPosition, String stepName, boolean success) throws Exception {
         try {
             jobService.endStep(jobDbEntity);
             notifyStateChange();
@@ -288,10 +287,10 @@ public abstract class AbstractJob implements Job {
      *
      * <p>This method is guaranteed to be called before any steps start executing.</p>
      *
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void beforeJob() throws RuntimeException {
+    protected void beforeJob() throws Exception {
     }
 
     /**
@@ -301,10 +300,10 @@ public abstract class AbstractJob implements Job {
      * immediately after {@link #jobFailed(Exception)} if the job fails.</p>
      *
      * @param success Whether the job completed successfully or not.
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void afterJob(boolean success) throws RuntimeException {
+    protected void afterJob(boolean success) throws Exception {
     }
 
     /**
@@ -312,10 +311,10 @@ public abstract class AbstractJob implements Job {
      * 
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
      * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void beforeStep(int stepPosition, String stepName) throws RuntimeException {
+    protected void beforeStep(int stepPosition, String stepName) throws Exception {
     }
 
     /**
@@ -327,10 +326,10 @@ public abstract class AbstractJob implements Job {
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
      * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
      * @param success Whether the step completed successfully or not.
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void afterStep(int stepPosition, String stepName, boolean success) throws RuntimeException {
+    protected void afterStep(int stepPosition, String stepName, boolean success) throws Exception {
     }
 
     /**
@@ -342,10 +341,10 @@ public abstract class AbstractJob implements Job {
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
      * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
      * @param error The error that caused the step to fail.
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void stepFailed(int stepPosition, String stepName, Exception error) throws RuntimeException {
+    protected void stepFailed(int stepPosition, String stepName, Exception error) throws Exception {
     }
 
     /**
@@ -354,10 +353,10 @@ public abstract class AbstractJob implements Job {
      * <p>This is called after {@link #afterStep(int, String, boolean)} but before {@link #afterJob(boolean)}.</p>
      *
      * @param error The error that caused the job to fail.
-     * @throws RuntimeException In case of an error
+     * @throws Exception In case of an error
      */
     @ForOverride
-    protected void jobFailed(Exception error) throws RuntimeException {
+    protected void jobFailed(Exception error) throws Exception {
     }
 
     @Override

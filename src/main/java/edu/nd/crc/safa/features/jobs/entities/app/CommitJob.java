@@ -8,45 +8,54 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import lombok.Setter;
 
 /**
  * The worker responsible for providing method implementations for
  * the steps to create projects.
  */
 public abstract class CommitJob extends AbstractJob {
-    /**
-     * The project version of the
-     */
-    protected ProjectCommit projectCommit;
-    /**
-     * The project version the commit is applied to.
-     */
-    protected ProjectVersion projectVersion;
-    /**
-     * The service used for creating entities.
-     */
-    ProjectChanger projectChanger;
 
+    @Setter
+    private ProjectCommit projectCommit;
+
+    /**
+     * Create a commit job for a project that already exists.
+     *
+     * @param jobDbEntity DB entity for this job.
+     * @param serviceProvider Service provider
+     * @param projectCommit The project commit all changes from this job should go into
+     */
     protected CommitJob(JobDbEntity jobDbEntity,
                         ServiceProvider serviceProvider,
                         ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
-        this.projectVersion = projectCommit.getCommitVersion();
-        if (this.projectVersion == null) {
-            throw new IllegalArgumentException("Project version is null!");
-        }
         this.projectCommit = projectCommit;
-        this.projectChanger = new ProjectChanger(projectVersion, serviceProvider);
+    }
+
+    protected CommitJob(JobDbEntity jobDbEntity,
+                        ServiceProvider serviceProvider) {
+        super(jobDbEntity, serviceProvider);
+        this.projectCommit = null;
     }
 
     @IJobStep(value = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
+        assertProjectVersionIsSet();
+        ProjectChanger projectChanger = new ProjectChanger(projectCommit.getCommitVersion(), serviceProvider);
         projectChanger.commitAsUser(projectCommit, getJobDbEntity().getUser());
+    }
+
+    private void assertProjectVersionIsSet() {
+        if (this.projectCommit == null || this.projectCommit.getCommitVersion() == null) {
+            throw new NullPointerException("Project version is not set.");
+        }
     }
 
     @Override
     protected UUID getCompletedEntityId() {
+        assertProjectVersionIsSet();
         return projectCommit.getCommitVersion().getVersionId();
     }
 }

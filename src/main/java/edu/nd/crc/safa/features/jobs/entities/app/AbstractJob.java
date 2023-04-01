@@ -1,15 +1,14 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
@@ -17,7 +16,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import lombok.AllArgsConstructor;
+import com.google.errorprone.annotations.ForOverride;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -25,14 +24,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 
 /**
- * Responsible for finding methods corresponding to steps in job and running them
- * by providing a default execution method.
+ * <p>Responsible for finding methods corresponding to steps in job and running them
+ * by providing a default execution method.</p>
  *
- * <p>TODO: Create annotation to specify step implementations over reflection.
+ * <p>Subclasses of this class should implement job steps by annotating them with
+ * the {@link IJobStep} annotation. See the docs for the annotation for more information
+ * on implementing job steps.</p>
+ *
+ * <p>Callback methods are provided that can be overridden to receive notifications
+ * about the progression of the job for the purposes of logging, etc.:<br>
+ * {@link #beforeJob()}<br>
+ * {@link #afterJob(boolean)}<br>
+ * {@link #jobFailed(Exception)}<br>
+ * {@link #beforeStep(int, String)}<br>
+ * {@link #afterStep(int, String, boolean)}<br>
+ * {@link #stepFailed(int, String, Exception)}<br>
+ * </p>
  */
 @Getter
 @Setter
@@ -40,14 +52,20 @@ public abstract class AbstractJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
 
+    private JobLogger dbLogger;
+
     /**
      * The job identifying information that is being performed.
      */
     protected JobDbEntity jobDbEntity;
+
     /**
      * Service used to send job updates.
      */
     protected ServiceProvider serviceProvider;
+    protected JobService jobService;
+    protected NotificationService notificationService;
+
     /**
      * List of step indices to skip.
      */
@@ -56,96 +74,65 @@ public abstract class AbstractJob implements Job {
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
         this.serviceProvider = serviceProvider;
+
+        this.jobService = this.serviceProvider.getJobService();
+        this.notificationService = this.serviceProvider.getNotificationService();
+
+        this.dbLogger = new JobLogger(serviceProvider.getJobLoggingService(), jobDbEntity, 0);
     }
 
     /**
-     * Returns list of job steps including their position, name, and method implementation.
-     *
-     * @param jobClass The job class to retrieve steps for.
-     * @param <T>      The class of of the job.
-     * @return List of {@link JobStepImplementation} for job class.
-     */
-    static <T extends AbstractJob> List<JobStepImplementation> getSteps(Class<T> jobClass) {
-        List<JobStepImplementation> jobSteps = new ArrayList<>();
-        for (Method method : jobClass.getMethods()) {
-            IJobStep jobStep = method.getAnnotation(IJobStep.class);
-            if (jobStep != null) {
-                JobStepImplementation stepImplementation = new JobStepImplementation(
-                    jobStep,
-                    method
-                );
-                jobSteps.add(stepImplementation);
-            }
-        }
-
-        JobStepImplementation[] stepNames = new JobStepImplementation[jobSteps.size()];
-        for (JobStepImplementation stepImplementation : jobSteps) {
-            int position = stepImplementation.annotation.position();
-            int index = getStepIndex(position, jobSteps.size());
-            stepNames[index] = stepImplementation;
-        }
-        return Arrays.asList(stepNames);
-    }
-
-    /**
-     * Returns names of steps of given abstract job class.
-     *
-     * @param jobClass Job to retrieve step names from.
-     * @param <T>      The type of Abstract job.
-     * @return List of string names representing job steps.
-     */
-    static <T extends AbstractJob> List<String> getJobSteps(Class<T> jobClass) {
-        return getSteps(jobClass)
-            .stream()
-            .map(jobStepImplementation -> jobStepImplementation.annotation.value())
-            .collect(Collectors.toList());
-    }
-
-    public static int getStepIndex(int position, int size) {
-        if (position > 0) {
-            return position - 1;
-        } else {
-            return size + position;
-        }
-    }
-
-    /**
-     * For job steps updating the job status as the steps progress.
+     * Execute all job steps.
      *
      * @param execution JobExecution used for restarting jobs (WIP).
      */
     @Override
     public void execute(@NonNull JobExecution execution) {
-        JobService jobService = this.serviceProvider.getJobService();
-        NotificationService notificationService = this.serviceProvider.getNotificationService();
-
-        List<JobStepImplementation> jobSteps = getSteps(this.getClass());
+        List<JobStepImplementation> jobSteps = JobExecutionUtilities.getSteps(this.getClass());
         int nSteps = jobSteps.size();
-
-        JobLogger logger = new JobLogger(serviceProvider.getJobLoggingService(), jobDbEntity, 0);
+        boolean success = true;
 
         try {
+            notifyBeforeJob();
             for (JobStepImplementation stepImplementation : jobSteps) {
-                if (this.skipSteps.contains(stepImplementation.annotation.position())) {
-                    continue;
-                }
-                // Pre-step
-                logger.setStepNum(getStepIndex(stepImplementation.annotation.position(), nSteps));
-                jobService.startStep(jobDbEntity, nSteps);
-                notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
-
-                // Pre-step
-                log.info("Running job step " + stepImplementation.method.getName());
-                invokeStep(stepImplementation, logger);
-
-                // Post-step
-                jobService.endStep(jobDbEntity);
-                notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
+                executeJobStep(stepImplementation, nSteps);
             }
         } catch (Exception e) {
-            jobService.failJob(jobDbEntity);
-            logger.logException(e);
-            notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
+            success = false;
+            notifyJobFailed(e);
+        } finally {
+            notifyAfterJob(success);
+        }
+    }
+
+    /**
+     * Execute a single job step.
+     *
+     * @param stepImplementation Object containing information about the step to be performed
+     * @param nSteps Total number of steps for this job
+     * @throws InvocationTargetException When the job step throws an exception
+     * @throws IllegalAccessException When the job step cannot be accessed
+     */
+    private void executeJobStep(JobStepImplementation stepImplementation, int nSteps)
+        throws InvocationTargetException, IllegalAccessException {
+
+        int position = stepImplementation.getAnnotation().position();
+        String stepName = stepImplementation.getAnnotation().value();
+        boolean success = true;
+
+        if (this.skipSteps.contains(position)) {
+            return;
+        }
+
+        try {
+            notifyBeforeStep(position, stepName, nSteps);
+            invokeStep(stepImplementation);
+        } catch (Exception e) {
+            success = false;
+            notifyStepFailed(position, stepName, e);
+            throw e;
+        } finally {
+            notifyAfterStep(position, stepName, success);
         }
     }
 
@@ -153,14 +140,13 @@ public abstract class AbstractJob implements Job {
      * Runs a step, giving it the job logger if necessary.
      *
      * @param stepImplementation The step to run
-     * @param logger The logger to give to the step if it wants it
      * @throws InvocationTargetException If there is a problem invoking the method
      * @throws IllegalAccessException If there is a problem invoking the method
      */
-    private void invokeStep(JobStepImplementation stepImplementation, JobLogger logger)
+    private void invokeStep(JobStepImplementation stepImplementation)
             throws InvocationTargetException, IllegalAccessException {
 
-        Method method = stepImplementation.method;
+        Method method = stepImplementation.getMethod();
 
         // TODO this is fine now, but if the possible method signatures
         //      ever get more complex this will need to be refactored
@@ -168,7 +154,7 @@ public abstract class AbstractJob implements Job {
             method.invoke(this);
         } else if (method.getParameterCount() == 1) {
             if (method.getParameterTypes()[0].equals(JobLogger.class)) {
-                method.invoke(this, logger);
+                method.invoke(this, dbLogger);
             } else {
                 throw new SafaError("Unsure how to invoke method %s of %s. Parameter 1 is not a JobLogger",
                         method.getName(), method.getDeclaringClass().getName());
@@ -176,32 +162,6 @@ public abstract class AbstractJob implements Job {
         } else {
             throw new SafaError("Unsure how to invoke method %s of %s. Too many parameters found",
                     method.getName(), method.getDeclaringClass().getName());
-        }
-    }
-
-    /**
-     * Returns the method responsible for running step with given name.
-     * Name is matches step if lower case versions of each match.
-     *
-     * @param stepName The name of the step to retrieve method for.
-     * @return The method matching given step name.
-     */
-    public Method getMethodForStepByName(String stepName) {
-        String query = stepName.replace(" ", "").toLowerCase();
-        List<Method> methodQuery = Arrays
-            .stream(this.getClass().getMethods())
-            .filter(m -> m.getName().toLowerCase().contains(query))
-            .collect(Collectors.toList());
-        int methodQuerySize = methodQuery.size();
-
-        if (methodQuerySize == 0) {
-            throw new SafaError("Could not find implementation for step: " + stepName);
-        } else if (methodQuery.size() == 1) {
-            return methodQuery.get(0);
-        } else {
-            List<String> methodNames = methodQuery.stream().map(Method::getName).collect(Collectors.toList());
-            String error = String.format("Found more than one implementation for step: %s%n%s", stepName, methodNames);
-            throw new SafaError(error);
         }
     }
 
@@ -214,14 +174,194 @@ public abstract class AbstractJob implements Job {
     }
 
     /**
-     * Responsible for initializing any data needed to run the job steps.
-     *
-     * @throws SafaError Error occurring during job initialization.
+     * Broadcast that the job is about to start.
      */
-    public void initJobData() throws SafaError, IOException {
+    private void notifyBeforeJob() {
+        try {
+            beforeJob();
+        } catch (Exception e) {
+            dbLogger.log("Error in reporting job starting");
+            throw e;
+        }
+    }
+
+    /**
+     * Broadcast that the job has finished.
+     *
+     * @param success Whether the job finished successfully or not.
+     */
+    private void notifyAfterJob(boolean success) {
+        try {
+            afterJob(success);
+        } catch (Exception e) {
+            dbLogger.log("Error in reporting job finishing:");
+            dbLogger.logException(e);
+        }
+    }
+
+    /**
+     * Broadcast that a step is about to be executed.
+     *
+     * @param stepPosition The position of the step as defined by its annotation.
+     * @param stepName The name of the step as defined by its annotation.
+     * @param nSteps The number of steps in this job.
+     */
+    private void notifyBeforeStep(int stepPosition, String stepName, int nSteps) {
+        try {
+            dbLogger.setStepNum(JobExecutionUtilities.getStepIndex(stepPosition, nSteps));
+            jobService.startStep(jobDbEntity, nSteps);
+            notifyStateChange();
+
+            log.info("Running job step \"{}\"", stepName);
+
+            beforeStep(stepPosition, stepName);
+        } catch (Exception e) {
+            dbLogger.log("Error in reporting step starting");
+            throw e;
+        }
+    }
+
+    /**
+     * Broadcast that a step has completed.
+     *
+     * @param stepPosition The position of the step as defined by its annotation.
+     * @param stepName The name of the step as defined by its annotation.
+     * @param success Whether the step finished successfully or not.
+     */
+    private void notifyAfterStep(int stepPosition, String stepName, boolean success) {
+        try {
+            jobService.endStep(jobDbEntity);
+            notifyStateChange();
+
+            afterStep(stepPosition, stepName, success);
+        } catch (Exception e) {
+            dbLogger.log("Error in reporting step finishing");
+            throw e;
+        }
+    }
+
+    /**
+     * Broadcast that a step failed.
+     *
+     * @param stepPosition The position of the step as defined by its annotation.
+     * @param stepName The name of the step as defined by its annotation.
+     * @param error The error that caused the failure.
+     */
+    private void notifyStepFailed(int stepPosition, String stepName, Exception error) {
+        try {
+            stepFailed(stepPosition, stepName, error);
+        } catch (Exception e) {
+            dbLogger.log("Error in reporting step failure:");
+            dbLogger.logException(e);
+        }
+    }
+
+    /**
+     * Broadcast that a job failed.
+     *
+     * @param error The error that caused the failure.
+     */
+    private void notifyJobFailed(Exception error) {
+        try {
+            dbLogger.log("Error executing job:");
+            dbLogger.logException(error);
+
+            jobService.failJob(jobDbEntity);
+            notifyStateChange();
+
+            jobFailed(error);
+        } catch (Exception e) {
+            dbLogger.log("Additional error in reporting the previous error:");
+            dbLogger.logException(e);
+        }
+    }
+
+    /**
+     * Broadcast a change in this job to any clients that are listening for it.
+     */
+    private void notifyStateChange() {
+        notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
+    }
+
+    /**
+     * <p>Override this method to be notified when this job is about to start.</p>
+     *
+     * <p>This method is guaranteed to be called before any steps start executing.</p>
+     *
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void beforeJob() throws RuntimeException {
+    }
+
+    /**
+     * <p>Override this method to be notified when this job is finished.</p>
+     *
+     * <p>This method is guaranteed to be called after all steps are finished executing, or
+     * immediately after {@link #jobFailed(Exception)} if the job fails.</p>
+     *
+     * @param success Whether the job completed successfully or not.
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void afterJob(boolean success) throws RuntimeException {
+    }
+
+    /**
+     * <p>Override this method to be notified when a step is about to start.</p>
+     * 
+     * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
+     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void beforeStep(int stepPosition, String stepName) throws RuntimeException {
+    }
+
+    /**
+     * <p>Override this method to be notified when a step has completed.</p>
+     * 
+     * <p>In the case of a step failing, this method will always be called after
+     * {@link #stepFailed(int, String, Exception)}, but before {@link #jobFailed(Exception)}.</p>
+     *
+     * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
+     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
+     * @param success Whether the step completed successfully or not.
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void afterStep(int stepPosition, String stepName, boolean success) throws RuntimeException {
+    }
+
+    /**
+     * <p>Override this method to be notified when a step fails.</p>
+     * 
+     * <p>This will be called before {@link #afterStep(int, String, boolean)} as well
+     * as before {@link #jobFailed(Exception)} and {@link #afterJob(boolean)}</p>
+     *
+     * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
+     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
+     * @param error The error that caused the step to fail.
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void stepFailed(int stepPosition, String stepName, Exception error) throws RuntimeException {
+    }
+
+    /**
+     * <p>Override this method to be notified when a job fails.</p>
+     * 
+     * <p>This is called after {@link #afterStep(int, String, boolean)} but before {@link #afterJob(boolean)}.</p>
+     *
+     * @param error The error that caused the job to fail.
+     * @throws RuntimeException In case of an error
+     */
+    @ForOverride
+    protected void jobFailed(Exception error) throws RuntimeException {
     }
 
     @Override
+    @NonNull
     public String getName() {
         return this.jobDbEntity.getName();
     }
@@ -233,18 +373,13 @@ public abstract class AbstractJob implements Job {
 
     @Override
     public JobParametersIncrementer getJobParametersIncrementer() {
-        return params -> params;
+        return params -> Objects.requireNonNullElseGet(params, JobParameters::new);
     }
 
     @Override
+    @NonNull
     public JobParametersValidator getJobParametersValidator() {
         return params -> {
         };
-    }
-
-    @AllArgsConstructor
-    static class JobStepImplementation {
-        IJobStep annotation;
-        Method method;
     }
 }

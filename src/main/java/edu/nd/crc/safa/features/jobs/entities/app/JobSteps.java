@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +21,6 @@ public class JobSteps {
     };
 
     public static List<String> getJobSteps(Class<? extends AbstractJob> jobType) {
-        return AbstractJob.getJobSteps(jobType);
+        return JobExecutionUtilities.getJobStepNames(jobType);
     }
 }

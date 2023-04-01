@@ -68,10 +68,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.files = files;
     }
 
-    @Override
     @IJobStep(value = "Uploading Flat Files", position = 1)
     public void initJobData() throws SafaError, IOException {
-        super.initJobData();
         Project project = this.projectVersion.getProject();
         this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);

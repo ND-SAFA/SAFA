@@ -58,7 +58,7 @@ public abstract class AbstractJobBuilder<I> {
         // Step 4 - Start job
         this.serviceProvider
             .getJobService()
-            .executeJob(this.jobDbEntity, this.serviceProvider, abstractJob);
+            .executeJob(this.serviceProvider, abstractJob);
 
         // Step 5 - Return job
         return JobAppEntity.createFromJob(this.jobDbEntity);

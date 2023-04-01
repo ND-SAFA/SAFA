@@ -178,22 +178,14 @@ public class JobService {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    public void executeJob(JobDbEntity jobDbEntity,
-                           ServiceProvider serviceProvider,
-                           AbstractJob jobCreationThread) throws
+    public void executeJob(ServiceProvider serviceProvider, AbstractJob job) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+
         JobParameters jobParameters = new JobParametersBuilder()
             .addLong("time", System.currentTimeMillis()).toJobParameters();
 
-        try {
-            jobCreationThread.initJobData();
-        } catch (Exception e) {
-            e.printStackTrace();
-            serviceProvider.getJobService().failJob(jobDbEntity);
-            throw new SafaError("Failed to start job. %s", e.getMessage());
-        }
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
-        jobLauncher.run(jobCreationThread, jobParameters);
+        jobLauncher.run(job, jobParameters);
     }
 }

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -7,7 +8,11 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.features.versions.services.VersionService;
 
 import lombok.Setter;
 
@@ -20,6 +25,11 @@ public abstract class CommitJob extends AbstractJob {
     @Setter
     private ProjectCommit projectCommit;
 
+    private final ProjectService projectService;
+    private final VersionService versionService;
+
+    private ProjectVersion createdProjectVersion;
+
     /**
      * Create a commit job for a project that already exists.
      *
@@ -27,16 +37,19 @@ public abstract class CommitJob extends AbstractJob {
      * @param serviceProvider Service provider
      * @param projectCommit The project commit all changes from this job should go into
      */
-    protected CommitJob(JobDbEntity jobDbEntity,
-                        ServiceProvider serviceProvider,
-                        ProjectCommit projectCommit) {
+    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider, ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
+        this.projectService = serviceProvider.getProjectService();
+        this.versionService = serviceProvider.getVersionService();
+
         this.projectCommit = projectCommit;
     }
 
-    protected CommitJob(JobDbEntity jobDbEntity,
-                        ServiceProvider serviceProvider) {
+    protected CommitJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         super(jobDbEntity, serviceProvider);
+        this.projectService = serviceProvider.getProjectService();
+        this.versionService = serviceProvider.getVersionService();
+
         this.projectCommit = null;
     }
 
@@ -57,5 +70,27 @@ public abstract class CommitJob extends AbstractJob {
     protected UUID getCompletedEntityId() {
         assertProjectVersionIsSet();
         return projectCommit.getCommitVersion().getVersionId();
+    }
+
+    /**
+     * Creates a new project.
+     *
+     * @param name The name of the project.
+     * @param description The description of the project.
+     * @return A newly created project version.
+     */
+    protected ProjectVersion createProject(String name, String description) {
+        Project project = new Project(name, description);
+        projectService.saveProjectWithUserAsOwner(project, this.jobDbEntity.getUser());
+
+        createdProjectVersion = versionService.createInitialProjectVersion(project);
+        return createdProjectVersion;
+    }
+
+    @Override
+    protected void jobFailed(Exception error) throws RuntimeException, IOException {
+        if (createdProjectVersion != null) {
+            projectService.deleteProject(createdProjectVersion.getProject());
+        }
     }
 }

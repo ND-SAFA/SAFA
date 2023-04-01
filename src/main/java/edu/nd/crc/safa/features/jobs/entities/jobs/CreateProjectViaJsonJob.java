@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class CreateProjectViaJsonJob extends CommitJob {
     private final ProjectAppEntity projectAppEntity;
@@ -35,7 +36,13 @@ public class CreateProjectViaJsonJob extends CommitJob {
 
     @IJobStep(value = "Creating Project", position = 1)
     public void createProjectStep() {
-        createProject(projectOwner, projectAppEntity.getName(), projectAppEntity.getDescription());
+        ProjectVersion projectVersion =
+            createProject(projectOwner, projectAppEntity.getName(), projectAppEntity.getDescription());
+        this.projectAppEntity.setProjectVersion(projectVersion);
+        this.traceGenerationRequest.setProjectVersion(projectVersion);
+
+        getProjectCommit().addArtifacts(ModificationType.ADDED, this.projectAppEntity.getArtifacts());
+        getProjectCommit().addTraces(ModificationType.ADDED, this.projectAppEntity.getTraces());
     }
 
     @IJobStep(value = "Generating Trace Links", position = 2)

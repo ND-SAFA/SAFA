@@ -116,6 +116,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
     }
 
+    @IJobStep(value = "Creating SAFA Project to Jira Project Mapping", position = 4)
     public void mapSafaProject(JobLogger logger) {
         Project project = getProjectCommit().getCommitVersion().getProject();
 
@@ -135,7 +136,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
     }
 
-    @IJobStep(value = "Importing Issues and Links", position = 4)
+    @IJobStep(value = "Importing Issues and Links", position = 5)
     public void convertIssuesToArtifactsAndTraceLinks() {
         ProjectEntities projectEntities = this.retrieveJiraEntities();
         getProjectCommit().addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());

@@ -28,6 +28,7 @@ class TestJobStepNames extends ApplicationBaseTest {
     void testCommitJobSteps() {
         List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaJsonJob.class);
         String[] expectedStepNames = new String[]{
+            "Creating Project",
             "Generating Trace Links",
             "Committing Entities",
             "Done"
@@ -67,6 +68,7 @@ class TestJobStepNames extends ApplicationBaseTest {
             "Authenticating User Credentials",
             "Retrieving Jira Project",
             "Creating SAFA Project",
+            "Creating SAFA Project to Jira Project Mapping",
             "Importing Issues and Links",
             "Committing Entities",
             "Done"

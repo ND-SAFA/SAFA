@@ -17,7 +17,10 @@ public class JobSteps {
         "Authenticate User Credentials",
         "Retrieve JIRA project",
         "Create SAFA Project",
-        "Convert Issues To Artifacts And Trace Links"
+        "Creating SAFA Project to Jira Project Mapping",
+        "Importing Issues and Links",
+        "Committing Entities",
+        "Done"
     };
 
     public static List<String> getJobSteps(Class<? extends AbstractJob> jobType) {

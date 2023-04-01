@@ -207,8 +207,9 @@ public abstract class AbstractJob implements Job {
      */
     private void notifyBeforeStep(int stepPosition, String stepName, int nSteps) throws Exception {
         try {
-            dbLogger.setStepNum(JobExecutionUtilities.getStepIndex(stepPosition, nSteps));
-            jobService.startStep(jobDbEntity, nSteps);
+            int stepNum = JobExecutionUtilities.getStepIndex(stepPosition, nSteps);
+            dbLogger.setStepNum(stepNum);
+            jobService.startStep(jobDbEntity, stepNum, nSteps);
             notifyStateChange();
 
             log.info("Running job step \"{}\"", stepName);

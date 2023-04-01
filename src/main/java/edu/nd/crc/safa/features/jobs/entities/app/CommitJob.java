@@ -10,10 +10,12 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 
+import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -23,6 +25,7 @@ import lombok.Setter;
 public abstract class CommitJob extends AbstractJob {
 
     @Setter
+    @Getter
     private ProjectCommit projectCommit;
 
     private final ProjectService projectService;
@@ -75,15 +78,17 @@ public abstract class CommitJob extends AbstractJob {
     /**
      * Creates a new project.
      *
+     * @param owner The owner of the project.
      * @param name The name of the project.
      * @param description The description of the project.
      * @return A newly created project version.
      */
-    protected ProjectVersion createProject(String name, String description) {
+    protected ProjectVersion createProject(SafaUser owner, String name, String description) {
         Project project = new Project(name, description);
-        projectService.saveProjectWithUserAsOwner(project, this.jobDbEntity.getUser());
+        projectService.saveProjectWithUserAsOwner(project, owner);
 
         createdProjectVersion = versionService.createInitialProjectVersion(project);
+        projectCommit = new ProjectCommit(createdProjectVersion, false);
         return createdProjectVersion;
     }
 

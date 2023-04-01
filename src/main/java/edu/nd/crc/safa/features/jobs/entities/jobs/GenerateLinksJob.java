@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Generates trace links between artifacts defined in request.
@@ -72,6 +73,8 @@ public class GenerateLinksJob extends CommitJob {
 
     @IJobStep(value = "Generating links", position = 2)
     public void generateLinks(JobLogger logger) {
+        ProjectCommit projectCommit = getProjectCommit();
+
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
             logger.log("Running tracing request:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
                     tracingRequest.getModel(), tracingRequest.getMethod(),
@@ -100,6 +103,8 @@ public class GenerateLinksJob extends CommitJob {
 
             // Step - Filter our trace links overriding manual or approved links
             HashMap<String, List<String>> traceHashMap = new HashMap<>();
+
+            ProjectVersion projectVersion = projectCommit.getCommitVersion();
             this.serviceProvider
                 .getTraceService()
                 .getAppEntities(projectVersion, t -> t.getApprovalStatus().equals(ApprovalStatus.APPROVED)
@@ -121,7 +126,7 @@ public class GenerateLinksJob extends CommitJob {
 
             logger.log("Filtered down to %d traces that will be committed.", filteredGeneratedLinks.size());
 
-            this.projectCommit.addTraces(ModificationType.ADDED, filteredGeneratedLinks);
+            projectCommit.addTraces(ModificationType.ADDED, filteredGeneratedLinks);
             logger.log("\n================\n");
         }
 

@@ -20,6 +20,8 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.CloudStorage;
 
@@ -42,12 +44,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class JobController extends BaseController {
 
     private final JobService jobService;
+    private final SafaUserService safaUserService;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
                          ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
         this.jobService = serviceProvider.getJobService();
+        this.safaUserService = serviceProvider.getSafaUserService();
     }
 
     /**
@@ -107,9 +111,9 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody @Valid CreateProjectByJsonPayload payload) throws Exception {
         // Step - Create and start job.
-        System.out.println("Payload:" + payload);
+        SafaUser requester = safaUserService.getCurrentUser();
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
-            serviceProvider, payload.getProject(), payload.getRequests());
+            serviceProvider, payload.getProject(), payload.getRequests(), requester);
         return createProjectByJsonJobBuilder.perform();
     }
 

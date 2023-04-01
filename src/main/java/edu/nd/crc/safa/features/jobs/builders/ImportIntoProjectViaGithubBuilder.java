@@ -23,16 +23,12 @@ public class ImportIntoProjectViaGithubBuilder extends CreateProjectViaGithubBui
     }
 
     @Override
-    protected GithubIdentifier constructIdentifier() {
-        return this.githubIdentifier;
-    }
-
-    @Override
     AbstractJob constructJobForWork() {
         return new GithubProjectImportJob(
             jobDbEntity,
             serviceProvider,
-            this.githubIdentifier
+            this.githubIdentifier,
+            this.user
         );
     }
 }

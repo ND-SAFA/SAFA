@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -25,7 +24,6 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Setter;
-import org.springframework.util.StringUtils;
 
 /**
  * Responsible for providing step implementations for:
@@ -60,12 +58,11 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
     private final SafaUser user;
 
-    public CreateProjectViaJiraJob(
-        JobDbEntity jobDbEntity,
-        ServiceProvider serviceProvider,
-        JiraIdentifier jiraIdentifier,
-        SafaUser user) {
-        super(jobDbEntity, serviceProvider, new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
+    protected static final int CREATE_PROJECT_STEP_INDEX = 3;
+
+    public CreateProjectViaJiraJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider,
+                                   JiraIdentifier jiraIdentifier, SafaUser user) {
+        super(jobDbEntity, serviceProvider);
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
         this.user = user;
@@ -105,26 +102,22 @@ public class CreateProjectViaJiraJob extends CommitJob {
                 jiraProjectResponse.getName(), issues.size());
     }
 
-    @IJobStep(value = "Creating SAFA Project", position = 3)
+    @IJobStep(value = "Creating SAFA Project", position = CREATE_PROJECT_STEP_INDEX)
     public void createSafaProject(JobLogger logger) {
         // Step - Save as SAFA project
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
-        Project project = this.jiraIdentifier.getProjectVersion().getProject();
 
-        // if not already set
-        if (!StringUtils.hasLength(project.getName())) {
-            project.setName(projectName);
-        }
-        if (!StringUtils.hasLength(project.getDescription())) {
-            project.setDescription(projectDescription);
-        }
-        project = this.serviceProvider.getProjectRepository().save(project);
+        Project project = createProject(user, projectName, projectDescription).getProject();
 
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
 
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
+    }
+
+    public void mapSafaProject(JobLogger logger) {
+        Project project = getProjectCommit().getCommitVersion().getProject();
 
         // Step - Map JIRA project to SAFA project
         this.jiraProject = this.getJiraProjectMapping(
@@ -133,7 +126,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
             this.jiraIdentifier.getJiraProjectId());
 
         logger.log("Project %s is mapped to Jira project %s within org with ID %s.", project.getProjectId(),
-                jiraProject.getJiraProjectId(), jiraProject.getOrgId());
+            jiraProject.getJiraProjectId(), jiraProject.getOrgId());
     }
 
     protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId)  {
@@ -145,8 +138,8 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @IJobStep(value = "Importing Issues and Links", position = 4)
     public void convertIssuesToArtifactsAndTraceLinks() {
         ProjectEntities projectEntities = this.retrieveJiraEntities();
-        this.projectCommit.addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
-        this.projectCommit.addTraces(ModificationType.ADDED, projectEntities.getTraces());
+        getProjectCommit().addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
+        getProjectCommit().addTraces(ModificationType.ADDED, projectEntities.getTraces());
 
         jiraProject.setLastUpdate(new Date());
         this.serviceProvider.getJiraProjectRepository().save(jiraProject);

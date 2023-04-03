@@ -23,7 +23,7 @@ public class ImportIntoProjectViaGithubBuilder extends CreateProjectViaGithubBui
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new GithubProjectImportJob(
             jobDbEntity,
             serviceProvider,

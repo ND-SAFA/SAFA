@@ -44,7 +44,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
     }
 
     @Override
-    AbstractJob constructJobForWork() throws IOException {
+    protected AbstractJob constructJobForWork() throws IOException {
         uploadFlatFiles(this.identifier.getProject());
 
         // Step 3 - Create job worker
@@ -56,12 +56,12 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         return this.identifier.getProject().getName();
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return FlatFileProjectCreationJob.class;
     }
 

@@ -29,7 +29,7 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
     }
 
     @Override
-    AbstractJob constructJobForWork() throws IOException {
+    protected AbstractJob constructJobForWork() throws IOException {
         return new TrainModelJob(
             jobDbEntity,
             serviceProvider,
@@ -39,13 +39,13 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         String modelName = this.identifier.getRequests().get(0).getModel().getName();
         return String.format("Training model: [%s].", modelName);
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return TrainModelJob.class;
     }
 }

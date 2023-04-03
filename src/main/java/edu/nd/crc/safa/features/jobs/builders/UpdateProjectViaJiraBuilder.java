@@ -26,7 +26,7 @@ public class UpdateProjectViaJiraBuilder extends CreateProjectViaJiraBuilder {
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new JiraProjectUpdateJob(
             jobDbEntity,
             serviceProvider,

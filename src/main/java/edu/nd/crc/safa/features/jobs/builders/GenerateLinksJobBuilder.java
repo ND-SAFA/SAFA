@@ -26,18 +26,18 @@ public class GenerateLinksJobBuilder extends AbstractJobBuilder<TraceGenerationR
     }
 
     @Override
-    AbstractJob constructJobForWork() throws IOException {
+    protected AbstractJob constructJobForWork() throws IOException {
         ProjectCommit projectCommit = new ProjectCommit(this.request.getProjectVersion(), false);
         return new GenerateLinksJob(this.jobDbEntity, this.serviceProvider, projectCommit, this.request);
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         return GenerateLinksJob.getJobName(request);
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return GenerateLinksJob.class;
     }
 }

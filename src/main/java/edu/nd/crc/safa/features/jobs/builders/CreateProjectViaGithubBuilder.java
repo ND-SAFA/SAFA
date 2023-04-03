@@ -31,17 +31,17 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIden
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new GithubProjectCreationJob(this.jobDbEntity, serviceProvider, this.githubIdentifier, this.user);
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         return GithubProjectCreationJob.createJobName(this.githubIdentifier);
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return GithubProjectCreationJob.class;
     }
 }

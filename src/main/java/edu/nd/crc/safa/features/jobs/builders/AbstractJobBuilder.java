@@ -22,13 +22,13 @@ public abstract class AbstractJobBuilder<I> {
     /**
      * Input to job builder.
      */
-    I identifier;
+    protected I identifier;
     /**
      * The database entity for this job.
      */
-    JobDbEntity jobDbEntity;
+    protected JobDbEntity jobDbEntity;
 
-    SafaUser user;
+    protected SafaUser user;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {
         this(serviceProvider, null);
@@ -72,19 +72,19 @@ public abstract class AbstractJobBuilder<I> {
     /**
      * Step 2 - Creates job definition for change.
      */
-    abstract AbstractJob constructJobForWork() throws IOException;
+    protected abstract AbstractJob constructJobForWork() throws IOException;
 
     /**
      * Returns the name of the job.
      *
      * @return The name of the job.
      */
-    abstract String getJobName();
+    protected abstract String getJobName();
 
     /**
      * @return The type of job used to identify operation being performed.return
      */
-    abstract Class<? extends AbstractJob> getJobType();
+    protected abstract Class<? extends AbstractJob> getJobType();
 
     @AllArgsConstructor
     protected static class JobDefinition {

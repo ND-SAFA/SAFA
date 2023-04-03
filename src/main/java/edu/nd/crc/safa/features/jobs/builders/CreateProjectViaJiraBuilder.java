@@ -36,7 +36,7 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         // Step - Create jira project creation job
         return new CreateProjectViaJiraJob(
             this.jobDbEntity,
@@ -47,12 +47,12 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         return CreateProjectViaJiraJob.createJobName(this.identifier);
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return CreateProjectViaJiraJob.class;
     }
 }

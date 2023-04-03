@@ -19,7 +19,7 @@ public class UpdateProjectViaGithubBuilder extends CreateProjectViaGithubBuilder
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new GithubProjectUpdateJob(
             jobDbEntity,
             serviceProvider,

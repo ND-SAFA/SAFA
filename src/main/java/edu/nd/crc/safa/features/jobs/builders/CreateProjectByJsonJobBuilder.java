@@ -43,7 +43,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         // Step - Create initial commit
         this.projectAppEntity.setProjectVersion(this.identifier);
         this.traceGenerationRequest.setProjectVersion(this.identifier);
@@ -59,12 +59,12 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    String getJobName() {
+    protected String getJobName() {
         return String.format("Creating project %s.", projectAppEntity.getName());
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return CreateProjectViaJsonJob.class;
     }
 }

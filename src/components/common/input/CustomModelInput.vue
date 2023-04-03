@@ -6,7 +6,6 @@
     :options="options"
     option-label="name"
     option-value="id"
-    emit-value
     map-options
   >
     <template #option="{ opt, itemProps }">

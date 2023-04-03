@@ -10,12 +10,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from cloud.model_utility import CloudUtility
-from data.readers.definitions.api_definition import ApiDefinition
 from experiment_creator import ExperimentCreator, PredictionJobTypes
-from experiments.experiment import Experiment
 from serializers.prediction_serializer import PredictionSerializer
-from tgen.src.jobs.components.job_result import JobResult
-from util.definition_creator import DefinitionCreator
+from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.experiments.experiment import Experiment
+from tgen.jobs.components.job_result import JobResult
+from tgen.util.definition_creator import DefinitionCreator
 
 
 def get_responses(response_keys: Union[str, list]) -> Dict:

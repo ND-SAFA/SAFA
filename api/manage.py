@@ -3,6 +3,11 @@
 import os
 import sys
 
+TGEN_PATH = os.path.join(os.path.dirname(__file__), "..", "tgen")
+TGEN_PATH = os.path.normpath(TGEN_PATH)
+sys.path.append(TGEN_PATH)
+print(TGEN_PATH)
+
 
 def main():
     """Run administrative tasks."""

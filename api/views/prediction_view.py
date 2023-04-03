@@ -1,4 +1,5 @@
 import json
+import os.path
 from typing import Any, Dict, Union
 
 from django.http import HttpRequest
@@ -10,8 +11,11 @@ from rest_framework.views import APIView
 
 from cloud.model_utility import CloudUtility
 from data.readers.definitions.api_definition import ApiDefinition
+from experiment_creator import ExperimentCreator, PredictionJobTypes
+from experiments.experiment import Experiment
 from serializers.prediction_serializer import PredictionSerializer
 from tgen.src.jobs.components.job_result import JobResult
+from util.definition_creator import DefinitionCreator
 
 
 def get_responses(response_keys: Union[str, list]) -> Dict:
@@ -37,10 +41,24 @@ class PredictView(APIView):
         prediction_payload = self.read_request(request, PredictionSerializer)
         model = prediction_payload["model"]
         dataset: ApiDefinition = prediction_payload["dataset"]
+        temp_dir = os.path.expanduser("~/desktop/safa/openai/output")
 
-        model_path = CloudUtility.download_model(model)
-        # TODO: Create definition JSON for experiment and run.
-        raise NotImplementedError("Current building out prediction endpoint.")
+        prediction_job_args = {
+            "dataset": dataset,
+            "output_dir": temp_dir
+        }
+        if model != "gpt":
+            prediction_job_args["prediction_job_type"] = PredictionJobTypes.OPENAI
+        else:
+            model_path = CloudUtility.download_model(model)
+            prediction_job_args["prediction_job_type"] = PredictionJobTypes.BASE
+            prediction_job_args["model_path"] = model_path
+
+        # Assign output path based on random ID
+        experiment_definition = ExperimentCreator.create_prediction_definition(**prediction_job_args)
+        experiment: Experiment = DefinitionCreator.create(Experiment, experiment_definition)
+        experiment.run()
+        return experiment.steps[0].jobs[0].result
 
     @staticmethod
     def read_request(request: HttpRequest, serializer_class) -> Any:
@@ -52,6 +70,5 @@ class PredictView(APIView):
         """
         data = json.loads(request.body)
         serializer = serializer_class(data=data)
-        if serializer.is_valid():
-            return serializer.save()
-        raise Exception(serializer.errors)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()

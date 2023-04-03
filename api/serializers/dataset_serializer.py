@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
+from data.readers.definitions.api_definition import ApiDefinition
 from serializers.serializer_utility import SerializerUtility
-from tgen.src.server.api.api_definition import ApiDefinition
 
 
 class DatasetSerializer(serializers.Serializer):

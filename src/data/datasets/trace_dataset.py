@@ -18,6 +18,7 @@ from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
+from util.enum_util import EnumDict
 from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
 
@@ -173,6 +174,20 @@ class TraceDataset(iDataset):
         :return: a list of ordered link ids
         """
         return [link_id for link_id in self.pos_link_ids + self.neg_link_ids]
+
+    def get_ordered_links(self) -> List[EnumDict]:
+        """
+        Gets links in the order that they are given in the trainer dataset
+        :return: A list of ordered links
+        """
+        return [self.trace_df.get_link(link_id) for link_id in self.get_ordered_link_ids()]
+
+    def get_ordered_labels(self) -> List[EnumDict]:
+        """
+        Gets labels in the order that they are given in the trainer dataset
+        :return: A list of ordered labels
+        """
+        return [link[TraceKeys.LABEL] for link in self.get_ordered_links()]
 
     def get_source_target_pairs(self, link_ids: List = None) -> List[Tuple]:
         """

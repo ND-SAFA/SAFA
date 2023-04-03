@@ -7,7 +7,6 @@ from datasets import disable_caching
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.idataset import iDataset
 from data.datasets.pre_train_dataset import PreTrainDataset
@@ -23,6 +22,7 @@ from util.base_object import BaseObject
 from util.enum_util import get_enum_from_name
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
+import pandas as pd
 
 disable_caching()
 
@@ -119,7 +119,22 @@ class TrainerDatasetManager(BaseObject):
             self._prepare_datasets(self.augmenter)
         return self._datasets
 
-    def get_hf_datasets(self, model_manager: ModelManager):
+    def replace_dataset(self, new_dataset: iDataset, dataset_role: DatasetRole) -> None:
+        """
+        Replaces the dataset for the given dataset role with the new dataset
+        :param new_dataset: The dataset to replace the original dataset with
+        :param dataset_role: The role of the dataset being replaced
+        :return: None
+        """
+        datasets = self.get_datasets()
+        datasets[dataset_role] = new_dataset
+
+    def get_hf_datasets(self, model_manager: ModelManager) -> Dict[str, pd.DataFrame]:
+        """
+        Gets all datasets in the expected hugging face format
+        :param model_manager: The model manager to use for tokenization
+        :return: A dictionary mapping all dataset roles to their expected hugging face format
+        """
         if self._hf_datasets is None:
             self._hf_datasets = {}
             datasets = self.get_datasets()

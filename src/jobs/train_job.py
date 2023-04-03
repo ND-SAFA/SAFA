@@ -23,5 +23,8 @@ class TrainJob(AbstractTraceJob):
             training_output.prediction_output = trainer.perform_prediction(DatasetRole.EVAL)
         best_model_path = self._trainer.state.best_model_checkpoint
         if best_model_path:
-            os.rename(best_model_path, os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME))
+            best_model_dir = os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME)
+            if os.path.exists(best_model_dir):
+                os.rmdir(best_model_dir)
+            os.rename(best_model_path,best_model_dir)
         return JobResult.from_trace_output(training_output)

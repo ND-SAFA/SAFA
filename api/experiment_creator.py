@@ -25,13 +25,12 @@ class ExperimentCreator:
         :return: Definition defining prediction job.
         """
         base_definition = {
-            "output_dir": output_dir,
             "trainer_dataset_manager": {
                 "eval_dataset_creator": dataset
             }
         }
         if prediction_job_type == PredictionJobTypes.OPENAI:
-            return {
+            definition = {
                 **base_definition,
                 "object_type": "OPEN_AI",
                 "task": "PREDICT",
@@ -39,7 +38,7 @@ class ExperimentCreator:
             }
         elif prediction_job_type == PredictionJobTypes.BASE:
             assert model_path is not None, "Expected model_path to be defined for prediction job."
-            return {
+            definition = {
                 **base_definition,
                 "job_args": {},
                 "model_manager": {
@@ -48,17 +47,19 @@ class ExperimentCreator:
                 "trainer_args": {},
             }
         else:
-            raise NotImplementedError(f"Prediction job is not supported for job type:{job_type}")
+            raise NotImplementedError(f"Prediction job is not supported for job type:{prediction_job_type.name}")
+        return ExperimentCreator.create_job_experiment(definition, output_dir)
 
     @staticmethod
-    def create_trace_dataset_job(dataset_creator_definition: Dict):
-        return ExperimentCreator.create_job_experiment({
-
-        })
-
-    @staticmethod
-    def create_job_experiment(job_definition: Dict) -> Dict:
+    def create_job_experiment(job_definition: Dict, output_dir: str) -> Dict:
+        """
+        Wraps job definition in experiment definition.
+        :param job_definition: The job to wrap.
+        :param output_dir: The directory to output job materials.
+        :return: Experiment definition for job.
+        """
         return {
+            "output_dir": output_dir,
             "steps": [{
                 "jobs": [job_definition]
             }]

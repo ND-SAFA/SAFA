@@ -2,7 +2,7 @@ import os
 
 from cloud.gcp_cloud_storage import GcpCloudStorage
 from cloud.icloud_storage import ICloudStorage
-from util.supported_enum import SupportedEnum
+from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedCloudStorage(SupportedEnum):
@@ -16,4 +16,5 @@ class SupportedCloudStorage(SupportedEnum):
         """
         :return: Returns the cloud storage defined in environment.
         """
-        return cls.get_value(os.environ["STORAGE"])
+        storage_provider = os.environ.get("STORAGE", "GCP")
+        return cls.get_value(storage_provider)

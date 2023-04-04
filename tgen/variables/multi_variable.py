@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from variables.variable import Variable
+from tgen.variables.variable import Variable
 
 
 class MultiVariable(Variable, list):

@@ -1,9 +1,9 @@
 from typing import Dict, List
 
-from data.github.gartifacts.gartifact_set import GArtifactSet
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gtraces.glink import GLink
-from data.github.gtraces.glink_store import GLinkStore
+from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gtraces.glink import GLink
+from tgen.data.github.gtraces.glink_store import GLinkStore
 
 
 class GLinkProcessor:

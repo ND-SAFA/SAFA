@@ -2,21 +2,21 @@ from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Type, Union, get_origin, get_args, Optional
+from typing import Any, Dict, List, Optional, Type, Union, get_args
 
 from typeguard import check_type
 from typing_extensions import get_args
 
-from util.enum_util import get_enum_from_name
-from util.logging.logger_manager import logger
-from util.param_specs import ParamSpecs
-from util.reflection_util import ReflectionUtil
-from variables.definition_variable import DefinitionVariable
-from variables.experimental_variable import ExperimentalVariable
-from variables.multi_variable import MultiVariable
-from variables.typed_definition_variable import TypedDefinitionVariable
-from variables.undetermined_variable import UndeterminedVariable
-from variables.variable import Variable
+from tgen.util.enum_util import get_enum_from_name
+from tgen.util.logging.logger_manager import logger
+from tgen.util.param_specs import ParamSpecs
+from tgen.util.reflection_util import ReflectionUtil
+from tgen.variables.definition_variable import DefinitionVariable
+from tgen.variables.experimental_variable import ExperimentalVariable
+from tgen.variables.multi_variable import MultiVariable
+from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from tgen.variables.undetermined_variable import UndeterminedVariable
+from tgen.variables.variable import Variable
 
 
 @dataclass
@@ -226,7 +226,7 @@ class BaseObject(ABC):
             "Cannot create %s because %s has not defined the enum class to use." % (child_class_name, cls.__name__))
 
     @classmethod
-    def  _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):
+    def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):
         """
         Asserts that the value is of the expected type for the variable with the given name
         :param val: the value

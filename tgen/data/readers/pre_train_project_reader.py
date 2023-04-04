@@ -1,9 +1,9 @@
 import os
 from typing import List
 
-from data.readers.entity.entity_reader import EntityReader
-from data.keys.structure_keys import StructuredKeys
-from util.base_object import BaseObject
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.entity.entity_reader import EntityReader
+from tgen.util.base_object import BaseObject
 
 
 class PreTrainProjectReader(BaseObject):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from data.readers.entity.entity_parser_type import EntityParserType
+from tgen.data.readers.entity.entity_parser_type import EntityParserType
 
 
 class AbstractEntityFormat(ABC):

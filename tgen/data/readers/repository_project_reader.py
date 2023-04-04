@@ -1,6 +1,6 @@
-from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from data.readers.definitions.repository_project_definition import RepositoryProjectDefinition
-from data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from tgen.data.readers.definitions.repository_project_definition import RepositoryProjectDefinition
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
 
 class RepositoryProjectReader(StructuredProjectReader):

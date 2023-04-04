@@ -3,20 +3,20 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame
-from data.keys.safa_format import SafaKeys
-from data.keys.structure_keys import StructuredKeys
-from data.readers.abstract_project_reader import AbstractProjectReader
-from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from data.readers.definitions.structure_project_definition import StructureProjectDefinition
-from data.readers.definitions.tim_project_definition import TimProjectDefinition
-from data.readers.entity.entity_reader import EntityReader
-from util.enum_util import EnumDict
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
-from util.logging.logger_manager import logger
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.safa_format import SafaKeys
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
+from tgen.data.readers.entity.entity_reader import EntityReader
+from tgen.util.enum_util import EnumDict
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
+from tgen.util.logging.logger_manager import logger
 
 
 class StructuredProjectReader(AbstractProjectReader):

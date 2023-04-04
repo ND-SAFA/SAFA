@@ -3,8 +3,8 @@ import os
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
-from train.trainer_args import TrainerArgs
-from train.wandb.Wandb import Wandb
+from tgen.train.trainer_args import TrainerArgs
+from tgen.train.wandb.Wandb import Wandb
 
 
 class TraceCallback(WandbCallback):

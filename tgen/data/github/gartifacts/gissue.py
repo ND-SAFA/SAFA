@@ -3,10 +3,10 @@ from typing import Callable, Dict, List, Union
 
 from github import Issue
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from data.github.gartifacts.gartifact_type import GArtifactType
-from util.date_time_util import DateTimeUtil
-from util.override import overrides
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.util.date_time_util import DateTimeUtil
+from tgen.util.override import overrides
 
 
 class GIssue(AbstractGithubArtifact):

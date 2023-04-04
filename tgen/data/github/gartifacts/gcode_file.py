@@ -1,11 +1,10 @@
-import io
 import os
-from typing import Callable, Dict, Union, List, Set, Iterable
+from typing import Callable, Dict, Iterable, Set, Union
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from data.github.github_constants import ALLOWED_CODE_EXTENSIONS
-from util.file_util import FileUtil
-from util.override import overrides
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.data.github.github_constants import ALLOWED_CODE_EXTENSIONS
+from tgen.util.file_util import FileUtil
+from tgen.util.override import overrides
 
 
 class GCodeFile(AbstractGithubArtifact):

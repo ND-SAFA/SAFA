@@ -1,13 +1,13 @@
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from models.model_manager import ModelManager
-from train.open_ai.open_ai_args import OpenAIArgs
-from train.open_ai.open_ai_task import OpenAITask
-from train.open_ai.open_ai_trainer import OpenAITrainer
-from train.open_ai.prompt_generator import PromptGenerator
-from train.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.models.model_manager import ModelManager
+from tgen.train.open_ai.open_ai_args import OpenAIArgs
+from tgen.train.open_ai.open_ai_task import OpenAITask
+from tgen.train.open_ai.open_ai_trainer import OpenAITrainer
+from tgen.train.open_ai.prompt_generator import PromptGenerator
+from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 
 
 class OpenAIJob(AbstractTraceJob):

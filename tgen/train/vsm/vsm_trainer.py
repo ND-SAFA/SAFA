@@ -9,19 +9,19 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
-from constants import VSM_THRESHOLD_DEFAULT
-from data.dataframes.artifact_dataframe import ArtifactKeys
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.trace_dataset import TraceDataset
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from train.itrainer import iTrainer
-from train.metrics.metrics_manager import MetricsManager
-from train.metrics.supported_trace_metric import SupportedTraceMetric
-from train.trace_output.stage_eval import Metrics
-from train.trace_output.trace_prediction_output import TracePredictionOutput
-from train.trace_output.trace_train_output import TraceTrainOutput
-from util.override import overrides
+from tgen.constants import VSM_THRESHOLD_DEFAULT
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.train.itrainer import iTrainer
+from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.train.trace_output.stage_eval import Metrics
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.train.trace_output.trace_train_output import TraceTrainOutput
+from tgen.util.override import overrides
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 

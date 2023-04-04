@@ -1,5 +1,5 @@
-from data.hub.abstract_hub_id import AbstractHubId
-from util.override import overrides
+from tgen.data.hub.abstract_hub_id import AbstractHubId
+from tgen.util.override import overrides
 
 
 class CCHITHubId(AbstractHubId):

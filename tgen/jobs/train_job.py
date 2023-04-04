@@ -2,10 +2,10 @@ import os
 
 from transformers.integrations import WandbCallback
 
-from constants import BEST_MODEL_NAME
-from data.tdatasets.dataset_role import DatasetRole
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_result import JobResult
+from tgen.constants import BEST_MODEL_NAME
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_result import JobResult
 
 
 class TrainJob(AbstractTraceJob):
@@ -26,5 +26,5 @@ class TrainJob(AbstractTraceJob):
             best_model_dir = os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME)
             if os.path.exists(best_model_dir):
                 os.rmdir(best_model_dir)
-            os.rename(best_model_path,best_model_dir)
+            os.rename(best_model_path, best_model_dir)
         return JobResult.from_trace_output(training_output)

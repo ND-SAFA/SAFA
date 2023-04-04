@@ -1,12 +1,11 @@
 import os
+from typing import Tuple
 
-from typing import List, Tuple
-
-from data.tdatasets.pre_train_dataset import PreTrainDataset
-from data.readers.pre_train_project_reader import PreTrainProjectReader
-from data.splitting.abstract_split_strategy import AbstractSplitStrategy
-from util.file_util import FileUtil
-from util.override import overrides
+from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
+from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
+from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
+from tgen.util.file_util import FileUtil
+from tgen.util.override import overrides
 
 
 class PreTrainSplitStrategy(AbstractSplitStrategy):

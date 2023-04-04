@@ -2,11 +2,11 @@ from typing import Dict, Type
 
 from rest_enumfield import EnumField
 from rest_framework import serializers
+from tgen.data.processing.augmentation.data_augmentation_steps import AugmentationStep
 
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from data.processing.augmentation.data_augmentation_steps import AugmentationStep
-from jobs.job_factory import JobFactory
-from server.serializers.serializer_utility import SerializerUtility
+from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tgen.jobs.job_factory import JobFactory
+from tgen.server.serializers.serializer_utility import SerializerUtility
 
 
 class AugmentationStepSerializer(serializers.Serializer):

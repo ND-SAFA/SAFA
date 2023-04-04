@@ -13,7 +13,7 @@ sys.path.append(ROOT_PATH)
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
-    from scripts.modules.script_runner import ScriptRunner
+    from tgen.scripts.modules.script_runner import ScriptRunner
 
     parser = argparse.ArgumentParser(
         prog='Experiment',

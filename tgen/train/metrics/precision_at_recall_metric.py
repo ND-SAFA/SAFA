@@ -3,9 +3,9 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
-from util.logging.logger_manager import logger
+from tgen.constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.util.logging.logger_manager import logger
 
 _DESCRIPTION = """
 Calculates the optimal threshold for predictions.

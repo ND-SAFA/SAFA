@@ -7,11 +7,11 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from constants import MAX_SEQ_LENGTH_DEFAULT
-from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
-from util.base_object import BaseObject
-from util.override import overrides
-from util.logging.logger_manager import logger
+from tgen.constants import MAX_SEQ_LENGTH_DEFAULT
+from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
+from tgen.util.base_object import BaseObject
+from tgen.util.logging.logger_manager import logger
+from tgen.util.override import overrides
 
 LAYER = List[Parameter]
 
@@ -159,7 +159,7 @@ class ModelManager(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from models.supported_model_manager import SupportedModelManager
+        from tgen.models.supported_model_manager import SupportedModelManager
         return SupportedModelManager
 
     def _freeze_layers(self, model: PreTrainedModel, layers_to_freeze: List[int]) -> None:

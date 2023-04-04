@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
-from constants import RESAMPLE_RATE_DEFAULT
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from util.override import overrides
+from tgen.constants import RESAMPLE_RATE_DEFAULT
+from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tgen.util.override import overrides
 
 
 class ResampleStep(AbstractDataAugmentationStep):

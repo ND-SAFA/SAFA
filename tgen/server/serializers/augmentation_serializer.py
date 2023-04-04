@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from data.processing.augmentation.data_augmenter import DataAugmenter
-from server.serializers.augmentation_step_serializer import AugmentationStepSerializer
-from server.serializers.serializer_utility import SerializerUtility
+from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from tgen.server.serializers.augmentation_step_serializer import AugmentationStepSerializer
+from tgen.server.serializers.serializer_utility import SerializerUtility
 
 
 class AugmentationSerializer(serializers.Serializer):

@@ -1,7 +1,7 @@
 from typing import List
 
-from constants import MIN_LENGTH_DEFAULT
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from tgen.constants import MIN_LENGTH_DEFAULT
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class FilterMinLengthStep(AbstractDataProcessingStep):

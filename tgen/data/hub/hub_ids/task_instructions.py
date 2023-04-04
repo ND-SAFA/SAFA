@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Iterable, List, Tuple
 
-from data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 
 
 @dataclass

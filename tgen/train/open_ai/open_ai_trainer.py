@@ -1,25 +1,25 @@
 import os
-from typing import Dict, Tuple, List
+from typing import Dict, List, Tuple
 
 import openai
 import pandas as pd
-
-from constants import OPEN_AI_ORG, OPEN_AI_KEY
-from data.dataframes.artifact_dataframe import ArtifactKeys
-from data.dataframes.trace_dataframe import TraceKeys
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.trace_dataset import TraceDataset
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from train.itrainer import iTrainer
-from train.metrics.metrics_manager import MetricsManager
-from train.open_ai.open_ai_args import OpenAIArgs
-from train.open_ai.open_ai_task import OpenAITask
-from train.open_ai.prompt_generator import PromptGenerator
-from train.trace_output.trace_prediction_output import TracePredictionOutput
-from util.file_util import FileUtil
-from util.logging.logger_manager import logger
-from scipy.special import softmax
 from openai.openai_object import OpenAIObject
+from scipy.special import softmax
+
+from tgen.constants import OPEN_AI_KEY, OPEN_AI_ORG
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.train.itrainer import iTrainer
+from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.train.open_ai.open_ai_args import OpenAIArgs
+from tgen.train.open_ai.open_ai_task import OpenAITask
+from tgen.train.open_ai.prompt_generator import PromptGenerator
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 
 assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
                                     f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"

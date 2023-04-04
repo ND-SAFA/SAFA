@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 The F1 score can be interpreted as a harmonic mean of the precision and recall, where an F1 

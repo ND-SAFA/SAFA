@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from util.base_object import BaseObject
+from tgen.util.base_object import BaseObject
 
 
 class AbstractProjectDefinition(BaseObject, ABC):

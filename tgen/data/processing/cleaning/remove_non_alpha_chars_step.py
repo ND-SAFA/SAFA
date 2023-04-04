@@ -1,6 +1,6 @@
 from typing import List
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class RemoveNonAlphaCharsStep(AbstractDataProcessingStep):

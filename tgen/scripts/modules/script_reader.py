@@ -5,12 +5,12 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES, OUTPUT_FILENAME
-from jobs.components.job_result import JobResult
-from scripts.modules.script_definition import ScriptDefinition
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
-from util.logging.logger_manager import logger
+from tgen.constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES, OUTPUT_FILENAME
+from tgen.jobs.components.job_result import JobResult
+from tgen.scripts.modules.script_definition import ScriptDefinition
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
+from tgen.util.logging.logger_manager import logger
 
 pd.set_option('display.max_colwidth', None)
 

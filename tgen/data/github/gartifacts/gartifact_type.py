@@ -1,4 +1,4 @@
-from util.supported_enum import SupportedEnum
+from tgen.util.supported_enum import SupportedEnum
 
 
 class GArtifactType(SupportedEnum):

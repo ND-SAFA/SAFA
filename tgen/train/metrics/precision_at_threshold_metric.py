@@ -3,9 +3,9 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_score
 
-from constants import K_METRIC_DEFAULT
-from data.tdatasets.trace_matrix import TraceMatrix
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.constants import K_METRIC_DEFAULT
+from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Precision@K metric measures the percentage of predicted links that were correct.

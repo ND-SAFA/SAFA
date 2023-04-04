@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import datasets
 from datasets import MetricInfo
 
-from util.base_object import BaseObject
+from tgen.util.base_object import BaseObject
 
 
 class AbstractTraceMetric(datasets.Metric, BaseObject, ABC):

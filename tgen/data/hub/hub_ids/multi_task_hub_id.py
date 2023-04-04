@@ -2,8 +2,8 @@ import os
 from abc import ABC
 from typing import List
 
-from constants import STAGES
-from data.hub.abstract_hub_id import AbstractHubId
+from tgen.constants import STAGES
+from tgen.data.hub.abstract_hub_id import AbstractHubId
 
 
 class MultiStageHubId(AbstractHubId, ABC):

@@ -1,8 +1,8 @@
-from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
+from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
 
 
 class CreateDatasetsJob(AbstractJob):

@@ -1,12 +1,12 @@
 import os
 from typing import Iterable
 
-from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.keys.structure_keys import StructuredKeys
-from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from util.file_util import FileUtil
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.util.file_util import FileUtil
 
 
 class ExportArtifactsJob(AbstractJob):

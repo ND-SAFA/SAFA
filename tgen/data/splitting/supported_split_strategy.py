@@ -1,8 +1,8 @@
 from enum import Enum
 
-from data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
-from data.splitting.random_split_strategy import RandomSplitStrategy
-from data.splitting.source_split_strategy import SourceSplitStrategy
+from tgen.data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
+from tgen.data.splitting.random_split_strategy import RandomSplitStrategy
+from tgen.data.splitting.source_split_strategy import SourceSplitStrategy
 
 
 class SupportedSplitStrategy(Enum):

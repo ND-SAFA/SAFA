@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Type
+from typing import Generic, Type, TypeVar
 
-from data.tdatasets.idataset import iDataset
-from data.processing.cleaning.data_cleaner import DataCleaner
-from util.base_object import BaseObject
-from util.override import overrides
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 DatasetType = TypeVar("DatasetType", bound=iDataset)
 
@@ -26,7 +26,7 @@ class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.creators.supported_dataset_creator import SupportedDatasetCreator
+        from tgen.data.creators.supported_dataset_creator import SupportedDatasetCreator
         return SupportedDatasetCreator
 
     @abstractmethod

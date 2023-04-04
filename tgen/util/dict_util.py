@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from util.list_util import ListUtil
+from tgen.util.list_util import ListUtil
 
 
 class DictUtil:

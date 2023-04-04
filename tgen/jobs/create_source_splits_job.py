@@ -5,19 +5,19 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.trace_dataset import TraceDataset
-from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from data.keys.structure_keys import StructuredKeys
-from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from util.dataframe_util import DataFrameUtil
-from util.list_util import ListUtil
-from util.logging.logger_manager import logger
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.list_util import ListUtil
+from tgen.util.logging.logger_manager import logger
 
 
 class CreateSourceSplitsJob(AbstractJob):

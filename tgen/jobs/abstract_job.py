@@ -10,16 +10,16 @@ from typing import Dict, Type
 import torch
 import wandb
 
-from constants import OUTPUT_FILENAME
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from models.model_manager import ModelManager
-from util.base_object import BaseObject
-from util.file_util import FileUtil
-from util.logging.logger_manager import logger
-from util.override import overrides
-from util.random_util import RandomUtil
-from util.status import Status
+from tgen.constants import OUTPUT_FILENAME
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.models.model_manager import ModelManager
+from tgen.util.base_object import BaseObject
+from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
+from tgen.util.override import overrides
+from tgen.util.random_util import RandomUtil
+from tgen.util.status import Status
 
 
 class AbstractJob(threading.Thread, BaseObject):
@@ -117,7 +117,7 @@ class AbstractJob(threading.Thread, BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from jobs.supported_job_type import SupportedJobType
+        from tgen.jobs.supported_job_type import SupportedJobType
         return SupportedJobType
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":

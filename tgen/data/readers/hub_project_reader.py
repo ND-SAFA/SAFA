@@ -2,10 +2,10 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from data.hub.abstract_hub_id import AbstractHubId
-from data.hub.supported_datasets import SupportedDatasets
-from data.hub.trace_dataset_downloader import TraceDatasetDownloader
-from data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.hub.abstract_hub_id import AbstractHubId
+from tgen.data.hub.supported_datasets import SupportedDatasets
+from tgen.data.hub.trace_dataset_downloader import TraceDatasetDownloader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 
 
 class HubProjectReader(AbstractProjectReader):

@@ -1,11 +1,11 @@
 from typing import Optional
 
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from models.model_manager import ModelManager
-from train.trainer_args import TrainerArgs
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.models.model_manager import ModelManager
+from tgen.train.trainer_args import TrainerArgs
 
 
 class PushModelJob(AbstractTraceJob):

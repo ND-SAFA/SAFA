@@ -2,19 +2,19 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
-from constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
-from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from jobs.abstract_job import AbstractJob
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_result import JobResult
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.wandb.Wandb import Wandb
-from util.base_object import BaseObject
-from util.dict_util import ListUtil
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
-from util.status import Status
-from variables.experimental_variable import ExperimentalVariable
+from tgen.constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
+from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_result import JobResult
+from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.wandb.Wandb import Wandb
+from tgen.util.base_object import BaseObject
+from tgen.util.dict_util import ListUtil
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
+from tgen.util.status import Status
+from tgen.variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):

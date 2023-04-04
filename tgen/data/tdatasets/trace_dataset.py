@@ -6,21 +6,21 @@ import pandas as pd
 import torch
 from datasets import Dataset
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from data.tdatasets.data_key import DataKey
-from data.tdatasets.idataset import iDataset
-from data.tdatasets.trace_matrix import TraceMatrix
-from data.keys.csv_format import CSVKeys
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from models.model_manager import ModelManager
-from models.model_properties import ModelArchitectureType
-from util.enum_util import EnumDict
-from util.logging.logger_manager import logger
-from util.thread_util import ThreadUtil
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
+from tgen.data.tdatasets.data_key import DataKey
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from tgen.models.model_manager import ModelManager
+from tgen.models.model_properties import ModelArchitectureType
+from tgen.util.enum_util import EnumDict
+from tgen.util.logging.logger_manager import logger
+from tgen.util.thread_util import ThreadUtil
 
 
 class TraceDataset(iDataset):

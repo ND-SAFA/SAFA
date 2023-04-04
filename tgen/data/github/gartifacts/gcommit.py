@@ -2,8 +2,8 @@ from typing import Callable, Dict, List, Union
 
 from git import Commit
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from util.override import overrides
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.util.override import overrides
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 

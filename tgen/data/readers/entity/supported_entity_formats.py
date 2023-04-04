@@ -1,14 +1,14 @@
 import os
 from typing import Dict
 
-from data.readers.entity.entity_parser_type import EntityParserType
-from data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from data.readers.entity.formats.csv_entity_format import CsvEntityFormat
-from data.readers.entity.formats.folder_entity_format import FolderEntityFormat
-from data.readers.entity.formats.json_entity_format import JsonEntityFormat
-from data.readers.entity.formats.xml_entity_format import XmlEntityFormat
-from data.keys.structure_keys import StructuredKeys
-from util.json_util import JsonUtil
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.entity.entity_parser_type import EntityParserType
+from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from tgen.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
+from tgen.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
+from tgen.data.readers.entity.formats.json_entity_format import JsonEntityFormat
+from tgen.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
+from tgen.util.json_util import JsonUtil
 
 
 class SupportedEntityFormats:

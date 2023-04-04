@@ -1,9 +1,9 @@
 from enum import Enum
 
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from tgen.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
+from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 
 
 class SupportedDatasetCreator(Enum):

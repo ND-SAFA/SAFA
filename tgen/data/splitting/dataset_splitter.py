@@ -1,10 +1,10 @@
 from typing import Dict, List, OrderedDict
 
-from data.tdatasets.idataset import iDataset
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.pre_train_dataset import PreTrainDataset
-from data.splitting.remainder_split_strategy import RemainderSplitStrategy
-from data.splitting.supported_split_strategy import SupportedSplitStrategy
+from tgen.data.splitting.remainder_split_strategy import RemainderSplitStrategy
+from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 
 
 class DatasetSplitter:

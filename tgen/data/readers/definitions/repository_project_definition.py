@@ -1,8 +1,8 @@
 from typing import Dict
 
-from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from data.readers.definitions.tim_project_definition import TimProjectDefinition
-from data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
 
 
 class RepositoryProjectDefinition(AbstractProjectDefinition):

@@ -1,12 +1,12 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.trace_output.abstract_trace_output import AbstractTraceOutput
-from train.trainer_args import TrainerArgs
-from util.base_object import BaseObject
-from util.json_util import JsonUtil
-from util.status import Status
-from util.uncased_dict import UncasedDict
+from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.train.trainer_args import TrainerArgs
+from tgen.util.base_object import BaseObject
+from tgen.util.json_util import JsonUtil
+from tgen.util.status import Status
+from tgen.util.uncased_dict import UncasedDict
 
 
 class JobResult(BaseObject):

@@ -4,11 +4,11 @@ from typing import Dict, Generic, List, Tuple, Type, TypeVar
 
 import pandas as pd
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.supported_gartifacts import SupportedGArtifacts
-from util.file_util import FileUtil
-from util.logging.logger_manager import logger
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gartifacts.supported_gartifacts import SupportedGArtifacts
+from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 
 T = TypeVar('T', bound="AbstractArtifact")
 

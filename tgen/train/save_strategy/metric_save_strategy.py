@@ -1,9 +1,9 @@
 from typing import Dict
 
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.trace_output.stage_eval import Metrics
+from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage
+from tgen.train.trace_output.stage_eval import Metrics
 
 
 class MetricSaveStrategy(AbstractSaveStrategy):

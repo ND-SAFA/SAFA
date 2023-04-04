@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple, TypeVar, Type
+from typing import List, Tuple, Type, TypeVar
 
 from sklearn.model_selection import train_test_split
 
-from data.creators.abstract_dataset_creator import DatasetType
-from util.base_object import BaseObject
-from util.override import overrides
-from util.random_util import RandomUtil
+from tgen.data.creators.abstract_dataset_creator import DatasetType
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
+from tgen.util.random_util import RandomUtil
 
 GenericDatum = TypeVar("GenericData")
 GenericData = List[GenericDatum]
@@ -41,7 +41,6 @@ class AbstractSplitStrategy(ABC):
         random_state = RandomUtil.CURRENT_SEED if RandomUtil.CURRENT_SEED is not None else 0
         return train_test_split(data, test_size=second_split_percentage, stratify=labels, random_state=random_state, **kwargs)
 
-
     @classmethod
     @overrides(BaseObject)
     def _get_enum_class(cls, child_class_name: str) -> Type:
@@ -50,5 +49,5 @@ class AbstractSplitStrategy(ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.splitting.supported_split_strategy import SupportedSplitStrategy
+        from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
         return SupportedSplitStrategy

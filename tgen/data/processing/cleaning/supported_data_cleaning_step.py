@@ -1,16 +1,16 @@
 from enum import Enum
 
-from data.processing.cleaning.extract_code_identifiers import ExtractCodeIdentifiersStep
-from data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
-from data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
-from data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
-from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
-from data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
-from data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
-from data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
-from data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
-from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
+from tgen.data.processing.cleaning.extract_code_identifiers import ExtractCodeIdentifiersStep
+from tgen.data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
+from tgen.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
+from tgen.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
+from tgen.data.processing.cleaning.regex_replacement_step import RegexReplacementStep
+from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
+from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
+from tgen.data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
+from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from tgen.data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
 
 
 class SupportedDataCleaningStep(Enum):

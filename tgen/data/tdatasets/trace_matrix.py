@@ -5,8 +5,8 @@ from typing import Callable, Iterable, List, Union
 
 import numpy as np
 
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from util.enum_util import EnumDict
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
 

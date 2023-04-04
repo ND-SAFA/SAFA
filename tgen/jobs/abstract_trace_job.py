@@ -2,19 +2,19 @@ import os
 from abc import ABC
 from typing import Any, Optional, Type
 
-from constants import BEST_MODEL_NAME
-from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
-from jobs.create_datasets_job import CreateDatasetsJob
-from models.model_manager import ModelManager
-from train.trace_trainer import TraceTrainer
-from train.trainer_args import TrainerArgs
-from util.base_object import BaseObject
-from util.override import overrides
-from util.reflection_util import ReflectionUtil
-from variables.definition_variable import DefinitionVariable
+from tgen.constants import BEST_MODEL_NAME
+from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.create_datasets_job import CreateDatasetsJob
+from tgen.models.model_manager import ModelManager
+from tgen.train.trace_trainer import TraceTrainer
+from tgen.train.trainer_args import TrainerArgs
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
+from tgen.util.reflection_util import ReflectionUtil
+from tgen.variables.definition_variable import DefinitionVariable
 
 
 class AbstractTraceJob(AbstractJob, ABC):

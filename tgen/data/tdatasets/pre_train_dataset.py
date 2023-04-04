@@ -1,12 +1,10 @@
-import os
-import shutil
 from typing import Any
 
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
-from data.tdatasets.idataset import iDataset
-from models.model_manager import ModelManager
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.models.model_manager import ModelManager
 
 
 class PreTrainDataset(iDataset):

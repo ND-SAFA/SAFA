@@ -2,14 +2,14 @@ import os
 import uuid
 from typing import List
 
-from constants import EXPERIMENT_ID_DEFAULT
-from experiments.experiment_step import ExperimentStep
-from jobs.abstract_job import AbstractJob
-from util.base_object import BaseObject
-from util.file_util import FileUtil
-from util.logging.logger_config import LoggerConfig
-from util.logging.logger_manager import LoggerManager
-from util.status import Status
+from tgen.constants import EXPERIMENT_ID_DEFAULT
+from tgen.experiments.experiment_step import ExperimentStep
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.util.base_object import BaseObject
+from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_config import LoggerConfig
+from tgen.util.logging.logger_manager import LoggerManager
+from tgen.util.status import Status
 
 
 class Experiment(BaseObject):

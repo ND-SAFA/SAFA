@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 
-from util.reflection_util import ReflectionUtil
-from util.uncased_dict import UncasedDict
+from tgen.util.reflection_util import ReflectionUtil
+from tgen.util.uncased_dict import UncasedDict
 
 
 class NpEncoder(json.JSONEncoder):
@@ -27,7 +27,7 @@ class NpEncoder(json.JSONEncoder):
             return self.default(instance_fields)
         if isinstance(obj, Enum):
             return obj.name
-        from util.base_object import BaseObject
+        from tgen.util.base_object import BaseObject
         if isinstance(obj, BaseObject):
             return str(obj)
         if isinstance(obj, list):

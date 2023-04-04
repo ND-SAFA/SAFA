@@ -2,7 +2,7 @@ import random
 from copy import copy
 from typing import List
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class ShuffleWordsStep(AbstractDataProcessingStep):

@@ -1,8 +1,8 @@
 import re
 from typing import List, Tuple, Union
 
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.gissue import GIssue
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gartifacts.gissue import GIssue
 
 AutoLinkPatterns = [  # patterns are uncased
     ["\\bpr[,|.|\s|:]{0,1}\s+#\d+\\b", GArtifactType.PULL, "#"],  # Matches [PR: #2]

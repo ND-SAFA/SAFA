@@ -2,17 +2,17 @@ import os
 
 from transformers import DataCollatorForLanguageModeling
 
-from constants import BEST_MODEL_NAME, MLM_PROBABILITY_DEFAULT
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.pre_train_dataset import PreTrainDataset
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from jobs.train_job import TrainJob
-from models.model_manager import ModelManager
-from models.model_properties import ModelTask
-from train.trace_trainer import TraceTrainer
-from train.trainer_args import TrainerArgs
+from tgen.constants import BEST_MODEL_NAME, MLM_PROBABILITY_DEFAULT
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.train_job import TrainJob
+from tgen.models.model_manager import ModelManager
+from tgen.models.model_properties import ModelTask
+from tgen.train.trace_trainer import TraceTrainer
+from tgen.train.trainer_args import TrainerArgs
 
 
 class MLMPreTrainJob(TrainJob):

@@ -1,12 +1,12 @@
 from enum import Enum
 
-from data.readers.api_project_reader import ApiProjectReader
-from data.readers.csv_project_reader import CsvProjectReader
-from data.readers.hub_project_reader import HubProjectReader
-from data.readers.pre_train_project_reader import PreTrainProjectReader
-from data.readers.pre_train_trace_reader import PreTrainTraceReader
-from data.readers.repository_project_reader import RepositoryProjectReader
-from data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.data.readers.csv_project_reader import CsvProjectReader
+from tgen.data.readers.hub_project_reader import HubProjectReader
+from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
+from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
+from tgen.data.readers.repository_project_reader import RepositoryProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
 
 class SupportedDatasetReader(Enum):

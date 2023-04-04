@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple, Type
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame
-from util.base_object import BaseObject
-from util.override import overrides
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 
 class AbstractProjectReader(BaseObject, ABC):
@@ -48,7 +48,6 @@ class AbstractProjectReader(BaseObject, ABC):
         """
         return self.overrides
 
-
     @classmethod
     @overrides(BaseObject)
     def _get_enum_class(cls, child_class_name: str) -> Type:
@@ -57,5 +56,5 @@ class AbstractProjectReader(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.readers.supported_dataset_reader import SupportedDatasetReader
+        from tgen.data.readers.supported_dataset_reader import SupportedDatasetReader
         return SupportedDatasetReader

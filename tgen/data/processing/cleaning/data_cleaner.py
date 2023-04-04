@@ -2,8 +2,8 @@ from typing import List
 
 from tqdm import tqdm
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from data.processing.abstract_data_processor import AbstractDataProcessor
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.data.processing.abstract_data_processor import AbstractDataProcessor
 
 
 class DataCleaner(AbstractDataProcessor):

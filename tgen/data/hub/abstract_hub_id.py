@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from data.readers.abstract_project_reader import AbstractProjectReader
-from data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
 
 class AbstractHubId(ABC):

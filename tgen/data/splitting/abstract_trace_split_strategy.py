@@ -1,11 +1,10 @@
 from abc import ABC
-from typing import List, Set, Union
+from typing import List
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from data.tdatasets.trace_dataset import TraceDataset
-from data.splitting.abstract_split_strategy import AbstractSplitStrategy
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
 class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):

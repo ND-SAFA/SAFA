@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Any, List
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from util.base_object import BaseObject
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.util.base_object import BaseObject
 
 
 class AbstractDataProcessor(BaseObject):

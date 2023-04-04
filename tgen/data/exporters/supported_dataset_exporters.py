@@ -1,7 +1,7 @@
 from enum import Enum
 
-from data.exporters.csv_exporter import CSVExporter
-from data.exporters.safa_exporter import SafaExporter
+from tgen.data.exporters.csv_exporter import CSVExporter
+from tgen.data.exporters.safa_exporter import SafaExporter
 
 
 class SupportedDatasetExporter(Enum):

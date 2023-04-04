@@ -1,12 +1,12 @@
 import string
 from typing import List, Set, Union
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class RemoveUnwantedCharsStep(AbstractDataProcessingStep):
     ORDER = ProcessingOrder.FIRST
-    
+
     def __init__(self, additional_unwanted_chars: Union[Set[str], str] = None):
         """
         Responsible for removing non alplhanumeric characters

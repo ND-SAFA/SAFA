@@ -1,12 +1,11 @@
 import enum
+import math
 from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List, Type
 
-import math
-
-from util.base_object import BaseObject
-from util.override import overrides
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 
 class ProcessingOrder(enum.Enum):
@@ -62,8 +61,8 @@ class AbstractDataProcessingStep(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-        from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+        from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+        from tgen.data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
         if child_class_name in SupportedDataCleaningStep.__members__:
             return SupportedDataCleaningStep
         return SupportedAugmentationStep

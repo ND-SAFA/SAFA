@@ -2,7 +2,7 @@ from typing import List
 
 from nltk import PorterStemmer
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class LemmatizeWordStep(AbstractDataProcessingStep):

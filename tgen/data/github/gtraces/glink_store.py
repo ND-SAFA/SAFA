@@ -1,13 +1,13 @@
 from typing import Callable, Dict, List, Union
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from data.github.gartifacts.gartifact_set import GArtifactSet
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.gcommit import GCommit
-from data.github.gartifacts.gissue import GIssue
-from data.github.gartifacts.gpull import GPull
-from data.github.gtraces.glink import GLink
-from data.github.gtraces.glink_finder import GLinkTarget, LinkFinder
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gartifacts.gcommit import GCommit
+from tgen.data.github.gartifacts.gissue import GIssue
+from tgen.data.github.gartifacts.gpull import GPull
+from tgen.data.github.gtraces.glink import GLink
+from tgen.data.github.gtraces.glink_finder import GLinkTarget, LinkFinder
 
 SearchFunction = Callable[[Union[GCommit, GIssue, GPull]], List[GLinkTarget]]
 

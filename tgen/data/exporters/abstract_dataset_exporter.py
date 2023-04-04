@@ -2,10 +2,10 @@ import os
 from abc import abstractmethod
 from typing import Type
 
-from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.tdatasets.trace_dataset import TraceDataset
-from util.base_object import BaseObject
-from util.override import overrides
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 
 class AbstractDatasetExporter(BaseObject):
@@ -51,7 +51,7 @@ class AbstractDatasetExporter(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+        from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
         return SupportedDatasetExporter
 
     @staticmethod

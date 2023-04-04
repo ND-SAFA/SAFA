@@ -14,18 +14,18 @@ from \
 from github.Issue import Issue
 from tqdm import tqdm
 
-from data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
-from data.github.gartifacts.gartifact_set import GArtifactSet
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.gcode_file import GCodeFile
-from data.github.gartifacts.gcommit import GCommit
-from data.github.gartifacts.gissue import GIssue
-from data.github.gartifacts.gpull import GPull
-from data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
+from tgen.data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
+from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gartifacts.gcode_file import GCodeFile
+from tgen.data.github.gartifacts.gcommit import GCommit
+from tgen.data.github.gartifacts.gissue import GIssue
+from tgen.data.github.gartifacts.gpull import GPull
+from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
     ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
-from util.file_util import FileUtil
-from util.logging.logger_manager import logger
+from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 
 
 class RepositoryDownloader:

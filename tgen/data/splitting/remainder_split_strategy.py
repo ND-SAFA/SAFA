@@ -1,8 +1,8 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
-from data.tdatasets.trace_dataset import TraceDataset
-from data.splitting.abstract_split_strategy import AbstractSplitStrategy
-from util.override import overrides
+from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.util.override import overrides
 
 
 class RemainderSplitStrategy(AbstractSplitStrategy):

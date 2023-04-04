@@ -1,9 +1,9 @@
 import os
 from typing import Any, Dict, List, Tuple
 
-from constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
+from tgen.constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
 
 ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM]
 

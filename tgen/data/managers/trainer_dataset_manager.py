@@ -2,27 +2,27 @@ import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Union
 
+import pandas as pd
 from datasets import disable_caching
 
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.tdatasets.dataset_role import DatasetRole
-from data.tdatasets.idataset import iDataset
-from data.tdatasets.pre_train_dataset import PreTrainDataset
-from data.tdatasets.trace_dataset import TraceDataset
-from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from data.exporters.supported_dataset_exporters import SupportedDatasetExporter
-from data.keys.csv_format import CSVKeys
-from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.splitting.dataset_splitter import DatasetSplitter
-from data.splitting.supported_split_strategy import SupportedSplitStrategy
-from models.model_manager import ModelManager
-from util.base_object import BaseObject
-from util.enum_util import get_enum_from_name
-from util.override import overrides
-from variables.undetermined_variable import UndeterminedVariable
-import pandas as pd
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
+from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from tgen.data.splitting.dataset_splitter import DatasetSplitter
+from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.models.model_manager import ModelManager
+from tgen.util.base_object import BaseObject
+from tgen.util.enum_util import get_enum_from_name
+from tgen.util.override import overrides
+from tgen.variables.undetermined_variable import UndeterminedVariable
 
 disable_caching()
 

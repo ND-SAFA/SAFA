@@ -1,6 +1,6 @@
 from logging import Logger
 
-from util.override import overrides
+from tgen.util.override import overrides
 
 
 class TGenLogger(Logger):

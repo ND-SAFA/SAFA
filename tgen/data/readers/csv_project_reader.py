@@ -3,19 +3,19 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from constants import NO_ORPHAN_CHECK_VALUE
-from data.dataframes.artifact_dataframe import ArtifactDataFrame
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame
-from data.keys.csv_format import CSVKeys
-from data.keys.structure_keys import StructuredKeys
-from data.readers.abstract_project_reader import AbstractProjectReader
-from util.dataframe_util import DataFrameUtil
-from util.enum_util import EnumDict
-from util.file_util import FileUtil
-from util.list_util import ListUtil
-from util.logging.logger_manager import logger
-from util.thread_util import ThreadUtil
+from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.enum_util import EnumDict
+from tgen.util.file_util import FileUtil
+from tgen.util.list_util import ListUtil
+from tgen.util.logging.logger_manager import logger
+from tgen.util.thread_util import ThreadUtil
 
 
 class CsvProjectReader(AbstractProjectReader):

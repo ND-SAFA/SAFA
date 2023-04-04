@@ -1,17 +1,17 @@
 from enum import Enum
 
-from jobs.create_datasets_job import CreateDatasetsJob
-from jobs.create_model_job import CreateModelJob
-from jobs.create_source_splits_job import CreateSourceSplitsJob
-from jobs.delete_model_job import DeleteModelJob
-from jobs.download_repository_job import DownloadRepositoryJob
-from jobs.export_artifacts_job import ExportArtifactsJob
-from jobs.mlm_pre_train_job import MLMPreTrainJob
-from jobs.open_ai_job import OpenAIJob
-from jobs.predict_job import PredictJob
-from jobs.push_model_job import PushModelJob
-from jobs.train_job import TrainJob
-from jobs.vsm_job import VSMJob
+from tgen.jobs.create_datasets_job import CreateDatasetsJob
+from tgen.jobs.create_model_job import CreateModelJob
+from tgen.jobs.create_source_splits_job import CreateSourceSplitsJob
+from tgen.jobs.delete_model_job import DeleteModelJob
+from tgen.jobs.download_repository_job import DownloadRepositoryJob
+from tgen.jobs.export_artifacts_job import ExportArtifactsJob
+from tgen.jobs.mlm_pre_train_job import MLMPreTrainJob
+from tgen.jobs.open_ai_job import OpenAIJob
+from tgen.jobs.predict_job import PredictJob
+from tgen.jobs.push_model_job import PushModelJob
+from tgen.jobs.train_job import TrainJob
+from tgen.jobs.vsm_job import VSMJob
 
 
 class SupportedJobType(Enum):

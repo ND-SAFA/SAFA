@@ -1,10 +1,10 @@
 import os
 from typing import Dict, List, Optional, Tuple
 
-from data.github.abstract_github_entity import AbstractGithubArtifact
-from data.github.gartifacts.gcode_file import GCodeFile
-from data.github.gtraces.glink import GLink
-from util.file_util import FileUtil
+from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
+from tgen.data.github.gartifacts.gcode_file import GCodeFile
+from tgen.data.github.gtraces.glink import GLink
+from tgen.util.file_util import FileUtil
 
 ARTIFACTS_TYPE = Dict[str, GCodeFile]
 LINKS_TYPE = Dict[str, GLink]

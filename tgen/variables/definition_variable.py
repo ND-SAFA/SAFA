@@ -1,7 +1,7 @@
 from typing import Dict
 
-from util.uncased_dict import UncasedDict
-from variables.variable import Variable
+from tgen.util.uncased_dict import UncasedDict
+from tgen.variables.variable import Variable
 
 
 class DefinitionVariable(UncasedDict, Variable):

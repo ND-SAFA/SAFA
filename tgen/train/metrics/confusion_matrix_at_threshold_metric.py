@@ -1,7 +1,7 @@
 import datasets
 
-from constants import THRESHOLD_DEFAULT
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.constants import THRESHOLD_DEFAULT
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Confusion matrix metric calculates the number of true and false positives and the true/false negatives.

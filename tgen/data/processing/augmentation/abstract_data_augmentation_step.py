@@ -5,9 +5,9 @@ from typing import Any, Iterable, List, Tuple
 
 from typing_extensions import Type
 
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
-from util.base_object import BaseObject
-from util.override import overrides
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 
 class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
@@ -110,7 +110,7 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+        from tgen.data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
         return SupportedAugmentationStep
 
     @staticmethod

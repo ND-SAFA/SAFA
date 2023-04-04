@@ -11,8 +11,8 @@ sys.path.append(ROOT_PATH)
 
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 if __name__ == "__main__":
-    from models.model_manager import ModelManager
-    from models.model_properties import ModelTask
+    from tgen.models.model_manager import ModelManager
+    from tgen.models.model_properties import ModelTask
     from deepspeed.runtime.zero.stage3 import estimate_zero3_model_states_mem_needs_all_live
 
     models = ["bert-base-uncased", "bert-large-uncased"]

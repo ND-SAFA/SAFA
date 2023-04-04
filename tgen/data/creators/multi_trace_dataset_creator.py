@@ -1,10 +1,10 @@
 from typing import List
 
-from constants import REMOVE_ORPHANS_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
-from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.processing.cleaning.data_cleaner import DataCleaner
-from data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.constants import REMOVE_ORPHANS_DEFAULT
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 
 
 class MultiTraceDatasetCreator(AbstractDatasetCreator):

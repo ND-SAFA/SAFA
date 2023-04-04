@@ -4,7 +4,7 @@ from copy import deepcopy
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Tuple, Union
 
-from util.json_util import JsonUtil
+from tgen.util.json_util import JsonUtil
 
 
 class FileUtil:

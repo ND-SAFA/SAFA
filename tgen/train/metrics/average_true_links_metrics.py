@@ -3,8 +3,8 @@ from typing import Dict
 import datasets
 import numpy as np
 
-from data.tdatasets.trace_matrix import TraceMatrix
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 The average true links per query by source artifact.

@@ -1,10 +1,10 @@
 import os
 
-from data.github.repository_downloader import RepositoryDownloader
-from data.github.repository_exporter import RepositoryExporter
-from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
+from tgen.data.github.repository_downloader import RepositoryDownloader
+from tgen.data.github.repository_exporter import RepositoryExporter
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
 
 
 class DownloadRepositoryJob(AbstractJob):

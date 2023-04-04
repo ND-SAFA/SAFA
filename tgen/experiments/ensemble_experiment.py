@@ -5,20 +5,20 @@ from typing import Callable, List
 import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
-from constants import OUTPUT_FILENAME, EXPERIMENT_ID_DEFAULT
-from data.tdatasets.dataset_role import DatasetRole
-from experiments.experiment import Experiment
-from experiments.experiment_step import ExperimentStep
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_result import JobResult
-from jobs.predict_job import PredictJob
-from jobs.vsm_job import VSMJob
-from models.single_layer.single_layer_model import train, SingleLayerModel, predict
-from train.metrics.metrics_manager import MetricsManager
-from util.file_util import FileUtil
-from util.json_util import JsonUtil
-from util.logging.logger_config import LoggerConfig
-from util.status import Status
+from tgen.constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.experiments.experiment import Experiment
+from tgen.experiments.experiment_step import ExperimentStep
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.predict_job import PredictJob
+from tgen.jobs.vsm_job import VSMJob
+from tgen.models.single_layer.single_layer_model import SingleLayerModel, predict, train
+from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
+from tgen.util.logging.logger_config import LoggerConfig
+from tgen.util.status import Status
 
 
 def average(arr):

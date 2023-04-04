@@ -2,13 +2,13 @@ from typing import Dict
 
 from rest_framework import serializers
 
-from server.serializers.serializer_utility import SerializerUtility
-from variables.definition_variable import DefinitionVariable
-from variables.experimental_variable import ExperimentalVariable
-from variables.multi_variable import MultiVariable
-from variables.typed_definition_variable import TypedDefinitionVariable
-from variables.undetermined_variable import UndeterminedVariable
-from variables.variable import Variable
+from tgen.server.serializers.serializer_utility import SerializerUtility
+from tgen.variables.definition_variable import DefinitionVariable
+from tgen.variables.experimental_variable import ExperimentalVariable
+from tgen.variables.multi_variable import MultiVariable
+from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from tgen.variables.undetermined_variable import UndeterminedVariable
+from tgen.variables.variable import Variable
 
 
 class ExperimentSerializer(serializers.Serializer):

@@ -1,11 +1,11 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from constants import NO_ORPHAN_CHECK_VALUE
+from test.testres.base_test import BaseTest
+from tgen.constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.keys.safa_format import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
-from test.testres.base_test import BaseTest
 from tgen.util.json_util import JsonUtil
 
 

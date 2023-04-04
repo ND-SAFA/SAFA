@@ -3,16 +3,16 @@ from typing import List, Type
 
 from datasets import Metric, list_metrics
 
-from train.metrics.abstract_trace_metric import AbstractTraceMetric
-from train.metrics.average_true_links_metrics import AverageTrueLinksMetric
-from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
-from train.metrics.f1_metric import FMetric
-from train.metrics.lag_metric import LagMetric
-from train.metrics.map_at_k_metric import MapAtKMetric
-from train.metrics.map_metric import MapMetric
-from train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
-from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from util.supported_enum import SupportedEnum
+from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.train.metrics.average_true_links_metrics import AverageTrueLinksMetric
+from tgen.train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
+from tgen.train.metrics.f1_metric import FMetric
+from tgen.train.metrics.lag_metric import LagMetric
+from tgen.train.metrics.map_at_k_metric import MapAtKMetric
+from tgen.train.metrics.map_metric import MapMetric
+from tgen.train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
+from tgen.train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
+from tgen.util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"
 

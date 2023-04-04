@@ -2,14 +2,14 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame
-from data.keys.structure_keys import StructuredKeys
-from data.readers.abstract_project_reader import AbstractProjectReader
-from server.api.api_definition import ApiDefinition
-from util.dataframe_util import DataFrameUtil
-from util.enum_util import EnumDict
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.server.api.api_definition import ApiDefinition
+from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.enum_util import EnumDict
 
 
 class ApiProjectReader(AbstractProjectReader):

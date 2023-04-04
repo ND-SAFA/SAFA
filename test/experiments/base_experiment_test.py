@@ -2,11 +2,11 @@ import json
 import os
 import random
 
-from constants import OUTPUT_FILENAME
-from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.supported_job_type import SupportedJobType
 from test.testres.base_test import BaseTest
 from test.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.constants import OUTPUT_FILENAME
+from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.multi_variable import MultiVariable

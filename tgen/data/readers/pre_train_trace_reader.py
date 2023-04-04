@@ -1,16 +1,15 @@
 import os
 import random
-from typing import Tuple, List, Dict
+from typing import List, Tuple
 
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from data.readers.abstract_project_reader import AbstractProjectReader
-from util.file_util import FileUtil
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.util.file_util import FileUtil
 
 
 class PreTrainTraceReader(AbstractProjectReader):
-
     LAYER_ID = "layer_1"
 
     def __init__(self, data_file: str, overrides: dict = None):

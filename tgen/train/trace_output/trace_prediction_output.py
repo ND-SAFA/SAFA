@@ -4,9 +4,9 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from train.trace_output.abstract_trace_output import AbstractTraceOutput
-from train.trace_output.stage_eval import Metrics, TracePredictions
-from util.reflection_util import ReflectionUtil
+from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
+from tgen.util.reflection_util import ReflectionUtil
 
 
 @dataclass

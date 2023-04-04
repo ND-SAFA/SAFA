@@ -1,21 +1,21 @@
 import os
 import shutil
 from typing import List, Sized, Tuple
+from unittest import TestCase
 
 import mock
 from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from constants import DELETE_TEST_OUTPUT
-from tgen.data.processing.cleaning.data_cleaner import DataCleaner
-from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from test.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from tgen.constants import DELETE_TEST_OUTPUT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from test.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from tgen.util.logging.logger_config import LoggerConfig
 from tgen.util.logging.logger_manager import LoggerManager
-from unittest import TestCase
 
 
 class BaseTest(TestCase):

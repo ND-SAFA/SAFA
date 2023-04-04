@@ -1,8 +1,8 @@
 from typing import Type
 
-from data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from data.keys.structure_keys import StructuredKeys
-from util.enum_util import EnumDict
+from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.util.enum_util import EnumDict
 
 LayerKeys = StructuredKeys.LayerMapping
 

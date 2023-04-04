@@ -1,4 +1,4 @@
-from variables.variable import Variable
+from tgen.variables.variable import Variable
 
 
 class UndeterminedVariable(Variable):

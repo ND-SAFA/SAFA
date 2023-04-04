@@ -2,20 +2,21 @@ import os
 import re
 from typing import Dict, Union
 
-from data.github.gartifacts.gartifact_set import GArtifactSet
-from data.github.gartifacts.gartifact_type import GArtifactType
-from data.github.gartifacts.gcode_file import GCodeFile
-from data.github.gartifacts.gcommit import GCommit
-from data.github.gartifacts.gissue import GIssue
-from data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, CODE_ARTIFACT_FILE, \
+from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
+from tgen.data.github.gartifacts.gartifact_type import GArtifactType
+from tgen.data.github.gartifacts.gcode_file import GCodeFile
+from tgen.data.github.gartifacts.gcommit import GCommit
+from tgen.data.github.gartifacts.gissue import GIssue
+from tgen.data.github.github_constants import ALLOWED_CODE_EXTENSIONS, CODE2CODE_ARTIFACT_FILE, CODE2CODE_EXPORT_FILE, \
+    CODE_ARTIFACT_FILE, \
     CODE_EXPORT_FILE, COMMIT2ISSUE_EXPORT_FILE, COMMITDIFF2ISSUE_EXPORT_FILE, COMMIT_ARTIFACT_FILE, \
     COMMIT_DIFF_EXPORT_FILE, COMMIT_EXPORT_FILE, ISSUE2CODE_EXPORT_FILE, ISSUE_ARTIFACT_FILE, \
     ISSUE_EXPORT_FILE, PULL_ARTIFACT_FILE, PULL_EXPORT_FILE
-from data.github.gtraces.glink import GLink
-from data.github.gtraces.glink_processor import GLinkProcessor
-from data.github.gtraces.glink_store import GLinkStore
-from data.processing.cleaning.data_cleaner import DataCleaner
-from data.processing.cleaning.regex_replacement_step import RegexReplacementStep
+from tgen.data.github.gtraces.glink import GLink
+from tgen.data.github.gtraces.glink_processor import GLinkProcessor
+from tgen.data.github.gtraces.glink_store import GLinkStore
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 
 GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Revert.*of.*",

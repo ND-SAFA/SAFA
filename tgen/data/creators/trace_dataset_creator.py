@@ -3,21 +3,21 @@ from typing import Any, Dict, List, Set
 
 import pandas as pd
 
-from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
+from tgen.constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from data.dataframes.layer_dataframe import LayerDataFrame
-from data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from data.tdatasets.trace_dataset import TraceDataset
-from data.keys.structure_keys import StructuredKeys
-from data.processing.cleaning.data_cleaner import DataCleaner
-from data.readers.abstract_project_reader import AbstractProjectReader
-from util.dataframe_util import DataFrameUtil
-from util.dict_util import ListUtil
-from util.logging.logger_manager import logger
-from util.reflection_util import ReflectionUtil
-from util.thread_util import ThreadUtil
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.dict_util import ListUtil
+from tgen.util.logging.logger_manager import logger
+from tgen.util.reflection_util import ReflectionUtil
+from tgen.util.thread_util import ThreadUtil
 
 
 class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):

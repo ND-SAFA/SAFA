@@ -1,8 +1,8 @@
 from typing import Type
 
-from data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
-from data.readers.abstract_project_reader import AbstractProjectReader
-from data.readers.csv_project_reader import CsvProjectReader
+from tgen.data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.csv_project_reader import CsvProjectReader
 
 
 class GitHubId(MultiStageHubId):

@@ -1,7 +1,7 @@
-from typing import Type, Union
+from typing import Type
 
-from jobs.abstract_job import AbstractJob
-from variables.definition_variable import DefinitionVariable
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.variables.definition_variable import DefinitionVariable
 
 
 class JobFactory:

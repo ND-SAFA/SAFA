@@ -6,22 +6,22 @@ from datasets import Dataset
 from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
-from data.tdatasets.data_key import DataKey
-from data.tdatasets.dataset_role import DatasetRole
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from models.model_manager import ModelManager
-from train.itrainer import iTrainer
-from train.metrics.metrics_manager import MetricsManager
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.save_strategy.metric_save_strategy import MetricSaveStrategy
-from train.trace_output.trace_prediction_output import TracePredictionOutput
-from train.trace_output.trace_train_output import TraceTrainOutput
-from train.trainer_args import TrainerArgs
-from train.wandb.trace_callback import TraceCallback
-from util.base_object import BaseObject
-from util.logging.logger_manager import logger
-from util.override import overrides
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.data_key import DataKey
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.models.model_manager import ModelManager
+from tgen.train.itrainer import iTrainer
+from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.train.trace_output.trace_train_output import TraceTrainOutput
+from tgen.train.trainer_args import TrainerArgs
+from tgen.train.wandb.trace_callback import TraceCallback
+from tgen.util.base_object import BaseObject
+from tgen.util.logging.logger_manager import logger
+from tgen.util.override import overrides
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 torch.backends.cudnn.deterministic = True

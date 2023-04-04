@@ -1,4 +1,4 @@
-from data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 
 
 class CSVExporter(AbstractDatasetExporter):

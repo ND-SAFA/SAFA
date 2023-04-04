@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 
 class SourceTargetSwapStep(AbstractDataAugmentationStep):

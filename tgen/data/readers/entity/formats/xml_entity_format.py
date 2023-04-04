@@ -2,8 +2,8 @@ from typing import List
 
 import pandas as pd
 
-from data.readers.entity.entity_parser_type import EntityParserType
-from data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from tgen.data.readers.entity.entity_parser_type import EntityParserType
+from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 
 
 class XmlEntityFormat(AbstractEntityFormat):

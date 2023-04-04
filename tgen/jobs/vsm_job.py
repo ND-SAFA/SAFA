@@ -1,15 +1,15 @@
 from typing import List, Optional
 
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
-from models.model_manager import ModelManager
-from train.itrainer import iTrainer
-from train.metrics.supported_trace_metric import SupportedTraceMetric
-from train.trace_output.trace_train_output import TraceTrainOutput
-from train.trainer_args import TrainerArgs
-from train.vsm.vsm_trainer import VSMTrainer
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.job_result import JobResult
+from tgen.models.model_manager import ModelManager
+from tgen.train.itrainer import iTrainer
+from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.train.trace_output.trace_train_output import TraceTrainOutput
+from tgen.train.trainer_args import TrainerArgs
+from tgen.train.vsm.vsm_trainer import VSMTrainer
 
 
 class VSMJob(AbstractTraceJob):

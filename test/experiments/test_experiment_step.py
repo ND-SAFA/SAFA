@@ -1,27 +1,25 @@
+import math
 import os
 from unittest import mock
 from unittest.mock import patch
 
-import math
-
-from constants import BASE_EXPERIMENT_NAME
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from test.experiments.base_experiment_test import BaseExperimentTest
+from test.testres.object_creator import ObjectCreator
+from test.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.constants import BASE_EXPERIMENT_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment_step import ExperimentStep
-from test.experiments.base_experiment_test import BaseExperimentTest
 from tgen.jobs.abstract_trace_job import AbstractTraceJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.predict_job import PredictJob
 from tgen.jobs.train_job import TrainJob
 from tgen.models.model_manager import ModelManager
-from test.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.train.trainer_args import TrainerArgs
 from tgen.util.file_util import FileUtil
-from test.testres.object_creator import ObjectCreator
 from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable
 

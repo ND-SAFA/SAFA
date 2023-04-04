@@ -1,6 +1,6 @@
-from data.hub.abstract_hub_id import AbstractHubId
-from data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
-from util.override import overrides
+from tgen.data.hub.abstract_hub_id import AbstractHubId
+from tgen.data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
+from tgen.util.override import overrides
 
 
 class DroneHubId(MultiStageHubId):

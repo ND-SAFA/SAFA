@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict
 
-from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.trace_output.stage_eval import Metrics
-from util.base_object import BaseObject
-from util.enum_util import FunctionalWrapper
+from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage
+from tgen.train.trace_output.stage_eval import Metrics
+from tgen.util.base_object import BaseObject
+from tgen.util.enum_util import FunctionalWrapper
 
 ComparisonFunction = Callable[[Any, Any], bool]
 

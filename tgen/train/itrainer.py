@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
-from data.tdatasets.dataset_role import DatasetRole
-from train.trace_output.trace_prediction_output import TracePredictionOutput
-from train.trace_output.trace_train_output import TraceTrainOutput
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 
 
 class iTrainer:

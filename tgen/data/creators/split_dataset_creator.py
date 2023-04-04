@@ -1,11 +1,11 @@
 from typing import Optional, Union
 
-from constants import VALIDATION_PERCENTAGE_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.tdatasets.pre_train_dataset import PreTrainDataset
-from data.tdatasets.trace_dataset import TraceDataset
-from data.processing.cleaning.data_cleaner import DataCleaner
-from data.splitting.supported_split_strategy import SupportedSplitStrategy
+from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 
 class SplitDatasetCreator(AbstractDatasetCreator):

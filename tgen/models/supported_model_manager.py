@@ -1,6 +1,6 @@
 from enum import Enum
 
-from models.model_manager import ModelManager
+from tgen.models.model_manager import ModelManager
 
 
 class SupportedModelManager(Enum):

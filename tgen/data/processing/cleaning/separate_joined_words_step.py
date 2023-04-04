@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, List
 
-from data.processing.abstract_data_processing_step import ProcessingOrder, AbstractDataProcessingStep
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class SeparateJoinedWordsStep(AbstractDataProcessingStep):

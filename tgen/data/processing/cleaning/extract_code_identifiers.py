@@ -4,8 +4,8 @@ import javac_parser
 from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
-from constants import JAVA_KEYWORDS_PATH
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.constants import JAVA_KEYWORDS_PATH
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):

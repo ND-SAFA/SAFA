@@ -1,15 +1,15 @@
+import math
 import random
 from dataclasses import dataclass
 from typing import List, Optional, Set, Tuple
 
-import math
 import nltk
 from nltk import pos_tag, word_tokenize
 from nltk.corpus import stopwords, wordnet as wn
 from nltk.stem import WordNetLemmatizer
 
-from constants import REPLACEMENT_PERCENTAGE_DEFAULT
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tgen.constants import REPLACEMENT_PERCENTAGE_DEFAULT
+from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset
 

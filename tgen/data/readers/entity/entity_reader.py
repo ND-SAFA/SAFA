@@ -3,11 +3,11 @@ from typing import Dict, Generic, Optional, TypeVar
 
 import pandas as pd
 
-from data.keys.structure_keys import StructuredKeys
-from data.readers.entity.supported_entity_formats import SupportedEntityFormats
-from util.dataframe_util import DataFrameUtil
-from util.json_util import JsonUtil
-from util.logging.logger_manager import logger
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
+from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.json_util import JsonUtil
+from tgen.util.logging.logger_manager import logger
 
 EntityType = TypeVar("EntityType")
 

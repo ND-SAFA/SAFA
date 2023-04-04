@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from variables.definition_variable import DefinitionVariable
-from variables.variable import Variable
+from tgen.variables.definition_variable import DefinitionVariable
+from tgen.variables.variable import Variable
 
 
 class TypedDefinitionVariable(DefinitionVariable):

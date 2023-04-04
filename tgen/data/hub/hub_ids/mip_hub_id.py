@@ -1,4 +1,4 @@
-from data.hub.abstract_hub_id import AbstractHubId
+from tgen.data.hub.abstract_hub_id import AbstractHubId
 
 
 class MipHubId(AbstractHubId):

@@ -1,7 +1,5 @@
-from typing import NamedTuple
-
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.util.enum_util import EnumDict
 
 

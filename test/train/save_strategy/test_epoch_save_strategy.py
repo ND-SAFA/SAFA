@@ -1,6 +1,6 @@
 from typing import Dict
 
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage

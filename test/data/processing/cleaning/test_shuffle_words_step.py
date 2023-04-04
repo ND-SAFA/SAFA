@@ -1,7 +1,7 @@
 import random
 
 from tgen.data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestShuffleWordsStep(BaseTest):

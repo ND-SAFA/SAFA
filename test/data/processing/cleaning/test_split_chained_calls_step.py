@@ -1,5 +1,5 @@
 from tgen.data.processing.cleaning.split_chained_calls_tep import SplitChainedCallsStep
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestSplitChainedCallsStep(BaseTest):

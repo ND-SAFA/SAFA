@@ -1,7 +1,7 @@
 from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
-from tgen.data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
-from test.testres.base_test import BaseTest
-from test.testres.test_assertions import TestAssertions
+from test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_assertions import TestAssertions
 
 
 class TestPreTrainProjectReader(BaseTest):

@@ -1,8 +1,8 @@
 import os
 
 from tgen.data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import GITHUB_REPO_DIR
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import GITHUB_REPO_DIR
 
 
 class TestCppHeaderLinkCreator(BaseTest):

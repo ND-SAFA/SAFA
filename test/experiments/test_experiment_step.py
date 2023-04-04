@@ -3,9 +3,9 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from test.experiments.base_experiment_test import BaseExperimentTest
-from test.testres.object_creator import ObjectCreator
-from test.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
+from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.constants import BASE_EXPERIMENT_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition

@@ -2,9 +2,9 @@ import os
 
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from tgen.testres.test_assertions import TestAssertions
 from tgen.util.file_util import FileUtil
 
 

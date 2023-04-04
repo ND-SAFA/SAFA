@@ -1,5 +1,5 @@
 from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestRemoveUnwantedCharStep(BaseTest):

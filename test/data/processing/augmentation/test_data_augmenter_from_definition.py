@@ -1,6 +1,6 @@
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from test.testres.base_test import BaseTest
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.object_creator import ObjectCreator
 from tgen.variables.experimental_variable import ExperimentalVariable
 
 

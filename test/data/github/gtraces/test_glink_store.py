@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from tgen.data.github.gtraces.glink_finder import GLinkTarget
 from tgen.data.github.gtraces.glink_store import GLinkStore
-from test.testres.testprojects.github_test_project import GithubTestProject
+from tgen.testres.testprojects.github_test_project import GithubTestProject
 
 
 class TestGTraceStore(TestCase):

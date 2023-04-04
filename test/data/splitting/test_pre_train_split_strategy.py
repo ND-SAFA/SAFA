@@ -2,13 +2,13 @@ import os
 from collections import OrderedDict
 
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
 from tgen.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
-from test.testres.base_trace_test import BaseTraceTest
-from test.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.base_tests.base_trace_test import BaseTraceTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.util.file_util import FileUtil
 
 

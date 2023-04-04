@@ -1,7 +1,7 @@
 import json
 
 from tgen.jobs.components.job_result import JobResult
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.util.status import Status

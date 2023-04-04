@@ -2,8 +2,8 @@ from typing import Dict, List
 
 import pandas as pd
 
-from test.testres.base_test import BaseTest
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_assertions import TestAssertions
 from tgen.util.dataframe_util import DataFrameUtil
 
 

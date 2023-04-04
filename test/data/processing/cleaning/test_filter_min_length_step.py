@@ -1,5 +1,5 @@
 from tgen.data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestFilterMinLengthStep(BaseTest):

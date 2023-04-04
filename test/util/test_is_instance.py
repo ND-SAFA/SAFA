@@ -1,6 +1,6 @@
 from typing import Callable, List, Optional
 
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.util.base_object import BaseObject
 
 

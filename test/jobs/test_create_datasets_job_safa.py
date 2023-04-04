@@ -1,5 +1,3 @@
-from unittest import skip
-
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -7,9 +5,9 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.create_datasets_job import CreateDatasetsJob
-from test.jobs.base_job_test import BaseJobTest
-from test.testres.paths.paths import TEST_OUTPUT_DIR
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.object_creator import ObjectCreator
 
 
 class TestCreateDatasetJobSAFA(BaseJobTest):

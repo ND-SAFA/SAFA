@@ -6,7 +6,7 @@ from unittest.mock import patch
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.experiments.experiment import Experiment
-from test.experiments.base_experiment_test import BaseExperimentTest
+from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.jobs.predict_job import PredictJob
 from tgen.jobs.train_job import TrainJob
 

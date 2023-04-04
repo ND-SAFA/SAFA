@@ -2,9 +2,9 @@ import os
 
 from tgen.jobs.components.job_result import JobResult
 from tgen.scripts.modules.script_reader import ScriptOutputReader
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import TEST_RESULT_READER
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_RESULT_READER
+from tgen.testres.test_assertions import TestAssertions
 
 
 class TestResultReader(BaseTest):

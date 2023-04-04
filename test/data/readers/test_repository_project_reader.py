@@ -1,5 +1,5 @@
-from tgen.data.readers.tests.abstract_project_reader_test import AbstractProjectReaderTest
-from test.testres.testprojects.repo_one_test_project import RepositoryOneTestProject
+from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
+from tgen.testres.testprojects.repo_one_test_project import RepositoryOneTestProject
 
 
 class TestRepositoryProjectReader(AbstractProjectReaderTest):

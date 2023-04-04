@@ -1,5 +1,5 @@
 from tgen.scripts.modules.script_definition import ScriptDefinition
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestScriptDefinition(BaseTest):

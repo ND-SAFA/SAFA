@@ -1,4 +1,4 @@
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 
 

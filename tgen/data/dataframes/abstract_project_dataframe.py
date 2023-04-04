@@ -132,7 +132,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param ignore_index: If True, do not use the index values along the concatenation axis.
         :return: The new combined dataframe
         """
-        orient = 'record' if ignore_index else 'index'
+        orient = 'records' if ignore_index else 'index'
         data1 = dataframe1.to_dict(orient=orient)
         data2 = dataframe2.to_dict(orient=orient)
         if ignore_index:

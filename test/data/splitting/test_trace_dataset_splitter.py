@@ -3,12 +3,10 @@ from unittest import mock
 from unittest.mock import patch
 
 from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.splitting.random_split_strategy import RandomSplitStrategy
-from tgen.data.splitting.remainder_split_strategy import RemainderSplitStrategy
-from tgen.data.splitting.tests.base_split_test import BaseSplitTest
+from tgen.testres.base_tests.base_split_test import BaseSplitTest
 from tgen.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.models.model_manager import ModelManager
-from test.testres.base_trace_test import BaseTraceTest
+from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 
 
 class TestTraceDatasetSplitter(BaseSplitTest):

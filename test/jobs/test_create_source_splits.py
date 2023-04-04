@@ -6,13 +6,12 @@ import pandas as pd
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.create_source_splits_job import CreateSourceSplitsJob
-from test.jobs.base_job_test import BaseJobTest
-from test.testres.paths.paths import TEST_OUTPUT_DIR
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.object_creator import ObjectCreator
 
 ARTIFACT_TYPE = "source_type_{}"
 SPLITS = [0.2, 0.2]

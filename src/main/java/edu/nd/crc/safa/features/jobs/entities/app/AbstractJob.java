@@ -27,6 +27,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * <p>Responsible for finding methods corresponding to steps in job and running them
@@ -70,6 +72,10 @@ public abstract class AbstractJob implements Job {
      * List of step indices to skip.
      */
     List<Integer> skipSteps = new ArrayList<>();
+    /**
+     * The authentication to execute job with.
+     */
+    Authentication authentication;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
@@ -140,7 +146,7 @@ public abstract class AbstractJob implements Job {
      *
      * @param stepImplementation The step to run
      * @throws InvocationTargetException If there is a problem invoking the method
-     * @throws IllegalAccessException If there is a problem invoking the method
+     * @throws IllegalAccessException    If there is a problem invoking the method
      */
     private void invokeStep(JobStepImplementation stepImplementation)
             throws InvocationTargetException, IllegalAccessException {
@@ -156,11 +162,11 @@ public abstract class AbstractJob implements Job {
                 method.invoke(this, dbLogger);
             } else {
                 throw new SafaError("Unsure how to invoke method %s of %s. Parameter 1 is not a JobLogger",
-                        method.getName(), method.getDeclaringClass().getName());
+                    method.getName(), method.getDeclaringClass().getName());
             }
         } else {
             throw new SafaError("Unsure how to invoke method %s of %s. Too many parameters found",
-                    method.getName(), method.getDeclaringClass().getName());
+                method.getName(), method.getDeclaringClass().getName());
         }
     }
 

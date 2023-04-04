@@ -14,15 +14,11 @@ import lombok.AllArgsConstructor;
 /**
  * Defines a job performing some actions on some identified entity.
  */
-public abstract class AbstractJobBuilder<I> {
+public abstract class AbstractJobBuilder {
     /**
      * List of services.
      */
     protected ServiceProvider serviceProvider;
-    /**
-     * Input to job builder.
-     */
-    protected I identifier;
     /**
      * The database entity for this job.
      */
@@ -40,10 +36,7 @@ public abstract class AbstractJobBuilder<I> {
     }
 
     public JobAppEntity perform() throws Exception {
-        // Step 1 - Select project version to change
-        this.identifier = this.constructIdentifier();
-
-        // Step 2 - Create database entity
+        // Step 1 - Create database entity
         JobService jobService = this.serviceProvider.getJobService();
 
         if (this.user == null) {
@@ -65,12 +58,7 @@ public abstract class AbstractJobBuilder<I> {
     }
 
     /**
-     * Step 1 - Find project version that is getting affected.
-     */
-    protected abstract I constructIdentifier();
-
-    /**
-     * Step 2 - Creates job definition for change.
+     * Creates job definition for change.
      */
     protected abstract AbstractJob constructJobForWork() throws IOException;
 

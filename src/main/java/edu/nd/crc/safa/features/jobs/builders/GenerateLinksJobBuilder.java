@@ -11,18 +11,13 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 /**
  * Creates a job for generating trace links.
  */
-public class GenerateLinksJobBuilder extends AbstractJobBuilder<TraceGenerationRequest> {
+public class GenerateLinksJobBuilder extends AbstractJobBuilder {
     TraceGenerationRequest request;
 
     public GenerateLinksJobBuilder(ServiceProvider serviceProvider,
                                    TraceGenerationRequest request) {
         super(serviceProvider);
         this.request = request;
-    }
-
-    @Override
-    protected TraceGenerationRequest constructIdentifier() {
-        return request;
     }
 
     @Override

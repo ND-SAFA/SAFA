@@ -118,7 +118,7 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
         }
     }
 
-    private static class DummyCommitJobBuilder extends AbstractJobBuilder<ProjectVersion> {
+    private static class DummyCommitJobBuilder extends AbstractJobBuilder {
 
         private final ProjectCommit commit;
         private final boolean allowProjectCreation;
@@ -135,11 +135,6 @@ public class TestCommitJobProjectCreation extends ApplicationBaseTest {
             this.allowProjectCreation = allowProjectCreation;
             this.fail = fail;
             this.user = user;
-        }
-
-        @Override
-        public ProjectVersion constructIdentifier() {
-            return null;
         }
 
         @Override

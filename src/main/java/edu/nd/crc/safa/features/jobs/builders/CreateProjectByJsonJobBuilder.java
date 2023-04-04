@@ -9,12 +9,11 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Builds job for creating a project via JSON.
  */
-public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVersion> {
+public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder {
 
     private final SafaUser projectOwner;
     /**
@@ -38,16 +37,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    protected ProjectVersion constructIdentifier() {
-        return null;
-    }
-
-    @Override
     protected AbstractJob constructJobForWork() {
-        // Step - Create initial commit
-        this.projectAppEntity.setProjectVersion(this.identifier);
-        this.traceGenerationRequest.setProjectVersion(this.identifier);
-
         // Step - Create job
         return new CreateProjectViaJsonJob(
             this.jobDbEntity,

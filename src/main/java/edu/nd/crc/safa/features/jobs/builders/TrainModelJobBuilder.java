@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 /**
  * Responsible for building a job for training a model.
  */
-public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
+public class TrainModelJobBuilder extends AbstractJobBuilder {
     private final Project project;
     private final TrainingRequest trainingRequest;
 
@@ -21,11 +21,6 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
         super(serviceProvider);
         this.project = project;
         this.trainingRequest = trainingRequest;
-    }
-
-    @Override
-    protected TrainingRequest constructIdentifier() {
-        return this.trainingRequest;
     }
 
     @Override
@@ -40,7 +35,7 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
 
     @Override
     protected String getJobName() {
-        String modelName = this.identifier.getRequests().get(0).getModel().getName();
+        String modelName = this.trainingRequest.getRequests().get(0).getModel().getName();
         return String.format("Training model: [%s].", modelName);
     }
 

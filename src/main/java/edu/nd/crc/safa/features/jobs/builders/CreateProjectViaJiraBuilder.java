@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 /**
  * Builds job for pulling issues from JIRA and updating project.
  */
-public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifier> {
+public class CreateProjectViaJiraBuilder extends AbstractJobBuilder {
     JiraIdentifier jiraIdentifier;
 
     SafaUser user;
@@ -25,24 +25,19 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    protected JiraIdentifier constructIdentifier() {
-        return this.jiraIdentifier;
-    }
-
-    @Override
     protected AbstractJob constructJobForWork() {
         // Step - Create jira project creation job
         return new CreateProjectViaJiraJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.jiraIdentifier,
             this.user
         );
     }
 
     @Override
     protected String getJobName() {
-        return CreateProjectViaJiraJob.createJobName(this.identifier);
+        return CreateProjectViaJiraJob.createJobName(this.jiraIdentifier);
     }
 
     @Override

@@ -16,12 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Builds job for updating project via flat files.
  */
-public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<ProjectVersion> {
+public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     /**
-     * ID of ProjectVersion being updated.
+     * ProjectVersion being updated.
      */
-    UUID versionId;
+    ProjectVersion projectVersion;
 
     /**
      * The files to parse
@@ -32,32 +32,25 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
                                              UUID versionId,
                                              MultipartFile[] files) {
         super(serviceProvider);
-        this.versionId = versionId;
+        this.projectVersion = this.serviceProvider.getProjectVersionRepository().findByVersionId(versionId);
         this.files = files;
     }
 
     @Override
-    protected ProjectVersion constructIdentifier() {
-        return this.serviceProvider
-            .getProjectVersionRepository()
-            .findByVersionId(versionId);
-    }
-
-    @Override
     protected AbstractJob constructJobForWork() throws IOException {
-        uploadFlatFiles(this.identifier.getProject());
+        uploadFlatFiles(this.projectVersion.getProject());
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.projectVersion,
             files);
     }
 
     @Override
     protected String getJobName() {
-        return this.identifier.getProject().getName();
+        return this.projectVersion.getProject().getName();
     }
 
     @Override

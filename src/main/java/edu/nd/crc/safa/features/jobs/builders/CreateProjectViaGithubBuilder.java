@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 /**
  * Creates a job responsible for pulling and parsing a GitHub repository
  */
-public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIdentifier> {
+public class CreateProjectViaGithubBuilder extends AbstractJobBuilder {
 
     /**
      * Identifier GitHub project to import.
@@ -23,11 +23,6 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIden
         super(serviceProvider, user);
         this.githubIdentifier = githubIdentifier;
         this.user = user;
-    }
-
-    @Override
-    protected GithubIdentifier constructIdentifier() {
-        return this.githubIdentifier;
     }
 
     @Override

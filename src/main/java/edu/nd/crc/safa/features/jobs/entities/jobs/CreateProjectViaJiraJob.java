@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.Setter;
 
@@ -108,7 +109,9 @@ public class CreateProjectViaJiraJob extends CommitJob {
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
 
-        Project project = createProject(user, projectName, projectDescription).getProject();
+        ProjectVersion projectVersion = createProject(user, projectName, projectDescription);
+        Project project = projectVersion.getProject();
+        this.jiraIdentifier.setProjectVersion(projectVersion);
 
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
 

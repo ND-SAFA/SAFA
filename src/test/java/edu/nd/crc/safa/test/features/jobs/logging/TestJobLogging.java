@@ -41,7 +41,7 @@ public class TestJobLogging extends ApplicationBaseTest {
         TestJob job = new TestJob(jobDbEntity, serviceProvider);
         serviceProvider
                 .getJobService()
-                .executeJob(jobDbEntity, serviceProvider, job);
+                .executeJob(serviceProvider, job);
 
         JobTestService.verifyJobWasCompleted(serviceProvider, jobDbEntity.getId(), 5);
 

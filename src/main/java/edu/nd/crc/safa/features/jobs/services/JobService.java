@@ -28,7 +28,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -131,6 +130,19 @@ public class JobService {
     }
 
     /**
+     * Saves job with lastUpdated date at time of save.
+     *
+     * @param jobDbEntity The job whose lastUpdated property is being modified.
+     * @param stepNum     The index of the step we're starting.
+     * @param nSteps      The number of steps in job.
+     */
+    public void startStep(JobDbEntity jobDbEntity, int stepNum, int nSteps) {
+        jobDbEntity.setCurrentStep(stepNum);
+        jobDbEntity.incrementProgress(nSteps - 1); // excluding done step
+        this.jobDbRepository.save(jobDbEntity);
+    }
+
+    /**
      * Moves job to next step and saves job.
      *
      * @param jobDbEntity The job to update its step.
@@ -186,24 +198,14 @@ public class JobService {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    public void executeJob(JobDbEntity jobDbEntity,
-                           ServiceProvider serviceProvider,
-                           AbstractJob abstractJob) throws
+    public void executeJob(ServiceProvider serviceProvider, AbstractJob job) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+
         JobParameters jobParameters = new JobParametersBuilder()
             .addLong("time", System.currentTimeMillis()).toJobParameters();
 
-        try {
-            abstractJob.initJobData();
-            abstractJob.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
-            logger.info("Authentication in job has been set.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            serviceProvider.getJobService().failJob(jobDbEntity);
-            throw new SafaError("Failed to start job. %s", e.getMessage());
-        }
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
-        jobLauncher.run(abstractJob, jobParameters);
+        jobLauncher.run(job, jobParameters);
     }
 }

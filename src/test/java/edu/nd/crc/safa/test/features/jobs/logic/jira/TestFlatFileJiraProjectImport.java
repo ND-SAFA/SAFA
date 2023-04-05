@@ -62,7 +62,7 @@ class TestFlatFileJiraProjectImport extends JiraBaseFlatFileTest {
         job.getSkipSteps().addAll(List.of(1, 2));
         serviceProvider
             .getJobService()
-            .executeJob(jobDbEntity, serviceProvider, job);
+            .executeJob(serviceProvider, job);
 
         // VP - Verify that project completed
         JobDbEntity completedJob = verifyJIRAJobWasCompleted(jobDbEntity.getId());

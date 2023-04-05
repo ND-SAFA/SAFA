@@ -4,14 +4,12 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Builds job for pulling issues from JIRA and updating project.
  */
-public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifier> {
+public class CreateProjectViaJiraBuilder extends AbstractJobBuilder {
     JiraIdentifier jiraIdentifier;
 
     SafaUser user;
@@ -27,32 +25,23 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    protected JiraIdentifier constructIdentifier() {
-        Project project = new Project("", ""); // Set once parse starts
-        this.serviceProvider.getProjectService().saveProjectWithUserAsOwner(project, user);
-        ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
-        this.jiraIdentifier.setProjectVersion(projectVersion);
-        return this.jiraIdentifier;
-    }
-
-    @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         // Step - Create jira project creation job
         return new CreateProjectViaJiraJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.jiraIdentifier,
             this.user
         );
     }
 
     @Override
-    String getJobName() {
-        return CreateProjectViaJiraJob.createJobName(this.identifier);
+    protected String getJobName() {
+        return CreateProjectViaJiraJob.createJobName(this.jiraIdentifier);
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return CreateProjectViaJiraJob.class;
     }
 }

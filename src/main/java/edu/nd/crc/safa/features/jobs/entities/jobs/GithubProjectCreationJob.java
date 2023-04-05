@@ -26,6 +26,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.util.StringUtils;
 
@@ -63,11 +64,17 @@ public class GithubProjectCreationJob extends CommitJob {
      */
     protected GithubProject githubProject;
 
+    private final SafaUser user;
+
+    protected static final int CREATE_PROJECT_STEP_NUM = 3;
+
     public GithubProjectCreationJob(JobDbEntity jobDbEntity,
                                     ServiceProvider serviceProvider,
-                                    GithubIdentifier githubIdentifier) {
-        super(jobDbEntity, serviceProvider, new ProjectCommit(githubIdentifier.getProjectVersion(), false));
+                                    GithubIdentifier githubIdentifier,
+                                    SafaUser user) {
+        super(jobDbEntity, serviceProvider);
         this.githubIdentifier = githubIdentifier;
+        this.user = user;
     }
 
     public static String createJobName(String repositoryName) {
@@ -103,27 +110,27 @@ public class GithubProjectCreationJob extends CommitJob {
         logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
     }
 
-    @IJobStep(value = "Creating SAFA Project", position = 3)
+    @IJobStep(value = "Creating SAFA Project", position = CREATE_PROJECT_STEP_NUM)
     public void createSafaProject(JobLogger logger) {
         // Step - Save as SAFA project
         String projectName = this.githubRepositoryDTO.getName();
         String projectDescription = this.githubRepositoryDTO.getDescription();
-        Project project = this.githubIdentifier.getProjectVersion().getProject();
 
         if (projectDescription == null) {
             projectDescription = projectName;
         }
 
-        // if not already set
-        if (!StringUtils.hasLength(project.getName())) {
-            project.setName(projectName);
-        }
-        if (!StringUtils.hasLength(project.getDescription())) {
-            project.setDescription(projectDescription);
-        }
-        this.serviceProvider.getProjectRepository().save(project);
+        ProjectVersion projectVersion = createProject(user, projectName, projectDescription);
+        this.githubIdentifier.setProjectVersion(projectVersion);
 
+        Project project = projectVersion.getProject();
         logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
+    }
+
+    @IJobStep(value = "Creating SAFA Project -> Github Repository Mapping", position = 4)
+    public void createSafaProjectMapping(JobLogger logger) {
+        String projectName = this.githubRepositoryDTO.getName();
+        Project project = this.githubIdentifier.getProjectVersion().getProject();
 
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
@@ -135,7 +142,6 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     protected GithubProject getGithubProjectMapping(Project project) {
-        SafaUser principal = this.getJobDbEntity().getUser();
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
@@ -145,18 +151,19 @@ public class GithubProjectCreationJob extends CommitJob {
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
 
-    @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 4)
+    @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
 
+        ProjectCommit commit = getProjectCommit();
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
-        this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
+        commit.addArtifacts(ModificationType.ADDED, getArtifacts());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
 
-        logger.log("Retrieved %d artifacts from project.", projectCommit.getArtifacts().getSize());
+        logger.log("Retrieved %d artifacts from project.", commit.getArtifacts().getSize());
     }
 
     protected List<ArtifactAppEntity> getArtifacts() {

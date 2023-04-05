@@ -19,16 +19,12 @@ public class UpdateProjectViaGithubBuilder extends CreateProjectViaGithubBuilder
     }
 
     @Override
-    protected GithubIdentifier constructIdentifier() {
-        return this.githubIdentifier;
-    }
-
-    @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new GithubProjectUpdateJob(
             jobDbEntity,
             serviceProvider,
-            this.githubIdentifier
+            this.githubIdentifier,
+            this.user
         );
     }
 }

@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +30,11 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
     public GithubProjectUpdateJob(JobDbEntity jobDbEntity,
                                   ServiceProvider serviceProvider,
-                                  GithubIdentifier githubIdentifier) {
-        super(jobDbEntity, serviceProvider, githubIdentifier);
+                                  GithubIdentifier githubIdentifier,
+                                  SafaUser user) {
+        super(jobDbEntity, serviceProvider, githubIdentifier, user);
+        setProjectCommit(new ProjectCommit(githubIdentifier.getProjectVersion(), false));
+        getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
@@ -41,32 +42,31 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        if (request.getCookies() == null) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        Optional<String> token = Arrays.stream(request.getCookies())
-            .filter(c -> c.getName().equals(SecurityConstants.JWT_COOKIE_NAME))
-            .findFirst()
-            .map(Cookie::getValue);
-
-        if (token.isEmpty()) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        UsernamePasswordAuthenticationToken authenticationToken = null;
-
         try {
-            authenticationToken = authenticate(token.get());
+            if (request.getCookies() == null) {
+                return;
+            }
+
+            Optional<String> token = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals(SecurityConstants.JWT_COOKIE_NAME))
+                .findFirst()
+                .map(Cookie::getValue);
+
+            if (token.isEmpty()) {
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken authenticationToken = authenticate(token.get());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } catch (UsernameNotFoundException ignored) {
+            // This happens if the user has a token for a deleted account. We have code that is supposed
+            // to delete the cookie, so I don't know why it sticks around, but by catching the exception
+            // we can at least keep the chain from dying
         } catch (SafaError e) {
             e.printStackTrace();
-            return;
+        } finally {
+            chain.doFilter(request, response);
         }
-
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        chain.doFilter(request, response);
     }
 
     /**

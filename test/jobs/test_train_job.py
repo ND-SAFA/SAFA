@@ -2,10 +2,10 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from test.jobs.base_job_test import BaseJobTest
-from test.testres.object_creator import ObjectCreator
-from test.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from tgen.testres.test_assertions import TestAssertions
 from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager

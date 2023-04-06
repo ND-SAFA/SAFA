@@ -1,8 +1,8 @@
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.data.readers.tests.abstract_project_reader_test import AbstractProjectReaderTest
-from test.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
-from test.testres.testprojects.structured_test_project import StructuredTestProject
+from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
+from tgen.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
+from tgen.testres.testprojects.structured_test_project import StructuredTestProject
 
 
 class TestStructureProjectReader(AbstractProjectReaderTest):

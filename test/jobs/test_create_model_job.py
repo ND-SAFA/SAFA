@@ -1,10 +1,10 @@
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.create_model_job import CreateModelJob
-from test.jobs.base_job_test import BaseJobTest
+from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.models.model_manager import ModelManager
-from test.testres.paths.paths import TEST_OUTPUT_DIR
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.object_creator import ObjectCreator
 
 
 class TestCreateModelJob(BaseJobTest):

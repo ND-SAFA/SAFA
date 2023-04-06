@@ -1,5 +1,5 @@
 from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestSplitDatasetCreator(BaseTest):

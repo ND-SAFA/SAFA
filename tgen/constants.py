@@ -80,7 +80,7 @@ DELETE_TEST_OUTPUT = os.getenv("DELETE_TEST_OUTPUT", "true").capitalize() == "Tr
 MNT_DIR = os.environ.get('MNT_DIR', "")
 
 # -------------- PATHS --------------
-PROJ_PATH = dirname(dirname(dirname(abspath(__file__))))
+PROJ_PATH = os.path.join(dirname(dirname(dirname(abspath(__file__)))), 'tgen')
 RES_PATH = os.path.join(PROJ_PATH, "res")
 JAVA_KEYWORDS_PATH = os.path.join(RES_PATH, "JavaReservedKeywords.txt")
 

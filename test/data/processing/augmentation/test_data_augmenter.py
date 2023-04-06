@@ -2,8 +2,8 @@ from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.resample_step import ResampleStep
 from tgen.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from test.testres.base_test import BaseTest
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_assertions import TestAssertions
 
 
 class TestDataAugmenter(BaseTest):

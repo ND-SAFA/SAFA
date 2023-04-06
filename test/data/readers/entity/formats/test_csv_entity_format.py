@@ -2,9 +2,9 @@ from typing import Dict, List, Type
 
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
-from tgen.data.readers.entity.formats.tests.abstract_entity_format_test import AbstractEntityFormatTest
-from test.testres.paths.test_format_paths import CSV_ENTITY_PATH
-from test.testres.testprojects.csv_test_project import CsvTestProject
+from test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
+from tgen.testres.paths.test_format_paths import CSV_ENTITY_PATH
+from tgen.testres.testprojects.csv_test_project import CsvTestProject
 
 
 class TestCsvEntityFormat(AbstractEntityFormatTest):

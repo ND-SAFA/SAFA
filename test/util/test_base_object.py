@@ -1,11 +1,11 @@
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Union
 from unittest import skip
 
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.server.serializers.experiment_serializer import ExperimentSerializer
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.util.base_object import BaseObject
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.object_creator import ObjectCreator
 from tgen.util.reflection_util import ReflectionUtil
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable

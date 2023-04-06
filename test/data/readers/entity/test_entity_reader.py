@@ -1,11 +1,11 @@
 import os
 
 from tgen.data.readers.entity.entity_reader import EntityReader
-from tgen.data.readers.entity.formats.tests.test_xml_entity_format import TestXmlEntityFormat
+from test.data.readers.entity.formats.test_xml_entity_format import TestXmlEntityFormat
 from tgen.data.keys.structure_keys import StructuredKeys
-from test.testres.base_test import BaseTest
-from test.testres.paths.test_format_paths import XML_ENTITY_PATH
-from test.testres.test_assertions import TestAssertions
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.test_format_paths import XML_ENTITY_PATH
+from tgen.testres.test_assertions import TestAssertions
 
 
 class TestEntityReader(BaseTest):

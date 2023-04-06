@@ -3,8 +3,8 @@ import os
 import pandas as pd
 
 from tgen.data.github.repository_exporter import RepositoryExporter
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import GITHUB_REPO_ARTIFACTS_DIR, TEST_OUTPUT_DIR
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import GITHUB_REPO_ARTIFACTS_DIR, TEST_OUTPUT_DIR
 
 
 class TestGithubExporter(BaseTest):

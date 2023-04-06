@@ -2,9 +2,9 @@ from typing import Dict, List, Type
 
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
-from tgen.data.readers.entity.formats.tests.abstract_entity_format_test import AbstractEntityFormatTest
+from test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
 from tgen.data.keys.structure_keys import StructuredKeys
-from test.testres.paths.test_format_paths import FOLDER_PROJECT_PATH
+from tgen.testres.paths.test_format_paths import FOLDER_PROJECT_PATH
 
 
 class TestFolderEntityFormat(AbstractEntityFormatTest):

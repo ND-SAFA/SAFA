@@ -1,8 +1,8 @@
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
-from test.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
+from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 
 
 class TestPreTrainingTraceReader(BaseTest):

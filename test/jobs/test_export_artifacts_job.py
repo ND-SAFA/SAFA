@@ -5,10 +5,10 @@ from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.export_artifacts_job import ExportArtifactsJob
-from test.jobs.base_job_test import BaseJobTest
-from test.testres.test_data_manager import TestDataManager
+from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.test_data_manager import TestDataManager
 from tgen.util.file_util import FileUtil
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.object_creator import ObjectCreator
 
 
 class TestExportArtifactsJob(BaseJobTest):

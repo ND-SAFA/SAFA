@@ -12,6 +12,16 @@ class TraceDataFrame(AbstractProjectDataFrame):
     Contains the trace links found in a project
     """
 
+    def __init__(self, *args, **kwargs):
+        """
+        Creates constructor with guaranteed columns for trace dataframe.
+        :param args: The positional arguments to constructor trace dataframe with.
+        :param kwargs: The keyword arguments to construct trace dataframe with.
+        """
+        if "columns" not in kwargs:
+            kwargs["columns"] = StructuredKeys.Trace.get_cols()
+        super().__init__(*args, **kwargs)
+
     @classmethod
     def index_name(cls) -> str:
         """

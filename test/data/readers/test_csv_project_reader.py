@@ -1,5 +1,5 @@
-from tgen.data.readers.tests.abstract_project_reader_test import AbstractProjectReaderTest
-from test.testres.testprojects.csv_test_project import CsvTestProject
+from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
+from tgen.testres.testprojects.csv_test_project import CsvTestProject
 
 
 class TestCsvProjectReader(AbstractProjectReaderTest):

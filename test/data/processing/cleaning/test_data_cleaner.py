@@ -3,7 +3,7 @@ from typing import Type
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestDataCleaner(BaseTest):

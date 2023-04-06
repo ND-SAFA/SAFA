@@ -11,14 +11,12 @@ from tgen.variables.undetermined_variable import UndeterminedVariable
 from tgen.variables.variable import Variable
 
 
-class ExperimentSerializer(serializers.Serializer):
+class ExperimentSerializer:
     KEY = "definition"
     definition = serializers.DictField(required=True)
 
-    def update(self, instance, validated_data):
-        SerializerUtility.update_error()
-
-    def create(self, validated_data: Dict) -> Dict[str, Variable]:
+    @staticmethod
+    def create(validated_data: Dict) -> Dict[str, Variable]:
         """
         Creates experiment instructions by converting Dict of primitives into
         one of variables.
@@ -26,29 +24,30 @@ class ExperimentSerializer(serializers.Serializer):
         :return: Mapping between keys and variables.
         """
         result: Dict[str, Variable] = {}
-        if self.KEY in validated_data:
-            validated_data = validated_data[self.KEY]
+        if ExperimentSerializer.KEY in validated_data:
+            validated_data = validated_data[ExperimentSerializer.KEY]
         for key, value in validated_data.items():
-            result[key] = self.create_variable(value)
+            result[key] = ExperimentSerializer.create_variable(value)
         return result
 
-    def create_variable(self, value):
+    @staticmethod
+    def create_variable(value):
         """
         Creates variable from primitive, dict, or list.
         :param value: The value to convert into a variable.
         :return: Variable encapsulating value.
         """
         if isinstance(value, dict):
-            value_definition = self.create(value)
+            value_definition = ExperimentSerializer.create(value)
             if value.get(ExperimentalVariable.SYMBOL, None):
-                values = [self.create_variable(v) for v in value[ExperimentalVariable.SYMBOL]]
+                values = [ExperimentSerializer.create_variable(v) for v in value[ExperimentalVariable.SYMBOL]]
                 return ExperimentalVariable(values)
             elif value.get(TypedDefinitionVariable.OBJECT_TYPE_KEY, None):
                 return TypedDefinitionVariable(value_definition)
             else:
                 return DefinitionVariable(value_definition)
         if isinstance(value, list) and len(value) > 0 and isinstance(value[0], Dict):
-            values = [self.create_variable(v) for v in value]
+            values = [ExperimentSerializer.create_variable(v) for v in value]
             return MultiVariable(values)
         else:
             if isinstance(value, str) and value.strip() == UndeterminedVariable.SYMBOL:

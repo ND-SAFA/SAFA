@@ -5,7 +5,7 @@ import numpy as np
 
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 

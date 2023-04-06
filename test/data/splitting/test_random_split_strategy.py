@@ -1,5 +1,5 @@
 from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.data.splitting.tests.base_split_test import BaseSplitTest
+from tgen.testres.base_tests.base_split_test import BaseSplitTest
 
 
 class TestRandomSplitStrategy(BaseSplitTest):

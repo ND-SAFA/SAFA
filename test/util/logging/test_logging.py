@@ -1,7 +1,7 @@
 from logging import FileHandler
 from unittest import skip
 
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 

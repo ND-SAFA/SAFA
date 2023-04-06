@@ -1,11 +1,11 @@
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from test.testres.base_test import BaseTest
-from test.testres.testprojects.abstract_test_project import AbstractTestProject
-from test.testres.testprojects.api_test_project import ApiTestProject
-from test.testres.testprojects.csv_test_project import CsvTestProject
-from test.testres.testprojects.repo_one_test_project import RepositoryOneTestProject
-from test.testres.testprojects.safa_test_project import SafaTestProject
-from test.testres.testprojects.structured_test_project import StructuredTestProject
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
+from tgen.testres.testprojects.api_test_project import ApiTestProject
+from tgen.testres.testprojects.csv_test_project import CsvTestProject
+from tgen.testres.testprojects.repo_one_test_project import RepositoryOneTestProject
+from tgen.testres.testprojects.safa_test_project import SafaTestProject
+from tgen.testres.testprojects.structured_test_project import StructuredTestProject
 
 
 class TestTraceDatasetCreator(BaseTest):

@@ -3,20 +3,19 @@ from typing import Dict
 
 import mock
 
-import sys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
-from test.testres.base_trace_test import BaseTraceTest
-from test.testres.test_assertions import TestAssertions
-from test.testres.test_data_manager import TestDataManager
+from tgen.testres.base_tests.base_trace_test import BaseTraceTest
+from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.test_data_manager import TestDataManager
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.stage_eval import Metrics
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_trainer import TraceTrainer
 from tgen.train.trainer_args import TrainerArgs
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.object_creator import ObjectCreator
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 

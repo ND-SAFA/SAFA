@@ -1,9 +1,9 @@
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import TEST_OUTPUT_DIR
-from test.testres.object_creator import ObjectCreator
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.object_creator import ObjectCreator
 
 
 class TestSafaExporter(BaseTest):

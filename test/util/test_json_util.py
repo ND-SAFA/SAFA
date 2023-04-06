@@ -1,5 +1,5 @@
 from tgen.jobs.components.job_result import JobResult
-from test.testres.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage
 from tgen.train.trace_output.stage_eval import StageEval
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput

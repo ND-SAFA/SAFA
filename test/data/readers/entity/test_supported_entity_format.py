@@ -4,8 +4,8 @@ from tgen.data.readers.entity.formats.json_entity_format import JsonEntityFormat
 from tgen.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
 from tgen.data.keys.structure_keys import StructuredKeys
-from test.testres.base_test import BaseTest
-from test.testres.paths.test_format_paths import CSV_ENTITY_PATH, FOLDER_PROJECT_PATH, JSON_ENTITY_PATH, XML_ENTITY_PATH
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.test_format_paths import CSV_ENTITY_PATH, FOLDER_PROJECT_PATH, JSON_ENTITY_PATH, XML_ENTITY_PATH
 
 
 class TestSupportedEntityFormat(BaseTest):

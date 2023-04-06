@@ -1,3 +1,4 @@
+import traceback
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -162,8 +163,10 @@ class BaseObject(ABC):
                 return params
             return expected_class(**params)
         except Exception as e:
-            logger.exception("Unable to initialize %s for %s" % (expected_class, cls.__name__))
-            raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
+            error_msg = f"Unable to initialize {expected_class} for {cls.__name__}."
+            traceback.print_exc()
+            logger.exception(msg=error_msg)
+            raise TypeError(error_msg)
 
     @classmethod
     def _add_param_values(cls, obj_meta_list: List[ObjectMeta], param_name: str, param_value: Any,

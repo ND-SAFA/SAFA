@@ -4,9 +4,9 @@ import pandas as pd
 
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
-from test.testres.base_test import BaseTest
-from test.testres.paths.paths import TEST_OUTPUT_DIR
-from test.testres.testprojects.github_test_project import GithubTestProject
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.testprojects.github_test_project import GithubTestProject
 
 
 class TestGArtifactSet(BaseTest):

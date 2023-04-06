@@ -50,4 +50,4 @@ class ViewUtil:
         """
         return {
             status.HTTP_200_OK: Schema(type=TYPE_OBJECT,
-                                       properties=JobResult.get_properties(response_keys))}
+                                       properties=JobResult.w(response_keys))}

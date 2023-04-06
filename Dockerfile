@@ -31,20 +31,6 @@ RUN apt-get install -y software-properties-common && \
 COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
-# Step - Install tini and gcsfuse
-RUN set -e; \
-    apt-get update -y && apt-get install -y \
-    tini \
-    lsb-release; \
-    gcsFuseRepo=gcsfuse-`lsb_release -c -s`; \
-    echo "deb http://packages.cloud.google.com/apt $gcsFuseRepo main" | \
-    tee /etc/apt/sources.list.d/gcsfuse.list; \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
-    apt-key add -; \
-    apt-get update; \
-    apt-get install -y gcsfuse \
-    && apt-get clean spo
-
 # Step - Copy source and build files
 COPY /tgen/src /app/src/
 

@@ -10,10 +10,10 @@ from rest_framework.views import APIView
 
 from experiment_creator import JobCreator, PredictionJobTypes, PredictionJobs
 from serializers.prediction_serializer import PredictionSerializer
+from testres.object_creator import ObjectCreator
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.components.job_result import JobResult
 from util.json_util import NpEncoder
-from util.object_creator import ObjectCreator
 from utils.view_util import ViewUtil
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")

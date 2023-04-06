@@ -1,5 +1,17 @@
-from typing import Dict
+from typing import Union
 
+from constants import NO_ORPHAN_CHECK_VALUE
+from data.creators.trace_dataset_creator import TraceDatasetCreator
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.readers.api_project_reader import ApiProjectReader
+from data.readers.definitions.api_definition import ApiDefinition
+from jobs.components.job_args import JobArgs
+from jobs.open_ai_job import OpenAIJob
+from jobs.predict_job import PredictJob
+from models.model_manager import ModelManager
+from train.open_ai.open_ai_args import OpenAIArgs
+from train.open_ai.open_ai_task import OpenAITask
+from train.trainer_args import TrainerArgs
 from util.supported_enum import SupportedEnum
 
 
@@ -8,14 +20,17 @@ class PredictionJobTypes(SupportedEnum):
     BASE = "base"
 
 
-class ExperimentCreator:
+PredictionJobs = Union[OpenAIJob, PredictJob]
+
+
+class JobCreator:
     """
     Creates experiment definitions for endpoints.
     """
 
     @staticmethod
-    def create_prediction_definition(dataset: Dict, output_dir: str, prediction_job_type: PredictionJobTypes,
-                                     model_path: str = None) -> Dict:
+    def create_prediction_definition(dataset: ApiDefinition, output_dir: str, prediction_job_type: PredictionJobTypes,
+                                     model_path: str = None) -> PredictionJobs:
         """
         Creates experiment definition for predicting on dataset using defined job type.
         :param dataset: The dataset to predict on.
@@ -24,43 +39,27 @@ class ExperimentCreator:
         :param model_path: The path to the model used for prediction.
         :return: Definition defining prediction job.
         """
-        base_definition = {
-            "trainer_dataset_manager": {
-                "eval_dataset_creator": dataset
-            }
-        }
+        eval_project_reader = ApiProjectReader(api_definition=dataset)
+        eval_dataset_creator = TraceDatasetCreator(project_reader=eval_project_reader, allowed_orphans=NO_ORPHAN_CHECK_VALUE)
+        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=eval_dataset_creator)
+        job_args = JobArgs(random_seed=42)
+
         if prediction_job_type == PredictionJobTypes.OPENAI:
-            definition = {
-                **base_definition,
-                "object_type": "OPEN_AI",
-                "task": "PREDICT",
-                "data_output_path": output_dir
-            }
+            trainer_args = OpenAIArgs(metrics=None)
+            job = OpenAIJob(data_output_path=output_dir,
+                            task=OpenAITask.PREDICT,
+                            trainer_dataset_manager=trainer_dataset_manager,
+                            trainer_args=trainer_args,
+                            job_args=job_args)
+            return job
         elif prediction_job_type == PredictionJobTypes.BASE:
             assert model_path is not None, "Expected model_path to be defined for prediction job."
-            definition = {
-                **base_definition,
-                "job_args": {},
-                "model_manager": {
-                    "model_path": model_path
-                },
-                "trainer_args": {},
-            }
+            trainer_args = TrainerArgs(output_dir=output_dir, metrics=None)
+            model_manager = ModelManager(model_path=model_path)
+            job = PredictJob(job_args=job_args,
+                             model_manager=model_manager,
+                             trainer_dataset_manager=trainer_dataset_manager,
+                             trainer_args=trainer_args)
+            return job
         else:
             raise NotImplementedError(f"Prediction job is not supported for job type:{prediction_job_type.name}")
-        return ExperimentCreator.create_job_experiment(definition, output_dir)
-
-    @staticmethod
-    def create_job_experiment(job_definition: Dict, output_dir: str) -> Dict:
-        """
-        Wraps job definition in experiment definition.
-        :param job_definition: The job to wrap.
-        :param output_dir: The directory to output job materials.
-        :return: Experiment definition for job.
-        """
-        return {
-            "output_dir": output_dir,
-            "steps": [{
-                "jobs": [job_definition]
-            }]
-        }

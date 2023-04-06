@@ -13,3 +13,4 @@ class TestPredictionView(ApiBaseTest):
             "dataset": TestData.dataset
         }
         res = self.request("/predict/", data=data)
+        print(res)

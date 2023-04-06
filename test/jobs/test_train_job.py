@@ -14,8 +14,8 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.train_job import TrainJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trace_trainer import TraceTrainer
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trace_trainer import TraceTrainer
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 

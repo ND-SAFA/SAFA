@@ -1,4 +1,6 @@
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
+from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.jobs.abstract_trace_job import AbstractTraceJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
@@ -6,7 +8,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.open_ai.open_ai_args import OpenAIArgs
 from tgen.train.open_ai.open_ai_task import OpenAITask
 from tgen.train.open_ai.open_ai_trainer import OpenAITrainer
-from tgen.train.open_ai.prompt_generator import PromptGenerator
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 
 
@@ -17,7 +18,7 @@ class OpenAIJob(AbstractTraceJob):
 
     def __init__(self, data_output_path: str, task: OpenAITask,
                  trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
-                 trainer_args: OpenAIArgs = OpenAIArgs(), prompt_generator: PromptGenerator = PromptGenerator(),
+                 trainer_args: OpenAIArgs = OpenAIArgs(), prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator(),
                  job_args: JobArgs = JobArgs()):
         """
         Initializes job with necessary args

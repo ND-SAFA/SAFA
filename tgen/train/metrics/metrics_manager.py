@@ -30,6 +30,8 @@ class MetricsManager:
         :param trace_predictions: The output of a model.
         :param predicted_similarities: The similarity scores predicted
         """
+        n_predictions, n_expected = len(trace_predictions) if trace_predictions else len(predicted_similarities), len(trace_df)
+        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         scores = self.get_similarity_scores(trace_predictions) if predicted_similarities is None else predicted_similarities
         self.trace_matrix = TraceMatrix(trace_df, scores, link_ids)
 
@@ -40,6 +42,8 @@ class MetricsManager:
         :param metric_names: name of metrics desired for evaluation
         :return: a dictionary of metric_name to result
         """
+        if len(metric_names) < 1:
+            return {}
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
         trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()

@@ -18,7 +18,7 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.predict_job import PredictJob
 from tgen.jobs.train_job import TrainJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.util.file_util import FileUtil
 from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable

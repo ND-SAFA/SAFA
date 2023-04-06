@@ -8,7 +8,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.itrainer import iTrainer
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.train.vsm.vsm_trainer import VSMTrainer
 
 

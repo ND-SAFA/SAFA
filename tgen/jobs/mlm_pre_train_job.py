@@ -11,8 +11,8 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.train_job import TrainJob
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelTask
-from tgen.train.trace_trainer import TraceTrainer
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trace_trainer import TraceTrainer
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 
 
 class MLMPreTrainJob(TrainJob):

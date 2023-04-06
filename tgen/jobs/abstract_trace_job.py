@@ -9,8 +9,8 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.create_datasets_job import CreateDatasetsJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trace_trainer import TraceTrainer
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trace_trainer import TraceTrainer
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 from tgen.util.reflection_util import ReflectionUtil

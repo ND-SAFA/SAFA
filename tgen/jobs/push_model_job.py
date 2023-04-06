@@ -5,7 +5,7 @@ from tgen.jobs.abstract_trace_job import AbstractTraceJob
 from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 
 
 class PushModelJob(AbstractTraceJob):

@@ -3,7 +3,7 @@ import os
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.train.wandb.Wandb import Wandb
 
 

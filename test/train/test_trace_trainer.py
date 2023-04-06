@@ -13,8 +13,8 @@ from tgen.testres.test_data_manager import TestDataManager
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.stage_eval import Metrics
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trace_trainer import TraceTrainer
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trace_trainer import TraceTrainer
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.testres.object_creator import ObjectCreator
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 

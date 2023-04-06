@@ -15,7 +15,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 

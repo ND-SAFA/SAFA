@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import openai
 import pandas as pd
@@ -10,13 +10,14 @@ from tgen.constants import OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.train.itrainer import iTrainer
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.open_ai.open_ai_args import OpenAIArgs
 from tgen.train.open_ai.open_ai_task import OpenAITask
-from tgen.train.open_ai.prompt_generator import PromptGenerator
+from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
@@ -33,7 +34,8 @@ class OpenAITrainer(iTrainer):
     """
 
     def __init__(self, data_output_path: str, trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
-                 trainer_args: OpenAIArgs = OpenAIArgs(), prompt_generator: PromptGenerator = PromptGenerator()):
+                 trainer_args: OpenAIArgs = OpenAIArgs(),
+                 prompt_generator: AbstractPromptGenerator = AbstractPromptGenerator()):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
@@ -56,12 +58,11 @@ class OpenAITrainer(iTrainer):
         :return: The training response
         """
         training_file_id = self.create_dataset_file_id(DatasetRole.TRAIN)
-        params = self.trainer_args.to_params(OpenAITask.FINE_TUNE)
+        params = self.trainer_args.to_params(self.prompt_generator, OpenAITask.FINE_TUNE)
         if DatasetRole.VAL in self.trainer_dataset_manager:
             params["validation_file"] = self.create_dataset_file_id(DatasetRole.VAL)
         res = openai.FineTune.create(training_file=training_file_id,
                                      model=self.base_model,
-                                     classification_positive_class=self.prompt_generator.pos_class,
                                      **params)
         logger.info(res.events[-1].message)
         return res
@@ -77,7 +78,7 @@ class OpenAITrainer(iTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> OpenAIObject:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -85,15 +86,9 @@ class OpenAITrainer(iTrainer):
         """
         prompt_df = self.convert_to_prompts_dataset(self.trainer_dataset_manager[dataset_role])
         res = openai.Completion.create(model=self.base_model, prompt=list(prompt_df[self.prompt_generator.PROMPT_KEY]),
-                                       **self.trainer_args.to_params(OpenAITask.PREDICT))
-        scores = list(map(lambda r: self._get_score(r["logprobs"]["top_logprobs"]), res["choices"]))
-        eval_metrics, metrics_manager = self._compute_trace_metrics(scores, dataset_role)
-        logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
-        return TracePredictionOutput(predictions=metrics_manager.get_scores(),
-                                     label_ids=metrics_manager.trace_matrix.labels,
-                                     metrics=eval_metrics,
-                                     prediction_entries=metrics_manager.get_trace_predictions(),
-                                     additional_output={"id": res["id"]})
+                                       **self.trainer_args.to_params(self.prompt_generator, OpenAITask.PREDICT))
+        return self._create_classification_output(res, dataset_role) \
+            if isinstance(self.prompt_generator, ClassificationPromptGenerator) else self._create_generation_output(res)
 
     def cleanup(self) -> None:
         """
@@ -136,22 +131,35 @@ class OpenAITrainer(iTrainer):
             entries.append(entry)
         return pd.DataFrame(entries)
 
-    def _compute_trace_metrics(self, predictions: List[float], dataset_role: DatasetRole) -> Tuple[Dict, MetricsManager]:
+    @staticmethod
+    def _create_generation_output(res: OpenAIObject):
         """
-        Computes the traces metric on given trace output using trace information from dataset role.
-        :param predictions: The predictions from openai.
-        :param dataset_role: The role of the trace dataset being predicted (used for source-target labels).
-        :return: Trace metrics and metrics manager used to calculate them.
+        Creates the output for a generation
+        :param res: The response from the completion
+        :return: The generation output
         """
+        return TracePredictionOutput(predictions=[choice.text.strip() for choice in res["choices"]],
+                                     additional_output={"id": res["id"]})
+
+    def _create_classification_output(self, res: OpenAIObject, dataset_role: DatasetRole):
+        """
+        Creates the output for a classification
+        :param res: The response from the completion
+        :param dataset_role: The role of the dataset being predicted on
+        :return: The classification output
+        """
+        scores = list(map(lambda r: self._get_score(r["logprobs"]["top_logprobs"]), res["choices"]))
         dataset = self.trainer_dataset_manager[dataset_role]
-        n_predictions, n_expected = len(predictions), len(dataset)
-        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
-        assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
         metrics_manager = MetricsManager(trace_df=dataset.trace_df,
                                          link_ids=dataset.get_ordered_link_ids(),
-                                         predicted_similarities=predictions)
-        trace_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        return trace_metrics, metrics_manager
+                                         trace_predictions=scores)
+        eval_metrics = metrics_manager.eval(self.trainer_args.metrics)
+        logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
+        return TracePredictionOutput(predictions=metrics_manager.get_scores(),
+                                     label_ids=metrics_manager.trace_matrix.labels,
+                                     metrics=eval_metrics,
+                                     prediction_entries=metrics_manager.get_trace_predictions(),
+                                     additional_output={"id": res["id"]})
 
     def _get_score(self, probs: List[Dict]) -> float:
         """

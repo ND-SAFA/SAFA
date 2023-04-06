@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Union
 
 import torch
 from datasets import Dataset
@@ -17,7 +17,7 @@ from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.train.wandb.trace_callback import TraceCallback
 from tgen.util.base_object import BaseObject
 from tgen.util.logging.logger_manager import logger
@@ -82,10 +82,12 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: THe prediction output
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-
         self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
-        eval_metrics, metrics_manager = self._compute_trace_metrics(output, dataset_role)
+        metrics_manager = MetricsManager(trace_df=dataset.trace_df,
+                                         link_ids=dataset.get_ordered_link_ids(),
+                                         trace_predictions=output.predictions)
+        eval_metrics = metrics_manager.eval(self.trainer_args.metrics)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
 
@@ -118,25 +120,12 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :param output:The prediction output on a trace dataset.
         :return: Trace metrics associated with prediction.
         """
-        trace_metrics, _ = self._compute_trace_metrics(output, dataset_role=dataset_role)
-        return trace_metrics
-
-    def _compute_trace_metrics(self, output: PredictionOutput, dataset_role: DatasetRole) -> Tuple[Dict, MetricsManager]:
-        """
-        Computes the traces metric on given trace output using trace information from dataset role.
-        :param output: The output of a prediction on a trace dataset.
-        :param dataset_role: The role of the trace dataset being predicted (used for source-target labels).
-        :return: Trace metrics and metrics manager used to calculate them.
-        """
         dataset = self.trainer_dataset_manager[dataset_role]
-        n_predictions, n_expected = len(output.predictions), len(dataset)
-        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
-        assert len(dataset) == n_expected, f"Found dataset ({len(dataset)}) does not required links ({n_expected})."
         metrics_manager = MetricsManager(trace_df=dataset.trace_df,
                                          link_ids=dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)
-        trace_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        return trace_metrics, metrics_manager
+        trace_metrics = metrics_manager.eval(self.trainer_args.metrics)
+        return trace_metrics
 
     def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
         """
@@ -145,5 +134,5 @@ class TraceTrainer(Trainer, iTrainer, BaseObject):
         :return: Dataset at dataset role if it exists.
         """
 
-        return self.trainer_dataset_manager.get_hf_datasets(self.model_manager)[
-            dataset_role] if dataset_role in self.trainer_dataset_manager else None
+        return self.trainer_dataset_manager.get_hf_datasets(self.model_manager)[dataset_role] \
+            if dataset_role in self.trainer_dataset_manager else None

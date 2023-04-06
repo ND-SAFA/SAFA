@@ -5,7 +5,7 @@ from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelTask
 from tgen.testres.test_assertions import TestAssertions
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.testres.object_creator import ObjectCreator
 
 

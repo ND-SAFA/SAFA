@@ -1,15 +1,15 @@
 import os
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Generic
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.util.file_util import FileUtil
 
 
-class PreTrainTraceReader(AbstractProjectReader):
+class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
     LAYER_ID = "layer_1"
 
     def __init__(self, data_file: str, overrides: dict = None):
@@ -21,7 +21,7 @@ class PreTrainTraceReader(AbstractProjectReader):
         super().__init__(overrides)
         self.data_file = data_file
 
-    def read_project(self) -> Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]:
+    def read_project(self) -> TraceDataFramesTypes:
         """
         Reads a text file and converts to the trace format
         :return:

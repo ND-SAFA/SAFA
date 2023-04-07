@@ -1,7 +1,8 @@
 import os
 import uuid
 from os.path import dirname
-from typing import List
+
+import pandas as pd
 
 from tgen.constants import BLOCK_SIZE_DEFAULT
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -40,7 +41,7 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
         :return: The pre-training dataset.
         """
         pre_train_reader = PreTrainProjectReader(self.orig_data_path)
-        training_examples = pre_train_reader.create()
+        training_examples = pre_train_reader.read_project()
         dataset_file = self._write_training_examples(training_examples)
         return PreTrainDataset(dataset_file, block_size=self.block_size)
 

@@ -1,5 +1,5 @@
 import os.path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Generic
 
 import pandas as pd
 
@@ -9,7 +9,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.csv_format import CSVKeys
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
@@ -18,7 +18,7 @@ from tgen.util.logging.logger_manager import logger
 from tgen.util.thread_util import ThreadUtil
 
 
-class CsvProjectReader(AbstractProjectReader):
+class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     """
     Responsible for reading trace links and artifacts from CSV file.
     """
@@ -35,7 +35,7 @@ class CsvProjectReader(AbstractProjectReader):
         self.project_path = project_path
         self.overrides["allowed_orphans"] = NO_ORPHAN_CHECK_VALUE
 
-    def read_project(self, n_threads: int = 1) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self, n_threads: int = 1) -> TraceDataFramesTypes:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Generic
 
 import pandas as pd
 
@@ -6,13 +6,13 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.server.api.api_definition import ApiDefinition
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 
 
-class ApiProjectReader(AbstractProjectReader):
+class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     """
     Responsible for converting JSON from API into DataFrames containing artifacts and traces.
     """
@@ -26,7 +26,7 @@ class ApiProjectReader(AbstractProjectReader):
         super().__init__(overrides)
         self.api_definition = api_definition
 
-    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self) -> TraceDataFramesTypes:
         """
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.

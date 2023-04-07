@@ -14,6 +14,6 @@ class TestPreTrainProjectReader(BaseTest):
         Tests that pre-train project creator reads correct lines.
         """
         pre_train_reader = PreTrainProjectReader(TestMLMPreTrainDatasetCreator.PRETRAIN_DIR)
-        training_examples = pre_train_reader.create()
+        training_examples = pre_train_reader.read_project()
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         TestAssertions.assert_lists_have_the_same_vals(self, training_examples, expected_lines)

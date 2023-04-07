@@ -2,20 +2,20 @@ from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import Dict, Type
 
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.util.base_object import BaseObject
+from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
 
 
 @dataclass
-class AbstractPromptGenerator(ABC, BaseObject):
+class AbstractPromptGenerator(BaseObject):
     base_prompt = BasePrompt
 
     __PROMPT_SEPARATOR = "\n\n###\n\n"
     __COMPLETION_SEPARATOR = "###"
     COMPLETION_START = " "
-    PROMPT_KEY = "prompt"
-    COMPLETION_KEY = "completion"
 
     def format_prompt(self, base_prompt: str) -> str:
         """
@@ -40,18 +40,18 @@ class AbstractPromptGenerator(ABC, BaseObject):
         """
         prompt = self.format_prompt(base_prompt)
         completion = self.format_completion(base_completion)
-        return {
-            "prompt": prompt,
-            "completion": completion
-        }
+        return EnumDict({
+            PromptKeys.PROMPT: prompt,
+            PromptKeys.COMPLETION: completion
+        })
 
     @abstractmethod
-    def generate(self, source_content: str, target_content: str, label: int = None) -> Dict[str, str]:
+    def generate(self, source_content: str, target_content: str, **kwargs) -> Dict[str, str]:
         """
         Generates the prompt and response
         :source_content: The content of the source artifact
         :target_content: The content of the target artifact
-        :label: The label of the link
+        :kwargs: Additional params for the generation
         :return: Dictionary containing the prompt and completion
         """
     

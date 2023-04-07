@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Generic
 
 import pandas as pd
 
@@ -8,7 +8,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.safa_format import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
@@ -19,7 +19,7 @@ from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_manager import logger
 
 
-class StructuredProjectReader(AbstractProjectReader):
+class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     """
     Responsible for reading artifacts and trace links and constructing
     a trace dataset.
@@ -39,7 +39,7 @@ class StructuredProjectReader(AbstractProjectReader):
         self.definition = None
         self.conversions = conversions
 
-    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self) -> TraceDataFramesTypes:
         """
         Reads artifact and trace links from files.
         :return: Returns DataFrames containing artifacts, traces, and mapping between layers.
@@ -47,7 +47,7 @@ class StructuredProjectReader(AbstractProjectReader):
         self.definition = self.definition_reader.read_project_definition(self.project_path)
         self.conversions = self.definition.get(StructuredKeys.CONVERSIONS, self.conversions)
         self.overrides.update(self.definition.get(StructuredKeys.OVERRIDES, {}))
-        artifact_df = self._read_artifact_df(self.project_path, self._get_artifact_definitions())
+        artifact_df = self.read_artifact_df()
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()
         logger.info(f"Artifacts: {len(artifact_df)} Traces: {len(trace_df)} Queries: {len(layer_mapping_df)}")
@@ -59,16 +59,15 @@ class StructuredProjectReader(AbstractProjectReader):
         """
         return FileUtil.get_file_name(self.project_path)
 
-    def _read_artifact_df(self, project_path: str, type2definition: Dict[str, Dict]) -> pd.DataFrame:
+    def read_artifact_df(self) -> pd.DataFrame:
         """
         Reads artifacts in project converting each to its own data frame.
-        :param project_path: Path to project.
-        :param type2definition: Mapping between artifacts' name and definition.
         :return:  Mapping between artifacts' name and its reader.
         """
         artifacts_df = ArtifactDataFrame()
+        type2definition = self._get_artifact_definitions()
         for artifact_type, artifact_definition in type2definition.items():
-            artifact_reader = EntityReader(project_path,
+            artifact_reader = EntityReader(self.project_path,
                                            artifact_definition,
                                            conversions=self.conversions)
             artifact_type_df = artifact_reader.read_entities()

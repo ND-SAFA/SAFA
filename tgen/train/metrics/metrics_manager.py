@@ -30,7 +30,7 @@ class MetricsManager:
         :param trace_predictions: The output of a model.
         :param predicted_similarities: The similarity scores predicted
         """
-        n_predictions, n_expected = len(trace_predictions) if trace_predictions else len(predicted_similarities), len(trace_df)
+        n_predictions, n_expected = len(predicted_similarities) if trace_predictions is None else len(trace_predictions), len(trace_df)
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         scores = self.get_similarity_scores(trace_predictions) if predicted_similarities is None else predicted_similarities
         self.trace_matrix = TraceMatrix(trace_df, scores, link_ids)

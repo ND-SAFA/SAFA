@@ -15,4 +15,4 @@ steps:
             '--build-arg', 'GITHUB_SECRET_ARG=${_GITHUB_SECRET}',
             '.' ]
 
-timeout: 800s
+timeout: 1200s

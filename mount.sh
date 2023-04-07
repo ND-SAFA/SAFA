@@ -1,1 +1,0 @@
-sudo mount -o discard,defaults /dev/sdb ~/bank

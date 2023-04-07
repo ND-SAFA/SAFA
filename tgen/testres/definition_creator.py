@@ -5,6 +5,9 @@ from tgen.variables.definition_variable import DefinitionVariable
 
 
 class DefinitionCreator:
+    """
+    Factory for experiment definitions.
+    """
 
     @staticmethod
     def create(definition_class, definition, **kwargs) -> Any:

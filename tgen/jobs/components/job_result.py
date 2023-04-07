@@ -77,12 +77,14 @@ class JobResult(BaseObject):
         trace_output_dict = trace_output.output_to_dict()
         self.update(trace_output_dict)
 
-    def to_json(self, keys: List[str] = None) -> str:
+    def to_json(self, keys: List[str] = None, as_dict: bool = False) -> str:
         """
         Returns the job output as json
         :return: the output as json
         """
         obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
+        if as_dict:
+            return obj
         return JsonUtil.dict_to_json(obj)
 
     def as_dict(self) -> dict:

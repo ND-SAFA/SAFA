@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class StructuredKeys:
@@ -11,6 +12,13 @@ class StructuredKeys:
         SOURCE = "source"
         TARGET = "target"
         LABEL = "label"
+
+        @staticmethod
+        def get_cols() -> List["Trace"]:
+            """
+            :return: Returns the list of columns in trace dataframe.
+            """
+            return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL]
 
     class Artifact(Enum):
         ID = "id"

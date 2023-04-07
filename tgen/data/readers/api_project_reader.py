@@ -34,9 +34,9 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         artifact_map = {}
         layer_mapping = []
 
-        source_layers = self.api_definition["source_layers"]
-        target_layers = self.api_definition["target_layers"]
-        links = self.api_definition["true_links"]  # TODO : need to rename back-end to thiss
+        source_layers = self.api_definition.source_layers
+        target_layers = self.api_definition.target_layers
+        links = self.api_definition.get_links()
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
             source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, i)

@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 from tgen.server.serializers.experiment_serializer import ExperimentSerializer
 from tgen.variables.definition_variable import DefinitionVariable
@@ -31,6 +31,4 @@ class DefinitionCreator:
         :return: The data as a definition var
         """
         definition = {ExperimentSerializer.KEY: data}
-        experiment_serializer = ExperimentSerializer(data=definition)
-        assert experiment_serializer.is_valid(), experiment_serializer.errors
-        return experiment_serializer.save()
+        return ExperimentSerializer.create(definition)

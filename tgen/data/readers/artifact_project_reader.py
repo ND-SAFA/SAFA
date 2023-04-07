@@ -23,6 +23,7 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         Reads project data from files.
         :return: Returns the data frames containing the project artifacts.
         """
+        self.structured_project_reader.get_project_definition()
         return self.structured_project_reader.read_artifact_df()
 
     def get_project_name(self) -> str:

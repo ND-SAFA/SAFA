@@ -9,7 +9,7 @@ from datasets import Dataset
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep

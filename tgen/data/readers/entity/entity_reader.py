@@ -28,7 +28,7 @@ class EntityReader(Generic[EntityType]):
         JsonUtil.require_properties(definition, required_properties)
         self.definition: Dict = definition
         self.path = os.path.join(base_path, JsonUtil.get_property(definition, StructuredKeys.PATH))
-        self.conversions: Dict[str, Dict] = conversions if conversions else None
+        self.conversions: Dict[str, Dict] = conversions
         self.entity_type = None
 
     def read_entities(self) -> pd.DataFrame:

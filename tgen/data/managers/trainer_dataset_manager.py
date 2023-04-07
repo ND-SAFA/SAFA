@@ -10,7 +10,7 @@ from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetC
 from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
-from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy

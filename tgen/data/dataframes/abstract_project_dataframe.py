@@ -21,7 +21,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         Extends the pandas dataframe for all trace project information
         """
-        if isinstance(data, dict):
+        if isinstance(data, dict) and not isinstance(data, EnumDict):
             data = EnumDict(data)
         if columns is not None and isinstance(columns[0], Enum):
             columns = [col.value for col in columns]

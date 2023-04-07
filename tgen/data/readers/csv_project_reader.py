@@ -7,7 +7,7 @@ from tgen.constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.util.dataframe_util import DataFrameUtil

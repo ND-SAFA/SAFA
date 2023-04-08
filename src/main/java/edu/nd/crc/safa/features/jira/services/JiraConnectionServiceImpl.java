@@ -211,22 +211,27 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         body.setClientSecret(this.clientSecret);
         body.setRedirectLink(this.redirectLink);
 
-        JiraAuthResponseDTO dto = WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                .uri(uri)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(JiraAuthResponseDTO.class)
-        ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
+        try {
+            JiraAuthResponseDTO dto = WebApiUtils.blockOptional(
+                    this.webClient
+                            .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                            .uri(uri)
+                            .bodyValue(body)
+                            .retrieve()
+                            .bodyToMono(JiraAuthResponseDTO.class)
+            ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
 
-        JiraAccessCredentialsDTO result = new JiraAccessCredentialsDTO();
+            JiraAccessCredentialsDTO result = new JiraAccessCredentialsDTO();
 
-        result.setBearerAccessToken(dto.getAccessToken());
-        result.setClientId(clientId);
-        result.setClientSecret(clientSecret);
-        result.setRefreshToken(dto.getRefreshToken());
-        return result;
+            result.setBearerAccessToken(dto.getAccessToken());
+            result.setClientId(clientId);
+            result.setClientSecret(clientSecret);
+            result.setRefreshToken(dto.getRefreshToken());
+            return result;
+        } catch (Exception e) {
+            System.out.println("Error connecting to jira:\nurl:" + uri + "\nbody: " + body);
+            throw e;
+        }
     }
 
     @Override

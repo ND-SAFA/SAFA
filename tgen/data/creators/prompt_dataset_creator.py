@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Tuple
 
 import pandas as pd
 
@@ -33,15 +33,15 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
-                 data_output_path: str = None, project_file_id: str = None, ):
+                 data_export_path: str = None, project_file_id: str = None):
         """
         Initializes creator with entities extracted from reader.
-        :param data_output_path: The path to where data files will be saved
+        :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
         :param project_reader: Project reader responsible for extracting project entities.
         :param trace_dataset_creator: Data Creator responsible for making the trace dataset
         """
         super().__init__()
-        self.data_output_path = data_output_path
+        self.data_export_path = data_export_path
         self.project_reader = project_reader
         self.trace_dataset_creator = trace_dataset_creator
         self.project_file_id = project_file_id
@@ -51,12 +51,12 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         Creates TraceDataset with links.
         :return: TraceDataset.
         """
-        trace_dataset = self.trace_dataset_creator.create() if self.trace_dataset_creator else None
         df = self.project_reader.read_project() if self.project_reader else None
         artifact_df = df if isinstance(df, ArtifactDataFrame) else None
         prompt_df = df if isinstance(df, PromptDataFrame) else None
+        trace_dataset = self.trace_dataset_creator.create() if self.trace_dataset_creator else None
         return PromptDataset(prompt_df=prompt_df, artifact_df=artifact_df, trace_dataset=trace_dataset,
-                             project_file_id=self.project_file_id, data_output_path=self.data_output_path)
+                             project_file_id=self.project_file_id, data_export_path=self.data_export_path)
 
     def get_name(self) -> str:
         """
@@ -65,8 +65,8 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         """
         if self.project_reader:
             return self.project_reader.get_project_name()
-        if self.data_output_path:
-            return FileUtil.get_file_name(self.data_output_path)
+        if self.data_export_path:
+            return FileUtil.get_file_name(self.data_export_path)
         if self.project_file_id:
             return self.project_file_id
         return ''

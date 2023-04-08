@@ -6,13 +6,13 @@ from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 
 class TestArtifactProjectReader(BaseTest):
     """
-    Tests that csv project is correctly parsed.
+    Tests that artifact project is correctly parsed.
     """
     test_project = ArtifactTestProject()
 
     def test_read_project(self):
         """
-        Tests that the csv project can be read and translated to data frames.
+        Tests that the artifact project can be read and translated to artifact data frame.
         """
         self.verify_project_data_frames(self.test_project)
 

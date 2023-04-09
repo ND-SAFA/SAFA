@@ -41,8 +41,7 @@ class PromptDataset(iDataset):
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
         if not self.project_file_id and prompt_df is None:
-            assert not (self.artifact_df is None and self.trace_dataset is None), "Either artifacts dataframe " \
-                                                                                  "or trace dataframe to generate dataset."
+            assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe to generate dataset."
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -101,11 +100,12 @@ class PromptDataset(iDataset):
         """
         if self.prompt_df is None:
             assert prompt_generator is not None, "Must provide prompt generator to create prompt dataset for trainer"
-            self.prompt_df = self.generate_prompts_dataframe_from_traces(prompt_generator) if self.trace_dataset \
-                else self.generate_prompts_dataframe_from_artifacts(prompt_generator)
+            assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe to generate dataframe."
+            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_generator) if self.trace_dataset \
+                else self._generate_prompts_dataframe_from_artifacts(prompt_generator)
         return self.prompt_df
 
-    def generate_prompts_dataframe_from_traces(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
+    def _generate_prompts_dataframe_from_traces(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
         """
         Converts trace links in to prompt format for generation model.
         :param prompt_generator: The generator of prompts for the dataset
@@ -121,7 +121,7 @@ class PromptDataset(iDataset):
             entries.append(entry)
         return pd.DataFrame(entries)
 
-    def generate_prompts_dataframe_from_artifacts(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
+    def _generate_prompts_dataframe_from_artifacts(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
         """
         Converts artifacts in to prompt format for generation model.
         :param prompt_generator: The generator of prompts for the dataset
@@ -132,3 +132,10 @@ class PromptDataset(iDataset):
             entry = prompt_generator.generate(target_content=row[ArtifactKeys.CONTENT.value], source_content='')
             entries.append(entry)
         return pd.DataFrame(entries)
+
+    def _has_trace_data(self) -> bool:
+        """
+        Returns True when project data in the form of an artifacts_df or trace_dataset has been provided, else False
+        :return: True when project data in the form of an artifacts_df or trace_dataset has been provided, else False
+        """
+        return not (self.artifact_df is None and self.trace_dataset is None)

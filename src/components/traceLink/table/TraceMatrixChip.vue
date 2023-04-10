@@ -84,7 +84,6 @@ const className = computed(() =>
  * Selects the trace link represented by this chip.
  */
 function handleClick(): void {
-  console.log({ traceLink });
   if (!traceLink.value) return;
 
   selectionStore.selectTraceLink(traceLink.value);

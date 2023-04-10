@@ -9,6 +9,7 @@
     :rows="rows"
     row-key="projectId"
     item-name="Project"
+    data-cy="table-version"
     @refresh="handleReload"
     @row:add="handleOpenAdd"
     @row:delete="handleOpenDelete"

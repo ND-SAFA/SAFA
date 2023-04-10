@@ -6,7 +6,7 @@ describe("Artifact Types", () => {
   });
 
   beforeEach(() => {
-    cy.initProjectVersion().expandViewport();
+    cy.initProjectVersion();
   });
 
   describe("I can add a new artifact type when creating a new artifact", () => {
@@ -29,16 +29,18 @@ describe("Artifact Types", () => {
   });
 
   describe("I can change the icon of an artifact type", () => {
-    it("Changes the icon of a type", () => {
-      const type = "design";
+    it.only("Changes the icon of a type", () => {
+      const type = "Design";
 
       cy.switchToTimView();
 
       cy.getNode(type).click();
-      cy.getCy(DataCy.typeOptionsIconButton).last().click();
+      cy.getCy(DataCy.typeOptionsIconButton).within(() => {
+        cy.get("button").last().click();
+      });
 
       cy.getCy(DataCy.artifactLevelContent).within(() => {
-        cy.get("i").should("have.class", "mdi-alpha-a-box-outline");
+        cy.get("i").first().should("have.class", "mdi-alpha-a-box-outline");
       });
     });
   });

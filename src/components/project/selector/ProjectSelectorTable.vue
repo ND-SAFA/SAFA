@@ -10,6 +10,7 @@
     :rows="rows"
     row-key="projectId"
     item-name="Project"
+    data-cy="table-project"
     @refresh="handleReload"
     @row:add="handleOpenAdd"
     @row:edit="handleOpenEdit"

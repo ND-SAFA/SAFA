@@ -16,7 +16,7 @@ Cypress.Commands.add("getNodes", (selected) => {
 });
 
 Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
-  cy.getCy(DataCy.appLoading).should("not.be.visible");
+  cy.getCy(DataCy.appLoading).should("not.exist");
 
   if (waitForNodes) {
     cy.getNodes().should("be.visible");

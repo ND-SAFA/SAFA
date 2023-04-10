@@ -7,7 +7,7 @@
       @submit="handleSaveProject"
     >
       <template #1>
-        <authentication-selector v-model="source" />
+        <authentication-selector v-model="source" @input="handleSelectSource" />
       </template>
       <template #2>
         <jira-organization-selector v-if="source === 'Jira'" />
@@ -64,6 +64,14 @@ const steps = ref<StepperStep[]>([
   { title: "Select Organization", done: false },
   { title: "Select Project", done: false },
 ]);
+
+/**
+ * Selects the type of integration to import from.
+ * @param type - The type of integration.
+ */
+function handleSelectSource(type: "Jira" | "GitHub"): void {
+  source.value = type;
+}
 
 /**
  * Attempts to import a project.

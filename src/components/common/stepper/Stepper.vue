@@ -20,7 +20,7 @@
     </q-step>
 
     <template v-if="!props.minimal" #navigation>
-      <q-stepper-navigation>
+      <q-stepper-navigation class="q-mt-sm">
         <slot name="actions" />
         <flex-box full-width align="end">
           <text-button

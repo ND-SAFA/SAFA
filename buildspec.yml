@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Build started on `date`
+      - docker build -t tgen-image .
+      - docker tag tgen-image:latest 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen-image:latest
+      - $(aws ecr get-login --no-include-email)
+      - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen-image:latest
+

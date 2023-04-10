@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.server.api.api_definition import ApiDefinition
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator, LayerEntry, TraceInstruction
@@ -31,7 +32,7 @@ class ApiTestProject(AbstractTestProject):
             "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
             "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
         }
-        return ApiProjectReader(data)
+        return ApiProjectReader(ApiDefinition(**data))
 
     @staticmethod
     def get_n_links() -> int:

@@ -1,11 +1,20 @@
-from typing import Dict, List, Tuple, TypedDict
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+
+from tgen.util.base_object import BaseObject
 
 
-class ApiDefinition(TypedDict):
+@dataclass
+class ApiDefinition(BaseObject):
     """
-    Defines the API payload for training or predicting on a model.
-    Note, `links` not included during prediction.
+    Defines the dataset received through the API.
     """
     source_layers: List[Dict[str, str]]
     target_layers: List[Dict[str, str]]
-    true_links: List[Tuple[str, str]]
+    true_links: List[Tuple[str, str]] = None
+
+    def get_links(self) -> List[Tuple[str, str]]:
+        """
+        :return: Returns the trace links defined in API dataset.
+        """
+        return [] if self.true_links is None else self.true_links

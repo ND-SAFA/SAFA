@@ -40,6 +40,6 @@ const definition = computed<TimEdgeCytoElement>(() => ({
     dark: darkMode.value,
     generated: props.generated,
   },
-  classes: props.sourceType === props.targetType ? ["loop"] : [],
+  classes: props.sourceType === props.targetType ? "loop" : "",
 }));
 </script>

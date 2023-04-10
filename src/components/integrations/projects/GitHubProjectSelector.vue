@@ -11,6 +11,9 @@
         :key="item.name"
         :title="item.name"
         :subtitle="getRepositoryTime(item)"
+        clickable
+        :active="projectName === item.name"
+        active-class="bg-background"
         @click="handleProjectSelect(item)"
       />
     </list>
@@ -39,6 +42,8 @@ const loading = ref(false);
 const organizationName = computed(
   () => integrationsStore.gitHubOrganization?.name
 );
+
+const projectName = computed(() => integrationsStore.gitHubProject?.name);
 
 /**
  * Loads a user's GitHub projects for a selected organization.

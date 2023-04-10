@@ -10,6 +10,7 @@
         v-for="item in organizations"
         :key="item.name"
         :title="item.name"
+        clickable
         @click="handleOrganizationSelect(item)"
       />
     </list>

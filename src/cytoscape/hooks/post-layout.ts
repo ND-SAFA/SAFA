@@ -26,8 +26,12 @@ export function addAutoMoveToNode(
   layout: IGraphLayout,
   node: NodeSingular
 ): void {
+  const children = node
+    .connectedEdges(`edge[source='${node.data().id}']`)
+    .targets();
+
   const rule = cy.automove({
-    nodesMatching: node.successors("node"),
+    nodesMatching: children.union(children.successors()),
     reposition: AutoMoveReposition.DRAG,
     dragWith: node,
   });

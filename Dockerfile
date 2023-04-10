@@ -24,8 +24,13 @@ COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
 ## Step - Copy source and build files
+RUN apt-get git
+RUN git submodule update --init --recursive
 COPY /tgen/ /app/tgen/
 COPY /api/ /app/api/
+
+## Test
+RUN python3
 
 # Finalize
 EXPOSE 80

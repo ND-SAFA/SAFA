@@ -1,6 +1,14 @@
 version: 0.2
+env:
+  secrets-manager:
+    $DOCKERHUB_USERNAME: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_USERNAME"
+    $DOCKERHUB_PASS: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_PASSWORD"
+
 
 phases:
+  pre_build:
+    commands:
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
   build:
     commands:
       - echo Build started on `date`

@@ -44,6 +44,6 @@ const definition = computed<TraceCytoElement>(() => ({
     score: props.trace.score,
     dark: darkMode.value,
   },
-  classes: props.trace.sourceId === props.trace.targetId ? ["loop"] : [],
+  classes: props.trace.sourceId === props.trace.targetId ? "loop" : "",
 }));
 </script>

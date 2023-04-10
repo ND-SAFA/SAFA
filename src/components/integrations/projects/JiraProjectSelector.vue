@@ -11,6 +11,9 @@
         :key="item.name"
         :title="item.name"
         :subtitle="item.key"
+        clickable
+        :active="projectName === item.name"
+        active-class="bg-background"
         @click="handleProjectSelect(item)"
       >
         <template #icon>
@@ -31,7 +34,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, watch, ref } from "vue";
+import { onMounted, watch, ref, computed } from "vue";
 import { JiraProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadJiraProjects } from "@/api";
@@ -39,6 +42,8 @@ import { StepperListStep, List, ListItem } from "@/components/common";
 
 const projects = ref<JiraProjectSchema[]>([]);
 const loading = ref(false);
+
+const projectName = computed(() => integrationsStore.jiraProject?.name);
 
 /**
  * Loads a user's Jira projects for a selected site.

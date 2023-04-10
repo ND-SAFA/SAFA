@@ -18,7 +18,7 @@
       </template>
     </panel-card>
     <flex-box justify="center" align="center" b="4">
-      <icon size="md" rotate="270" variant="trace" color="primary" />
+      <icon size="md" :rotate="270" variant="trace" color="primary" />
       <attribute-chip v-if="!!score" confidence-score :value="score" />
     </flex-box>
     <panel-card>

@@ -69,7 +69,7 @@ import {
   typeOptionsStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
+import { artifactTreeGraph } from "@/cytoscape";
 import CytoscapeController from "./CytoscapeController.vue";
 import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";

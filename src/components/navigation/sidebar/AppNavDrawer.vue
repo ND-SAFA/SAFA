@@ -38,7 +38,7 @@
         tooltip="Open sidebar"
         :color="darkMode ? 'secondary' : 'primary'"
         data-cy="button-sidebar-open"
-        rotate="180"
+        :rotate="180"
         @click="sidebarOpen = true"
       />
     </flex-box>

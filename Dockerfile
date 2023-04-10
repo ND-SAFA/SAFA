@@ -17,7 +17,7 @@ RUN apt-get install -y software-properties-common && \
 
 ## Step - Install TGEN requirements
 COPY tgen/requirements.txt /app/tgen/
-COPY tgen/requirements/ /app/tgen/requirements/
+ADD tgen/requirements/ /app/tgen/requirements/
 RUN pip3 install -r /app/tgen/requirements.txt
 
 ## Step - Install API requirements

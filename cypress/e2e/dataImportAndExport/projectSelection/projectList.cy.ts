@@ -24,7 +24,7 @@ describe("Project List", () => {
       cy.inputText(DataCy.selectionSearch, "$".repeat(20));
 
       cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-        tr.should("have.length", 2);
+        tr.should("have.length", 1);
       });
     });
   });

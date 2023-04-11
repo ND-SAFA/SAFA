@@ -269,10 +269,10 @@ export enum DataCy {
 
   // Trace Link Generation
 
-  traceLinkTable = "table-trace-link",
-  traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
+  traceLinkTable = "table-trace-approval",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",
+  traceLinkTableApprovalInput = "input-approval-type",
 
   // Project Version
   projectSavingIndicator = "project-saving-indicator",

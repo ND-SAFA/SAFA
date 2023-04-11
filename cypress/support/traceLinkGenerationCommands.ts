@@ -3,18 +3,15 @@ import { DataCy } from "@/fixtures";
 Cypress.Commands.add("openTraceApproval", () => {
   cy.expandViewport()
     .clickButtonWithName("Trace Prediction")
-    .switchTab("Trace Approval")
-    .clickButton(DataCy.sidebarCloseButton);
+    .switchTab("Trace Approval");
 });
 
 Cypress.Commands.add("sortTraceApproval", (sort) => {
   if (sort === "name") {
-    cy.clickButton(DataCy.traceLinkTableSortByInput).type(
-      "{enter}{downArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.traceLinkTableSortByInput).clickMenuOption("name");
   } else if (sort === "approval") {
-    cy.clickButton(DataCy.traceLinkTableSortByInput).type(
-      "{backspace}{upArrow}{enter}{esc}"
+    cy.clickButton(DataCy.traceLinkTableSortByInput).clickMenuOption(
+      "approval"
     );
   } else {
     cy.clickButton(DataCy.traceLinkTableSortByInput).type("{backspace}{esc}");
@@ -23,13 +20,9 @@ Cypress.Commands.add("sortTraceApproval", (sort) => {
 
 Cypress.Commands.add("groupTraceApproval", (group) => {
   if (group === "type") {
-    cy.clickButton(DataCy.traceLinkTableGroupByInput).type(
-      "{backspace}{upArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.traceLinkTableGroupByInput).clickMenuOption("type");
   } else if (group === "status") {
-    cy.clickButton(DataCy.traceLinkTableGroupByInput).type(
-      "{downArrow}{downArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.traceLinkTableGroupByInput).clickMenuOption("status");
   } else {
     cy.clickButton(DataCy.traceLinkTableGroupByInput).type("{backspace}{esc}");
   }
@@ -37,16 +30,14 @@ Cypress.Commands.add("groupTraceApproval", (group) => {
 
 Cypress.Commands.add("filterTraceApproval", (filter) => {
   if (filter === "approved") {
-    cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-      "{backspace}{downArrow}{enter}{esc}"
+    cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
+      "{backspace}approved{downArrow}{enter}"
     );
   } else if (filter === "declined") {
-    cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-      "{backspace}{downArrow}{downArrow}{enter}{esc}"
+    cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
+      "{backspace}declined{downArrow}{downArrow}{enter}"
     );
   } else {
-    cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-      "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.traceLinkTableApprovalInput).type("{backspace}{esc}");
   }
 });

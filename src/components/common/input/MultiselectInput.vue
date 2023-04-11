@@ -7,7 +7,7 @@
     use-chips
     use-input
     :label="props.label"
-    :options="props.options"
+    :options="options"
     :option-value="props.optionValue"
     :option-label="props.optionLabel"
     :map-options="props.optionToValue"
@@ -17,7 +17,10 @@
     :error="showError"
     :class="className"
     :hint="props.hint"
-    :new-value-mode="props.addValues ? 'add-unique' : ''"
+    :new-value-mode="props.addValues ? 'add-unique' : undefined"
+    input-debounce="0"
+    :clearable="props.clearable"
+    @filter="filter"
   >
     <template #prepend>
       <slot name="prepend" />
@@ -35,9 +38,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { withDefaults, computed } from "vue";
+import { withDefaults, computed, ref, watch } from "vue";
 import { SizeType } from "@/types";
-import { useMargins, useVModel } from "@/hooks";
+import { typeOptionsStore, useMargins, useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
@@ -52,11 +55,11 @@ const props = withDefaults(
     /**
      * The key of an option's id.
      */
-    optionValue?: string;
+    optionValue?: string | ((opt: unknown) => string);
     /**
      * The key of an option's display label.
      */
-    optionLabel?: string;
+    optionLabel?: string | ((opt: unknown) => string);
     /**
      * Only saves the option's value, not the entire object.
      */
@@ -93,6 +96,10 @@ const props = withDefaults(
      * Whether to display as outlined, instead of the default filled.
      */
     outlined?: boolean;
+    /**
+     * Whether to display a button to clear the input.
+     */
+    clearable?: boolean;
   }>(),
   {
     b: "1",
@@ -119,5 +126,34 @@ const className = useMargins(props, () => [[!!props.class, props.class]]);
 
 const showError = computed(
   () => (!!props.errorMessage && props.errorMessage.length > 0) || undefined
+);
+
+const options = ref(props.options);
+
+/**
+ * Filters the artifact type options.
+ * @param searchText - The search text to filter with.
+ * @param update - A function call to update the options.
+ */
+function filter(
+  searchText: string | null,
+  update: (fn: () => void) => void
+): void {
+  update(() => {
+    if (!searchText) {
+      options.value = props.options;
+    } else {
+      const lowercaseSearchText = searchText.toLowerCase();
+
+      options.value = props.options.filter((option) =>
+        String(option).toLowerCase().includes(lowercaseSearchText)
+      );
+    }
+  });
+}
+
+watch(
+  () => props.options,
+  (newOptions) => (options.value = newOptions)
 );
 </script>

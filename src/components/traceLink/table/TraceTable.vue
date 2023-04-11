@@ -9,6 +9,7 @@
       :loading="loading"
       :filter-row="filterRow"
       :custom-cells="customCells"
+      data-cy="view-trace-matrix-table"
       @row-click="handleView"
     >
       <template #header-right>
@@ -16,6 +17,7 @@
           v-model="rowTypes"
           outlined
           dense
+          clearable
           :use-chips="false"
           :options="options"
           label="Row Types"
@@ -27,6 +29,7 @@
           v-model="colTypes"
           outlined
           dense
+          clearable
           :use-chips="false"
           :options="options"
           label="Column Types"

@@ -71,7 +71,9 @@ Cypress.Commands.add("uploadFiles", (dataCy, ...filePaths) => {
 });
 
 Cypress.Commands.add("switchTab", (tabLabel) => {
-  cy.contains("div", tabLabel).click();
+  cy.get(".q-tabs").within(() => {
+    cy.contains("div", tabLabel).click();
+  });
 });
 
 Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {

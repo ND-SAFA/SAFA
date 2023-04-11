@@ -264,8 +264,8 @@ export enum DataCy {
 
   traceMatrixTable = "view-trace-matrix-table",
 
-  traceMatrixTableRowTypeInput = "input-trace-matrix-table-row-types",
-  traceMatrixTableColTypeInput = "input-trace-matrix-table-col-types",
+  traceMatrixTableRowTypeInput = "input-trace-table-row-types",
+  traceMatrixTableColTypeInput = "input-trace-table-col-types",
 
   // Trace Link Generation
 

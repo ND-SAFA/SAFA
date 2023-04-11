@@ -40,7 +40,7 @@ export default {
 <script setup lang="ts">
 import { withDefaults, computed, ref, watch } from "vue";
 import { SelectOption, SizeType } from "@/types";
-import { typeOptionsStore, useMargins, useVModel } from "@/hooks";
+import { useMargins, useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{

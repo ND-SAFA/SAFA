@@ -126,7 +126,7 @@ describe("Documents", () => {
     });
   });
 
-  describe.only("I can delete a document", () => {
+  describe("I can delete a document", () => {
     it("Deletes a document", () => {
       const name = `New ${Math.random()}`;
 

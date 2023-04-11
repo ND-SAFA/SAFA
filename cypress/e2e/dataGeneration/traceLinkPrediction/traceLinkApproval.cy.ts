@@ -39,10 +39,7 @@ describe("Trace Link Approval", () => {
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
-      // Filter for approved links.
-      cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
-        "{backspace}{downArrow}{downArrow}{enter}{esc}"
-      );
+      cy.filterTraceApproval("approved");
 
       cy.withinTableRows(
         DataCy.traceLinkTable,
@@ -78,10 +75,7 @@ describe("Trace Link Approval", () => {
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
-      // Filter for approved links.
-      cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
-        "{backspace}{downArrow}{enter}{esc}"
-      );
+      cy.filterTraceApproval("declined");
 
       cy.withinTableRows(
         DataCy.traceLinkTable,

@@ -14,6 +14,7 @@ phases:
       - echo Build started on `date`
       - git submodule update --init --recursive
       - docker build -t tgen .
-      - docker tag tgen:latest thearod5/tgen
-      - docker push thearod5/tgen
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 178003569110.dkr.ecr.us-east-1.amazonaws.com
+      - docker tag tgen:latest 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
+      - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
 

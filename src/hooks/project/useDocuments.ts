@@ -99,11 +99,9 @@ export const useDocuments = defineStore("documents", {
         defaultDocument;
       const currentArtifactIds = loadedDocument.artifactIds;
 
-      this.$patch({
-        allDocuments: documents,
-        baseDocument: defaultDocument,
-        currentDocument: loadedDocument,
-      });
+      this.allDocuments = documents;
+      this.baseDocument = defaultDocument;
+      this.currentDocument = loadedDocument;
 
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });

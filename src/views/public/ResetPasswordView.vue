@@ -1,18 +1,17 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
         el="h1"
-        class="mb-3"
         value="Reset Password"
       />
 
       <div v-if="!isSubmitted">
-        <typography el="p" value="Please enter a new password." />
+        <typography b="2" el="p" value="Please enter a new password." />
 
-        <password-field v-model="password" :errors="errors" />
+        <password-input v-model="password" :errors="errors" />
       </div>
 
       <typography
@@ -22,86 +21,84 @@
       />
     </template>
 
-    <template v-slot:actions>
-      <v-btn
+    <template #actions>
+      <text-button
         v-if="!isSubmitted"
         color="primary"
-        @click="handleReset"
+        label="Update Password"
         :disabled="password.length === 0"
         :loading="isLoading"
-      >
-        Update Password
-      </v-btn>
+        @click="handleReset"
+      />
 
-      <span class="ml-auto">
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
-          Back To Login
-        </v-btn>
+      <span class="q-ml-auto">
+        <text-button
+          text
+          small
+          label="Back To Login"
+          color="primary"
+          @click="handleLogin"
+        />
       </span>
     </template>
   </card-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { getParam, navigateTo, QueryParams, Routes } from "@/router";
-import { updatePassword } from "@/api";
-import { CardPage, PasswordField, Typography } from "@/components";
-
 /**
  * Displays the reset password page.
  */
-export default Vue.extend({
+export default {
   name: "ResetPasswordView",
-  components: { PasswordField, CardPage, Typography },
-  data() {
-    return {
-      password: "",
-      token: "",
-      isSubmitted: false,
-      isError: false,
-      isLoading: false,
-    };
-  },
-  mounted() {
-    const token = getParam(QueryParams.PW_RESET);
+};
+</script>
 
-    if (!token) return;
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
+import { getParam, navigateTo, QueryParams, Routes } from "@/router";
+import { updatePassword } from "@/api";
+import { CardPage, PasswordInput, Typography, TextButton } from "@/components";
 
-    this.token = String(token);
-  },
-  computed: {
-    /**
-     * @return Any errors encountered.
-     */
-    errors(): string[] {
-      return this.isError ? ["Unable to reset your password."] : [];
-    },
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Attempts to reset a user's password.
-     */
-    handleReset() {
-      this.isLoading = true;
+const token = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isSubmitted = ref(false);
 
-      updatePassword({
-        newPassword: this.password,
-        resetToken: this.token,
-      })
-        .then(() => {
-          this.isSubmitted = true;
-          this.isError = false;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
+const errors = computed(() =>
+  isError.value ? ["Unable to reset your password."] : []
+);
+
+onMounted(() => {
+  const loadedToken = getParam(QueryParams.PW_RESET);
+
+  if (!loadedToken) return;
+
+  token.value = String(loadedToken);
 });
+
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Attempts to reset a user's password.
+ */
+function handleReset() {
+  isLoading.value = true;
+
+  updatePassword({
+    newPassword: password.value,
+    resetToken: token.value,
+  })
+    .then(() => {
+      isSubmitted.value = true;
+      isError.value = false;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

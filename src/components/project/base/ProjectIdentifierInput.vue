@@ -1,76 +1,52 @@
 <template>
-  <v-container style="max-width: 40em">
-    <v-text-field
-      filled
-      v-model="currentName"
+  <div class="q-mx-auto long-input">
+    <text-input
+      v-model="nameText"
       label="Project Name"
-      :data-cy="dataCyName"
       hint="Required"
-      persistent-hint
+      :data-cy="props.dataCyName"
     />
-    <v-textarea
-      filled
-      hide-details
-      v-model="currentDescription"
+    <text-input
+      v-model="descriptionText"
+      type="textarea"
       label="Project Description"
-      rows="3"
-      :data-cy="dataCyDescription"
+      :data-cy="props.dataCyDescription"
     />
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
 /**
  * Input fields for editing a project.
- *
- * @emits-1 `update:name` (string) - On name updated.
- * @emits-2 `update:description` (string) - On description updated.
  */
-export default Vue.extend({
+export default {
   name: "ProjectIdentifierInput",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    dataCyName: {
-      type: String,
-      default: "input-project-name",
-    },
-    dataCyDescription: {
-      type: String,
-      default: "input-project-description",
-    },
-  },
-  computed: {
-    /**
-     * Emits changes to the name.
-     */
-    currentName: {
-      get(): string {
-        return this.name;
-      },
-      set(newName: string): void {
-        this.$emit("update:name", newName);
-      },
-    },
-    /**
-     * Emits changes to the description.
-     */
-    currentDescription: {
-      get(): string {
-        return this.description;
-      },
-      set(newDescription: string): void {
-        this.$emit("update:description", newDescription);
-      },
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { withDefaults } from "vue";
+import { useVModel } from "@/hooks";
+import { TextInput } from "@/components/common";
+
+const props = withDefaults(
+  defineProps<{
+    name: string;
+    description: string;
+    dataCyName?: string;
+    dataCyDescription?: string;
+  }>(),
+  {
+    dataCyName: "input-project-name",
+    dataCyDescription: "input-project-description",
+  }
+);
+
+defineEmits<{
+  (e: "update:name", name: string): void;
+  (e: "update:description", description: string): void;
+}>();
+
+const nameText = useVModel(props, "name");
+const descriptionText = useVModel(props, "description");
 </script>

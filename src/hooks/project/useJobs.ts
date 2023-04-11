@@ -20,6 +20,13 @@ export const useJobs = defineStore("jobs", {
   getters: {},
   actions: {
     /**
+     * Toggles whether a job is selected.
+     * @param job - The job to select.
+     */
+    selectJob(job: JobSchema): void {
+      this.selectedJob = this.selectedJob === job ? undefined : job;
+    },
+    /**
      * Adds job to list of jobs if new job, otherwise updates previous one.
      * New or updated job will be first element of the list of jobs.
      *
@@ -27,15 +34,6 @@ export const useJobs = defineStore("jobs", {
      */
     updateJob(job: JobSchema): void {
       this.jobs = [job, ...this.jobs.filter(({ id }) => id !== job.id)];
-    },
-    /**
-     * Finds a job.
-     *
-     * @param jobId - The job id to get.
-     * @returns The job with given id.
-     */
-    getJob(jobId: string): JobSchema | undefined {
-      return this.jobs.find(({ id }) => id === jobId);
     },
     /**
      * Removes job matching id of given job.

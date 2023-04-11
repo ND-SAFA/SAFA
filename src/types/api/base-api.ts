@@ -62,6 +62,11 @@ export interface IOHandlerCallback<Res = void> {
 }
 
 /**
- * Represents a url parameter in the app's web address.
+ * Represents a URL parameter in the app's web address.
  */
-export type URLParameter = string | (string | null)[] | undefined;
+export type URLParameter = undefined | null | string | (string | null)[];
+
+/**
+ * Represents a collection of URL parameters.
+ */
+export type URLQuery = Record<string, URLParameter>;

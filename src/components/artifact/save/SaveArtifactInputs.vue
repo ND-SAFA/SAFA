@@ -1,78 +1,75 @@
 <template>
-  <div class="mt-4">
-    <v-row dense>
-      <v-col cols="6">
-        <v-text-field
-          filled
-          v-if="!store.isFTA"
-          v-model="store.editedArtifact.name"
-          label="Artifact Name"
-          hint="Please select an identifier for the artifact"
-          :error-messages="nameErrors"
-          :loading="nameCheckIsLoading"
-          data-cy="input-artifact-name"
-      /></v-col>
-      <v-col cols="6">
-        <artifact-type-input
-          persistent-hint
-          v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
-          v-model="store.editedArtifact.type"
-          label="Artifact Type"
-          hint="Required"
-          data-cy="input-artifact-type"
-      /></v-col>
-    </v-row>
-
-    <v-textarea
+  <div>
+    <text-input
       v-if="!store.isFTA"
-      filled
-      persistent-hint
-      label="Artifact Body"
-      v-model="store.editedArtifact.body"
-      rows="3"
+      v-model="store.editedArtifact.name"
+      label="Artifact Name"
+      hint="Please select an identifier for the artifact"
+      :error-message="nameError"
+      :loading="nameCheckLoading"
+      class="q-mb-md"
+      data-cy="input-artifact-name"
+    />
+    <artifact-type-input
+      v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
+      v-model="store.editedArtifact.type"
+      label="Artifact Type"
       hint="Required"
+      class="q-mb-md"
+      data-cy="input-artifact-type"
+    />
+
+    <text-input
+      v-if="!store.isFTA"
+      v-model="store.editedArtifact.body"
+      label="Artifact Body"
+      type="textarea"
+      hint="Required"
+      class="q-mb-md"
       data-cy="input-artifact-body"
     />
 
-    <v-select
-      v-if="displayDocumentType"
-      filled
-      label="Document Type"
+    <select-input
+      v-if="showDocumentType"
       v-model="store.editedArtifact.documentType"
-      :items="documentTypes"
-      item-text="name"
-      item-value="id"
+      label="Document Type"
+      :options="documentTypes"
+      option-label="name"
+      option-value="id"
+      option-to-value
       hint="Which type of document this artifact belongs to"
+      class="q-mb-md"
       data-cy="input-artifact-document"
     />
-    <v-select
-      filled
+    <select-input
       v-if="store.isSafetyCase"
-      label="Safety Case Type"
       v-model="store.editedArtifact.safetyCaseType"
-      :items="safetyCaseTypes"
-      item-text="name"
-      item-value="id"
+      label="Safety Case Type"
+      :options="safetyCaseTypes"
+      option-label="name"
+      option-value="id"
+      option-to-value
+      class="q-mb-md"
       data-cy="input-artifact-sc"
     />
-    <v-select
-      filled
+    <select-input
       v-if="store.isFTA"
-      label="Logic Type"
       v-model="store.editedArtifact.logicType"
-      :items="logicTypes"
-      item-text="name"
-      item-value="id"
+      label="Logic Type"
+      :options="logicTypes"
+      option-label="name"
+      option-value="id"
+      option-to-value
+      class="q-mb-md"
       data-cy="input-artifact-logic"
     />
     <artifact-input
-      only-document-artifacts
       v-if="!store.isUpdate"
       v-model="store.parentId"
-      :multiple="false"
+      only-document-artifacts
       label="Parent Artifact"
       data-cy="input-artifact-parent"
-      class="mb-4"
+      class="q-mb-md"
     />
 
     <attribute-list-input :artifact="store.editedArtifact" />
@@ -80,8 +77,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { SelectOption } from "@/types";
+/**
+ * Inputs for artifact creation and editing.
+ */
+export default {
+  name: "SaveArtifactInputs",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
@@ -89,87 +94,64 @@ import {
   ArtifactInput,
   ArtifactTypeInput,
   AttributeListInput,
+  TextInput,
+  SelectInput,
 } from "@/components/common";
 
+const safetyCaseTypes = safetyCaseOptions();
+const logicTypes = logicTypeOptions();
+
+const nameCheckTimer = ref<ReturnType<typeof setTimeout> | undefined>();
+const nameCheckLoading = ref(false);
+
+const store = computed(() => artifactSaveStore);
+
+const documentTypes = computed(
+  () => documentTypeMap()[documentStore.currentType]
+);
+
+const showDocumentType = computed(() => documentTypes.value.length > 1);
+
+const nameError = computed(() =>
+  nameCheckLoading.value ? false : artifactSaveStore.nameError
+);
+
 /**
- * Inputs for artifact creation and editing.
+ * Checks whether the set name has already been taken in this project.
  */
-export default Vue.extend({
-  name: "SaveArtifactInputs",
-  components: {
-    AttributeListInput,
-    ArtifactTypeInput,
-    ArtifactInput,
-  },
-  data() {
-    return {
-      nameCheckTimer: undefined as ReturnType<typeof setTimeout> | undefined,
-      nameCheckIsLoading: false,
+watch(
+  () => artifactSaveStore.editedArtifact.name,
+  (newName) => {
+    if (nameCheckTimer.value) {
+      clearTimeout(nameCheckTimer.value);
+    }
 
-      safetyCaseTypes: safetyCaseOptions(),
-      logicTypes: logicTypeOptions(),
-    };
-  },
-  computed: {
-    /**
-     * @return The document types allowed on the current document.
-     */
-    documentTypes(): SelectOption[] {
-      return documentTypeMap()[documentStore.currentType];
-    },
-    /**
-     * @return Whether to display the document type input.
-     */
-    displayDocumentType(): boolean {
-      return this.documentTypes.length > 1;
-    },
-    /**
-     * @return The document types allowed on the current document.
-     */
-    nameErrors(): string[] {
-      return this.nameCheckIsLoading ? [] : artifactSaveStore.nameErrors;
-    },
-    /**
-     * @return The artifact save store.
-     */
-    store(): typeof artifactSaveStore {
-      return artifactSaveStore;
-    },
-  },
-  watch: {
-    /**
-     * Checks for name conflicts when the name changes.
-     */
-    "store.editedArtifact.name"(newName: string): void {
-      if (this.nameCheckTimer) {
-        clearTimeout(this.nameCheckTimer);
+    artifactSaveStore.isNameValid = false;
+    nameCheckLoading.value = true;
+    nameCheckTimer.value = setTimeout(() => {
+      if (!newName) {
+        artifactSaveStore.isNameValid = false;
+        nameCheckLoading.value = false;
+      } else if (!artifactSaveStore.hasNameChanged) {
+        artifactSaveStore.isNameValid = true;
+        nameCheckLoading.value = false;
+      } else {
+        getDoesArtifactExist(projectStore.versionId, newName)
+          .then((nameExists) => {
+            artifactSaveStore.isNameValid = !nameExists;
+            nameCheckLoading.value = false;
+          })
+          .catch(() => {
+            artifactSaveStore.isNameValid = false;
+            nameCheckLoading.value = false;
+          });
       }
+    }, 500);
+  }
+);
 
-      artifactSaveStore.isNameValid = false;
-      this.nameCheckIsLoading = true;
-      this.nameCheckTimer = setTimeout(() => {
-        if (!newName) {
-          artifactSaveStore.isNameValid = false;
-          this.nameCheckIsLoading = false;
-        } else if (!artifactSaveStore.hasNameChanged) {
-          artifactSaveStore.isNameValid = true;
-          this.nameCheckIsLoading = false;
-        } else {
-          getDoesArtifactExist(projectStore.versionId, newName)
-            .then((nameExists) => {
-              artifactSaveStore.isNameValid = !nameExists;
-              this.nameCheckIsLoading = false;
-            })
-            .catch(() => {
-              artifactSaveStore.isNameValid = false;
-              this.nameCheckIsLoading = false;
-            });
-        }
-      }, 500);
-    },
-    "store.editedArtifact.type"() {
-      artifactSaveStore.updateArtifactType();
-    },
-  },
-});
+watch(
+  () => artifactSaveStore.editedArtifact.type,
+  () => artifactSaveStore.updateArtifactType()
+);
 </script>

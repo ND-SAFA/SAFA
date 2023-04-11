@@ -1,106 +1,106 @@
 <template>
   <card-page id="login-view">
-    <template v-slot:form>
-      <v-text-field
-        filled
-        label="Email"
+    <template #form>
+      <text-input
         v-model="email"
-        :error-messages="isError ? ['Invalid username or password'] : []"
+        label="Email"
+        :error-message="isError && 'Invalid username or password'"
         data-cy="input-email"
-        @keydown.enter="handleLogin"
+        @enter="handleSubmit"
       />
-      <password-field v-model="password" @enter="handleLogin" />
+      <password-input v-model="password" @enter="handleSubmit" />
     </template>
 
-    <template v-slot:actions>
-      <v-btn
+    <template #actions>
+      <text-button
         color="primary"
-        width="8em"
+        label="Login"
         :disabled="password.length === 0"
         :loading="isLoading"
+        class="login-button"
         data-cy="button-login"
-        @click="handleLogin"
-      >
-        Login
-      </v-btn>
+        @click="handleSubmit"
+      />
 
-      <div class="ml-auto text-right">
-        <span>
+      <div class="q-ml-auto text-right">
+        <div>
           <typography value="Dont have an account yet?" />
 
-          <v-btn
+          <text-button
             text
             small
-            class="px-1"
+            label="Sign Up"
+            class="q-pl-sm"
             color="primary"
             data-cy="button-create-account-redirect"
             @click="handleSignUp"
-          >
-            Sign Up
-          </v-btn>
-        </span>
+          />
+        </div>
 
-        <v-btn
+        <text-button
           text
           small
-          class="px-1"
+          label="Forgot Password"
           color="primary"
           @click="handleForgotPassword"
-        >
-          Forgot Password
-        </v-btn>
+        />
       </div>
     </template>
   </card-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
-import { handleLogin } from "@/api";
-import { CardPage, PasswordField, Typography } from "@/components";
-
 /**
  * Displays the login page.
  */
-export default Vue.extend({
+export default {
   name: "LoginView",
-  components: { Typography, PasswordField, CardPage },
-  data() {
-    return {
-      email: "",
-      password: "",
-      isError: false,
-      isLoading: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigate to the sign up page.
-     */
-    handleSignUp() {
-      navigateTo(Routes.CREATE_ACCOUNT);
-    },
-    /**
-     * Navigate to the forgot password page.
-     */
-    handleForgotPassword() {
-      navigateTo(Routes.FORGOT_PASSWORD);
-    },
-    /**
-     * Attempts to log the user in.
-     */
-    handleLogin() {
-      this.isLoading = true;
+};
+</script>
 
-      handleLogin({
-        email: this.email,
-        password: this.password,
-      })
-        .then(() => (this.isError = false))
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+<script setup lang="ts">
+import { ref } from "vue";
+import { navigateTo, Routes } from "@/router";
+import { handleLogin } from "@/api";
+import {
+  CardPage,
+  PasswordInput,
+  Typography,
+  TextButton,
+  TextInput,
+} from "@/components";
+
+const email = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+
+/**
+ * Navigate to the sign-up page.
+ */
+function handleSignUp() {
+  navigateTo(Routes.CREATE_ACCOUNT);
+}
+
+/**
+ * Navigate to the forgot password page.
+ */
+function handleForgotPassword() {
+  navigateTo(Routes.FORGOT_PASSWORD);
+}
+
+/**
+ * Attempts to log the user in.
+ */
+function handleSubmit() {
+  isLoading.value = true;
+
+  handleLogin({
+    email: email.value,
+    password: password.value,
+  })
+    .then(() => (isError.value = false))
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

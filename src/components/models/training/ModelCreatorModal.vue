@@ -1,103 +1,79 @@
 <template>
-  <modal :is-open="!!isOpen" :title="modalTitle" @close="handleClose">
-    <template v-slot:body>
-      <flex-box t="4">
-        <v-text-field
-          filled
-          v-model="editedModel.name"
-          label="Model Name"
-          class="mr-1"
-          hide-details
-        />
-        <gen-method-input
-          v-if="!isUpdate"
-          only-trainable
-          v-model="editedModel.baseModel"
-          style="max-width: 200px"
-        />
-      </flex-box>
-    </template>
-    <template v-slot:actions>
-      <v-spacer />
-      <v-btn :disabled="!canSave" color="primary" @click="handleSave">
-        Save
-      </v-btn>
+  <modal :open="props.open" :title="modalTitle" @close="emit('close')">
+    <flex-box>
+      <text-input
+        v-model="editedModel.name"
+        label="Model Name"
+        class="q-mr-md"
+      />
+      <gen-method-input
+        v-if="!isUpdate"
+        v-model="editedModel.baseModel"
+        only-trainable
+      />
+    </flex-box>
+    <template #actions>
+      <text-button
+        label="Save"
+        :disabled="!canSave"
+        color="primary"
+        @click="handleSave"
+      />
     </template>
   </modal>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GenerationModelSchema } from "@/types";
-import { modelSaveStore } from "@/hooks";
-import { handleSaveModel } from "@/api";
-import { Modal, GenMethodInput, FlexBox } from "@/components/common";
-
 /**
  * A modal for creating and editing models.
- *
- * @emits-1 `close` - On close.
  */
-export default Vue.extend({
+export default {
   name: "ModelCreatorModal",
-  components: {
-    Modal,
-    GenMethodInput,
-    FlexBox,
-  },
-  props: {
-    isOpen: Boolean,
-  },
-  computed: {
-    /**
-     * @return Whether an existing model is being updated.
-     */
-    isUpdate(): boolean {
-      return modelSaveStore.isUpdate;
-    },
-    /**
-     * @return The model being edited.
-     */
-    editedModel(): GenerationModelSchema {
-      return modelSaveStore.editedModel;
-    },
-    /**
-     * @return The name of the modal.
-     */
-    modalTitle(): string {
-      return this.isUpdate ? "Edit Model" : "Create Model";
-    },
-    /**
-     * @return Whether the model can be saved.
-     */
-    canSave(): boolean {
-      return modelSaveStore.canSave;
-    },
-  },
-  methods: {
-    /**
-     * Emits an event to close the modal.
-     */
-    handleClose() {
-      this.$emit("close");
-    },
-    /**
-     * Saves the current model.
-     */
-    handleSave() {
-      handleSaveModel({});
-      this.handleClose();
-    },
-  },
-  watch: {
-    /**
-     * Resets the modal when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+};
+</script>
 
-      modelSaveStore.resetModel();
-    },
-  },
-});
+<script setup lang="ts">
+import { computed, watch } from "vue";
+import { modelSaveStore } from "@/hooks";
+import { handleSaveModel } from "@/api";
+import {
+  Modal,
+  GenMethodInput,
+  FlexBox,
+  TextInput,
+  TextButton,
+} from "@/components/common";
+
+const props = defineProps<{
+  open: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const isUpdate = computed(() => modelSaveStore.isUpdate);
+const editedModel = computed(() => modelSaveStore.editedModel);
+const modalTitle = computed(() =>
+  isUpdate.value ? "Edit Model" : "Create Model"
+);
+const canSave = computed(() => modelSaveStore.canSave);
+
+/**
+ * Saves the current model.
+ */
+function handleSave() {
+  handleSaveModel({
+    onSuccess: () => emit("close"),
+  });
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+
+    modelSaveStore.resetModel();
+  }
+);
 </script>

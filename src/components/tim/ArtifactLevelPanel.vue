@@ -1,84 +1,75 @@
 <template>
-  <div v-if="isOpen">
-    <flex-box t="2">
-      <text-button text variant="artifact" @click="handleViewLevel">
-        View In Tree
-      </text-button>
+  <details-panel panel="displayArtifactLevel">
+    <flex-box b="2">
+      <text-button
+        text
+        label="View In Tree"
+        icon="artifact"
+        @click="handleViewLevel"
+      />
     </flex-box>
-    <panel-card class="mt-2" data-cy="panel-artifact-type">
-      <attribute-chip artifact-type :value="artifactLevel.name" />
-      <v-divider class="mt-1" />
+
+    <panel-card :title="artifactLevelName" data-cy="panel-artifact-type">
+      <template #title-actions>
+        <icon :id="iconId" size="md" color="primary" />
+      </template>
       <typography variant="caption" value="Details" />
-      <typography el="p" :value="artifactCount" />
+      <typography el="p" :value="countDisplay" />
     </panel-card>
-    <panel-card class="mt-2" data-cy="panel-artifact-type-options">
-      <typography variant="subtitle" value="Type Options" />
-      <v-divider class="my-1" />
-      <type-direction-input v-if="artifactLevel" :entry="artifactLevel" />
-      <type-icon-input v-if="artifactLevel" :entry="artifactLevel" />
+
+    <panel-card
+      v-if="artifactLevel"
+      title="Type Options"
+      data-cy="panel-artifact-type-options"
+    >
+      <type-direction-input :artifact-level="artifactLevel" />
+      <type-icon-input :artifact-level="artifactLevel" />
     </panel-card>
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { TimArtifactLevelSchema } from "@/types";
-import { appStore, layoutStore, selectionStore } from "@/hooks";
+/**
+ * Displays artifact level information.
+ */
+export default {
+  name: "ArtifactLevelPanel",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { layoutStore, selectionStore, typeOptionsStore } from "@/hooks";
 import {
   PanelCard,
-  AttributeChip,
   Typography,
   TypeDirectionInput,
   TypeIconInput,
   TextButton,
+  Icon,
   FlexBox,
+  DetailsPanel,
 } from "@/components/common";
 
-/**
- * Displays artifact level information.
- */
-export default Vue.extend({
-  name: "ArtifactLevelPanel",
-  components: {
-    TextButton,
-    FlexBox,
-    PanelCard,
-    AttributeChip,
-    Typography,
-    TypeDirectionInput,
-    TypeIconInput,
-  },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayArtifactLevel";
-    },
-    /**
-     * @return The selected trace matrix.
-     */
-    artifactLevel(): TimArtifactLevelSchema | undefined {
-      return selectionStore.selectedArtifactLevel;
-    },
-    /**
-     * @return The number of artifacts of the selected type.
-     */
-    artifactCount(): string {
-      const count = this.artifactLevel?.count || 0;
+const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const artifactLevelName = computed(() => artifactLevel.value?.name || "");
 
-      return count === 1 ? "1 Artifact" : `${count} Artifacts`;
-    },
-  },
-  methods: {
-    /**
-     * Switches to tree view and highlights this type level.
-     */
-    handleViewLevel(): void {
-      if (!this.artifactLevel) return;
+const countDisplay = computed(() => {
+  const count = artifactLevel.value?.count || 0;
 
-      layoutStore.viewTreeTypes([this.artifactLevel.name]);
-    },
-  },
+  return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
+
+const iconId = computed(() =>
+  typeOptionsStore.getArtifactTypeIcon(artifactLevelName.value)
+);
+
+/**
+ * Switches to tree view and highlights this type level.
+ */
+function handleViewLevel(): void {
+  if (!artifactLevel.value) return;
+
+  layoutStore.viewTreeTypes([artifactLevel.value.name]);
+}
 </script>

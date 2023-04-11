@@ -1,17 +1,26 @@
 <template>
   <authentication-list-item
     title="Jira"
-    :is-loading="isLoading"
+    :loading="loading"
     :has-credentials="hasCredentials"
-    :inactive="inactive"
-    @click="handleClick"
+    :inactive="props.inactive"
+    @click="emit('click')"
     @connect="handleAuthentication"
     @disconnect="handleDeleteCredentials"
   />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Prompts the user to authenticate their Jira account.
+ */
+export default {
+  name: "JiraAuthentication",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
 import { integrationsStore } from "@/hooks";
 import {
   authorizeJira,
@@ -20,61 +29,38 @@ import {
 } from "@/api";
 import AuthenticationListItem from "./AuthenticationListItem.vue";
 
-/**
- * Prompts the user to authenticate their Jira account.
- */
-export default Vue.extend({
-  name: "JiraAuthentication",
-  components: {
-    AuthenticationListItem,
-  },
-  props: {
-    inactive: Boolean,
-  },
-  data() {
-    return {
-      isLoading: false,
-    };
-  },
-  /**
-   * If a Jira access code is found in the query, loads the Jira authorization token and sites
-   * for the user.
-   */
-  mounted() {
-    this.isLoading = true;
+const props = defineProps<{
+  inactive?: boolean;
+}>();
 
-    handleAuthorizeJira({
-      onComplete: () => (this.isLoading = false),
-    });
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return integrationsStore.validJiraCredentials;
-    },
-  },
-  methods: {
-    /**
-     * Opens the Jira authentication window.
-     */
-    handleAuthentication(): void {
-      authorizeJira();
-    },
-    /**
-     * Clears the saved Jira credentials.
-     */
-    async handleDeleteCredentials(): Promise<void> {
-      await deleteJiraCredentials();
-      integrationsStore.validJiraCredentials = false;
-    },
-    /**
-     * Selects this integration source.
-     */
-    handleClick(): void {
-      this.$emit("click");
-    },
-  },
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
+
+const loading = ref(false);
+
+const hasCredentials = computed(() => integrationsStore.validJiraCredentials);
+
+/**
+ * Opens the Jira authentication window.
+ */
+function handleAuthentication(): void {
+  authorizeJira();
+}
+
+/**
+ * Clears the saved Jira credentials.
+ */
+async function handleDeleteCredentials(): Promise<void> {
+  await deleteJiraCredentials();
+  integrationsStore.validJiraCredentials = false;
+}
+
+onMounted(() => {
+  loading.value = true;
+
+  handleAuthorizeJira({
+    onComplete: () => (loading.value = false),
+  });
 });
 </script>

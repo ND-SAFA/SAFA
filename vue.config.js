@@ -2,10 +2,14 @@
 const fs = require("fs");
 
 module.exports = {
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ["quasar"],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
+    },
+    quasar: {
+      importStrategy: "kebab",
+      rtlSupport: false,
     },
   },
   lintOnSave: true,
@@ -17,9 +21,12 @@ module.exports = {
   },
   devServer: fs.existsSync("./certs/localhost.safa.ai.pem")
     ? {
-        https: {
-          key: fs.readFileSync("./certs/localhost.safa.ai-key.pem"),
-          cert: fs.readFileSync("./certs/localhost.safa.ai.pem"),
+        server: {
+          type: "https",
+          options: {
+            key: fs.readFileSync("./certs/localhost.safa.ai-key.pem"),
+            cert: fs.readFileSync("./certs/localhost.safa.ai.pem"),
+          },
         },
         host: "localhost.safa.ai",
         port: 8080,

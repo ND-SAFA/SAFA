@@ -29,7 +29,7 @@ export function createSnackbarMessage(): SnackbarMessage {
   return {
     errors: [],
     message: "",
-    type: MessageType.CLEAR,
+    type: MessageType.clear,
   };
 }
 

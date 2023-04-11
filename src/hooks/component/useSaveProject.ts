@@ -1,15 +1,29 @@
 import { defineStore } from "pinia";
 
 import {
-  ArtifactUploader,
+  ArtifactMap,
   CreateProjectByJsonSchema,
+  CreatorFilePanel,
   MembershipSchema,
+  ModelType,
   ProjectRole,
-  TraceUploader,
 } from "@/types";
 import { createProject } from "@/util";
 import sessionStore from "@/hooks/core/useSession";
 import { pinia } from "@/plugins";
+
+const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
+  variant,
+  name: "",
+  type: "",
+  open: true,
+  valid: false,
+  loading: false,
+  ignoreErrors: false,
+  itemNames: [],
+  isGenerated: false,
+  generateMethod: ModelType.NLBert,
+});
 
 /**
  * The save project store assists in creating new projects.
@@ -18,43 +32,37 @@ export const useSaveProject = defineStore("saveProject", {
   state: () => ({
     name: "",
     description: "",
+    artifactPanels: [createEmptyPanel("artifact")] as CreatorFilePanel[],
+    tracePanels: [createEmptyPanel("trace")] as CreatorFilePanel[],
+    artifactMap: {} as ArtifactMap,
   }),
-  getters: {},
-  actions: {
+  getters: {
     /**
-     * Resets the created project state.
+     * @return All artifact types.
      */
-    resetProject(): void {
-      this.name = "";
-      this.description = "";
+    artifactTypes(): string[] {
+      return this.artifactPanels.map(({ type }) => type);
     },
     /**
-     * Creates a project creation request from uploaded data.
-     *
-     * @param artifactUploader - The uploaded artifacts.
-     * @param traceUploader - The uploaded trace links.
-     * @return The request to create this project.
+     * @return A project creation request with the uploaded data.
      */
-    getCreationRequest(
-      artifactUploader: ArtifactUploader,
-      traceUploader: TraceUploader
-    ): CreateProjectByJsonSchema {
-      const artifacts = artifactUploader.panels
-        .map(({ projectFile }) => projectFile.artifacts || [])
+    creationRequest(): CreateProjectByJsonSchema {
+      const artifacts = this.artifactPanels
+        .map(({ artifacts = [] }) => artifacts)
         .reduce((acc, cur) => [...acc, ...cur], []);
-      const traces = traceUploader.panels
-        .map(({ projectFile }) => projectFile.traces || [])
+      const traces = this.tracePanels
+        .map(({ traces = [] }) => traces)
         .reduce((acc, cur) => [...acc, ...cur], []);
-      const requests = traceUploader.panels
-        .filter(({ projectFile }) => projectFile.isGenerated)
-        .map(({ projectFile }) => ({
+      const requests = this.tracePanels
+        .filter(({ isGenerated }) => isGenerated)
+        .map(({ type, toType = "", generateMethod }) => ({
           artifactLevels: [
             {
-              source: projectFile.sourceId,
-              target: projectFile.targetId,
+              source: type,
+              target: toType,
             },
           ],
-          method: projectFile.method,
+          method: generateMethod,
         }));
       const user: MembershipSchema = {
         projectMembershipId: "",
@@ -71,6 +79,41 @@ export const useSaveProject = defineStore("saveProject", {
       });
 
       return { project, requests };
+    },
+  },
+  actions: {
+    /**
+     * Resets the created project state.
+     */
+    resetProject(): void {
+      this.name = "";
+      this.description = "";
+      this.artifactPanels = [createEmptyPanel("artifact")];
+      this.tracePanels = [createEmptyPanel("trace")];
+      this.artifactMap = {};
+    },
+    /**
+     * Adds a new creator panel.
+     * @param variant - The type of panel to add.
+     */
+    addPanel(variant: "artifact" | "trace"): void {
+      if (variant === "artifact") {
+        this.artifactPanels.push(createEmptyPanel("artifact"));
+      } else {
+        this.tracePanels.push(createEmptyPanel("trace"));
+      }
+    },
+    /**
+     * Removes a creator panel.
+     * @param variant - The type of panel to remove.
+     * @param index - The panel index to remove.
+     */
+    removePanel(variant: "artifact" | "trace", index: number): void {
+      if (variant === "artifact") {
+        this.artifactPanels = this.artifactPanels.filter((_, i) => i !== index);
+      } else {
+        this.tracePanels = this.tracePanels.filter((_, i) => i !== index);
+      }
     },
   },
 });

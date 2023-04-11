@@ -95,7 +95,7 @@ export function handleDeleteAttribute(
 export async function handleSaveAttributeLayout(
   layout: AttributeLayoutSchema,
   isUpdate: boolean,
-  { onSuccess, onError, onComplete }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback<AttributeLayoutSchema>
 ): Promise<void> {
   try {
     const projectId = projectStore.projectId;
@@ -106,14 +106,17 @@ export async function handleSaveAttributeLayout(
       attributesStore.updateLayout(updatedLayout);
 
       logStore.onSuccess(`Edited attribute layout: ${layout.name}`);
+
+      onSuccess?.(updatedLayout);
     } else {
       const createdLayout = await createAttributeLayout(projectId, layout);
 
       attributesStore.updateLayout(createdLayout);
 
       logStore.onSuccess(`Created attribute layout: ${layout.name}`);
+
+      onSuccess?.(createdLayout);
     }
-    onSuccess?.();
   } catch (e) {
     logStore.onDevError(String(e));
     logStore.onError(`Unable to save attribute layout: ${layout.name}`);

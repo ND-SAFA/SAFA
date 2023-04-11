@@ -1,43 +1,35 @@
 <template>
   <text-button
-    v-if="hasUpdate"
+    v-if="runUpdate"
     text
-    small
+    label="Load Changes"
     color="accent"
-    icon-id="mdi-cloud-sync-outline"
+    icon="sync"
     data-cy="button-nav-load-update"
     @click="handleClick"
-  >
-    Load Project Updates
-  </text-button>
+  />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-import { TextButton } from "@/components/common";
-
 /**
  * Renders a button to update the current project.
  */
-export default Vue.extend({
+export default {
   name: "UpdateButton",
-  components: { TextButton },
-  computed: {
-    /**
-     * @return Whether the app has an update.
-     */
-    hasUpdate(): boolean {
-      return !!appStore.runUpdate;
-    },
-  },
-  methods: {
-    /**
-     * Runs the current update.
-     */
-    async handleClick(): Promise<void> {
-      await appStore.loadAppChanges();
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import { TextButton } from "@/components/common";
+
+const runUpdate = computed(() => appStore.runUpdate);
+
+/**
+ * Runs the current update.
+ */
+function handleClick(): void {
+  appStore.loadAppChanges();
+}
 </script>

@@ -87,10 +87,10 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * @return Any errors to report on the name.
      */
-    nameErrors(): string[] {
+    nameError(): string | false {
       return this.isNameValid || this.editedArtifact.name === ""
-        ? []
-        : ["This name is already used, please select another."];
+        ? false
+        : "This name is already used, please select another.";
     },
     canSave(): boolean {
       const { logicType, safetyCaseType, type, body } = this.editedArtifact;

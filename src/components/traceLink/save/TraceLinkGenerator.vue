@@ -1,123 +1,117 @@
 <template>
   <div>
-    <typography el="h2" variant="subtitle" value="Generate Trace Links" />
-    <typography el="p" b="4" :value="modalDescription" />
+    <typography
+      el="p"
+      b="4"
+      value="Select which sets of artifact types that you would like to generate links between."
+    />
     <custom-model-input v-model="model" />
     <trace-matrix-creator v-model="matrices" />
-    <v-btn
+    <text-button
       block
+      label="Generate Trace Links"
       :disabled="!isValid"
-      :loading="isLoading"
+      :loading="loading"
       color="primary"
       data-cy="button-trace-generate"
-      class="mt-2"
+      class="q-mt-md"
       @click="handleSubmit"
-    >
-      Generate Trace Links
-    </v-btn>
+    />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
-import { handleGenerateLinks } from "@/api";
-import { Typography, CustomModelInput } from "@/components/common";
-import { TraceMatrixCreator } from "../save";
-
 /**
  * Displays inputs for generating trace links.
- *
- * @emits `submit` - On submit.
  */
-export default Vue.extend({
+export default {
   name: "TraceLinkGenerator",
-  components: {
-    TraceMatrixCreator,
-    CustomModelInput,
-    Typography,
-  },
-  props: {
-    isOpen: Boolean,
-  },
-  data() {
-    return {
-      isLoading: false,
-      isValid: false,
-      method: undefined as ModelType | undefined,
-      model: undefined as GenerationModelSchema | undefined,
-      matrices: [{ source: "", target: "" }] as ArtifactLevelSchema[],
-    };
-  },
-  watch: {
-    /**
-     * Reset the state when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+};
+</script>
 
-      this.reset();
-    },
-    /**
-     * Validates that all matrices are valid on change.
-     */
-    matrices: {
-      deep: true,
-      handler() {
-        this.isValid = this.isEverythingValid;
-      },
-    },
-    model() {
-      this.isValid = this.isEverythingValid;
-    },
-  },
-  computed: {
-    /**
-     * @return The description of this modal.
-     */
-    modalDescription(): string {
-      return "Select which sets of artifact types that you would like to generate links between.";
-    },
-    /**
-     * @return Whether the current matrices are valid.
-     */
-    areMatricesValid(): boolean {
-      return this.matrices
-        .map((matrix) => !!matrix.source && !!matrix.target)
-        .reduce((acc, cur) => acc && cur, true);
-    },
-    /**
-     * @return Whether the current request is valid.
-     */
-    isEverythingValid(): boolean {
-      return !!this.model && this.areMatricesValid;
-    },
-  },
-  methods: {
-    /**
-     * Resets this component's data.
-     */
-    reset(): void {
-      this.isLoading = false;
-      this.isValid = false;
-      this.method = undefined;
-      this.model = undefined;
-      this.matrices = [{ source: "", target: "" }];
-    },
-    /**
-     * Attempts to generate the selected trace links.
-     */
-    handleSubmit(): void {
-      if (!this.model) return;
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
+import { handleGenerateLinks } from "@/api";
+import { Typography, CustomModelInput, TextButton } from "@/components/common";
+import { TraceMatrixCreator } from "../save";
 
-      this.isLoading = true;
-      handleGenerateLinks(undefined, this.model, this.matrices, {
-        onComplete: () => {
-          this.reset();
-          this.$emit("submit");
-        },
-      });
+const props = defineProps<{
+  open: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "submit"): void;
+}>();
+
+const createEmptyArtifactLevel = (): ArtifactLevelSchema[] => [
+  { source: "", target: "" },
+];
+
+const loading = ref(false);
+const isValid = ref(false);
+const method = ref<ModelType | undefined>();
+const model = ref<GenerationModelSchema | undefined>();
+const matrices = ref(createEmptyArtifactLevel());
+
+const areMatricesValid = computed(() =>
+  matrices.value
+    .map((matrix: ArtifactLevelSchema) => !!matrix.source && !!matrix.target)
+    .reduce((acc: boolean, cur: boolean) => acc && cur, true)
+);
+
+const isEverythingValid = computed(
+  () => !!model.value && areMatricesValid.value
+);
+
+/**
+ * Resets this component's data.
+ */
+function handleReset(): void {
+  loading.value = false;
+  isValid.value = false;
+  method.value = undefined;
+  model.value = undefined;
+  matrices.value = createEmptyArtifactLevel();
+}
+
+/**
+ * Attempts to generate the selected trace links.
+ */
+function handleSubmit(): void {
+  if (!model.value) return;
+
+  loading.value = true;
+
+  handleGenerateLinks(undefined, model.value, matrices.value, {
+    onComplete: () => {
+      emit("submit");
+      handleReset();
     },
+  });
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+
+    handleReset();
+  }
+);
+
+watch(
+  () => matrices.value,
+  () => {
+    isValid.value = isEverythingValid.value;
   },
-});
+  { deep: true }
+);
+
+watch(
+  () => model.value,
+  () => {
+    isValid.value = isEverythingValid.value;
+  }
+);
 </script>

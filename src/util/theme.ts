@@ -1,4 +1,9 @@
-import { ApprovalType, ArtifactDeltaState, JobStatus } from "@/types";
+import {
+  ApprovalType,
+  ArtifactDeltaState,
+  JobStatus,
+  ThemeColor,
+} from "@/types";
 
 /**
  * Defines all colors in the theme.
@@ -12,9 +17,7 @@ export enum ThemeColors {
 
   white = "#FFFFFF", // Text
   black = "#1E1E1E", // Text
-  lightGrey = "#EEEEEE", // Backgrounds
-  grey = "#DDDDDD",
-  darkGrey = "#969696", // Borders
+  darkGrey = "#272727", // Backgrounds
 
   textLight = "#36405A",
   textDark = "#FFF",
@@ -39,6 +42,52 @@ export enum ThemeColors {
   warningLight = "#FFD592", // Backgrounds
   warningDark = "#DD8300", // Borders
 }
+
+/**
+ * The colors used in light mode.
+ */
+export const lightPalette: Record<string, string> = {
+  primary: ThemeColors.primary,
+  secondary: ThemeColors.secondary,
+  accent: ThemeColors.accent,
+
+  info: ThemeColors.primary,
+  warning: ThemeColors.warning,
+  negative: ThemeColors.error,
+  positive: ThemeColors.added,
+
+  text: ThemeColors.textLight,
+  neutral: ThemeColors.white,
+  background: ThemeColors.backgroundLight,
+  selected: ThemeColors.selectedLight,
+
+  addedLight: ThemeColors.addedLight,
+  modifiedLight: ThemeColors.modifiedLight,
+  removedLight: ThemeColors.removedLight,
+};
+
+/**
+ * The colors used in dark mode.
+ */
+export const darkPalette: Record<string, string> = {
+  primary: ThemeColors.primaryDark,
+  secondary: ThemeColors.secondary,
+  accent: ThemeColors.accent,
+
+  info: ThemeColors.primary,
+  warning: ThemeColors.warning,
+  negative: ThemeColors.error,
+  positive: ThemeColors.added,
+
+  text: ThemeColors.textDark,
+  neutral: ThemeColors.black,
+  background: ThemeColors.backgroundDark,
+  selected: ThemeColors.selectedDark,
+
+  addedLight: ThemeColors.addedLight,
+  modifiedLight: ThemeColors.modifiedLight,
+  removedLight: ThemeColors.removedLight,
+};
 
 /**
  * Returns the background color for the given state.
@@ -91,18 +140,39 @@ export function getBorderColor(state?: ArtifactDeltaState | string): string {
  * @param score - The score to get the color for.
  * @return The color.
  */
-export function getScoreColor(score: number | string): string {
+export function getScoreColor(score: number | string): ThemeColor {
   const [ints, decimals] = String(score).split(".");
   const tenths = decimals[0];
 
   if (ints === "1" || ["8", "9"].includes(tenths)) {
-    return ThemeColors.added;
+    return "positive";
   } else if (["6", "7"].includes(tenths)) {
-    return ThemeColors.secondary;
-  } else if (["4", "5"].includes(tenths)) {
-    return ThemeColors.warning;
+    return "secondary";
   } else {
-    return ThemeColors.error;
+    return "negative";
+  }
+}
+
+/**
+ * Returns the background color for an approval state.
+ * @param state - The state to get the color for.
+ * @return The color.
+ */
+export function getEnumColor(
+  state: ApprovalType | ArtifactDeltaState | string
+): ThemeColor {
+  switch (state) {
+    case ArtifactDeltaState.ADDED:
+    case ApprovalType.APPROVED:
+      return "positive";
+    case ArtifactDeltaState.MODIFIED:
+    case ApprovalType.UNREVIEWED:
+      return "primary";
+    case ArtifactDeltaState.REMOVED:
+    case ApprovalType.DECLINED:
+      return "negative";
+    default:
+      return "";
   }
 }
 
@@ -112,14 +182,14 @@ export function getScoreColor(score: number | string): string {
  * @param status - The job status to get the color of.
  * @returns The display color.
  */
-export function getJobStatusColor(status: JobStatus): string {
+export function getJobStatusColor(status: JobStatus): ThemeColor {
   switch (status) {
     case JobStatus.COMPLETED:
-      return ThemeColors.modified;
+      return "primary";
     case JobStatus.IN_PROGRESS:
-      return "#EEBC3D";
-    case JobStatus.CANCELLED:
-      return ThemeColors.removed;
+      return "secondary";
+    case JobStatus.FAILED:
+      return "negative";
     default:
       return "";
   }

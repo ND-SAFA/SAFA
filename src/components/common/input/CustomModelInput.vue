@@ -1,71 +1,47 @@
 <template>
-  <v-select
-    filled
-    hide-details
-    label="Custom Model"
+  <q-select
     v-model="model"
-    :items="modelOptions"
-    class="mr-2"
-    item-text="name"
-    item-value="id"
+    filled
+    label="Custom Model"
+    :options="options"
+    option-label="name"
+    option-value="id"
+    map-options
   >
-    <template v-slot:item="{ item }">
-      <div class="my-1">
-        <typography el="div" :value="item.name" />
-        <typography variant="caption" :value="item.baseModel" />
-      </div>
+    <template #option="{ opt, itemProps }">
+      <list-item
+        v-bind="itemProps"
+        :title="opt.name"
+        :subtitle="opt.baseModel"
+      />
     </template>
-  </v-select>
+  </q-select>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { GenerationModelSchema } from "@/types";
-import { projectStore } from "@/hooks";
-import { Typography } from "@/components/common/display";
-
 /**
  * A selector for custom models.
- *
- * @emits-1 `input` (TrainedModel | undefined) - On value change.
  */
-export default Vue.extend({
+export default {
   name: "CustomModelInput",
-  components: {
-    Typography,
-  },
-  props: {
-    value: Object as PropType<GenerationModelSchema | undefined>,
-  },
-  data() {
-    return {
-      model: this.value?.id,
-    };
-  },
-  computed: {
-    /**
-     * @return The trace generation model types.
-     */
-    modelOptions(): GenerationModelSchema[] {
-      return projectStore.models;
-    },
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: GenerationModelSchema) {
-      this.model = currentValue?.id;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentId: string) {
-      this.$emit(
-        "input",
-        projectStore.models.find(({ id }) => id === currentId)
-      );
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { GenerationModelSchema } from "@/types";
+import { projectStore, useVModel } from "@/hooks";
+import { ListItem } from "@/components/common/display";
+
+const props = defineProps<{
+  modelValue: GenerationModelSchema | undefined;
+}>();
+
+defineEmits<{
+  (e: "update:modelValue", value: GenerationModelSchema | undefined): void;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+const options = computed(() => projectStore.models);
 </script>

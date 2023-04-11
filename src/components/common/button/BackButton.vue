@@ -1,45 +1,47 @@
 <template>
-  <v-btn text @click="handleClick">
-    <v-icon left> mdi-arrow-left </v-icon>
-    {{ text }}
-  </v-btn>
+  <text-button text icon="back" :label="buttonLabel" @click="handleClick" />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { getParams, navigateBack, navigateTo, Routes } from "@/router";
-
 /**
  * A generic back button
  */
-export default Vue.extend({
+export default {
   name: "BackButton",
-  props: {
-    text: {
-      type: String,
-      default: "Go Back",
-    },
-    route: {
-      type: String as PropType<Routes | undefined>,
-      default: undefined,
-    },
-    toProject: Boolean,
-  },
-  methods: {
-    /**
-     * Routes back to the given page.
-     */
-    handleClick(): void {
-      if (this.toProject) {
-        navigateTo(Routes.ARTIFACT, getParams());
-      } else if (this.route) {
-        navigateTo(this.route);
-      } else {
-        navigateBack();
-      }
-    },
-  },
-});
+};
 </script>
 
-<style scoped></style>
+<script setup lang="ts">
+import { computed } from "vue";
+import { getParams, navigateBack, navigateTo, Routes } from "@/router";
+import TextButton from "./TextButton.vue";
+
+const props = defineProps<{
+  label?: string;
+  route?: Routes;
+  toProject?: boolean;
+}>();
+
+const buttonLabel = computed(() => {
+  if (props.toProject) {
+    return "Back To Tree View";
+  } else if (props.label) {
+    return props.label;
+  } else {
+    return "Go Back";
+  }
+});
+
+/**
+ * Routes back to the given page.
+ */
+function handleClick(): void {
+  if (props.toProject) {
+    navigateTo(Routes.ARTIFACT, getParams());
+  } else if (props.route) {
+    navigateTo(props.route);
+  } else {
+    navigateBack();
+  }
+}
+</script>

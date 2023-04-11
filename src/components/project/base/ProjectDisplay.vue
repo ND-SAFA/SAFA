@@ -1,54 +1,56 @@
 <template>
-  <panel-card class="full-width mr-2">
-    <v-card-title>
-      <typography el="h2" variant="subtitle" :value="project.name" />
-    </v-card-title>
-    <v-card-subtitle>
-      <typography variant="caption" :value="version" />
-    </v-card-subtitle>
-    <v-card-text>
-      <typography ep="p" :value="description" />
-    </v-card-text>
-    <v-card-actions>
-      <div>
-        <flex-box wrap b="4">
-          <div class="mb-2">
-            <attribute-chip
-              :value="artifacts"
-              icon="mdi-alpha-a-box-outline"
-              color="primary"
-            />
-          </div>
-          <div class="mb-2">
-            <attribute-chip
-              :value="traceLinks"
-              icon="mdi-ray-start-arrow"
-              color="primary"
-            />
+  <panel-card :title="project.name">
+    <typography variant="caption" :value="versionLabel" />
+    <br />
+    <typography ep="p" :value="description" />
+    <div class="q-mt-md">
+      <flex-box wrap b="2">
+        <div class="q-mb-sm">
+          <attribute-chip
+            :value="artifactLabel"
+            icon="artifact"
+            color="primary"
+          />
+        </div>
+        <div class="q-mb-sm">
+          <attribute-chip :value="traceLabel" icon="trace" color="primary" />
+        </div>
+      </flex-box>
+      <flex-box
+        v-for="direction in typeDirections"
+        :key="direction[0]"
+        wrap
+        b="2"
+        align="center"
+      >
+        <attribute-chip artifact-type :value="direction[0]" />
+        <flex-box wrap>
+          <icon
+            class="q-mx-xs q-mt-xs"
+            size="sm"
+            color="primary"
+            variant="trace"
+          />
+          <div v-for="type in direction[1]" :key="type">
+            <attribute-chip artifact-type :value="type" />
           </div>
         </flex-box>
-        <flex-box
-          wrap
-          v-for="direction in typeDirections"
-          :key="direction[0]"
-          y="2"
-          align="center"
-        >
-          <attribute-chip artifact-type :value="direction[0]" />
-          <flex-box wrap>
-            <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
-            <div v-for="type in direction[1]" :key="type" class="mb-1">
-              <attribute-chip artifact-type :value="type" />
-            </div>
-          </flex-box>
-        </flex-box>
-      </div>
-    </v-card-actions>
+      </flex-box>
+    </div>
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays high level project information.
+ */
+export default {
+  name: "ProjectDisplay",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { versionToString } from "@/util";
 import { projectStore, typeOptionsStore } from "@/hooks";
 import {
@@ -56,59 +58,28 @@ import {
   AttributeChip,
   Typography,
   FlexBox,
+  Icon,
 } from "@/components/common";
 
-/**
- * ProjectDisplay.
- */
-export default Vue.extend({
-  name: "ProjectDisplay",
-  components: { FlexBox, PanelCard, AttributeChip, Typography },
-  computed: {
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
-    /**
-     * @return The version for this project.
-     */
-    version(): string {
-      return `Version ${versionToString(this.project.projectVersion)}`;
-    },
-    /**
-     * @return The artifact count for this project.
-     */
-    artifacts(): string {
-      return `${this.project.artifacts.length} Artifacts`;
-    },
-    /**
-     * @return The artifact count for this project.
-     */
-    traceLinks(): string {
-      return `${this.project.traces.length} Trace Links`;
-    },
-    /**
-     * @return The description for this project.
-     */
-    description(): string {
-      return this.project.description || "No Description.";
-    },
-    /**
-     * @return The artifact types for this project.
-     */
-    artifactTypes(): string[] {
-      return typeOptionsStore.artifactTypes;
-    },
-    /**
-     * @return The artifact type directions for this project.
-     */
-    typeDirections(): [string, string[]][] {
-      return Object.values(typeOptionsStore.artifactLevels)
-        .map((level) => [level.name, level.allowedTypes] as [string, string[]])
-        .filter(([, targets]) => targets.length > 0);
-    },
-  },
-});
+const project = computed(() => projectStore.project);
+
+const versionLabel = computed(
+  () => `Version ${versionToString(project.value.projectVersion)}`
+);
+
+const artifactLabel = computed(
+  () => `${project.value.artifacts.length} Artifacts`
+);
+
+const traceLabel = computed(() => `${project.value.traces.length} Trace Links`);
+
+const description = computed(
+  () => project.value.description || "No Description."
+);
+
+const typeDirections = computed(() =>
+  Object.values(typeOptionsStore.artifactLevels)
+    .map((level) => [level.name, level.allowedTypes] as [string, string[]])
+    .filter(([, targets]) => targets.length > 0)
+);
 </script>

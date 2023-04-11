@@ -1,48 +1,45 @@
 <template>
-  <div class="mt-4">
+  <panel-card>
     <text-button
-      v-if="!isSelectorVisible"
+      v-if="!selectorVisible"
       block
-      large
+      label="Compare Versions"
       color="primary"
-      icon-id="mdi-source-branch"
+      icon="view-delta"
       @click="handleChange"
-    >
-      Compare Versions
-    </text-button>
+    />
     <text-button
       v-else
       block
-      large
       outlined
-      variant="cancel"
+      label="Hide Delta View"
+      icon="cancel"
       @click="handleChange"
-    >
-      Hide Delta View
-    </text-button>
-
-    <v-select
-      v-if="isSelectorVisible"
-      filled
+    />
+    <select-input
       v-model="version"
-      :items="versions"
-      :loading="isLoading"
-      item-value="versionId"
+      :disabled="!selectorVisible"
+      :options="versions"
+      :loading="loading"
+      option-value="versionId"
+      :option-label="getVersionName"
       label="Delta Version"
-      class="mt-4"
-    >
-      <template v-slot:selection>
-        {{ getVersionName(version) }}
-      </template>
-      <template v-slot:item="{ item }">
-        {{ getVersionName(item) }}
-      </template>
-    </v-select>
-  </div>
+      class="q-mt-md"
+    />
+  </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the delta panel navigation.
+ */
+export default {
+  name: "DeltaPanelNav",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
@@ -51,98 +48,61 @@ import {
   handleReloadProject,
   handleSetProjectDelta,
 } from "@/api";
-import { TextButton } from "@/components/common";
+import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
-/**
- * Displays the delta panel navigation.
- */
-export default Vue.extend({
-  name: "DeltaPanelNav",
-  components: { TextButton },
-  data() {
-    return {
-      isLoading: false,
-      isSelectorVisible: deltaStore.inDeltaView,
-      versions: [] as VersionSchema[],
-    };
+const loading = ref(false);
+const selectorVisible = ref(deltaStore.inDeltaView);
+const versions = ref<VersionSchema[]>([]);
+
+const version = computed({
+  get() {
+    return deltaStore.afterVersion;
   },
-  mounted() {
-    this.loadVersions();
-  },
-  computed: {
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
-    /**
-     * @return Whether delta view is enabled.
-     */
-    inDeltaView(): boolean {
-      return deltaStore.inDeltaView;
-    },
-    /**
-     * Tracks the delta version and loads new versions.
-     */
-    version: {
-      get(): VersionSchema | undefined {
-        return deltaStore.afterVersion;
-      },
-      set(newVersionId: string): void {
-        const newVersion = this.versions.find(
-          ({ versionId }) => versionId === newVersionId
-        );
+  set(newVersion) {
+    if (!newVersion || !projectStore.version) return;
 
-        if (!newVersion || !this.project.projectVersion) return;
+    loading.value = true;
 
-        this.isLoading = true;
-
-        handleSetProjectDelta(this.project.projectVersion, newVersion, () => {
-          this.isLoading = false;
-        });
-      },
-    },
-  },
-  methods: {
-    /**
-     * Returns a version's name.
-     * @param version - The version to name.
-     * @return The version's name.
-     */
-    getVersionName(version: VersionSchema): string {
-      return versionToString(version);
-    },
-    /**
-     * Loads the versions of the current project.
-     */
-    async loadVersions(): Promise<void> {
-      const { projectId } = this.project;
-      this.versions = projectId
-        ? (await getProjectVersions(projectId)).filter(
-            ({ versionId }) =>
-              versionId !== this.project.projectVersion?.versionId
-          )
-        : [];
-    },
-    /**
-     * Changes whether delta view is enabled.
-     */
-    handleChange(): void {
-      if (this.isSelectorVisible) {
-        deltaStore.setIsDeltaViewEnabled(false);
-        handleReloadProject();
-        this.isSelectorVisible = false;
-      } else {
-        this.isSelectorVisible = true;
-      }
-    },
-    /**
-     * Enables delta view.
-     */
-    handleSubmit(): void {
-      deltaStore.setIsDeltaViewEnabled(true);
-    },
+    handleSetProjectDelta(projectStore.version, newVersion, () => {
+      loading.value = false;
+    });
   },
 });
+
+/**
+ * Returns a version's name.
+ * @param version - The version to name.
+ * @return The version's name.
+ */
+function getVersionName(version: VersionSchema): string {
+  return versionToString(version);
+}
+
+/**
+ * Loads the versions of the current project.
+ */
+async function loadVersions(): Promise<void> {
+  const projectId = projectStore.projectId;
+
+  versions.value = projectId
+    ? (await getProjectVersions(projectId)).filter(
+        ({ versionId }) => versionId !== projectStore.version?.versionId
+      )
+    : [];
+}
+
+/**
+ * Changes whether delta view is enabled.
+ */
+function handleChange(): void {
+  if (selectorVisible.value) {
+    deltaStore.setIsDeltaViewEnabled(false);
+    handleReloadProject();
+    selectorVisible.value = false;
+  } else {
+    selectorVisible.value = true;
+  }
+}
+
+onMounted(() => loadVersions());
 </script>

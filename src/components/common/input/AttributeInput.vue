@@ -1,230 +1,195 @@
 <template>
-  <v-text-field
+  <text-input
     v-if="attribute.type === 'text'"
-    filled
     :label="attribute.label"
-    class="mr-2"
     :rules="[lengthRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-textarea
+  <text-input
     v-else-if="attribute.type === 'paragraph'"
-    filled
+    type="textarea"
     :label="attribute.label"
-    class="mr-2"
-    rows="3"
     :rules="[lengthRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-select
+  <select-input
     v-else-if="attribute.type === 'select'"
-    filled
     :label="attribute.label"
-    :items="attribute.options"
-    class="mr-2"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :options="attribute.options"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-autocomplete
+  <multiselect-input
     v-else-if="attribute.type === 'multiselect'"
-    multiple
-    filled
-    chips
-    deletable-chips
     :label="attribute.label"
-    :items="attribute.options"
-    class="mr-2"
+    :options="attribute.options"
     :rules="[lengthRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
   <artifact-input
     v-else-if="attribute.type === 'relation'"
     multiple
     :label="attribute.label"
-    class="mr-2 mb-2"
     :rules="[lengthRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-menu
-    v-else-if="attribute.type === 'date'"
-    ref="menu"
-    v-model="menu"
-    :close-on-content-click="false"
-    :return-value.sync="model[attribute.key]"
-    transition="scale-transition"
-    offset-y
-    min-width="auto"
-  >
-    <template v-slot:activator="{ on, attrs }">
-      <v-text-field
-        filled
-        v-model="model[attribute.key]"
-        :label="attribute.label"
-        append-icon="mdi-calendar"
-        readonly
-        v-bind="attrs"
-        v-on="on"
-        class="mr-2"
-      ></v-text-field>
-    </template>
-    <v-date-picker
-      :value="model[attribute.key]"
-      @input="handleInput"
-      no-title
-      scrollable
-      color="primary"
-    >
-      <v-spacer></v-spacer>
-      <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
-      <v-btn
-        text
-        color="primary"
-        @click="$refs.menu.save(model[attribute.key])"
-      >
-        OK
-      </v-btn>
-    </v-date-picker>
-  </v-menu>
-
-  <v-text-field
+  <text-input
     v-else-if="attribute.type === 'int'"
     type="number"
-    filled
     :label="attribute.label"
-    class="mr-2"
     :rules="[intRules, numRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-text-field
+  <text-input
     v-else-if="attribute.type === 'float'"
     type="number"
-    filled
     :label="attribute.label"
-    class="mr-2"
     :rules="[numRules]"
-    :value="model[attribute.key]"
-    @input="handleInput"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
   />
 
-  <v-checkbox
+  <q-checkbox
     v-else-if="attribute.type === 'boolean'"
     :label="attribute.label"
-    class="pl-4 mr-2"
-    :input-value="model[attribute.key]"
-    @change="handleInput"
+    :model-value="attributes[attribute.key]"
+    class="q-my-sm"
+    @update:model-value="handleInput"
   />
+
+  <q-input
+    v-else-if="attribute.type === 'date'"
+    filled
+    :label="attribute.label"
+    :model-value="attributes[attribute.key]"
+    @update:model-value="handleInput"
+  >
+    <template #append>
+      <q-icon name="mdi-calendar" class="cursor-pointer">
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+          <q-date
+            :model-value="attributes[attribute.key]"
+            mask="YYYY-MM-DDTHH:mm:00.000Z"
+            @update:model-value="handleInput"
+          >
+            <div class="row items-center justify-end">
+              <q-btn v-close-popup label="Close" color="primary" flat />
+            </div>
+          </q-date>
+        </q-popup-proxy>
+      </q-icon>
+    </template>
+  </q-input>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * An input for a generic attribute.
+ */
+export default {
+  name: "AttributeInput",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import {
   AttributeCollectionSchema,
   AttributeSchema,
   AttributeDataType,
 } from "@/types";
+import TextInput from "./TextInput.vue";
+import SelectInput from "./SelectInput.vue";
 import ArtifactInput from "./ArtifactInput.vue";
+import MultiselectInput from "./MultiselectInput.vue";
+
+const props = defineProps<{
+  /**
+   * The collection of attribute values.
+   */
+  attributes: AttributeCollectionSchema;
+  /**
+   * The attribute being edited.
+   */
+  attribute: AttributeSchema;
+}>();
+
+const intRules = computed(
+  () =>
+    (value: string | number | undefined): string | true => {
+      if (value === undefined || value === "") {
+        return true;
+      } else {
+        const strValue = typeof value === "string" ? value : String(value);
+
+        return strValue.includes(".") ? "Must be a valid integer." : true;
+      }
+    }
+);
+
+const numRules = computed(
+  () =>
+    (value: string | number | undefined): string | true => {
+      const { min = null, max = null } = props.attribute;
+      const numValue = typeof value === "string" ? parseFloat(value) : value;
+
+      if (numValue === undefined || isNaN(numValue)) {
+        return true;
+      } else if (max !== null && numValue > max) {
+        return `Value is greater than ${max}.`;
+      } else if (min !== null && numValue < min) {
+        return `Value is less than ${min}.`;
+      } else {
+        return true;
+      }
+    }
+);
+
+const lengthRules = computed(
+  () =>
+    (value: string | string[] | undefined): string | true => {
+      const { min = null, max = null } = props.attribute;
+      const unit = Array.isArray(value) ? "items" : "characters";
+
+      if (!value) {
+        return true;
+      } else if (max !== null && value.length > max) {
+        return `Value has greater than ${max} ${unit}.`;
+      } else if (min !== null && value.length < min) {
+        return `Value has less than ${min} ${unit}.`;
+      } else {
+        return true;
+      }
+    }
+);
 
 /**
- * An input for a generic attribute.
+ * Handles input changes to make adjustments to the stored data types.
+ *
+ * @param value - The updated value of this attribute.
  */
-export default Vue.extend({
-  name: "AttributeInput",
-  components: { ArtifactInput },
-  props: {
-    model: {
-      type: Object as PropType<AttributeCollectionSchema>,
-      required: true,
-    },
-    attribute: {
-      type: Object as PropType<AttributeSchema>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      menu: false,
-    };
-  },
-  computed: {
-    /**
-     * Creates an error when an integer has a float value.
-     */
-    intRules(): (value: string | number | undefined) => string | true {
-      return (value) => {
-        if (value === undefined || value === "") {
-          return true;
-        } else {
-          const strValue = typeof value === "string" ? value : String(value);
-
-          return strValue.includes(".") ? "Must be a valid integer." : true;
-        }
-      };
-    },
-    /**
-     * Creates an error when a number is not within bounds.
-     */
-    numRules(): (value: string | number | undefined) => string | true {
-      return (value) => {
-        const { min = null, max = null } = this.attribute;
-        const numValue = typeof value === "string" ? parseFloat(value) : value;
-
-        if (numValue === undefined || isNaN(numValue)) {
-          return true;
-        } else if (max !== null && numValue > max) {
-          return `Value is greater than ${max}.`;
-        } else if (min !== null && numValue < min) {
-          return `Value is less than ${min}.`;
-        } else {
-          return true;
-        }
-      };
-    },
-    /**
-     * Creates an error when length is not within bounds.
-     */
-    lengthRules(): (value: string | string[] | undefined) => string | true {
-      return (value) => {
-        const { min = null, max = null } = this.attribute;
-        const unit = Array.isArray(value) ? "items" : "characters";
-
-        if (!value) {
-          return true;
-        } else if (max !== null && value.length > max) {
-          return `Value has greater than ${max} ${unit}.`;
-        } else if (min !== null && value.length < min) {
-          return `Value has less than ${min} ${unit}.`;
-        } else {
-          return true;
-        }
-      };
-    },
-  },
-  methods: {
-    /**
-     * Handles input changes to make adjustments to the stored data types.
-     *
-     * @param value - The updated value of this attribute.
-     */
-    handleInput(value: AttributeDataType): void {
-      if (this.attribute.type === "int") {
-        this.model[this.attribute.key] = parseInt(String(value));
-      } else if (this.attribute.type === "float") {
-        this.model[this.attribute.key] = parseFloat(String(value));
-      } else {
-        this.model[this.attribute.key] = value;
-      }
-    },
-  },
-});
+function handleInput(value: AttributeDataType): void {
+  if (props.attribute.type === "int") {
+    props.attributes[props.attribute.key] = parseInt(String(value));
+  } else if (props.attribute.type === "float") {
+    props.attributes[props.attribute.key] = parseFloat(String(value));
+  } else if (props.attribute.type === "date") {
+    props.attributes[props.attribute.key] = new Date(
+      String(value)
+    ).toISOString();
+  } else {
+    props.attributes[props.attribute.key] = value;
+  }
+}
 </script>

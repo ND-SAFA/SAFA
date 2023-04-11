@@ -1,140 +1,111 @@
 <template>
-  <panel-card>
-    <typography el="h2" variant="subtitle" value="Trace Prediction Models" />
-    <typography
-      el="p"
-      b="4"
-      value="Create a new model below, or expand one of the models to view past training and add new steps."
-    />
-    <table-selector
-      is-open
-      show-expand
-      :headers="headers"
-      :items="items"
-      item-key="id"
-      class="model-table mt-5"
-      @item:add="handleAdd"
-      @item:edit="handleEdit"
-      @item:delete="handleDelete"
+  <panel-card
+    title="Trace Prediction Models"
+    subtitle="Create a new model below, or expand one of the models to continue and view past training."
+  >
+    <model-creator-modal :open="saveOpen" @close="handleClose" />
+    <model-share-modal :open="shareOpen" @close="handleClose" />
+    <selector-table
+      v-model:expanded="expanded"
+      class="model-table"
+      :columns="modelColumns"
+      :rows="rows"
+      row-key="id"
+      addable
+      editable
+      deletable
+      @row:add="handleAdd"
+      @row:edit="handleEdit"
+      @row:delete="handleDelete"
       @refresh="handleRefresh"
     >
-      <template v-slot:addItemDialogue>
-        <model-creator-modal :is-open="isSaveOpen" @close="handleClose" />
-        <model-share-modal
-          :model="currentItem"
-          :is-open="isShareOpen"
-          @close="handleClose"
-        />
+      <template #expanded-item="{ row }">
+        <model-training :model="row" />
       </template>
-      <template v-slot:expanded-item="{ item }">
-        <ModelEditor :model="item" />
-      </template>
-      <template v-slot:[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <icon-button
-          icon-id="mdi-share-variant"
+          icon="share"
           tooltip="Share Model"
           @click="handleShare(item)"
         />
       </template>
-    </table-selector>
+    </selector-table>
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GenerationModelSchema } from "@/types";
-import { modelSaveStore, projectStore } from "@/hooks";
-import { handleDeleteModel, handleLoadModels } from "@/api";
-import {
-  TableSelector,
-  IconButton,
-  Typography,
-  PanelCard,
-} from "@/components/common";
-import { ModelEditor } from "./editor";
-import ModelShareModal from "./ModelShareModal.vue";
-import ModelCreatorModal from "./ModelCreatorModal.vue";
-
 /**
  * Renders a table of project models.
  */
-export default Vue.extend({
+export default {
   name: "ModelTable",
-  components: {
-    PanelCard,
-    ModelShareModal,
-    ModelCreatorModal,
-    IconButton,
-    ModelEditor,
-    TableSelector,
-    Typography,
-  },
-  data() {
-    return {
-      isSaveOpen: false,
-      isShareOpen: false,
-      headers: [
-        { text: "Name", value: "name" },
-        { text: "Base Model", value: "baseModel" },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
-      currentItem: undefined as GenerationModelSchema | undefined,
-    };
-  },
-  computed: {
-    /**
-     * @return All project models.
-     */
-    items(): GenerationModelSchema[] {
-      return projectStore.models;
-    },
-  },
-  methods: {
-    /**
-     * Closes the model modal.
-     */
-    handleClose() {
-      this.isSaveOpen = false;
-      this.isShareOpen = false;
-      this.currentItem = undefined;
-    },
-    /**
-     * Opens the modal to add a model.
-     */
-    handleAdd() {
-      modelSaveStore.baseModel = undefined;
-      this.isSaveOpen = true;
-    },
-    /**
-     * Opens the modal to edit a model.
-     * @param model - The model to edit.
-     */
-    handleEdit(model: GenerationModelSchema) {
-      modelSaveStore.baseModel = model;
-      this.currentItem = model;
-      this.isSaveOpen = true;
-    },
-    /**
-     * Opens the modal to share a model.
-     * @param model - The model to share.
-     */
-    handleShare(model: GenerationModelSchema) {
-      this.currentItem = model;
-      this.isShareOpen = true;
-    },
-    /**
-     * Opens the modal to delete a model.
-     * @param model - The model to delete.
-     */
-    handleDelete(model: GenerationModelSchema) {
-      handleDeleteModel(model);
-    },
-    /**
-     * Refreshes the loaded models.
-     */
-    handleRefresh() {
-      handleLoadModels();
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { GenerationModelSchema } from "@/types";
+import { modelColumns } from "@/util";
+import { modelSaveStore, projectStore } from "@/hooks";
+import { handleDeleteModel, handleLoadModels } from "@/api";
+import { IconButton, PanelCard, SelectorTable } from "@/components/common";
+import { ModelTraining } from "./editor";
+import ModelShareModal from "./ModelShareModal.vue";
+import ModelCreatorModal from "./ModelCreatorModal.vue";
+
+const saveOpen = ref(false);
+const shareOpen = ref(false);
+const expanded = ref<GenerationModelSchema[]>([]);
+
+const rows = computed(() => projectStore.models);
+
+/**
+ * Closes the model modal.
+ */
+function handleClose() {
+  saveOpen.value = false;
+  shareOpen.value = false;
+  modelSaveStore.baseModel = undefined;
+}
+
+/**
+ * Opens the modal to add a model.
+ */
+function handleAdd() {
+  modelSaveStore.baseModel = undefined;
+  saveOpen.value = true;
+}
+
+/**
+ * Opens the modal to edit a model.
+ * @param model - The model to edit.
+ */
+function handleEdit(model: GenerationModelSchema) {
+  modelSaveStore.baseModel = model;
+  saveOpen.value = true;
+}
+
+/**
+ * Opens the modal to share a model.
+ * @param model - The model to share.
+ */
+function handleShare(model: GenerationModelSchema) {
+  modelSaveStore.baseModel = model;
+  shareOpen.value = true;
+}
+
+/**
+ * Opens the modal to delete a model.
+ * @param model - The model to delete.
+ */
+function handleDelete(model: GenerationModelSchema) {
+  handleDeleteModel(model);
+}
+
+/**
+ * Refreshes the loaded models.
+ */
+function handleRefresh() {
+  handleLoadModels();
+}
 </script>

@@ -56,10 +56,10 @@ export const useSaveDocument = defineStore("saveDocument", {
     /**
      * @return Document name errors to display.
      */
-    nameErrors(): string[] {
-      return this.isNameValid
-        ? []
-        : ["This name is already used, please select another."];
+    nameError(): string | false {
+      return this.isNameValid || this.editedDocument.name === ""
+        ? false
+        : "This name is already used, please select another.";
     },
     /**
      * @return Whether the document can be saved.

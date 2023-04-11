@@ -25,10 +25,12 @@ export async function handleLoadModels(): Promise<void> {
  *
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action completes.
  */
 export function handleSaveModel({
   onSuccess,
   onError,
+  onComplete,
 }: IOHandlerCallback<GenerationModelSchema>): void {
   const model = modelSaveStore.editedModel;
   logStore.onInfo(
@@ -47,7 +49,8 @@ export function handleSaveModel({
       logStore.onError(`Unable to create saved: ${model.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
-    });
+    })
+    .finally(onComplete);
 }
 
 /**

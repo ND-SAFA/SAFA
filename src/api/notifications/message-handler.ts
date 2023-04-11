@@ -15,11 +15,10 @@ import {
   jobStore,
   membersStore,
   projectStore,
-  sessionStore,
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
-import { router, routesWithRequiredProject } from "@/router";
+import { router } from "@/router";
 import {
   handleClearProject,
   handleLoadVersion,
@@ -38,15 +37,15 @@ export async function handleEntityChangeMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
+  const routeRequiresProject = router.currentRoute.value.matched.some(
+    ({ meta }) => meta.requiresProject
+  );
   const message: ChangeMessageSchema = JSON.parse(frame.body);
+  const isCurrentUser = false; // message.user === sessionStore.userEmail;
+  const updateLayout = message.updateLayout && routeRequiresProject;
   const project = await getChanges(versionId, message);
-  //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
-  const isCurrentUser = message.user === sessionStore.userEmail && false;
-  const updateLayout =
-    message.updateLayout &&
-    routesWithRequiredProject.includes(router.currentRoute.path);
 
-  // Skip updates by the current user that dont involve a layout update.
+  // Skip updates by the current user that don't involve a layout update.
   if (isCurrentUser && !updateLayout) return;
 
   appStore.enqueueChanges(async () => {
@@ -62,10 +61,10 @@ export async function handleEntityChangeMessage(
       }
     }
 
+    if (!updateLayout) return;
+
     // Step - Update default layout after changes are stored.
-    if (updateLayout) {
-      documentStore.updateBaseLayout(project.layout);
-    }
+    documentStore.updateBaseLayout(project.layout);
   });
 }
 

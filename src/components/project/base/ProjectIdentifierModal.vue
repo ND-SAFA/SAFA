@@ -1,126 +1,100 @@
 <template>
   <modal
-    :is-open="isOpen"
-    :title="modelTitle"
-    size="m"
-    :is-loading="isLoading"
+    size="md"
+    :loading="loading"
+    :open="props.open"
+    :title="modalTitle"
     data-cy="modal-project-edit"
-    :actions-height="doShowUpload ? 0 : 50"
-    @close="handleClose"
+    @close="handleCancel"
   >
-    <template v-slot:body>
-      <project-files-uploader
-        v-if="doShowUpload"
-        data-cy-name="input-project-name-modal"
-        data-cy-description="input-project-description-modal"
-        @submit="handleClose"
-      />
-      <project-identifier-input
-        v-else
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
-        data-cy-name="input-project-name-modal"
-        data-cy-description="input-project-description-modal"
-      />
-    </template>
-    <template v-slot:actions v-if="!doShowUpload">
-      <v-btn
-        @click="handleSave"
+    <project-files-uploader
+      v-if="showUpload"
+      data-cy-name="input-project-name-modal"
+      data-cy-description="input-project-description-modal"
+      @submit="handleCancel"
+    />
+    <project-identifier-input
+      v-else
+      v-model:name="identifier.name"
+      v-model:description="identifier.description"
+      data-cy-name="input-project-name-modal"
+      data-cy-description="input-project-description-modal"
+    />
+    <template v-if="!showUpload" #actions>
+      <text-button
         color="primary"
-        class="ml-auto"
+        label="Save"
         :disabled="!canSave"
         data-cy="button-project-save"
-      >
-        Save
-      </v-btn>
+        @click="handleSave"
+      />
     </template>
   </modal>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { IdentifierSchema } from "@/types";
+/**
+ * A modal for creating or editing a project.
+ */
+export default {
+  name: "ProjectIdentifierModal",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
 import { identifierSaveStore } from "@/hooks";
-import { Modal } from "@/components/common";
+import { handleSaveProject } from "@/api";
+import { Modal, TextButton } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
-/**
- * A modal for creating or editing a project.
- *
- * @emits-1 `close` - On close.
- * @emits-2 `save` - On project save.
- */
-export default Vue.extend({
-  name: "ProjectIdentifierModal",
-  components: {
-    Modal,
-    ProjectFilesUploader,
-    ProjectIdentifierInput,
-  },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  computed: {
-    /**
-     * @return  The identifier being updated.
-     */
-    identifier(): IdentifierSchema {
-      return identifierSaveStore.editedIdentifier;
-    },
-    /**
-     * @return Whether an existing identifier is being updated.
-     */
-    isUpdate(): boolean {
-      return identifierSaveStore.isUpdate;
-    },
-    modelTitle(): string {
-      return this.isUpdate ? "Edit Project" : "Create Project";
-    },
-    /**
-     * @return Whether to show the file upload.
-     */
-    doShowUpload(): boolean {
-      return !this.isUpdate;
-    },
-    /**
-     * @return Whether the identifier can be saved.
-     */
-    canSave(): boolean {
-      return identifierSaveStore.canSave;
-    },
-  },
-  methods: {
-    /**
-     * Emits a request to close.
-     */
-    handleClose() {
-      this.$emit("close");
-    },
-    /**
-     * Emits a request to save a project.
-     */
-    handleSave() {
-      this.$emit("save");
-    },
-  },
-  watch: {
-    /**
-     * Resets identifier data when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
+const props = defineProps<{
+  open: boolean;
+}>();
 
-      identifierSaveStore.resetIdentifier();
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "save"): void;
+}>();
+
+const loading = ref(false);
+
+const identifier = computed(() => identifierSaveStore.editedIdentifier);
+const isUpdate = computed(() => identifierSaveStore.isUpdate);
+const showUpload = computed(() => !identifierSaveStore.isUpdate);
+const canSave = computed(() => identifierSaveStore.canSave);
+const modalTitle = computed(() =>
+  isUpdate.value ? "Edit Project" : "Create Project"
+);
+
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+
+    identifierSaveStore.resetIdentifier();
+  }
+);
+
+/**
+ * Cancels the project saving.
+ */
+function handleCancel(): void {
+  emit("close");
+}
+
+/**
+ * Confirms the project saving.
+ */
+function handleSave(): void {
+  loading.value = true;
+
+  handleSaveProject({
+    onSuccess: () => {
+      emit("save");
     },
-  },
-});
+    onComplete: () => (loading.value = false),
+  });
+}
 </script>

@@ -1,28 +1,38 @@
 <template>
-  <v-app>
-    <v-main class="primary lighten-5">
-      <transition name="fade" mode="out-in">
-        <keep-alive>
-          <router-view />
-        </keep-alive>
-      </transition>
-    </v-main>
+  <q-layout view="lHh Lpr lff" class="bg-background">
     <app-nav />
-  </v-app>
+    <q-page-container>
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { AppNav } from "@/components";
-
 /**
  * Renders the SAFA app.
  */
-export default Vue.extend({
+export default {
   name: "App",
-  components: {
-    AppNav,
-  },
+};
+</script>
+
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { LocalStorageKeys } from "@/types";
+import { useTheme } from "@/hooks";
+import { AppNav } from "@/components";
+
+const { toggleDarkMode } = useTheme();
+
+onMounted(() => {
+  const storedDarkMode =
+    localStorage.getItem(LocalStorageKeys.darkMode) === "true";
+
+  toggleDarkMode(storedDarkMode);
 });
 </script>
 

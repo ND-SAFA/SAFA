@@ -1,113 +1,86 @@
 <template>
-  <div v-if="isOpen">
-    <flex-box t="2">
-      <text-button text variant="artifact" @click="handleViewLevel">
-        View In Tree
-      </text-button>
+  <details-panel panel="displayTraceMatrix">
+    <flex-box b="2">
+      <text-button
+        text
+        label="View In Tree"
+        icon="artifact"
+        @click="handleViewLevel"
+      />
     </flex-box>
-    <panel-card class="mt-2">
-      <flex-box wrap>
+
+    <panel-card>
+      <flex-box wrap align="center">
         <attribute-chip artifact-type :value="sourceType" />
-        <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
+        <icon class="q-mx-xs" size="sm" color="primary" variant="trace" />
         <attribute-chip artifact-type :value="targetType" />
       </flex-box>
-      <v-divider class="mt-1" />
+      <separator class="q-my-sm" />
       <typography variant="caption" value="Total Trace Links" />
-      <typography el="p" :value="traceTotalCount" />
+      <typography el="p" :value="totalCount" />
       <typography variant="caption" value="Generated Trace Links" />
-      <typography el="p" :value="traceGeneratedCount" />
+      <typography el="p" :value="generatedCount" />
       <typography variant="caption" value="Approved Trace Links" />
-      <typography el="p" :value="traceApprovedCount" />
+      <typography el="p" :value="approvedCount" />
     </panel-card>
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { TimTraceMatrixSchema } from "@/types";
-import { appStore, layoutStore, selectionStore } from "@/hooks";
+/**
+ * Displays trace matrix information.
+ */
+export default {
+  name: "TraceMatrixPanel",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { layoutStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
   Typography,
   FlexBox,
   TextButton,
+  Icon,
+  Separator,
+  DetailsPanel,
 } from "@/components/common";
 
-/**
- * Displays trace matrix information.
- */
-export default Vue.extend({
-  name: "TraceMatrixPanel",
-  components: {
-    FlexBox,
-    PanelCard,
-    AttributeChip,
-    Typography,
-    TextButton,
-  },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayTraceMatrix";
-    },
-    /**
-     * @return The selected trace matrix
-     */
-    traceMatrix(): TimTraceMatrixSchema | undefined {
-      return selectionStore.selectedTraceMatrix;
-    },
-    /**
-     * @return The selected source artifact type.
-     */
-    sourceType(): string {
-      return this.traceMatrix?.sourceType || "";
-    },
-    /**
-     * @return The selected target artifact type.
-     */
-    targetType(): string {
-      return this.traceMatrix?.targetType || "";
-    },
-    /**
-     * @return The total number of traces between the selected types.
-     */
-    traceTotalCount(): string {
-      const count = this.traceMatrix?.count || 0;
+const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 
-      return count === 1 ? "1 Link" : `${count} Links`;
-    },
-    /**
-     * @return The number of generated traces between the selected types.
-     */
-    traceGeneratedCount(): string {
-      const count = this.traceMatrix?.generatedCount || 0;
+const sourceType = computed(() => traceMatrix.value?.sourceType || "");
+const targetType = computed(() => traceMatrix.value?.targetType || "");
 
-      return count === 1 ? "1 Link" : `${count} Links`;
-    },
-    /**
-     * @return The number of approved traces between the selected types.
-     */
-    traceApprovedCount(): string {
-      const count = this.traceMatrix?.approvedCount || 0;
+const totalCount = computed(() => {
+  const count = traceMatrix.value?.count || 0;
 
-      return count === 1 ? "1 Link" : `${count} Links`;
-    },
-  },
-  methods: {
-    /**
-     * Switches to tree view and highlights this type matrix.
-     */
-    handleViewLevel(): void {
-      if (!this.traceMatrix) return;
-
-      layoutStore.viewTreeTypes([
-        this.traceMatrix.sourceType,
-        this.traceMatrix.targetType,
-      ]);
-    },
-  },
+  return count === 1 ? "1 Link" : `${count} Links`;
 });
+
+const generatedCount = computed(() => {
+  const count = traceMatrix.value?.generatedCount || 0;
+
+  return count === 1 ? "1 Link" : `${count} Links`;
+});
+
+const approvedCount = computed(() => {
+  const count = traceMatrix.value?.approvedCount || 0;
+
+  return count === 1 ? "1 Link" : `${count} Links`;
+});
+
+/**
+ * Switches to tree view and highlights this type matrix.
+ */
+function handleViewLevel(): void {
+  if (!traceMatrix.value) return;
+
+  layoutStore.viewTreeTypes([
+    traceMatrix.value.sourceType,
+    traceMatrix.value.targetType,
+  ]);
+}
 </script>

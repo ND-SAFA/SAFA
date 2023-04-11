@@ -1,138 +1,82 @@
 <template>
-  <flex-box wrap b="2" v-if="doDisplay">
+  <flex-box v-if="doDisplay" wrap t="2" class="settings-buttons">
     <text-button
       text
-      icon-id="mdi-download"
+      label="Download"
+      icon="download"
       data-cy="button-settings-download"
       @click="handleDownload"
-    >
-      Download
-    </text-button>
+    />
     <text-button
       text
-      variant="edit"
+      label="Edit"
+      icon="edit"
       data-cy="button-settings-edit"
       @click="handleEdit"
-    >
-      Edit
-    </text-button>
-    <v-divider vertical />
+    />
+    <separator vertical />
     <text-button
       text
-      variant="delete"
+      label="Delete"
+      icon="delete"
       data-cy="button-settings-delete"
       @click="handleDelete"
-    >
-      Delete
-    </text-button>
+    />
     <project-identifier-modal
-      :is-open="isEditOpen"
-      :is-loading="isLoading"
+      :open="isEditOpen"
       @close="isEditOpen = false"
-      @save="handleSave"
+      @save="isEditOpen = false"
     />
     <confirm-project-delete
-      :is-open="isDeleteOpen"
-      @confirm="handleConfirmDeleteProject"
-      @cancel="isDeleteOpen = false"
+      :open="isDeleteOpen"
+      @close="isDeleteOpen = false"
+      @confirm="isDeleteOpen = false"
     />
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import {
-  handleSaveProject,
-  handleDownloadProjectCSV,
-  handleDeleteProject,
-} from "@/api";
-import { FlexBox, TextButton } from "@/components/common";
-import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
-import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
-
 /**
  * Displays buttons for interacting with projects.
  */
-export default Vue.extend({
+export default {
   name: "ProjectButtons",
-  components: {
-    TextButton,
-    FlexBox,
-    ProjectIdentifierModal,
-    ConfirmProjectDelete,
-  },
-  data() {
-    return {
-      isLoading: false,
-      isEditOpen: false,
-      isDeleteOpen: false,
-      projectToEdit: projectStore.project,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether to display these buttons.
-     */
-    doDisplay(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
-  },
-  methods: {
-    /**
-     * Opens the edit modal.
-     */
-    handleEdit(): void {
-      identifierSaveStore.baseIdentifier = this.project;
-      this.isEditOpen = true;
-    },
-    /**
-     * Opens the edit modal.
-     */
-    handleDelete(): void {
-      identifierSaveStore.baseIdentifier = this.project;
-      this.isDeleteOpen = true;
-    },
-    /**
-     * Attempts to save the project.
-     */
-    handleSave(): void {
-      this.isLoading = true;
+};
+</script>
 
-      handleSaveProject({
-        onSuccess: (project) => projectStore.updateProject(project),
-        onComplete: () => {
-          this.isLoading = false;
-          this.isEditOpen = false;
-        },
-      });
-    },
-    /**
-     * Downloads project files
-     */
-    handleDownload(): void {
-      handleDownloadProjectCSV();
-    },
-    /**
-     * Attempts to delete a project, and closes the delete modal.
-     */
-    handleConfirmDeleteProject() {
-      this.isLoading = true;
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
+import { handleDownloadProjectCSV } from "@/api";
+import { FlexBox, TextButton, Separator } from "@/components/common";
+import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
+import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 
-      handleDeleteProject({
-        onSuccess: () => {
-          this.isDeleteOpen = false;
-          this.$emit("unselected");
-        },
-        onComplete: () => (this.isLoading = false),
-      });
-    },
-  },
-});
+const isEditOpen = ref(false);
+const isDeleteOpen = ref(false);
+
+const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+
+/**
+ * Opens the edit modal.
+ */
+function handleEdit(): void {
+  identifierSaveStore.baseIdentifier = projectStore.project;
+  isEditOpen.value = true;
+}
+
+/**
+ * Opens the edit modal.
+ */
+function handleDelete(): void {
+  identifierSaveStore.baseIdentifier = projectStore.project;
+  isDeleteOpen.value = true;
+}
+
+/**
+ * Downloads project files
+ */
+function handleDownload(): void {
+  handleDownloadProjectCSV();
+}
 </script>

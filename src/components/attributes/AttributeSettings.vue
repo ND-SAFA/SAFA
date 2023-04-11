@@ -1,39 +1,40 @@
 <template>
   <panel-card>
-    <v-row style="min-height: 60vh">
-      <v-col cols="12" lg="4">
-        <v-navigation-drawer
-          v-if="$vuetify.breakpoint.lgAndUp"
-          absolute
-          permanent
-          width="33%"
-        >
-          <attribute-editor />
-        </v-navigation-drawer>
-        <attribute-editor v-else />
-      </v-col>
-      <v-col cols="12" lg="8">
-        <attribute-layout-editor />
-      </v-col>
-    </v-row>
+    <q-layout container view="lHh Lpr lff" class="settings-attributes">
+      <q-drawer
+        v-if="!smallWindow"
+        model-value
+        persistent
+        bordered
+        :breakpoint="0"
+        :width="260"
+      >
+        <attribute-editor />
+      </q-drawer>
+      <q-page-container>
+        <q-page class="q-mx-md">
+          <attribute-editor v-if="smallWindow" />
+          <attribute-layout-editor />
+        </q-page>
+      </q-page-container>
+    </q-layout>
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Renders settings for customizing artifact attributes.
+ */
+export default {
+  name: "AttributeSettings",
+};
+</script>
+
+<script setup lang="ts">
+import { useScreen } from "@/hooks";
 import { PanelCard } from "@/components/common";
 import AttributeEditor from "./AttributeEditor.vue";
 import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
 
-/**
- * Renders settings for customizing artifact attributes.
- */
-export default Vue.extend({
-  name: "AttributeSettings",
-  components: {
-    AttributeLayoutEditor,
-    AttributeEditor,
-    PanelCard,
-  },
-});
+const { smallWindow } = useScreen();
 </script>

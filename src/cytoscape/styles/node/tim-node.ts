@@ -21,8 +21,7 @@ export function svgTIM(data: TimNodeCytoElementData): string {
   return `
     <svg
       width="${TIM_NODE_WIDTH}" height="${TIM_NODE_HEIGHT}"
-      class="artifact-svg-wrapper"
-      style="margin-top: 7px"
+      class="artifact-svg-wrapper tim-svg-wrapper"
       data-cy="tim-node"
       data-cy-name="${data.artifactType}"
     >

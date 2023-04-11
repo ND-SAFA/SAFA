@@ -45,6 +45,7 @@ export const applyOpacityToGeneratedLinks: LayoutHook = (
 ): void => {
   cy.edges(GENERATED_LINK_SELECTOR).forEach((edge: EdgeSingular) => {
     const score = edge.data().score;
+
     edge.style({
       width: Math.min(
         score * GENERATED_TRACE_MAX_WIDTH,

@@ -1,57 +1,44 @@
 <template>
   <sidebar-grid>
-    <template v-slot:header>
-      <trace-prediction-header />
-    </template>
-    <template v-slot:sidebar>
+    <template #sidebar>
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab-item key="1">
+      <template #models>
         <model-table />
-      </v-tab-item>
-      <v-tab-item key="2">
-        <panel-card>
-          <trace-link-generator :is-open="tab === 1" />
+      </template>
+      <template #generation>
+        <panel-card title="Generate Trace Links">
+          <trace-link-generator :open="tab === 'generation'" />
         </panel-card>
-      </v-tab-item>
-      <v-tab-item key="3">
-        <trace-approval-table />
-      </v-tab-item>
+      </template>
+      <template #approval>
+        <approval-table />
+      </template>
     </tab-list>
   </sidebar-grid>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Tabs for predicting and approving trace links.
+ */
+export default {
+  name: "TracePredictionTabs",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { TracePredictionTabTypes } from "@/types";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, SidebarGrid, PanelCard } from "@/components/common";
 import { TraceLinkGenerator } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project";
 import { ModelTable } from "./training";
-import { TraceApprovalTable } from "./approval";
-import TracePredictionHeader from "./TracePredictionHeader.vue";
+import { ApprovalTable } from "./approval";
 
-/**
- * Tabs for predicting and approving trace links.
- */
-export default Vue.extend({
-  name: "TracePredictionTabs",
-  components: {
-    PanelCard,
-    SidebarGrid,
-    TracePredictionHeader,
-    ProjectDisplay,
-    TraceLinkGenerator,
-    ModelTable,
-    TraceApprovalTable,
-    TabList,
-  },
-  data() {
-    return {
-      tab: 0,
-      tabs: tracePredictionTabOptions(),
-    };
-  },
-});
+const tabs = tracePredictionTabOptions();
+
+const tab = ref<TracePredictionTabTypes>(TracePredictionTabTypes.models);
 </script>

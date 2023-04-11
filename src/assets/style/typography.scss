@@ -3,12 +3,18 @@
 $heading-font-family: "Source Sans Pro";
 $body-font-family: "Source Sans Pro";
 
-.v-application {
+// Text Styling
+
+#app {
   [class*="text-"] {
-    color: var(--v-text-base);
     font-family: $body-font-family, sans-serif !important;
   }
   font-family: $body-font-family, sans-serif !important;
+}
+
+h1, h2, h3, h4, h6, h6 {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .text-ellipsis {
@@ -16,10 +22,55 @@ $body-font-family: "Source Sans Pro";
   text-overflow: ellipsis;
 }
 
+.text-sm {
+  font-size: 10px;
+}
+
+.text-lg {
+  font-size: 20px;
+}
+
 .inherit-color {
   color: inherit !important;
 }
 
-.v-tab {
-  text-transform: none !important;
+.text-expanded {
+  white-space: nowrap;
+  width: inherit;
+  max-width: 60vw;
+}
+
+.text-white-space-normal {
+  white-space: normal;
+}
+
+.text-word-break-all {
+  word-break: break-all;
+}
+
+// Text Block Styling
+
+.attribute-chip {
+  max-width: 200px;
+}
+
+.attribute-bar {
+  width: 200px;
+
+  .attribute-bar-text {
+    max-width: 50px;
+  }
+}
+
+.artifact-display {
+  max-width: 500px;
+}
+
+.trace-matrix-chip {
+  border-width: 2px;
+  border-style: solid;
+
+  &-unreviewed {
+    border-style: dashed;
+  }
 }

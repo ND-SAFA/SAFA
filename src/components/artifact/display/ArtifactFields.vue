@@ -1,20 +1,16 @@
 <template>
   <panel-card>
-    <flex-box align="center" justify="space-between">
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <typography
-            ellipsis
-            v-on="on"
-            v-bind="attrs"
-            variant="subtitle"
-            el="h1"
-            :value="name"
-            data-cy="text-selected-name"
-          />
-        </template>
-        {{ name }}
-      </v-tooltip>
+    <flex-box align="center" justify="between">
+      <div>
+        <typography
+          ellipsis
+          variant="subtitle"
+          el="h1"
+          :value="name"
+          data-cy="text-selected-name"
+        />
+        <q-tooltip>{{ name }}</q-tooltip>
+      </div>
       <attribute-chip
         artifact-type
         :value="type"
@@ -22,7 +18,7 @@
       />
     </flex-box>
 
-    <v-divider />
+    <separator b="2" />
 
     <typography variant="caption" value="Body" />
     <typography
@@ -32,13 +28,22 @@
       data-cy="text-selected-body"
     />
 
-    <attribute-list-display class="mt-4" :artifact="artifact" />
+    <attribute-list-display :artifact="artifact" />
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ReservedArtifactType, TextType } from "@/types";
+/**
+ * Displays the selected node's title and option buttons.
+ */
+export default {
+  name: "ArtifactFields",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { ReservedArtifactType } from "@/types";
 import { selectionStore } from "@/hooks";
 import {
   Typography,
@@ -46,51 +51,14 @@ import {
   AttributeChip,
   PanelCard,
   AttributeListDisplay,
+  Separator,
 } from "@/components/common";
 
-/**
- * Displays the selected node's title and option buttons.
- */
-export default Vue.extend({
-  name: "ArtifactFields",
-  components: {
-    AttributeListDisplay,
-    PanelCard,
-    AttributeChip,
-    FlexBox,
-    Typography,
-  },
-  computed: {
-    /**
-     * @return The selected artifact.
-     */
-    artifact() {
-      return selectionStore.selectedArtifact;
-    },
-    /**
-     * @return The selected artifact's name.
-     */
-    name(): string {
-      return this.artifact?.name || "";
-    },
-    /**
-     * @return The selected artifact's type.
-     */
-    type(): string {
-      return this.artifact?.type || "";
-    },
-    /**
-     * @return The selected artifact's body text variant.
-     */
-    variant(): TextType {
-      return this.type === ReservedArtifactType.github ? "code" : "expandable";
-    },
-    /**
-     * @return The selected artifact's body.
-     */
-    body(): string {
-      return this.artifact?.body.trim() || "";
-    },
-  },
-});
+const artifact = computed(() => selectionStore.selectedArtifact);
+const name = computed(() => artifact.value?.name || "");
+const type = computed(() => artifact.value?.type || "");
+const body = computed(() => artifact.value?.body.trim() || "");
+const variant = computed(() =>
+  type?.value === ReservedArtifactType.github ? "code" : "expandable"
+);
 </script>

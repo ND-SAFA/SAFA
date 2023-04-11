@@ -1,16 +1,4 @@
-.full-window-page {
-  max-width: 100%;
-  height: 100%;
-  padding: 0;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.full-height {
-  height: 100%;
-}
+// Width Utilities
 
 .width {
   &-min {
@@ -22,14 +10,45 @@
   &-fit {
     width: fit-content;
   }
+  &-100 {
+    width: 100%;
+  }
+  &-50 {
+    width: 50%;
+  }
 }
+
+// Height Utilities
+
+.scrollable {
+  overflow-y: scroll;
+
+  &-md {
+    max-height: 400px;
+  }
+}
+
+// Flex Utilities
+
+.align {
+  &-start {
+    align-items: flex-start !important;
+  }
+  &-center {
+    align-items: center !important;
+  }
+  &-end {
+    align-items: flex-end !important;
+  }
+}
+
+.nowrap {
+  flex-wrap: nowrap;
+}
+
+// Opacity Changes
 
 .faded {
-  opacity: 0.6;
-}
-
-.disable-events {
-  pointer-events: none;
   opacity: 0.6;
 }
 

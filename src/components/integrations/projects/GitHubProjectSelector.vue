@@ -1,118 +1,92 @@
 <template>
   <stepper-list-step
     title="GitHub Repositories"
-    :item-count="repositories.length"
-    :loading="repositoriesLoading"
     empty-message="There are no repositories."
+    :item-count="projects.length"
+    :loading="loading"
   >
-    <template slot="items">
-      <template v-for="repository in repositories">
-        <v-list-item
-          three-line
-          :key="repository.id"
-          @click="handleRepositorySelect(repository)"
-        >
-          <v-list-item-icon v-if="!!repository.avatar_url">
-            <v-avatar>
-              <img :src="repository.avatar_url" :alt="repository.name" />
-            </v-avatar>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title v-text="repository.name" />
-            <v-list-item-subtitle v-text="getRepositorySubtitle(repository)" />
-            <v-list-item-subtitle v-text="getRepositoryTime(repository)" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-    </template>
+    <list>
+      <list-item
+        v-for="item in projects"
+        :key="item.name"
+        :title="item.name"
+        :subtitle="getRepositoryTime(item)"
+        clickable
+        :active="projectName === item.name"
+        active-class="bg-background"
+        @click="handleProjectSelect(item)"
+      />
+    </list>
   </stepper-list-step>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GitHubProjectSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadGitHubProjects } from "@/api";
-import { StepperListStep } from "@/components/common";
-
 /**
  * Allows for selecting a GitHub repository.
  */
-export default Vue.extend({
+export default {
   name: "GitHubProjectSelector",
-  components: {
-    StepperListStep,
-  },
-  data() {
-    return {
-      repositories: [] as GitHubProjectSchema[],
-      repositoriesLoading: false,
-    };
-  },
-  mounted() {
-    this.loadProjects();
-  },
-  computed: {
-    /**
-     * @return The selected GitHub organization name.
-     */
-    organizationName(): string | undefined {
-      return integrationsStore.gitHubOrganization?.name;
-    },
-  },
-  watch: {
-    /**
-     * Loads projects when credentials are valid.
-     */
-    organizationName(): void {
-      this.loadProjects();
-    },
-  },
-  methods: {
-    /**
-     * Loads a user's GitHub projects for a selected organization.
-     */
-    async loadProjects() {
-      if (!integrationsStore.gitHubOrganization) return;
+};
+</script>
 
-      integrationsStore.gitHubProject = undefined;
-      this.repositoriesLoading = true;
+<script setup lang="ts">
+import { computed, ref, onMounted, watch } from "vue";
+import { GitHubProjectSchema } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadGitHubProjects } from "@/api";
+import { StepperListStep, List, ListItem } from "@/components/common";
 
-      handleLoadGitHubProjects({
-        onSuccess: (repositories) => {
-          this.repositories = repositories.filter(
-            ({ owner }) => owner === this.organizationName
-          );
-          this.repositoriesLoading = false;
-        },
-        onError: () => (this.repositoriesLoading = false),
-      });
-    },
-    /**
-     * Returns a repository's subtitle.
-     * @param repository - The repository to extract from.
-     * @return The subtitle.
-     */
-    getRepositorySubtitle(repository: GitHubProjectSchema): string {
-      return repository.name;
-    },
-    /**
-     * Returns a repository's last updated time.
-     * @param repository - The repository to extract from.
-     * @return The last updated time.
-     */
-    getRepositoryTime(repository: GitHubProjectSchema): string {
-      const updated = new Date(repository.created_at);
+const projects = ref<GitHubProjectSchema[]>([]);
+const loading = ref(false);
 
-      return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
+const organizationName = computed(
+  () => integrationsStore.gitHubOrganization?.name
+);
+
+const projectName = computed(() => integrationsStore.gitHubProject?.name);
+
+/**
+ * Loads a user's GitHub projects for a selected organization.
+ */
+function handleReload() {
+  if (!integrationsStore.gitHubOrganization) return;
+
+  integrationsStore.gitHubProject = undefined;
+  loading.value = true;
+
+  handleLoadGitHubProjects({
+    onSuccess: (repositories) => {
+      projects.value = repositories.filter(
+        ({ owner }) => owner === organizationName.value
+      );
     },
-    /**
-     * SHandles a click to select a repository.
-     * @param repository - The repository to select.
-     */
-    handleRepositorySelect(repository: GitHubProjectSchema | undefined) {
-      integrationsStore.selectGitHubProject(repository);
-    },
-  },
-});
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Returns a repository's last updated time.
+ * @param repository - The repository to extract from.
+ * @return The last updated time.
+ */
+function getRepositoryTime(repository: GitHubProjectSchema): string {
+  const updated = new Date(repository.created_at);
+
+  return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
+}
+
+/**
+ * SHandles a click to select a repository.
+ * @param project - The repository to select.
+ */
+function handleProjectSelect(project: GitHubProjectSchema | undefined) {
+  integrationsStore.selectGitHubProject(project);
+}
+
+onMounted(() => handleReload());
+
+watch(
+  () => organizationName.value,
+  () => handleReload()
+);
 </script>

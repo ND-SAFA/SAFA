@@ -1,23 +1,21 @@
 <template>
-  <private-page>
-    <template v-slot:page>
-      <project-creator />
-    </template>
+  <private-page
+    title="Create Project"
+    subtitle="Create a project using one of the following methods."
+  >
+    <project-creator />
   </private-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { PrivatePage, ProjectCreator } from "@/components";
-
 /**
  * Displays the steps for creating a project.
  */
-export default Vue.extend({
+export default {
   name: "ProjectCreatorView",
-  components: {
-    ProjectCreator,
-    PrivatePage,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PrivatePage, ProjectCreator } from "@/components";
 </script>

@@ -1,42 +1,29 @@
 <template>
-  <v-autocomplete
-    hide-details
-    ref="artifactInput"
-    :filled="filled"
-    :multiple="multiple"
-    :label="label"
+  <q-select
     v-model="model"
-    :items="artifacts"
-    item-text="name"
-    item-value="id"
-    :filter="filterArtifacts"
-    @keydown.enter="$emit('enter')"
+    filled
+    use-chips
+    map-options
+    emit-value
+    use-input
+    :clearable="multiple"
+    :multiple="multiple"
+    :label="label || 'Artifact'"
+    :options="options"
+    option-label="name"
+    option-value="id"
+    @filter="filter"
   >
-    <template v-slot:append>
-      <icon-button
-        small
-        icon-id="mdi-content-save-outline"
-        tooltip="Save Artifacts"
-        data-cy="button-save-artifacts"
-        @click="handleClose"
+    <template #option="{ opt, itemProps }">
+      <artifact-body-display v-bind="itemProps" display-title :artifact="opt" />
+    </template>
+    <template #selected-item="{ opt, index, removeAtIndex }">
+      <attribute-chip
+        v-if="!!opt && opt.name && index < 3"
+        removable
+        :value="opt.name"
+        @remove="removeAtIndex(index)"
       />
-    </template>
-    <template v-slot:item="{ item, on, attrs }">
-      <v-list-item v-on="on" v-bind="attrs" dense>
-        <v-checkbox :value="isSelected(item)" />
-        <artifact-body-display display-title :artifact="item" />
-      </v-list-item>
-    </template>
-    <template v-slot:selection="{ item, index }">
-      <v-chip
-        v-if="index < 3"
-        close
-        small
-        class="primary-border neutral-bg"
-        @click:close="handleDelete(item)"
-      >
-        <typography :value="item.name" />
-      </v-chip>
       <typography
         v-else-if="index === 3"
         secondary
@@ -44,128 +31,74 @@
         :value="'+' + (selectedCount - 3)"
       />
     </template>
-  </v-autocomplete>
+  </q-select>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ArtifactSchema } from "@/types";
-import { filterArtifacts } from "@/util";
-import { artifactStore } from "@/hooks";
-import { IconButton } from "@/components/common/button";
-import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
-
 /**
  * An input for artifacts.
  *
  * @emits `input` (Artifact[]) - On input change.
  * @emits `enter` - On submit.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactInput",
-  components: {
-    IconButton,
-    Typography,
-    ArtifactBodyDisplay,
-  },
-  props: {
-    value: {
-      type: [Array, String] as PropType<string[] | string | undefined>,
-      required: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: true,
-    },
-    label: {
-      type: String,
-      default: "Visible Artifacts",
-    },
-    onlyDocumentArtifacts: {
-      type: Boolean,
-      default: false,
-    },
-    filled: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-    };
-  },
-  methods: {
-    filterArtifacts,
-    /**
-     * Determines whether an artifact is in the selected state.
-     *
-     * @param item - The artifact to check.
-     * @return Whether it is selected.
-     */
-    isSelected(item: ArtifactSchema): boolean {
-      if (typeof this.model === "string") {
-        return item.id === this.model;
-      } else if (Array.isArray(this.model)) {
-        return this.model.includes(item.id);
-      } else {
-        return false;
-      }
-    },
-    /**
-     * Removes an artifact from the selection.
-     *
-     * @param item - The artifact to remove.
-     */
-    handleDelete(item: ArtifactSchema): void {
-      if (typeof this.model === "string") {
-        this.model = "";
-      } else if (Array.isArray(this.model)) {
-        this.model = this.model.filter((id) => id !== item.id);
-      }
-    },
-    /**
-     * Closes the selection window.
-     */
-    handleClose(): void {
-      (this.$refs.artifactInput as HTMLElement).blur();
-    },
-  },
-  computed: {
-    /**
-     * @return The artifacts to select from.
-     */
-    artifacts(): ArtifactSchema[] {
-      return this.onlyDocumentArtifacts
-        ? artifactStore.currentArtifacts
-        : artifactStore.allArtifacts;
-    },
-    /**
-     * @return The number of selected artifacts.
-     */
-    selectedCount(): number {
-      if (typeof this.model === "string") {
-        return 1;
-      } else if (Array.isArray(this.model)) {
-        return this.model.length;
-      } else {
-        return 0;
-      }
-    },
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: string[] | string | undefined) {
-      this.model = currentValue;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentValue: string[] | string | undefined) {
-      this.$emit("input", currentValue);
-    },
-  },
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { filterArtifacts } from "@/util";
+import { artifactStore, useVModel } from "@/hooks";
+import {
+  Typography,
+  ArtifactBodyDisplay,
+  AttributeChip,
+} from "@/components/common/display";
+
+const props = defineProps<{
+  modelValue: string[] | string | undefined;
+  multiple?: boolean;
+  label?: string;
+  onlyDocumentArtifacts?: boolean;
+}>();
+
+const model = useVModel(props, "modelValue");
+
+const artifacts = computed(() =>
+  props.onlyDocumentArtifacts
+    ? artifactStore.currentArtifacts
+    : artifactStore.allArtifacts
+);
+
+const options = ref(artifacts.value);
+
+const selectedCount = computed(() => {
+  if (typeof model.value === "string") {
+    return 1;
+  } else if (Array.isArray(model.value)) {
+    return model.value.length;
+  } else {
+    return 0;
+  }
 });
+
+/**
+ * Filters the artifact options.
+ * @param searchText - The search text to filter with.
+ * @param update - A function call to update the options.
+ */
+function filter(searchText: string, update: (fn: () => void) => void): void {
+  update(() => {
+    if (searchText === "") {
+      options.value = artifacts.value;
+    } else {
+      const lowercaseSearchText = searchText.toLowerCase();
+
+      options.value = artifacts.value.filter((artifact) =>
+        filterArtifacts(artifact, lowercaseSearchText)
+      );
+    }
+  });
+}
 </script>

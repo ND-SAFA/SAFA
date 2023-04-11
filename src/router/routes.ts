@@ -1,3 +1,19 @@
+import { RouteRecordRaw } from "vue-router";
+import {
+  ArtifactView,
+  CreateAccountView,
+  ForgotPasswordView,
+  HomeView,
+  LoginView,
+  MyAccountView,
+  ProjectCreatorView,
+  ProjectSelectorView,
+  ProjectSettingsView,
+  ResetPasswordView,
+  TracePredictionView,
+  UploadStatusView,
+} from "@/views";
+
 /**
  * Enumerates the possible routes within the app.
  */
@@ -14,7 +30,6 @@ export enum Routes {
   TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
-  ERROR = "/error",
 }
 
 /**
@@ -29,15 +44,89 @@ export enum QueryParams {
   GITHUB_TOKEN = "code",
 }
 
-export const routesWithRequiredProject: string[] = [
-  Routes.PROJECT_SETTINGS,
-  Routes.ARTIFACT,
-  Routes.TRACE_LINK,
-];
-
-export const routesPublic: string[] = [
-  Routes.LOGIN_ACCOUNT,
-  Routes.CREATE_ACCOUNT,
-  Routes.FORGOT_PASSWORD,
-  Routes.RESET_PASSWORD,
+export const routes: Array<RouteRecordRaw> = [
+  // Public
+  {
+    path: Routes.LOGIN_ACCOUNT,
+    name: "Login",
+    component: LoginView,
+    meta: {
+      isPublic: true,
+    },
+  },
+  {
+    path: Routes.CREATE_ACCOUNT,
+    name: "Create Account",
+    component: CreateAccountView,
+    meta: {
+      isPublic: true,
+    },
+  },
+  {
+    path: Routes.FORGOT_PASSWORD,
+    name: "Forgot Password",
+    component: ForgotPasswordView,
+    meta: {
+      isPublic: true,
+    },
+  },
+  {
+    path: Routes.RESET_PASSWORD,
+    name: "Reset Password",
+    component: ResetPasswordView,
+    meta: {
+      isPublic: true,
+    },
+  },
+  // Private
+  {
+    path: Routes.ACCOUNT,
+    name: "My Account",
+    component: MyAccountView,
+  },
+  {
+    path: Routes.HOME,
+    name: "Home",
+    component: HomeView,
+  },
+  {
+    path: Routes.PROJECT_CREATOR,
+    name: "Create Project",
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.MY_PROJECTS,
+    name: "My Projects",
+    component: ProjectSelectorView,
+  },
+  {
+    path: Routes.UPLOAD_STATUS,
+    name: "Upload Status",
+    component: UploadStatusView,
+  },
+  // Project Specific
+  {
+    path: Routes.ARTIFACT,
+    name: "Artifact View",
+    component: ArtifactView,
+    meta: {
+      requiresProject: true,
+    },
+  },
+  {
+    path: Routes.TRACE_LINK,
+    name: "Trace Prediction",
+    component: TracePredictionView,
+    meta: {
+      requiresProject: true,
+    },
+  },
+  {
+    path: Routes.PROJECT_SETTINGS,
+    name: "Project Settings",
+    component: ProjectSettingsView,
+    meta: {
+      requiresProject: true,
+    },
+  },
 ];

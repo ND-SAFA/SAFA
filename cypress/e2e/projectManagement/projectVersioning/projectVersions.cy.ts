@@ -51,9 +51,10 @@ describe("Project Versions", () => {
 
   describe("I can upload new flat files to a project version", () => {
     it("Uploads files to the current version", () => {
-      cy.projectSelectorContinue("project")
-        .projectSelectorContinue("version")
-        .openUploadFiles();
+      cy.projectSelectorContinue("project").projectSelectorContinue("version");
+
+      cy.getCy(DataCy.appLoading).should("not.exist");
+      cy.openUploadFiles();
 
       cy.uploadFiles(
         DataCy.versionUploadFilesInput,

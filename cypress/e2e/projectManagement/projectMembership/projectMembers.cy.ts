@@ -1,12 +1,8 @@
 import { DataCy, inviteUser } from "@/fixtures";
 
 describe("Project Members", () => {
-  before(() => {
-    cy.initEmptyProject();
-  });
-
   beforeEach(() => {
-    cy.initProjectVersion(false).openProjectSettings();
+    cy.initEmptyProject().initProjectVersion(false).openProjectSettings();
   });
 
   describe("As an owner, I can add a new member to a project", () => {
@@ -25,12 +21,13 @@ describe("Project Members", () => {
 
   describe("As an owner, I can edit a project member’s permissions", () => {
     it("Can edit the permissions of a project member", () => {
-      cy.clickButton(DataCy.projectSettingsEditUserButton);
+      cy.projectAddNewMember(inviteUser.email, "Viewer");
 
-      cy.getCy(DataCy.projectSettingsAddRole)
-        .click({ force: true })
-        .type("Admin", { force: true })
-        .type("{enter}", { force: true });
+      cy.clickButton(DataCy.projectSettingsEditUserButton, "last");
+
+      cy.clickButton(DataCy.projectSettingsAddRole).clickButtonWithName(
+        "Admin"
+      );
 
       cy.clickButton(DataCy.projectSettingsAddToProject);
 
@@ -40,9 +37,12 @@ describe("Project Members", () => {
 
   describe("As an owner, I can remove a member from a project", () => {
     it("Can remove a member from a project", () => {
-      cy.clickButton(DataCy.projectSettingsDeleteUserButton).clickButton(
-        DataCy.confirmModalButton
-      );
+      cy.projectAddNewMember(inviteUser.email, "Viewer");
+
+      cy.clickButton(
+        DataCy.projectSettingsDeleteUserButton,
+        "last"
+      ).clickButton(DataCy.confirmModalButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

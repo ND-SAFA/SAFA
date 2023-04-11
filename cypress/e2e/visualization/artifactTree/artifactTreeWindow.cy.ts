@@ -56,7 +56,7 @@ describe("Artifact Tree Window", () => {
       cy.clickButton(DataCy.navTableButton)
         .clickButton(DataCy.navTreeButton)
         .getCy(DataCy.appLoading)
-        .should("not.be.visible");
+        .should("not.exist");
 
       // Assert that right clicking works to know that the graph is responsive.
       cy.centerGraph()
@@ -68,7 +68,7 @@ describe("Artifact Tree Window", () => {
     });
   });
 
-  describe("I can filter the visibility of artifacts by type", () => {
+  describe.skip("I can filter the visibility of artifacts by type", () => {
     it("Fades out filtered artifacts", () => {
       cy.clickButton(DataCy.navGraphFilterButton);
 

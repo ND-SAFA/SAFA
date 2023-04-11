@@ -1,5 +1,5 @@
 <template>
-  <q-tr v-if="groupBy">
+  <q-tr v-if="groupBy" data-cy="artifact-table-group">
     <q-td colspan="100%" class="bg-background">
       <div>
         <flex-box align="center" justify="between">

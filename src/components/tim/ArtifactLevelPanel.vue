@@ -1,5 +1,5 @@
 <template>
-  <details-panel panel="displayArtifactLevel">
+  <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
     <flex-box b="2">
       <text-button
         text
@@ -9,7 +9,7 @@
       />
     </flex-box>
 
-    <panel-card :title="artifactLevelName" data-cy="panel-artifact-type">
+    <panel-card :title="artifactLevelName">
       <template #title-actions>
         <icon :id="iconId" size="md" color="primary" />
       </template>

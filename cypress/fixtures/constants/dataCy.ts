@@ -39,6 +39,7 @@ export enum DataCy {
   selectorAddButton = "button-selector-add",
   selectorEditButton = "button-selector-edit",
   selectorDeleteButton = "button-selector-delete",
+  selectorSearchInput = "input-selector-search",
 
   // Modals
 
@@ -214,12 +215,11 @@ export enum DataCy {
   projectSettingsEditButton = "button-settings-edit",
   projectSettingsDeleteButton = "button-settings-delete",
 
-  projectSettingsAddEmail = "settings-input-user-email",
-  projectSettingsAddRole = "settings-input-user-role",
+  projectSettingsAddEmail = "input-settings-user-email",
+  projectSettingsAddRole = "input-settings-user-role",
   projectSettingsAddToProject = "button-add-user-to-project",
   projectSettingsEditUserButton = "button-selector-edit",
   projectSettingsDeleteUserButton = "button-selector-delete",
-  projectSettingsSearchUser = "input-selector-search",
   projectSettingsTable = "generic-selector-table",
 
   // Project Documents
@@ -264,15 +264,15 @@ export enum DataCy {
 
   traceMatrixTable = "view-trace-matrix-table",
 
-  traceMatrixTableRowTypeInput = "input-trace-matrix-table-row-types",
-  traceMatrixTableColTypeInput = "input-trace-matrix-table-col-types",
+  traceMatrixTableRowTypeInput = "input-trace-table-row-types",
+  traceMatrixTableColTypeInput = "input-trace-table-col-types",
 
   // Trace Link Generation
 
-  traceLinkTable = "table-trace-link",
-  traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
+  traceLinkTable = "table-trace-approval",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",
+  traceLinkTableApprovalInput = "input-approval-type",
 
   // Project Version
   projectSavingIndicator = "project-saving-indicator",

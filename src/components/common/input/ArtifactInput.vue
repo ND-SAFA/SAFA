@@ -12,6 +12,7 @@
     :options="options"
     option-label="name"
     option-value="id"
+    input-debounce="0"
     @filter="filter"
   >
     <template #option="{ opt, itemProps }">

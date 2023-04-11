@@ -16,6 +16,7 @@
       default-sort-desc
       :filter-row="filterRow"
       :custom-cells="customCells"
+      data-cy="table-trace-approval"
       @group:open="handleOpenGroup"
       @group:close="handleCloseGroup"
     >

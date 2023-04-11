@@ -1,5 +1,11 @@
 import { DataCy } from "@/fixtures";
 
+// 1 header row, 2 virtual scrolls, no traces.
+const emptyMatchRowCount = 1 + 2;
+
+// 1 header row, 2 virtual scrolls, 1 group row, 1 trace x 2 rows each.
+const singleMatchRowCount = 1 + 2 + 1 + 2;
+
 describe("Trace Link Approval", () => {
   before(() => {
     cy.initProject();
@@ -17,10 +23,13 @@ describe("Trace Link Approval", () => {
 
       cy.filterTraceApproval("approved");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // The header, group, and trace link.
-        tr.should("have.length", 3);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", singleMatchRowCount);
+        },
+        false
+      );
     });
 
     it("Can approve a declined trace link and check that it is approved", () => {
@@ -31,14 +40,17 @@ describe("Trace Link Approval", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
       // Filter for approved links.
-      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+      cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
       );
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // The header, group, and trace link.
-        tr.should("have.length", 3);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", singleMatchRowCount);
+        },
+        false
+      );
     });
   });
 
@@ -50,10 +62,13 @@ describe("Trace Link Approval", () => {
 
       cy.filterTraceApproval("declined");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // The header, group, and trace link.
-        tr.should("have.length", 3);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", singleMatchRowCount);
+        },
+        false
+      );
     });
 
     it("Can decline an approved trace link and check that it is declined", () => {
@@ -64,14 +79,17 @@ describe("Trace Link Approval", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
       // Filter for approved links.
-      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+      cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
         "{backspace}{downArrow}{enter}{esc}"
       );
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // The header, group, and trace link.
-        tr.should("have.length", 3);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", singleMatchRowCount);
+        },
+        false
+      );
     });
   });
 
@@ -81,10 +99,13 @@ describe("Trace Link Approval", () => {
         .filterTraceApproval("approved")
         .clickButton(DataCy.traceUnreviewButton);
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // Only the header and group rows, no traces.
-        tr.should("have.length", 2);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", emptyMatchRowCount);
+        },
+        false
+      );
     });
 
     it("Can un-review a declined trace link", () => {
@@ -92,10 +113,13 @@ describe("Trace Link Approval", () => {
         .filterTraceApproval("declined")
         .clickButton(DataCy.traceUnreviewButton);
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        // Only the header and group rows, no traces.
-        tr.should("have.length", 2);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.should("have.length", emptyMatchRowCount);
+        },
+        false
+      );
     });
   });
 });

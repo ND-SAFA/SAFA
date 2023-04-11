@@ -15,6 +15,7 @@
     :options="options"
     option-label="name"
     option-value="id"
+    input-debounce="0"
     @filter="filterOptions"
   >
     <template #prepend>

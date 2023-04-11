@@ -15,7 +15,12 @@
     data-cy="button-document-select-open"
   >
     <template #option="{ opt, itemProps }">
-      <list-item v-bind="itemProps" :title="opt.name" :action-cols="2">
+      <list-item
+        v-bind="itemProps"
+        :title="opt.name"
+        :action-cols="2"
+        :data-cy-name="opt.name"
+      >
         <template #actions>
           <icon-button
             v-if="canEdit(opt.name)"

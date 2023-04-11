@@ -29,9 +29,7 @@ Cypress.Commands.add("createNewVersion", (type) => {
     revision: DataCy.versionCreateRevisionButton,
   };
 
-  cy.getCy(DataCy.selectionVersionList).within(() => {
-    cy.clickButton(DataCy.selectorAddButton);
-  });
+  cy.clickButton(DataCy.selectorAddButton);
 
   cy.getCy(DataCy.versionCreateModal).within(() => {
     cy.clickButton(selectors[type]);

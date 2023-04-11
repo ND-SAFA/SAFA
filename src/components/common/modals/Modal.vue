@@ -1,5 +1,9 @@
 <template>
-  <q-dialog :model-value="props.open" @close="emit('close')">
+  <q-dialog
+    :model-value="props.open"
+    :data-cy="props.dataCy"
+    @close="emit('close')"
+  >
     <q-card :class="className">
       <q-card-section>
         <flex-box

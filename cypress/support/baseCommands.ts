@@ -60,7 +60,7 @@ Cypress.Commands.add("clickSelectOption", (dataCy, optionName) => {
 });
 
 Cypress.Commands.add("clickMenuOption", (optionName) => {
-  cy.get(`[role="menu"]`)
+  cy.get(`[role="listbox"]`)
     .contains(optionName, { matchCase: false })
     .first()
     .click();

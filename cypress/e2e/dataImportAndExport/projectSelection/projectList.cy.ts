@@ -2,7 +2,6 @@ import { DataCy, Routes, testProject, validUser } from "@/fixtures";
 
 describe("Project List", () => {
   before(() => {
-    cy.viewport(1080, 1080);
     cy.initEmptyProject().clearAllCookies();
   });
 

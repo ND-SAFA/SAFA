@@ -49,7 +49,6 @@ Cypress.Commands.add("clickButtonWithName", (name) => {
   cy.contains(name, { matchCase: false }).last().click();
 });
 
-// TODO: clickSelectOption is broken (.v-menu__content is not valid selector anymore)
 Cypress.Commands.add("clickSelectOption", (dataCy, optionName) => {
   cy.getCy(dataCy).parent().click();
   cy.get(".v-menu__content")

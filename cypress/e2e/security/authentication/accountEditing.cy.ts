@@ -33,11 +33,10 @@ describe("Account Editing", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
       // Test that the password was changed.
-      cy.logout();
-      cy.login(editUser.email, editUser.newPassword);
-      cy.visit(Routes.ACCOUNT);
-      cy.login(editUser.email, editUser.newPassword);
-      cy.locationShouldEqual(Routes.ACCOUNT);
+      cy.logout()
+        .visit(Routes.ACCOUNT)
+        .login(editUser.email, editUser.newPassword)
+        .locationShouldEqual(Routes.ACCOUNT);
 
       // Revert the password value.
       cy.inputText(DataCy.passwordCurrentInput, editUser.newPassword)

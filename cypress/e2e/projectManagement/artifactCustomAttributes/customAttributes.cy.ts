@@ -1,37 +1,24 @@
-import { DataCy } from "@/fixtures";
+import { DataCy, customAttribute } from "@/fixtures";
 describe("Custom Attributes", () => {
   before(() => {
     cy.initProject();
   });
 
   beforeEach(() => {
-    cy.dbResetProjects().initProject();
-    cy.initProjectVersion();
+    cy.initEmptyProject();
   });
 
-  const customAttribute = {
-    Key: "Test Key",
-    Label: "Test Label",
-    Min: "0",
-    Max: "1000",
-  };
-
   describe("I can add a custom attribute to my project", () => {
-    // TODO: Add a custom attribute to the project
     it("Adds a custom attribute to the project", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
       cy.clickButton(DataCy.addAttributeButton);
 
       // Fill in the form for the attribute
-      cy.getCy(DataCy.attributeKeyInput).type(customAttribute.Key);
-      cy.getCy(DataCy.attributeLabelInput).type(customAttribute.Label);
-
-      // This selector is disabled in the css from any key or mouse input
-      // cy.getCy(DataCy.attributeTypeInput).click().type("{downArrow}{enter}");
-
-      cy.getCy(DataCy.attributeMinInput).type(customAttribute.Min);
-      cy.getCy(DataCy.attributeMaxInput).type(customAttribute.Max);
+      cy.inputText(DataCy.attributeKeyInput, customAttribute.key);
+      cy.inputText(DataCy.attributeLabelInput, customAttribute.label);
+      cy.inputText(DataCy.attributeMinInput, customAttribute.min);
+      cy.inputText(DataCy.attributeMaxInput, customAttribute.max);
       cy.clickButton(DataCy.attributeSaveButton);
 
       // Verify that the attribute was added
@@ -45,8 +32,8 @@ describe("Custom Attributes", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
       cy.createCustomAttribute(customAttribute);
-      cy.clickButtonWithName("Test Label");
-      cy.getCy(DataCy.attributeLabelInput).clear().type("New Label");
+      cy.clickButtonWithName(customAttribute.label);
+      cy.inputText(DataCy.attributeLabelInput, "New Label", true);
       cy.clickButton(DataCy.attributeSaveButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.attributeTableItem)
@@ -60,7 +47,7 @@ describe("Custom Attributes", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
       cy.createCustomAttribute(customAttribute);
-      cy.clickButtonWithName("Test Label");
+      cy.clickButtonWithName(customAttribute.label);
       cy.clickButton(DataCy.attributeDeleteButton);
       cy.clickButton(DataCy.confirmModalButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -68,11 +55,20 @@ describe("Custom Attributes", () => {
     });
   });
 
-  describe.skip("I can generate FMEA attributes for traced artifact children", () => {
-    // TODO: Add this test once FMEA attributes are implemented
-  });
+  describe.skip("I can generate FMEA attributes for traced artifact children", () => {});
 
-  describe.skip("I cannot change the key or data type of a custom attribute", () => {
-    // TODO: Add this test one this feature is stable to implement
+  describe("I cannot change the key or data type of a custom attribute", () => {
+    it("Creates a custom attribute and checks that the key and data type are disabled", () => {
+      cy.clickButton(DataCy.navSettingsButton);
+      cy.clickButtonWithName("Custom Attributes");
+      cy.createCustomAttribute(customAttribute);
+      cy.clickButtonWithName(customAttribute.label);
+
+      // Let's make sure that the key and data input fields are disabled
+      cy.getCy(DataCy.attributeKeyInput)
+        .should("be.disabled")
+        .and("have.value", customAttribute.key);
+      cy.getCy(DataCy.attributeTypeInput).should("be.disabled");
+    });
   });
 });

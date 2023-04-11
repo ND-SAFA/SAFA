@@ -175,6 +175,7 @@ export enum DataCy {
   selectedPanelType = "text-selected-type",
   selectedPanelBody = "text-selected-body",
   selectedPanelBodyButton = "button-artifact-body",
+  selectedPanelCustomAttribute = "attribute-undefined",
   selectedPanelEditButton = "button-artifact-edit",
   selectedPanelDeleteButton = "button-artifact-delete",
 
@@ -288,6 +289,15 @@ export enum DataCy {
   attributeDeleteButton = "button-delete-attribute",
   attributeSaveButton = "button-save-attribute",
   attributeTableItem = "generic-list-item",
+
+  attributeTableItemPlusButton = "button-add-attribute-to-layout",
+  attributeLayoutAddButton = "button-attribute-layout-add",
+  attributeLayoutNameInput = "input-attribute-layout-name",
+  attributeLayoutTypeInput = "input-attribute-layout-artifact-types",
+  attributeLayoutSaveButton = "button-attribute-layout-save",
+  attributeLayoutDeleteAttributeButton = "button-attribute-layout-delete-attribute",
+  attributeLayoutDeleteButton = "button-attribute-layout-delete",
+  attributeLayoutConfirmDeleteButton = "button-confirm-modal",
 }
 
 export enum DataIds {

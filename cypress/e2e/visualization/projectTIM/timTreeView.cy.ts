@@ -9,13 +9,13 @@ describe("TIM Tree View", () => {
 
   describe("I can see the TIM tree of a document", () => {
     it("Shows all TIM artifact types", () => {
-      cy.getNode("design")
+      cy.getNode("Design")
         .should("be.visible")
         .within(() => {
           cy.contains("14 Artifacts");
         });
 
-      cy.getNode("requirement")
+      cy.getNode("Requirement")
         .should("be.visible")
         .within(() => {
           cy.contains("5 Artifacts");

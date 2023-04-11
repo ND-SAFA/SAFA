@@ -35,7 +35,7 @@ Cypress.Commands.add("filterTraceApproval", (filter) => {
     );
   } else if (filter === "declined") {
     cy.clickButton(DataCy.traceLinkTableApprovalInput).type(
-      "{backspace}declined{downArrow}{downArrow}{enter}"
+      "{backspace}declined{downArrow}{enter}"
     );
   } else {
     cy.clickButton(DataCy.traceLinkTableApprovalInput).type("{backspace}{esc}");

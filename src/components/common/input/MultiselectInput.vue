@@ -39,7 +39,7 @@ export default {
 
 <script setup lang="ts">
 import { withDefaults, computed, ref, watch } from "vue";
-import { SizeType } from "@/types";
+import { SelectOption, SizeType } from "@/types";
 import { typeOptionsStore, useMargins, useVModel } from "@/hooks";
 
 const props = withDefaults(
@@ -51,7 +51,7 @@ const props = withDefaults(
     /**
      * The options to select from.
      */
-    options: unknown[];
+    options: string[] | SelectOption[] | unknown[];
     /**
      * The key of an option's id.
      */
@@ -145,8 +145,15 @@ function filter(
     } else {
       const lowercaseSearchText = searchText.toLowerCase();
 
-      options.value = props.options.filter((option) =>
-        String(option).toLowerCase().includes(lowercaseSearchText)
+      options.value = props.options.filter(
+        (option: string | SelectOption | unknown) => {
+          const value =
+            !!option && typeof option === "object" && "name" in option
+              ? String(option.name)
+              : String(option);
+
+          return value.toLowerCase().includes(lowercaseSearchText);
+        }
       );
     }
   });

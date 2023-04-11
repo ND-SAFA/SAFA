@@ -162,7 +162,7 @@ async function handleUpdateChange(
       typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);
       break;
     case EntityType.DOCUMENT:
-      documentStore.updateDocuments(project.documents);
+      await documentStore.updateDocuments(project.documents);
       break;
     case EntityType.ARTIFACTS:
       artifactStore.addOrUpdateArtifacts(project.artifacts);

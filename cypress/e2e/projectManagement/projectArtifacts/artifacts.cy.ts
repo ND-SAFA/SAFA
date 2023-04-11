@@ -21,7 +21,7 @@ describe("Artifacts", () => {
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
       cy.inputText(DataCy.artifactSaveBodyInput, "New Artifact");
-      cy.inputText(DataCy.artifactSaveTypeInput, "", true);
+      cy.inputText(DataCy.artifactSaveTypeInput, "{backspace}");
 
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 

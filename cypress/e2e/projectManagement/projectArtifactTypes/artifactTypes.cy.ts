@@ -29,7 +29,7 @@ describe("Artifact Types", () => {
   });
 
   describe("I can change the icon of an artifact type", () => {
-    it.only("Changes the icon of a type", () => {
+    it("Changes the icon of a type", () => {
       const type = "Design";
 
       cy.switchToTimView();

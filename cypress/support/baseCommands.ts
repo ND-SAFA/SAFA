@@ -79,7 +79,7 @@ Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
     .should("be.visible")
     .within(() => {
       if (waitForLoad) {
-        cy.get(".v-data-table__progress").should("not.exist");
+        cy.get(".q-linear-progress__model").should("not.exist");
       }
 
       fn(cy.get("tr"));

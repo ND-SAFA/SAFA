@@ -76,15 +76,18 @@ const optionCountDisplay = computed(() =>
  * @param searchText - The search text to filter with.
  * @param update - A function call to update the options.
  */
-function filter(searchText: string, update: (fn: () => void) => void): void {
+function filter(
+  searchText: string | null,
+  update: (fn: () => void) => void
+): void {
   update(() => {
-    if (searchText === "") {
+    if (!searchText) {
       options.value = typeOptionsStore.artifactTypes;
     } else {
       const lowercaseSearchText = searchText.toLowerCase();
 
       options.value = typeOptionsStore.artifactTypes.filter((type) =>
-        type.toLowerCase().includes(lowercaseSearchText)
+        (type?.toLowerCase() || "").includes(lowercaseSearchText)
       );
     }
   });

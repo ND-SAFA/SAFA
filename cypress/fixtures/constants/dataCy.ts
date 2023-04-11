@@ -39,6 +39,7 @@ export enum DataCy {
   selectorAddButton = "button-selector-add",
   selectorEditButton = "button-selector-edit",
   selectorDeleteButton = "button-selector-delete",
+  selectorSearchInput = "input-selector-search",
 
   // Modals
 
@@ -214,12 +215,11 @@ export enum DataCy {
   projectSettingsEditButton = "button-settings-edit",
   projectSettingsDeleteButton = "button-settings-delete",
 
-  projectSettingsAddEmail = "settings-input-user-email",
-  projectSettingsAddRole = "settings-input-user-role",
+  projectSettingsAddEmail = "input-settings-user-email",
+  projectSettingsAddRole = "input-settings-user-role",
   projectSettingsAddToProject = "button-add-user-to-project",
   projectSettingsEditUserButton = "button-selector-edit",
   projectSettingsDeleteUserButton = "button-selector-delete",
-  projectSettingsSearchUser = "input-selector-search",
   projectSettingsTable = "generic-selector-table",
 
   // Project Documents

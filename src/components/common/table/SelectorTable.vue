@@ -20,7 +20,11 @@
 
     <template v-if="!props.minimal" #top>
       <flex-box full-width align="center" justify="between" y="2">
-        <searchbar v-model="searchText" :label="searchLabel" />
+        <searchbar
+          v-model="searchText"
+          :label="searchLabel"
+          data-cy="input-selector-search"
+        />
         <icon-button
           tooltip="Refresh"
           icon="graph-refresh"

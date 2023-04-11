@@ -4,7 +4,7 @@
       v-model="userEmail"
       label="Email"
       :error-message="emailErrorMessage"
-      data-cy="settings-input-user-email"
+      data-cy="input-settings-user-email"
     />
     <select-input
       v-model="userRole"
@@ -12,8 +12,9 @@
       :options="projectRoles"
       option-label="name"
       option-value="id"
+      option-to-value
       class="q-mb-lg"
-      data-cy="settings-input-user-role"
+      data-cy="input-settings-user-role"
     />
     <project-input v-if="!member" v-model="projectIds" multiple />
     <template #actions>

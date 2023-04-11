@@ -1,7 +1,7 @@
 import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("openProjectSettings", () => {
-  cy.clickButtonWithName("Settings");
+  cy.clickButton(DataCy.navSettingsButton);
 });
 
 Cypress.Commands.add("projectAddNewMember", (name, projectRole) => {
@@ -9,9 +9,9 @@ Cypress.Commands.add("projectAddNewMember", (name, projectRole) => {
 
   cy.inputText(DataCy.projectSettingsAddEmail, name);
 
-  cy.getCy(DataCy.projectSettingsAddRole)
-    .click({ force: true })
-    .type(`${projectRole}{enter}`, { force: true });
+  cy.clickButton(DataCy.projectSettingsAddRole).clickButtonWithName(
+    projectRole
+  );
 
   cy.clickButton(DataCy.projectSettingsAddToProject);
 });

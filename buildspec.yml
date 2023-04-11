@@ -15,6 +15,5 @@ phases:
       - git submodule update --init --recursive
       - docker build -t tgen-image .
       - docker tag tgen-image:latest 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
-      - $(aws ecr get-login --no-include-email)
       - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
 

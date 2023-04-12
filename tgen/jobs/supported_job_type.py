@@ -1,5 +1,3 @@
-from enum import Enum
-
 from tgen.jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.create_model_job import CreateModelJob
 from tgen.jobs.create_source_splits_job import CreateSourceSplitsJob
@@ -12,9 +10,10 @@ from tgen.jobs.predict_job import PredictJob
 from tgen.jobs.push_model_job import PushModelJob
 from tgen.jobs.train_job import TrainJob
 from tgen.jobs.vsm_job import VSMJob
+from tgen.util.supported_enum import SupportedEnum
 
 
-class SupportedJobType(Enum):
+class SupportedJobType(SupportedEnum):
     EXPORT_ARTIFACTS = ExportArtifactsJob
     PUSH_MODEL = PushModelJob
     CREATE_DATASETS = CreateDatasetsJob

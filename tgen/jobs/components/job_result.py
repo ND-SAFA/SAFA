@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
+
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainer_args import TrainerArgs
@@ -32,6 +34,11 @@ class JobResult(BaseObject):
     EXPORT_PATH = "export_path"
     PREDICTION_OUTPUT = "prediction_output"
     LABEL_IDS = "label_ids"
+
+    _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
+                   STATUS: Schema(type=TYPE_INTEGER),
+                   MODEL_PATH: Schema(type=TYPE_STRING),
+                   EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
         """
@@ -171,6 +178,21 @@ class JobResult(BaseObject):
         :return: None
         """
         JsonUtil.require_properties(self.__result, properties)
+
+    @staticmethod
+    def get_properties(response_keys: Union[str, list]) -> Dict:
+        """
+        Gets properties used to generate response documentation
+        :param response_keys: either a single response key or a list of response data_keys to get properties for
+        :return a dictionary of the response data_keys mapped to appropriate schema
+        """
+        if not isinstance(response_keys, list):
+            response_keys = [response_keys]
+        properties = {}
+        for key in response_keys:
+            if key in JobResult._properties:
+                properties[key] = JobResult._properties[key]
+        return properties
 
     def __getitem__(self, key: str) -> Any:
         """

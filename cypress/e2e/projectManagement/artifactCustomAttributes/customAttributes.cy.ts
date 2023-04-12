@@ -50,7 +50,6 @@ describe("Custom Attributes", () => {
 
   describe.skip("I can generate FMEA attributes for traced artifact children", () => {});
 
-  // There is a bug here
   describe("I cannot change the key or data type of a custom attribute", () => {
     it("Creates a custom attribute and checks that the key and data type are disabled", () => {
       cy.clickButton(DataCy.navSettingsButton);

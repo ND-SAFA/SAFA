@@ -212,12 +212,12 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         body.setRedirectLink(this.redirectLink);
 
         JiraAuthResponseDTO dto = WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                .uri(uri)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(JiraAuthResponseDTO.class)
+                this.webClient
+                        .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                        .uri(uri)
+                        .bodyValue(body)
+                        .retrieve()
+                        .bodyToMono(JiraAuthResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
 
         JiraAccessCredentialsDTO result = new JiraAccessCredentialsDTO();

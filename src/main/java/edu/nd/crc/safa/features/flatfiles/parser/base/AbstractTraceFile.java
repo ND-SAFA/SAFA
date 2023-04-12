@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFIle;
+import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Contains trace file constants and validation
  */
-public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEntity, I> implements ITraceFIle {
+public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEntity, I> implements ITraceFile {
 
     protected AbstractTraceFile(List<TraceAppEntity> entities) {
         super(entities);

@@ -21,16 +21,11 @@ public class UpdateProjectViaJiraBuilder extends CreateProjectViaJiraBuilder {
     }
 
     @Override
-    protected JiraIdentifier constructIdentifier() {
-        return this.jiraIdentifier;
-    }
-
-    @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new JiraProjectUpdateJob(
             jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.jiraIdentifier,
             user
         );
     }

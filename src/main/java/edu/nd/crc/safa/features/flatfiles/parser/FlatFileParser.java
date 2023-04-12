@@ -21,15 +21,15 @@ public class FlatFileParser {
     /**
      * List of artifact file definitions
      */
-    protected List<IDataFile<ArtifactAppEntity>> artifactFiles = new ArrayList<>();
+    protected List<IDataFile<ArtifactAppEntity>> artifactFiles;
     /**
      * List of trace link file definitions
      */
-    protected List<IDataFile<TraceAppEntity>> traceFiles = new ArrayList<>();
+    protected List<IDataFile<TraceAppEntity>> traceFiles;
     /**
      * List of trace generation requests.
      */
-    protected TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();
+    protected TraceGenerationRequest traceGenerationRequest;
 
     protected IProjectDefinitionParser timParser;
 

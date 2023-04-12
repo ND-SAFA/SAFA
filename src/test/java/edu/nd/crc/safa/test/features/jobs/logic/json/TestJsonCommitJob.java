@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  */
 class TestJsonCommitJob extends ApplicationBaseTest {
     final String description = "description";
-    final int N_STEPS = 3;
+    final int N_STEPS = 4;
     EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
 
     @Test

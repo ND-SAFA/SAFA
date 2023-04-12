@@ -16,12 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Builds job for updating project via flat files.
  */
-public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<ProjectVersion> {
+public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     /**
-     * ID of ProjectVersion being updated.
+     * ProjectVersion being updated.
      */
-    UUID versionId;
+    ProjectVersion projectVersion;
 
     /**
      * The files to parse
@@ -32,36 +32,29 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
                                              UUID versionId,
                                              MultipartFile[] files) {
         super(serviceProvider);
-        this.versionId = versionId;
+        this.projectVersion = this.serviceProvider.getProjectVersionRepository().findByVersionId(versionId);
         this.files = files;
     }
 
     @Override
-    protected ProjectVersion constructIdentifier() {
-        return this.serviceProvider
-            .getProjectVersionRepository()
-            .findByVersionId(versionId);
-    }
-
-    @Override
-    AbstractJob constructJobForWork() throws IOException {
-        uploadFlatFiles(this.identifier.getProject());
+    protected AbstractJob constructJobForWork() throws IOException {
+        uploadFlatFiles(this.projectVersion.getProject());
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.projectVersion,
             files);
     }
 
     @Override
-    String getJobName() {
-        return this.identifier.getProject().getName();
+    protected String getJobName() {
+        return this.projectVersion.getProject().getName();
     }
 
     @Override
-    Class<? extends AbstractJob> getJobType() {
+    protected Class<? extends AbstractJob> getJobType() {
         return FlatFileProjectCreationJob.class;
     }
 

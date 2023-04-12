@@ -14,21 +14,17 @@ import lombok.AllArgsConstructor;
 /**
  * Defines a job performing some actions on some identified entity.
  */
-public abstract class AbstractJobBuilder<I> {
+public abstract class AbstractJobBuilder {
     /**
      * List of services.
      */
     protected ServiceProvider serviceProvider;
     /**
-     * Input to job builder.
-     */
-    I identifier;
-    /**
      * The database entity for this job.
      */
-    JobDbEntity jobDbEntity;
+    protected JobDbEntity jobDbEntity;
 
-    SafaUser user;
+    protected SafaUser user;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {
         this(serviceProvider, null);
@@ -40,10 +36,7 @@ public abstract class AbstractJobBuilder<I> {
     }
 
     public JobAppEntity perform() throws Exception {
-        // Step 1 - Select project version to change
-        this.identifier = this.constructIdentifier();
-
-        // Step 2 - Create database entity
+        // Step 1 - Create database entity
         JobService jobService = this.serviceProvider.getJobService();
 
         if (this.user == null) {
@@ -58,33 +51,28 @@ public abstract class AbstractJobBuilder<I> {
         // Step 4 - Start job
         this.serviceProvider
             .getJobService()
-            .executeJob(this.jobDbEntity, this.serviceProvider, abstractJob);
+            .executeJob(this.serviceProvider, abstractJob);
 
         // Step 5 - Return job
         return JobAppEntity.createFromJob(this.jobDbEntity);
     }
 
     /**
-     * Step 1 - Find project version that is getting affected.
+     * Creates job definition for change.
      */
-    protected abstract I constructIdentifier();
-
-    /**
-     * Step 2 - Creates job definition for change.
-     */
-    abstract AbstractJob constructJobForWork() throws IOException;
+    protected abstract AbstractJob constructJobForWork() throws IOException;
 
     /**
      * Returns the name of the job.
      *
      * @return The name of the job.
      */
-    abstract String getJobName();
+    protected abstract String getJobName();
 
     /**
      * @return The type of job used to identify operation being performed.return
      */
-    abstract Class<? extends AbstractJob> getJobType();
+    protected abstract Class<? extends AbstractJob> getJobType();
 
     @AllArgsConstructor
     protected static class JobDefinition {

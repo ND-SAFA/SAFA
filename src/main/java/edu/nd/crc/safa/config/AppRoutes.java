@@ -81,7 +81,6 @@ public class AppRoutes {
         public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
             + "/versions/{versionId}/flat-files";
         public static final String DOWNLOAD_FLAT_FILES = UPDATE_PROJECT_VERSION_FROM_FLAT_FILES + "/{fileType}";
-        public static final String CREATE_NEW_PROJECT_FROM_FLAT_FILES = Projects.ROOT + "/flat-files";
         public static final String PARSE_ARTIFACT_FILE = Projects.ROOT + "/parse/artifacts/{artifactType}";
         public static final String PARSE_TRACE_FILE = Projects.ROOT + "/parse/traces";
 

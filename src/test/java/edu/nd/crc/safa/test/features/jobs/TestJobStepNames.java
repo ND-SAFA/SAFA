@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
+import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
@@ -20,14 +20,15 @@ import org.junit.jupiter.api.Test;
 class TestJobStepNames extends ApplicationBaseTest {
     @Test
     void negativeIndices() {
-        assertThat(AbstractJob.getStepIndex(-1, 1)).isEqualTo(0);
-        assertThat(AbstractJob.getStepIndex(-2, 5)).isEqualTo(3);
+        assertThat(JobExecutionUtilities.getStepIndex(-1, 1)).isEqualTo(0);
+        assertThat(JobExecutionUtilities.getStepIndex(-2, 5)).isEqualTo(3);
     }
 
     @Test
     void testCommitJobSteps() {
         List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaJsonJob.class);
         String[] expectedStepNames = new String[]{
+            "Creating Project",
             "Generating Trace Links",
             "Committing Entities",
             "Done"
@@ -67,6 +68,7 @@ class TestJobStepNames extends ApplicationBaseTest {
             "Authenticating User Credentials",
             "Retrieving Jira Project",
             "Creating SAFA Project",
+            "Creating SAFA Project to Jira Project Mapping",
             "Importing Issues and Links",
             "Committing Entities",
             "Done"

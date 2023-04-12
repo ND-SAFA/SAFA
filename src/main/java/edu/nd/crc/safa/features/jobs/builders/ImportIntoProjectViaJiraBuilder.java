@@ -22,16 +22,11 @@ public class ImportIntoProjectViaJiraBuilder extends CreateProjectViaJiraBuilder
     }
 
     @Override
-    protected JiraIdentifier constructIdentifier() {
-        return this.jiraIdentifier;
-    }
-
-    @Override
-    AbstractJob constructJobForWork() {
+    protected AbstractJob constructJobForWork() {
         return new JiraProjectImportJob(
             jobDbEntity,
             serviceProvider,
-            this.identifier,
+            this.jiraIdentifier,
             user
         );
     }

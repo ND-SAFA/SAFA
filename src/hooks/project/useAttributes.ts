@@ -34,12 +34,10 @@ export const useAttributes = defineStore("attributes", {
      *
      * @return The default layout for artifact attributes.
      */
-    defaultLayout(): AttributePositionSchema[] {
-      const layout = this.attributeLayouts.find(
+    defaultLayout(): AttributeLayoutSchema | undefined {
+      return this.attributeLayouts.find(
         ({ artifactTypes }) => artifactTypes.length === 0
       );
-
-      return layout?.positions || [];
     },
   },
   actions: {
@@ -121,7 +119,7 @@ export const useAttributes = defineStore("attributes", {
       return (
         this.attributeLayouts.find(({ artifactTypes }) =>
           artifactTypes.includes(type)
-        ) || this.attributeLayouts[0]
+        ) || this.defaultLayout
       );
     },
     /**

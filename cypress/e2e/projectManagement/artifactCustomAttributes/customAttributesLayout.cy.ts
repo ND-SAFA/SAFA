@@ -48,7 +48,7 @@ describe("Custom Attributes Layout", () => {
   });
 
   describe("I can see different layouts of custom attributes based on an artifact's type", () => {
-    it.only("Verifies that the layout is applied to the artifact of the correct type", () => {
+    it("Verifies that the layout is applied only to the artifact of the correct type", () => {
       cy.clickButton(DataCy.navArtifactViewButton).clickButton(
         DataCy.navTableButton
       );

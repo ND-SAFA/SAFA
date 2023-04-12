@@ -129,6 +129,8 @@ class OpenAITrainer(iTrainer):
         :param probs: The probabilities of each top completion
         :return: The softmax score from the predicted completions
         """
+        assert isinstance(self.prompt_generator,
+                          ClassificationPromptGenerator), "Must provide a classification prompt generator to get prediction score"
         if len(probs) < 1:
             return 0.5
         probs = probs[0]

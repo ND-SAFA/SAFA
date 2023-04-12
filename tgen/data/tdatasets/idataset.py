@@ -16,9 +16,9 @@ class iDataset(BaseObject):
         """
 
     @abstractmethod
-    def to_trainer_dataset(self, model_generator: ModelManager) -> Any:
+    def to_trainer_dataset(self, **kwargs) -> Any:
         """
         Converts data to that used by Huggingface (HF) trainer.
-        :param model_generator: The model generator determining architecture and feature function for trace links.
+        :param kwargs: The arguments needed to create the trainer dataset
         :return: A data used by the HF trainer.
         """

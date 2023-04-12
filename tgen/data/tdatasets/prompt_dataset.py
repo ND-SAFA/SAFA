@@ -41,7 +41,7 @@ class PromptDataset(iDataset):
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
         if not self.project_file_id and prompt_df is None:
-            assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe to generate dataset."
+            assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe must be provided to generate dataset."
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """

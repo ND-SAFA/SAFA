@@ -6,15 +6,15 @@ from typing import List, Union
 
 import tiktoken
 
-from tgen.data.chunkers.open_ai_token_limits import ModelTokenLimits
-from tgen.util.file_util import FileUtil
+from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.util.override import overrides
 
 NODE = Union[ast.AST, ast.stmt]
 
 
-class PythonChunker:
+class PythonChunker(AbstractChunker):
     """
-    Handles chunking for python files
+    Handles chunking Python code into chunks within a model's token limit
     """
 
     IGNORED_NODES = [ast.Import, ast.ImportFrom]
@@ -26,18 +26,16 @@ class PythonChunker:
         :param model_name: The model that will be doing the tokenization
         :return: The approximate number of tokens
         """
-        self.model_name = model_name
-        self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name)
+        super().__init__(model_name)
 
-    def chunk(self, path_to_code: str) -> List[str]:
+    def _chunk(self, content: str) -> List[str]:
         """
-        Chunks the given file into pieces that are beneath the model's token limit
-        :param path_to_code: The path to the python file to chunk
+        Chunks the given python code into pieces that are beneath the model's token limit
+        :param content: The code to be chunked
         :return: The nodes chunked into sizes beneath the token limit
         """
-        file_content = FileUtil.read_file(path_to_code)
-        lines = [self._replace_white_space_with_tab(line) for line in file_content.split(os.linesep)]
-        nodes = ast.parse(file_content)
+        lines = [self._replace_white_space_with_tab(line) for line in content.split(os.linesep)]
+        nodes = ast.parse(content)
         chunks = self.__chunk_helper(nodes, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks]
 
@@ -54,25 +52,18 @@ class PythonChunker:
         for chunk in potential_chunks:
             content = self._get_node_content(chunk, lines)
             if self.exceeds_token_limit(content):
-                if len(chunk.body) < 1:
+                if not hasattr(chunk, "body"):
                     chunks.append(self._resize_node(chunk, lines))
                 else:
                     new_chunks = self.__chunk_helper(chunk, lines)
-                    chunk.end_lineno = new_chunks[0].lineno-2  # ensure no content from parent is lost
+                    chunk.end_lineno = new_chunks[0].lineno - 2  # ensure no content from parent is lost
                     chunks.extend([chunk] + new_chunks)
             else:
                 chunks.append(chunk)
         return chunks
 
-    def exceeds_token_limit(self, content: str) -> bool:
-        """
-        Returns true if the given content exceeds the token limit for the model.
-        :param content: The content to check
-        :return: True if the content exceeds the token limit for the model else False
-        """
-        return self.estimate_num_tokens(content, self.model_name) > self.token_limit
-
     @staticmethod
+    @overrides(AbstractChunker)
     def estimate_num_tokens(content: str, model_name: str) -> int:
         """
         Approximates the number of tokens that some content will be tokenized into by a given model.
@@ -131,6 +122,6 @@ class PythonChunker:
         needs_tab = re.match('^[ ]{2,}', orig_str)
         if needs_tab:
             num_spaces = needs_tab.regs[0][1] - needs_tab.regs[0][0]
-            tabs = '\t' * math.floor(num_spaces/PythonChunker.N_SPACE_TO_TAB)
+            tabs = '\t' * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
             return re.sub(r'^[ ]{2,}', tabs, orig_str)
         return orig_str

@@ -13,7 +13,7 @@ class TestPythonChunker(BaseTest):
 
     def test_chunk(self):
         chunker = self.get_chunker()
-        chunks = chunker.chunk(self.DATA_PATH)
+        chunks = chunker.chunk(path_to_file=self.DATA_PATH)
         all_content = FileUtil.read_file(self.DATA_PATH).split("\n")
         chunked_content = "\n".join(chunks)
         for line in all_content:

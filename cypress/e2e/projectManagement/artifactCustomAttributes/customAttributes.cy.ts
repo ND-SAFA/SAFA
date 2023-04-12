@@ -1,19 +1,14 @@
 import { DataCy, customAttribute } from "@/fixtures";
 describe("Custom Attributes", () => {
-  before(() => {
-    cy.initProject();
-  });
-
   beforeEach(() => {
-    cy.initEmptyProject();
+    cy.initProject().initProjectVersion();
   });
 
   describe("I can add a custom attribute to my project", () => {
     it("Adds a custom attribute to the project", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
-      cy.clickButton(DataCy.addAttributeButton);
-
+      cy.clickButton(DataCy.addAttributeButton, "first", true);
       // Fill in the form for the attribute
       cy.inputText(DataCy.attributeKeyInput, customAttribute.key);
       cy.inputText(DataCy.attributeLabelInput, customAttribute.label);
@@ -36,9 +31,7 @@ describe("Custom Attributes", () => {
       cy.inputText(DataCy.attributeLabelInput, "New Label", true);
       cy.clickButton(DataCy.attributeSaveButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.attributeTableItem)
-        .should("be.visible")
-        .and("contain", "New Label");
+      cy.getCy(DataCy.attributeTableItem).should("contain", "New Label");
     });
   });
 

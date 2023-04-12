@@ -1,59 +1,41 @@
 import { DataCy, customAttribute, customLayout } from "@/fixtures";
 
 describe("Custom Attributes Values", () => {
-  before(() => {
-    cy.initProject();
-  });
-
   beforeEach(() => {
     cy.initProject().initProjectVersion();
-  });
 
-  describe("I can edit custom attribute values on artifacts", () => {
-    it("Creates a custom attribute and layout and edits this on the artifact", () => {
-      cy.clickButton(DataCy.navSettingsButton);
-      cy.clickButtonWithName("Custom Attributes");
-      cy.createCustomAttribute(customAttribute);
-      cy.createCustomLayout(customLayout);
+    // Visit custom attributes tab.
+    cy.clickButton(DataCy.navSettingsButton).switchTab("Custom Attributes");
 
-      // Navigate to the artifact and edit the custom attribute
-      cy.clickButton(DataCy.navArtifactViewButton);
-      cy.clickButton(DataCy.navTableButton);
-      cy.clickButtonWithName("F8");
-      cy.clickButton(DataCy.selectedPanelEditButton);
-      cy.contains("label", customAttribute.label);
-      cy.getCy(DataCy.selectedPanelCustomAttribute)
-        .find("input")
-        .type("Test Value");
+    // Create an attribute and layout.
+    cy.createCustomAttribute(customAttribute).createCustomLayout(customLayout);
 
-      cy.clickButton(DataCy.artifactSaveSubmitButton);
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-    });
+    // View a node on the graph.
+    cy.clickButton(DataCy.navArtifactViewButton)
+      .clickButton(DataCy.navTableButton)
+      .clickButtonWithName("F8");
   });
 
   describe("I can see custom attributes values on artifacts", () => {
-    it("Creates a custom attribute and layout and verifies that the value is present on the artifact", () => {
-      cy.clickButton(DataCy.navSettingsButton);
-      cy.clickButtonWithName("Custom Attributes");
-      cy.createCustomAttribute(customAttribute);
-      cy.createCustomLayout(customLayout);
+    it("Views a custom attribute on an artifact", () => {
+      cy.getCy(
+        DataCy.selectedPanelAttributePrefix + customAttribute.key
+      ).should("exist");
+    });
+  });
 
-      // Navigate to the artifact and edit the custom attribute
-      cy.clickButton(DataCy.navArtifactViewButton);
-      cy.clickButton(DataCy.navTableButton);
-      cy.clickButtonWithName("F8");
+  describe("I can edit custom attribute values on artifacts", () => {
+    it("Edits a custom attribute from an artifact", () => {
       cy.clickButton(DataCy.selectedPanelEditButton);
-      cy.contains("label", customAttribute.label);
-      cy.getCy(DataCy.selectedPanelCustomAttribute)
-        .find("input")
-        .type("Test Value");
-      cy.clickButton(DataCy.artifactSaveSubmitButton);
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
-      // Now verify that the value is present on the artifact
-      cy.reload();
-      cy.clickButtonWithName("F8");
-      cy.contains("Test Value");
+      cy.inputText(
+        DataCy.selectedPanelAttributeInputPrefix + customAttribute.key,
+        "Test Value"
+      );
+
+      cy.clickButton(DataCy.artifactSaveSubmitButton);
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });
 

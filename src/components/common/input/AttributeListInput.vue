@@ -5,7 +5,7 @@
         class="q-mr-sm q-pb-md"
         :attributes="attributes"
         :attribute="attribute"
-        :data-cy="`attribute-${attribute.name}`"
+        :data-cy="`input-attribute-${attribute.key}`"
       />
     </template>
   </attribute-grid>

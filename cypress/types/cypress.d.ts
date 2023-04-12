@@ -27,6 +27,24 @@ interface DocumentFields {
   childArtifacts?: string;
 }
 
+/**
+ * Represents fields that can be filled in to create an attribute.
+ */
+interface AttributeFields {
+  key?: string;
+  label?: string;
+  min?: string;
+  max?: string;
+}
+
+/**
+ * Represents fields that can be filled in to create an attribute layout.
+ */
+interface AttributeLayoutFields {
+  name?: string;
+  type?: string;
+}
+
 declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
@@ -546,20 +564,36 @@ declare namespace Cypress {
     // Custom Attributes
 
     /**
+     * Fills inputs in the custom attribute panel.
+     *
+     * @param props - The attribute fields to set.
+     */
+    fillCustomAttributeFields(props: AttributeFields): Chainable<void>;
+
+    /**
      * Creates a new custom attribute.
      * The custom attribute panel must be open.
      *
-     * @param customAttribute - The custom attribute definition to create.
+     * @param props - The attribute fields to set.
      */
-    createCustomAttribute(customAttribute): Chainable<void>;
+    createCustomAttribute(props: AttributeFields): Chainable<void>;
+
+    /**
+     * Fills inputs in the custom attribute layout panel.
+     * The custom attribute panel must be open and a custom attribute must be made
+     * before this is called.
+     *
+     * @param props - The custom layout fields to set.
+     */
+    fillCustomLayoutFields(props: AttributeLayoutFields): Chainable<void>;
 
     /**
      * Creates a new custom Layout.
      * The custom attribute panel must be open and a custom attribute must be made
      * before this is called.
      *
-     * @param customLayout - The custom layout definition to create.
+     * @param props - The custom layout fields to set.
      */
-    createCustomLayout(customLayout): Chainable<void>;
+    createCustomLayout(props: AttributeLayoutFields): Chainable<void>;
   }
 }

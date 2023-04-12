@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :data-cy="dataCy">
     <typography
       v-if="props.showName"
       variant="caption"
@@ -43,6 +43,8 @@ const props = defineProps<{
    */
   showName?: boolean;
 }>();
+
+const dataCy = computed(() => `text-attribute-${props.attribute.key}`);
 
 /**
  * The display values for an array attribute.

@@ -1,5 +1,5 @@
 export const customAttribute = {
-  key: "Test Key",
+  key: "testKey",
   label: "Test Label",
   min: "0",
   max: "1000",

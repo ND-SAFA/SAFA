@@ -3,6 +3,7 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -12,13 +13,12 @@ from tgen.data.readers.definitions.structure_project_definition import Structure
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment_step import ExperimentStep
-from tgen.jobs.abstract_trace_job import AbstractTraceJob
-from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.predict_job import PredictJob
-from tgen.jobs.train_job import TrainJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.hugging_face.trainer_args import TrainerArgs
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.file_util import FileUtil
 from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable
@@ -29,7 +29,7 @@ class TestExperimentStep(BaseExperimentTest):
                        "trainer_args.num_train_epochs"]
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
-    @patch.object(TrainJob, "_run")
+    @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         train_job_run_mock.side_effect = self.job_fake_run
         definition_mock.return_value = StructureProjectDefinition()
@@ -47,7 +47,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(train_job_run_mock.call_count, 4)
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
-    @patch.object(TrainJob, "_run")
+    @patch.object(HuggingFaceJob, "_run")
     def test_run_failed(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         train_job_run_mock.side_effect = ValueError()
         definition_mock.return_value = StructureProjectDefinition()
@@ -57,7 +57,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEqual(train_job_run_mock.call_count, 1)
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
-    @patch.object(PredictJob, "_run")
+    @patch.object(HuggingFaceJob, "_run")
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
         definition_mock.return_value = StructureProjectDefinition()
@@ -105,7 +105,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(results[0], results[1])  # Nothing differentiating the two paths other than id which is set by experiment
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
-    @patch.object(AbstractTraceJob, "get_trainer")
+    @patch.object(AbstractTrainerJob, "get_trainer")
     def test_get_best_job(self, get_trainer_mock, definition_mock: mock.MagicMock):
         definition_mock.return_value = StructureProjectDefinition()
         job1, job2 = self.get_test_jobs()
@@ -140,10 +140,12 @@ class TestExperimentStep(BaseExperimentTest):
 
     @staticmethod
     def get_test_jobs():
-        job1 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), TrainerDatasetManager(),
-                        TrainerArgs(output_dir=TEST_OUTPUT_DIR))
-        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), TrainerDatasetManager(),
-                        TrainerArgs(output_dir=TEST_OUTPUT_DIR))
+        job1 = HuggingFaceJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR), model_manager=ModelManager(TEST_OUTPUT_DIR),
+                              trainer_dataset_manager=TrainerDatasetManager(),
+                              trainer_args=HuggingFaceArgs(output_dir=TEST_OUTPUT_DIR), task=TrainerTask.TRAIN)
+        job2 = HuggingFaceJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR), model_manager=ModelManager(TEST_OUTPUT_DIR),
+                              trainer_dataset_manager=TrainerDatasetManager(),
+                              trainer_args=HuggingFaceArgs(output_dir=TEST_OUTPUT_DIR), task=TrainerTask.TRAIN)
         return [job1, job2]
 
     @staticmethod

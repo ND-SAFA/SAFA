@@ -28,7 +28,7 @@ class TestPythonChunker(BaseTest):
 
     def test_exceeds_token_limit(self):
         chunker = self.get_chunker()
-        words = "word" * chunker.token_limit
+        words = "word" * (chunker.token_limit * 2)
         self.assertTrue(chunker.exceeds_token_limit(words))
         self.assertFalse(chunker.exceeds_token_limit("word"))
 

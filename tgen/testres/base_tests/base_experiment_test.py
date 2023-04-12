@@ -7,6 +7,7 @@ from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.constants import OUTPUT_FILENAME
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.supported_job_type import SupportedJobType
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.multi_variable import MultiVariable
@@ -21,7 +22,8 @@ class BaseExperimentTest(BaseTest):
         "steps": MultiVariable([
             DefinitionVariable({
                 "jobs": MultiVariable([TypedDefinitionVariable({
-                    TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
+                    TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.HUGGING_FACE.name,
+                    "task": TrainerTask.TRAIN,
                     "job_args": DefinitionVariable({
                     }),
                     "model_manager": DefinitionVariable({
@@ -46,7 +48,8 @@ class BaseExperimentTest(BaseTest):
                 })
             }),
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.HUGGING_FACE.name,
+                "task": TrainerTask.PREDICT,
                 "job_args": DefinitionVariable({
                 }),
                 "model_manager": DefinitionVariable({

@@ -3,7 +3,8 @@
     {
       "jobs": [
         {
-          "object_type": "PREDICT",
+          "object_type": "HUGGING_FACE",
+          "task": "PREDICT",
           "job_args": {
             "random_seed": 812
           },

@@ -11,7 +11,7 @@ import torch
 import wandb
 
 from tgen.constants import OUTPUT_FILENAME
-from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
 from tgen.util.base_object import BaseObject

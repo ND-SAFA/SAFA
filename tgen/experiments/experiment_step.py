@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 from tgen.constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.wandb.Wandb import Wandb
@@ -136,7 +136,7 @@ class ExperimentStep(BaseObject):
             return None
         best_job = best_job if best_job else jobs[0]
         for job in jobs:
-            if isinstance(job, AbstractTraceJob):
+            if isinstance(job, AbstractTrainerJob):
                 if best_job is None or job.result.is_better_than(best_job.result, self.comparison_criterion):
                     best_job = job
         return best_job
@@ -154,7 +154,7 @@ class ExperimentStep(BaseObject):
                 job.result[JobResult.EXPERIMENTAL_VARS] = {}
             if experimental_vars:
                 job.result[JobResult.EXPERIMENTAL_VARS].update(experimental_vars[i])
-                if isinstance(job, AbstractTraceJob):
+                if isinstance(job, AbstractTrainerJob):
                     job.trainer_args.experimental_vars = experimental_vars[i]
         return jobs
 
@@ -181,7 +181,7 @@ class ExperimentStep(BaseObject):
         for job in self.jobs:
             run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS], str(job.id))
             job_base_path = os.path.join(output_dir, run_name)
-            if isinstance(job, AbstractTraceJob):
+            if isinstance(job, AbstractTrainerJob):
                 model_path = os.path.join(job_base_path, "models")
                 setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job

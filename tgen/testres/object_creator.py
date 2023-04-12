@@ -9,14 +9,15 @@ from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
-from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.train.hugging_face.trainer_args import TrainerArgs
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.testres.definition_creator import DefinitionCreator
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 ObjectType = TypeVar("ObjectType")
@@ -73,7 +74,8 @@ class ObjectCreator:
     }
 
     experiment_train_job_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.HUGGING_FACE.name,
+        "task": TrainerTask.TRAIN,
         "model_manager": model_manager_definition,
         "job_args": {},
         "trainer_dataset_manager": {
@@ -92,7 +94,8 @@ class ObjectCreator:
     }
 
     experiment_predict_job_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.HUGGING_FACE.name,
+        "task": TrainerTask.PREDICT,
         "model_manager": model_manager_definition,
         "job_args": {},
         "trainer_dataset_manager": {
@@ -115,7 +118,7 @@ class ObjectCreator:
                              "output_dir": TEST_OUTPUT_DIR}
 
     SUPPORTED_OBJECTS = {
-        TrainerArgs: trainer_args_definition,
+        HuggingFaceArgs: trainer_args_definition,
         JobArgs: job_args_definition,
         TraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,

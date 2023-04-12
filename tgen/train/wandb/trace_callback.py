@@ -3,7 +3,7 @@ import os
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
-from tgen.train.hugging_face.trainer_args import TrainerArgs
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.train.wandb.Wandb import Wandb
 
 
@@ -12,7 +12,7 @@ class TraceCallback(WandbCallback):
     Contains modifications including setting group of run.
     """
 
-    def setup(self, args: TrainerArgs, state, model, **kwargs) -> None:
+    def setup(self, args: HuggingFaceArgs, state, model, **kwargs) -> None:
         """
         Initialize wandb with the correct group name using experimental variables.
         :param args: The trainer args used to identify run.

@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.hugging_face.trainer_args import TrainerArgs
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.json_util import JsonUtil
 from tgen.util.status import Status
@@ -123,7 +123,7 @@ class JobResult(BaseObject):
             return repr(None)
         printable = {}
         for name, val in self[JobResult.EXPERIMENTAL_VARS].items():
-            if not isinstance(val, BaseObject) and not isinstance(val, TrainerArgs):
+            if not isinstance(val, BaseObject) and not isinstance(val, HuggingFaceArgs):
                 printable[name] = val
         return repr(printable)
 

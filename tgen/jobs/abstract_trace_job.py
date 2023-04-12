@@ -1,5 +1,6 @@
 import os
 from abc import ABC
+from dataclasses import dataclass
 from typing import Any, Optional, Type
 
 from tgen.constants import BEST_MODEL_NAME
@@ -10,7 +11,6 @@ from tgen.jobs.components.job_args import JobArgs
 from tgen.jobs.create_datasets_job import CreateDatasetsJob
 from tgen.models.model_manager import ModelManager
 from tgen.train.hugging_face.trace_trainer import TraceTrainer
-from tgen.train.hugging_face.trainer_args import TrainerArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 from tgen.util.reflection_util import ReflectionUtil
@@ -19,8 +19,8 @@ from tgen.variables.definition_variable import DefinitionVariable
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, job_args: JobArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs):
+    def __init__(self, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager, trainer_args: dataclass,
+                 job_args: JobArgs = None):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job
@@ -39,7 +39,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         Runs the job and saves the output
         """
         if self.job_args.save_dataset_splits:
-            CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()
+            CreateDatasetsJob(self.trainer_dataset_manager, self.job_args).run()
         return super().run()
 
     def get_trainer(self, **kwargs) -> TraceTrainer:

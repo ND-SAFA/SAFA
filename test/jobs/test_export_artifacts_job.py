@@ -50,4 +50,4 @@ class TestExportArtifactsJob(BaseJobTest):
         job_args = ObjectCreator.create(JobArgs)
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager)
         trace_project_creator: TraceDatasetCreator = trainer_dataset_manager.get_creator(DatasetRole.TRAIN)
-        return ExportArtifactsJob(job_args, trace_project_creator, **kwargs)
+        return ExportArtifactsJob(trace_project_creator, job_args, **kwargs)

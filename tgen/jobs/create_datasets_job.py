@@ -7,8 +7,7 @@ from tgen.jobs.components.job_result import JobResult
 
 class CreateDatasetsJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager,
-                 export_path: str,
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, export_path: str, job_args: JobArgs = None,
                  format_type: SupportedDatasetExporter = SupportedDatasetExporter.CSV):
         """
         Responsible for creating and saving new data

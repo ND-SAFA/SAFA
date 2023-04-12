@@ -35,5 +35,5 @@ class TestCreateDatasetJobSAFA(BaseJobTest):
         job_args = ObjectCreator.create(JobArgs)
         dataset_creator = ObjectCreator.create(TraceDatasetCreator)
         trainer_dataset_manager = TrainerDatasetManager(train_dataset_creator=dataset_creator)
-        return CreateDatasetsJob(job_args=job_args, export_path=TEST_OUTPUT_DIR, trainer_dataset_manager=trainer_dataset_manager,
+        return CreateDatasetsJob(trainer_dataset_manager=trainer_dataset_manager, export_path=TEST_OUTPUT_DIR, job_args=job_args,
                                  format_type=SupportedDatasetExporter.SAFA)

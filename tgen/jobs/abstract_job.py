@@ -24,14 +24,14 @@ from tgen.util.status import Status
 
 class AbstractJob(threading.Thread, BaseObject):
 
-    def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):
+    def __init__(self, job_args: JobArgs = None, model_manager: ModelManager = None):
         """
         The base job class
         :param job_args: The arguments to the job.
         :param model_manager: the model manager
         """
         super().__init__()
-        self.job_args = job_args
+        self.job_args = job_args if job_args else JobArgs()
         self.model_manager = model_manager
         self.result = JobResult()
         self.id = uuid.uuid4()

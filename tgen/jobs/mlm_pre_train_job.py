@@ -17,9 +17,8 @@ from tgen.train.hugging_face.trainer_args import TrainerArgs
 
 class MLMPreTrainJob(TrainJob):
 
-    def __init__(self, job_args: JobArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs,
-                 mlm_probability: float = MLM_PROBABILITY_DEFAULT):
+    def __init__(self, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs,
+                 job_args: JobArgs = None, mlm_probability: float = MLM_PROBABILITY_DEFAULT):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job
@@ -29,7 +28,7 @@ class MLMPreTrainJob(TrainJob):
         :param mlm_probability: the probability for the masking a word in the learning model
         """
         model_manager.model_task = ModelTask.MASKED_LEARNING
-        super().__init__(job_args, model_manager, trainer_dataset_manager, trainer_args)
+        super().__init__(model_manager, trainer_dataset_manager, trainer_args, job_args)
         self.mlm_probability = mlm_probability
 
     def _run(self) -> JobResult:

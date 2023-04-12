@@ -17,8 +17,7 @@ class VSMJob(AbstractTraceJob):
     Handles VSM training + prediction
     """
 
-    def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager,
-                 metrics: List[str] = None):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, job_args: JobArgs = None, metrics: List[str] = None):
         """
         Handles VSM training + prediction
         :param job_args: the arguments for the job
@@ -27,8 +26,8 @@ class VSMJob(AbstractTraceJob):
         """
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
-        super().__init__(job_args=job_args, model_manager=ModelManager("VSM"), trainer_dataset_manager=trainer_dataset_manager,
-                         trainer_args=TrainerArgs(output_dir=job_args.output_dir))
+        super().__init__(model_manager=ModelManager("VSM"), trainer_dataset_manager=trainer_dataset_manager,
+                         trainer_args=TrainerArgs(output_dir=job_args.output_dir), job_args=job_args)
         self.metrics = metrics
         self._trainer: Optional[VSMTrainer] = None
 

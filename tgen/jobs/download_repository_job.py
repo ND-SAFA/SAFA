@@ -13,7 +13,7 @@ class DownloadRepositoryJob(AbstractJob):
     and their corresponding trace links from them.
     """
 
-    def __init__(self, job_args: JobArgs, repo_name: str, artifact_store_path: str, clone_path: str, output_path: str,
+    def __init__(self, repo_name: str, artifact_store_path: str, clone_path: str, output_path: str, job_args: JobArgs = None,
                  load: bool = False):
         """
         Constructs downloader for repo.

@@ -14,7 +14,8 @@ class ExportArtifactsJob(AbstractJob):
     Exports projects artifacts across all levels to newline delimited file.
     """
 
-    def __init__(self, job_args: JobArgs, trace_dataset_creator: TraceDatasetCreator, file_name: str = None, delimiter: str = "\n"):
+    def __init__(self, trace_dataset_creator: TraceDatasetCreator, job_args: JobArgs = None, file_name: str = None,
+                 delimiter: str = "\n"):
         """
         Initializes export job with args and with dataset creator to export.
         :param job_args: the arguments for the job

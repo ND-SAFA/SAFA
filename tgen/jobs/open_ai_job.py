@@ -19,7 +19,7 @@ class OpenAIJob(AbstractTraceJob):
     def __init__(self, data_output_path: str, task: OpenAITask,
                  trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
                  trainer_args: OpenAIArgs = OpenAIArgs(), prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator(),
-                 job_args: JobArgs = JobArgs()):
+                 job_args: JobArgs = None):
         """
         Initializes job with necessary args
         :param base_model: The name of the model
@@ -29,8 +29,8 @@ class OpenAIJob(AbstractTraceJob):
         :param prompt_generator: Determines the expected prompt and completion format
         :param job_args: Args for all tgen jobs
         """
-        super().__init__(job_args=job_args, model_manager=ModelManager(model_path=base_model),
-                         trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
+        super().__init__(model_manager=ModelManager(model_path=base_model), trainer_dataset_manager=trainer_dataset_manager,
+                         trainer_args=trainer_args, job_args=job_args)
         self.task = task
         self.base_model = base_model
         self.data_output_path = data_output_path

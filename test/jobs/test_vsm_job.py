@@ -22,7 +22,7 @@ class TestVSMJob(BaseJobTest):
                 **ObjectCreator.dataset_creator_definition
             }
         }, override=False)
-        return VSMJob(job_args, trainer_dataset_manager=trainer_dataset_manager,
+        return VSMJob(trainer_dataset_manager=trainer_dataset_manager, job_args=job_args,
                       metrics=ObjectCreator.trainer_args_definition["metrics"])
 
     def _assert_success(self, job: VSMJob, output_dict: dict):

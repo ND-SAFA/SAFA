@@ -10,8 +10,8 @@ from tgen.train.hugging_face.trainer_args import TrainerArgs
 
 class PushModelJob(AbstractTraceJob):
 
-    def __init__(self, job_args: JobArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: Optional[TrainerDatasetManager], trainer_args: TrainerArgs):
+    def __init__(self, model_manager: ModelManager, trainer_dataset_manager: Optional[TrainerDatasetManager],
+                 trainer_args: TrainerArgs, job_args: JobArgs = None):
         """
         Responsible for pushing model to hugging face repo
         :param job_args: the arguments for the job
@@ -19,8 +19,8 @@ class PushModelJob(AbstractTraceJob):
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
         """
-        super().__init__(job_args=job_args, model_manager=model_manager, trainer_dataset_manager=trainer_dataset_manager,
-                         trainer_args=trainer_args)
+        super().__init__(model_manager=model_manager, trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args,
+                         job_args=job_args)
 
     def _run(self) -> JobResult:
         """

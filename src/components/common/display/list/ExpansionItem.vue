@@ -5,7 +5,7 @@
         <slot name="icon" />
       </q-item-section>
 
-      <q-item-section>
+      <q-item-section data-cy="generic-list-item">
         {{ label }}
       </q-item-section>
     </template>

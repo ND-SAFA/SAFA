@@ -1,13 +1,18 @@
 <template>
   <div>
     <flex-box v-if="store.isCustom" column b="3">
-      <text-input v-model="store.editedLayout.name" label="Name" />
+      <text-input
+        v-model="store.editedLayout.name"
+        label="Name"
+        data-cy="input-attribute-layout-name"
+      />
       <artifact-type-input
         v-model="store.editedLayout.artifactTypes"
         multiple
         hint="The layout only appears on these types."
         :error-message="store.typeErrors"
         class="full-width"
+        data-cy="input-attribute-layout-artifact-types"
       />
     </flex-box>
 
@@ -39,6 +44,7 @@
         text
         label="Delete"
         icon="delete"
+        data-cy="button-attribute-layout-delete"
         @click="handleDeleteLayout"
       />
       <q-space />
@@ -46,6 +52,7 @@
         label="Save"
         :disabled="!store.canSave"
         icon="save"
+        data-cy="button-attribute-layout-save"
         @click="handleSave"
       />
     </flex-box>

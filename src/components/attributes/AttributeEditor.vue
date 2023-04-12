@@ -36,6 +36,7 @@
             icon="add"
             tooltip="Add to layout"
             :disabled="isAttributeInLayout(attribute)"
+            data-cy="button-add-attribute-to-layout"
             @click="handleAddToLayout(attribute)"
           />
         </span>

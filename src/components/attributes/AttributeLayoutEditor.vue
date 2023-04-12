@@ -9,6 +9,7 @@
         text
         label="Add Layout"
         icon="add"
+        data-cy="button-attribute-layout-add"
         @click="handleAddLayout"
       />
     </template>

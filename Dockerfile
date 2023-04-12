@@ -1,20 +1,28 @@
 ## Step - Build Arguments
-ARG CUDA=11.7.1
-ARG UBUNTU_VERSION=20.04
-#FROM nvidia/cuda:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 FROM amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
 
 ## Step - Install WGET
-RUN apt-get update
+RUN apt update
 
 ## Step - Install python
-ARG PYTHON=python3.9
-RUN apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y ${PYTHON} python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+ARG PYTHON_VERSION=3.9
+ARG BOTO3_VERSION=1.6.3
+ARG BOTOCORE_VERSION=1.9.3
+ARG APPUSER=app
+
+RUN yum -y update &&\
+    yum install -y shadow-utils findutils gcc sqlite-devel zlib-devel \
+                   bzip2-devel openssl-devel readline-devel libffi-devel && \
+    groupadd ${APPUSER} && useradd ${APPUSER} -g ${APPUSER} && \
+    cd /usr/local/src && \
+    curl -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+    tar -xzf Python-${PYTHON_VERSION}.tgz && \
+    cd Python-${PYTHON_VERSION} && \
+    ./configure --enable-optimizations && make && make altinstall && \
+    rm -rf /usr/local/src/Python-${PYTHON_VERSION}* && \
+    yum remove -y shadow-utils audit-libs libcap-ng && yum -y autoremove && \
+    yum clean all
 
 ## Step - Install TGEN requirements
 COPY tgen/requirements.txt /app/tgen/

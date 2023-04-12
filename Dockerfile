@@ -2,9 +2,14 @@
 FROM amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
 
-## Step - Install python
-RUN amazon-linux-extras install -y python3.9
-RUN alternatives --set python /usr/bin/python3.9
+## Step - Install python (TODO: Replace version with variable)
+RUN yum update -y && yum groupinstall -y "Development tools" &&  \
+    yum install -y wget openssl-devel bzip2-devel libffi-devel &&  \
+    wget https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tgz &&  \
+    tar xvf Python-3.9.9.tgz
+RUN cd Python-3.9.9 && ./configure --enable-optimizations && make install
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py
+
 
 ## Step - Install TGEN requirements
 COPY tgen/requirements.txt /app/tgen/

@@ -3,11 +3,11 @@
 import os
 import sys
 
-TGEN_PATH = os.path.join(os.path.dirname(__file__), "..", "tgen")
+TGEN_PATH = os.path.join(os.path.dirname(__file__), "../..", "tgen")
 
 TGEN_PATH = os.path.normpath(TGEN_PATH)
 sys.path.append(TGEN_PATH)
-sys.path.append(os.path.join(TGEN_PATH, "tgen"))
+sys.path.append(os.path.join(TGEN_PATH, "../../tgen/tgen"))
 
 print(TGEN_PATH)
 
@@ -23,6 +23,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    print("SETTINGS:" + os.environ.get("DJANGO_SETTINGS_MODULE"))
     execute_from_command_line(sys.argv)
 
 

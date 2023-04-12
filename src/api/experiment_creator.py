@@ -1,18 +1,18 @@
 from typing import Union
 
-from constants import NO_ORPHAN_CHECK_VALUE
-from data.creators.trace_dataset_creator import TraceDatasetCreator
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.readers.api_project_reader import ApiProjectReader
-from data.readers.definitions.api_definition import ApiDefinition
-from jobs.components.job_args import JobArgs
-from jobs.open_ai_job import OpenAIJob
-from jobs.predict_job import PredictJob
-from models.model_manager import ModelManager
-from train.open_ai.open_ai_args import OpenAIArgs
-from train.open_ai.open_ai_task import OpenAITask
-from train.trainer_args import TrainerArgs
-from util.supported_enum import SupportedEnum
+from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.jobs.components.job_args import JobArgs
+from tgen.jobs.open_ai_job import OpenAIJob
+from tgen.jobs.predict_job import PredictJob
+from tgen.models.model_manager import ModelManager
+from tgen.train.open_ai.open_ai_args import OpenAIArgs
+from tgen.train.open_ai.open_ai_task import OpenAITask
+from tgen.train.trainer_args import TrainerArgs
+from tgen.util.supported_enum import SupportedEnum
 
 
 class PredictionJobTypes(SupportedEnum):

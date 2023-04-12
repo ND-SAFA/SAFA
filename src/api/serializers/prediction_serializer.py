@@ -2,8 +2,8 @@ from typing import Dict
 
 from rest_framework import serializers
 
-from serializers.dataset_serializer import DatasetSerializer
-from serializers.serializer_utility import SerializerUtility
+from api.serializers.dataset_serializer import DatasetSerializer
+from api.serializers.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
 
 

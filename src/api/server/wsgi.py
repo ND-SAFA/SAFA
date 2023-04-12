@@ -8,9 +8,17 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 """
 
 import os
+import sys
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'api.server.settings')
 
 application = get_wsgi_application()
+
+DIR_PATH = os.path.basename(__file__)
+SRC_PATH = os.path.join(DIR_PATH, "../..", "..")
+SRC_PATH = os.path.normpath(SRC_PATH)
+print(DIR_PATH)
+print(SRC_PATH)
+sys.path.append(SRC_PATH)

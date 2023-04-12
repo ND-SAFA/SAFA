@@ -1,8 +1,8 @@
 import os
 from typing import List
 
-from api_constants import MODEL_CACHE_PATH
-from cloud.supported_cloud_storage import SupportedCloudStorage
+from api.api_constants import MODEL_CACHE_PATH
+from api.cloud.supported_cloud_storage import SupportedCloudStorage
 
 
 class CloudUtility:

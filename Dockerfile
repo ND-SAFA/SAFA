@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-c"]
 
 ## Step - Install python (TODO: Replace version with variable)
 RUN yum update -y && yum groupinstall -y "Development tools" &&  \
-    yum install -y wget openssl-devel bzip2-devel libffi-devel &&  \
+    yum install -y wget openssl-devel bzip2-devel libffi-devel xz-devel &&  \
     wget https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tgz &&  \
     tar xvf Python-3.9.9.tgz
 RUN cd Python-3.9.9 && ./configure --enable-optimizations && make install
@@ -21,10 +21,11 @@ COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
 ## Step - Copy source and build files
-COPY /tgen/ /app/tgen/
-COPY /api/ /app/api/
+COPY /tgen/tgen/ /app/tgen/
+COPY /src/api/ /app/api/
 
 # Finalize
 EXPOSE 80
-WORKDIR /app/api/
-CMD ["gunicorn" ,"--bind", ":80", "--workers", "1","--threads","8","--timeout","0", "server.wsgi"]
+WORKDIR /app
+# CMD ["gunicorn" ,"--bind", ":80","--chdir", "/app", "--workers", "1","--threads","8","--timeout","0", "server.wsgi"]
+CMD ["gunicorn" ,"--bind", ":80","--env", "PYTHONPATH=/app","--env", "DJANGO_SETTINGS_MODULE=api.server.settings", "--workers", "1","--threads","8","--timeout","0", "api.server.wsgi"]

@@ -27,9 +27,7 @@ COPY .env /app/.env
 
 ### Step - Collect static files
 WORKDIR /app
-RUN pip3 install whitenoise
 RUN python3 api/manage.py collectstatic --noinput
-RUN echo "Found:" && ls -1 /app/staticfiles | wc -l | echo
 
 # Finalize
 EXPOSE 80

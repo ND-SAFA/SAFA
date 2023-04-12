@@ -2,9 +2,6 @@
 FROM amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
 
-## Step - Install WGET
-RUN apt update
-
 ## Step - Install python
 ARG PYTHON_VERSION=3.9
 ARG BOTO3_VERSION=1.6.3

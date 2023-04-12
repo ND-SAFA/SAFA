@@ -23,7 +23,6 @@ RUN pip3 install -r /app/requirements.txt
 ## Step - Copy source and build files
 COPY /tgen/tgen/ /app/tgen/
 COPY /src/api/ /app/api/
-COPY .env /app/.env
 
 ### Step - Collect static files
 WORKDIR /app

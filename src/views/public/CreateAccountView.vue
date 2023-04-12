@@ -1,11 +1,10 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
         el="h1"
-        class="mb-3"
         value="Welcome to SAFA!"
       />
 
@@ -14,15 +13,13 @@
           el="p"
           value="There are just a few key pieces of info we need to set up your account."
         />
-
-        <v-text-field
-          filled
-          label="Email"
+        <text-input
           v-model="email"
-          :error-messages="isError ? ['Unable to create an account'] : []"
+          label="Email"
+          :error-message="isError && 'Unable to create an account'"
           data-cy="input-new-email"
         />
-        <password-field v-model="password" data-cy="input-new-password" />
+        <password-input v-model="password" data-cy="input-new-password" />
       </div>
 
       <typography
@@ -33,80 +30,82 @@
       />
     </template>
 
-    <template v-slot:actions>
-      <v-btn
+    <template #actions>
+      <text-button
         v-if="!isCreated"
         color="primary"
+        label="Create"
         :disabled="password.length === 0"
         data-cy="button-create-account"
         @click="handleCreateAccount"
-      >
-        Create Account
-      </v-btn>
+      />
 
-      <span class="ml-auto text-right text-body-1">
+      <span class="q-ml-auto text-right">
         <typography value="Already have an account?" />
 
-        <v-btn
+        <text-button
           text
           small
-          class="px-1"
+          label="Login"
+          class="q-px-sm"
           color="primary"
-          @click="handleLogin"
           data-cy="button-create-account-login"
-        >
-          Login
-        </v-btn>
+          @click="handleLogin"
+        />
       </span>
     </template>
   </card-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
-import { createUser } from "@/api";
-import { CardPage, PasswordField, Typography } from "@/components";
-
 /**
  * Displays the create account page.
  */
-export default Vue.extend({
+export default {
   name: "CreateAccountView",
-  components: { CardPage, PasswordField, Typography },
-  data() {
-    return {
-      email: "",
-      password: "",
-      isError: false,
-      isLoading: false,
-      isCreated: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Attempts to create a new account.
-     */
-    handleCreateAccount() {
-      this.isLoading = true;
+};
+</script>
 
-      createUser({
-        email: this.email,
-        password: this.password,
-      })
-        .then(() => {
-          this.isError = false;
-          this.isCreated = true;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+<script setup lang="ts">
+import { ref } from "vue";
+import { navigateTo, Routes } from "@/router";
+import { createUser } from "@/api";
+import {
+  CardPage,
+  PasswordInput,
+  Typography,
+  TextInput,
+  TextButton,
+} from "@/components";
+
+const email = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isCreated = ref(false);
+
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Attempts to create a new account.
+ */
+function handleCreateAccount() {
+  isLoading.value = true;
+
+  createUser({
+    email: email.value,
+    password: password.value,
+  })
+    .then(() => {
+      isError.value = false;
+      isCreated.value = true;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

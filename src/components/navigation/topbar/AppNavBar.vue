@@ -1,43 +1,39 @@
 <template>
-  <v-app-bar app clipped-right :color="$vuetify.theme.dark ? '' : 'primary'">
-    <header-bar />
-    <template v-slot:extension v-if="graphVisible">
-      <graph-bar />
-    </template>
-  </v-app-bar>
+  <q-header elevated :class="darkMode ? 'bg-neutral' : 'bg-primary'">
+    <q-toolbar class="nav-topbar">
+      <div class="full-width">
+        <header-bar />
+        <graph-bar v-if="graphVisible" />
+      </div>
+    </q-toolbar>
+    <loading-bar />
+  </q-header>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Route } from "vue-router";
-import { router, Routes } from "@/router";
-import { HeaderBar } from "./header";
-import { GraphBar } from "./graph";
-
 /**
  * Renders the top navigation bar.
  */
-export default Vue.extend({
+export default {
   name: "AppNavBar",
-  components: {
-    HeaderBar,
-    GraphBar,
-  },
-  data() {
-    return {
-      graphVisible: router.currentRoute.path === Routes.ARTIFACT,
-    };
-  },
-  watch: {
-    /**
-     * Checks whether the graph buttons should be visible when the route changes.
-     */
-    $route(to: Route) {
-      this.graphVisible = to.path === Routes.ARTIFACT;
-    },
-  },
-  computed: {},
-});
+};
 </script>
 
-<style scoped lang="scss"></style>
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { useTheme } from "@/hooks";
+import { Routes } from "@/router";
+import { HeaderBar, LoadingBar } from "./header";
+import { GraphBar } from "./graph";
+
+const { darkMode } = useTheme();
+
+const currentRoute = useRoute();
+const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
+
+watch(
+  () => currentRoute.path,
+  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
+);
+</script>

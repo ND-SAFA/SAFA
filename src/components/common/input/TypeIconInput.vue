@@ -1,60 +1,64 @@
 <template>
   <div>
-    <div class="mt-1">
-      <typography bold color="primary" :value="entry.name" />
-      <typography secondary value="Icon:" />
-    </div>
-    <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
-      <v-btn
-        :disabled="!allowEditing"
-        v-for="option in icons"
-        :key="option"
-        data-cy="button-type-options-icon"
-        @change="handleIconChange(entry, option)"
-      >
-        <v-icon>{{ option }}</v-icon>
-      </v-btn>
-    </v-btn-toggle>
+    <typography
+      bold
+      color="primary"
+      class="q-mr-xs"
+      :value="props.artifactLevel.name"
+    />
+    <typography secondary value="Icon" />
+    <q-btn-toggle
+      v-model="icon"
+      flat
+      :options="iconOptions"
+      :disable="!allowEditing"
+      data-cy="button-type-options-icon"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Renders an input for changing the icon for an artifact type.
+ */
+export default {
+  name: "TypeIconInput",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { allTypeIcons } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { handleSaveArtifactTypeIcon } from "@/api";
 import { Typography } from "@/components/common/display";
 
-/**
- * Renders an input for changing the icon for an artifact type.
- */
-export default Vue.extend({
-  name: "TypeIconInput",
-  components: { Typography },
-  props: {
-    entry: Object as PropType<TimArtifactLevelSchema>,
+const props = defineProps<{
+  /**
+   * The artifact level to display and allow editing of.
+   */
+  artifactLevel: TimArtifactLevelSchema;
+}>();
+
+const iconOptions = allTypeIcons.map((icon) => ({
+  icon,
+  label: "",
+  value: icon,
+}));
+
+const allowEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
+const icon = computed({
+  get(): string {
+    return allTypeIcons[props.artifactLevel.iconIndex];
   },
-  data() {
-    return { icons: allTypeIcons };
-  },
-  computed: {
-    /**
-     * @return Whether to allow editing.
-     */
-    allowEditing(): boolean {
-      return sessionStore.isEditor(projectStore.project);
-    },
-  },
-  methods: {
-    /**
-     * Updates the icon for an artifact type.
-     * @param entry - The type to update.
-     * @param icon - The icon to set.
-     */
-    handleIconChange(entry: TimArtifactLevelSchema, icon: string) {
-      handleSaveArtifactTypeIcon({ ...entry, icon });
-    },
+  set(iconId: string) {
+    props.artifactLevel.iconIndex = allTypeIcons.indexOf(iconId);
+
+    handleSaveArtifactTypeIcon({ ...props.artifactLevel, icon: iconId });
   },
 });
 </script>

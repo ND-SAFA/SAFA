@@ -1,32 +1,25 @@
 <template>
-  <panel-card>
-    <typography variant="subtitle" el="h2" value="Theme" />
-    <v-divider class="mb-2" />
-    <switch-input v-model="darkMode" label="Enable dark mode" />
+  <panel-card title="Theme">
+    <switch-input
+      label="Enable dark mode"
+      :model-value="darkMode"
+      @update:model-value="toggleDarkMode"
+    />
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { LocalStorageKeys } from "@/types";
-import { PanelCard, Typography, SwitchInput } from "@/components/common";
-
 /**
- * ThemeController
+ * Injects the app theme.
  */
-export default Vue.extend({
+export default {
   name: "ThemeController",
-  components: { SwitchInput, PanelCard, Typography },
-  computed: {
-    darkMode: {
-      get(): boolean {
-        return this.$vuetify.theme.dark;
-      },
-      set(dark: boolean): void {
-        this.$vuetify.theme.dark = dark;
-        localStorage.setItem(LocalStorageKeys.darkMode, String(dark));
-      },
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { useTheme } from "@/hooks";
+import { PanelCard, SwitchInput } from "@/components/common";
+
+const { darkMode, toggleDarkMode } = useTheme();
 </script>

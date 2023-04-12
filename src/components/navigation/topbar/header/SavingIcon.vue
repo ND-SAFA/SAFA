@@ -1,33 +1,24 @@
 <template>
-  <v-tooltip bottom z-index="10000" v-if="isSaving">
-    <template v-slot:activator="{ on, attrs }">
-      <v-progress-circular
-        v-on="on"
-        v-bind="attrs"
-        indeterminate
-        size="36"
-        color="accent"
-      >
-        <v-icon color="accent"> mdi-cloud-upload-outline </v-icon>
-      </v-progress-circular>
-    </template>
-    <span>Saving...</span>
-  </v-tooltip>
+  <div v-if="isSaving">
+    <q-circular-progress color="accent" indeterminate size="md" />
+    <icon color="accent" variant="saving" class="nav-saving-icon" />
+    <q-tooltip> Saving... </q-tooltip>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-
 /**
  * Renders app saving state.
  */
-export default Vue.extend({
+export default {
   name: "SavingIcon",
-  computed: {
-    isSaving(): boolean {
-      return appStore.isSaving;
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+import { Icon } from "@/components/common";
+
+const isSaving = computed(() => appStore.isSaving);
 </script>

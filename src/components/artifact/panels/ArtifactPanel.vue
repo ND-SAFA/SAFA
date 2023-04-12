@@ -1,28 +1,20 @@
 <template>
-  <div v-if="isOpen">
+  <details-panel panel="displayArtifact">
     <artifact-buttons />
     <artifact-content />
-  </div>
+  </details-panel>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-import { ArtifactButtons, ArtifactContent } from "../display";
-
 /**
  * Displays artifact information.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactPanel",
-  components: { ArtifactContent, ArtifactButtons },
-  computed: {
-    /**
-     * @return Whether this panel is open.
-     */
-    isOpen(): boolean {
-      return appStore.isDetailsPanelOpen === "displayArtifact";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { DetailsPanel } from "@/components/common";
+import { ArtifactButtons, ArtifactContent } from "../display";
 </script>

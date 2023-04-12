@@ -1,68 +1,45 @@
 <template>
-  <panel-card v-if="doDisplay" data-cy="artifact-warnings">
-    <flex-box justify="space-between">
-      <typography
-        el="h2"
-        l="1"
-        variant="subtitle"
-        value="Warnings"
-        data-cy="artifact-table-panel-warnings-title"
-      />
-      <v-icon color="secondary">mdi-hazard-lights</v-icon>
-    </flex-box>
+  <panel-card v-if="doDisplay" title="Warnings" data-cy="artifact-warnings">
+    <template #title-actions>
+      <icon variant="warning" />
+    </template>
 
-    <v-divider />
-
-    <v-list expand>
-      <toggle-list
-        v-for="(warning, idx) in selectedArtifactWarnings"
-        :key="idx"
-        :title="warning.ruleName"
-      >
-        <typography :value="warning.ruleMessage" />
-      </toggle-list>
-    </v-list>
+    <expansion-item
+      v-for="(warning, idx) in warnings"
+      :key="idx"
+      :label="warning.ruleName"
+    >
+      <typography :value="warning.ruleMessage" />
+    </expansion-item>
   </panel-card>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { WarningSchema } from "@/types";
-import { warningStore, selectionStore } from "@/hooks";
-import {
-  Typography,
-  FlexBox,
-  ToggleList,
-  PanelCard,
-} from "@/components/common";
-
 /**
  * Displays the selected node's error.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactErrors",
-  components: { PanelCard, ToggleList, FlexBox, Typography },
-  computed: {
-    /**
-     * @return The selected artifact.
-     */
-    selectedArtifact() {
-      return selectionStore.selectedArtifact;
-    },
-    /**
-     * @return The selected artifact's warnings.
-     */
-    selectedArtifactWarnings(): WarningSchema[] {
-      const id = this.selectedArtifact?.id || "";
+};
+</script>
 
-      return warningStore.artifactWarnings[id] || [];
-    },
-    /**
-     * @return Whether to display this section.
-     */
-    doDisplay(): boolean {
-      return this.selectedArtifactWarnings.length > 0;
-    },
-  },
+<script setup lang="ts">
+import { computed } from "vue";
+import { selectionStore, warningStore } from "@/hooks";
+import {
+  Typography,
+  PanelCard,
+  Icon,
+  ExpansionItem,
+} from "@/components/common";
+
+const artifact = computed(() => selectionStore.selectedArtifact);
+
+const warnings = computed(() => {
+  const id = artifact.value?.id || "";
+
+  return warningStore.artifactWarnings[id] || [];
 });
+
+const doDisplay = computed(() => warnings.value.length > 0);
 </script>

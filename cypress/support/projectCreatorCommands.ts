@@ -67,14 +67,11 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
 });
 
 Cypress.Commands.add("openPanelAfterClose", () => {
-  // Wait is required for waiting until the close animation completes.
-  cy.wait(200).clickButton(DataCy.creationFilePanel, "last");
+  cy.wait(300).clickButton(DataCy.creationFilePanel, "last");
 });
 
 Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
-  cy.clickButton(DataCy.creationCreatePanelButton);
-  cy.getCy(DataCy.creationTypeInput).type(name);
-  cy.clickButton(DataCy.creationTypeButton);
+  cy.inputText(DataCy.creationTypeInput, name, false, true);
   cy.uploadFiles(DataCy.creationStandardFilesInput, file);
 
   if (next) {
@@ -83,10 +80,8 @@ Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
 });
 
 Cypress.Commands.add("createTraceMatrix", (source, target, file, next) => {
-  cy.clickButtonWithName("Create new trace matrix")
-    .clickSelectOption(DataCy.creationTraceSourceInput, source)
-    .clickSelectOption(DataCy.creationTraceTargetInput, target)
-    .clickButton(DataCy.creationTraceCreateButton);
+  cy.clickButton(DataCy.creationTraceSourceInput).clickButtonWithName(source);
+  cy.clickButton(DataCy.creationTraceTargetInput).clickButtonWithName(target);
 
   if (file) {
     cy.uploadFiles(DataCy.creationStandardFilesInput, file);
@@ -100,6 +95,7 @@ Cypress.Commands.add("createTraceMatrix", (source, target, file, next) => {
 Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
   cy.setProjectIdentifier("standard");
   cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
+  cy.clickButtonWithName("New Artifact Type");
   cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard, true);
 
   if (createTraces) {
@@ -117,39 +113,3 @@ Cypress.Commands.add("waitForJobLoad", () => {
     cy.getCy(DataCy.jobOpenButton, "first", 10000).should("not.be.disabled");
   });
 });
-
-// Cypress.Commands.add("loadProject", () => {
-//   cy.visit("/create")
-//     .login(validUser.email, validUser.password)
-//     .location("pathname", { timeout: 5000 })
-//     .should("equal", "/create");
-//
-//   cy.intercept({ method: "POST", url: "/projects" }).as("postProject");
-//
-//   cy.switchTab("Bulk Upload")
-//     .setProjectIdentifier("bulk")
-//     .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
-//     .clickButton(DataCy.creationUploadButton);
-//
-//   cy.wait("@postProject").then((interception) => {
-//     const { body } = interception.response;
-//     const versionId = body.projectVersion.versionId;
-//
-//     cy.wrap(null, { timeout: 10000 }).then(() => {
-//       cy.streamRequest<any>(
-//         {
-//           url: `wss://dev-api.safa.ai`,
-//         },
-//         {}
-//       ).then((results) => {
-//         const result = results?.[1];
-//         const data = result?.data;
-//       });
-//     });
-//   });
-//
-//   cy.getCy(DataCy.jobStatus, "first", 20000).should(
-//     "contain.text",
-//     "Completed"
-//   );
-// });

@@ -1,36 +1,47 @@
 <template>
-  <stepper
-    :minimal="type === 'connect'"
-    v-model="currentStep"
-    :steps="steps"
-    @submit="handleSaveProject"
-  >
-    <template v-slot:items>
-      <v-stepper-content step="1">
-        <authentication-selector v-model="source" />
-      </v-stepper-content>
-      <v-stepper-content step="2">
+  <panel-card>
+    <stepper
+      v-model="currentStep"
+      :minimal="props.type === 'connect'"
+      :steps="steps"
+      @submit="handleSaveProject"
+    >
+      <template #1>
+        <authentication-selector v-model="source" @input="handleSelectSource" />
+      </template>
+      <template #2>
         <jira-organization-selector v-if="source === 'Jira'" />
         <git-hub-organization-selector v-if="source === 'GitHub'" />
-      </v-stepper-content>
-      <v-stepper-content step="3">
+      </template>
+      <template #3>
         <jira-project-selector v-if="source === 'Jira'" />
         <git-hub-project-selector v-if="source === 'GitHub'" />
-      </v-stepper-content>
-    </template>
-  </stepper>
+      </template>
+    </stepper>
+  </panel-card>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { StepState } from "@/types";
+/**
+ * Allows for creating a project from integrations sources.
+ *
+ * @emits-1 `submit` - On project submission.
+ */
+export default {
+  name: "IntegrationsStepper",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { StepperStep } from "@/types";
 import { integrationsStore } from "@/hooks";
 import {
   handleImportGitHubProject,
   handleImportJiraProject,
   handleSyncInstallation,
 } from "@/api";
-import { Stepper } from "@/components/common";
+import { Stepper, PanelCard } from "@/components/common";
 import {
   JiraOrganizationSelector,
   GitHubOrganizationSelector,
@@ -38,155 +49,123 @@ import {
 import { AuthenticationSelector } from "./authentication";
 import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 
-/**
- * Allows for creating a project from integrations sources.
- *
- * @emits-1 `submit` - On project submission.
- */
-export default Vue.extend({
-  name: "IntegrationsStepper",
-  components: {
-    JiraOrganizationSelector,
-    GitHubOrganizationSelector,
-    AuthenticationSelector,
-    GitHubProjectSelector,
-    JiraProjectSelector,
-    Stepper,
-  },
-  props: {
-    type: {
-      required: true,
-      type: String as PropType<"create" | "connect">,
-    },
-  },
-  data() {
-    return {
-      source: undefined as "Jira" | "GitHub" | undefined,
-      steps: [
-        ["Connect to Source", false],
-        ["Select Organization", false],
-        ["Select Project", false],
-      ] as StepState[],
-      currentStep: 1,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      if (this.source === "Jira") {
-        return integrationsStore.validJiraCredentials;
-      } else if (this.source === "GitHub") {
-        return integrationsStore.validGitHubCredentials;
-      } else {
-        return false;
-      }
-    },
-    /**
-     * @return What organization is selected.
-     */
-    organizationIsSelected(): string | undefined {
-      if (this.source === "Jira") {
-        return integrationsStore.jiraOrganization?.name;
-      } else if (this.source === "GitHub") {
-        return integrationsStore.gitHubOrganization?.name;
-      } else {
-        return undefined;
-      }
-    },
-    /**
-     * @return Whether a project is selected.
-     */
-    projectIsSelected(): string | undefined {
-      if (this.source === "Jira") {
-        return integrationsStore.jiraProject?.name;
-      } else if (this.source === "GitHub") {
-        return integrationsStore.gitHubProject?.name;
-      } else {
-        return undefined;
-      }
-    },
-  },
-  watch: {
-    /**
-     * Updates the current step when credentials are loaded.
-     */
-    hasCredentials(valid: boolean): void {
-      if (valid) {
-        this.currentStep = 2;
-        this.setStepIsValid(0, true);
-      } else {
-        this.currentStep = 1;
-        this.setStepIsValid(0, false);
-      }
-    },
-    /**
-     * Updates the selection step when a project is selected.
-     */
-    organizationIsSelected(name: string | undefined): void {
-      if (name) {
-        this.currentStep = 3;
-        this.setStepIsValid(1, true);
-      } else {
-        this.currentStep = 2;
-        this.setStepIsValid(1, false);
-      }
-    },
-    /**
-     * Updates the selection step when a project is selected.
-     */
-    projectIsSelected(name: string | undefined): void {
-      this.setStepIsValid(2, !!name);
-    },
-  },
-  methods: {
-    /**
-     * Sets the valid state of a step.
-     * @param stepIndex - The step cto change.
-     * @param isValid - Whether the step is valid.
-     */
-    setStepIsValid(stepIndex: number, isValid: boolean): void {
-      Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
-    },
-    /**
-     * Attempts to import a project.
-     */
-    handleSaveProject(): void {
-      const callbacks = {
-        onSuccess: () => this.$emit("submit"),
-      };
+const props = defineProps<{
+  type: "create" | "connect";
+}>();
 
-      if (this.type === "create") {
-        // Create a new project.
-        if (this.source === "Jira") {
-          handleImportJiraProject(callbacks);
-        } else if (this.source === "GitHub") {
-          handleImportGitHubProject(callbacks);
-        }
-      } else {
-        // Sync with the current project.
-        if (this.source === "Jira") {
-          handleSyncInstallation(
-            {
-              type: "JIRA",
-              installationOrgId: integrationsStore.jiraOrganization?.id || "",
-              installationId: integrationsStore.jiraProject?.id || "",
-            },
-            callbacks
-          );
-        } else if (this.source === "GitHub") {
-          handleSyncInstallation(
-            {
-              type: "GITHUB",
-              installationOrgId: integrationsStore.gitHubOrganization?.id || "",
-              installationId: integrationsStore.gitHubProject?.name || "",
-            },
-            callbacks
-          );
-        }
-      }
-    },
+const emit = defineEmits<{
+  (e: "submit"): void;
+}>();
+
+const source = ref<"Jira" | "GitHub" | undefined>();
+const currentStep = ref(1);
+const steps = ref<StepperStep[]>([
+  { title: "Connect to Source", done: false },
+  { title: "Select Organization", done: false },
+  { title: "Select Project", done: false },
+]);
+
+/**
+ * Selects the type of integration to import from.
+ * @param type - The type of integration.
+ */
+function handleSelectSource(type: "Jira" | "GitHub"): void {
+  source.value = type;
+}
+
+/**
+ * Attempts to import a project.
+ */
+function handleSaveProject(): void {
+  const callbacks = {
+    onSuccess: () => emit("submit"),
+  };
+
+  if (props.type === "create") {
+    // Create a new project.
+    if (source.value === "Jira") {
+      handleImportJiraProject(callbacks);
+    } else if (source.value === "GitHub") {
+      handleImportGitHubProject(callbacks);
+    }
+  } else {
+    // Sync with the current project.
+    if (source.value === "Jira") {
+      handleSyncInstallation(
+        {
+          type: "JIRA",
+          installationOrgId: integrationsStore.jiraOrganization?.id || "",
+          installationId: integrationsStore.jiraProject?.id || "",
+        },
+        callbacks
+      );
+    } else if (source.value === "GitHub") {
+      handleSyncInstallation(
+        {
+          type: "GITHUB",
+          installationOrgId: integrationsStore.gitHubOrganization?.id || "",
+          installationId: integrationsStore.gitHubProject?.name || "",
+        },
+        callbacks
+      );
+    }
+  }
+}
+
+watch(
+  () => {
+    if (source.value === "Jira") {
+      return integrationsStore.validJiraCredentials;
+    } else if (source.value === "GitHub") {
+      return integrationsStore.validGitHubCredentials;
+    } else {
+      return false;
+    }
   },
-});
+  (valid) => {
+    if (valid) {
+      currentStep.value = 2;
+      steps.value[0].done = true;
+    } else {
+      currentStep.value = 1;
+      steps.value[0].done = false;
+    }
+  }
+);
+
+watch(
+  () => {
+    if (source.value === "Jira") {
+      return integrationsStore.jiraOrganization?.name;
+    } else if (source.value === "GitHub") {
+      return integrationsStore.gitHubOrganization?.name;
+    } else {
+      return undefined;
+    }
+  },
+  (name) => {
+    if (name) {
+      currentStep.value = 3;
+      steps.value[1].done = true;
+    } else {
+      currentStep.value = 2;
+      steps.value[1].done = false;
+    }
+  }
+);
+
+watch(
+  () => {
+    if (source.value === "Jira") {
+      return integrationsStore.jiraProject?.name;
+    } else if (source.value === "GitHub") {
+      return integrationsStore.gitHubProject?.name;
+    } else {
+      return undefined;
+    }
+  },
+  (name) => {
+    steps.value[2].done = !!name;
+  }
+);
 </script>

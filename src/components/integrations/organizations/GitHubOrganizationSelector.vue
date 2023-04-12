@@ -1,100 +1,78 @@
 <template>
   <stepper-list-step
     title="GitHub Organizations"
-    :item-count="organizations.length"
-    :loading="organizationsLoading"
     empty-message="There are no organizations."
+    :item-count="organizations.length"
+    :loading="loading"
   >
-    <template slot="items">
-      <template v-for="organization in organizations">
-        <v-list-item
-          three-line
-          :key="organization.id"
-          @click="handleOrganizationSelect(organization)"
-        >
-          <v-list-item-content>
-            <v-list-item-title v-text="organization.name" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-    </template>
+    <list>
+      <list-item
+        v-for="item in organizations"
+        :key="item.name"
+        :title="item.name"
+        clickable
+        @click="handleOrganizationSelect(item)"
+      />
+    </list>
   </stepper-list-step>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GitHubOrganizationSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadGitHubProjects } from "@/api";
-import { StepperListStep } from "@/components/common";
-
 /**
  * Allows for selecting a GitHub organization.
  */
-export default Vue.extend({
+export default {
   name: "GitHubOrganizationSelector",
-  components: {
-    StepperListStep,
-  },
-  data() {
-    return {
-      organizations: [] as GitHubOrganizationSchema[],
-      organizationsLoading: false,
-    };
-  },
-  mounted() {
-    this.loadOrganizations();
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return integrationsStore.validGitHubCredentials;
-    },
-  },
-  watch: {
-    /**
-     * Loads organizations when credentials are valid.
-     */
-    hasCredentials(): void {
-      this.loadOrganizations();
-    },
-  },
-  methods: {
-    /**
-     * Loads a user's GitHub organizations.
-     */
-    async loadOrganizations() {
-      if (!integrationsStore.validGitHubCredentials) return;
+};
+</script>
 
-      integrationsStore.gitHubOrganization = undefined;
-      this.organizationsLoading = true;
+<script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
+import { GitHubOrganizationSchema } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadGitHubProjects } from "@/api";
+import { StepperListStep, List, ListItem } from "@/components/common";
 
-      handleLoadGitHubProjects({
-        onSuccess: (projects) => {
-          this.organizations = [];
+const organizations = ref<GitHubOrganizationSchema[]>([]);
+const loading = ref(false);
 
-          projects.forEach(({ owner }) => {
-            if (this.organizations.find(({ id }) => id === owner)) return;
+/**
+ * Loads a user's GitHub organizations.
+ */
+async function handleReload() {
+  if (!integrationsStore.validGitHubCredentials) return;
 
-            this.organizations.push({ id: owner, name: owner });
-          });
+  integrationsStore.gitHubOrganization = undefined;
+  loading.value = true;
 
-          this.organizationsLoading = false;
-        },
-        onError: () => (this.organizationsLoading = false),
+  handleLoadGitHubProjects({
+    onSuccess: (projects) => {
+      organizations.value = [];
+
+      projects.forEach(({ owner }) => {
+        if (organizations.value.find(({ id }) => id === owner)) return;
+
+        organizations.value.push({ id: owner, name: owner });
       });
     },
-    /**
-     * Handles a click to select an organization.
-     * @param organization - The organization to select.
-     */
-    handleOrganizationSelect(
-      organization: GitHubOrganizationSchema | undefined
-    ) {
-      integrationsStore.selectGitHubOrganization(organization);
-    },
-  },
-});
+    onComplete: () => (loading.value = false),
+  });
+}
+
+/**
+ * Handles a click to select an organization.
+ * @param selectedOrganization - The organization to select.
+ */
+function handleOrganizationSelect(
+  selectedOrganization: GitHubOrganizationSchema | undefined
+) {
+  integrationsStore.selectGitHubOrganization(selectedOrganization);
+}
+
+onMounted(() => handleReload());
+
+watch(
+  () => integrationsStore.validGitHubCredentials,
+  () => handleReload()
+);
 </script>

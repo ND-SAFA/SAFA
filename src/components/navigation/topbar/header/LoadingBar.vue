@@ -1,32 +1,26 @@
 <template>
-  <v-progress-linear
+  <q-linear-progress
+    v-if="isLoading"
     rounded
-    height="5"
-    v-show="isLoading"
+    size="sm"
     indeterminate
-    absolute
-    bottom
-    color="secondary"
+    color="accent"
     data-cy="app-loading"
   />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-
 /**
  * Loading bar used in application header.
  */
-export default Vue.extend({
+export default {
   name: "LoadingBar",
-  computed: {
-    /**
-     * @return Whether the app is loading
-     */
-    isLoading(): boolean {
-      return appStore.isLoading > 0;
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { appStore } from "@/hooks";
+
+const isLoading = computed(() => appStore.isLoading > 0);
 </script>

@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "target": "es5",
     "lib": ["es5", "dom"],
-    "types": ["cypress", "node", "@lensesio/cypress-websocket-testing"],
+    "types": ["cypress", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]

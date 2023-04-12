@@ -2,6 +2,7 @@ import { DataCy } from "@/fixtures";
 
 describe("Job Submission", () => {
   beforeEach(() => {
+    cy.viewport(1080, 1080);
     cy.initProject(false);
   });
 
@@ -14,6 +15,7 @@ describe("Job Submission", () => {
   describe("I can see the jobs I created", () => {
     it("Shows a list of imported projects", () => {
       cy.clickButtonWithName("Project Uploads");
+      cy.waitForJobLoad();
 
       cy.withinTableRows(
         DataCy.jobTable,

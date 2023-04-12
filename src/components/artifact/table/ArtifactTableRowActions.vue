@@ -1,57 +1,53 @@
 <template>
   <flex-box>
     <icon-button
-      icon-id="mdi-pencil"
+      icon="edit"
       :tooltip="`Edit '${artifact.name}'`"
-      @click="handleEdit(artifact)"
       data-cy="button-artifact-edit-icon"
+      @click="handleEdit"
     />
     <icon-button
-      icon-id="mdi-delete"
+      icon="delete"
       :tooltip="`Delete '${artifact.name}'`"
-      @click="handleDelete(artifact)"
       data-cy="button-artifact-delete-icon"
+      @click="handleDelete"
     />
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Represents actions for an artifact.
+ */
+export default {
+  name: "ArtifactTableRowActions",
+};
+</script>
+
+<script setup lang="ts">
 import { ArtifactSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { FlexBox, IconButton } from "@/components/common";
 
+const props = defineProps<{
+  artifact: ArtifactSchema;
+}>();
+
 /**
- * Represents actions for an artifact.
+ * Opens the edit artifact window.
  */
-export default Vue.extend({
-  name: "ArtifactTableRowActions",
-  components: {
-    FlexBox,
-    IconButton,
-  },
-  props: {
-    artifact: Object as PropType<ArtifactSchema>,
-  },
-  methods: {
-    /**
-     * Opens the edit artifact window.
-     * @param artifact - The artifact to edit.
-     */
-    handleEdit(artifact: ArtifactSchema) {
-      selectionStore.selectArtifact(artifact.id);
-      appStore.openArtifactCreatorTo({
-        isNewArtifact: false,
-      });
-    },
-    /**
-     * Opens the delete artifact window.
-     * @param artifact - The artifact to delete.
-     */
-    handleDelete(artifact: ArtifactSchema) {
-      handleDeleteArtifact(artifact, {});
-    },
-  },
-});
+function handleEdit() {
+  selectionStore.selectArtifact(props.artifact.id);
+  appStore.openArtifactCreatorTo({
+    isNewArtifact: false,
+  });
+}
+
+/**
+ * Opens the delete artifact window.
+ */
+function handleDelete() {
+  handleDeleteArtifact(props.artifact, {});
+}
 </script>

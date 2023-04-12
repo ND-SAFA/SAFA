@@ -100,9 +100,9 @@ export function timestampToDisplay(timestamp: string): string {
 
   return date.toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
-    weekday: "long",
+    weekday: "short",
     hour: "numeric",
     minute: "numeric",
   });

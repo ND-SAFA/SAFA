@@ -24,9 +24,9 @@ export const useAttributes = defineStore("attributes", {
      */
     attributeLayouts: [] as AttributeLayoutSchema[],
     /**
-     * The index of the current layout selected for editing.
+     * The id of the current layout selected for editing.
      */
-    selectedLayout: 0,
+    selectedLayoutId: "",
   }),
   getters: {
     /**
@@ -34,18 +34,10 @@ export const useAttributes = defineStore("attributes", {
      *
      * @return The default layout for artifact attributes.
      */
-    defaultLayout(): AttributePositionSchema[] {
-      const layout = this.attributeLayouts.find(
+    defaultLayout(): AttributeLayoutSchema | undefined {
+      return this.attributeLayouts.find(
         ({ artifactTypes }) => artifactTypes.length === 0
       );
-
-      return layout?.positions || [];
-    },
-    /**
-     * @return The id of the selected layout.
-     */
-    selectedLayoutId(): string {
-      return this.attributeLayouts[this.selectedLayout]?.id || "";
     },
   },
   actions: {
@@ -55,6 +47,7 @@ export const useAttributes = defineStore("attributes", {
     initializeProject(project: ProjectSchema): void {
       this.attributes = project.attributes || [];
       this.attributeLayouts = project.attributeLayouts || [];
+      this.selectedLayoutId = project.attributeLayouts?.[0]?.id || "";
     },
 
     /**
@@ -117,7 +110,7 @@ export const useAttributes = defineStore("attributes", {
       projectStore.project.attributeLayouts = this.attributeLayouts;
     },
     /**
-     * Returns the layout based on an artifact type.
+     * Returns the attribute grid layout for the given artifact type.
      *
      * @param type - The type to find.
      * @return The attribute layout.
@@ -126,7 +119,7 @@ export const useAttributes = defineStore("attributes", {
       return (
         this.attributeLayouts.find(({ artifactTypes }) =>
           artifactTypes.includes(type)
-        ) || this.attributeLayouts[0]
+        ) || this.defaultLayout
       );
     },
     /**
@@ -176,6 +169,10 @@ export const useAttributes = defineStore("attributes", {
       this.attributeLayouts = this.attributeLayouts.filter(
         ({ id }) => id !== layout.id
       );
+
+      if (this.selectedLayoutId !== layout.id) return;
+
+      this.selectedLayoutId = this.attributeLayouts[0]?.id || "";
     },
   },
 });

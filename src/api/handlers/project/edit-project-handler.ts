@@ -29,7 +29,7 @@ export function handleSaveProject({
 
   saveProject(identifier)
     .then((project) => {
-      projectStore.addProject(project);
+      projectStore.addProject(identifier.projectId ? identifier : project);
       logStore.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })

@@ -18,6 +18,9 @@ async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
   const response = await fetch(`${baseURL}/${args[0]}`, {
     ...args[1],
     credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -40,9 +43,6 @@ export async function createUser(
   return sessionFetch<SessionSchema>(fillEndpoint(Endpoint.createAccount), {
     method: "POST",
     body: JSON.stringify(user),
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
 }
 

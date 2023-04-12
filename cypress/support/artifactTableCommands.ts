@@ -10,31 +10,21 @@ Cypress.Commands.add("switchToTableView", (tab) => {
 
 Cypress.Commands.add("sortArtifactTable", (sort) => {
   if (sort === "name") {
-    cy.clickButton(DataCy.artifactTableSortByInput).type("{enter}{enter}{esc}");
+    cy.clickButton(DataCy.artifactTableSortByInput).clickMenuOption("name");
   } else if (sort === "type") {
-    cy.clickButton(DataCy.artifactTableSortByInput).type(
-      "{enter}{downArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.artifactTableSortByInput).clickMenuOption("type");
   } else {
-    cy.clickButton(DataCy.artifactTableSortByInput).type(
-      "{backspace}{backspace}{backspace}{backspace}{esc}"
-    );
+    cy.clickButton(DataCy.artifactTableSortByInput).type("{backspace}{esc}");
   }
 });
 
 Cypress.Commands.add("groupArtifactTable", (group) => {
   if (group === "name") {
-    cy.clickButton(DataCy.artifactTableGroupByInput).type(
-      "{upArrow}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.artifactTableGroupByInput).clickMenuOption("name");
   } else if (group === "type") {
-    cy.clickButton(DataCy.artifactTableGroupByInput).type(
-      "{enter}{enter}{esc}"
-    );
+    cy.clickButton(DataCy.artifactTableGroupByInput).clickMenuOption("type");
   } else {
-    cy.clickButton(DataCy.artifactTableGroupByInput).type(
-      "{backspace}{backspace}{backspace}{backspace}{esc}"
-    );
+    cy.clickButton(DataCy.artifactTableGroupByInput).type("{backspace}{esc}");
   }
 });
 

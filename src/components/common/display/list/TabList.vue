@@ -1,60 +1,56 @@
 <template>
   <div>
-    <flex-box class="width-fit" align="center">
+    <q-tabs v-model="model" active-color="primary" align="left" :breakpoint="0">
       <slot name="before" />
-      <v-tabs v-model="model" class="transparent-bg">
-        <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
-          <typography :value="name" />
-        </v-tab>
-      </v-tabs>
+      <q-tab
+        v-for="{ id, name } in tabs"
+        :key="id"
+        :name="id"
+        :label="name"
+        no-caps
+      />
       <slot name="after" />
-    </flex-box>
-    <v-tabs-items v-model="model" class="mt-1">
-      <slot />
-    </v-tabs-items>
+    </q-tabs>
+    <q-tab-panels v-model="model" animated class="bg-transparent">
+      <q-tab-panel
+        v-for="{ id } in tabs"
+        :key="id"
+        :name="id"
+        class="q-pt-sm q-px-none"
+      >
+        <slot :name="id" />
+      </q-tab-panel>
+    </q-tab-panels>
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { SelectOption } from "@/types";
-import { FlexBox } from "@/components/common/layout";
-import Typography from "../Typography.vue";
-
 /**
  * Renders content across multiple tabs.
- * Use the `<v-tab-item/>` component to wrap each tab's child component.
- *
- * @emits-1 `input` (NUmber) - On tab change.
  */
-export default Vue.extend({
+export default {
   name: "TabList",
-  components: { FlexBox, Typography },
-  props: {
-    value: Number,
-    tabs: {
-      type: Array as PropType<SelectOption[]>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-    };
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: number) {
-      this.model = currentValue;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentValue: number) {
-      this.$emit("input", currentValue);
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { SelectOption } from "@/types";
+import { useVModel } from "@/hooks";
+
+const props = defineProps<{
+  /**
+   * The tab id currently selected.
+   */
+  modelValue: string;
+  /**
+   * The tabs to display.
+   */
+  tabs: SelectOption[];
+}>();
+
+defineEmits<{
+  (e: "update:modelValue", value: number): void;
+}>();
+
+const model = useVModel(props, "modelValue");
 </script>

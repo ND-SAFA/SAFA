@@ -13,7 +13,7 @@ export function htmlFTA(data: ArtifactCytoElementData): string {
 
   return `
     <div style="${visibility};">
-      <strong class="text-h5" style="font-weight: 600">${data.logicType}</strong>
+      <strong class="text-h5">${data.logicType}</strong>
     </div>
   `;
 }

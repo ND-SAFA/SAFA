@@ -1,55 +1,34 @@
 <template>
-  <div style="position: absolute; bottom: 0" class="full-width">
-    <v-list-item>
-      <v-list-item-icon>
+  <div class="full-width nav-account">
+    <list-item to="" title="Notifications">
+      <template #icon>
         <notifications />
-      </v-list-item-icon>
-      <v-list-item-title>
-        <typography value="Notifications" />
-      </v-list-item-title>
-    </v-list-item>
+      </template>
+    </list-item>
 
-    <v-divider />
+    <separator />
 
-    <v-list-item :to="accountPath">
-      <v-list-item-icon>
-        <v-icon color="primary">mdi-account-circle</v-icon>
-      </v-list-item-icon>
-      <v-list-item-title data-cy="page-account">
-        <typography bold value="My Account" />
-      </v-list-item-title>
-    </v-list-item>
+    <list-item
+      :to="Routes.ACCOUNT"
+      color="primary"
+      icon="account"
+      title="My Account"
+      class="q-py-sm"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { appStore } from "@/hooks";
-import { Routes } from "@/router";
-import { Typography } from "@/components/common";
-import Notifications from "./Notifications.vue";
-
 /**
  * Renders the navigation drawer.
  */
-export default Vue.extend({
+export default {
   name: "NavAccount",
-  components: { Notifications, Typography },
-  data() {
-    return { accountPath: Routes.ACCOUNT };
-  },
-  computed: {
-    /**
-     * Manages changes to the panel open state.
-     */
-    sidebarOpen: {
-      get(): boolean {
-        return appStore.isAppPanelOpen;
-      },
-      set() {
-        appStore.toggleAppPanel();
-      },
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { Routes } from "@/router";
+import { ListItem, Separator } from "@/components/common";
+import Notifications from "./Notifications.vue";
 </script>

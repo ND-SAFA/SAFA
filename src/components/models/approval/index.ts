@@ -1,1 +1,1 @@
-export { default as TraceApprovalTable } from "./TraceApprovalTable.vue";
+export { default as ApprovalTable } from "./ApprovalTable.vue";

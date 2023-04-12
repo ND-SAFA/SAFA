@@ -1,159 +1,151 @@
 <template>
-  <v-btn-toggle tile group multiple dense :value="value">
+  <q-btn-group flat class="q-mx-sm nav-mode-select">
     <text-button
-      :value="options.tim"
-      text
-      color="accent"
+      v-bind="buttonProps(options.tim)"
+      :hide-label="smallWindow"
+      label="TIM"
       data-cy="button-nav-tim"
-      icon-id="mdi-ballot"
+      icon="view-tim"
       @click="handleTimView"
-    >
-      TIM
-    </text-button>
+    />
     <text-button
+      v-bind="buttonProps(options.tree)"
       :disabled="isTreeDisabled"
-      :value="options.tree"
-      text
-      color="accent"
+      :hide-label="smallWindow"
+      label="Tree"
       data-cy="button-nav-tree"
-      icon-id="mdi-family-tree"
+      icon="view-tree"
       @click="handleTreeView"
-    >
-      Tree
-    </text-button>
+    />
     <text-button
-      :value="options.table"
-      text
-      color="accent"
+      v-bind="buttonProps(options.table)"
+      :hide-label="smallWindow"
+      label="Table"
       data-cy="button-nav-table"
-      icon-id="mdi-table-multiple"
+      icon="view-table"
       @click="handleTableView"
-    >
-      Table
-    </text-button>
+    />
     <text-button
+      v-bind="buttonProps(options.delta)"
       :disabled="isDeltaDisabled"
-      :value="options.delta"
-      text
-      color="accent"
+      :hide-label="smallWindow"
+      label="Delta"
       data-cy="button-nav-delta"
-      icon-id="mdi-compare"
+      icon="view-delta"
       @click="handleDeltaView"
-    >
-      Delta
-    </text-button>
-  </v-btn-toggle>
+    />
+  </q-btn-group>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GraphMode } from "@/types";
-import { appStore, deltaStore, documentStore, layoutStore } from "@/hooks";
-import { TextButton } from "@/components/common";
-
 /**
  * Buttons for changing the mode of the artifact view.
  */
-export default Vue.extend({
+export default {
   name: "ModeButtons",
-  components: { TextButton },
-  data() {
-    return {
-      value: [] as GraphMode[],
-      options: {
-        tim: GraphMode.tim,
-        tree: GraphMode.tree,
-        table: GraphMode.table,
-        delta: GraphMode.delta,
-      },
-    };
-  },
-  mounted() {
-    this.updateValue();
-  },
-  computed: {
-    /**
-     * @return Whether the project is currently in delta view.
-     */
-    inDeltaView(): boolean {
-      return deltaStore.inDeltaView;
-    },
-    /**
-     * @return Whether the tree view is disabled.
-     */
-    isTreeDisabled(): boolean {
-      return documentStore.isTableOnlyDocument;
-    },
-    /**
-     * @return Whether the tree view is disabled.
-     */
-    isDeltaDisabled(): boolean {
-      return layoutStore.mode === GraphMode.tim;
-    },
-  },
-  methods: {
-    /**
-     * Updates the values of which buttons are highlighted.
-     */
-    updateValue(): void {
-      const selected: GraphMode[] = [];
+};
+</script>
 
-      selected.push(layoutStore.mode);
+<script setup lang="ts">
+import { computed, ref, onMounted, watch } from "vue";
+import { GraphMode } from "@/types";
+import {
+  appStore,
+  deltaStore,
+  documentStore,
+  layoutStore,
+  useScreen,
+} from "@/hooks";
+import { TextButton } from "@/components/common";
 
-      if (this.inDeltaView) {
-        selected.push(GraphMode.delta);
-      }
+const options = {
+  tim: GraphMode.tim,
+  tree: GraphMode.tree,
+  table: GraphMode.table,
+  delta: GraphMode.delta,
+};
 
-      this.value = selected;
-    },
-    /**
-     * Opens tree view.
-     */
-    handleTimView(): void {
-      layoutStore.mode = GraphMode.tim;
-      this.updateValue();
-    },
-    /**
-     * Opens tree view.
-     */
-    handleTreeView(): void {
-      layoutStore.mode = GraphMode.tree;
-      this.updateValue();
-    },
-    /**
-     * Opens table view.
-     */
-    handleTableView(): void {
-      layoutStore.mode = GraphMode.table;
-      this.updateValue();
-    },
-    /**
-     * Opens delta view.
-     */
-    handleDeltaView(): void {
-      appStore.openDetailsPanel("delta");
-      this.updateValue();
-    },
-  },
-  watch: {
-    /**
-     * Updates the value when delta view changes.
-     */
-    inDeltaView(): void {
-      this.updateValue();
-    },
-    /**
-     * Updates the value when the document type changes.
-     */
-    isTreeDisabled(): void {
-      this.updateValue();
-    },
-    /**
-     * Updates the value when the graph mode changes.
-     */
-    isDeltaDisabled(): void {
-      this.updateValue();
-    },
-  },
-});
+const { smallWindow } = useScreen();
+
+const value = ref<GraphMode[]>([]);
+
+const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
+const isDeltaDisabled = computed(() => layoutStore.mode === GraphMode.tim);
+
+/**
+ * Returns props for a mode button.
+ * @param option - The mode button to get props for.
+ */
+function buttonProps(option: GraphMode) {
+  const selected = value.value.includes(option);
+
+  return {
+    text: !selected,
+    outlined: selected,
+    color: selected ? "secondary" : "accent",
+  };
+}
+
+/**
+ * Updates the values of which buttons are highlighted.
+ */
+function updateValue(): void {
+  const selected: GraphMode[] = [];
+
+  selected.push(layoutStore.mode);
+
+  if (deltaStore.inDeltaView) {
+    selected.push(GraphMode.delta);
+  }
+
+  value.value = selected;
+}
+
+/**
+ * Opens tree view.
+ */
+function handleTimView(): void {
+  layoutStore.mode = GraphMode.tim;
+  updateValue();
+}
+
+/**
+ * Opens tree view.
+ */
+function handleTreeView(): void {
+  layoutStore.mode = GraphMode.tree;
+  updateValue();
+}
+
+/**
+ * Opens table view.
+ */
+function handleTableView(): void {
+  layoutStore.mode = GraphMode.table;
+  updateValue();
+}
+/**
+ * Opens delta view.
+ */
+function handleDeltaView(): void {
+  appStore.openDetailsPanel("delta");
+  updateValue();
+}
+
+onMounted(() => updateValue());
+
+watch(
+  () => deltaStore.inDeltaView,
+  () => updateValue()
+);
+
+watch(
+  () => isTreeDisabled.value,
+  () => updateValue()
+);
+
+watch(
+  () => isDeltaDisabled.value,
+  () => updateValue()
+);
 </script>

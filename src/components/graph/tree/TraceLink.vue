@@ -1,61 +1,49 @@
 <template>
-  <cy-element :definition="definition" />
+  <cy-element3 :definition="definition" />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Displays trace link edge between artifacts.
+ */
+export default {
+  name: "TraceLink",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import {
-  ArtifactDeltaState,
   GraphElementType,
   GraphMode,
   TraceCytoElement,
   TraceLinkSchema,
 } from "@/types";
-import { deltaStore } from "@/hooks";
+import { deltaStore, useTheme } from "@/hooks";
+import { CyElement3 } from "../base";
 
-/**
- * Displays trace link edge between artifacts.
- */
-export default Vue.extend({
-  name: "TraceLink",
-  props: {
-    trace: {
-      type: Object as PropType<TraceLinkSchema>,
-      required: true,
-    },
-    faded: Boolean,
-  },
-  computed: {
-    /**
-     * @return The delta state of this trace link.
-     */
-    linkDeltaState(): ArtifactDeltaState {
-      return deltaStore.getTraceDeltaType(this.trace.traceLinkId);
-    },
-    /**
-     * @return The trace link's data definition.
-     */
-    definition(): TraceCytoElement {
-      const { sourceId, targetId, traceLinkId, traceType, approvalStatus } =
-        this.trace;
+const props = defineProps<{
+  trace: TraceLinkSchema;
+  faded?: boolean;
+}>();
 
-      return {
-        data: {
-          type: GraphElementType.edge,
-          graph: GraphMode.tree,
-          id: traceLinkId,
-          // Reversed to show arrow toward parent.
-          source: targetId,
-          target: sourceId,
-          deltaType: this.linkDeltaState,
-          faded: this.faded,
-          traceType,
-          approvalStatus,
-          dark: this.$vuetify.theme.dark,
-        },
-        classes: sourceId === targetId ? ["loop"] : [],
-      };
-    },
+const { darkMode } = useTheme();
+
+const definition = computed<TraceCytoElement>(() => ({
+  data: {
+    type: GraphElementType.edge,
+    graph: GraphMode.tree,
+    id: props.trace.traceLinkId,
+    // Reversed to show arrow toward parent.
+    source: props.trace.targetId,
+    target: props.trace.sourceId,
+    deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
+    faded: props.faded,
+    traceType: props.trace.traceType,
+    approvalStatus: props.trace.approvalStatus,
+    score: props.trace.score,
+    dark: darkMode.value,
   },
-});
+  classes: props.trace.sourceId === props.trace.targetId ? "loop" : "",
+}));
 </script>

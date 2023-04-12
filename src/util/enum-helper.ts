@@ -6,7 +6,6 @@ import {
   DocumentType,
   FTANodeType,
   ModelShareType,
-  ModelTabTypes,
   ModelType,
   ProjectRole,
   SafetyCaseType,
@@ -187,18 +186,6 @@ export function creatorTabOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for model editor tabs.
- *
- * @return The select option names and ids.
- */
-export function modelEditorTabOptions(): SelectOption[] {
-  return [
-    createEnumOption(ModelTabTypes.training, "Training"),
-    createEnumOption(ModelTabTypes.evaluation, "Evaluation"),
-  ];
-}
-
-/**
  * Returns display names for trace prediction tabs.
  *
  * @return The select option names and ids.
@@ -247,7 +234,7 @@ export function trainingTabOptions(): SelectOption[] {
 export function tableViewTabOptions(): SelectOption[] {
   return [
     createEnumOption("artifacts", "Artifacts"),
-    createEnumOption("traceLinks", "Trace Links"),
+    createEnumOption("traces", "Trace Links"),
   ];
 }
 

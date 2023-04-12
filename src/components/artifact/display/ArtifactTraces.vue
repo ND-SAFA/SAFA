@@ -1,45 +1,39 @@
 <template>
   <div v-if="doDisplay">
-    <panel-card>
-      <flex-box justify="space-between" align="center">
-        <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
+    <panel-card :title="parentTitle">
+      <template #title-actions>
         <text-button
           text
-          variant="add"
+          label="Link Parent"
+          icon="add"
           data-cy="button-artifact-link-parent"
           @click="handleLinkParent"
-        >
-          Link Parent
-        </text-button>
-      </flex-box>
-      <v-divider />
-      <v-list
+        />
+      </template>
+      <list
         v-if="parents.length > 0"
-        dense
-        style="max-height: 300px"
-        class="overflow-y-auto"
+        :scroll-height="300"
         data-cy="list-selected-parents"
       >
-        <template v-for="parent in parents">
-          <v-list-item
-            :key="parent.id"
-            data-cy="list-selected-parent-item"
-            @click="handleArtifactClick(parent.name)"
-          >
-            <v-list-item-title>
-              <artifact-body-display display-title :artifact="parent" />
-            </v-list-item-title>
-            <v-list-item-action @click.stop="">
-              <icon-button
-                icon-id="mdi-ray-start-end"
-                tooltip="View Trace Link"
-                data-cy="button-selected-parent-link"
-                @click="handleTraceLinkClick(parent.name)"
-              />
-            </v-list-item-action>
-          </v-list-item>
-        </template>
-      </v-list>
+        <list-item
+          v-for="parent in parents"
+          :key="parent.id"
+          clickable
+          :action-cols="1"
+          data-cy="list-selected-parent-item"
+          @click="handleArtifactClick(parent.name)"
+        >
+          <artifact-body-display display-title :artifact="parent" />
+          <template #actions>
+            <icon-button
+              icon="trace"
+              tooltip="View Trace Link"
+              data-cy="button-selected-parent-link"
+              @click="handleTraceLinkClick(parent.name)"
+            />
+          </template>
+        </list-item>
+      </list>
       <typography
         v-else
         l="1"
@@ -48,46 +42,40 @@
       />
     </panel-card>
 
-    <panel-card>
-      <flex-box justify="space-between" align="center">
-        <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
+    <panel-card :title="childTitle">
+      <template #title-actions>
         <text-button
           text
-          variant="add"
+          label="Link Child"
+          icon="add"
           data-cy="button-artifact-link-child"
           @click="handleLinkChild"
-        >
-          Link Child
-        </text-button>
-      </flex-box>
-      <v-divider />
-      <v-list
+        />
+      </template>
+      <list
         v-if="children.length > 0"
-        dense
-        style="max-height: 300px"
-        class="overflow-y-auto"
+        :scroll-height="300"
         data-cy="list-selected-children"
       >
-        <template v-for="child in children">
-          <v-list-item
-            :key="child.name"
-            data-cy="list-selected-child-item"
-            @click="handleArtifactClick(child.name)"
-          >
-            <v-list-item-title>
-              <artifact-body-display display-title :artifact="child" />
-            </v-list-item-title>
-            <v-list-item-action @click.stop="">
-              <icon-button
-                icon-id="mdi-ray-start-end"
-                tooltip="View Trace Link"
-                data-cy="button-selected-child-link"
-                @click="handleTraceLinkClick(child.name)"
-              />
-            </v-list-item-action>
-          </v-list-item>
-        </template>
-      </v-list>
+        <list-item
+          v-for="child in children"
+          :key="child.id"
+          clickable
+          :action-cols="1"
+          data-cy="list-selected-child-item"
+          @click="handleArtifactClick(child.name)"
+        >
+          <artifact-body-display display-title :artifact="child" />
+          <template #actions>
+            <icon-button
+              icon="trace"
+              tooltip="View Trace Link"
+              data-cy="button-selected-child-link"
+              @click="handleTraceLinkClick(child.name)"
+            />
+          </template>
+        </list-item>
+      </list>
       <typography
         v-else
         l="1"
@@ -99,8 +87,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ArtifactSchema } from "@/types";
+/**
+ * Displays the selected node's parents and children.
+ */
+export default {
+  name: "ArtifactTraces",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import {
   appStore,
   artifactStore,
@@ -114,133 +110,97 @@ import {
   PanelCard,
   ArtifactBodyDisplay,
   TextButton,
-  FlexBox,
+  List,
+  ListItem,
 } from "@/components/common";
 
+const artifact = computed(() => selectionStore.selectedArtifact);
+
+const parents = computed(() =>
+  artifact.value
+    ? subtreeStore
+        .getParents(artifact.value.id)
+        .map((id) => artifactStore.getArtifactById(id))
+    : []
+);
+
+const children = computed(() =>
+  artifact.value
+    ? subtreeStore
+        .getChildren(artifact.value.id)
+        .map((id) => artifactStore.getArtifactById(id))
+    : []
+);
+
+const doDisplay = computed(
+  () => parents.value.length + children.value.length > 0
+);
+
+const parentTitle = computed(() =>
+  parents.value.length === 1
+    ? "1 Parent Artifact"
+    : `${parents.value.length} Parent Artifacts`
+);
+
+const childTitle = computed(() =>
+  children.value.length === 1
+    ? "1 Child Artifact"
+    : `${children.value.length} Child Artifacts`
+);
+
 /**
- * Displays the selected node's parents and children.
+ * Selects an artifact.
+ * @param artifactName - The artifact to select.
  */
-export default Vue.extend({
-  name: "ArtifactTraces",
-  components: {
-    FlexBox,
-    ArtifactBodyDisplay,
-    PanelCard,
-    IconButton,
-    Typography,
-    TextButton,
-  },
-  computed: {
-    /**
-     * @return The selected artifact.
-     */
-    artifact() {
-      return selectionStore.selectedArtifact;
-    },
-    /**
-     * @return The selected artifact's parents.
-     */
-    parents(): ArtifactSchema[] {
-      if (!this.artifact) return [];
+function handleArtifactClick(artifactName: string): void {
+  const relatedArtifact = artifactStore.getArtifactByName(artifactName);
 
-      return subtreeStore
-        .getParents(this.artifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
-    },
-    /**
-     * @return The selected artifact's children.
-     */
-    children(): ArtifactSchema[] {
-      if (!this.artifact) return [];
+  if (!relatedArtifact) return;
 
-      return subtreeStore
-        .getChildren(this.artifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
-    },
-    /**
-     * @return Whether to display this section.
-     */
-    doDisplay(): boolean {
-      return this.parents.length + this.children.length > 0;
-    },
-    /**
-     * Determines the width of trace link buttons.
-     */
-    style(): string {
-      return this.children.length > 0 && this.parents.length > 0
-        ? "max-width: 75px"
-        : "max-width: 240px";
-    },
-    /**
-     * Generates the name of the parent dropdown.
-     */
-    parentTitle(): string {
-      const length = this.parents.length;
+  selectionStore.selectArtifact(relatedArtifact.id);
+}
 
-      return length === 1 ? "1 Parent" : `${length} Parents`;
-    },
-    /**
-     * Generates the name of the child dropdown.
-     */
-    childTitle(): string {
-      const length = this.children.length;
+/**
+ * Selects the trace link to an artifact.
+ * @param artifactName - The artifact to select the link to.
+ */
+function handleTraceLinkClick(artifactName: string): void {
+  const relatedArtifact = artifactStore.getArtifactByName(artifactName);
 
-      return length === 1 ? "1 Child" : `${length} Children`;
-    },
-  },
-  methods: {
-    /**
-     * Selects an artifact.
-     * @param artifactName - The artifact to select.
-     */
-    handleArtifactClick(artifactName: string): void {
-      const artifact = artifactStore.getArtifactByName(artifactName);
+  if (!relatedArtifact || !artifact.value) return;
 
-      if (!artifact) return;
+  const traceLink = traceStore.getTraceLinkByArtifacts(
+    relatedArtifact.id,
+    artifact.value.id,
+    true
+  );
 
-      selectionStore.selectArtifact(artifact.id);
-    },
-    /**
-     * Selects the trace link to an artifact.
-     * @param artifactName - The artifact to select the link to.
-     */
-    handleTraceLinkClick(artifactName: string): void {
-      const artifact = artifactStore.getArtifactByName(artifactName);
+  if (!traceLink) return;
 
-      if (!artifact || !this.artifact) return;
+  selectionStore.selectTraceLink(traceLink);
+}
 
-      const traceLink = traceStore.getTraceLinkByArtifacts(
-        artifact.id,
-        this.artifact.id,
-        true
-      );
+/**
+ * Opens the create trace link panel with this artifact as the child.
+ */
+function handleLinkParent(): void {
+  if (!artifact.value) return;
 
-      if (!traceLink) return;
+  appStore.openTraceCreatorTo({
+    type: "source",
+    artifactId: artifact.value.id,
+  });
+}
 
-      selectionStore.selectTraceLink(traceLink);
-    },
-    /**
-     * Opens the create trace link panel with this artifact as the child.
-     */
-    handleLinkParent(): void {
-      if (!this.artifact) return;
+/**
+ * Opens the create trace link panel with this artifact as the parent.
+ */
+function handleLinkChild(): void {
+  if (!artifact.value) return;
 
-      appStore.openTraceCreatorTo({
-        type: "source",
-        artifactId: this.artifact.id,
-      });
-    },
-    /**
-     * Opens the create trace link panel with this artifact as the parent.
-     */
-    handleLinkChild(): void {
-      if (!this.artifact) return;
-
-      appStore.openTraceCreatorTo({
-        type: "target",
-        artifactId: this.artifact.id,
-      });
-    },
-  },
-});
+  appStore.openTraceCreatorTo({
+    type: "target",
+    artifactId: artifact.value.id,
+  });
+}
 </script>

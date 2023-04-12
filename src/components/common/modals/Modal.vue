@@ -1,119 +1,95 @@
 <template>
-  <v-dialog
-    :value="isOpen"
-    :width="`${width}px`"
-    :retain-focus="false"
-    persistent
+  <q-dialog
+    :model-value="props.open"
+    :data-cy="props.dataCy"
+    @close="emit('close')"
   >
-    <v-card :class="`modal-${size}`" :data-cy="dataCy">
-      <v-card-title class="primary">
+    <q-card :class="className">
+      <q-card-section>
         <flex-box
           full-width
-          justify="space-between"
+          justify="between"
           align="center"
           data-cy="modal-title"
         >
-          <typography :value="title" color="white" />
+          <typography :value="props.title" />
           <icon-button
             tooltip="Close"
-            icon-id="mdi-close"
-            color="white"
+            icon="cancel"
             data-cy="button-close"
-            @click="$emit('close')"
+            @click="emit('close')"
           />
         </flex-box>
-      </v-card-title>
-
-      <v-card-text>
-        <slot name="body" />
-      </v-card-text>
-
-      <v-divider />
-
-      <v-progress-linear v-if="isLoading" indeterminate color="secondary" />
-
-      <v-card-actions
-        v-if="actionsHeight > 0"
-        dense
-        :style="`height: ${actionsHeight}px`"
-      >
+        <separator />
+        <q-linear-progress v-if="!!props.loading" indeterminate />
+        <typography
+          v-if="!!props.subtitle"
+          t="2"
+          b=""
+          el="p"
+          :value="props.subtitle"
+        />
+      </q-card-section>
+      <q-card-section v-if="!!slots.default">
+        <slot />
+      </q-card-section>
+      <q-card-actions v-if="!!slots.actions" align="right">
+        <separator />
         <slot name="actions" />
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ModalSize } from "@/types";
-import { Typography } from "@/components/common/display";
-import { IconButton } from "@/components/common/button";
-import { FlexBox } from "@/components/common/layout";
-
 /**
  * Displays a generic modal.
- *
- * @emits `close` - On close.
  */
-export default Vue.extend({
+export default {
   name: "Modal",
-  components: {
-    FlexBox,
-    Typography,
-    IconButton,
-  },
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    actionsHeight: {
-      type: Number,
-      required: false,
-      default: 50,
-    },
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    size: {
-      type: String as PropType<ModalSize>,
-      required: false,
-      default: "m",
-    },
-    dataCy: String,
-  },
-  computed: {
-    /**
-     * @return The modal width.
-     */
-    width(): number {
-      switch (this.size) {
-        case "xxs":
-          return 250;
-        case "xs":
-          return 300;
-        case "s":
-          return 400;
-        case "m":
-          return 600;
-        case "l":
-          return 800;
-        default:
-          return 400;
-      }
-    },
-  },
-});
+};
 </script>
 
-<style scoped>
-html {
-  overflow: hidden !important;
-}
-</style>
+<script setup lang="ts">
+import { computed, useSlots } from "vue";
+import { Typography, Separator, FlexBox } from "@/components/common/display";
+import { IconButton } from "@/components/common/button";
+
+const props = defineProps<{
+  /**
+   * The modal title.
+   */
+  title: string;
+  /**
+   * The modal subtitle.
+   */
+  subtitle?: string;
+  /**
+   * Whether the modal is open.
+   */
+  open: boolean;
+  /**
+   * Whether the component is loading.
+   */
+  loading?: boolean;
+  /**
+   * A fixed width size to set for the modal.
+   */
+  size?: "sm" | "md" | "lg";
+  /**
+   * The testing selector to set.
+   */
+  dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  /**
+   * Called when closed.
+   */
+  (e: "close"): void;
+}>();
+
+const slots = useSlots();
+
+const className = computed(() => `modal-${props.size}`);
+</script>

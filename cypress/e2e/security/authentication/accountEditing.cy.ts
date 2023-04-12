@@ -16,6 +16,12 @@ describe("Account Editing", () => {
         .clickButton(DataCy.passwordChangeButton);
 
       cy.getCy(DataCy.snackbarError).should("be.visible");
+
+      // Test that the password was not changed.
+      cy.logout();
+      cy.login(editUser.email, editUser.newPassword);
+      cy.locationShouldEqual(Routes.LOGIN_ACCOUNT);
+      cy.contains("Invalid username or password");
     });
 
     it("Should be able to change my password with the correct current password", () => {
@@ -25,6 +31,12 @@ describe("Account Editing", () => {
         .clickButton(DataCy.passwordChangeButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+      // Test that the password was changed.
+      cy.logout()
+        .visit(Routes.ACCOUNT)
+        .login(editUser.email, editUser.newPassword)
+        .locationShouldEqual(Routes.ACCOUNT);
 
       // Revert the password value.
       cy.inputText(DataCy.passwordCurrentInput, editUser.newPassword)
@@ -44,6 +56,9 @@ describe("Account Editing", () => {
         .clickButton(DataCy.confirmModalButton);
 
       cy.getCy(DataCy.snackbarError).should("be.visible");
+      cy.logout()
+        .login(editUser.email, editUser.password)
+        .should("not.contain", "Invalid username or password");
     });
 
     it("Successfully deletes my account", () => {
@@ -56,6 +71,10 @@ describe("Account Editing", () => {
         .clickButton(DataCy.confirmModalButton);
 
       cy.locationShouldEqual(Routes.LOGIN_ACCOUNT);
+
+      // Try to login with the deleted account.
+      cy.login(deleteUser.email, deleteUser.password);
+      cy.contains("Invalid username or password");
     });
   });
 });

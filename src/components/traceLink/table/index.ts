@@ -1,1 +1,1 @@
-export { default as TraceMatrixTable } from "./TraceMatrixTable.vue";
+export { default as TraceTable } from "./TraceTable.vue";

@@ -27,6 +27,24 @@ interface DocumentFields {
   childArtifacts?: string;
 }
 
+/**
+ * Represents fields that can be filled in to create an attribute.
+ */
+interface AttributeFields {
+  key?: string;
+  label?: string;
+  min?: string;
+  max?: string;
+}
+
+/**
+ * Represents fields that can be filled in to create an attribute layout.
+ */
+interface AttributeLayoutFields {
+  name?: string;
+  type?: string;
+}
+
 declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
@@ -118,11 +136,13 @@ declare namespace Cypress {
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
      * @param clear - If true, the input will be cleared first.
+     * @param last - If true, the last element will be selected.
      */
     inputText(
       dataCy: string,
       inputValue: string,
-      clear?: boolean
+      clear?: boolean,
+      last?: boolean
     ): Chainable<void>;
 
     /**
@@ -540,5 +560,40 @@ declare namespace Cypress {
     filterTraceApproval(
       filter: "all" | "approved" | "declined"
     ): Chainable<void>;
+
+    // Custom Attributes
+
+    /**
+     * Fills inputs in the custom attribute panel.
+     *
+     * @param props - The attribute fields to set.
+     */
+    fillCustomAttributeFields(props: AttributeFields): Chainable<void>;
+
+    /**
+     * Creates a new custom attribute.
+     * The custom attribute panel must be open.
+     *
+     * @param props - The attribute fields to set.
+     */
+    createCustomAttribute(props: AttributeFields): Chainable<void>;
+
+    /**
+     * Fills inputs in the custom attribute layout panel.
+     * The custom attribute panel must be open and a custom attribute must be made
+     * before this is called.
+     *
+     * @param props - The custom layout fields to set.
+     */
+    fillCustomLayoutFields(props: AttributeLayoutFields): Chainable<void>;
+
+    /**
+     * Creates a new custom Layout.
+     * The custom attribute panel must be open and a custom attribute must be made
+     * before this is called.
+     *
+     * @param props - The custom layout fields to set.
+     */
+    createCustomLayout(props: AttributeLayoutFields): Chainable<void>;
   }
 }

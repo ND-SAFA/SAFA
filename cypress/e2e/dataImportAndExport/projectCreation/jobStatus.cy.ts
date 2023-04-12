@@ -2,8 +2,8 @@ import { DataCy, Routes } from "@/fixtures";
 
 describe("Job Status", () => {
   beforeEach(() => {
+    cy.viewport(1080, 1080);
     cy.initProject(false);
-
     cy.locationShouldEqual(Routes.UPLOAD_STATUS);
   });
 
@@ -13,6 +13,7 @@ describe("Job Status", () => {
 
   describe("I can see the current status of a job", () => {
     it("Shows in progress jobs", () => {
+      cy.contains("Project Uploads");
       cy.getCy(DataCy.jobStatus, "first").should("contain.text", "In Progress");
     });
 

@@ -1,94 +1,55 @@
 <template>
   <modal
-    size="xs"
-    :isOpen="isMessageDefined"
-    :title="title"
+    size="sm"
+    :open="isOpen"
+    :title="message.title"
+    :subtitle="message.body"
     @close="handleClose"
   >
-    <template v-slot:body>
-      <typography y="2" el="p" :value="body" />
-    </template>
-    <template v-slot:actions>
-      <v-spacer />
-      <v-btn
+    <template #actions>
+      <text-button
+        label="Confirm"
         color="primary"
         data-cy="button-confirm-modal"
         @click="handleConfirm"
-      >
-        I accept
-      </v-btn>
+      />
     </template>
   </modal>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
-import { logStore } from "@/hooks";
-import { Typography } from "@/components/common/display";
-import Modal from "./Modal.vue";
-
 /**
  * Displays a modal for confirming sensitive actions.
  */
-export default Vue.extend({
+export default {
   name: "AppConfirmModal",
-  components: { Typography, Modal },
-  props: {
-    message: {
-      type: Object as PropType<ConfirmDialogueMessage>,
-      required: false,
-    },
-    width: {
-      type: String,
-      required: false,
-      default: "500",
-    },
-  },
-  data() {
-    return {
-      dialog: false,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether the current message exists.
-     */
-    isMessageDefined(): boolean {
-      return !!this.message && this.message.type !== ConfirmationType.CLEAR;
-    },
-    /**
-     * @return The message title.
-     */
-    title(): string {
-      return this.message?.title || "";
-    },
-    /**
-     * @return The message body.
-     */
-    body(): string {
-      return this.message?.body || "";
-    },
-  },
-  methods: {
-    /**
-     * Confirms the confirmation message.
-     */
-    handleConfirm(): void {
-      if (!this.message) return;
+};
+</script>
 
-      logStore.clearConfirmation();
-      this.message.statusCallback(true);
-    },
-    /**
-     * Closes the confirmation message.
-     */
-    handleClose(): void {
-      if (!this.message) return;
+<script setup lang="ts">
+import { computed } from "vue";
+import { ConfirmationType } from "@/types";
+import { logStore } from "@/hooks";
+import { TextButton } from "@/components/common/button";
+import Modal from "./Modal.vue";
 
-      logStore.clearConfirmation();
-      this.message.statusCallback(false);
-    },
-  },
-});
+const message = computed(() => logStore.confirmation);
+
+const isOpen = computed(() => message.value.type !== ConfirmationType.CLEAR);
+
+/**
+ * Confirms the confirmation message.
+ */
+function handleConfirm(): void {
+  message.value.statusCallback(true);
+  logStore.clearConfirmation();
+}
+
+/**
+ * Closes the confirmation message.
+ */
+function handleClose(): void {
+  message.value.statusCallback(false);
+  logStore.clearConfirmation();
+}
 </script>

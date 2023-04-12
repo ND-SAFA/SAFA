@@ -1,46 +1,37 @@
 <template>
-  <flex-box y="4">
+  <flex-box b="2">
     <trace-link-approval
-      :link="traceLink"
-      show-delete
-      @link:approve="handleClose"
-      @link:decline="handleClose"
-      @link:unreview="handleClose"
-      @link:delete="handleClose"
+      :trace="traceLink"
+      deletable
+      @approve="handleClose"
+      @decline="handleClose"
+      @unreview="handleClose"
+      @delete="handleClose"
     />
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { TraceLinkSchema } from "@/types";
+/**
+ * Displays buttons for the selected trace link.
+ */
+export default {
+  name: "TraceLinkButtons",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { appStore, selectionStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import { TraceLinkApproval } from "./index";
 
-/**
- * Displays buttons for the selected trace link.
- */
-export default Vue.extend({
-  name: "TraceLinkButtons",
-  components: { TraceLinkApproval, FlexBox },
-  computed: {
-    /**
-     * @return The selected trace link.
-     */
-    traceLink(): TraceLinkSchema | undefined {
-      return selectionStore.selectedTraceLink;
-    },
-  },
-  methods: {
-    /**
-     * Closes this panel.
-     */
-    handleClose(): void {
-      appStore.closeSidePanels();
-    },
-  },
-});
-</script>
+const traceLink = computed(() => selectionStore.selectedTraceLink);
 
-<style scoped lang="scss"></style>
+/**
+ * Closes this panel.
+ */
+function handleClose(): void {
+  appStore.closeSidePanels();
+}
+</script>

@@ -1,77 +1,66 @@
 <template>
   <div>
-    <v-row class="my-1" v-if="!showOnly">
-      <v-col cols="6">
-        <artifact-body-display
-          :artifact="sourceArtifact"
-          display-title
-          display-divider
-        />
-      </v-col>
-
-      <v-divider vertical inset />
-
-      <v-col cols="6">
-        <artifact-body-display
-          :artifact="targetArtifact"
-          display-title
-          display-divider
-        />
-      </v-col>
-    </v-row>
+    <flex-box v-if="!showOnly" full-width y="1" justify="between" :wrap="false">
+      <artifact-body-display
+        :artifact="sourceArtifact"
+        display-title
+        display-divider
+      />
+      <separator vertical />
+      <artifact-body-display
+        :artifact="targetArtifact"
+        display-title
+        display-divider
+      />
+    </flex-box>
 
     <typography
       v-else
-      defaultExpanded
-      secondary
+      default-expanded
       t="1"
       variant="expandable"
-      :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
+      :value="
+        showOnly === 'source' ? sourceArtifact?.body : targetArtifact?.body
+      "
     />
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ArtifactSchema, TraceLinkSchema } from "@/types";
-import { artifactStore } from "@/hooks";
-import { Typography, ArtifactBodyDisplay } from "@/components/common";
-
 /**
- * Displays a trace link.
+ * Displays a trace link's artifacts.
  */
-export default Vue.extend({
+export default {
   name: "TraceLinkDisplay",
-  components: {
-    Typography,
-    ArtifactBodyDisplay,
-  },
-  props: {
-    link: {
-      type: Object as PropType<TraceLinkSchema>,
-      required: true,
-    },
-    showOnly: String as PropType<"source" | "target">,
-  },
-  data() {
-    return {
-      isSourceExpanded: false,
-      isTargetExpanded: false,
-    };
-  },
-  computed: {
-    /**
-     * @return The artifact this link comes from.
-     */
-    sourceArtifact(): ArtifactSchema | undefined {
-      return artifactStore.getArtifactById(this.link.sourceId);
-    },
-    /**
-     * @return The artifact this link goes towards.
-     */
-    targetArtifact(): ArtifactSchema | undefined {
-      return artifactStore.getArtifactById(this.link.targetId);
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { TraceLinkSchema } from "@/types";
+import { artifactStore } from "@/hooks";
+import {
+  Typography,
+  ArtifactBodyDisplay,
+  FlexBox,
+  Separator,
+} from "@/components/common";
+
+const props = defineProps<{
+  /**
+   * The trace link to display.
+   */
+  trace: TraceLinkSchema;
+  /**
+   * Whether to display only the source or target artifact.
+   */
+  showOnly?: "source" | "target";
+}>();
+
+const sourceArtifact = computed(() =>
+  artifactStore.getArtifactById(props.trace.sourceId)
+);
+const targetArtifact = computed(() =>
+  artifactStore.getArtifactById(props.trace.targetId)
+);
 </script>

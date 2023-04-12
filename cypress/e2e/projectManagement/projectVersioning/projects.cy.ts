@@ -29,6 +29,8 @@ describe("Projects", () => {
     it("Edits a project from the settings", () => {
       cy.projectSelectorContinue("project").projectSelectorContinue("version");
 
+      cy.getCy(DataCy.appLoading).should("not.exist");
+
       cy.clickButton(DataCy.navSettingsButton).clickButton(
         DataCy.projectSettingsEditButton
       );
@@ -64,6 +66,8 @@ describe("Projects", () => {
 
     it("Deletes a project from the settings", () => {
       cy.projectSelectorContinue("project").projectSelectorContinue("version");
+
+      cy.getCy(DataCy.appLoading).should("not.exist");
 
       cy.clickButton(DataCy.navSettingsButton).clickButton(
         DataCy.projectSettingsDeleteButton

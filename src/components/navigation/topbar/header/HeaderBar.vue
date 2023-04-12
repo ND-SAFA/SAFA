@@ -1,59 +1,42 @@
 <template>
   <div class="full-width">
-    <flex-box full-width justify="space-between">
-      <flex-box align="center">
-        <searchbar v-if="graphVisible" />
-      </flex-box>
+    <flex-box full-width :wrap="false" justify="between" align="center" y="2">
+      <project-searchbar v-if="graphVisible" />
+      <q-space />
       <flex-box align="center">
         <update-button />
         <saving-icon />
-        <app-version />
+        <version-selector />
       </flex-box>
     </flex-box>
-    <v-divider class="accent faded mt-2" v-if="graphVisible" />
-    <loading-bar />
+    <separator v-if="graphVisible" nav />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Route } from "vue-router";
-import { router, Routes } from "@/router";
-import { FlexBox } from "@/components/common";
-import Searchbar from "./Searchbar.vue";
-import AppVersion from "./AppVersion.vue";
-import SavingIcon from "./SavingIcon.vue";
-import UpdateButton from "./UpdateButton.vue";
-import LoadingBar from "./LoadingBar.vue";
-
 /**
  * Renders the top navigation bar header.
  */
-export default Vue.extend({
+export default {
   name: "HeaderBar",
-  components: {
-    Searchbar,
-    SavingIcon,
-    UpdateButton,
-    AppVersion,
-    FlexBox,
-    LoadingBar,
-  },
-  data() {
-    return {
-      graphVisible: router.currentRoute.path === Routes.ARTIFACT,
-    };
-  },
-  watch: {
-    /**
-     * Checks whether the graph buttons should be visible when the route changes.
-     */
-    $route(to: Route) {
-      this.graphVisible = to.path === Routes.ARTIFACT;
-    },
-  },
-  computed: {},
-});
+};
 </script>
 
-<style scoped lang="scss"></style>
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { Routes } from "@/router";
+import { FlexBox, Separator } from "@/components/common";
+import { VersionSelector } from "@/components/project";
+import ProjectSearchbar from "./ProjectSearchbar.vue";
+import SavingIcon from "./SavingIcon.vue";
+import UpdateButton from "./UpdateButton.vue";
+
+const currentRoute = useRoute();
+const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
+
+watch(
+  () => currentRoute.path,
+  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
+);
+</script>

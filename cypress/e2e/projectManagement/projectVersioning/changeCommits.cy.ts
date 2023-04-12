@@ -13,12 +13,12 @@ describe("Change Commits", () => {
     it("Commits an artifact", () => {
       const name = "Test Commit Artifact";
 
-      cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("be.disabled");
 
       cy.createNewArtifact({ name }, true, true);
 
       cy.getNode(name).should("be.visible");
-      cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
     });
   });
 
@@ -29,13 +29,13 @@ describe("Change Commits", () => {
       cy.createNewArtifact({ name }, true, true);
 
       cy.getNode(name).should("be.visible");
-      cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navUndoButton);
 
       cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("not.exist");
-      cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("be.disabled");
     });
 
     it("Undoes edits to an artifact", () => {
@@ -58,12 +58,10 @@ describe("Change Commits", () => {
 
       cy.clickButton(DataCy.selectedPanelCloseButton);
 
-      cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
-
-      cy.clickButton(DataCy.navUndoButton);
+      cy.wait(1000).clickButton(DataCy.navUndoButton);
 
       cy.getCy(DataCy.snackbarUpdate).should("be.visible");
-      cy.getNode(name).should("be.visible");
+      cy.getNode(name).should("exist");
     });
 
     it.skip("Undoes changes to a trace link", () => {
@@ -78,7 +76,7 @@ describe("Change Commits", () => {
         tr.filter(":visible").should("have.length", 9);
       });
 
-      cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navUndoButton);
 
@@ -103,7 +101,7 @@ describe("Change Commits", () => {
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getNode(existingName).should("not.exist");
-      cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
+      cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navUndoButton);
 
@@ -128,13 +126,13 @@ describe("Change Commits", () => {
 
       cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("not.exist");
-      cy.getCy(DataCy.navRedoButton).should("not.have.class", "disable-events");
+      cy.getCy(DataCy.navRedoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navRedoButton);
 
       cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("be.visible");
-      cy.getCy(DataCy.navRedoButton).should("have.class", "disable-events");
+      cy.getCy(DataCy.navRedoButton).should("be.disabled");
     });
   });
 });

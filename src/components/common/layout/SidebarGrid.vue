@@ -1,25 +1,34 @@
 <template>
-  <div class="ma-8">
+  <div>
     <slot name="header" />
-    <v-row dense>
-      <v-col :cols="$vuetify.breakpoint.lgAndUp ? 4 : 12">
+    <flex-box :column="smallWindow">
+      <flex-item
+        :parts="smallWindow ? '12' : '4'"
+        :full-width="smallWindow"
+        :class="smallWindow ? '' : 'q-pr-md'"
+      >
         <slot name="sidebar" />
-      </v-col>
-      <v-col :cols="$vuetify.breakpoint.lgAndUp ? 8 : 12">
+      </flex-item>
+      <flex-item :parts="smallWindow ? '12' : '8'" :full-width="smallWindow">
         <slot />
-      </v-col>
-    </v-row>
+      </flex-item>
+    </flex-box>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
 /**
  * Represents a grid with a sidebar that changes
  * to a stacked representation at smaller screen sizes.
  */
-export default Vue.extend({
+export default {
   name: "SidebarGrid",
-});
+};
+</script>
+
+<script setup lang="ts">
+import { useScreen } from "@/hooks";
+import { FlexBox, FlexItem } from "@/components/common/display";
+
+const { smallWindow } = useScreen();
 </script>

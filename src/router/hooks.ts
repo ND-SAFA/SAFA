@@ -1,6 +1,6 @@
-import { URLParameter } from "@/types";
+import { URLParameter, URLQuery } from "@/types";
 import { QueryParams, Routes } from "@/router/routes";
-import router from "@/router/router";
+import { router } from "@/router/router";
 
 /**
  * Navigates app to given route, if app is already on the route then
@@ -11,9 +11,12 @@ import router from "@/router/router";
  */
 export async function navigateTo(
   route: Routes | string,
-  query: Record<string, string | (string | null)[]> = {}
+  query: URLQuery = {}
 ): Promise<void> {
-  if (router.currentRoute.path === route && Object.keys(query).length === 0) {
+  if (
+    router.currentRoute.value.path === route &&
+    Object.keys(query).length === 0
+  ) {
     return;
   } else {
     await router.push({ path: route, query });
@@ -30,8 +33,8 @@ export function navigateBack(): void {
 /**
  * Return the app's query parameters.
  */
-export function getParams(): Record<string, string | (string | null)[]> {
-  return router.currentRoute.query;
+export function getParams(): URLQuery {
+  return router.currentRoute.value.query;
 }
 
 /**
@@ -41,7 +44,7 @@ export function getParams(): Record<string, string | (string | null)[]> {
  * @return The query parameter value.
  */
 export function getParam(key: QueryParams): URLParameter {
-  return router.currentRoute.query[key];
+  return router.currentRoute.value.query[key];
 }
 
 /**
@@ -51,15 +54,20 @@ export function getParam(key: QueryParams): URLParameter {
  * @param value - The query param value.
  */
 export async function updateParam(key: string, value: string): Promise<void> {
-  if (router.currentRoute.query[key] === value) return;
+  const currentRoute = router.currentRoute.value;
 
-  return navigateTo(router.currentRoute.path, { [key]: value });
+  if (currentRoute.query[key] === value) return;
+
+  return navigateTo(currentRoute.path, { [key]: value });
 }
 
 /**
  * Removes all query parameters.
  */
 export async function removeParams(): Promise<void> {
-  if (Object.values(router.currentRoute.query).length === 0) return;
-  return navigateTo(router.currentRoute.path, {});
+  const currentRoute = router.currentRoute.value;
+
+  if (Object.values(currentRoute.query).length === 0) return;
+
+  return navigateTo(currentRoute.path, {});
 }

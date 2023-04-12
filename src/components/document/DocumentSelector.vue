@@ -1,52 +1,64 @@
 <template>
-  <v-select
-    ref="documentSelector"
-    v-model="select"
-    :items="items"
-    label="View"
-    outlined
-    color="accent"
+  <q-select
+    v-model="document"
     dense
-    hide-details
+    outlined
     dark
-    style="max-width: 200px"
-    class="mx-1 nav-input"
-    item-text="name"
+    :options-dark="darkMode"
+    options-selected-class="primary"
+    :options="options"
+    label="View"
+    class="nav-input nav-document"
+    option-label="name"
+    option-value="documentId"
+    color="accent"
     data-cy="button-document-select-open"
   >
-    <template v-slot:item="{ item }">
-      <v-row dense align="center" :data-cy-name="item.name">
-        <v-col data-cy="button-document-select-item">
-          {{ item.name }}
-        </v-col>
-        <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
+    <template #option="{ opt, itemProps }">
+      <list-item
+        v-bind="itemProps"
+        :title="opt.name"
+        :action-cols="2"
+        :data-cy-name="opt.name"
+      >
+        <template #actions>
           <icon-button
-            v-if="canEdit(item.name)"
-            icon-id="mdi-dots-horizontal"
-            :tooltip="`Edit ${item.name}`"
+            v-if="canEdit(opt.name)"
+            v-close-popup
+            icon="more"
+            :tooltip="`Edit ${opt.name}`"
             data-cy="button-document-select-edit"
+            @click="handleEditOpen(opt)"
           />
-        </v-col>
-      </v-row>
+        </template>
+      </list-item>
     </template>
-
-    <template v-slot:append-item>
+    <template #after-options>
       <text-button
         v-if="canEdit()"
+        v-close-popup
         text
         block
-        variant="add"
+        label="Add View"
+        icon="add"
         data-cy="button-document-select-create"
         @click="handleCreateOpen"
-      >
-        Add View
-      </text-button>
+      />
     </template>
-  </v-select>
+  </q-select>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * A selector for switching between documents.
+ */
+export default {
+  name: "DocumentSelector",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
@@ -54,67 +66,46 @@ import {
   documentStore,
   projectStore,
   sessionStore,
+  useTheme,
 } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { IconButton, TextButton } from "@/components/common";
+import { IconButton, TextButton, ListItem } from "@/components/common";
 
-export default Vue.extend({
-  name: "DocumentSelector",
-  components: { TextButton, IconButton },
-  computed: {
-    /**
-     * @return The current documents.
-     */
-    items() {
-      return documentStore.projectDocuments;
-    },
-    /**
-     * Switches documents when a document is selected.
-     */
-    select: {
-      get() {
-        return documentStore.currentDocument;
-      },
-      set(documentName: string) {
-        const document = this.items.find(({ name }) => documentName === name);
+const { darkMode } = useTheme();
 
-        if (document) {
-          handleSwitchDocuments(document);
-        }
-      },
-    },
+const options = computed(() => documentStore.projectDocuments);
+
+const document = computed({
+  get() {
+    return documentStore.currentDocument;
   },
-  methods: {
-    /**
-     * Returns whether a document can be edited.
-     * @param name - The document name, or none to check for general editing ability.
-     * @return Whether editing is allowed.
-     */
-    canEdit(name = ""): boolean {
-      return name !== "Default" && sessionStore.isEditor(projectStore.project);
-    },
-    /**
-     * Closes the selector menu and resets all data.
-     */
-    handleCloseMenu() {
-      (this.$refs.documentSelector as HTMLElement).blur();
-    },
-    /**
-     * Opens the create document modal.
-     */
-    handleCreateOpen() {
-      documentSaveStore.baseDocument = undefined;
-      this.handleCloseMenu();
-      appStore.openDetailsPanel("document");
-    },
-    /**
-     * Opens the edit document modal.
-     */
-    handleEditOpen(document: DocumentSchema) {
-      documentSaveStore.baseDocument = document;
-      this.handleCloseMenu();
-      appStore.openDetailsPanel("document");
-    },
+  set(document) {
+    handleSwitchDocuments(document);
   },
 });
+
+/**
+ * Returns whether a document can be edited.
+ * @param name - The document name, or none to check for general editing ability.
+ * @return Whether editing is allowed.
+ */
+function canEdit(name = ""): boolean {
+  return name !== "Default" && sessionStore.isEditor(projectStore.project);
+}
+
+/**
+ * Opens the document creation panel.
+ */
+function handleCreateOpen(): void {
+  documentSaveStore.baseDocument = undefined;
+  appStore.openDetailsPanel("document");
+}
+
+/**
+ * Opens the document edit panel.
+ */
+function handleEditOpen(document: DocumentSchema): void {
+  documentSaveStore.baseDocument = document;
+  appStore.openDetailsPanel("document");
+}
 </script>

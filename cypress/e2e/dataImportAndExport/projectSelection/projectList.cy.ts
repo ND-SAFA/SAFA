@@ -6,11 +6,8 @@ describe("Project List", () => {
   });
 
   beforeEach(() => {
-    cy.expandViewport().loginToPage(
-      validUser.email,
-      validUser.password,
-      Routes.MY_PROJECTS
-    );
+    cy.viewport(1080, 1080);
+    cy.loginToPage(validUser.email, validUser.password, Routes.MY_PROJECTS);
   });
 
   describe("I can search for projects by name", () => {
@@ -26,7 +23,7 @@ describe("Project List", () => {
       cy.inputText(DataCy.selectionSearch, "$".repeat(20));
 
       cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-        tr.should("have.length", 2);
+        tr.should("have.length", 1);
       });
     });
   });

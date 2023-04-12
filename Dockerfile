@@ -23,9 +23,15 @@ RUN pip3 install -r /app/requirements.txt
 ## Step - Copy source and build files
 COPY /tgen/tgen/ /app/tgen/
 COPY /src/api/ /app/api/
+COPY .env /app/.env
+
+### Step - Collect static files
+WORKDIR /app
+RUN pip3 install whitenoise
+RUN python3 api/manage.py collectstatic --noinput
+RUN echo "Found:" && ls -1 /app/staticfiles | wc -l | echo
 
 # Finalize
 EXPOSE 80
 WORKDIR /app
-# CMD ["gunicorn" ,"--bind", ":80","--chdir", "/app", "--workers", "1","--threads","8","--timeout","0", "server.wsgi"]
-CMD ["gunicorn" ,"--bind", ":80","--env", "PYTHONPATH=/app","--env", "DJANGO_SETTINGS_MODULE=api.server.settings", "--workers", "1","--threads","8","--timeout","0", "api.server.wsgi"]
+CMD ["gunicorn" ,"--bind", ":80","--env", "DJANGO_SETTINGS_MODULE=api.server.settings", "--workers", "1","--threads","1","--timeout","0", "api.server.wsgi"]

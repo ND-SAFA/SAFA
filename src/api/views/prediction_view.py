@@ -13,7 +13,7 @@ from api.serializers.prediction_serializer import PredictionSerializer
 from api.utils.view_util import ViewUtil
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.components.job_result import JobResult
-from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.definition_creator import DefinitionCreator
 from tgen.util.json_util import NpEncoder
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
@@ -47,7 +47,7 @@ class PredictView(APIView):
         prediction_payload = ViewUtil.read_request(request, PredictionSerializer)
         model = prediction_payload["model"]
         dataset_definition: Dict = prediction_payload["dataset"]
-        dataset: ApiDefinition = ObjectCreator.create(ApiDefinition, override=True, **dataset_definition)
+        dataset: ApiDefinition = DefinitionCreator.create(ApiDefinition, dataset_definition)
 
         api_id = uuid.uuid4()
         prediction_job = create_predict_definition(str(api_id), dataset, model)

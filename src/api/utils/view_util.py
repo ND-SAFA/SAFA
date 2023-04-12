@@ -6,7 +6,7 @@ from django.http import HttpRequest
 from drf_yasg.openapi import Schema, TYPE_OBJECT
 from rest_framework import status
 
-from jobs.components.job_result import JobResult
+from tgen.jobs.components.job_result import JobResult
 
 
 class ViewUtil:
@@ -50,4 +50,4 @@ class ViewUtil:
         """
         return {
             status.HTTP_200_OK: Schema(type=TYPE_OBJECT,
-                                       properties=JobResult.w(response_keys))}
+                                       properties=JobResult.get_properties(response_keys))}

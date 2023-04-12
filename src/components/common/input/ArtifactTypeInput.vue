@@ -8,6 +8,10 @@
     :options="options"
     :hint="hint"
     :error-message="errorMessage"
+    use-input
+    new-value-mode="add-unique"
+    input-debounce="0"
+    @filter="filter"
     @popup-hide="emit('blur')"
   >
     <template #selected-item="{ opt }">
@@ -27,7 +31,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, withDefaults } from "vue";
+import { computed, ref, watch, withDefaults } from "vue";
 import { artifactStore, typeOptionsStore, useVModel } from "@/hooks";
 import { AttributeChip, Typography } from "@/components/common/display";
 
@@ -55,7 +59,7 @@ const emit = defineEmits<{
 
 const model = useVModel(props, "modelValue");
 
-const options = computed(() => typeOptionsStore.artifactTypes);
+const options = ref(typeOptionsStore.artifactTypes);
 
 const optionCount = computed(() =>
   props.showCount && typeof model.value === "string"
@@ -65,5 +69,32 @@ const optionCount = computed(() =>
 
 const optionCountDisplay = computed(() =>
   optionCount.value === 1 ? "1 Artifact" : `${optionCount.value} Artifacts`
+);
+
+/**
+ * Filters the artifact type options.
+ * @param searchText - The search text to filter with.
+ * @param update - A function call to update the options.
+ */
+function filter(
+  searchText: string | null,
+  update: (fn: () => void) => void
+): void {
+  update(() => {
+    if (!searchText) {
+      options.value = typeOptionsStore.artifactTypes;
+    } else {
+      const lowercaseSearchText = searchText.toLowerCase();
+
+      options.value = typeOptionsStore.artifactTypes.filter((type) =>
+        (type?.toLowerCase() || "").includes(lowercaseSearchText)
+      );
+    }
+  });
+}
+
+watch(
+  () => typeOptionsStore.artifactTypes,
+  (artifactTypes) => (options.value = artifactTypes)
 );
 </script>

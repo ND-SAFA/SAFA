@@ -6,13 +6,13 @@ import {
   testProject,
   Routes,
 } from "@/fixtures";
-
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();
   });
 
   beforeEach(() => {
+    cy.viewport(1920, 1080);
     cy.loginToPage(
       validUser.email,
       validUser.password,
@@ -48,11 +48,9 @@ describe("Bulk Project Creation", () => {
     it("Can create an empty project in the project selector", () => {
       cy.openProjectSelector().clickButton(DataCy.selectorAddButton);
 
-      cy.getCy(DataCy.projectEditModal).within(() => {
-        cy.setProjectIdentifier("modal")
-          .clickButton(DataCy.creationEmptyToggle)
-          .clickButton(DataCy.creationUploadButton);
-      });
+      cy.setProjectIdentifier("modal")
+        .clickButton(DataCy.creationEmptyToggle)
+        .clickButton(DataCy.creationUploadButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

@@ -26,12 +26,14 @@ Cypress.Commands.add("doesExist", (dataCy) => {
   });
 });
 
-Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
+Cypress.Commands.add("inputText", (dataCy, inputValue, clear, last) => {
   if (clear) {
     cy.getCy(dataCy).clear();
   }
 
-  if (inputValue.length > 0) {
+  if (last === true && inputValue.length > 0) {
+    cy.getCy(dataCy, "last").type(inputValue);
+  } else if (inputValue.length > 0) {
     cy.getCy(dataCy).type(inputValue);
   }
 });
@@ -57,7 +59,7 @@ Cypress.Commands.add("clickSelectOption", (dataCy, optionName) => {
 });
 
 Cypress.Commands.add("clickMenuOption", (optionName) => {
-  cy.get(`[role="menu"]`)
+  cy.get(`[role="listbox"]`)
     .contains(optionName, { matchCase: false })
     .first()
     .click();
@@ -68,7 +70,9 @@ Cypress.Commands.add("uploadFiles", (dataCy, ...filePaths) => {
 });
 
 Cypress.Commands.add("switchTab", (tabLabel) => {
-  cy.contains("div", tabLabel).click();
+  cy.get(".q-tabs").within(() => {
+    cy.contains("div", tabLabel).click();
+  });
 });
 
 Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
@@ -76,7 +80,7 @@ Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
     .should("be.visible")
     .within(() => {
       if (waitForLoad) {
-        cy.get(".v-data-table__progress").should("not.exist");
+        cy.get(".q-linear-progress__model").should("not.exist");
       }
 
       fn(cy.get("tr"));

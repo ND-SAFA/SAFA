@@ -198,7 +198,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeDisplay(type: string): string {
-      return this.tim.artifacts[type].name;
+      return this.tim.artifacts[type]?.name || type;
     },
     /**
      * Finds the icon id for the given artifact type.
@@ -207,7 +207,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeIcon(type: string): string {
-      return this.tim.artifacts[type].icon;
+      return this.tim.artifacts[type]?.icon || defaultTypeIcon;
     },
     /**
      * Finds the artifact level info for an artifact type.

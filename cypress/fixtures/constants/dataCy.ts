@@ -39,6 +39,7 @@ export enum DataCy {
   selectorAddButton = "button-selector-add",
   selectorEditButton = "button-selector-edit",
   selectorDeleteButton = "button-selector-delete",
+  selectorSearchInput = "input-selector-search",
 
   // Modals
 
@@ -60,11 +61,11 @@ export enum DataCy {
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
-  logoutButton = "button-logout",
+  logoutButton = "button-account-logout",
 
   // Account Editing
 
-  accountPage = "page-account",
+  accountPage = "icon-account",
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",
@@ -96,11 +97,10 @@ export enum DataCy {
   creationCreatePanelButton = "button-create-panel",
   creationTypeInput = "input-artifact-type",
   creationTypeButton = "button-artifact-type",
-  creationArtifactDeleteButton = "button-delete-artifact",
+  creationArtifactDeleteButton = "button-delete-panel",
   creationEntitiesButton = "button-file-entities",
   creationIgnoreErrorsButton = "button-ignore-errors",
-  creationDeletePanel = "button-delete-artifact",
-  creationEntityButton = "button-created-entity",
+  creationDeletePanel = "button-delete-panel",
   creationFilePanel = "panel-files",
   creationUploadButton = "button-create-project",
   creationTraceSourceInput = "input-source-type",
@@ -177,6 +177,8 @@ export enum DataCy {
   selectedPanelBodyButton = "button-artifact-body",
   selectedPanelEditButton = "button-artifact-edit",
   selectedPanelDeleteButton = "button-artifact-delete",
+  selectedPanelAttributePrefix = "text-attribute-",
+  selectedPanelAttributeInputPrefix = "input-attribute-",
 
   selectedPanelParents = "list-selected-parents",
   selectedPanelParentItem = "list-selected-parent-item",
@@ -215,12 +217,11 @@ export enum DataCy {
   projectSettingsEditButton = "button-settings-edit",
   projectSettingsDeleteButton = "button-settings-delete",
 
-  projectSettingsAddEmail = "settings-input-user-email",
-  projectSettingsAddRole = "settings-input-user-role",
+  projectSettingsAddEmail = "input-settings-user-email",
+  projectSettingsAddRole = "input-settings-user-role",
   projectSettingsAddToProject = "button-add-user-to-project",
   projectSettingsEditUserButton = "button-selector-edit",
   projectSettingsDeleteUserButton = "button-selector-delete",
-  projectSettingsSearchUser = "input-selector-search",
   projectSettingsTable = "generic-selector-table",
 
   // Project Documents
@@ -265,15 +266,15 @@ export enum DataCy {
 
   traceMatrixTable = "view-trace-matrix-table",
 
-  traceMatrixTableRowTypeInput = "input-trace-matrix-table-row-types",
-  traceMatrixTableColTypeInput = "input-trace-matrix-table-col-types",
+  traceMatrixTableRowTypeInput = "input-trace-table-row-types",
+  traceMatrixTableColTypeInput = "input-trace-table-col-types",
 
   // Trace Link Generation
 
-  traceLinkTable = "table-trace-link",
-  traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
+  traceLinkTable = "table-trace-approval",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",
+  traceLinkTableApprovalInput = "input-approval-type",
 
   // Project Version
   projectSavingIndicator = "project-saving-indicator",
@@ -289,6 +290,15 @@ export enum DataCy {
   attributeDeleteButton = "button-delete-attribute",
   attributeSaveButton = "button-save-attribute",
   attributeTableItem = "generic-list-item",
+
+  attributeTableItemPlusButton = "button-add-attribute-to-layout",
+  attributeLayoutAddButton = "button-attribute-layout-add",
+  attributeLayoutNameInput = "input-attribute-layout-name",
+  attributeLayoutTypeInput = "input-attribute-layout-artifact-types",
+  attributeLayoutSaveButton = "button-attribute-layout-save",
+  attributeLayoutDeleteAttributeButton = "button-attribute-layout-delete-attribute",
+  attributeLayoutDeleteButton = "button-attribute-layout-delete",
+  attributeLayoutConfirmDeleteButton = "button-confirm-modal",
 }
 
 export enum DataIds {

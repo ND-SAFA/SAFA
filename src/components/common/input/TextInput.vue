@@ -9,6 +9,7 @@
     :class="className"
     :hint="props.hint"
     :type="props.type"
+    :disable="props.disabled"
     @keydown="handleKeydown"
   />
 </template>
@@ -65,6 +66,10 @@ const props = withDefaults(
       | "url"
       | "time"
       | "date";
+    /**
+     * Whether to disable this input.
+     */
+    disabled?: boolean;
     /**
      * A testing selector.
      */

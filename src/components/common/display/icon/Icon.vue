@@ -4,6 +4,7 @@
     :size="props.size"
     :style="iconStyle"
     :name="iconId"
+    :data-cy="`icon-${props.variant}`"
   />
 </template>
 
@@ -46,6 +47,10 @@ const props = defineProps<{
    * The  style to include on the component.
    */
   style?: string;
+  /**
+   * The data-cy attribute to include on the component.
+   */
+  dataCy?: string;
 }>();
 
 const iconId = computed(() => {

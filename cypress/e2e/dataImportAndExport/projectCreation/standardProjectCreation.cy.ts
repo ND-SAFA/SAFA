@@ -11,11 +11,7 @@ describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.expandViewport().loginToPage(
-      validUser.email,
-      validUser.password,
-      Routes.PROJECT_CREATOR
-    );
+    cy.loginToPage(validUser.email, validUser.password, Routes.PROJECT_CREATOR);
   });
 
   describe("Project Artifact Uploading", () => {
@@ -31,11 +27,9 @@ describe("Standard Project Creation", () => {
     describe("I can create sets of artifacts by type", () => {
       it("Cannot create a new panel with an empty name", () => {
         // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard").clickButton(
-          DataCy.creationCreatePanelButton
-        );
+        cy.setProjectIdentifier("standard");
 
-        cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
 
       it("Can create a new panel of artifacts", () => {
@@ -43,8 +37,6 @@ describe("Standard Project Creation", () => {
           "hazard",
           simpleProjectFilesMap.hazard
         );
-
-        cy.clickButton(DataCy.creationCreatePanelButton);
 
         cy.getCy(DataCy.creationFilePanel).should("be.visible");
       });
@@ -58,23 +50,12 @@ describe("Standard Project Creation", () => {
         );
 
         cy.openPanelAfterClose().clickButton(
-          DataCy.creationArtifactDeleteButton
+          DataCy.creationArtifactDeleteButton,
+          "first",
+          true
         );
 
         cy.getCy(DataCy.creationFilePanel).should("not.exist");
-      });
-
-      it("Cannot continue after deleted valid artifacts", () => {
-        cy.setProjectIdentifier("standard").createArtifactPanel(
-          "hazard",
-          simpleProjectFilesMap.hazard
-        );
-
-        cy.openPanelAfterClose().clickButton(
-          DataCy.creationArtifactDeleteButton
-        );
-
-        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
     });
 
@@ -85,12 +66,12 @@ describe("Standard Project Creation", () => {
           simpleProjectFilesMap.hazard
         );
 
-        cy.openPanelAfterClose()
-          .getCy(DataCy.creationEntitiesButton)
-          .should("be.visible")
-          .clickButton(DataCy.creationEntitiesButton, "last");
+        cy.getCy(DataCy.creationDeletePanel).should("not.be.visible");
 
-        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
+        cy.openPanelAfterClose()
+          .clickButtonWithName("Parsed Entities")
+          .getCy(DataCy.creationEntitiesButton)
+          .should("have.length", 5);
       });
     });
 
@@ -126,11 +107,9 @@ describe("Standard Project Creation", () => {
       });
 
       it("Cannot create a new panel without selecting two artifact types", () => {
-        cy.createReqToHazardFiles().clickButtonWithName(
-          "Create new trace matrix"
-        );
+        cy.createReqToHazardFiles();
 
-        cy.contains("Create new trace matrix").should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
     });
 
@@ -138,12 +117,12 @@ describe("Standard Project Creation", () => {
       it("Can delete a set of trace links", () => {
         cy.createReqToHazardFiles(true);
 
-        cy.openPanelAfterClose().clickButton(
-          DataCy.creationDeletePanel,
-          "last"
-        );
+        cy.getCy(DataCy.creationDeletePanel)
+          .should("not.be.visible")
+          .openPanelAfterClose();
+        cy.clickButton(DataCy.creationDeletePanel);
 
-        cy.contains("requirement X hazard").should("not.exist");
+        cy.contains("requirement to hazard").should("not.exist");
       });
     });
 
@@ -151,12 +130,12 @@ describe("Standard Project Creation", () => {
       it("Displays buttons for all of the trace links in the file", () => {
         cy.createReqToHazardFiles(true);
 
-        cy.openPanelAfterClose()
-          .getCy(DataCy.creationEntitiesButton)
-          .should("be.visible")
-          .clickButton(DataCy.creationEntitiesButton, "last");
+        cy.getCy(DataCy.creationDeletePanel).should("not.be.visible");
 
-        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
+        cy.openPanelAfterClose()
+          .clickButtonWithName("Parsed Entities")
+          .getCy(DataCy.creationEntitiesButton)
+          .should("have.length", 5);
       });
     });
 
@@ -187,9 +166,14 @@ describe("Standard Project Creation", () => {
       });
 
       it("Can continue with a bad file if errors are ignored", () => {
-        cy.createReqToHazardFiles().createTraceMatrix("hazard", "hazard");
+        cy.createReqToHazardFiles().createTraceMatrix("hazard", "requirement");
 
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.tim
+        );
 
         cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
 

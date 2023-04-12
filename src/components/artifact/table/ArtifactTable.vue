@@ -10,6 +10,7 @@
       :loading="loading"
       :filter-row="filterRow"
       :custom-cells="customCells"
+      data-cy="view-artifact-table"
       @row-click="handleView"
     >
       <template #header-right>

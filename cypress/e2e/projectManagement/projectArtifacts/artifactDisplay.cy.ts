@@ -11,7 +11,7 @@ describe("Artifact Display", () => {
 
   describe("I can see an artifacts type, name, and body", () => {
     it("Shows the artifact content of a selected artifact", () => {
-      const artifactType = "design";
+      const artifactType = "Design";
       const artifact = {
         name: "New",
         type: `${artifactType}{downArrow}{enter}`,

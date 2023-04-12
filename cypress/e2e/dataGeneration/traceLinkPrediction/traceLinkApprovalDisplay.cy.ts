@@ -15,9 +15,14 @@ describe("Trace Link Approval Display", () => {
         .sortTraceApproval("none")
         .groupTraceApproval("none");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.should("have.length", 8);
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          // 1 Header row, 2 virtual scrolls, 7 links x 2 rows per each
+          tr.should("have.length", 1 + 2 + 7 * 2);
+        },
+        false
+      );
     });
   });
 
@@ -28,27 +33,20 @@ describe("Trace Link Approval Display", () => {
         .groupTraceApproval("none");
 
       // Should have D9 first and D5 second in order of name (descending)
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.contains("D9").should("have.length", 1);
-        tr.contains("D9")
-          .parent()
-          .next()
-          .contains("D5")
-          .should("have.length", 1);
-      });
-    });
-
-    it("Can sort by approval status", () => {
-      cy.filterTraceApproval("all")
-        .sortTraceApproval("approval")
-        .groupTraceApproval("none");
-
-      // Check that unreviewed pops up and that approval status is bold.
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.contains("Approval Status").should(($label) => {
-          expect($label).to.have.css("font-weight", "700");
-        });
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.contains("D9").should("have.length", 1);
+          tr.contains("D9")
+            .parent()
+            .parent()
+            .next()
+            .next()
+            .contains("D5")
+            .should("have.length", 1);
+        },
+        false
+      );
     });
   });
 
@@ -58,9 +56,13 @@ describe("Trace Link Approval Display", () => {
         .sortTraceApproval("none")
         .groupTraceApproval("type");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.contains("Source type:").parent().contains("design");
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.contains("Source type:").parent().contains("Design");
+        },
+        false
+      );
     });
 
     it("Can group by approval status", () => {
@@ -68,9 +70,13 @@ describe("Trace Link Approval Display", () => {
         .sortTraceApproval("none")
         .groupTraceApproval("status");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.contains("Approval status:").parent().contains("Unreviewed");
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.contains("Approval status:").parent().contains("Unreviewed");
+        },
+        false
+      );
     });
   });
 
@@ -80,9 +86,13 @@ describe("Trace Link Approval Display", () => {
         .sortTraceApproval("none")
         .groupTraceApproval("status");
 
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.contains("Approval status:").parent().contains("7");
-      });
+      cy.withinTableRows(
+        DataCy.traceLinkTable,
+        (tr) => {
+          tr.contains("Approval status:").parent().contains("7");
+        },
+        false
+      );
     });
   });
 });

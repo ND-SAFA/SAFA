@@ -44,5 +44,5 @@ describe("Account Login", () => {
     });
   });
 
-  // describe("When I log out, all stored project information is cleared");
+  describe.skip("When I log out, all stored project information is cleared", () => {});
 });

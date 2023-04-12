@@ -9,7 +9,11 @@
       <typography :value="props.job.name" />
     </q-td>
     <q-td align="end">
-      <typography secondary :value="jobStatus(props.job).progress()" />
+      <typography
+        secondary
+        :value="jobStatus(props.job).progress()"
+        data-cy="job-progress"
+      />
     </q-td>
     <q-td align="end">
       <chip outline :color="jobStatus(props.job).color()" data-cy="job-status">

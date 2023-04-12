@@ -1,7 +1,8 @@
 ## Step - Build Arguments
 ARG CUDA=11.7.1
 ARG UBUNTU_VERSION=20.04
-FROM nvidia/cuda:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
+#FROM nvidia/cuda:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
+FROM amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
 
 ## Step - Install WGET

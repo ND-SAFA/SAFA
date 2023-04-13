@@ -1,8 +1,8 @@
 from typing import Dict
 
-from jobs.predict_job import PredictJob
-from jobs.supported_job_type import SupportedJobType
-from util.definition_creator import DefinitionCreator
+from tgen.jobs.predict_job import PredictJob
+from tgen.jobs.supported_job_type import SupportedJobType
+from tgen.testres.definition_creator import DefinitionCreator
 
 
 def predict_task(predict_job_definition: Dict) -> Dict:

@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
-
-from serializers.dataset_serializer import DatasetSerializer
-from tests.api_base_test import ApiBaseTest
-from tests.test_data import TestData
 from tgen.src.server.api.api_definition import ApiDefinition
+
+from api.serializers.dataset_serializer import DatasetSerializer
+from api.tests.api_base_test import ApiBaseTest
+from api.tests.test_data import TestData
 
 load_dotenv()
 

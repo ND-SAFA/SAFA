@@ -1,7 +1,7 @@
 import os
 
-from cloud.gcp_cloud_storage import GcpCloudStorage
-from cloud.icloud_storage import ICloudStorage
+from api.cloud.gcp_cloud_storage import GcpCloudStorage
+from api.cloud.icloud_storage import ICloudStorage
 from tgen.util.supported_enum import SupportedEnum
 
 

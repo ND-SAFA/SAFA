@@ -2,23 +2,15 @@ import json
 from typing import Dict
 from unittest import TestCase
 
-from celerytest import setup_celery_worker
-from celerytest.testcase import CeleryTestCaseMixin
 from django.core.wsgi import get_wsgi_application
 from django.test import Client
 from dotenv import load_dotenv
 
-from server.celery import app
 
-setup_celery_worker(app)  # need to setup worker outside
-
-
-class ApiBaseTest(CeleryTestCaseMixin, TestCase):
+class ApiBaseTest(TestCase):
     """
     The common unit test for API layer.
     """
-    celery_app = app
-    celery_concurrency = 4
 
     def setUp(self) -> None:
         """

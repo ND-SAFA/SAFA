@@ -1,5 +1,5 @@
-from tests.api_base_test import ApiBaseTest
-from tests.test_data import TestData
+from api.tests.api_base_test import ApiBaseTest
+from api.tests.test_data import TestData
 
 
 class TestPredictionView(ApiBaseTest):

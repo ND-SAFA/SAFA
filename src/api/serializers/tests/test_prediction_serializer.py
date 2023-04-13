@@ -1,6 +1,6 @@
-from serializers.prediction_serializer import PredictionSerializer
-from serializers.tests.test_dataset_serializer import TestDatasetSerializer
-from tests.api_base_test import ApiBaseTest
+from api.serializers.prediction_serializer import PredictionSerializer
+from api.serializers.tests.test_dataset_serializer import TestDatasetSerializer
+from api.tests.api_base_test import ApiBaseTest
 
 
 class TestPredictionSerializer(ApiBaseTest):

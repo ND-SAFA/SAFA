@@ -1,0 +1,23 @@
+version: 0.2
+env:
+  secrets-manager:
+    $DOCKERHUB_USERNAME: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_USERNAME"
+    $DOCKERHUB_PASS: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_PASSWORD"
+
+
+phases:
+  pre_build:
+    commands:
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
+  build:
+    commands:
+      - echo Build started on `date`
+      - git submodule update --init --recursive
+      - docker build -t tgen .
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 178003569110.dkr.ecr.us-east-1.amazonaws.com
+      - docker tag tgen:latest 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
+      - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:latest
+
+artifacts:
+  files:
+    - '**/*'

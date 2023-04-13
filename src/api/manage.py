@@ -3,13 +3,7 @@
 import os
 import sys
 
-TGEN_PATH = os.path.join(os.path.dirname(__file__), "..", "tgen")
-
-TGEN_PATH = os.path.normpath(TGEN_PATH)
-sys.path.append(TGEN_PATH)
-sys.path.append(os.path.join(TGEN_PATH, "tgen"))
-
-print(TGEN_PATH)
+sys.path.append("/app/")
 
 
 def main():

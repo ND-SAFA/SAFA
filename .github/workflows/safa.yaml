@@ -1,0 +1,29 @@
+name: Django Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - development
+    types: [ opened, synchronize ]
+  issue_comment:
+    types: [ created ]
+    body: /build
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: run
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        run: |
+          python manage.py test
+        env:
+          DEPLOYMENT: test

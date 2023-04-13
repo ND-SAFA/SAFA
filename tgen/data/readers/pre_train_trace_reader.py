@@ -27,6 +27,8 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         :return:
         """
         artifacts_df = self._get_artifacts_df(self.data_file)
+        if self.summarizer is not None:
+            artifacts_df = ArtifactDataFrame(self.summarizer.summarize_dataframe(artifacts_df, ArtifactKeys.CONTENT.value))
         trace_df = self._get_trace_df(list(artifacts_df.index))
         layer_df = self._get_layer_dataframe()
         return artifacts_df, trace_df, layer_df
@@ -52,6 +54,7 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         return ArtifactDataFrame({ArtifactKeys.ID: all_ids,
                                   ArtifactKeys.CONTENT: content,
                                   ArtifactKeys.LAYER_ID: [PreTrainTraceReader.LAYER_ID for i in range(len(content))]})
+
 
     @staticmethod
     def _get_trace_df(artifact_ids: List[int]) -> TraceDataFrame:

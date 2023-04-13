@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from tgen.data.chunkers.open_ai_token_limits import ModelTokenLimits
+from tgen.data.summarizers.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
-from tgen.util.file_util import FileUtil
 from tgen.util.override import overrides
 
 
@@ -21,15 +20,15 @@ class AbstractChunker(BaseObject, ABC):
         self.model_name = model_name
         self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name)
 
-    def chunk(self, path_to_file: str = None, content: str = None) -> List[str]:
+    @abstractmethod
+    def chunk(self, content: str) -> List[str]:
         """
-        Chunks the given file or content into pieces that are beneath the model's token limit
-        :param path_to_file: The path to the file to chunk
+        Chunks the given content into pieces that are beneath the model's token limit
         :param content: The content to chunk
         :return: The content chunked into sizes beneath the token limit
         """
-        content = FileUtil.read_file(path_to_file) if path_to_file else content
-        assert content is not None, "No content to parse."
+        if not self.exceeds_token_limit(content):
+            return [content]
         return self._chunk(content)
 
     def exceeds_token_limit(self, content: str) -> bool:
@@ -66,5 +65,5 @@ class AbstractChunker(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.chunkers.supported_chunker import SupportedChunker
+        from tgen.data.summarizers.chunkers.supported_chunker import SupportedChunker
         return SupportedChunker

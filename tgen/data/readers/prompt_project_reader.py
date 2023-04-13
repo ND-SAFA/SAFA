@@ -1,9 +1,5 @@
-import os
-
-import pandas as pd
-
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
@@ -31,7 +27,10 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         Reads project data from files.
         :return: Returns the data frames containing the project artifacts.
         """
-        return PromptDataFrame(JsonUtil.read_jsonl_file(self.project_path))
+        prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.project_path))
+        if self.summarizer is not None:
+            prompt_df = PromptDataFrame(self.summarizer.summarize_dataframe(prompt_df, PromptKeys.PROMPT.value))
+        return prompt_df
 
     def get_project_name(self) -> str:
         """

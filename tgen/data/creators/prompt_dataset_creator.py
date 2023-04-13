@@ -1,29 +1,11 @@
-from collections import Counter
-from typing import Any, Dict, List, Set, Tuple
-
-import pandas as pd
-
-from tgen.constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.processing.cleaning.data_cleaner import DataCleaner
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
-from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.dict_util import ListUtil
 from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.reflection_util import ReflectionUtil
-from tgen.util.thread_util import ThreadUtil
 
 
 class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
@@ -33,7 +15,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
-                 data_export_path: str = None, project_file_id: str = None):
+                 data_export_path: str = None, project_file_id: str = None, summarizer: Summarizer = None):
         """
         Initializes creator with entities extracted from reader.
         :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
@@ -45,6 +27,8 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         self.project_reader = project_reader
         self.trace_dataset_creator = trace_dataset_creator
         self.project_file_id = project_file_id
+        if summarizer is not None:
+            self._set_summarizer(summarizer)
 
     def create(self) -> PromptDataset:
         """
@@ -70,3 +54,14 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         if self.project_file_id:
             return self.project_file_id
         return ''
+
+    def _set_summarizer(self, summarizer: Summarizer) -> None:
+        """
+        Sets summarizers for project readers
+        :param summarizer: The summarizer to use
+        :return: None
+        """
+        if self.project_reader is not None:
+            self.project_reader.set_summarizer(summarizer)
+        if self.trace_dataset_creator is not None:
+            self.trace_dataset_creator.project_reader.set_summarizer(summarizer)

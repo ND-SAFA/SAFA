@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Type, TypeVar, Generic, Tuple
+from typing import Dict, Type, TypeVar, Generic, Tuple, Optional
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
@@ -22,6 +23,7 @@ class AbstractProjectReader(BaseObject, ABC, Generic[PROJECT_DATA]):
         :param overrides: The overrides to apply to project creator.
         """
         self.overrides = overrides if overrides else {}
+        self.summarizer: Optional[Summarizer] = None
 
     @abstractmethod
     def read_project(self) -> PROJECT_DATA:
@@ -50,6 +52,14 @@ class AbstractProjectReader(BaseObject, ABC, Generic[PROJECT_DATA]):
         :return: Dictionary of parameter names to their new values to override.
         """
         return self.overrides
+
+    def set_summarizer(self, summarizer: Summarizer):
+        """
+        Sets the summarizer used to summarize content read by the reader
+        :param summarizer: The summarizer to use
+        :return: None
+        """
+        self.summarizer = summarizer
 
     @classmethod
     @overrides(BaseObject)

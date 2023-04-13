@@ -3,7 +3,8 @@ from enum import Enum
 
 class BasePrompt(Enum):
     CLASSIFICATION = "Are these two artifacts related?"
-    BASIC_SUMMARY = "summarize this code '{}'"
+    CODE_SUMMARY = "Summarize this code '{}'"
+    NL_SUMMARY = "Summarize the following '{}'"
     SHALL_REQUIREMENT_SUMMARY = "Remove the terms `The system shall' from the following text and then " \
                                 "summarize in 20 words or less '{}'"
     HEADING_SUMMARY = "I am trying to provide a very short and representative summary of the long text to use as a heading " \

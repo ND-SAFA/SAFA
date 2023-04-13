@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 
 
 class JavaChunker(AbstractChunker):

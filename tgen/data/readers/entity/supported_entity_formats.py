@@ -2,7 +2,6 @@ import os
 from typing import Dict
 
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.entity.entity_parser_type import EntityParserType
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
 from tgen.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
@@ -25,13 +24,13 @@ class SupportedEntityFormats:
     }
 
     @classmethod
-    def get_parser(cls, data_path: str, definition: Dict = None) -> EntityParserType:
+    def get_parser(cls, data_path: str, definition: Dict = None) -> AbstractEntityFormat:
         """
         :return: Returns the function that will read data into a data frame.
         """
         if definition and StructuredKeys.PARSER in definition:
             parser_key = JsonUtil.get_property(definition, StructuredKeys.PARSER).upper()
-            return SupportedEntityFormats.FORMATS[parser_key].get_parser()
+            return SupportedEntityFormats.FORMATS[parser_key]
         if os.path.isdir(data_path):
             return SupportedEntityFormats.FORMATS["FOLDER"].get_parser()
         for _, entity_format in cls.FORMATS.items():

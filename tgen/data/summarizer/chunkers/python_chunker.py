@@ -6,7 +6,7 @@ from typing import List, Union
 
 import tiktoken
 
-from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.util.override import overrides
 
 NODE = Union[ast.AST, ast.stmt]

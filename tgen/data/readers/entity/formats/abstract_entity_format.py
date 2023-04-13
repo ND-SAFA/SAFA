@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
+import pandas as pd
 
-from tgen.data.readers.entity.entity_parser_type import EntityParserType
+from tgen.data.summarizer.summarizer import Summarizer
 
 
 class AbstractEntityFormat(ABC):
@@ -9,11 +10,25 @@ class AbstractEntityFormat(ABC):
     Defines interface for format responsible for converting data path into entities.
     """
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_parser() -> EntityParserType:
+    def parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
         """
-        :return: Returns parser for reading data path into DataFrame of entities.
+        Parses a data into DataFrame of entities.
+        :param data_path: The path to the data to parse
+        :param summarizer: If provided, will summarize the artifact content
+        :return: DataFrame of parsed entities.
+        """
+        return cls._parse(data_path, summarizer, **params)
+
+    @classmethod
+    @abstractmethod
+    def _parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
+        """
+        Parses a data into DataFrame of entities.
+        :param data_path: The path to the data to parse
+        :param summarizer: If provided, will summarize the artifact content
+        :return: DataFrame of parsed entities.
         """
 
     @staticmethod
@@ -34,4 +49,12 @@ class AbstractEntityFormat(ABC):
         for extension in cls.get_file_extensions():
             if extension in data_path:
                 return True
+        return False
+
+    @staticmethod
+    def performs_summarization() -> bool:
+        """
+        Returns whether the child format handles summarizations internally (see Folder entity Format)
+        :return: If True, the child format handles summarizations internally, else should be handled in parent
+        """
         return False

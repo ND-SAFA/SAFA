@@ -1,7 +1,7 @@
 import ast
 import os
 
-from tgen.data.chunkers.python_chunker import PythonChunker
+from tgen.data.summarizers.chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.util.file_util import FileUtil

@@ -57,6 +57,8 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             }))
 
         artifact_df = ArtifactDataFrame(artifact_map)
+        if self.summarizer is not None:
+            artifact_df = ArtifactDataFrame(self.summarizer.summarize_dataframe(artifact_df, StructuredKeys.Artifact.CONTENT.value))
         trace_df = TraceDataFrame(trace_df_entries)
         layer_mapping_df = LayerDataFrame(layer_mapping)
         return artifact_df, trace_df, layer_mapping_df

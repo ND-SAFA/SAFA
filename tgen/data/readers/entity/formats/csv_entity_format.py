@@ -2,8 +2,8 @@ from typing import List
 
 import pandas as pd
 
-from tgen.data.readers.entity.entity_parser_type import EntityParserType
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from tgen.data.summarizer.summarizer import Summarizer
 
 
 class CsvEntityFormat(AbstractEntityFormat):
@@ -11,12 +11,15 @@ class CsvEntityFormat(AbstractEntityFormat):
     Defines format for reading CSV files as entities.
     """
 
-    @staticmethod
-    def get_parser() -> EntityParserType:
+    @classmethod
+    def _parse(cls, data_path: str, summarizer: Summarizer = None, **kwargs) -> pd.DataFrame:
         """
-        :return: Returns pandas data frame parser from csv files.
+        Parses a CSV into DataFrame of entities.
+        :param data_path: The path to the data to parse
+        :param summarizer: If provided, will summarize the artifact content
+        :return: DataFrame of parsed entities.
         """
-        return pd.read_csv
+        return pd.read_csv(data_path)
 
     @staticmethod
     def get_file_extensions() -> List[str]:

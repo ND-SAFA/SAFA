@@ -1,10 +1,13 @@
 import os
-from typing import Dict, Generic, Optional, TypeVar
+from typing import Dict, Generic, Optional, TypeVar, Tuple
 
 import pandas as pd
 
 from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
+from tgen.data.summarizer.summarizer_info import SummarizefInfo
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_manager import logger
@@ -31,25 +34,29 @@ class EntityReader(Generic[EntityType]):
         self.conversions: Dict[str, Dict] = conversions
         self.entity_type = None
 
-    def read_entities(self) -> pd.DataFrame:
+    def read_entities(self, summarizer_info: SummarizefInfo = None) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
         :return: DataFrame containing processed entities.
         """
-        source_entities_df = self.read_original_entities()
+        summarizer = summarizer_info.summarizer if summarizer_info and summarizer_info.summarizer else None
+        parser, parser_params = self.get_parser()
+        source_entities_df = parser.parse(self.path, summarizer=summarizer, **parser_params)
         column_conversion = self.get_column_conversion()
         processed_df = DataFrameUtil.rename_columns(source_entities_df, column_conversion)
+        if summarizer and not parser.performs_summarization() and summarizer_info.col2summarize in processed_df:
+            summarizer_info.summarizer.summarize_dataframe(processed_df, summarizer_info.col2summarize)
         logger.info(f"{self.path}:{len(source_entities_df)}")
         return processed_df
 
-    def read_original_entities(self) -> pd.DataFrame:
+    def get_parser(self) -> Tuple[AbstractEntityFormat, Dict]:
         """
         Reads data and aggregates examples into data frame.
         :return: DataFrame containing original examples
         """
-        parser_params = JsonUtil.get_property(self.definition, StructuredKeys.PARAMS, {})
+        parser_params: Dict = JsonUtil.get_property(self.definition, StructuredKeys.PARAMS, {})
         parser = SupportedEntityFormats.get_parser(self.path, self.definition)
-        return parser(self.path, **parser_params)
+        return parser, parser_params
 
     def get_column_conversion(self) -> Optional[Dict]:
         """

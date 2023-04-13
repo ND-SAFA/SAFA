@@ -37,7 +37,8 @@ class TestEntityReader(BaseTest):
         project_path, file = os.path.split(XML_ENTITY_PATH)
         definition = self.create_definition(file, **{StructuredKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()}})
         entity_reader = EntityReader(project_path, definition)
-        original_df = entity_reader.read_original_entities()
+        parser, parser_params = entity_reader.get_parser()
+        original_df = parser.parse(entity_reader.path, **parser_params)
         TestAssertions.verify_entities_in_df(self, TestXmlEntityFormat.get_entities(), original_df)
 
     def test_read_column_conversions(self):

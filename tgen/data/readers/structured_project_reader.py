@@ -13,6 +13,7 @@ from tgen.data.readers.definitions.abstract_project_definition import AbstractPr
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
 from tgen.data.readers.entity.entity_reader import EntityReader
+from tgen.data.summarizer.summarizer_info import SummarizerInfo
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
@@ -87,7 +88,8 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             artifact_reader = EntityReader(self.project_path,
                                            artifact_definition,
                                            conversions=self.get_project_conversions())
-            artifact_type_df = artifact_reader.read_entities()
+            artifact_type_df = artifact_reader.read_entities(summarizer_info=SummarizerInfo(self.summarizer,
+                                                                                            StructuredKeys.Artifact.CONTENT.value))
             artifact_type_df[StructuredKeys.Artifact.LAYER_ID.value] = artifact_type
             artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
         return ArtifactDataFrame(artifacts_df)

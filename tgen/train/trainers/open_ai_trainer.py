@@ -1,36 +1,30 @@
 from typing import Dict, List
 
-import openai
 from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
-from tgen.constants import OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
 from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.train.trainers.itrainer import iTrainer
+from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.metrics.metrics_manager import MetricsManager
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.train.trainers.itrainer import iTrainer
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.logging.logger_manager import logger
-
-assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
-                                    f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
-openai.organization = OPEN_AI_ORG
-openai.api_key = OPEN_AI_KEY
+from tgen.util.open_ai_util import OpenAiUtil
 
 
-class OpenAITrainer(iTrainer):
+class OpenAiTrainer(iTrainer):
     """
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
-                 trainer_args: OpenAIArgs = OpenAIArgs(),
+                 trainer_args: OpenAiArgs = OpenAiArgs(),
                  prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator()):
         """
         Initializes the trainer with the necessary arguments for training and prediction
@@ -55,9 +49,9 @@ class OpenAITrainer(iTrainer):
         if DatasetRole.VAL in self.trainer_dataset_manager:
             val_dataset: PromptDataset = self.trainer_dataset_manager[DatasetRole.VAL]
             params["validation_file"] = val_dataset.get_project_file_id()
-        res = openai.FineTune.create(training_file=training_file_id,
-                                     model=self.base_model,
-                                     **params)
+        res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
+                                                model=self.base_model,
+                                                **params)
         logger.info(res.events[-1].message)
         return res
 
@@ -68,7 +62,7 @@ class OpenAITrainer(iTrainer):
         :param fine_tune_id: The id of the fine tune job
         :return: The response for the fine tune job
         """
-        res = openai.FineTune.retrieve(fine_tune_id)
+        res = OpenAiUtil.retrieve_fine_tune_request(id=fine_tune_id)
         logger.info(res.events[-1].message)
         return res
 
@@ -79,8 +73,8 @@ class OpenAITrainer(iTrainer):
         :return: THe prediction response
         """
         prompt_df = self.trainer_dataset_manager[dataset_role].to_trainer_dataset()
-        res = openai.Completion.create(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
-                                       **self.trainer_args.to_params(self.prompt_generator, TrainerTask.PREDICT))
+        res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
+                                                 **self.trainer_args.to_params(self.prompt_generator, TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset_role) \
             if isinstance(self.prompt_generator, ClassificationPromptGenerator) else self._create_generation_output(res)
 

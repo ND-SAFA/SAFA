@@ -11,7 +11,7 @@ from tgen.data.prompts.classification_prompt_generator import ClassificationProm
 
 
 @dataclass
-class OpenAIArgs:
+class OpenAiArgs:
     temperature: float = TEMPERATURE_DEFAULT
     max_tokens: int = MAX_TOKENS_DEFAULT
     logprobs: int = LOGPROBS_DEFAULT

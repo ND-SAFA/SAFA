@@ -1,15 +1,17 @@
 import os
 from typing import List
 
-from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
+import pandas as pd
+
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
-from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
+from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
-import openai
-import pandas as pd
+from tgen.util.open_ai_util import OpenAiUtil
+
 
 class Summarizer(BaseObject):
     """
@@ -57,10 +59,10 @@ class Summarizer(BaseObject):
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        args = OpenAIArgs()
+        args = OpenAiArgs()
         prompts = [prompt_generator.generate(target_content=chunk, source_content='') for chunk in chunks]
-        res = openai.Completion.create(model=model_path, prompt=prompts,
-                                       **args.to_params(prompt_generator, TrainerTask.PREDICT))
+        res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
+                                                 **args.to_params(prompt_generator, TrainerTask.PREDICT))
         return [choice.text.strip() for choice in res["choices"]]
 
     @staticmethod

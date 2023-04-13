@@ -11,13 +11,13 @@ from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
-import openai
 
 import pandas as pd
 
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.file_util import FileUtil
+from tgen.util.open_ai_util import OpenAiUtil
 
 
 class PromptDataset(iDataset):
@@ -86,7 +86,7 @@ class PromptDataset(iDataset):
         """
         if not self.project_file_id:
             export_path, should_delete_path = self.export_prompt_dataset(self.get_prompts_dataframe(prompt_generator))
-            res = openai.File.create(file=open(export_path), purpose=TrainerTask.TRAIN.value)
+            res = OpenAiUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)

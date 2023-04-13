@@ -6,19 +6,19 @@ from tgen.data.prompts.classification_prompt_generator import ClassificationProm
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.models.model_manager import ModelManager
-from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.train.trainers.open_ai_trainer import OpenAITrainer
+from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.util.override import overrides
 
 
-class OpenAIJob(AbstractTrainerJob):
+class OpenAiJob(AbstractTrainerJob):
     """
     Job to handle open ai tasks
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: OpenAIArgs = OpenAIArgs(),
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: OpenAiArgs = OpenAiArgs(),
                  base_model: str = "ada", task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None,
                  prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator()):
         """
@@ -36,14 +36,14 @@ class OpenAIJob(AbstractTrainerJob):
         self.prompt_generator = prompt_generator
 
     @overrides(AbstractTrainerJob)
-    def get_trainer(self, **kwargs) -> OpenAITrainer:
+    def get_trainer(self, **kwargs) -> OpenAiTrainer:
         """
         Gets the trace trainer for the job
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = OpenAITrainer(trainer_args=self.trainer_args,
+            self._trainer = OpenAiTrainer(trainer_args=self.trainer_args,
                                           trainer_dataset_manager=self.trainer_dataset_manager,
                                           base_model=self.base_model,
                                           prompt_generator=self.prompt_generator)

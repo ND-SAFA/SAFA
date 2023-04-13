@@ -29,7 +29,7 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         """
         prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.project_path))
         if self.summarizer is not None:
-            prompt_df = PromptDataFrame(self.summarizer.summarize_dataframe(prompt_df, PromptKeys.PROMPT.value))
+            prompt_df = self.summarizer.summarize_dataframe(prompt_df, PromptKeys.PROMPT.value)
         return prompt_df
 
     def get_project_name(self) -> str:

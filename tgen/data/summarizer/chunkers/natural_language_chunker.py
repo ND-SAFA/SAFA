@@ -14,5 +14,6 @@ class NaturalLanguageChunker(AbstractChunker):
         :param content: The content to chunk
         :return: The content chunked into sizes beneath the token limit
         """
+        return [content]
         # TODO
         raise NotImplementedError()

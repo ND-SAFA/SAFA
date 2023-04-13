@@ -29,11 +29,12 @@ class Summarizer(BaseObject):
         """
         chunker = self._get_chunker(path_to_file)
         is_code = is_code or chunker != SupportedChunker.NL
+        model_path = self._get_model_path_for_content(is_code) if not self.model_path else self.model_path
+        chunker = chunker.value(model_path)
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
-        chunks = chunker.chunk(content)
+        chunks = chunker.chunk(content=content)
         prompt_generator = CreationPromptGenerator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
-        model_path = self._get_model_path_for_content(is_code) if not self.model_path else self.model_path
         summarizations = self._summarize_chunks(chunks, prompt_generator, model_path)
         return os.linesep.join(summarizations)
 
@@ -44,7 +45,8 @@ class Summarizer(BaseObject):
         :param col2summarize: The name of the column in the dataframe to summarize
         :return: The dataframe with the contents in the given column summarized
         """
-        return df[col2summarize].apply(lambda item: self.summarize(content=item))
+        df[col2summarize] = df[col2summarize].apply(lambda item: self.summarize(content=item))
+        return df
 
     @staticmethod
     def _summarize_chunks(chunks: List[str], prompt_generator: CreationPromptGenerator, model_path: str, ) -> List[str]:

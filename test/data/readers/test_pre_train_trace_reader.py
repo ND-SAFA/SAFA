@@ -1,8 +1,14 @@
+import os
+from unittest import mock
+
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
+from tgen.data.summarizer.summarizer import Summarizer
+from tgen.testres.base_tests.abstract_project_reader_test import fake_open_ai_completion, SUMMARY_FORMAT
 from tgen.testres.base_tests.base_test import BaseTest
-
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
+from tgen.util.file_util import FileUtil
 
 
 class TestPreTrainingTraceReader(BaseTest):
@@ -16,7 +22,20 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         reader: PreTrainTraceReader = self.get_project_reader()
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
-        self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df)
+        lines = FileUtil.read_file(reader.data_file).split(os.linesep)
+        self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
+
+    @mock.patch("openai.Completion.create")
+    def test_summarization(self, mock_completion: mock.MagicMock):
+        """
+        Tests that pre-train data can be summarized
+        """
+        mock_completion.side_effect = fake_open_ai_completion
+        reader: PreTrainTraceReader = self.get_project_reader()
+        reader.set_summarizer(Summarizer())
+        artifact_df, trace_df, layer_mapping_df = reader.read_project()
+        lines = [SUMMARY_FORMAT.format(line) for line in FileUtil.read_file(reader.data_file).split(os.linesep)]
+        self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
     @staticmethod
     def get_project_path() -> str:
@@ -32,7 +51,7 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         return PreTrainTraceReader(cls.get_project_path())
 
-    def verify_project_data_frames(self, artifacts_df, traces_df, layer_df) -> None:
+    def verify_project_data_frames(self, artifacts_df, traces_df, layer_df, lines) -> None:
         """
         Verifies dataframes are as expected
         :return: None
@@ -41,3 +60,6 @@ class TestPreTrainingTraceReader(BaseTest):
             expected_artifacts = file.readlines()
         self.assertEquals(len(expected_artifacts), len(artifacts_df.index))
         self.assertEquals(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
+        for i, row in artifacts_df.iterrows():
+            self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT.value].strip(), msg="Item {} failed.".format(i))
+

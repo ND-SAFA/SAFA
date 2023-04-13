@@ -1,6 +1,8 @@
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.summarizer.summarizer import Summarizer
+from tgen.util.override import overrides
 
 
 class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
@@ -25,6 +27,15 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         """
         self.structured_project_reader.get_project_definition()
         return self.structured_project_reader.read_artifact_df()
+
+    @overrides(AbstractProjectReader)
+    def set_summarizer(self, summarizer: Summarizer) -> None:
+        """
+        Sets the summarizer used to summarize content read by the reader
+        :param summarizer: The summarizer to use
+        :return: None
+        """
+        self.structured_project_reader.set_summarizer(summarizer)
 
     def get_project_name(self) -> str:
         """

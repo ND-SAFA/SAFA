@@ -13,3 +13,9 @@ class TestCsvProjectReader(AbstractProjectReaderTest):
         Tests that the csv project can be read and translated to data frames.
         """
         self.verify_project_data_frames(self.test_project)
+
+    def test_summarization(self):
+        """
+        Tests that project artifacts can be summarized
+        """
+        self.verify_summarization(test_project=self.test_project)

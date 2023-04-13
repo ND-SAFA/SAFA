@@ -35,9 +35,9 @@ class PreTrainProjectReader(AbstractProjectReader[List]):
         for _, entity_row in entity_df.iterrows():
             col_name = StructuredKeys.Artifact.CONTENT.value
             file_content = entity_row[col_name]
-            if self.summarizer is not None:
-                file_content = self.summarizer.summarize(content=file_content)
             for example in file_content.split(self.DELIMINATOR):
+                if self.summarizer is not None:
+                    example = self.summarizer.summarize(content=example)
                 examples.append(example)
         return examples
 

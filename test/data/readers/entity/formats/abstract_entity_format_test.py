@@ -4,7 +4,7 @@ from typing import Dict, List, Type
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-
+import tgen
 
 class AbstractEntityFormatTest(BaseTest):
     """
@@ -25,8 +25,8 @@ class AbstractEntityFormatTest(BaseTest):
         :param kwargs: Any additional parameters passed to parser.
         :return: None
         """
-        entity_format_parser = self.entity_format.get_parser()
-        entity_df = entity_format_parser(self.data_path, **kwargs)
+        entity_format_parser = self.entity_format
+        entity_df = entity_format_parser.parse(self.data_path, **kwargs)
         expected_entities = self.get_entities()
         TestAssertions.verify_entities_in_df(self, expected_entities, entity_df)
 

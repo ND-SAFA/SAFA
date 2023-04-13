@@ -1,6 +1,6 @@
-from tgen.data.summarizers.chunkers.java_chunker import JavaChunker
-from tgen.data.summarizers.chunkers.natural_language_chunker import NaturalLanguageChunker
-from tgen.data.summarizers.chunkers.python_chunker import PythonChunker
+from tgen.data.summarizer.chunkers.java_chunker import JavaChunker
+from tgen.data.summarizer.chunkers.natural_language_chunker import NaturalLanguageChunker
+from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 
 
 class SupportedChunker:

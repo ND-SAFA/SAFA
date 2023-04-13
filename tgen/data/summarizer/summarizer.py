@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from tgen.data.summarizers.chunkers.supported_chunker import SupportedChunker
+from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
 from tgen.train.args.open_ai_args import OpenAIArgs

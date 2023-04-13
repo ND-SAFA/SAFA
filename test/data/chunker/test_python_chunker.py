@@ -1,7 +1,7 @@
 import ast
 import os
 
-from tgen.data.summarizers.chunkers.python_chunker import PythonChunker
+from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.util.file_util import FileUtil
@@ -13,8 +13,9 @@ class TestPythonChunker(BaseTest):
 
     def test_chunk(self):
         chunker = self.get_chunker()
-        chunks = chunker.chunk(path_to_file=self.DATA_PATH)
-        all_content = FileUtil.read_file(self.DATA_PATH).split("\n")
+        content = FileUtil.read_file(self.DATA_PATH)
+        chunks = chunker.chunk(content=content)
+        all_content = content.split("\n")
         chunked_content = "\n".join(chunks)
         for line in all_content:
             line = line.strip()

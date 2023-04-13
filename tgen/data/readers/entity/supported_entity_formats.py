@@ -32,10 +32,10 @@ class SupportedEntityFormats:
             parser_key = JsonUtil.get_property(definition, StructuredKeys.PARSER).upper()
             return SupportedEntityFormats.FORMATS[parser_key]
         if os.path.isdir(data_path):
-            return SupportedEntityFormats.FORMATS["FOLDER"].get_parser()
+            return SupportedEntityFormats.FORMATS["FOLDER"]
         for _, entity_format in cls.FORMATS.items():
             if entity_format.is_format(data_path):
-                return entity_format.get_parser()
+                return entity_format
 
         supported_file_types = [f.lower() for f in cls.FORMATS.keys()]
         raise ValueError(data_path, "does not have supported file type: ", supported_file_types)

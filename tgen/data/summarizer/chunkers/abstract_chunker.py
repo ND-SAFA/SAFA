@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from tgen.data.summarizers.chunkers.open_ai_token_limits import ModelTokenLimits
+from tgen.data.summarizer.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
@@ -20,7 +20,6 @@ class AbstractChunker(BaseObject, ABC):
         self.model_name = model_name
         self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name)
 
-    @abstractmethod
     def chunk(self, content: str) -> List[str]:
         """
         Chunks the given content into pieces that are beneath the model's token limit
@@ -65,5 +64,5 @@ class AbstractChunker(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.summarizers.chunkers.supported_chunker import SupportedChunker
+        from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
         return SupportedChunker

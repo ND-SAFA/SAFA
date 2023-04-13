@@ -11,7 +11,6 @@ class AbstractEntityFormat(ABC):
     """
 
     @classmethod
-    @abstractmethod
     def parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
         """
         Parses a data into DataFrame of entities.

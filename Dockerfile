@@ -28,6 +28,8 @@ COPY /src/api/ /app/api/
 WORKDIR /app
 RUN python3 api/manage.py collectstatic --noinput
 
+### COPy
+
 # Finalize
 EXPOSE 80
 WORKDIR /app

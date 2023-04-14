@@ -14,8 +14,6 @@ phases:
       - echo Build started on `date`
       - docker build -t tgen .
       - docker tag tgen 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:$STAGE
-  post_build:
-    commands:
       - docker push 178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:$STAGE
 artifacts:
   files:

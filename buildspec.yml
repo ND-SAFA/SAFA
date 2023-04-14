@@ -12,8 +12,6 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - mv .ebextensions/definitions/$STAGE.json Dockerrun.aws.json
-      - git submodule update --init --recursive
 
 artifacts:
   files:

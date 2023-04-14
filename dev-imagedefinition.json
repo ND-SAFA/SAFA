@@ -1,6 +1,6 @@
 [
   {
-    "name": "my-app",
+    "name": "test",
     "imageUri": "178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:dev"
   }
 ]

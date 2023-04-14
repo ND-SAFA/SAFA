@@ -1,6 +1,6 @@
 [
   {
-    "name": "test",
+    "name": "test-tgen-container",
     "imageUri": "178003569110.dkr.ecr.us-east-1.amazonaws.com/tgen:dev"
   }
 ]

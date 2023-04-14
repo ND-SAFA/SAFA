@@ -1,5 +1,6 @@
 import os
 import shutil
+from collections import namedtuple
 from typing import List, Sized, Tuple
 from unittest import TestCase
 
@@ -136,3 +137,12 @@ class BaseTest(TestCase):
         layer_ids = [1 for i in range(n_artifacts)]
         return ArtifactDataFrame(
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
+
+
+Choice = namedtuple("Choice", ["text"])
+SUMMARY_FORMAT = "Summary of {}"
+
+
+def fake_open_ai_completion(model, prompt, **args):
+    tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]
+    return {"choices": [Choice(SUMMARY_FORMAT.format(token)) for token in tokens]}

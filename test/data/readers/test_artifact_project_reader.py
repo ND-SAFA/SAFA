@@ -3,8 +3,7 @@ from unittest import mock
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.testres.base_tests.abstract_project_reader_test import fake_open_ai_completion, SUMMARY_FORMAT
-from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject

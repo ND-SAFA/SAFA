@@ -1,22 +1,12 @@
-from collections import namedtuple
 from typing import Dict, List
 from unittest import mock
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-
-Choice = namedtuple("Choice", ["text"])
-
-SUMMARY_FORMAT = "Summary of {}"
-
-
-def fake_open_ai_completion(model, prompt, **args):
-    tokens = ["\'".join(p['prompt'].split('\'')[1:-1]) for p in prompt]
-    return {"choices": [Choice(SUMMARY_FORMAT.format(token)) for token in tokens]}
 
 
 class AbstractProjectReaderTest(BaseTest):

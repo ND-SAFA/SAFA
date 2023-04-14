@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
@@ -18,8 +19,9 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, model_path: str = None):
+    def __init__(self, model_path: str = None, args: OpenAiArgs = None):
         self.model_path = model_path
+        self.args = OpenAiArgs() if not args else args
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
         """
@@ -31,13 +33,13 @@ class Summarizer(BaseObject):
         """
         chunker = self._get_chunker(path_to_file)
         is_code = is_code or chunker != SupportedChunker.NL
-        model_path = self._get_model_path_for_content(is_code) if not self.model_path else self.model_path
+        model_path = self._get_model_name_for_content(is_code) if not self.model_path else self.model_path
         chunker = chunker.value(model_path)
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content)
         prompt_generator = CreationPromptGenerator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
-        summarizations = self._summarize_chunks(chunks, prompt_generator, model_path)
+        summarizations = self._summarize_chunks(chunks, prompt_generator, model_path, self.args)
         return os.linesep.join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str):
@@ -51,7 +53,7 @@ class Summarizer(BaseObject):
         return df
 
     @staticmethod
-    def _summarize_chunks(chunks: List[str], prompt_generator: CreationPromptGenerator, model_path: str, ) -> List[str]:
+    def _summarize_chunks(chunks: List[str], prompt_generator: CreationPromptGenerator, model_path: str, args: OpenAiArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model
         :param model_path: The model to use for summarizations
@@ -59,8 +61,8 @@ class Summarizer(BaseObject):
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        args = OpenAiArgs()
-        prompts = [prompt_generator.generate(target_content=chunk, source_content='') for chunk in chunks]
+        prompts = [prompt_generator.generate(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
+                   for chunk in chunks]
         res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(prompt_generator, TrainerTask.PREDICT))
         return [choice.text.strip() for choice in res["choices"]]
@@ -77,15 +79,15 @@ class Summarizer(BaseObject):
             return default
         ext = FileUtil.get_file_ext(path_to_file)
         try:
-            return SupportedChunker[ext[1:]]
+            return SupportedChunker[ext[1:].upper()]
         except Exception:
             return default
 
     @staticmethod
-    def _get_model_path_for_content(is_code: bool) -> str:
+    def _get_model_name_for_content(is_code: bool) -> str:
         """
         Gets the best model for the content being summarized
         :param is_code: True if the content is code, else assumed to be Natural language
         :return: The best model for the content being summarized
         """
-        return "code-davinci-002" if is_code else "gpt-3.5-turbo"
+        return "code-davinci-002" if is_code else "text-davinci-003"

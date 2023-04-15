@@ -22,6 +22,8 @@ from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger
 from tgen.util.thread_util import ThreadUtil
 
+import networkx as nx
+
 
 class TraceDataset(iDataset):
     """
@@ -245,6 +247,16 @@ class TraceDataset(iDataset):
         """
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
+
+    def construct_graph_from_traces(self) -> nx.Graph:
+        """
+        Constructs a graph using the artifacts as nodes and positive trace links as edges
+        :return: A graph representation of the dataset
+        """
+        G = nx.Graph()
+        G.add_nodes_from(self.artifact_df.index)
+        G.add_edges_from(self.get_source_target_pairs(self.pos_link_ids))
+        return G
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """

@@ -98,7 +98,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         return dict_
 
     @staticmethod
-    def generate_link_id(source_id: str, target_id: str) -> int:
+    def generate_link_id(source_id: Any, target_id: Any) -> int:
         """
         Generates a unique id for a source, target link
         :param source_id: id of source artifact

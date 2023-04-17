@@ -45,8 +45,8 @@ class TestPromptProjectReader(BaseTest):
                 prompt_dict = json.loads(line)
                 prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.format(prompt_dict[PromptKeys.PROMPT.value])
                 expected_prompts.append(prompt_dict)
-        for i, row in prompts_df.iterrows():
-            row[PromptKeys.PROMPT.value] = row[PromptKeys.PROMPT.value] + "\n\n"
+        for i, row in prompts_df.itertuples():
+            row[PromptKeys.PROMPT] = row[PromptKeys.PROMPT] + "\n\n"
         TestAssertions.verify_entities_in_df(self, expected_prompts, prompts_df)
 
     def get_project_reader(self) -> PromptProjectReader:

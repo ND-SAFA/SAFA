@@ -61,8 +61,8 @@ class TestTraceDataset(BaseTraceTest):
 
         n_augmented_links = [0 for i in range(len(step_ids))]
         n_overlap = 0
-        for link_id, link in trace_dataset.trace_df.iterrows():
-            source_id, target_id = link[TraceKeys.SOURCE.value], link[TraceKeys.TARGET.value]
+        for link_id, link in trace_dataset.trace_df.itertuples():
+            source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
             source_content = trace_dataset.artifact_df.get_artifact(source_id)[ArtifactKeys.CONTENT]
             target_content = trace_dataset.artifact_df.get_artifact(target_id)[ArtifactKeys.CONTENT]
             for i, step_id in enumerate(step_ids):
@@ -149,15 +149,15 @@ class TestTraceDataset(BaseTraceTest):
         TestAssertions.assert_lists_have_the_same_vals(self, pos_links,
                                                        list(self.positive_links.index))
         self.assertEquals(len(data_entries), self.N_POSITIVE)
-        for link_id, link in self.positive_links.iterrows():
-            source_body = TestDataManager._get_artifact_body(link[TraceKeys.SOURCE.value])
-            target_body = TestDataManager._get_artifact_body(link[TraceKeys.TARGET.value])
+        for link_id, link in self.positive_links.itertuples():
+            source_body = TestDataManager._get_artifact_body(link[TraceKeys.SOURCE])
+            target_body = TestDataManager._get_artifact_body(link[TraceKeys.TARGET])
             self.assertIn((source_body, target_body), data_entries)
 
     def test_create_links_from_augmentation(self):
         ids = ['id1', 'id2']
         orig_links = self.positive_links
-        base_result = [(link[TraceKeys.SOURCE.value], link[TraceKeys.TARGET.value]) for index, link in orig_links.iterrows()]
+        base_result = [(link[TraceKeys.SOURCE], link[TraceKeys.TARGET]) for index, link in orig_links.itertuples()]
         results = [[(id_ + pair[0], id_ + pair[1]) for pair in base_result] for id_ in ids]
         augmentation_results = {
             AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
@@ -167,9 +167,9 @@ class TestTraceDataset(BaseTraceTest):
                                                       list(orig_links.index))
         self.assertEquals(len(trace_dataset.pos_link_ids), 3 * len(orig_links))
         n_augmented_links = [0 for i in range(len(ids))]
-        for index, link in trace_dataset.trace_df.iterrows():
+        for index, link in trace_dataset.trace_df.itertuples():
             for i, id_ in enumerate(ids):
-                source_id, target_id = link[TraceKeys.SOURCE.value], link[TraceKeys.TARGET.value]
+                source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
                 if id_ in source_id:
                     self.assertIn(id_, target_id)
                     source_content = trace_dataset.artifact_df.get_artifact(source_id)[ArtifactKeys.CONTENT]

@@ -1,7 +1,8 @@
 from abc import abstractmethod
+from collections import namedtuple
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Iterable
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
@@ -9,6 +10,7 @@ from pandas.core.internals.construction import dict_to_mgr
 
 from tgen.util import enum_util
 from tgen.util.enum_util import EnumDict
+from tgen.util.override import overrides
 
 
 class AbstractProjectDataFrame(pd.DataFrame):
@@ -142,6 +144,24 @@ class AbstractProjectDataFrame(pd.DataFrame):
         for index, cols in data1.items():
             cols[cls.index_name()] = index
         return cls.from_dict(data1.values())
+
+    @overrides(pd.DataFrame)
+    def itertuples(self, index: bool = True, name: str = "Pandas") -> EnumDict:
+        """
+        Iterate over DataFrame rows as namedtuples.
+        :param index: if True, return the index as the first element of the tuple.
+        :param name : The name of the returned namedtuples or None to return regular tuples.
+        :return enum dictionary of data
+        """
+        for row in super().itertuples(index, name):
+            if hasattr(row,"_asdict"):
+                dict_ = EnumDict(row._asdict())
+                index = dict_.pop("Index")
+                if self.index_name():
+                    dict_[self.index_name()] = index
+                yield index, dict_
+            else:
+                yield row
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

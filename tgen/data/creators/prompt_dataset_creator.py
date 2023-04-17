@@ -27,8 +27,9 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
         self.project_reader = project_reader
         self.trace_dataset_creator = trace_dataset_creator
         self.project_file_id = project_file_id
-        if summarizer is not None:
-            self._set_summarizer(summarizer)
+        self.summarizer = summarizer
+        if self.summarizer is not None:
+            self.set_summarizers(summarizer)
 
     def create(self) -> PromptDataset:
         """
@@ -55,12 +56,13 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
             return self.project_file_id
         return ''
 
-    def _set_summarizer(self, summarizer: Summarizer) -> None:
+    def set_summarizers(self, summarizer: Summarizer) -> None:
         """
         Sets summarizers for project readers
         :param summarizer: The summarizer to use
         :return: None
         """
+        self.summarizer = summarizer
         if self.project_reader is not None:
             self.project_reader.set_summarizer(summarizer)
         if self.trace_dataset_creator is not None:

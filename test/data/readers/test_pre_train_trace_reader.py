@@ -59,6 +59,6 @@ class TestPreTrainingTraceReader(BaseTest):
             expected_artifacts = file.readlines()
         self.assertEquals(len(expected_artifacts), len(artifacts_df.index))
         self.assertEquals(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
-        for i, row in artifacts_df.iterrows():
-            self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT.value].strip(), msg="Item {} failed.".format(i))
+        for i, row in artifacts_df.itertuples():
+            self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT].strip(), msg="Item {} failed.".format(i))
 

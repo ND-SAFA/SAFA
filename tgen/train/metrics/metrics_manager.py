@@ -30,7 +30,8 @@ class MetricsManager:
         :param trace_predictions: The output of a model.
         :param predicted_similarities: The similarity scores predicted
         """
-        n_predictions, n_expected = len(predicted_similarities) if trace_predictions is None else len(trace_predictions), len(trace_df)
+        n_predictions = len(predicted_similarities) if trace_predictions is None else len(trace_predictions)
+        n_expected = len(trace_df)
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         scores = self.get_similarity_scores(trace_predictions) if predicted_similarities is None else predicted_similarities
         self.trace_matrix = TraceMatrix(trace_df, scores, link_ids)
@@ -90,7 +91,8 @@ class MetricsManager:
         :return: List of similarity scores associated with predictions.
         """
         similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
+        n_predictions = predictions.shape[0] if isinstance(predictions, np.ndarray) else len(predictions)
+        for pred_i in range(n_predictions):
             prediction = predictions[pred_i]
             similarity_scores.append(softmax(prediction)[1])
         return similarity_scores

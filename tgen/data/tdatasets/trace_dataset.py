@@ -255,8 +255,11 @@ class TraceDataset(iDataset):
         """
         G = nx.Graph()
         G.add_nodes_from(self.artifact_df.index)
-        G.add_edges_from(self.get_source_target_pairs(self.pos_link_ids))
+        G.add_edges_from(self._get_edges())
         return G
+
+    def _get_edges(self) :
+        return self.get_source_target_pairs(self.pos_link_ids)
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
@@ -372,8 +375,8 @@ class TraceDataset(iDataset):
         """
         pos_link_ids = []
         neg_link_ids = []
-        for index, row in trace_df.iterrows():
-            if row[TraceKeys.LABEL.value]:
+        for index, row in trace_df.itertuples():
+            if row[TraceKeys.LABEL]:
                 pos_link_ids.append(index)
             else:
                 neg_link_ids.append(index)

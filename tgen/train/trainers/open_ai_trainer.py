@@ -72,7 +72,7 @@ class OpenAiTrainer(iTrainer):
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :return: THe prediction response
         """
-        prompt_df = self.trainer_dataset_manager[dataset_role].to_trainer_dataset()
+        prompt_df = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.prompt_generator)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                  **self.trainer_args.to_params(self.prompt_generator, TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset_role) \
@@ -107,7 +107,7 @@ class OpenAiTrainer(iTrainer):
         trace_dataset = prompts_dataset.trace_dataset
         metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                          link_ids=trace_dataset.get_ordered_link_ids(),
-                                         trace_predictions=scores)
+                                         predicted_similarities=scores)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics)
         logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
         return TracePredictionOutput(predictions=metrics_manager.get_scores(),

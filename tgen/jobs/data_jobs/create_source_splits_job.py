@@ -43,7 +43,7 @@ class CreateSourceSplitsJob(AbstractJob):
         :return: JobResult containing empty message.
         """
         dataset = self.exporter.get_dataset()
-        for layer_mapping_i, layer_mapping_row in dataset.layer_mapping_df.iterrows():
+        for layer_mapping_i, layer_mapping_row in dataset.layer_mapping_df.itertuples():
             source_name, target_name = self.get_layer_types(layer_mapping_row)
             task_name = f"task_{layer_mapping_i}"
 
@@ -140,6 +140,6 @@ class CreateSourceSplitsJob(AbstractJob):
         :param layer_mapping_row: Row in layer mapping dataframe containing source and target types.
         :return: Source and target types.
         """
-        source_name = layer_mapping_row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-        target_name = layer_mapping_row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        source_name = layer_mapping_row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+        target_name = layer_mapping_row[StructuredKeys.LayerMapping.TARGET_TYPE]
         return source_name, target_name

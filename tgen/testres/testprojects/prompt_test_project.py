@@ -70,9 +70,9 @@ class PromptTestProject:
         """
         artifacts = PromptTestProject.get_safa_artifacts()
         test_case.assertEqual(len(prompts_df), len(artifacts), **params)
-        for i, row in prompts_df.iterrows():
+        for i, row in prompts_df.itertuples():
             tokens = artifacts[i][ArtifactKeys.CONTENT.value]
-            test_case.assertIn(tokens, row[PromptKeys.PROMPT.value], **params)
+            test_case.assertIn(tokens, row[PromptKeys.PROMPT], **params)
 
     @staticmethod
     def verify_prompts_safa_project(test_case: BaseTest, prompt_df: PromptDataFrame, **params):
@@ -86,9 +86,9 @@ class PromptTestProject:
         test_case.assertEqual(len(entries), len(prompt_df), **params)
         artifacts = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
                      for artifact in PromptTestProject.get_safa_artifacts()}
-        for i, row in prompt_df.iterrows():
+        for i, row in prompt_df.itertuples():
             entry = entries[i]
             source_id, target_id = entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]
             source, target = artifacts[source_id], artifacts[target_id]
-            test_case.assertIn(target, row[PromptKeys.PROMPT.value], **params)
-            test_case.assertIn(source, row[PromptKeys.COMPLETION.value], **params)
+            test_case.assertIn(target, row[PromptKeys.PROMPT], **params)
+            test_case.assertIn(source, row[PromptKeys.COMPLETION], **params)

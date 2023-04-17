@@ -4,7 +4,7 @@ from typing import Any, Tuple
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
 from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
 from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
@@ -113,13 +113,13 @@ class PromptDataset(iDataset):
         """
         entries = []
         traces = self.trace_dataset.trace_df if isinstance(prompt_generator, ClassificationPromptGenerator) \
-            else DataFrameUtil.query_df(self.trace_dataset.trace_df, {TraceKeys.LABEL.value: 1})
-        for i, row in traces.iterrows():
+            else TraceDataFrame(DataFrameUtil.query_df(self.trace_dataset.trace_df, {TraceKeys.LABEL.value: 1}))
+        for i, row in traces.itertuples():
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = prompt_generator.generate(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT],
-                                              label=row[TraceKeys.LABEL.value])
+                                              label=row[TraceKeys.LABEL])
             entries.append(entry)
-        return pd.DataFrame(entries)
+        return PromptDataFrame(entries)
 
     def _generate_prompts_dataframe_from_artifacts(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
         """
@@ -128,10 +128,10 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, row in self.artifact_df.iterrows():
-            entry = prompt_generator.generate(target_content=row[ArtifactKeys.CONTENT.value], source_content='')
+        for i, row in self.artifact_df.itertuples():
+            entry = prompt_generator.generate(target_content=row[ArtifactKeys.CONTENT], source_content='')
             entries.append(entry)
-        return pd.DataFrame(entries)
+        return PromptDataFrame(entries)
 
     def _has_trace_data(self) -> bool:
         """

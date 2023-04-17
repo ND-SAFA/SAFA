@@ -35,7 +35,7 @@ class TestArtifactClusterer(BaseTest):
                     if cluster_link_id not in list(cluster_trace_df.index):
                         cluster_link_id = TraceDataFrame.generate_link_id(cluster_pair_num, cluster_num)
                         self.assertIn(cluster_link_id, list(cluster_trace_df.index))
-                    self.assertEqual(link[TraceKeys.LABEL.value], cluster_trace_df.get_link(cluster_link_id)[TraceKeys.LABEL.value])
+                    self.assertEqual(link[TraceKeys.LABEL.value], cluster_trace_df.get_link(cluster_link_id)[TraceKeys.LABEL])
 
         orig_trace_df = self.get_trace_dataset().trace_df
         clusters = self.CLUSTERS

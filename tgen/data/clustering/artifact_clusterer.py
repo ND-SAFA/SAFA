@@ -16,6 +16,8 @@ class ArtifactClusterer(BaseObject):
     Responsible for clustering dataset artifacts
     """
 
+    LAYER_ID = "layer_1"
+
     def __init__(self, trace_dataset: TraceDataset):
         """
         Initializes the clusterer with a dataset with artifacts to be clustered
@@ -53,7 +55,8 @@ class ArtifactClusterer(BaseObject):
         Creates the layer df from the clusters
         :return: The layer df from the clusters
         """
-        return LayerDataFrame({LayerKeys.SOURCE_TYPE: ["layer_1"], LayerKeys.TARGET_TYPE: ["layer_1"]})
+        return LayerDataFrame({LayerKeys.SOURCE_TYPE: [ArtifactClusterer.LAYER_ID],
+                               LayerKeys.TARGET_TYPE: [ArtifactClusterer.LAYER_ID]})
 
     @staticmethod
     def _get_trace_df_from_clusters(clusters: Clusters, orig_trace_df: TraceDataFrame, ) -> TraceDataFrame:
@@ -65,14 +68,14 @@ class ArtifactClusterer(BaseObject):
         """
         link_ids = set()
         traces = {}
-        for link_id, link in orig_trace_df.iterrows():
-            source_cluster = clusters[link[TraceKeys.SOURCE.value]]
-            target_cluster = clusters[link[TraceKeys.TARGET.value]]
+        for link_id, link in orig_trace_df.itertuples():
+            source_cluster = clusters[link[TraceKeys.SOURCE]]
+            target_cluster = clusters[link[TraceKeys.TARGET]]
             link_id = TraceDataFrame.generate_link_id(source_cluster, target_cluster)
             if source_cluster == target_cluster or link_id in link_ids:
                 continue
             traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: source_cluster, TraceKeys.TARGET: target_cluster,
-                                                            TraceKeys.LABEL: link[TraceKeys.LABEL.value]}))
+                                                            TraceKeys.LABEL: link[TraceKeys.LABEL]}))
             link_ids.add(link_id)
         return TraceDataFrame(traces)
 
@@ -92,4 +95,4 @@ class ArtifactClusterer(BaseObject):
             cluster_num_to_content[cluster_num].append(artifact_content)
         content = ["\n".join(artifact_content) for cluster_num, artifact_content in cluster_num_to_content.items()]
         return ArtifactDataFrame({ArtifactKeys.ID: list(cluster_num_to_content.keys()), ArtifactKeys.CONTENT: content,
-                                  ArtifactKeys.LAYER_ID: ["layer_1" for _ in content]})
+                                  ArtifactKeys.LAYER_ID: [ArtifactClusterer.LAYER_ID for _ in content]})

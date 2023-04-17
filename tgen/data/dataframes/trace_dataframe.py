@@ -55,8 +55,8 @@ class TraceDataFrame(AbstractProjectDataFrame):
             return
         if TraceKeys.LINK_ID.value not in self.columns and self.index.name != self.index_name():
             link_ids = []
-            for index, row in self.iterrows():
-                link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE.value], row[TraceKeys.TARGET.value]))
+            for index, row in self.itertuples():
+                link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE], row[TraceKeys.TARGET]))
             self[TraceKeys.LINK_ID] = link_ids
 
     def add_link(self, source_id: str, target_id: str, label: int = 0) -> EnumDict:

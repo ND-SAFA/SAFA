@@ -33,7 +33,7 @@ class OpenAiArgs:
         """
         assert task in self.__params, f"Unknown task {task.value}. Must choose from {self.__params.keys()}"
         params = self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task)
-        if isinstance(prompt_generator, ClassificationPromptGenerator):
+        if isinstance(prompt_generator, ClassificationPromptGenerator) and task == TrainerTask.TRAIN:
             params = self.__add_params_for_task(TrainerTask.CLASSIFICATION, params)
             params["classification_positive_class"] = prompt_generator.format_completion(prompt_generator.pos_class)
         return params

@@ -56,9 +56,9 @@ class SafaExporter(AbstractDatasetExporter):
         :return: None
         """
         artifact_types = set()
-        for _, row in self.get_dataset().layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        for _, row in self.get_dataset().layer_mapping_df.itertuples():
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             artifact_types.update({source_type, target_type})
 
         artifact_type_to_artifacts = {}
@@ -83,9 +83,9 @@ class SafaExporter(AbstractDatasetExporter):
         Create trace definition between each layer in trace creator.
         :return: None
         """
-        for _, row in self.get_dataset().layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        for _, row in self.get_dataset().layer_mapping_df.itertuples():
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             matrix_name = f"{source_type}2{target_type}"
             file_name = matrix_name + ".csv"
             export_file_path = os.path.join(self.export_path, file_name)

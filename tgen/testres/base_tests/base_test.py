@@ -115,8 +115,8 @@ class BaseTest(TestCase):
         target_artifacts = BaseTest.create_artifacts(target_prefix, n_target)
         trace_links = {TraceKeys.SOURCE.value: [], TraceKeys.TARGET.value: [], TraceKeys.LABEL.value: []}
         label_index = 0
-        for s_id, source_artifact in source_artifacts.iterrows():
-            for t_id, target_artifact in target_artifacts.iterrows():
+        for s_id, source_artifact in source_artifacts.itertuples():
+            for t_id, target_artifact in target_artifacts.itertuples():
                 trace_links[TraceKeys.SOURCE.value].append(s_id)
                 trace_links[TraceKeys.TARGET.value].append(t_id)
                 trace_links[TraceKeys.LABEL.value].append(labels[label_index])

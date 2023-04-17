@@ -89,6 +89,10 @@ public abstract class AbstractJob implements Job {
      */
     @Override
     public void execute(@NonNull JobExecution execution) {
+        if (this.authentication != null) {
+            SecurityContextHolder.getContext().setAuthentication(this.authentication);
+            log.info("Security context has been set in thread.");
+        }
         List<JobStepImplementation> jobSteps = JobExecutionUtilities.getSteps(this.getClass());
         int nSteps = jobSteps.size();
         boolean success = true;
@@ -360,6 +364,15 @@ public abstract class AbstractJob implements Job {
      */
     @ForOverride
     protected void jobFailed(Exception error) throws Exception {
+    }
+
+    /**
+     * Sets the authentication to use during execution.
+     *
+     * @param authentication The authentication object ensuring user credentials are valid.
+     */
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 
     @Override

@@ -23,7 +23,6 @@ public class VSMController implements ITraceLinkGeneration {
 
     @Override
     public List<TraceAppEntity> generateLinksWithState(String statePath,
-                                                       boolean loadFromStorage,
                                                        TracingPayload tracingPayload) {
         //Note, VSM has not state (yet).
         return generateLinksWithBaselineState(tracingPayload);

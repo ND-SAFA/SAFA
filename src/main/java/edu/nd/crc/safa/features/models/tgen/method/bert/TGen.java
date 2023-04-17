@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.models.tgen.method.bert;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,40 +12,33 @@ import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.models.entities.api.ModelIdentifierDTO;
-import edu.nd.crc.safa.features.models.entities.api.TGenTrainingRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.api.AbstractTGenResponse;
-import edu.nd.crc.safa.features.models.tgen.entities.api.TGenJobResponseDTO;
+import edu.nd.crc.safa.features.models.tgen.entities.api.TGenDataset;
 import edu.nd.crc.safa.features.models.tgen.entities.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.models.tgen.entities.api.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.models.tgen.entities.api.TGenTrainingResponse;
-import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.utilities.CloudStorage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.json.JSONObject;
+import org.apache.commons.lang3.NotImplementedException;
 
 /**
- * Responsible for providing an API for predicting trace links using TBert.
+ * Responsible for providing an API for predicting trace links via TGEN.
  */
-public class TBert implements ITraceLinkGeneration {
+public class TGen implements ITraceLinkGeneration {
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
     private final BertMethodIdentifier methodId;
 
-    public TBert(SafaRequestBuilder safaRequestBuilder, BertMethodIdentifier methodId) {
+    public TGen(SafaRequestBuilder safaRequestBuilder, BertMethodIdentifier methodId) {
         this.safaRequestBuilder = safaRequestBuilder;
         this.methodId = methodId;
     }
@@ -92,7 +84,7 @@ public class TBert implements ITraceLinkGeneration {
 
     @Override
     public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
-        return this.generateLinksWithState(methodId.getStatePath(), false, tracingPayload);
+        return this.generateLinksWithState(methodId.getStatePath(), tracingPayload);
     }
 
     /**
@@ -105,26 +97,16 @@ public class TBert implements ITraceLinkGeneration {
     @Override
     public List<TraceAppEntity> generateLinksWithState(
         String statePath,
-        boolean loadFromStorage,
         TracingPayload tracingPayload) {
         // Step - Build request
         TGenPredictionRequestDTO payload = createTraceGenerationPayload(
             statePath,
-            loadFromStorage,
             tracingPayload);
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
-        TGenJobResponseDTO response = this.safaRequestBuilder
-            .sendPost(predictEndpoint, payload, TGenJobResponseDTO.class);
-
-        if (response.getJobID() == null) {
-            throw new SafaError("Received null output path from TGEN.");
-        }
-
-        // Step - Convert to response
-        String outputPath = response.getJobID();
-        TGenPredictionOutput output = getOutput(outputPath, TGenPredictionOutput.class);
+        TGenPredictionOutput output = this.safaRequestBuilder
+            .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
         return convertPredictionsToLinks(output.getPredictions());
     }
 
@@ -139,16 +121,7 @@ public class TBert implements ITraceLinkGeneration {
     public void trainModel(String statePath,
                            TracingRequest tracingRequests,
                            ProjectAppEntity projectAppEntity) {
-        // Step - Build request
-        TGenTrainingRequest trainingPayload = createTrainingPayload(statePath, tracingRequests, projectAppEntity);
-
-        // Step - Send request
-        String trainEndpoint = TBertConfig.get().getTrainEndpoint();
-        TGenJobResponseDTO response = this.safaRequestBuilder
-            .sendPost(trainEndpoint, trainingPayload, TGenJobResponseDTO.class);
-
-        // Step - Convert to response
-        getOutput(response.getJobID(), TGenTrainingResponse.class);
+        throw new NotImplementedException("Training a model is deprecated. Please use a default model instead.");
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
@@ -169,27 +142,11 @@ public class TBert implements ITraceLinkGeneration {
 
     private TGenPredictionRequestDTO createTraceGenerationPayload(
         String statePath,
-        boolean loadFromStorage,
         TracingPayload tracingPayload) {
-        return new TGenPredictionRequestDTO(
-            methodId.getBaseModel(),
-            statePath,
-            loadFromStorage,
+        TGenDataset dataset = new TGenDataset(
             createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
-            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets),
-            new HashMap<>());
-    }
-
-    private TGenTrainingRequest createTrainingPayload(String statePath,
-                                                      TracingRequest tracingRequest,
-                                                      ProjectAppEntity projectAppEntity) {
-        TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-        return new TGenTrainingRequest(
-            methodId.getBaseModel(),
-            statePath,
-            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
-            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets),
-            projectAppEntity.getTraces());
+            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
+        return new TGenPredictionRequestDTO(statePath, dataset);
     }
 
     private List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload, Function<ArtifactLevel,
@@ -202,39 +159,6 @@ public class TBert implements ITraceLinkGeneration {
             artifactLevelsMap.add(artifactLevelsArtifactMap);
         });
         return artifactLevelsMap;
-    }
-
-    private <T extends AbstractTGenResponse> T getOutput(String jobId, Class<T> responseClass) {
-        //TODO: Use scheduled tasks instead of constant pinging.
-        String outputFile = CloudStorage.getJobOutputPath(jobId);
-        try {
-            while (!CloudStorage.hasAccess(outputFile)) {
-                Thread.sleep(1000 * Defaults.WAIT_SECONDS);
-            }
-            Blob blob = CloudStorage.getBlob(outputFile);
-            JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
-
-            System.out.println("File Json:" + json);
-
-            if (json.getInt("status") == -1) {
-                throw new SafaError("TBert failed while generating links: " + json.getString("exception"));
-            }
-            T predictionOutput = mapper.readValue(json.toString(), responseClass);
-            System.out.println("Prediction output:" + predictionOutput);
-            if (predictionOutput.getStatus() == -1) {
-                throw new SafaError(predictionOutput.getException());
-            }
-            return predictionOutput;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new SafaError("Interrupted while waiting for output of generated links.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new SafaError("IOException occurred while reading output of generated links.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new SafaError("An error occurred while training the model", e);
-        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

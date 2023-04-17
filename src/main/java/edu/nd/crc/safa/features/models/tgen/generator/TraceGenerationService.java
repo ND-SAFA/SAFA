@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.models.tgen.method.bert.BertMethodIdentifier;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
 import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -89,12 +89,12 @@ public class TraceGenerationService {
             .collect(Collectors.toList());
     }
 
-    public TBert getBertModel(BaseGenerationModels generationModel, SafaRequestBuilder safaRequestBuilder) {
+    public TGen createTgen(BaseGenerationModels generationModel, SafaRequestBuilder safaRequestBuilder) {
         BertMethodIdentifier methodIdentifier = bertModelIdentifiers.get(generationModel);
         if (methodIdentifier == null) {
             throw new NotImplementedException("Trace method not implemented:" + generationModel);
         }
-        return new TBert(safaRequestBuilder, methodIdentifier);
+        return new TGen(safaRequestBuilder, methodIdentifier);
     }
 
     private ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
@@ -104,7 +104,7 @@ public class TraceGenerationService {
             case PLBert:
             case NLBert:
             case AutomotiveBert:
-                return getBertModel(baseGenerationModels, safaRequestBuilder);
+                return createTgen(baseGenerationModels, safaRequestBuilder);
             default:
                 throw new NotImplementedException("Trace method not implemented:" + baseGenerationModels);
         }

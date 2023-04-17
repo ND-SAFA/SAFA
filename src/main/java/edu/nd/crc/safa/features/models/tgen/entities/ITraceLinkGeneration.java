@@ -18,7 +18,6 @@ public interface ITraceLinkGeneration {
      * @return List of generated trace links.
      */
     List<TraceAppEntity> generateLinksWithState(String statePath,
-                                                boolean loadFromStorage,
                                                 TracingPayload tracingRequests);
 
     /**

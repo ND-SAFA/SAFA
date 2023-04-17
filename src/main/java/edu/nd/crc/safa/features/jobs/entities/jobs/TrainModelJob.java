@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.entities.api.TrainingRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -34,13 +34,13 @@ public class TrainModelJob extends AbstractJob {
             this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(currentVersion);
 
         for (TracingRequest tracingRequest : this.trainingRequest.getRequests()) {
-            TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
+            TGen bertModel = this.serviceProvider.getTraceGenerationService().createTgen(
                 tracingRequest.getModel().getBaseModel(),
                 this.serviceProvider.getSafaRequestBuilder());
 
             logger.log("Training model:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
-                    tracingRequest.getModel(), tracingRequest.getMethod(),
-                    tracingRequest.getArtifactLevels());
+                tracingRequest.getModel(), tracingRequest.getMethod(),
+                tracingRequest.getArtifactLevels());
 
             bertModel.trainModel(
                 tracingRequest.getModel().getStatePath(),

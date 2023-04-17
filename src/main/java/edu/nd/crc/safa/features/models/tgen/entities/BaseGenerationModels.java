@@ -19,16 +19,11 @@ public enum BaseGenerationModels {
     /**
      * Vector-space-model with cosine similarity.
      */
-    VSM;
-
-    public static BaseGenerationModels getMethodWithDefault(String name, BaseGenerationModels defaultMethod) {
-        for (BaseGenerationModels method : BaseGenerationModels.values()) {
-            if (method.name().equals(name)) {
-                return method;
-            }
-        }
-        return defaultMethod;
-    }
+    VSM,
+    /**
+     * OpenAI's GPT3.5 ada model trained on traceability links
+     */
+    GPT;
 
     public static BaseGenerationModels getDefault() {
         return BaseGenerationModels.VSM;

@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.ShareMethod;
 import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -64,7 +64,7 @@ public class ModelController extends BaseController {
         // Step - Copy model to project
         if (createModel) {
             try {
-                TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
+                TGen bertModel = this.serviceProvider.getTraceGenerationService().createTgen(
                     modelAppEntity.getBaseModel(),
                     serviceProvider.getSafaRequestBuilder()
                 );
@@ -102,7 +102,7 @@ public class ModelController extends BaseController {
         this.serviceProvider.getModelRepository().delete(model);
 
         // Step - Delete model files
-        TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
+        TGen bertModel = this.serviceProvider.getTraceGenerationService().createTgen(
             modelAppEntity.getBaseModel(),
             serviceProvider.getSafaRequestBuilder()
         );
@@ -121,16 +121,16 @@ public class ModelController extends BaseController {
      * model name are supported. Edits to fields other than the model name will simply be
      * ignored.
      *
-     * @param projectId The ID of the project the model to edit exists under
-     * @param modelId The ID of the model to edit
+     * @param projectId      The ID of the project the model to edit exists under
+     * @param modelId        The ID of the model to edit
      * @param modelAppEntity The model object with all the data to update
      * @return The newly updated model
      * @throws SafaError When an attempt is made to update a field that is not allowed to change
      */
     @PutMapping(AppRoutes.Models.MODEL_BY_ID)
     public ModelAppEntity editModelById(@PathVariable UUID projectId,
-                              @PathVariable UUID modelId,
-                              @RequestBody ModelAppEntity modelAppEntity) throws SafaError {
+                                        @PathVariable UUID modelId,
+                                        @RequestBody ModelAppEntity modelAppEntity) throws SafaError {
 
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
 
@@ -170,16 +170,16 @@ public class ModelController extends BaseController {
      * if the new value is not set at all. If the field is updated, an exception is thrown.
      * Otherwise, this function does nothing.
      *
-     * @param oldValue The old value of the field.
-     * @param newValue The new value of the field.
+     * @param oldValue  The old value of the field.
+     * @param newValue  The new value of the field.
      * @param fieldName The name of the field we are checking (used for informational purposes in the exception).
-     * @param <T> The type of the field.
+     * @param <T>       The type of the field.
      * @throws SafaError If the field was in fact updated.
      */
     private <T> void checkNoUpdate(T oldValue, T newValue, String fieldName) throws SafaError {
         if (newValue != null && !newValue.equals(oldValue)) {
             throw new SafaError("Attempt to edit disallowed field: " + fieldName
-                    + " - '" + oldValue + "' -> '" + newValue + "'");
+                + " - '" + oldValue + "' -> '" + newValue + "'");
         }
     }
 
@@ -205,7 +205,7 @@ public class ModelController extends BaseController {
             UUID targetId = modelAppEntity.getId();
 
             // Step - Copy model to new project
-            TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
+            TGen bertModel = this.serviceProvider.getTraceGenerationService().createTgen(
                 modelAppEntity.getBaseModel(),
                 serviceProvider.getSafaRequestBuilder()
             );

@@ -207,6 +207,7 @@ public class JobService {
             .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
+        job.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
         jobLauncher.run(job, jobParameters);
     }
 }

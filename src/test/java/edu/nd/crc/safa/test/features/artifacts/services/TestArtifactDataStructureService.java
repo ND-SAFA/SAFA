@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.features.artifacts.services;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
@@ -121,9 +121,9 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         // Required because getting currentDocument requires a user be logged in
         AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
 
-        ProjectEntities projectEntities = new ProjectEntities(Arrays.asList(artifactApp));
+        ProjectEntities projectEntities = new ProjectEntities(Collections.singletonList(artifactApp));
         ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
-        projectChanger.setEntitiesAsCompleteSet(projectEntities);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities, currentUser);
 
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies).hasSize(1);
@@ -163,7 +163,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         // be logged in
         ProjectEntities projectEntities = new ProjectEntities(List.of(appEntity));
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
-        projectChanger.setEntitiesAsCompleteSet(projectEntities);
+        projectChanger.setEntitiesAsCompleteSet(projectEntities, currentUser);
 
         Optional<ArtifactVersion> updatedBodyQuery =
             this.artifactVersionRepository.findByProjectVersionAndArtifact(projectVersion,

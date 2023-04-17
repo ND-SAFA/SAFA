@@ -57,14 +57,25 @@ public class CurrentDocumentService {
      * Returns the id of the last document the user was on, or null if
      * they were on the default document.
      *
+     * @param user The user to get the document for
      * @return String or Null
      */
     @Nullable
-    public String getCurrentDocumentId() {
-        SafaUser user = this.safaUserService.getCurrentUser();
+    public String getCurrentDocumentId(SafaUser user) {
         Optional<CurrentDocument> currentDocumentOptional = this.currentDocumentRepository.findByUser(user);
         return currentDocumentOptional
             .map(currentDocument -> currentDocument.getDocument().getDocumentId().toString())
             .orElse(null);
+    }
+
+    /**
+     * Returns the id of the last document the user was on, or null if
+     * they were on the default document.
+     *
+     * @return String or Null
+     */
+    @Nullable
+    public String getCurrentDocumentIdForCurrentUser() {
+        return getCurrentDocumentId(this.safaUserService.getCurrentUser());
     }
 }

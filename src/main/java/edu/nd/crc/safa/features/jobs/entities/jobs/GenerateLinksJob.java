@@ -22,6 +22,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -41,13 +42,17 @@ public class GenerateLinksJob extends CommitJob {
      */
     ProjectAppEntity projectAppEntity;
 
+    private final SafaUser user;
+
     public GenerateLinksJob(JobDbEntity jobDbEntity,
                             ServiceProvider serviceProvider,
                             ProjectCommit projectCommit,
-                            TraceGenerationRequest traceGenerationRequest) {
+                            TraceGenerationRequest traceGenerationRequest,
+                            SafaUser user) {
         super(jobDbEntity, serviceProvider, projectCommit);
         this.traceGenerationRequest = traceGenerationRequest;
         this.generatedTraces = new ArrayList<>();
+        this.user = user;
     }
 
     /**
@@ -68,7 +73,7 @@ public class GenerateLinksJob extends CommitJob {
     public void retrieveTrainingArtifacts() {
         this.projectAppEntity = this.serviceProvider
             .getProjectRetrievalService()
-            .getProjectAppEntity(traceGenerationRequest.getProjectVersion());
+            .getProjectAppEntity(user, traceGenerationRequest.getProjectVersion());
     }
 
     @IJobStep(value = "Generating links", position = 2)
@@ -107,8 +112,8 @@ public class GenerateLinksJob extends CommitJob {
             ProjectVersion projectVersion = projectCommit.getCommitVersion();
             this.serviceProvider
                 .getTraceService()
-                .getAppEntities(projectVersion, t -> t.getApprovalStatus().equals(ApprovalStatus.APPROVED)
-                    || t.getTraceType().equals(TraceType.MANUAL))
+                .getAppEntities(projectVersion, user, t -> t.getApprovalStatus() == ApprovalStatus.APPROVED
+                    || t.getTraceType() == TraceType.MANUAL)
                 .forEach(t -> {
                     if (traceHashMap.containsKey(t.getSourceName())) {
                         traceHashMap.get(t.getSourceName()).add(t.getTargetName());

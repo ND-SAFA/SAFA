@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -74,11 +75,12 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
     /**
      * Returns list of models user has access to.
      *
+     * @param user the user accessing the models
      * @return The list of models.
      */
-    public List<ModelAppEntity> getUserModels() {
+    public List<ModelAppEntity> getUserModels(SafaUser user) {
         List<String> projectIds = this.projectService
-            .getProjectsForCurrentUser()
+            .getProjectsForUser(user)
             .stream()
             .map(ProjectIdAppEntity::getProjectId)
             .collect(Collectors.toList());
@@ -101,7 +103,7 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
     }
 
     @Override
-    public List<ModelAppEntity> getAppEntities(ProjectVersion projectVersion) {
-        return getUserModels();
+    public List<ModelAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+        return getUserModels(user);
     }
 }

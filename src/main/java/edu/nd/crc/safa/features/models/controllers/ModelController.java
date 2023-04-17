@@ -43,7 +43,8 @@ public class ModelController extends BaseController {
     public List<ModelAppEntity> getProjectModels(@PathVariable UUID projectId) {
         //TODO: Remove project id from this root.
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.serviceProvider.getModelService().getUserModels();
+        return this.serviceProvider.getModelService().getUserModels(
+            serviceProvider.getSafaUserService().getCurrentUser());
     }
 
     /**

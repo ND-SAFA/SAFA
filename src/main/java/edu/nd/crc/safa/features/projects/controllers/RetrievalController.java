@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,8 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Retrieval.GET_ARTIFACTS_IN_VERSION)
     public List<ArtifactAppEntity> getArtifactsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.serviceProvider.getArtifactService().getAppEntities(projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        return this.serviceProvider.getArtifactService().getAppEntities(projectVersion, user);
     }
 
     /**
@@ -72,7 +74,8 @@ public class RetrievalController extends BaseController {
     public List<ArtifactAppEntity> queryArtifactInVersion(@PathVariable UUID versionId,
                                                           @RequestBody List<UUID> artifactIds) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.serviceProvider.getArtifactService().getAppEntitiesByIds(projectVersion, artifactIds);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        return this.serviceProvider.getArtifactService().getAppEntitiesByIds(projectVersion, user, artifactIds);
     }
 
     /**
@@ -85,6 +88,7 @@ public class RetrievalController extends BaseController {
     @GetMapping(AppRoutes.Retrieval.GET_TRACES_IN_VERSION)
     public List<TraceAppEntity> getTracesInVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.serviceProvider.getTraceService().getAppEntities(projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        return this.serviceProvider.getTraceService().getAppEntities(projectVersion, user);
     }
 }

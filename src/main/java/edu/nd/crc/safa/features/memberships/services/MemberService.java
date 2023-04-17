@@ -48,7 +48,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     }
 
     @Override
-    public List<ProjectMemberAppEntity> getAppEntities(ProjectVersion projectVersion) {
+    public List<ProjectMemberAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         Project project = projectVersion.getProject();
         return this.projectMembershipRepository.findByProject(project)
             .stream()

@@ -30,6 +30,8 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -64,29 +66,31 @@ public class ProjectRetrievalService {
     private final ModelService modelService;
     private final AttributeService attributeService;
     private final AttributeLayoutService attributeLayoutService;
+    private final SafaUserService safaUserService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
      * the given version. Further, gathers the list of project members at the time of being called.
      *
      * @param projectVersion The point in the project whose entities are being retrieved.
+     * @param user The user making the request
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
-    public ProjectAppEntity getProjectAppEntity(ProjectVersion projectVersion) {
+    public ProjectAppEntity getProjectAppEntity(SafaUser user, ProjectVersion projectVersion) {
         // Versioned Entities
-        ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
 
         // Project Entities
-        List<ProjectMemberAppEntity> projectMembers = this.memberService.getAppEntities(projectVersion);
+        List<ProjectMemberAppEntity> projectMembers = this.memberService.getAppEntities(projectVersion, user);
 
         // Documents
-        List<DocumentAppEntity> documents = this.documentService.getAppEntities(projectVersion);
+        List<DocumentAppEntity> documents = this.documentService.getAppEntities(projectVersion, user);
 
         // Current document
-        String currentDocumentId = this.currentDocumentService.getCurrentDocumentId();
+        String currentDocumentId = this.currentDocumentService.getCurrentDocumentId(user);
 
         // Artifact types
-        List<TypeAppEntity> artifactTypes = this.typeService.getAppEntities(projectVersion);
+        List<TypeAppEntity> artifactTypes = this.typeService.getAppEntities(projectVersion, user);
 
         // Version errors
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
@@ -97,12 +101,13 @@ public class ProjectRetrievalService {
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
-        List<ModelAppEntity> models = this.modelService.getUserModels();
+        List<ModelAppEntity> models = this.modelService.getUserModels(user);
 
         List<CustomAttributeAppEntity> attributes = this.attributeService
             .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
 
-        List<AttributeLayoutAppEntity> attributeLayouts = this.attributeLayoutService.getAppEntities(projectVersion);
+        List<AttributeLayoutAppEntity> attributeLayouts =
+            this.attributeLayoutService.getAppEntities(projectVersion, user);
 
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
@@ -120,14 +125,26 @@ public class ProjectRetrievalService {
     }
 
     /**
+     * Creates a project application entity containing the entities (e.g. traces, artifacts) from
+     * the given version. Further, gathers the list of project members at the time of being called.
+     *
+     * @param projectVersion The point in the project whose entities are being retrieved.
+     * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
+     */
+    public ProjectAppEntity getProjectAppEntity(ProjectVersion projectVersion) {
+        return getProjectAppEntity(safaUserService.getCurrentUser(), projectVersion);
+    }
+
+    /**
      * Retrieves artifact and trace links in given version.
      *
      * @param projectVersion The version of the entities to retrieve.
+     * @param user The user making the request
      * @return {@link ProjectEntities} Artifacts and trace links at given version.
      */
-    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion, SafaUser user) {
         List<ArtifactAppEntity> artifacts = this.artifactService
-            .getAppEntities(projectVersion);
+            .getAppEntities(projectVersion, user);
         List<UUID> artifactIds = artifacts
             .stream()
             .map(ArtifactAppEntity::getId)

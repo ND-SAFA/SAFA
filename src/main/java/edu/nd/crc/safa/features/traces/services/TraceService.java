@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -23,21 +24,22 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
     TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Override
-    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion) {
-        return getAppEntities(projectVersion, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
+        return getAppEntities(projectVersion, user, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
     }
 
     /**
      * Retrieves list of filtered trace links at given version.
      *
      * @param projectVersion The version of the trace links to retrieve.
+     * @param user The user making the request
      * @param tracePredicate The filtering predicate, returns link if true on predicate.
      * @return List of filtered trace links.
      */
-    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion,
+    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user,
                                                Predicate<TraceAppEntity> tracePredicate) {
         List<ArtifactAppEntity> projectVersionArtifacts = artifactService
-            .getAppEntities(projectVersion);
+            .getAppEntities(projectVersion, user);
         List<UUID> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
             .map(ArtifactAppEntity::getId)

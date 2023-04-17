@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     ArtifactTypeRepository artifactTypeRepository;
 
     @Override
-    public List<TypeAppEntity> getAppEntities(ProjectVersion projectVersion) {
+    public List<TypeAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         return getAppEntities(projectVersion.getProject());
     }
 

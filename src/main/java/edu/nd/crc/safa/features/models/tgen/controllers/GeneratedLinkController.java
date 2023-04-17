@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,12 @@ public class GeneratedLinkController extends BaseController {
     @GetMapping(value = AppRoutes.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         return this.serviceProvider
             .getTraceService()
-            .getAppEntities(projectVersion, (t) -> true)
+            .getAppEntities(projectVersion, user, (t) -> true)
             .stream()
-            .filter(t -> t.getTraceType().equals(TraceType.GENERATED))
+            .filter(t -> t.getTraceType() == TraceType.GENERATED)
             .collect(Collectors.toList());
     }
 }

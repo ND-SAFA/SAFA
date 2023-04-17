@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,8 @@ public class DocumentArtifactController extends BaseDocumentController {
             a.addDocumentId(document.getDocumentId());
         }
 
-        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateDocumentLayout(document);
         List<UUID> artifactIds = artifacts
             .stream()

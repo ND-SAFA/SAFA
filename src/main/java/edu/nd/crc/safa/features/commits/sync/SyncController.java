@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +62,7 @@ public class SyncController extends BaseController {
                                                     Change change) {
         Project project = projectVersion.getProject();
         List<UUID> entityIds = change.getEntityIds();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         switch (change.getEntity()) {
             case PROJECT:
                 projectAppEntity.setName(project.getName());
@@ -68,31 +70,31 @@ public class SyncController extends BaseController {
                 break;
             case MEMBERS:
                 List<ProjectMemberAppEntity> projectMemberAppEntities =
-                    this.serviceProvider.getMemberService().getAppEntitiesByIds(projectVersion, entityIds);
+                    this.serviceProvider.getMemberService().getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setMembers(projectMemberAppEntities);
                 break;
             case TYPES:
                 List<TypeAppEntity> artifactTypes = this.serviceProvider
                     .getTypeService()
-                    .getAppEntities(projectVersion);
+                    .getAppEntities(projectVersion, user);
                 projectAppEntity.setArtifactTypes(artifactTypes);
                 break;
             case ARTIFACTS:
                 List<ArtifactAppEntity> artifacts = this.serviceProvider
                     .getArtifactService()
-                    .getAppEntitiesByIds(projectVersion, entityIds);
+                    .getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setArtifacts(artifacts);
                 break;
             case TRACES:
                 List<TraceAppEntity> traces = this.serviceProvider
                     .getTraceService()
-                    .getAppEntities(projectVersion, t -> !t.getApprovalStatus().equals(ApprovalStatus.DECLINED));
+                    .getAppEntities(projectVersion, user, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:
                 List<DocumentAppEntity> documents = this.serviceProvider
                     .getDocumentService()
-                    .getAppEntitiesByIds(projectVersion, entityIds);
+                    .getAppEntitiesByIds(projectVersion, user, entityIds);
                 projectAppEntity.setDocuments(documents);
                 break;
             case VERSION:
@@ -108,7 +110,7 @@ public class SyncController extends BaseController {
             case MODELS:
                 List<ModelAppEntity> models = this.serviceProvider
                     .getModelService()
-                    .getUserModels();
+                    .getUserModels(user);
                 projectAppEntity.setModels(models);
                 break;
             default:

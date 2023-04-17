@@ -131,8 +131,10 @@ public class JobController extends BaseController {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         request.setProjectVersion(projectVersion);
 
+        SafaUser user = safaUserService.getCurrentUser();
+
         // Step - Create and start job.
-        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request);
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request, user);
         return jobBuilder.perform();
     }
 

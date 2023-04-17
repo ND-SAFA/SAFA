@@ -23,6 +23,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -47,9 +48,11 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
      * Returns list of documents in given project
      *
      * @param projectVersion The version used to calculate artifact positions within the document.
+     * @param user The user making the request
      * @return List of documents in project.
      */
-    public List<DocumentAppEntity> getAppEntities(ProjectVersion projectVersion) {
+    @Override
+    public List<DocumentAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         List<Document> projectDocuments = this.documentRepository.findByProject(projectVersion.getProject());
         List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
         for (Document document : projectDocuments) {

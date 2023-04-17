@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         assertThat(entityId).isNotNull();
 
         // VP - Verify created entity
-        T entity = getEntity(projectVersion, entityId);
+        T entity = getEntity(projectVersion, currentUser, entityId);
         verifyCreatedEntity(entity);
 
         // VP - Verify creation message
@@ -46,7 +47,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         updateEntity();
 
         // Step - Verify updated entity
-        T updatedEntity = getEntity(projectVersion, entityId);
+        T updatedEntity = getEntity(projectVersion, currentUser, entityId);
         verifyUpdatedEntity(updatedEntity);
 
         // VP - Verify update message
@@ -57,7 +58,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         deleteEntity(updatedEntity);
 
         // VP - Verify entity deleted
-        List<T> entitiesWithId = getEntities(projectVersion, entityId);
+        List<T> entitiesWithId = getEntities(projectVersion, currentUser, entityId);
         assertThat(entitiesWithId).isEmpty();
 
         // VP - Verify deletion message
@@ -65,12 +66,12 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         verifyDeletionMessage(deleteMessage);
     }
 
-    private T getEntity(ProjectVersion projectVersion, UUID entityId) {
-        return getEntities(projectVersion, entityId).get(0);
+    private T getEntity(ProjectVersion projectVersion, SafaUser user, UUID entityId) {
+        return getEntities(projectVersion, user, entityId).get(0);
     }
 
-    private List<T> getEntities(ProjectVersion projectVersion, UUID entityId) {
-        return this.getAppService().getAppEntitiesByIds(projectVersion, List.of(entityId));
+    private List<T> getEntities(ProjectVersion projectVersion, SafaUser user, UUID entityId) {
+        return this.getAppService().getAppEntitiesByIds(projectVersion, user, List.of(entityId));
     }
 
     /**

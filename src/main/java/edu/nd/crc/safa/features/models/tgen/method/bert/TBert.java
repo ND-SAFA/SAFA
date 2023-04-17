@@ -36,11 +36,15 @@ import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for providing an API for predicting trace links using TBert.
  */
 public class TBert implements ITraceLinkGeneration {
+
+    private static final Logger log = LoggerFactory.getLogger(TBert.class);
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -124,6 +128,7 @@ public class TBert implements ITraceLinkGeneration {
 
         // Step - Convert to response
         String outputPath = response.getJobID();
+        log.info("Started tgen job at: " + outputPath);
         TGenPredictionOutput output = getOutput(outputPath, TGenPredictionOutput.class);
         return convertPredictionsToLinks(output.getPredictions());
     }

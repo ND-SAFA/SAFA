@@ -5,12 +5,14 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * The model to create for project.
  */
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class ModelAppEntity implements IAppEntity {

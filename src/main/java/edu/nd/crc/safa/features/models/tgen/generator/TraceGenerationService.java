@@ -97,7 +97,7 @@ public class TraceGenerationService {
         return new TBert(safaRequestBuilder, methodIdentifier);
     }
 
-    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
+    private ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
         switch (baseGenerationModels) {
             case VSM:
                 return new VSMController();

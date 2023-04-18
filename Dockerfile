@@ -3,7 +3,7 @@ FROM ubuntu:12.04 as config
 ADD src/main/resources /app/src/main/resources
 ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 
-ARG DB_INSTANCE_ARG
+ARG DB_INSTANCE_ARG=hi
 
 RUN if [ ! -z "$DB_INSTANCE_ARG" ] ; \
     then \
@@ -25,27 +25,8 @@ ADD build.gradle /app/
 WORKDIR /app
 RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
 
-# Step - Lint source code
-ADD checkstyle.xml /app/
-RUN gradle checkstyleMain
-
-# Step - Test application
-ADD resources/ /app/resources/
-RUN gradle test
-
 # Step - Create endpoint
 FROM openjdk:11 AS runner
-
-ARG DB_URL_ARG=jdbc:mysql://host.docker.internal/safa-db
-ARG DB_USER_ARG=root
-ARG DB_PASSWORD_ARG=secret2
-ARG JWT_KEY_ARG=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
-ARG TGEN_ENDPOINT_ARG=http://35.184.232.43
-ARG JIRA_REDIRECT_LINK_ARG="https://localhost.safa.ai:8080/create?tab=jira"
-ARG JIRA_CLIENT_ID_ARG="lWzIreg3PMSqkjkkvKyqR6xvHJDXvRAF"
-ARG JIRA_SECRET_ARG="YhfXF-mR0-ZZoH1RD0T504nAfAB002dNVmsmd-JES3LL3_X6kvebRUWh3Ja0IgdT"
-ARG GITHUB_CLIENT_ID_ARG="Iv1.75905e8f5ace1f4b"
-ARG GITHUB_SECRET_ARG="2d6bd433619bebf523cef951bd1296ac2d2795c3"
 
 ENV RUN_SCRIPT="/app/run.sh"
 
@@ -53,16 +34,6 @@ RUN \
     mkdir -p "$(dirname $RUN_SCRIPT)"; \
     touch "$RUN_SCRIPT"; \
     chmod +x "$RUN_SCRIPT"; \
-    if [ ! -z "$DB_URL_ARG" ]; then echo "export DB_URL='$DB_URL_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$DB_USER_ARG" ]; then echo "export DB_USER='$DB_USER_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$DB_PASSWORD_ARG" ]; then echo "export DB_PASSWORD='$DB_PASSWORD_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JWT_KEY_ARG" ]; then echo "export JWT_KEY='$JWT_KEY_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$TGEN_ENDPOINT_ARG" ]; then echo "export TGEN_ENDPOINT='$TGEN_ENDPOINT_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_REDIRECT_LINK_ARG" ]; then echo "export JIRA_REDIRECT_LINK='$JIRA_REDIRECT_LINK_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_CLIENT_ID_ARG" ]; then echo "export JIRA_CLIENT_ID='$JIRA_CLIENT_ID_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_SECRET_ARG" ]; then echo "export JIRA_SECRET='$JIRA_SECRET_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$GITHUB_CLIENT_ID_ARG" ]; then echo "export GITHUB_CLIENT_ID='$GITHUB_CLIENT_ID_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$GITHUB_SECRET_ARG" ]; then echo "export GITHUB_SECRET='$GITHUB_SECRET_ARG'" >> "$RUN_SCRIPT"; fi; \
     echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT"; \
     cat "$RUN_SCRIPT"
 

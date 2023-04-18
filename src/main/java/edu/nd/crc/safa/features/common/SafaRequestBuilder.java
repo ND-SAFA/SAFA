@@ -15,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @Service
@@ -67,12 +66,13 @@ public class SafaRequestBuilder {
             requestHeadersSpec.header(keyValue.getKey(), keyValue.getValue().toString());
         }
 
-        Mono<String> responseStr = requestHeadersSpec
+        String responseStr = requestHeadersSpec
             .retrieve()
-            .bodyToMono(String.class);
+            .bodyToMono(String.class).block();
+
 
         try {
-            return objectMapper.readValue(responseStr.block(), requestMeta.responseClass);
+            return objectMapper.readValue(responseStr, requestMeta.responseClass);
         } catch (JsonProcessingException e) {
             throw new SafaError("Unable to parse TGEN response.", e);
         }

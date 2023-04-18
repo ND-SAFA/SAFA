@@ -42,6 +42,13 @@ public class TraceGenerationService {
         BaseGenerationModels.NLBert, new BertMethodIdentifier("NL_BERT", "thearod5/nl-bert")
     );
 
+    /**
+     * Retrieves artifacts associated with the source and target types defined in the tracing request.
+     *
+     * @param tracingRequest   The request detailing the artifacts to trace and the model to do so with.
+     * @param projectAppEntity The project app entity containing artifacts and links.
+     * @return TracingPayload detailing the artifacts and the method to trace with.
+     */
     public static TracingPayload extractPayload(TracingRequest tracingRequest,
                                                 ProjectAppEntity projectAppEntity) {
         List<ArtifactLevel> artifactLevels = new ArrayList<>();

@@ -11,8 +11,9 @@ from tgen.constants import BEST_MODEL_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainers.itrainer import iTrainer
+from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
@@ -31,7 +32,7 @@ torch.backends.cudnn.benchmark = False
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
 
-class HuggingFaceTrainer(Trainer, iTrainer, BaseObject):
+class HuggingFaceTrainer(Trainer, AbstractTrainer):
     """
     Trains model on data for generic task.
     """
@@ -61,6 +62,7 @@ class HuggingFaceTrainer(Trainer, iTrainer, BaseObject):
         if save_strategy is None:
             self.save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer, callbacks=callbacks, **kwargs)
+        AbstractTrainer.__init__(self, trainer_dataset_manager=trainer_dataset_manager)
         self.remove_callback(WandbCallback)
 
     def perform_training(self) -> TraceTrainOutput:
@@ -78,13 +80,14 @@ class HuggingFaceTrainer(Trainer, iTrainer, BaseObject):
         self._set_best_model_path()
         return train_output
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
+        :param dataset: The dataset to use instead of from the dataset manager
         :return: THe prediction output
         """
-        dataset = self.trainer_dataset_manager[dataset_role]
+        dataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         self.eval_dataset = dataset.to_hf_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         metrics_manager = MetricsManager(trace_df=dataset.trace_df,

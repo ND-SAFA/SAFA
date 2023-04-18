@@ -6,7 +6,7 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trainers.itrainer import iTrainer
+from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -45,7 +45,7 @@ class VSMJob(AbstractTrainerJob):
         train_output = TraceTrainOutput(prediction_output=prediction_output, training_time=training_output.training_time)
         return JobResult.from_trace_output(train_output)
 
-    def get_trainer(self) -> iTrainer:
+    def get_trainer(self) -> AbstractTrainer:
         """
         Gets the VSM trainer for the job
         :return: the trainer

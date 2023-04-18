@@ -3,6 +3,8 @@ import sys
 
 from dotenv import load_dotenv
 
+from tgen.util.logging.logger_manager import logger
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -17,8 +19,8 @@ if __name__ == "__main__":
 
     models = ["bert-base-uncased", "bert-large-uncased"]
     for model in models:
-        print("-" * 10, model, "-" * 10)
+        logger.log_with_title("-" * 10, model)
         model_manager = ModelManager(model, model_task=ModelTask.AUTO)
         model = model_manager.get_model()
         estimate_zero3_model_states_mem_needs_all_live(model, num_gpus_per_node=4, num_nodes=1)
-        print("Done!")
+        logger.info("Done!")

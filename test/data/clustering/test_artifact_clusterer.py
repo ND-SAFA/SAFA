@@ -47,7 +47,7 @@ class TestArtifactClusterer(BaseTest):
     def test_get_artifacts_df_from_clusters(self):
         orig_artifact_df = self.get_trace_dataset().artifact_df
         clusters = self.CLUSTERS
-        cluster_artifact_df = ArtifactClusterer._get_artifact_df_from_clusters(clusters, orig_artifact_df)
+        cluster_artifact_df = ArtifactClusterer._get_artifact_df_from_clusters(clusters, orig_artifact_df, "layer_1")
         self.assertEqual(len(cluster_artifact_df), len(set(clusters.values())))
         for artifact_id, cluster_num in clusters.items():
             self.assertIn(int(cluster_num), list(cluster_artifact_df.index))

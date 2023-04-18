@@ -65,7 +65,7 @@ class Summarizer(BaseObject):
                    for chunk in chunks]
         res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(prompt_generator, TrainerTask.PREDICT))
-        return [choice.text.strip() for choice in res["choices"]]
+        return [choice["text"].strip() for choice in res["choices"]]
 
     @staticmethod
     def _get_chunker(path_to_file: str = None) -> SupportedChunker:

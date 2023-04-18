@@ -1,5 +1,7 @@
 from pynvml import nvmlDeviceGetHandleByIndex, nvmlDeviceGetMemoryInfo, nvmlInit
 
+from tgen.util.logging.logger_manager import logger
+
 
 class MemoryUtil:
     """
@@ -14,4 +16,4 @@ class MemoryUtil:
         nvmlInit()
         handle = nvmlDeviceGetHandleByIndex(0)
         info = nvmlDeviceGetMemoryInfo(handle)
-        print(f"GPU memory occupied: {info.used // 1024 ** 2} MB.")
+        logger.info(f"GPU memory occupied: {info.used // 1024 ** 2} MB.")

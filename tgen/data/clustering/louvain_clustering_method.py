@@ -12,4 +12,5 @@ class LouvainClusteringMethod(iClusteringMethod):
         Creates clusters of artifacts in the dataset using the Louvain Method
         :return: A dictionary mapping artifact id to its cluster num
         """
-        return community.best_partition(trace_dataset.construct_graph_from_traces())
+        graph = trace_dataset.construct_graph_from_traces()
+        return community.best_partition(graph)

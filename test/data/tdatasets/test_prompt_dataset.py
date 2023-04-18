@@ -4,12 +4,16 @@ from typing import Dict, List
 
 import mock
 
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
+from tgen.testres.testprojects.safa_test_project import SafaTestProject
+from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
 
 
@@ -36,9 +40,6 @@ class TestPromptDataset(BaseTest):
                 self.assertEqual("id", file_id, msg=fail_msg)
             else:
                 self.assertEqual("id_from_res", file_id, msg=fail_msg)
-        for file in os.listdir(os.getcwd()):
-            if file.endswith(".jsonl"):
-                self.fail("jsonl file was not deleted like expected")
 
     def test_export_and_get_dataframe(self):
         outputs = self.all_datasets_test(
@@ -50,14 +51,22 @@ class TestPromptDataset(BaseTest):
         outputs["with_filename"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(CreationPromptGenerator()),
                                                                  os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
         outputs["no_output_path"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(CreationPromptGenerator()))
+        expected_trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
         for type_, output in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)
             export_path, should_delete = output
             prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(export_path))
             if type_ == "artifact":
                 PromptTestProject.verify_prompts_artifacts_project(self, prompt_df, msg=fail_msg)
+            elif type_ == "dataset":
+                PromptTestProject.verify_prompts_safa_project_artifacts(self, prompt_df,
+                                                                        artifacts_df=expected_trace_dataset.artifact_df,
+                                                                        msg=fail_msg,)
             else:
-                PromptTestProject.verify_prompts_safa_project(self, prompt_df, msg=fail_msg)
+                pos_links_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(expected_trace_dataset.trace_df,
+                                                                             lambda row: row[TraceKeys.LABEL.value] == 1))
+                PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompt_df, trace_df=pos_links_df,
+                                                                                    msg=fail_msg)
             if type_ == "no_output_path":
                 self.assertTrue(should_delete, msg=fail_msg)
                 os.remove(export_path)

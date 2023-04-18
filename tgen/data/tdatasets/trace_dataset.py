@@ -255,11 +255,9 @@ class TraceDataset(iDataset):
         """
         G = nx.Graph()
         G.add_nodes_from(self.artifact_df.index)
-        G.add_edges_from(self._get_edges())
+        G.add_edges_from([(row[TraceKeys.SOURCE], row[TraceKeys.TARGET],
+                           {'weight': row[TraceKeys.LABEL]}) for i, row in self.trace_df.itertuples()])
         return G
-
-    def _get_edges(self) :
-        return self.get_source_target_pairs(self.pos_link_ids)
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
@@ -376,7 +374,7 @@ class TraceDataset(iDataset):
         pos_link_ids = []
         neg_link_ids = []
         for index, row in trace_df.itertuples():
-            if row[TraceKeys.LABEL]:
+            if round(row[TraceKeys.LABEL]) == 1:
                 pos_link_ids.append(index)
             else:
                 neg_link_ids.append(index)

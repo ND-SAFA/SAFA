@@ -14,19 +14,20 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.train.trainers.itrainer import iTrainer
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.stage_eval import Metrics
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
+from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.override import overrides
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 
 
-class VSMTrainer(iTrainer):
+class VSMTrainer(AbstractTrainer):
     """
     Handles training using VSM
     """
@@ -44,8 +45,9 @@ class VSMTrainer(iTrainer):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics
+        super().__init__(trainer_dataset_manager=trainer_dataset_manager)
 
-    @overrides(iTrainer)
+    @overrides(AbstractTrainer)
     def perform_training(self) -> TraceTrainOutput:
         """
         Performs training on the model using the Train dataset
@@ -57,16 +59,18 @@ class VSMTrainer(iTrainer):
         finish_time = time.perf_counter()
         return TraceTrainOutput(training_time=finish_time - start_time)
 
-    @overrides(iTrainer)
+    @overrides(AbstractTrainer)
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
+                           dataset: iDataset = None,
                            threshold: float = VSM_THRESHOLD_DEFAULT) -> TracePredictionOutput:
         """
-        Performs predictions on the model using the given dataset role
-        :param dataset_role: The dataset role to use for predictions
+        Performs the prediction and (optionally) evaluation for the model
+        :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
+        :param dataset: The dataset to use instead of from the dataset manager
         :param threshold: The threshold to use to determine whether a link is traced
         :return: The output from the predictions
         """
-        eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
+        eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         try:
             output = self.predict(eval_dataset, threshold)
         except exceptions.NotFittedError:

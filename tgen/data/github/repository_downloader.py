@@ -167,8 +167,7 @@ class RepositoryDownloader:
             try:
                 commits.append(GCommit.parse_commit(commit))
             except Exception as e:
-                print(e)
-                print("Commit failed: ", commit.hexsha)
+                logger.exception("Commit failed: ", commit.hexsha)
         return GArtifactSet(commits, GArtifactType.COMMIT)
 
     @staticmethod

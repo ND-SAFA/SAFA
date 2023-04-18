@@ -1,8 +1,10 @@
 from unittest import mock
 
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -11,6 +13,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
+from tgen.util.dataframe_util import DataFrameUtil
 
 
 class TestPromptDatasetCreator(BaseTest):
@@ -32,12 +35,14 @@ class TestPromptDatasetCreator(BaseTest):
     def test_project_reader_prompt(self):
         prompt_project_reader = PromptTestProject.get_project_reader()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=prompt_project_reader)
-        self.verify_dataset_creator(dataset_creator)
+        artifact_df, trace_df, _ = PromptTestProject.SAFA_PROJECT.get_project_reader().read_project()
+        self.verify_dataset_creator(dataset_creator, trace_df=trace_df, use_targets_only=True)
 
     def test_trace_dataset_creator(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator)
-        self.verify_dataset_creator(dataset_creator)
+        trace_df = TraceDatasetCreator(PromptTestProject.SAFA_PROJECT.get_project_reader()).create().trace_df
+        self.verify_dataset_creator(dataset_creator, prompt_generator=ClassificationPromptGenerator(), trace_df=trace_df)
 
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
@@ -61,10 +66,14 @@ class TestPromptDatasetCreator(BaseTest):
         trace_dataset = dataset_creator.create()
         self.assertEqual(trace_dataset.project_file_id, "id")
 
-    def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator):
+    def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame, use_targets_only: bool = False,
+                               prompt_generator=CreationPromptGenerator()):
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(CreationPromptGenerator())
-        PromptTestProject.verify_prompts_safa_project(self, prompts_df)
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_generator)
+        if not use_targets_only:
+            PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
+        else:
+            PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
     @mock.patch("openai.Completion.create")
     def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):

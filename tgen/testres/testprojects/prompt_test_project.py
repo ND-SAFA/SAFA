@@ -1,15 +1,13 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
@@ -61,6 +59,15 @@ class PromptTestProject:
         return artifacts
 
     @staticmethod
+    def get_safa_artifact_id_to_content() -> Dict[Any, str]:
+        """
+        Gets all the artifacts from the safa project
+        :return: A dictionary mapping artifact ids to their content
+        """
+        return {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
+                for artifact in PromptTestProject.get_safa_artifacts()}
+
+    @staticmethod
     def verify_prompts_artifacts_project(test_case: BaseTest, prompts_df: PromptDataFrame, **params):
         """
         Verifies the correct prompts are made from the test Artifacts project
@@ -75,20 +82,51 @@ class PromptTestProject:
             test_case.assertIn(tokens, row[PromptKeys.PROMPT], **params)
 
     @staticmethod
-    def verify_prompts_safa_project(test_case: BaseTest, prompt_df: PromptDataFrame, **params):
+    def verify_prompts_safa_project_traces_for_classification(test_case: BaseTest, prompt_df: PromptDataFrame,
+                                                              trace_df: TraceDataFrame, **params):
         """
         Verifies the correct prompts are made from the test SAFA project
         :param test_case: The test calling the method
         :param prompt_df: The prompt dataframe to verify
+        :param trace_df: The trace dataframe used to create the prompts
         :return:
         """
-        entries = PromptTestProject.SAFA_PROJECT.get_trace_entries()
-        test_case.assertEqual(len(entries), len(prompt_df), **params)
-        artifacts = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
-                     for artifact in PromptTestProject.get_safa_artifacts()}
-        for i, row in prompt_df.itertuples():
-            entry = entries[i]
-            source_id, target_id = entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]
+        test_case.assertEqual(len(trace_df), len(prompt_df), **params)
+        artifacts = PromptTestProject.get_safa_artifact_id_to_content()
+        for i, (link_id, link) in enumerate(trace_df.itertuples()):
+            prompt = prompt_df.get_row(i)
+            source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
             source, target = artifacts[source_id], artifacts[target_id]
-            test_case.assertIn(target, row[PromptKeys.PROMPT], **params)
-            test_case.assertIn(source, row[PromptKeys.COMPLETION], **params)
+            test_case.assertIn(target, prompt[PromptKeys.PROMPT], **params)
+            test_case.assertIn(source, prompt[PromptKeys.PROMPT], **params)
+
+    @staticmethod
+    def verify_prompts_safa_project_traces_for_generation(test_case: BaseTest, prompt_df: PromptDataFrame, trace_df: TraceDataFrame,
+                                                          **params):
+        """
+        Verifies the correct prompts are made from the test SAFA project
+        :param test_case: The test calling the method
+        :param prompt_df: The prompt dataframe to verify
+        :param trace_df: The trace dataframe used to create the prompts
+        :return:
+        """
+        test_case.assertEqual(len(trace_df), len(prompt_df), **params)
+        artifacts = PromptTestProject.get_safa_artifact_id_to_content()
+        for i, (id_, row) in enumerate(trace_df.itertuples()):
+            prompt = prompt_df.get_row(i)
+            test_case.assertIn(artifacts[row[TraceKeys.TARGET]], prompt[PromptKeys.PROMPT], **params)
+
+    @staticmethod
+    def verify_prompts_safa_project_artifacts(test_case: BaseTest, prompt_df: PromptDataFrame, artifacts_df: ArtifactDataFrame,
+                                              **params):
+        """
+        Verifies the correct prompts are made from the test SAFA project
+        :param test_case: The test calling the method
+        :param prompt_df: The prompt dataframe to verify
+        :param artifacts_df: The artifacts dataframe used to create the prompts
+        :return:
+        """
+        test_case.assertEqual(len(artifacts_df), len(prompt_df), **params)
+        for i, (id_, row) in enumerate(artifacts_df.itertuples()):
+            prompt = prompt_df.get_row(i)
+            test_case.assertIn(row["content"], prompt[PromptKeys.PROMPT], **params)

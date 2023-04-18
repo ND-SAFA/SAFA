@@ -1,6 +1,6 @@
 import os
 import shutil
-from collections import namedtuple
+from copy import deepcopy
 from typing import List, Sized, Tuple
 from unittest import TestCase
 
@@ -9,12 +9,12 @@ from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tgen.constants import DELETE_TEST_OUTPUT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tgen.util.logging.logger_config import LoggerConfig
 from tgen.util.logging.logger_manager import LoggerManager
 
@@ -139,10 +139,23 @@ class BaseTest(TestCase):
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
 
 
-Choice = namedtuple("Choice", ["text"])
 SUMMARY_FORMAT = "Summary of {}"
 
 
 def fake_open_ai_completion(model, prompt, **args):
+    choice = {
+        "logprobs": {
+            "top_logprobs": [
+                {
+                    " yes": -0.6815379,
+                    " no": -1.0818866
+                }
+            ]
+        },
+        "text": SUMMARY_FORMAT
+    }
     tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]
-    return {"choices": [Choice(SUMMARY_FORMAT.format(token)) for token in tokens]}
+    choices = [deepcopy(choice) for _ in tokens]
+    for i, choice in enumerate(choices):
+        choice['text'] = choice['text'].format(tokens[i])
+    return {"choices": choices, "id": "id"}

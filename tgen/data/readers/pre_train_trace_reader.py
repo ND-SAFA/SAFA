@@ -1,5 +1,6 @@
 import os
 import random
+import uuid
 from typing import List, Tuple, Generic
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -10,7 +11,7 @@ from tgen.util.file_util import FileUtil
 
 
 class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
-    LAYER_ID = "layer_1"
+    LAYER_ID = uuid.uuid4()
 
     def __init__(self, data_file: str, overrides: dict = None):
         """

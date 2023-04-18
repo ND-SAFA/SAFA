@@ -36,7 +36,7 @@ class PromptDataset(iDataset):
         :param data_export_path: The path to where data files will be saved if specified. May be to a directory or specific file
         """
         self.prompt_df = prompt_df
-        self.artifact_df = artifact_df
+        self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset else artifact_df
         self.trace_dataset = trace_dataset
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
@@ -101,8 +101,9 @@ class PromptDataset(iDataset):
         if self.prompt_df is None:
             assert prompt_generator is not None, "Must provide prompt generator to create prompt dataset for trainer"
             assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe to generate dataframe."
-            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_generator) if self.trace_dataset \
-                else self._generate_prompts_dataframe_from_artifacts(prompt_generator)
+            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_generator) \
+                if self.trace_dataset and isinstance(prompt_generator, ClassificationPromptGenerator) else \
+                self._generate_prompts_dataframe_from_artifacts(prompt_generator)
         return self.prompt_df
 
     def _generate_prompts_dataframe_from_traces(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
@@ -112,8 +113,7 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        traces = self.trace_dataset.trace_df if isinstance(prompt_generator, ClassificationPromptGenerator) \
-            else TraceDataFrame(DataFrameUtil.query_df(self.trace_dataset.trace_df, {TraceKeys.LABEL.value: 1}))
+        traces = self.trace_dataset.trace_df
         for i, row in traces.itertuples():
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = prompt_generator.generate(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT],

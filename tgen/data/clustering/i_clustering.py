@@ -4,7 +4,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
-Clusters = Dict[Any, int]
+Clusters = Dict[Any, str]
 
 
 class iClusteringMethod(BaseObject, ABC):

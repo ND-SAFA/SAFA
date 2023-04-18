@@ -8,7 +8,6 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * The model to create for project.
@@ -32,25 +31,12 @@ public class ModelAppEntity implements IAppEntity {
      */
     BaseGenerationModels baseModel;
 
-
     /**
      * @param baseGenerationModel The base model whose state is returned.
      * @return Returns the state of the associated model
      */
     public static String getStatePath(BaseGenerationModels baseGenerationModel) {
-        switch (baseGenerationModel) {
-            case GPT:
-                return "gpt";
-            case NLBert:
-                return "thearod5/nl-bert";
-            case PLBert:
-                return "thearod5/pl-bert";
-            case AutomotiveBert:
-                return "thearod5/automotive-bert"; //TODO : Placeholder, replaced with new version after update
-            default:
-                throw new NotImplementedException(String.format("%s does not have a defined state path.",
-                    baseGenerationModel));
-        }
+        return baseGenerationModel.getStatePath();
     }
 
     /**

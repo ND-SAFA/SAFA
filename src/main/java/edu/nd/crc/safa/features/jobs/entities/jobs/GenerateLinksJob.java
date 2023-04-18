@@ -29,6 +29,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * Generates trace links between artifacts defined in request.
  */
 public class GenerateLinksJob extends CommitJob {
+    private final SafaUser user;
     /**
      * The request to generate trace links.
      */
@@ -41,8 +42,6 @@ public class GenerateLinksJob extends CommitJob {
      * The entities to generate links for.
      */
     ProjectAppEntity projectAppEntity;
-
-    private final SafaUser user;
 
     public GenerateLinksJob(JobDbEntity jobDbEntity,
                             ServiceProvider serviceProvider,
@@ -93,10 +92,7 @@ public class GenerateLinksJob extends CommitJob {
                     .generateLinksWithMethod(tracingPayload));
             } else {
                 ModelAppEntity model = tracingPayload.getModel();
-                TGen bertModel = this.serviceProvider.getTraceGenerationService().createTgen(
-                    model.getBaseModel(),
-                    this.serviceProvider.getSafaRequestBuilder()
-                );
+                TGen bertModel = model.getBaseModel().createTGenController();
                 String statePath = model.getStatePath();
                 this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
             }

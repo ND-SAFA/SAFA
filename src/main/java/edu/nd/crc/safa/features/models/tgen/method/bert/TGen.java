@@ -11,9 +11,10 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.models.entities.api.ModelIdentifierDTO;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.api.TGenDataset;
@@ -24,7 +25,6 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -34,16 +34,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */
-public class TGen implements ITraceLinkGeneration {
+public class TGen implements ITraceGenerationController {
 
     private static final Logger log = LoggerFactory.getLogger(TGen.class);
 
     private final SafaRequestBuilder safaRequestBuilder;
-    private final ObjectMapper mapper = new ObjectMapper();
     private final BertMethodIdentifier methodId;
 
-    public TGen(SafaRequestBuilder safaRequestBuilder, BertMethodIdentifier methodId) {
-        this.safaRequestBuilder = safaRequestBuilder;
+    public TGen(BertMethodIdentifier methodId) {
+        this.safaRequestBuilder = ServiceProvider.instance.getSafaRequestBuilder();
         this.methodId = methodId;
     }
 

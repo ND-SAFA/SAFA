@@ -7,7 +7,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 /**
  * Defines API for a trace link generation algorithm.
  */
-public interface ITraceLinkGeneration {
+public interface ITraceGenerationController {
 
     /**
      * Generates trace links between each source and target artifact pair.

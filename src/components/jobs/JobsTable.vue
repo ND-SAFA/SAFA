@@ -25,17 +25,23 @@
       :open="jobLog.length > 0"
       @close="handleCloseLogs"
     >
-      <div v-for="(items, idx) in jobLog" :key="idx">
-        <div v-for="item in items" :key="item.entry">
-          <typography :value="jobSteps[idx]" variant="subtitle" />
-          <typography
-            el="p"
-            :value="timestampToDisplay(item.timestamp)"
-            variant="caption"
-          />
-          <typography el="p" :value="item.entry" />
-        </div>
-      </div>
+      <q-timeline>
+        <template v-for="(items, idx) in jobLog" :key="idx">
+          <q-timeline-entry
+            v-for="item in items"
+            :key="item.entry"
+            :subtitle="timestampToDisplay(item.timestamp)"
+            :title="jobSteps[idx]"
+          >
+            <typography
+              v-for="line in item.entry.split('\n')"
+              :key="line"
+              el="p"
+              :value="line"
+            />
+          </q-timeline-entry>
+        </template>
+      </q-timeline>
     </modal>
   </panel-card>
 </template>

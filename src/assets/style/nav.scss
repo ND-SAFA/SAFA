@@ -107,10 +107,14 @@ body.body--dark .q-layout__shadow:after {
   }
   &-md {
     width: 600px;
-    max-width: unset;
+    max-width: unset !important;
   }
   &-lg {
     width: 800px;
-    max-width: unset;
+    max-width: unset !important;
+  }
+  &-xl {
+    width: 80vw;
+    max-width: unset !important;
   }
 }

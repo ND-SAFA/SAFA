@@ -19,14 +19,13 @@
       </template>
     </data-table>
 
-    <modal title="Logs" :open="jobLog.length > 0" @close="handleCloseLogs">
-      <typography
-        t="4"
-        default-expanded
-        variant="code"
-        :value="logText"
-        data-cy="text-job-log"
-      />
+    <modal
+      size="xl"
+      title="Logs"
+      :open="jobLog.length > 0"
+      @close="handleCloseLogs"
+    >
+      <pre><code>{{ logText }}</code></pre>
     </modal>
   </panel-card>
 </template>
@@ -46,7 +45,7 @@ import { JobLogSchema, JobSchema } from "@/types";
 import { jobColumns } from "@/util";
 import { appStore, jobStore } from "@/hooks";
 import { getJobLog, handleReloadJobs } from "@/api";
-import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
+import { DataTable, PanelCard, Modal } from "@/components/common";
 import JobRow from "./JobRow.vue";
 
 const jobLog = ref<JobLogSchema[]>([]);

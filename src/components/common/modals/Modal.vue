@@ -3,6 +3,7 @@
     :model-value="props.open"
     :data-cy="props.dataCy"
     @close="emit('close')"
+    @hide="emit('close')"
   >
     <q-card :class="className">
       <q-card-section>
@@ -75,7 +76,7 @@ const props = defineProps<{
   /**
    * A fixed width size to set for the modal.
    */
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   /**
    * The testing selector to set.
    */

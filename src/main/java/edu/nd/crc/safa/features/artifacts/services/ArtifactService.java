@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     ArtifactVersionRepository artifactVersionRepository;
 
     @Override
-    public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion) {
+    public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         return versionToAppEntity(artifactVersions);

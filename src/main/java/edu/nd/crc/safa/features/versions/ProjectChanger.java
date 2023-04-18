@@ -54,7 +54,7 @@ public class ProjectChanger {
         ProjectCommit committedChanges = serviceProvider
             .getCommitService()
             .performCommit(projectCommit, user);
-        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
+        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateLayoutUpdates(committedChanges);
         return committedChanges;
     }
@@ -64,8 +64,9 @@ public class ProjectChanger {
      * Detects deleted entities by noting which entities are missing that were previously defined.
      *
      * @param projectEntities Artifact and trace links to set.
+     * @param user User making the request
      */
-    public void setEntitiesAsCompleteSet(ProjectEntities projectEntities) {
+    public void setEntitiesAsCompleteSet(ProjectEntities projectEntities, SafaUser user) {
         List<ArtifactAppEntity> artifacts = projectEntities.getArtifacts();
         List<TraceAppEntity> traces = projectEntities.getTraces();
         List<Pair<ArtifactVersion, CommitError>> artifactResponse = serviceProvider
@@ -76,7 +77,7 @@ public class ProjectChanger {
         saveCommitErrors(artifactResponse, ProjectEntity.ARTIFACTS);
         saveCommitErrors(traceResponse, ProjectEntity.TRACES);
 
-        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
+        LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion, user);
         layoutManager.generateLayoutForProject();
     }
 

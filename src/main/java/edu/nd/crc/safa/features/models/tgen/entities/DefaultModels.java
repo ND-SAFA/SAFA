@@ -14,7 +14,10 @@ public class DefaultModels {
      */
     public static List<ModelAppEntity> getDefaultModels() {
         return List.of(
-            new ModelAppEntity(UUID.randomUUID(), "GPT", BaseGenerationModels.GPT)
+            new ModelAppEntity(UUID.randomUUID(), "TraceGPT", BaseGenerationModels.GPT),
+            new ModelAppEntity(UUID.randomUUID(), "AutomotiveBert", BaseGenerationModels.AutomotiveBert),
+            new ModelAppEntity(UUID.randomUUID(), "Natural Language Bert", BaseGenerationModels.NLBert),
+            new ModelAppEntity(UUID.randomUUID(), "Programming Language Bert", BaseGenerationModels.NLBert)
         );
     }
 }

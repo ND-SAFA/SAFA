@@ -39,7 +39,8 @@ public class TraceGenerationService {
     private final Map<BaseGenerationModels, BertMethodIdentifier> bertModelIdentifiers = Map.of(
         BaseGenerationModels.AutomotiveBert, new BertMethodIdentifier("NL_BERT", "thearod5/automotive"),
         BaseGenerationModels.PLBert, new BertMethodIdentifier("PL_BERT", "thearod5/pl-bert"),
-        BaseGenerationModels.NLBert, new BertMethodIdentifier("NL_BERT", "thearod5/nl-bert")
+        BaseGenerationModels.NLBert, new BertMethodIdentifier("NL_BERT", "thearod5/nl-bert"),
+        BaseGenerationModels.GPT, new BertMethodIdentifier("GPT", "gpt")
     );
 
     /**

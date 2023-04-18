@@ -75,19 +75,21 @@ public class FlatFileService {
      *
      * @param projectVersion  The version that the artifacts and errors will be associated with.
      * @param files           The flat files defining the project
+     * @param user            The user making the request
      * @param asCompleteSet   Whether entities in flat files are complete set of entities in project version.
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
     public ProjectAppEntity updateProjectFromFlatFiles(ProjectVersion projectVersion,
                                                        List<MultipartFile> files,
+                                                       SafaUser user,
                                                        boolean asCompleteSet)
         throws SafaError, IOException {
 
         Project project = projectVersion.getProject();
         this.fileUploadService.uploadFilesToServer(project, files);
         JSONObject timFileContent = getTimFileContent(project);
-        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent, asCompleteSet);
+        this.parseFlatFilesAndCommitEntities(projectVersion, timFileContent, user, asCompleteSet);
         return this.projectRetrievalService.getProjectAppEntity(projectVersion);
     }
 
@@ -109,7 +111,7 @@ public class FlatFileService {
             throws SafaError, IOException {
 
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(projectVersionId).withEditVersionAs(user);
-        return updateProjectFromFlatFiles(projectVersion, files, asCompleteSet);
+        return updateProjectFromFlatFiles(projectVersion, files, user, asCompleteSet);
     }
 
     /**
@@ -119,11 +121,13 @@ public class FlatFileService {
      *
      * @param projectVersion  The project version to be associated with the files specified.
      * @param timFileJson     JSON definition of project extracted from tim.json file.
+     * @param user            The user making the request
      * @param asCompleteSet   Whether to save entities in flat files as entire set of entities in project.
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
                                                 JSONObject timFileJson,
+                                                SafaUser user,
                                                 boolean asCompleteSet) {
         try {
             // Step - Parse artifacts, traces, and trace generation requests
@@ -155,7 +159,7 @@ public class FlatFileService {
             );
             ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
             if (asCompleteSet) {
-                projectChanger.setEntitiesAsCompleteSet(projectEntities);
+                projectChanger.setEntitiesAsCompleteSet(projectEntities, user);
             } else {
                 projectChanger.commit(projectCommit);
             }

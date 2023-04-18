@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     private final NotificationService notificationService;
 
     @Override
-    public List<AttributeLayoutAppEntity> getAppEntities(ProjectVersion projectVersion) {
+    public List<AttributeLayoutAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         return layoutRepo.findByProject(projectVersion.getProject())
                 .stream()
                 .map(this::appEntityFromAttributeLayout)

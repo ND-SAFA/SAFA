@@ -1,9 +1,9 @@
 package edu.nd.crc.safa.features.documents.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,7 @@ public class DocumentController extends BaseDocumentController {
             document,
             documentAppEntity.getArtifactIds());
         List<UUID> affectedArtifactIds =
-            documentAppEntity.getArtifactIds().stream().collect(Collectors.toList());
+            new ArrayList<>(documentAppEntity.getArtifactIds());
 
         // Create or update: columns
         documentService.updateFMEAColumns(documentAppEntity, document);
@@ -100,7 +101,8 @@ public class DocumentController extends BaseDocumentController {
 
     public Map<UUID, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
                                                           DocumentAppEntity documentAppEntity) {
-        LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion, user);
         return projectLayout.generateDocumentLayout(documentAppEntity.toDocument());
     }
 
@@ -114,7 +116,8 @@ public class DocumentController extends BaseDocumentController {
     @GetMapping(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.documentService.getAppEntities(projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        return this.documentService.getAppEntities(projectVersion, user);
     }
 
     @GetMapping(AppRoutes.Documents.GET_DOCUMENT_BY_ID)

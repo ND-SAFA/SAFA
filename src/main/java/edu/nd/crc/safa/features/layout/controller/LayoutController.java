@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.layout.entities.api.LayoutGenerationResponseDTO;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,8 @@ public class LayoutController extends BaseController {
     public LayoutGenerationResponseDTO resetLayout(@PathVariable UUID versionId,
                                                    @RequestBody LayoutGenerationRequestDTO layoutGeneration) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        LayoutManager layoutManager = new LayoutManager(this.serviceProvider, projectVersion);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        LayoutManager layoutManager = new LayoutManager(this.serviceProvider, projectVersion, user);
         EntityChangeBuilder notificationBuilder = EntityChangeBuilder.create(versionId);
         LayoutGenerationResponseDTO response = new LayoutGenerationResponseDTO();
 

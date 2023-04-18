@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.layout.generator.KlayLayoutGenerator;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -40,7 +41,8 @@ public class LayoutManager {
     private final ProjectEntities projectEntities;
 
     public LayoutManager(ServiceProvider serviceProvider,
-                         ProjectVersion projectVersion) {
+                         ProjectVersion projectVersion,
+                         SafaUser user) {
         if (projectVersion == null) {
             throw new IllegalArgumentException("Project version is null.");
         }
@@ -51,7 +53,7 @@ public class LayoutManager {
         this.project = projectVersion.getProject();
         this.projectEntities = serviceProvider
             .getProjectRetrievalService()
-            .retrieveProjectEntitiesAtProjectVersion(projectVersion);
+            .retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
         this.serviceProvider = serviceProvider;
     }
 
@@ -66,7 +68,7 @@ public class LayoutManager {
         this.serviceProvider
             .getDocumentRepository()
             .findByProject(this.project)
-            .forEach(d -> generateDocumentLayout(d));
+            .forEach(this::generateDocumentLayout);
     }
 
     /**

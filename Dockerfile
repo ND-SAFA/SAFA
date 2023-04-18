@@ -33,4 +33,4 @@ RUN python3 api/manage.py collectstatic --noinput
 # Finalize
 EXPOSE 80
 WORKDIR /app
-CMD ["gunicorn" ,"--bind", ":80","--env", "DJANGO_SETTINGS_MODULE=api.server.settings", "--workers", "1","--threads","1","--timeout","0", "api.server.wsgi"]
+CMD ["gunicorn" ,"--bind", ":80","--env", "DJANGO_SETTINGS_MODULE=api.server.settings", "--workers", "4","--threads","4","--timeout","0", "api.server.wsgi"]

@@ -27,17 +27,16 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.json.JSONObject;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */
 public class TGen implements ITraceLinkGeneration {
 
-    private static final Logger log = LoggerFactory.getLogger(TBert.class);
+    private static final Logger log = LoggerFactory.getLogger(TGen.class);
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();

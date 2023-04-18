@@ -76,7 +76,7 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
      * @return The list of models.
      */
     // Replace method body to return the models in DefaultModels.java
-    public List<ModelAppEntity> getUserModels() {
+    public List<ModelAppEntity> getUserModels(SafaUser user) {
         return DefaultModels.getDefaultModels();
     }
 

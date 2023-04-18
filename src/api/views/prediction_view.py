@@ -29,7 +29,7 @@ def create_predict_definition(task_id: str, dataset: ApiDefinition, model: str) 
     """
     prediction_job_args = {
         "output_dir": os.path.join(JOB_DIR, task_id),
-        "prediction_job_type": PredictionJobTypes.OPENAI if model == "gpt" else PredictionJobTypes.BASE,
+        "prediction_job_type": PredictionJobTypes.OPENAI if model.lower().strip() == "gpt" else PredictionJobTypes.BASE,
         "model_path": model}
 
     return JobCreator.create_prediction_definition(dataset=dataset, **prediction_job_args)

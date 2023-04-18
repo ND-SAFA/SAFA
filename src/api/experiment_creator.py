@@ -47,6 +47,7 @@ class JobCreator:
         if prediction_job_type == PredictionJobTypes.OPENAI:
             trainer_args = OpenAIArgs(metrics=None)
             job = OpenAIJob(data_output_path=output_dir,
+                            base_model="ada:ft-safa:cm1-test-2023-03-29-20-25-19",
                             task=OpenAITask.PREDICT,
                             trainer_dataset_manager=trainer_dataset_manager,
                             trainer_args=trainer_args,

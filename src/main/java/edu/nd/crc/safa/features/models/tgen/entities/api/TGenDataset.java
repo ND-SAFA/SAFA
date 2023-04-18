@@ -14,9 +14,9 @@ public class TGenDataset {
     /**
      * Map of source artifact ids to content body.
      */
-    List<Map<String, String>> sourceLayers;
+    List<Map<String, String>> source_layers;
     /**
      * Map of target artifact ids to content body.
      */
-    List<Map<String, String>> targetLayers;
+    List<Map<String, String>> target_layers;
 }

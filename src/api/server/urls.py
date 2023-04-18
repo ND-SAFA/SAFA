@@ -23,7 +23,7 @@ from api.views.prediction_view import PredictView
 
 
 def homePageView(request):
-    return HttpResponse("Welcome to SAFA's trace generation server!")
+    return HttpResponse("Welcome to SAFA's trace generation server! This server is responsible for all things generation.")
 
 
 schema_view = get_schema_view(

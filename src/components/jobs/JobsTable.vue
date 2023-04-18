@@ -25,7 +25,15 @@
       :open="jobLog.length > 0"
       @close="handleCloseLogs"
     >
-      <pre><code>{{ logText }}</code></pre>
+      <div v-for="(item, idx) in jobLog" :key="idx">
+        <typography
+          v-if="!!item.length > 0"
+          el="p"
+          :value="item[0].timestamp"
+          variant="caption"
+        />
+        <typography v-if="!!item.length > 0" el="p" :value="item[0].entry" />
+      </div>
     </modal>
   </panel-card>
 </template>
@@ -46,13 +54,13 @@ import { jobColumns } from "@/util";
 import { appStore, jobStore } from "@/hooks";
 import { getJobLog, handleReloadJobs } from "@/api";
 import { DataTable, PanelCard, Modal } from "@/components/common";
+import Typography from "@/components/common/display/content/Typography.vue";
 import JobRow from "./JobRow.vue";
 
-const jobLog = ref<JobLogSchema[]>([]);
+const jobLog = ref<JobLogSchema[][]>([]);
 
 const rows = computed(() => jobStore.jobs);
 const loading = computed(() => appStore.isLoading > 0);
-const logText = computed(() => JSON.stringify(jobLog.value, null, 2));
 const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []
 );

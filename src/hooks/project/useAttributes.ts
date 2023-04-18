@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 
-import {
-  AttributeLayoutSchema,
-  AttributePositionSchema,
-  AttributeSchema,
-  ProjectSchema,
-} from "@/types";
+import { AttributeLayoutSchema, AttributeSchema, ProjectSchema } from "@/types";
 import { removeMatches } from "@/util";
 import { projectStore } from "@/hooks";
 import { pinia } from "@/plugins";

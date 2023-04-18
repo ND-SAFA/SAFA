@@ -49,8 +49,8 @@ export async function deleteJobById(jobId: string): Promise<void> {
  *
  * @param jobId - The job to get logs for.
  */
-export async function getJobLog(jobId: string): Promise<JobLogSchema[]> {
-  return authHttpClient<JobLogSchema[]>(
+export async function getJobLog(jobId: string): Promise<JobLogSchema[][]> {
+  return authHttpClient<JobLogSchema[][]>(
     fillEndpoint(Endpoint.getJobLog, { jobId }),
     {
       method: "GET",

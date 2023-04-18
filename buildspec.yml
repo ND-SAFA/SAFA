@@ -9,6 +9,9 @@ env:
 
 
 phases:
+  pre_build:
+    commands:
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
   build:
     commands:
       - echo Build started on `date`

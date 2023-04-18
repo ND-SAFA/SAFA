@@ -25,14 +25,16 @@
       :open="jobLog.length > 0"
       @close="handleCloseLogs"
     >
-      <div v-for="(item, idx) in jobLog" :key="idx">
-        <typography
-          v-if="!!item.length > 0"
-          el="p"
-          :value="item[0].timestamp"
-          variant="caption"
-        />
-        <typography v-if="!!item.length > 0" el="p" :value="item[0].entry" />
+      <div v-for="(items, idx) in jobLog" :key="idx">
+        <div v-for="item in items" :key="item.entry">
+          <typography :value="jobSteps[idx]" variant="subtitle" />
+          <typography
+            el="p"
+            :value="timestampToDisplay(item.timestamp)"
+            variant="caption"
+          />
+          <typography el="p" :value="item.entry" />
+        </div>
       </div>
     </modal>
   </panel-card>
@@ -50,14 +52,14 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { JobLogSchema, JobSchema } from "@/types";
-import { jobColumns } from "@/util";
+import { jobColumns, timestampToDisplay } from "@/util";
 import { appStore, jobStore } from "@/hooks";
 import { getJobLog, handleReloadJobs } from "@/api";
-import { DataTable, PanelCard, Modal } from "@/components/common";
-import Typography from "@/components/common/display/content/Typography.vue";
+import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";
 
 const jobLog = ref<JobLogSchema[][]>([]);
+const jobSteps = ref<string[]>([]);
 
 const rows = computed(() => jobStore.jobs);
 const loading = computed(() => appStore.isLoading > 0);
@@ -78,6 +80,7 @@ function handleReload() {
  */
 async function handleViewLogs(job: JobSchema): Promise<void> {
   jobLog.value = await getJobLog(job.id);
+  jobSteps.value = job.steps;
 }
 
 /**
@@ -85,6 +88,7 @@ async function handleViewLogs(job: JobSchema): Promise<void> {
  */
 function handleCloseLogs(): void {
   jobLog.value = [];
+  jobSteps.value = [];
 }
 
 onMounted(() => handleReload());

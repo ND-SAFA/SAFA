@@ -21,9 +21,11 @@ from rest_framework import permissions
 
 from api.views.prediction_view import PredictView
 
+HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
+
 
 def homePageView(request):
-    return HttpResponse("Welcome to SAFA's trace generation server! This server is responsible for all things generation.")
+    return HttpResponse(HOME_PAGE_CONTENT)
 
 
 schema_view = get_schema_view(

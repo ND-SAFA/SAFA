@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.models.tgen.entities.api;
 
 import java.util.List;
-import java.util.Map;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,14 +15,6 @@ public class TGenPredictionOutput extends AbstractTGenResponse {
      * List of links with their predicted similarity score.
      */
     List<PredictedLink> predictions;
-    /**
-     * Metrics on predictions.
-     */
-    Map<String, Double> metrics;
-    /**
-     * Error message if status is 1.
-     */
-    String exception;
 
     /**
      * A predicted similarity score between a source and targe artifact.
@@ -33,5 +24,6 @@ public class TGenPredictionOutput extends AbstractTGenResponse {
         String source;
         String target;
         double score;
+        double label;
     }
 }

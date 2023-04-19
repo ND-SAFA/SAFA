@@ -10,7 +10,7 @@ import java.util.Map;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceLinkConstructor;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -18,12 +18,11 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 /**
  * Vector Space Model using TF-IDF scores for evaluating document relevance
  */
-public class VSMController implements ITraceLinkGeneration {
+public class VSMController implements ITraceGenerationController {
     private Map<String, Double> idf;
 
     @Override
     public List<TraceAppEntity> generateLinksWithState(String statePath,
-                                                       boolean loadFromStorage,
                                                        TracingPayload tracingPayload) {
         //Note, VSM has not state (yet).
         return generateLinksWithBaselineState(tracingPayload);

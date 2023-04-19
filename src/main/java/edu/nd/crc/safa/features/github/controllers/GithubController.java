@@ -24,8 +24,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,8 +36,6 @@ import org.springframework.web.context.request.async.DeferredResult;
  */
 @Controller
 public class GithubController extends BaseController {
-
-    private static final Logger log = LoggerFactory.getLogger(GithubController.class);
 
     private final SafaUserService safaUserService;
     private final GithubConnectionService githubConnectionService;
@@ -59,6 +55,13 @@ public class GithubController extends BaseController {
         this.githubControllerUtils = githubControllerUtils;
     }
 
+    /**
+     * Returns a list of GitHub repositories that are accessible by the current user via
+     * an already connected GitHub integration.
+     *
+     * @return A list of {@link GithubRepositoryDTO}.
+     * @throws SafaError If there is no GitHub integration connected.
+     */
     @GetMapping(AppRoutes.Github.RETRIEVE_GITHUB_REPOSITORIES)
     public DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> retrieveGithubRepositories() {
         DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> output =
@@ -77,6 +80,12 @@ public class GithubController extends BaseController {
         return output;
     }
 
+    /**
+     * Creates a job that imports a GitHub repository into a new SAFA project.
+     *
+     * @param repositoryName The name of the repository to import.
+     * @return A {@link JobAppEntity} representing the import job.
+     */
     @PostMapping(AppRoutes.Github.Import.BY_NAME)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> pullGithubProject(
         @PathVariable("repositoryName") String repositoryName) {
@@ -97,6 +106,14 @@ public class GithubController extends BaseController {
         return output;
     }
 
+    /**
+     * Creates a job that re-imports a GitHub repository into a SAFA project after it has
+     * already been previously imported.
+     *
+     * @param repositoryName The name of the repository to import.
+     * @param versionId The ID of the project version to import into.
+     * @return Information about the started job
+     */
     @PutMapping(AppRoutes.Github.Import.UPDATE)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> updateGithubProject(
         @PathVariable("versionId") UUID versionId,
@@ -119,6 +136,14 @@ public class GithubController extends BaseController {
         return output;
     }
 
+    /**
+     * Creates a job that imports a GitHub repository into an existing SAFA project that has
+     * not previously had that repository imported into it.
+     *
+     * @param repositoryName The name of the repository to import.
+     * @param versionId The ID of the project version to import into.
+     * @return Information about the started job
+     */
     @PostMapping(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> importIntoExistingProject(
         @PathVariable("versionId") UUID versionId,
@@ -148,7 +173,7 @@ public class GithubController extends BaseController {
 
         GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
-        if (!responseDTO.getMessage().equals(GithubResponseMessage.OK)) {
+        if (responseDTO.getMessage() != GithubResponseMessage.OK) {
             throw new SafaError("Invalid GitHub credentials: " + responseDTO.getMessage());
         }
 

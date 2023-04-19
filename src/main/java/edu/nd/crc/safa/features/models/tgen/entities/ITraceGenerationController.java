@@ -7,18 +7,16 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 /**
  * Defines API for a trace link generation algorithm.
  */
-public interface ITraceLinkGeneration {
+public interface ITraceGenerationController {
 
     /**
      * Generates trace links between each source and target artifact pair.
      *
      * @param statePath       Path to the state of model.
-     * @param loadFromStorage Whether statePath reference cloud storage.
      * @param tracingRequests List of levels of artifacts containing sources and targets.
      * @return List of generated trace links.
      */
     List<TraceAppEntity> generateLinksWithState(String statePath,
-                                                boolean loadFromStorage,
                                                 TracingPayload tracingRequests);
 
     /**

@@ -28,6 +28,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -206,6 +207,7 @@ public class JobService {
             .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
+        job.setAuthentication(SecurityContextHolder.getContext().getAuthentication());
         jobLauncher.run(job, jobParameters);
     }
 }

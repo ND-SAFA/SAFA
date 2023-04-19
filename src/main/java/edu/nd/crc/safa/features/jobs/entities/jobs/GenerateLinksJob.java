@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -29,6 +29,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * Generates trace links between artifacts defined in request.
  */
 public class GenerateLinksJob extends CommitJob {
+    private final SafaUser user;
     /**
      * The request to generate trace links.
      */
@@ -41,8 +42,6 @@ public class GenerateLinksJob extends CommitJob {
      * The entities to generate links for.
      */
     ProjectAppEntity projectAppEntity;
-
-    private final SafaUser user;
 
     public GenerateLinksJob(JobDbEntity jobDbEntity,
                             ServiceProvider serviceProvider,
@@ -82,8 +81,8 @@ public class GenerateLinksJob extends CommitJob {
 
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
             logger.log("Running tracing request:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
-                    tracingRequest.getModel(), tracingRequest.getMethod(),
-                    tracingRequest.getArtifactLevels());
+                tracingRequest.getModel(), tracingRequest.getMethod(),
+                tracingRequest.getArtifactLevels());
 
             TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
             if (tracingPayload.getModel() == null) {
@@ -93,15 +92,9 @@ public class GenerateLinksJob extends CommitJob {
                     .generateLinksWithMethod(tracingPayload));
             } else {
                 ModelAppEntity model = tracingPayload.getModel();
-                TBert bertModel = this.serviceProvider.getTraceGenerationService().getBertModel(
-                    model.getBaseModel(),
-                    this.serviceProvider.getSafaRequestBuilder()
-                );
+                TGen bertModel = model.getBaseModel().createTGenController();
                 String statePath = model.getStatePath();
-                this.generatedTraces = bertModel.generateLinksWithState(
-                    statePath,
-                    true,
-                    tracingPayload);
+                this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
             }
 
             logger.log("Generated %d traces.", generatedTraces.size());

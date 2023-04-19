@@ -28,7 +28,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * <p>Responsible for finding methods corresponding to steps in job and running them
@@ -53,21 +52,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public abstract class AbstractJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
-
-    private JobLogger dbLogger;
-
     /**
      * The job identifying information that is being performed.
      */
     protected JobDbEntity jobDbEntity;
-
     /**
      * Service used to send job updates.
      */
     protected ServiceProvider serviceProvider;
     protected JobService jobService;
     protected NotificationService notificationService;
-
     /**
      * List of step indices to skip.
      */
@@ -76,6 +70,7 @@ public abstract class AbstractJob implements Job {
      * The authentication to execute job with.
      */
     Authentication authentication;
+    private JobLogger dbLogger;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
@@ -115,9 +110,9 @@ public abstract class AbstractJob implements Job {
      * Execute a single job step.
      *
      * @param stepImplementation Object containing information about the step to be performed
-     * @param nSteps Total number of steps for this job
+     * @param nSteps             Total number of steps for this job
      * @throws InvocationTargetException When the job step throws an exception
-     * @throws IllegalAccessException When the job step cannot be accessed
+     * @throws IllegalAccessException    When the job step cannot be accessed
      */
     private void executeJobStep(JobStepImplementation stepImplementation, int nSteps) throws Exception {
 
@@ -133,6 +128,7 @@ public abstract class AbstractJob implements Job {
             notifyBeforeStep(position, stepName, nSteps);
             invokeStep(stepImplementation);
         } catch (Exception e) {
+            e.printStackTrace();
             success = false;
             notifyStepFailed(position, stepName, e);
             throw e;
@@ -149,7 +145,7 @@ public abstract class AbstractJob implements Job {
      * @throws IllegalAccessException    If there is a problem invoking the method
      */
     private void invokeStep(JobStepImplementation stepImplementation)
-            throws InvocationTargetException, IllegalAccessException {
+        throws InvocationTargetException, IllegalAccessException {
 
         Method method = stepImplementation.getMethod();
 
@@ -208,8 +204,8 @@ public abstract class AbstractJob implements Job {
      * Broadcast that a step is about to be executed.
      *
      * @param stepPosition The position of the step as defined by its annotation.
-     * @param stepName The name of the step as defined by its annotation.
-     * @param nSteps The number of steps in this job.
+     * @param stepName     The name of the step as defined by its annotation.
+     * @param nSteps       The number of steps in this job.
      */
     private void notifyBeforeStep(int stepPosition, String stepName, int nSteps) throws Exception {
         try {
@@ -231,8 +227,8 @@ public abstract class AbstractJob implements Job {
      * Broadcast that a step has completed.
      *
      * @param stepPosition The position of the step as defined by its annotation.
-     * @param stepName The name of the step as defined by its annotation.
-     * @param success Whether the step finished successfully or not.
+     * @param stepName     The name of the step as defined by its annotation.
+     * @param success      Whether the step finished successfully or not.
      */
     private void notifyAfterStep(int stepPosition, String stepName, boolean success) throws Exception {
         try {
@@ -250,8 +246,8 @@ public abstract class AbstractJob implements Job {
      * Broadcast that a step failed.
      *
      * @param stepPosition The position of the step as defined by its annotation.
-     * @param stepName The name of the step as defined by its annotation.
-     * @param error The error that caused the failure.
+     * @param stepName     The name of the step as defined by its annotation.
+     * @param error        The error that caused the failure.
      */
     private void notifyStepFailed(int stepPosition, String stepName, Exception error) {
         try {
@@ -315,9 +311,9 @@ public abstract class AbstractJob implements Job {
 
     /**
      * <p>Override this method to be notified when a step is about to start.</p>
-     * 
+     *
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
-     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
+     * @param stepName     The name of the step as defined by its {@link IJobStep} annotation.
      * @throws Exception In case of an error
      */
     @ForOverride
@@ -326,13 +322,13 @@ public abstract class AbstractJob implements Job {
 
     /**
      * <p>Override this method to be notified when a step has completed.</p>
-     * 
+     *
      * <p>In the case of a step failing, this method will always be called after
      * {@link #stepFailed(int, String, Exception)}, but before {@link #jobFailed(Exception)}.</p>
      *
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
-     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
-     * @param success Whether the step completed successfully or not.
+     * @param stepName     The name of the step as defined by its {@link IJobStep} annotation.
+     * @param success      Whether the step completed successfully or not.
      * @throws Exception In case of an error
      */
     @ForOverride
@@ -341,13 +337,13 @@ public abstract class AbstractJob implements Job {
 
     /**
      * <p>Override this method to be notified when a step fails.</p>
-     * 
+     *
      * <p>This will be called before {@link #afterStep(int, String, boolean)} as well
      * as before {@link #jobFailed(Exception)} and {@link #afterJob(boolean)}</p>
      *
      * @param stepPosition The position of the step as defined by its {@link IJobStep} annotation.
-     * @param stepName The name of the step as defined by its {@link IJobStep} annotation.
-     * @param error The error that caused the step to fail.
+     * @param stepName     The name of the step as defined by its {@link IJobStep} annotation.
+     * @param error        The error that caused the step to fail.
      * @throws Exception In case of an error
      */
     @ForOverride
@@ -356,7 +352,7 @@ public abstract class AbstractJob implements Job {
 
     /**
      * <p>Override this method to be notified when a job fails.</p>
-     * 
+     *
      * <p>This is called after {@link #afterStep(int, String, boolean)} but before {@link #afterJob(boolean)}.</p>
      *
      * @param error The error that caused the job to fail.
@@ -365,7 +361,7 @@ public abstract class AbstractJob implements Job {
     @ForOverride
     protected void jobFailed(Exception error) throws Exception {
     }
-
+    
     @Override
     @NonNull
     public String getName() {

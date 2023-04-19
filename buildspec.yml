@@ -10,10 +10,8 @@ env:
 
 phases:
   build:
-    pre_build:
-      commands:
-        - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
     commands:
+      - docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_PASS
       - echo Build started on `date`
       - docker build -t bend .
       - docker tag bend 178003569110.dkr.ecr.us-east-1.amazonaws.com/bend:$STAGE

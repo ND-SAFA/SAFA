@@ -3,15 +3,6 @@ FROM ubuntu:12.04 as config
 ADD src/main/resources /app/src/main/resources
 ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 
-ARG DB_INSTANCE_ARG=hi
-
-RUN if [ ! -z "$DB_INSTANCE_ARG" ] ; \
-    then \
-      echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE_ARG" >> $PathToProperties && \
-      echo "spring.datasource.hikari.data-source-properties.socketFactory=com.google.cloud.sql.mysql.SocketFactory" >> $PathToProperties ; \
-    fi
-RUN cat $PathToProperties
-
 # Step 1 - Install necessary dependencies
 FROM gradle:6.9-jdk11 AS builder
 

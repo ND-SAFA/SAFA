@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.users.services;
 
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
@@ -33,11 +35,15 @@ public class SafaUserService {
     // This exists solely so that it can be set to false during testing so that we can disable the check in that context
     private static boolean CHECK_USER_THREAD = true;
 
+    private final Predicate<String> httpThreadPredicate = Pattern
+            .compile("http(?:s-jsse)?-nio-\\d{1,5}-exec-\\d+")
+            .asMatchPredicate();
+
     /**
      * @return the current {@link SafaUser} logged in
      */
     public SafaUser getCurrentUser() {
-        if (CHECK_USER_THREAD && !Thread.currentThread().getName().startsWith("https-jsse-nio-3000-exec")) {
+        if (CHECK_USER_THREAD && !httpThreadPredicate.test(Thread.currentThread().getName())) {
             logger.warn("Attempt to get user information from a thread that does not appear to be a spring thread ("
                 + Thread.currentThread().getName() + "). This is dangerous and should not be done.");
         }

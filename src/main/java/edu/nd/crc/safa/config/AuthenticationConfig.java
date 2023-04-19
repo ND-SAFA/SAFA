@@ -70,35 +70,36 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                 return cors;
             })
             .and()
-                .csrf()
-                .disable()
-                // Endpoint Settings
-                .authorizeRequests()
-                .antMatchers(
-                    AppRoutes.Accounts.LOGIN,
-                    AppRoutes.Accounts.CREATE_ACCOUNT,
-                    AppRoutes.Accounts.FORGOT_PASSWORD,
-                    AppRoutes.Accounts.RESET_PASSWORD,
-                    "/websocket/**",
-                    "/swagger-ui/**", // Needed to get config
-                    "/v3/api-docs/**",
-                    "/docs")
-                .permitAll()
+            .csrf()
+            .disable()
+            // Endpoint Settings
+            .authorizeRequests()
+            .antMatchers(
+                AppRoutes.Accounts.LOGIN,
+                AppRoutes.Accounts.CREATE_ACCOUNT,
+                AppRoutes.Accounts.FORGOT_PASSWORD,
+                AppRoutes.Accounts.RESET_PASSWORD,
+                "/websocket/**",
+                "/swagger-ui/**", // Needed to get config
+                "/v3/api-docs/**",
+                "/docs/**")
+            .permitAll()
             .and()
-                .logout()
-                .logoutUrl(AppRoutes.Accounts.LOGOUT)
-                .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
-                .logoutSuccessHandler((a,b,c) -> { })
+            .logout()
+            .logoutUrl(AppRoutes.Accounts.LOGOUT)
+            .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
+            .logoutSuccessHandler((a, b, c) -> {
+            })
             .and()
-                .authorizeRequests()
-                // Close authentication settings
-                .anyRequest()
-                .authenticated()
+            .authorizeRequests()
+            // Close authentication settings
+            .anyRequest()
+            .authenticated()
             // Authentication Filters
             .and()
-                .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-                .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean

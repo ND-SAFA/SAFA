@@ -28,6 +28,7 @@ RUN \
     echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT"; \
     cat "$RUN_SCRIPT"
 
+ENV PORT=80
 COPY --from=config /app/src/main/resources /app/src/main/resources
 COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
 ENTRYPOINT /bin/bash $RUN_SCRIPT

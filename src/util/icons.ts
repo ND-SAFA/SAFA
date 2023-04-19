@@ -29,6 +29,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-delete";
     case "cancel":
       return "mdi-close";
+    case "leave":
+      return "mdi-tab-remove";
     case "info":
       return "mdi-alert-circle-outline";
     case "error":

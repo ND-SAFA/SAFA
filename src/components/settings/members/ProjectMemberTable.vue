@@ -15,7 +15,17 @@
       @row:edit="handleEdit"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
-    />
+    >
+      <template #cell-actions="{ row }">
+        <icon-button
+          v-if="membersColumns.length > 1 && row.email === userEmail"
+          icon="leave"
+          tooltip="Leave project"
+          data-cy="button-selector-leave"
+          @click="handleLeave(row)"
+        />
+      </template>
+    </selector-table>
     <project-member-modal
       :open="modalOpen"
       :member="editedMember"
@@ -40,7 +50,7 @@ import { MembershipSchema, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { PanelCard, SelectorTable } from "@/components/common";
+import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
 const editedMember = ref<MembershipSchema | undefined>();
@@ -50,6 +60,7 @@ const modalOpen = ref(false);
 const project = computed(() => projectStore.project);
 
 const isAdmin = computed(() => sessionStore.isAdmin(project.value));
+const userEmail = computed(() => sessionStore.user?.email);
 
 const rows = computed(() => membersStore.members);
 
@@ -87,5 +98,13 @@ function handleDelete(member: MembershipSchema): void {
   } else {
     handleDeleteMember(member);
   }
+}
+
+/**
+ * Removes the current user from the project.
+ * @param member - The current user's membership.
+ */
+function handleLeave(member: MembershipSchema) {
+  handleDeleteMember(member);
 }
 </script>

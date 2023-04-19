@@ -16,6 +16,15 @@
     @row:edit="handleOpenEdit"
     @row:delete="handleOpenDelete"
   >
+    <template #cell-actions="{ row }">
+      <icon-button
+        v-if="row.members.length > 1"
+        icon="leave"
+        tooltip="Leave project"
+        data-cy="button-selector-leave"
+        @click="handleLeave(row)"
+      />
+    </template>
     <template #bottom>
       <confirm-project-delete
         :open="deleteOpen"
@@ -46,8 +55,8 @@ import { useRoute } from "vue-router";
 import { IdentifierSchema } from "@/types";
 import { projectExpandedColumns, projectNameColumn } from "@/util";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import { handleGetProjects } from "@/api";
-import { SelectorTable } from "@/components/common";
+import { handleDeleteMember, handleGetProjects } from "@/api";
+import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 const props = defineProps<{
@@ -153,6 +162,20 @@ function handleConfirmDelete() {
  */
 function handleConfirmSave() {
   saveOpen.value = false;
+}
+
+/**
+ * Removes the current user from the project.
+ * @param project - The project to leave.
+ */
+function handleLeave(project: IdentifierSchema) {
+  const member = project.members.find(
+    (member) => member.email === sessionStore.user?.email
+  );
+
+  if (!member) return;
+
+  handleDeleteMember(member);
 }
 
 /**

@@ -1,34 +1,38 @@
-# Step 1 - Create production environment
-FROM ubuntu:12.04 as config
-ADD src/main/resources /app/src/main/resources
-ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
-
 # Step 1 - Install necessary dependencies
-FROM gradle:6.9-jdk11 AS builder
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:11 AS builder
+SHELL ["/bin/bash", "-c"]
 
-# ... - Copy source code
-COPY --from=config /app/src/main/resources /app/src/main/resources
-ADD src/main/java /app/src/main/java
-ADD src/test /app/src/test
-ADD build.gradle /app/
+# Step 2 - Install gradle
+ARG GRADLE_VERSION=8.1
+RUN yum update -y -q && yum install -y -q wget unzip zip
+RUN curl -q -s "https://get.sdkman.io" | bash
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install gradle $GRADLE_VERSION
 
-# ... - Compile code
+# Step 3 - Copy source code
+ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 WORKDIR /app
-RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
+ADD src/main/resources src/main/resources
+ADD src/main/java src/main/java
+ADD src/test src/test
+ADD build.gradle .
+ADD gradle gradle
 
-# Step - Create endpoint
-FROM openjdk:11 AS runner
+# Step 4 - Install gradle version for building
+COPY gradlew .
+RUN chmod +x gradlew
+RUN ./gradlew build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
 
+## Step - Create endpoint
 ENV RUN_SCRIPT="/app/run.sh"
-
+ARG JAR_PATH="/app.jar"
+ARG SPRING_PROFILE=deployment
 RUN \
     mkdir -p "$(dirname $RUN_SCRIPT)"; \
     touch "$RUN_SCRIPT"; \
     chmod +x "$RUN_SCRIPT"; \
-    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT"; \
+    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=${SPRING_PROFILE} ${JAR_PATH}" >> "$RUN_SCRIPT"; \
     cat "$RUN_SCRIPT"
 
 ENV PORT=80
-COPY --from=config /app/src/main/resources /app/src/main/resources
-COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
+RUN mv /app/build/libs/edu.nd.crc.safa-0.1.0.jar $JAR_PATH
 ENTRYPOINT /bin/bash $RUN_SCRIPT

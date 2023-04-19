@@ -31,4 +31,4 @@ class TestHierarchyGeneration(BaseTest):
                                      prompt_generator=CreationPromptGenerator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY))
         hgen = HierarchyGenerator(tgen_trainer, hgen_trainer)
         dataset = hgen.run(layer_id)
-        #dataset
+        dataset

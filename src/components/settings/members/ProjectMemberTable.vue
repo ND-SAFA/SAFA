@@ -22,7 +22,7 @@
           icon="leave"
           tooltip="Leave project"
           data-cy="button-selector-leave"
-          @click="handleLeave(row)"
+          @click="handleDelete(row)"
         />
       </template>
     </selector-table>
@@ -60,9 +60,14 @@ const modalOpen = ref(false);
 const project = computed(() => projectStore.project);
 
 const isAdmin = computed(() => sessionStore.isAdmin(project.value));
-const userEmail = computed(() => sessionStore.user?.email);
 
 const rows = computed(() => membersStore.members);
+
+const userEmail = computed(() => sessionStore.user?.email);
+
+const ownerCount = computed(
+  () => rows.value.filter((member) => member.role === ProjectRole.OWNER).length
+);
 
 /**
  * Loads the project's members.
@@ -85,26 +90,14 @@ function handleEdit(member: MembershipSchema): void {
 }
 
 /**
- * Opens the delete member modal.
+ * Opens the delete member modal, if the member is not the only owner.
  * @param member - The member to delete.
  */
 function handleDelete(member: MembershipSchema): void {
-  if (
-    member.role === ProjectRole.OWNER &&
-    rows.value.filter((member) => member.role === ProjectRole.OWNER).length ===
-      1
-  ) {
-    logStore.onInfo("You cannot delete the only owner of this project.");
+  if (member.role === ProjectRole.OWNER && ownerCount.value === 1) {
+    logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
     handleDeleteMember(member);
   }
-}
-
-/**
- * Removes the current user from the project.
- * @param member - The current user's membership.
- */
-function handleLeave(member: MembershipSchema) {
-  handleDeleteMember(member);
 }
 </script>

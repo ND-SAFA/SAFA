@@ -52,9 +52,14 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IdentifierSchema } from "@/types";
+import { IdentifierSchema, ProjectRole } from "@/types";
 import { projectExpandedColumns, projectNameColumn } from "@/util";
-import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
+import {
+  identifierSaveStore,
+  logStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { handleDeleteMember, handleGetProjects } from "@/api";
 import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
@@ -172,10 +177,15 @@ function handleLeave(project: IdentifierSchema) {
   const member = project.members.find(
     (member) => member.email === sessionStore.user?.email
   );
+  const ownerCount = project.members.filter(
+    (member) => member.role === ProjectRole.OWNER
+  ).length;
 
-  if (!member) return;
-
-  handleDeleteMember(member);
+  if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
+    logStore.onInfo("You cannot remove the only owner of this project.");
+  } else {
+    handleDeleteMember(member);
+  }
 }
 
 /**

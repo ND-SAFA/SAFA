@@ -13,6 +13,7 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,6 +63,8 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             // This happens if the user has a token for a deleted account. We have code that is supposed
             // to delete the cookie, so I don't know why it sticks around, but by catching the exception
             // we can at least keep the chain from dying
+        } catch (ExpiredJwtException ignored) {
+            // If your JWT expired, just move on and force the user to log in again
         } catch (SafaError e) {
             e.printStackTrace();
         } finally {

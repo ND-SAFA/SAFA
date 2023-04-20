@@ -60,18 +60,18 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * Finds and adds given member to project with specified role.
      *
      * @param project        The project to add the member to.
+     * @param currentUser    The user performing the update.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
      * @return {@link ProjectMembership} Updated project membership.
      * @throws SafaError Throws error if given role is greater than the role
      *                   of the user issuing this request.
      */
-    public ProjectMembership addOrUpdateProjectMembership(Project project,
+    public ProjectMembership addOrUpdateProjectMembership(Project project, SafaUser currentUser,
                                                           String newMemberEmail,
                                                           ProjectRole newMemberRole) throws SafaError {
         // Step - Find member being added and the current member.
         SafaUser newMember = this.safaUserService.getUserByEmail(newMemberEmail);
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
 
         // Step - Assert that member being added has fewer permissions than current user.
         List<ProjectMembership> projectMemberships = this.projectMembershipRepository.findByProject(project);
@@ -113,6 +113,28 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      */
     public List<ProjectMembership> getProjectMembers(Project project) {
         return this.projectMembershipRepository.findByProject(project);
+    }
+
+    /**
+     * Returns list of members in given project with any of the given roles.
+     *
+     * @param project The project whose members are retrieved.
+     * @param projectRoles The project roles to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
+        return this.projectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
+    }
+
+    /**
+     * Returns list of members in given project with the given role.
+     *
+     * @param project The project whose members are retrieved.
+     * @param projectRole The project role to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
+        return getProjectMembersWithRoles(project, List.of(projectRole));
     }
 
     /**

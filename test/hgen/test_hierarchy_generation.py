@@ -15,8 +15,9 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.base_tests.base_test import BaseTest, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
@@ -51,7 +52,7 @@ class TestHierarchyGeneration(BaseTest):
             tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
 
             hgen = self.get_hierarchy_generator(tgen_trainer, dataset_creator_for_sources=dataset_creator)
-            generated_dataset = hgen.run(self.LAYER_ID)
+            generated_dataset = hgen.run()
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
 
@@ -123,10 +124,11 @@ class TestHierarchyGeneration(BaseTest):
     @mock.patch("openai.Completion.create")
     def test_create_linked_dataset_for_intra_level_artifacts(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()))
         artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
-        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, layer_id)
+        hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()),
+                                            layer_id=layer_id)
+        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df)
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
             self.assertLess(label - 0.4012, 0.001)
@@ -197,32 +199,10 @@ class TestHierarchyGeneration(BaseTest):
     def get_dataset_creator(**params):
         return PromptDatasetCreator(summarizer=Summarizer(), **params)
 
-    @staticmethod
-    def get_hierarchy_generator(tgen_trainer: OpenAiTrainer, **params):
+    def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
         hgen_trainer_params = {"trainer_args": OpenAiArgs(metrics=[]),
                                "prompt_generator": CreationPromptGenerator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
-        return HierarchyGenerator(tgen_trainer=tgen_trainer, hgen_trainer_class=OpenAiTrainer, **params, **hgen_trainer_params)
-
-    def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame,
-                               use_targets_only: bool = False,
-                               prompt_generator=CreationPromptGenerator()):
-        prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_generator)
-        if not use_targets_only:
-            PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
-        else:
-            PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
-
-    @mock.patch("openai.Completion.create")
-    def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):
-        """
-        Verifies that entries are properly summarized by reader
-        :return: None
-        """
-        mock_completion.side_effect = fake_open_ai_completion
-        prompt_dataset: PromptDataset = dataset_creator.create()
-        for row in artifacts_entries:
-            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
-        artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
-            else prompt_dataset.trace_dataset.artifact_df
-        TestAssertions.verify_entities_in_df(self, artifacts_entries, artifacts_df)
+        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_class=OpenAiTrainer, hgen_trainer_params=hgen_trainer_params,
+                        source_layer_id=self.LAYER_ID if not layer_id else layer_id,
+                        **params)
+        return HierarchyGenerator(args)

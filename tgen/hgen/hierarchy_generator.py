@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Any, Union, Type
+from typing import List, Any, Union
 
 from tgen.data.clustering.SupportedClusteringMethod import SupportedClusteringMethod
 from tgen.data.clustering.i_clustering import Clusters
@@ -12,44 +12,38 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.hgen.hgen_args import HGenArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 
 
 class HierarchyGenerator(BaseObject):
 
-    def __init__(self, hgen_trainer_class: Type[AbstractTrainer], dataset_creator_for_sources: TraceDatasetCreator = None,
-                 tgen_trainer: AbstractTrainer = None, **hgen_trainer_params):
-        """
-        Initializes the generator with the trainer used for creating trace links
-        :param tgen_trainer: The trainer used for creating trace links
-        :param hgen_trainer: The trainer used for generating higher level artifacts
-        """
-        assert tgen_trainer or dataset_creator_for_sources, "Must provide either a dataset creator to make a " \
-                                                            "dataset with traces between artifacts of the source layer " \
-                                                            "or a trace generation trainer to create one."
-        self.tgen_trainer = tgen_trainer
-        self.hgen_trainer_class = hgen_trainer_class
-        self.hgen_trainer_params = hgen_trainer_params
-        self.dataset_creator_for_sources = dataset_creator_for_sources
+    """
+    Responsible for generating higher-level artifacts from low-level artifacts
+    """
 
-    def run(self, layer_id: Any) -> TraceDataset:
+    def __init__(self, args: HGenArgs):
+        """
+        Initializes the generator with necessary trainer information
+        :param args: The arguments required for the hierarchy generation
+        """
+        self.args = args
+
+    def run(self) -> TraceDataset:
         """
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
-        :param layer_id: ID of the layer to generate higher-level artifacts for
         :return:  A new trace dataset containing generated higher-level artifacts
         """
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
-        if self.tgen_trainer:
-            trace_dataset_with_sources = self.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
+        if self.args.tgen_trainer:
+            trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
             assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
-            source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(trace_dataset_with_sources.artifact_df,
-                                                                                              layer_id)
+            source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(trace_dataset_with_sources.artifact_df)
         else:
-            trace_dataset_with_sources = self.dataset_creator_for_sources.create()
+            trace_dataset_with_sources = self.args.dataset_creator_for_sources.create()
             source_layer_only_dataset = self._create_trace_dataset_with_single_layer(trace_dataset_with_sources.artifact_df,
-                                                                                     layer_id,
+                                                                                     self.args.source_layer_id,
                                                                                      trace_dataset_with_sources.trace_df)
 
         # Step 2: Create clusters of related artifacts
@@ -57,40 +51,37 @@ class HierarchyGenerator(BaseObject):
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
-        hgen_trainer = self.hgen_trainer_class(trainer_dataset_manager=hgen_dataset_manager, **self.hgen_trainer_params)
+        hgen_trainer = self.args.hgen_trainer_class(trainer_dataset_manager=hgen_dataset_manager, **self.args.hgen_trainer_params)
         artifact_generations = hgen_trainer.perform_prediction().predictions
 
         # Step 4: Create new dataset with created artifacts
         return self._create_trace_dataset_with_generated_artifacts(artifact_generations, hgen_dataset_manager[DatasetRole.EVAL],
                                                                    trace_dataset_with_sources,
                                                                    cluster_dataset_creator.get_clusters(),
-                                                                   source_layer=layer_id,
-                                                                   target_layer=cluster_dataset_creator.layer_id)
+                                                                   target_layer_id=cluster_dataset_creator.layer_id)
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        hgen_dataset: TraceDataset,
-                                                       original_artifacts_dataset: Union[PromptDataset, TraceDataset],
-                                                       clusters: Clusters,
-                                                       source_layer: str, target_layer: str) -> TraceDataset:
+                                                       original_sources_dataset: Union[PromptDataset, TraceDataset],
+                                                       clusters: Clusters, target_layer_id: str) -> TraceDataset:
         """
         Creates a dataset with traces between the original lower-level artifacts and the newly generated upper-level artifacts
         :param artifact_generations: A list of generated artifact content
         :param hgen_dataset: The dataset created from the clusters
-        :param original_artifacts_dataset: The original dataset used for trace generation
-        :param source_layer: The id of the source layer (original artifacts)
-        :param target_layer: The id of the target layer (generated artifacts)
+        :param original_sources_dataset: The original dataset used for trace generation
+        :param target_layer_id: The id of the target layer (generated artifacts)
         :return: The dataset using the new generated artifacts
         """
-        original_artifact_df = original_artifacts_dataset.artifact_df
-        original_trace_dataset = original_artifacts_dataset.trace_dataset if isinstance(original_artifacts_dataset,
-                                                                                        PromptDataset) else original_artifacts_dataset
+        original_artifact_df = original_sources_dataset.artifact_df
+        original_trace_dataset = original_sources_dataset.trace_dataset if isinstance(original_sources_dataset,
+                                                                                      PromptDataset) else original_sources_dataset
         original_trace_df, original_layer_df = None, None
         if original_trace_dataset is not None:
             original_trace_df = original_trace_dataset.trace_df
             original_layer_df = original_trace_dataset.layer_mapping_df
 
         artifact_df = self._create_artifact_df_with_generated_artifacts(artifact_generations, original_artifact_df, hgen_dataset)
-        layer_df = self._create_layer_df_with_generated_artifacts(source_layer, target_layer, original_layer_df)
+        layer_df = self._create_layer_df_with_generated_artifacts(self.args.source_layer_id, target_layer_id, original_layer_df)
         trace_df = self._create_trace_df_with_generated_artifacts(artifact_df, clusters, original_trace_df)
         return TraceDataset(artifact_df, trace_df, layer_df)
 
@@ -144,14 +135,14 @@ class HierarchyGenerator(BaseObject):
         layer_df.add_layer(source_layer, target_layer)
         return layer_df
 
-    def _create_linked_dataset_for_intra_level_artifacts(self, artifacts_df: ArtifactDataFrame, layer_id: Any = None) -> TraceDataset:
+    def _create_linked_dataset_for_intra_level_artifacts(self, artifacts_df: ArtifactDataFrame) -> TraceDataset:
         """
         Creates a trace dataset from predictions for trace links within the same layer
-        :param layer_id: ID of the layer to make predictions for
+        :param artifacts_df: Dataframe containing all source artifacts
         :return: The dataset containing the trace link predictions
         """
-        single_layer_dataset = self._create_trace_dataset_with_single_layer(artifacts_df, layer_id)
-        prediction_entries = self.tgen_trainer.perform_prediction(dataset=single_layer_dataset).prediction_entries
+        single_layer_dataset = self._create_trace_dataset_with_single_layer(artifacts_df, self.args.source_layer_id)
+        prediction_entries = self.args.tgen_trainer.perform_prediction(dataset=single_layer_dataset).prediction_entries
         for entry in prediction_entries:
             entry[TraceKeys.LABEL.value] = entry.pop("score")  # replace score with label to use scores as soft labels
         trace_df = TraceDataFrame(prediction_entries)

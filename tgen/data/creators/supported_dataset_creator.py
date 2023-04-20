@@ -1,5 +1,6 @@
 from enum import Enum
 
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
 from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
@@ -11,3 +12,4 @@ class SupportedDatasetCreator(Enum):
     SPLIT = SplitDatasetCreator
     TRACE = TraceDatasetCreator
     MULTI = MultiTraceDatasetCreator
+    CLUSTER = ClusterDatasetCreator

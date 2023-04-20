@@ -139,3 +139,13 @@ class PromptDataset(iDataset):
         :return: True when project data in the form of an artifacts_df or trace_dataset has been provided, else False
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Overriding to allow direct access to trace dataset elements
+        :param item: The attribute name to get
+        :return: The attribute from trace dataset if it exists else attribute error is raised
+        """
+        if hasattr(self.trace_dataset, item):
+            return getattr(self.trace_dataset, item)
+        raise super().__getattr__(item)

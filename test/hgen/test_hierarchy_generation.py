@@ -1,34 +1,228 @@
 import uuid
+from copy import deepcopy
 from unittest import mock
 
+import networkx as nx
+
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.testres.base_tests.base_test import BaseTest, fake_open_ai_completion
-from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
+from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
+from tgen.util.enum_util import EnumDict
+
+
+def fake_clustering(G: nx.Graph):
+    return {node: i % 4 for i, node in enumerate(G.nodes)}
 
 
 class TestHierarchyGeneration(BaseTest):
+    LAYER_ID = str(uuid.uuid4())
+
+    class FakeDatasetCreator:
+
+        def create(self) -> TraceDataset:
+            trace_dataset_creator = TestHierarchyGeneration.get_dataset_creator_with_trace_dataset_creator()
+            dataset = trace_dataset_creator.create().trace_dataset
+            dataset.artifact_df = TestHierarchyGeneration.set_all_artifacts_to_same_layer(dataset.artifact_df)
+            return dataset
 
     @mock.patch("community.best_partition")
     @mock.patch("openai.Completion.create")
-    def test_summarize(self, mock_completion: mock.MagicMock, mock_partition: mock.MagicMock):
+    def test_run(self, mock_completion: mock.MagicMock, mock_partition: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        reader = ArtifactTestProject().get_project_reader()
-        mock_partition.return_value = {entry["id"]: i % 4 for i, entry in enumerate(ArtifactTestProject().get_artifact_entries())}
-        trainer_dataset_manager = TrainerDatasetManager(summarize_dataset_creator=PromptDatasetCreator(project_reader=reader))
-        layer_id = str(uuid.uuid4())
-        layer_ids = [layer_id for _ in trainer_dataset_manager[DatasetRole.SUMMARIZE].artifact_df.index]
-        trainer_dataset_manager[DatasetRole.SUMMARIZE].artifact_df[ArtifactKeys.LAYER_ID] = layer_ids
-        tgen_trainer = OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]))
-        hgen_trainer = OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]),
-                                     prompt_generator=CreationPromptGenerator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY))
-        hgen = HierarchyGenerator(tgen_trainer, hgen_trainer)
-        dataset = hgen.run(layer_id)
-        dataset
+        mock_partition.side_effect = fake_clustering
+        dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
+                            self.get_dataset_creator_with_trace_dataset_creator(),
+                            self.FakeDatasetCreator()]
+        for i, dataset_creator in enumerate(dataset_creators):
+            tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
+
+            hgen = self.get_hierarchy_generator(tgen_trainer, dataset_creator_for_sources=dataset_creator)
+            generated_dataset = hgen.run(self.LAYER_ID)
+            orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
+                else PromptDataset(trace_dataset=dataset_creator.create())
+
+            self.assertEqual(len(orig_dataset.artifact_df) + 4, len(generated_dataset.artifact_df))
+            expected_n_traces = len(orig_dataset.artifact_df) * 4
+            if hasattr(orig_dataset.trace_dataset, "trace_df"):
+                expected_n_traces += len(orig_dataset.trace_dataset)
+            self.assertEqual(expected_n_traces, len(generated_dataset))
+            expected_n_layers = 1
+            if hasattr(orig_dataset.trace_dataset, "layer_mapping_df"):
+                expected_n_layers += len(orig_dataset.trace_dataset.layer_mapping_df)
+            self.assertEqual(expected_n_layers, len(generated_dataset.layer_mapping_df))
+
+    def test_create_artifacts_df_with_generated_artifacts(self):
+        hgen_dataset = PromptTestProject.get_trace_dataset_creator().create()
+        generated_content = "generated content"
+        artifact_generations = [generated_content for _ in hgen_dataset.artifact_df.index]
+        orig_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ["original_id"], ArtifactKeys.CONTENT: ["original_content"],
+                                              ArtifactKeys.LAYER_ID: ["original_layer"]})
+        artifact_df = HierarchyGenerator._create_artifact_df_with_generated_artifacts(artifact_generations, orig_artifact_df,
+                                                                                      hgen_dataset)
+        expected_entities = [EnumDict({ArtifactKeys.ID: id_, ArtifactKeys.CONTENT: artifact[ArtifactKeys.CONTENT]})
+                             for id_, artifact in orig_artifact_df.itertuples()]
+        expected_entities.extend([EnumDict({ArtifactKeys.ID: id_, ArtifactKeys.CONTENT: generated_content})
+                                  for id_ in hgen_dataset.artifact_df.index])
+        TestAssertions.verify_entities_in_df(self, expected_entities, artifact_df)
+
+    def test_create_trace_df_with_generated_artifacts(self):
+        def verify_trace_df(df, n_expected):
+            self.assertEqual(len(trace_df), n_expected)
+            for source_id, artifact in layer_artifacts.itertuples():
+                for target_id in range(n_clusters):
+                    self.assertIsNotNone(df.get_link(source_id=source_id, target_id=str(target_id)))
+
+        dataset = PromptTestProject.get_trace_dataset_creator().create()
+        layer_artifacts = dataset.artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] ==
+                                                                        dataset.artifact_df[ArtifactKeys.LAYER_ID][0])
+        n_clusters = 4
+        clusters = {id_: str(i % n_clusters) for i, id_ in enumerate(dataset.artifact_df.index)}
+        new_artifacts_df = deepcopy(dataset.artifact_df)
+        for i in range(n_clusters):
+            new_artifacts_df.add_artifact(str(i), "generated content")
+
+        # Without original trace df
+        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(new_artifacts_df, clusters)
+        total_traces = (len(clusters) - len(layer_artifacts)) + (len(layer_artifacts) * n_clusters)
+        verify_trace_df(trace_df, total_traces)
+
+        # With original trace df
+        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(new_artifacts_df, clusters, dataset.trace_df)
+        total_traces += len(dataset.trace_df)
+        verify_trace_df(trace_df, total_traces)
+        for id_, trace in dataset.trace_df.itertuples():
+            self.assertIsNotNone(trace_df.get_link(id_))
+
+    def test_create_layer_df_with_generated_artifacts(self):
+        # Without original layer dataframe
+        expected_entities = [EnumDict({LayerKeys.SOURCE_TYPE: "source_layer", LayerKeys.TARGET_TYPE: "target_layer"})]
+        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts("source_layer", "target_layer")
+        TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
+
+        # With original layer dataframe
+        trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
+        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts("source_layer", "target_layer",
+                                                                                trace_dataset.layer_mapping_df)
+        expected_entities.extend([layer for i, layer in trace_dataset.layer_mapping_df.itertuples()])
+        TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
+
+    @mock.patch("openai.Completion.create")
+    def test_create_linked_dataset_for_intra_level_artifacts(self, mock_completion: mock.MagicMock):
+        mock_completion.side_effect = fake_open_ai_completion
+        hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()))
+        artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
+        layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
+        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, layer_id)
+        self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
+        for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
+            self.assertLess(label - 0.4012, 0.001)
+
+    def test_create_trace_dataset_for_single_layer(self):
+        artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
+        layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
+
+        # Dont supply trace dataframe
+        single_layer_trace_dataset = HierarchyGenerator._create_trace_dataset_with_single_layer(artifact_df, layer_id)
+        self.verify_single_layer_dataset(single_layer_trace_dataset, artifact_df, layer_id)
+
+        # Do supply trace dataframe
+        layer_artifact_ids = list(single_layer_trace_dataset.artifact_df.index)
+        source, target = layer_artifact_ids[0], layer_artifact_ids[1]
+        trace_df = TraceDataFrame({TraceKeys.SOURCE: [source], TraceKeys.TARGET: [target], TraceKeys.LABEL: [1]})
+        single_layer_trace_dataset = HierarchyGenerator._create_trace_dataset_with_single_layer(artifact_df, layer_id, trace_df)
+        self.verify_single_layer_dataset(single_layer_trace_dataset, artifact_df, layer_id)
+        self.assertEqual(single_layer_trace_dataset.trace_df.get_link(source_id=source, target_id=target)[TraceKeys.LABEL], 1)
+
+    def verify_single_layer_dataset(self, dataset, artifact_df, layer_id):
+        layer_artifacts = artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
+        n_layer_artifacts = len(layer_artifacts)
+        expected_entites = [EnumDict({ArtifactKeys.ID: id_}) for id_ in layer_artifacts.index]
+        TestAssertions.verify_entities_in_df(self, expected_entites, dataset.artifact_df)
+        self.assertEqual(n_layer_artifacts * (n_layer_artifacts - 1), len(dataset))
+        for id_, link in dataset.trace_df.itertuples():
+            self.assertIn(link[TraceKeys.SOURCE], layer_artifacts)
+            self.assertIn(link[TraceKeys.TARGET], layer_artifacts)
+        self.assertEqual(1, len(dataset.layer_mapping_df))
+
+    @staticmethod
+    def get_tgen_trainer(dataset_creator):
+        trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
+        return OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]))
+
+    @staticmethod
+    def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):
+        trainer_dataset_manager = TrainerDatasetManager(
+            eval_dataset_creator=dataset_creator)
+        dataset = trainer_dataset_manager[DatasetRole.EVAL]
+        if dataset.artifact_df is not None:
+            dataset.artifact_df = TestHierarchyGeneration.set_all_artifacts_to_same_layer(dataset.artifact_df)
+        return trainer_dataset_manager
+
+    @staticmethod
+    def set_all_artifacts_to_same_layer(artifact_df):
+        layer_ids = [TestHierarchyGeneration.LAYER_ID for _ in artifact_df.index]
+        artifact_df[ArtifactKeys.LAYER_ID] = layer_ids
+        return artifact_df
+
+    @staticmethod
+    def get_dataset_creator_with_artifact_project_reader():
+        artifact_project_reader = PromptTestProject.get_artifact_project_reader()
+        return TestHierarchyGeneration.get_dataset_creator(project_reader=artifact_project_reader)
+
+    @staticmethod
+    def get_dataset_creator_with_prompt_project_reader():
+        prompt_project_reader = PromptTestProject.get_project_reader()
+        return TestHierarchyGeneration.get_dataset_creator(project_reader=prompt_project_reader)
+
+    @staticmethod
+    def get_dataset_creator_with_trace_dataset_creator():
+        trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
+        return TestHierarchyGeneration.get_dataset_creator(trace_dataset_creator=trace_dataset_creator)
+
+    @staticmethod
+    def get_dataset_creator(**params):
+        return PromptDatasetCreator(summarizer=Summarizer(), **params)
+
+    @staticmethod
+    def get_hierarchy_generator(tgen_trainer: OpenAiTrainer, **params):
+        hgen_trainer_params = {"trainer_args": OpenAiArgs(metrics=[]),
+                               "prompt_generator": CreationPromptGenerator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
+        return HierarchyGenerator(tgen_trainer=tgen_trainer, hgen_trainer_class=OpenAiTrainer, **params, **hgen_trainer_params)
+
+    def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame,
+                               use_targets_only: bool = False,
+                               prompt_generator=CreationPromptGenerator()):
+        prompt_dataset = dataset_creator.create()
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_generator)
+        if not use_targets_only:
+            PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
+        else:
+            PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
+
+    @mock.patch("openai.Completion.create")
+    def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):
+        """
+        Verifies that entries are properly summarized by reader
+        :return: None
+        """
+        mock_completion.side_effect = fake_open_ai_completion
+        prompt_dataset: PromptDataset = dataset_creator.create()
+        for row in artifacts_entries:
+            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+        artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
+            else prompt_dataset.trace_dataset.artifact_df
+        TestAssertions.verify_entities_in_df(self, artifacts_entries, artifacts_df)

@@ -1,14 +1,14 @@
 from abc import abstractmethod
-from collections import namedtuple
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union, Iterable
+from typing import Any, Dict, List, Union, Callable
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
 from tgen.util import enum_util
+from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
 
@@ -154,7 +154,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return enum dictionary of data
         """
         for row in super().itertuples(index, name):
-            if hasattr(row,"_asdict"):
+            if hasattr(row, "_asdict"):
                 dict_ = EnumDict(row._asdict())
                 index = dict_.pop("Index")
                 if self.index_name():
@@ -162,6 +162,22 @@ class AbstractProjectDataFrame(pd.DataFrame):
                 yield index, dict_
             else:
                 yield row
+
+    def filter_by_row(self, filter_lambda: Callable) -> "AbstractProjectDataFrame":
+        """
+        Returns a copy of the dataframe with filter applied to rows
+        :param filter_lambda: The lambda used to filter out rows
+        :return: A copy of the dataframe with filter applied to rows
+        """
+        return self.__class__(DataFrameUtil.filter_df_by_row(self, filter_lambda))
+
+    def filter_by_index(self, index_to_filter: List) -> "AbstractProjectDataFrame":
+        """
+        Returns a copy of the dataframe with filter applied to rows
+        :param index_to_filter: The list of indices to filter out
+        :return: A copy of the dataframe with filter applied to rows
+        """
+        return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

@@ -1,8 +1,8 @@
 import uuid
-from typing import Dict
 
 from tgen.data.clustering.SupportedClusteringMethod import SupportedClusteringMethod
 from tgen.data.clustering.i_clustering import Clusters, iClusteringMethod
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
@@ -12,45 +12,52 @@ from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 
 
-class ArtifactClusterer(BaseObject):
+class ClusterDatasetCreator(AbstractDatasetCreator):
     """
     Responsible for clustering dataset artifacts
     """
 
-    def __init__(self, trace_dataset: TraceDataset):
+    def __init__(self, trace_dataset: TraceDataset, cluster_method: SupportedClusteringMethod):
         """
-        Initializes the clusterer with a dataset with artifacts to be clustered
+        Initializes with a dataset with artifacts to be clustered
         :param trace_dataset: The dataset to perform clustering on
         """
+        super().__init__()
         self.trace_dataset = trace_dataset
+        self.cluster_method = cluster_method
         self.layer_id = str(uuid.uuid4())
-        self.__method_to_clusters: Dict[SupportedClusteringMethod, Clusters] = {}
+        self.__clusters: Clusters = {}
 
-    def get_clusters(self, clustering_method: SupportedClusteringMethod) -> Clusters:
+    def get_clusters(self) -> Clusters:
         """
         Returns clusters of artifacts in the dataset
-        :param clustering_method: The method to use to cluster the dataset
         :return: A dictionary mapping artifact id to its cluster num
         """
-        if clustering_method not in self.__method_to_clusters:
-            clustering_method_cls: iClusteringMethod = clustering_method.value
+        if not self.__clusters:
+            clustering_method_cls: iClusteringMethod = self.cluster_method.value
             clusters = clustering_method_cls.cluster(trace_dataset=self.trace_dataset)
             cluster_num_2_id = {cluster_num: str(uuid.uuid4()) for cluster_num in clusters.values()}
-            self.__method_to_clusters[clustering_method] = {artifact_id: cluster_num_2_id[cluster_num]
-                                                            for artifact_id, cluster_num in clusters.items()}
-        return self.__method_to_clusters[clustering_method]
+            self.__clusters = {artifact_id: cluster_num_2_id[cluster_num]
+                               for artifact_id, cluster_num in clusters.items()}
+        return self.__clusters
 
-    def create_dataset_from_clusters(self, clustering_method: SupportedClusteringMethod) -> TraceDataset:
+    def create(self) -> TraceDataset:
         """
         Creates a trace dataset with each cluster from the given method as a single artifact
-        :param clustering_method: The method to use to cluster the dataset
         :return: A trace dataset constructed from the clusters
         """
-        clusters = self.get_clusters(clustering_method)
+        clusters = self.get_clusters()
         artifact_df = self._get_artifact_df_from_clusters(clusters, self.trace_dataset.artifact_df, self.layer_id)
         trace_df = self._get_trace_df_from_clusters(clusters, self.trace_dataset.trace_df)
         layer_df = self._get_layer_df_from_clusters(self.layer_id)
         return TraceDataset(artifact_df=artifact_df, trace_df=trace_df, layer_mapping_df=layer_df)
+
+    def get_name(self) -> str:
+        """
+        Returns the name of the dataset
+        :return: The name of the dataset
+        """
+        return self.cluster_method.value
 
     @staticmethod
     def _get_layer_df_from_clusters(layer_id: str) -> LayerDataFrame:

@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,9 +51,10 @@ public class ProjectMembershipController extends BaseController {
                                                                @RequestBody ProjectMembershipRequest request)
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         ProjectMembership updatedProjectMembership = this.serviceProvider
             .getMemberService()
-            .addOrUpdateProjectMembership(project, request.getMemberEmail(), request.getProjectRole());
+            .addOrUpdateProjectMembership(project, user, request.getMemberEmail(), request.getProjectRole());
         this.serviceProvider
             .getNotificationService()
             .broadcastChange(EntityChangeBuilder

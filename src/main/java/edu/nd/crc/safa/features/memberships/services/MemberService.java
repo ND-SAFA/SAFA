@@ -60,18 +60,18 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * Finds and adds given member to project with specified role.
      *
      * @param project        The project to add the member to.
+     * @param currentUser    The user performing the update.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
      * @return {@link ProjectMembership} Updated project membership.
      * @throws SafaError Throws error if given role is greater than the role
      *                   of the user issuing this request.
      */
-    public ProjectMembership addOrUpdateProjectMembership(Project project,
+    public ProjectMembership addOrUpdateProjectMembership(Project project, SafaUser currentUser,
                                                           String newMemberEmail,
                                                           ProjectRole newMemberRole) throws SafaError {
         // Step - Find member being added and the current member.
         SafaUser newMember = this.safaUserService.getUserByEmail(newMemberEmail);
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
 
         // Step - Assert that member being added has fewer permissions than current user.
         List<ProjectMembership> projectMemberships = this.projectMembershipRepository.findByProject(project);

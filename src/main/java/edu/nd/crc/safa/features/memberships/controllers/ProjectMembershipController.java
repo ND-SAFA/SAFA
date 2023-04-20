@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -95,23 +96,25 @@ public class ProjectMembershipController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
-        ProjectMembership projectMembership = this.serviceProvider
-            .getMemberService()
-            .getMembershipById(projectMembershipId);
+        MemberService memberService = serviceProvider.getMemberService();
+
+        ProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
 
         // Step - Verify user has sufficient permissions
-        // You can always remove yourself, and you can remove others if you have edit permissions
+        // You can always remove yourself, and you can remove others if you have admin permissions
         Project project = projectMembership.getProject();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         if (!projectMembership.getMember().equals(user)) {
             permissionService.requireAdminPermission(project, user);
         }
 
-        // Step - Verify last member not being deleted.
-        List<ProjectMembership> projectMemberships =
-            this.serviceProvider.getMemberService().getProjectMembersWithRole(project, ProjectRole.OWNER);
-        if (projectMemberships.size() == 1 && projectMemberships.get(0).getMembershipId().equals(projectMembershipId)) {
-            throw new SafaError("Cannot delete last owner of project.");
+        // Step - Verify last owner not being deleted.
+        if (projectMembership.getRole() == ProjectRole.OWNER) {
+            List<ProjectMembership> projectMemberships =
+                memberService.getProjectMembersWithRole(project, ProjectRole.OWNER);
+            if (projectMemberships.size() == 1) {
+                throw new SafaError("Cannot delete last owner of project.");
+            }
         }
 
         // Step - Delete membership

@@ -1,0 +1,42 @@
+{
+    viewer {
+        repositories(first: 100) {
+            edges {
+                node {
+                    id
+                    name
+                    owner {
+                        login
+                    }
+                    nameWithOwner
+                    isPrivate
+                    url
+                    description
+                    visibility
+                    createdAt
+                    primaryLanguage {
+                        name
+                    }
+                    defaultBranchRef {
+                        name
+                    }
+                    refs(refPrefix: "refs/heads/", first: 100) {
+                        edges {
+                            node {
+                                name
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
+                    }
+                }
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}

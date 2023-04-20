@@ -1,8 +1,12 @@
 package edu.nd.crc.safa.features.github.entities.app;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
+
+import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
+import edu.nd.crc.safa.features.github.entities.api.graphql.EdgeNode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,9 +19,13 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GithubRepositoryDTO {
 
-    private Long id;
+    private String id;
 
     private String name;
+
+    private String owner;
+
+    private String nameWithOwner;
 
     @JsonProperty("private")
     private Boolean isPrivate;
@@ -29,28 +37,48 @@ public class GithubRepositoryDTO {
 
     private String visibility;
 
-    @JsonProperty("fork")
-    private Boolean isFork;
-
-    private Long size;
-
     @JsonProperty("default_branch")
     private String defaultBranch;
-
-    private List<String> topics;
 
     @JsonProperty("created_at")
     private Date creationDate;
 
     private String language;
 
-    @JsonProperty("forks_count")
-    private String forksCount;
+    private List<String> branches;
 
-    private String ownerLoginHandler;
+    public static List<GithubRepositoryDTO> fromGraphQlResponse(GithubGraphQlRepositoriesResponse gqlResponse) {
+        if (gqlResponse == null) {
+            return new ArrayList<>();
+        }
 
-    @JsonProperty("owner")
-    public void setOwnerLoginHandler(Map<String, String> ownerData) {
-        this.ownerLoginHandler = ownerData.get("login");
+        return gqlResponse.getData().getViewer().getRepositories().getEdges().stream()
+            .map(EdgeNode::getNode)
+            .map(repo -> {
+                GithubRepositoryDTO ghDto = new GithubRepositoryDTO();
+                ghDto.setId(repo.getId());
+                ghDto.setName(repo.getName());
+                ghDto.setOwner(repo.getOwner().getLogin());
+                ghDto.setNameWithOwner(repo.getNameWithOwner());
+                ghDto.setIsPrivate(repo.isPrivate());
+                ghDto.setUrl(repo.getUrl());
+                ghDto.setDescription(repo.getDescription());
+                ghDto.setVisibility(repo.getVisibility().name());
+                ghDto.setDefaultBranch(repo.getDefaultBranchRef().getName());
+                ghDto.setCreationDate(repo.getCreatedAt());
+
+                if (repo.getPrimaryLanguage() != null) {
+                    ghDto.setLanguage(repo.getPrimaryLanguage().getName());
+                }
+
+                List<String> branches = repo.getRefs().getEdges().stream()
+                    .map(EdgeNode::getNode)
+                    .map(GithubGraphQlRepositoriesResponse.Payload.Branch::getName)
+                    .collect(Collectors.toList());
+                ghDto.setBranches(branches);
+
+                return ghDto;
+            }).collect(Collectors.toList());
+
     }
 }

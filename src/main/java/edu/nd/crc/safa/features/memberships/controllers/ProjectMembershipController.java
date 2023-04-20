@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,15 +94,20 @@ public class ProjectMembershipController extends BaseController {
             .getMemberService()
             .getMembershipById(projectMembershipId);
 
-        // Step - Verify last member not being deleted.
+        // Step - Verify user has sufficient permissions
+        // You can always remove yourself, and you can remove others if you have edit permissions
         Project project = projectMembership.getProject();
-        List<ProjectMembership> projectMemberships = this.serviceProvider.getMemberService().getProjectMembers(project);
-        if (projectMemberships.size() == 1) {
-            throw new SafaError("Cannot delete last member of project.");
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        if (!projectMembership.getMember().equals(user)) {
+            this.resourceBuilder.setProject(project).withEditProject();
         }
 
-        // Step - Verify user has sufficient permissions
-        this.resourceBuilder.setProject(project).withEditProject();
+        // Step - Verify last member not being deleted.
+        List<ProjectMembership> projectMemberships =
+            this.serviceProvider.getMemberService().getProjectMembersWithRole(project, ProjectRole.OWNER);
+        if (projectMemberships.size() == 1 && projectMemberships.get(0).getMembershipId().equals(projectMembershipId)) {
+            throw new SafaError("Cannot delete last owner of project.");
+        }
 
         // Step - Delete membership
         this.serviceProvider.getProjectMembershipRepository().delete(projectMembership);

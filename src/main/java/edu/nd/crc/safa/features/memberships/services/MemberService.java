@@ -116,6 +116,28 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     }
 
     /**
+     * Returns list of members in given project with any of the given roles.
+     *
+     * @param project The project whose members are retrieved.
+     * @param projectRoles The project roles to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
+        return this.projectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
+    }
+
+    /**
+     * Returns list of members in given project with the given role.
+     *
+     * @param project The project whose members are retrieved.
+     * @param projectRole The project role to match.
+     * @return List of project memberships relating members to projects.
+     */
+    public List<ProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
+        return getProjectMembersWithRoles(project, List.of(projectRole));
+    }
+
+    /**
      * Deletes project membership effectively removing user from
      * associated project
      *

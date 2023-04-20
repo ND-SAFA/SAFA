@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 from typing import Dict
 
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
 
 
 @dataclass
-class ClassificationPromptGenerator(AbstractPromptGenerator):
-    base_prompt = BasePrompt.CLASSIFICATION
-    pos_class = "yes"
-    neg_class = "no"
-    artifact_prompt_format = "\n1. {}\n2. {}"
+class ClassificationPromptCreator(AbstractPromptCreator):
+    base_prompt: BasePrompt = BasePrompt.CLASSIFICATION
+    pos_class: str = "yes"
+    neg_class: str = "no"
+    artifact_prompt_format: str = "\n1. {}\n2. {}"
 
-    def generate(self, source_content: str, target_content: str, label: int = None) -> Dict[str, str]:
+    def create(self, source_content: str, target_content: str, label: int = None) -> Dict[str, str]:
         """
         Generates the prompt and response
         :source_content: The content of the source artifact

@@ -7,7 +7,7 @@ import mock
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
+from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -29,11 +29,11 @@ class TestPromptDataset(BaseTest):
         openai_file_create_mock.return_value = TestResponse()
         outputs = self.all_datasets_test(
             lambda dataset: dataset.get_project_file_id(
-                prompt_generator=CreationPromptGenerator() if dataset._has_trace_data else None),
+                prompt_creator=GenerationPromptCreator() if dataset._has_trace_data else None),
         )
         dataset = self.get_dataset_with_prompt_df()
         dataset.data_export_path = TEST_OUTPUT_DIR
-        outputs["with_output_path"] = dataset.get_project_file_id(CreationPromptGenerator())
+        outputs["with_output_path"] = dataset.get_project_file_id(GenerationPromptCreator())
         for type_, file_id in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)
             if type_ == "id":
@@ -43,14 +43,14 @@ class TestPromptDataset(BaseTest):
 
     def test_export_and_get_dataframe(self):
         outputs = self.all_datasets_test(
-            lambda dataset: dataset.export_prompt_dataset(dataset.get_prompts_dataframe(CreationPromptGenerator()),
+            lambda dataset: dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()),
                                                           TEST_OUTPUT_DIR),
             ["id"]
         )
         dataset = self.get_dataset_with_prompt_df()
-        outputs["with_filename"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(CreationPromptGenerator()),
+        outputs["with_filename"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()),
                                                                  os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
-        outputs["no_output_path"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(CreationPromptGenerator()))
+        outputs["no_output_path"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()))
         expected_trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
         for type_, output in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)

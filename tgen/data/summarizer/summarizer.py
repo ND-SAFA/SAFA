@@ -5,7 +5,7 @@ import pandas as pd
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
+from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -38,8 +38,8 @@ class Summarizer(BaseObject):
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content)
-        prompt_generator = CreationPromptGenerator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
-        summarizations = self._summarize_chunks(chunks, prompt_generator, model_path, self.args)
+        prompt_creator = GenerationPromptCreator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
+        summarizations = self._summarize_chunks(chunks, prompt_creator, model_path, self.args)
         return os.linesep.join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str):
@@ -53,19 +53,19 @@ class Summarizer(BaseObject):
         return df
 
     @staticmethod
-    def _summarize_chunks(chunks: List[str], prompt_generator: CreationPromptGenerator, model_path: str, args: OpenAiArgs) -> List[str]:
+    def _summarize_chunks(chunks: List[str], prompt_creator: GenerationPromptCreator, model_path: str, args: OpenAiArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model
         :param model_path: The model to use for summarizations
-        :param prompt_generator: The generator to use to create prompts for summarizations
+        :param prompt_creator: The generator to use to create prompts for summarizations
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        prompts = [prompt_generator.generate(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
+        prompts = [prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
                    for chunk in chunks]
         res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
-                                                 **args.to_params(prompt_generator, TrainerTask.PREDICT))
-        return [choice["text"].strip() for choice in res["choices"]]
+                                                 **args.to_params(prompt_creator, TrainerTask.PREDICT))
+        return [choice.text.strip() for choice in res.choices]
 
     @staticmethod
     def _get_chunker(path_to_file: str = None) -> SupportedChunker:

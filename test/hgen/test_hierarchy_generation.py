@@ -10,14 +10,15 @@ from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
+from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.testres.base_tests.base_test import BaseTest, fake_open_ai_completion
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
@@ -201,7 +202,7 @@ class TestHierarchyGeneration(BaseTest):
 
     def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
         hgen_trainer_params = {"trainer_args": OpenAiArgs(metrics=[]),
-                               "prompt_generator": CreationPromptGenerator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
+                               "prompt_creator": GenerationPromptCreator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
         args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_class=OpenAiTrainer, hgen_trainer_params=hgen_trainer_params,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **params)

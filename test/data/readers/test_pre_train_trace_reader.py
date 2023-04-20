@@ -5,7 +5,8 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 from tgen.util.file_util import FileUtil
 

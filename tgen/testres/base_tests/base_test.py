@@ -1,6 +1,5 @@
 import os
 import shutil
-from copy import deepcopy
 from typing import List, Sized, Tuple
 from unittest import TestCase
 
@@ -139,23 +138,3 @@ class BaseTest(TestCase):
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
 
 
-SUMMARY_FORMAT = "Summary of {}"
-
-
-def fake_open_ai_completion(model, prompt, **args):
-    choice = {
-        "logprobs": {
-            "top_logprobs": [
-                {
-                    " yes": -0.6815379,
-                    " no": -1.0818866
-                }
-            ]
-        },
-        "text": SUMMARY_FORMAT
-    }
-    tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]
-    choices = [deepcopy(choice) for _ in tokens]
-    for i, choice in enumerate(choices):
-        choice['text'] = choice['text'].format(tokens[i])
-    return {"choices": choices, "id": "id"}

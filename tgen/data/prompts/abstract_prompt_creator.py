@@ -10,11 +10,11 @@ from tgen.util.override import overrides
 
 
 @dataclass
-class AbstractPromptGenerator(BaseObject):
+class AbstractPromptCreator(BaseObject):
     base_prompt = BasePrompt
 
-    __PROMPT_SEPARATOR = "\n\n###\n\n"
-    __COMPLETION_SEPARATOR = "###"
+    _PROMPT_SEPARATOR = "\n\n###\n\n"
+    _COMPLETION_SEPARATOR = "###"
     COMPLETION_START = " "
 
     def format_prompt(self, base_prompt: str) -> str:
@@ -23,7 +23,7 @@ class AbstractPromptGenerator(BaseObject):
         :param base_prompt: The base prompt
         :return: The formatted prompt
         """
-        return f"{base_prompt}{self.__PROMPT_SEPARATOR}"
+        return f"{base_prompt}{self._PROMPT_SEPARATOR}"
 
     def format_completion(self, base_completion: str) -> str:
         """
@@ -31,7 +31,7 @@ class AbstractPromptGenerator(BaseObject):
         :param base_completion: The base completion
         :return: The formatted completion
         """
-        return f"{self.COMPLETION_START}{base_completion}{self.__COMPLETION_SEPARATOR}"
+        return f"{self.COMPLETION_START}{base_completion}{self._COMPLETION_SEPARATOR}"
 
     def generate_base(self, base_prompt: str, base_completion: str) -> Dict[str, str]:
         """
@@ -46,7 +46,7 @@ class AbstractPromptGenerator(BaseObject):
         })
 
     @abstractmethod
-    def generate(self, source_content: str, target_content: str, **kwargs) -> Dict[str, str]:
+    def create(self, source_content: str, target_content: str, **kwargs) -> Dict[str, str]:
         """
         Generates the prompt and response
         :source_content: The content of the source artifact
@@ -63,5 +63,5 @@ class AbstractPromptGenerator(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.prompts.supported_prompt_generator import SupportedPromptGenerator
+        from tgen.data.prompts.supported_prompt_creator import SupportedPromptGenerator
         return SupportedPromptGenerator

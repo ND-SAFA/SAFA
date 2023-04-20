@@ -1,8 +1,8 @@
 from typing import Union
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
-from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.models.model_manager import ModelManager
@@ -20,20 +20,20 @@ class OpenAiJob(AbstractTrainerJob):
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: OpenAiArgs = OpenAiArgs(),
                  base_model: str = "ada", task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None,
-                 prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator()):
+                 prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()):
         """
         Initializes job with necessary args
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_generator: Determines the expected prompt and completion format
+        :param prompt_creator: Determines the expected prompt and completion format
         :param job_args: Args for all tgen jobs
         """
         super().__init__(model_manager=ModelManager(model_path=base_model), trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task, job_args=job_args)
         self.base_model = base_model
         self.trainer_args = trainer_args
-        self.prompt_generator = prompt_generator
+        self.prompt_creator = prompt_creator
 
     @overrides(AbstractTrainerJob)
     def get_trainer(self, **kwargs) -> OpenAiTrainer:
@@ -46,7 +46,7 @@ class OpenAiJob(AbstractTrainerJob):
             self._trainer = OpenAiTrainer(trainer_args=self.trainer_args,
                                           trainer_dataset_manager=self.trainer_dataset_manager,
                                           base_model=self.base_model,
-                                          prompt_generator=self.prompt_generator)
+                                          prompt_creator=self.prompt_creator)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

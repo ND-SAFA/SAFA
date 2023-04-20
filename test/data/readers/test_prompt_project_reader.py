@@ -2,12 +2,11 @@ import json
 import os
 from unittest import mock
 
-import pandas as pd
-
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_assertions import TestAssertions
 

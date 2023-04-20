@@ -2,14 +2,14 @@ from dataclasses import dataclass
 from typing import Dict
 
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 
 
 @dataclass
-class CreationPromptGenerator(AbstractPromptGenerator):
+class GenerationPromptCreator(AbstractPromptCreator):
     base_prompt: BasePrompt = BasePrompt.SYSTEM_REQUIREMENT_CREATION
 
-    def generate(self, source_content: str, target_content: str, label: int = None) -> Dict[str, str]:
+    def create(self, source_content: str, target_content: str, label: int = None) -> Dict[str, str]:
         """
         Generates the prompt and response
         :source_content: The content of the source artifact

@@ -2,20 +2,18 @@ import os
 import uuid
 from typing import Any, Tuple
 
+import pandas as pd
+
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
-from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
+from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
-
-import pandas as pd
-
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.file_util import FileUtil
 from tgen.util.open_ai_util import OpenAiUtil
 
@@ -51,7 +49,7 @@ class PromptDataset(iDataset):
         """
         raise NotImplementedError("A prompt dataset for hugging face is currently not supported")
 
-    def to_trainer_dataset(self, prompts_generator: AbstractPromptGenerator) -> pd.DataFrame:
+    def to_trainer_dataset(self, prompts_generator: AbstractPromptCreator) -> pd.DataFrame:
         """
         Converts data to that used by Huggingface (HF) trainer.
         :param prompts_generator: The model generator determining architecture and feature function for trace links.
@@ -78,58 +76,59 @@ class PromptDataset(iDataset):
         prompt_df.to_json(export_path, orient='records', lines=True)
         return export_path, should_delete
 
-    def get_project_file_id(self, prompt_generator: AbstractPromptGenerator = None) -> str:
+    def get_project_file_id(self, prompt_creator: AbstractPromptCreator = None) -> str:
         """
         Gets the project file id used by open_ai
-        :param prompt_generator: The generator of prompts for the dataset
+        :param prompt_creator: The generator of prompts for the dataset
         :return: The project file id used by open_ai
         """
         if not self.project_file_id:
-            export_path, should_delete_path = self.export_prompt_dataset(self.get_prompts_dataframe(prompt_generator))
+            export_path, should_delete_path = self.export_prompt_dataset(self.get_prompts_dataframe(prompt_creator))
             res = OpenAiUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompts_dataframe(self, prompt_generator: AbstractPromptGenerator = None) -> pd.DataFrame:
+    def get_prompts_dataframe(self, prompt_creator: AbstractPromptCreator = None) -> pd.DataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
-        :param prompt_generator: The generator of prompts for the dataset
+        :param prompt_creator: The generator of prompts for the dataset
         :return: The prompt dataframe containing prompts and completions
         """
         if self.prompt_df is None:
-            assert prompt_generator is not None, "Must provide prompt generator to create prompt dataset for trainer"
-            assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe to generate dataframe."
-            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_generator) \
-                if self.trace_dataset and isinstance(prompt_generator, ClassificationPromptGenerator) else \
-                self._generate_prompts_dataframe_from_artifacts(prompt_generator)
+            assert prompt_creator is not None, "Must provide prompt generator to create prompt dataset for trainer"
+            assert self._has_trace_data(), "Either artifacts dataframe or trace dataset" \
+                                           " to generate dataframe."
+            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_creator) \
+                if self.trace_dataset and isinstance(prompt_creator, ClassificationPromptCreator) else \
+                self._generate_prompts_dataframe_from_artifacts(prompt_creator)
         return self.prompt_df
 
-    def _generate_prompts_dataframe_from_traces(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
+    def _generate_prompts_dataframe_from_traces(self, prompt_creator: AbstractPromptCreator) -> pd.DataFrame:
         """
         Converts trace links in to prompt format for generation model.
-        :param prompt_generator: The generator of prompts for the dataset
+        :param prompt_creator: The generator of prompts for the dataset
         :return: A prompts based dataset.
         """
         entries = []
         traces = self.trace_dataset.trace_df
         for i, row in traces.itertuples():
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
-            entry = prompt_generator.generate(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT],
-                                              label=row[TraceKeys.LABEL])
+            entry = prompt_creator.create(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT],
+                                          label=row[TraceKeys.LABEL])
             entries.append(entry)
         return PromptDataFrame(entries)
 
-    def _generate_prompts_dataframe_from_artifacts(self, prompt_generator: AbstractPromptGenerator) -> pd.DataFrame:
+    def _generate_prompts_dataframe_from_artifacts(self, prompt_creator: AbstractPromptCreator) -> pd.DataFrame:
         """
         Converts artifacts in to prompt format for generation model.
-        :param prompt_generator: The generator of prompts for the dataset
+        :param prompt_creator: The generator of prompts for the dataset
         :return: A prompts based dataset.
         """
         entries = []
         for i, row in self.artifact_df.itertuples():
-            entry = prompt_generator.generate(target_content=row[ArtifactKeys.CONTENT], source_content='')
+            entry = prompt_creator.create(target_content=row[ArtifactKeys.CONTENT], source_content='')
             entries.append(entry)
         return PromptDataFrame(entries)
 
@@ -148,4 +147,4 @@ class PromptDataset(iDataset):
         """
         if hasattr(self.trace_dataset, item):
             return getattr(self.trace_dataset, item)
-        raise super().__getattr__(item)
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")

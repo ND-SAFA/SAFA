@@ -1,12 +1,13 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
+from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_generator import AbstractPromptGenerator
-from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -27,31 +28,32 @@ class OpenAiTrainer(AbstractTrainer):
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
                  trainer_args: OpenAiArgs = OpenAiArgs(),
-                 prompt_generator: AbstractPromptGenerator = ClassificationPromptGenerator()):
+                 prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_generator: In charge of generator promtps for dataset
+        :param prompt_creator: In charge of generator promtps for dataset
         """
         self.base_model = base_model
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.prompt_generator = prompt_generator
+        self.prompt_creator = prompt_creator
         super().__init__(trainer_dataset_manager)
 
-    def perform_training(self) -> OpenAIObject:
+    def perform_training(self) -> FineTune:
         """
         Handles training of the model
         :return: The training response
         """
-        train_dataset: PromptDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
-        training_file_id = train_dataset.get_project_file_id()
-        params = self.trainer_args.to_params(self.prompt_generator, TrainerTask.TRAIN)
-        if DatasetRole.VAL in self.trainer_dataset_manager:
-            val_dataset: PromptDataset = self.trainer_dataset_manager[DatasetRole.VAL]
-            params["validation_file"] = val_dataset.get_project_file_id()
+        train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
+        training_file_id = train_dataset.get_project_file_id(self.prompt_creator)
+        include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
+        params = self.trainer_args.to_params(self.prompt_creator, TrainerTask.TRAIN, include_classification_metrics)
+        if include_classification_metrics:
+            val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
+            params["validation_file"] = val_dataset.get_project_file_id(self.prompt_creator)
         res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
                                                 model=self.base_model,
                                                 **params)
@@ -76,14 +78,13 @@ class OpenAiTrainer(AbstractTrainer):
         :param dataset: The dataset to use instead of from the dataset manager
         :return: THe prediction response
         """
-        dataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
-        if isinstance(dataset, TraceDataset):
-            dataset = PromptDataset(trace_dataset=dataset)
-        prompt_df = dataset.to_trainer_dataset(self.prompt_generator)
+        dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
+        dataset = self.convert_dataset_to_prompt_dataset(dataset)
+        prompt_df = dataset.to_trainer_dataset(self.prompt_creator)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
-                                                 **self.trainer_args.to_params(self.prompt_generator, TrainerTask.PREDICT))
+                                                 **self.trainer_args.to_params(self.prompt_creator, TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \
-            if isinstance(self.prompt_generator, ClassificationPromptGenerator) else self._create_generation_output(res)
+            if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
 
     def cleanup(self) -> None:
         """
@@ -93,14 +94,25 @@ class OpenAiTrainer(AbstractTrainer):
         pass
 
     @staticmethod
+    def convert_dataset_to_prompt_dataset(dataset: Union[PromptDataset, TraceDataset]) -> PromptDataset:
+        """
+        If the dataset is not a prompt dataset, it is converted to one
+        :param dataset: The original dataset
+        :return: The dataset a a prompt dataset
+        """
+        if not isinstance(dataset, PromptDataset):
+            dataset = PromptDataset(trace_dataset=dataset)
+        return dataset
+
+    @staticmethod
     def _create_generation_output(res: OpenAIObject):
         """
         Creates the output for a generation
         :param res: The response from the completion
         :return: The generation output
         """
-        return TracePredictionOutput(predictions=[choice["text"].strip() for choice in res["choices"]],
-                                     additional_output={"id": res["id"]})
+        return TracePredictionOutput(predictions=[choice.text.strip() for choice in res.choices],
+                                     additional_output={"id": res.id})
 
     def _create_classification_output(self, res: OpenAIObject, dataset: PromptDataset):
         """
@@ -109,10 +121,10 @@ class OpenAiTrainer(AbstractTrainer):
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        scores = list(map(lambda r: self._get_score(r["logprobs"]["top_logprobs"]), res["choices"]))
+        scores = list(map(lambda r: self._get_score(r.logprobs.top_logprobs), res.choices))
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores,
-                                       additional_output={"id": res["id"]})
+                                       additional_output={"id": res.id})
         if trace_dataset is not None:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              link_ids=trace_dataset.get_ordered_link_ids(),
@@ -130,13 +142,13 @@ class OpenAiTrainer(AbstractTrainer):
         :param probs: The probabilities of each top completion
         :return: The softmax score from the predicted completions
         """
-        assert isinstance(self.prompt_generator,
-                          ClassificationPromptGenerator), "Must provide a classification prompt generator to get prediction score"
+        assert isinstance(self.prompt_creator,
+                          ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
         if len(probs) < 1:
             return 0.5
         probs = probs[0]
-        v0 = probs.get(self.prompt_generator.COMPLETION_START + self.prompt_generator.pos_class, 0)
-        v1 = probs.get(self.prompt_generator.COMPLETION_START + self.prompt_generator.neg_class, 0)
+        v0 = probs.get(self.prompt_creator.COMPLETION_START + self.prompt_creator.pos_class, 0)
+        v1 = probs.get(self.prompt_creator.COMPLETION_START + self.prompt_creator.neg_class, 0)
         prob_v = [v0, v1]
         score = softmax(prob_v)[1]
         return score

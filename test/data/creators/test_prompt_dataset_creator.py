@@ -2,18 +2,17 @@ from unittest import mock
 
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.data.prompts.classification_prompt_generator import ClassificationPromptGenerator
-from tgen.data.prompts.creation_prompt_generator import CreationPromptGenerator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.testres.base_tests.base_test import BaseTest, SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.testres.testprojects.safa_test_project import SafaTestProject
-from tgen.util.dataframe_util import DataFrameUtil
 
 
 class TestPromptDatasetCreator(BaseTest):
@@ -22,7 +21,7 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader)
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(CreationPromptGenerator())
+        prompts_df = prompt_dataset.get_prompts_dataframe(GenerationPromptCreator())
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
     def test_project_reader_artifact_with_summarizer(self):
@@ -42,7 +41,7 @@ class TestPromptDatasetCreator(BaseTest):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator)
         trace_df = TraceDatasetCreator(PromptTestProject.SAFA_PROJECT.get_project_reader()).create().trace_df
-        self.verify_dataset_creator(dataset_creator, prompt_generator=ClassificationPromptGenerator(), trace_df=trace_df)
+        self.verify_dataset_creator(dataset_creator, prompt_creator=ClassificationPromptCreator(), trace_df=trace_df)
 
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
@@ -67,9 +66,9 @@ class TestPromptDatasetCreator(BaseTest):
         self.assertEqual(trace_dataset.project_file_id, "id")
 
     def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame, use_targets_only: bool = False,
-                               prompt_generator=CreationPromptGenerator()):
+                               prompt_creator=GenerationPromptCreator()):
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_generator)
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_creator)
         if not use_targets_only:
             PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
         else:

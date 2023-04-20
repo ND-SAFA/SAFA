@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.PermissionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,10 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectMembershipController extends BaseController {
 
+    private final PermissionService permissionService;
+
     @Autowired
     public ProjectMembershipController(ResourceBuilder resourceBuilder,
-                                       ServiceProvider serviceProvider) {
+                                       ServiceProvider serviceProvider,
+                                       PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
+        this.permissionService = permissionService;
     }
 
     /**
@@ -99,7 +104,7 @@ public class ProjectMembershipController extends BaseController {
         Project project = projectMembership.getProject();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         if (!projectMembership.getMember().equals(user)) {
-            this.resourceBuilder.setProject(project).withEditProject();
+            permissionService.requireAdminPermission(project, user);
         }
 
         // Step - Verify last member not being deleted.

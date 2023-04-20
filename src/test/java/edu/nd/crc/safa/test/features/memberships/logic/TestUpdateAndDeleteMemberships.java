@@ -45,14 +45,14 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
     }
 
     @Test
-    void testRemoveSelfAsLastAdmin() throws Exception {
+    void testRemoveSelfAsLastOwner() throws Exception {
         authorizationService.removeMemberFromProject(project, currentUser.getEmail(), status().is4xxClientError());
     }
 
     @Test
-    void testRemoveSelfWithMultipleAdmins() throws Exception {
+    void testRemoveSelfWithMultipleOwner() throws Exception {
         serviceProvider.getMemberService().addOrUpdateProjectMembership(project, currentUser,
-            Sharee.email, ProjectRole.ADMIN);
+            Sharee.email, ProjectRole.OWNER);
         authorizationService.removeMemberFromProject(project, currentUser.getEmail());
     }
 }

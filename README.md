@@ -1,5 +1,9 @@
-[![dev](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=development)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml)
-[![prod](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=production)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml)
+# Build Status
+
+| Branch | Status |
+|--------|--------|
+| dev    | [![dev](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=development)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml) |
+| prod   | [![prod](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=production)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml) |
 
 # Running SAFA Services API Locally
 

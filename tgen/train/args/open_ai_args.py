@@ -35,9 +35,12 @@ class OpenAiArgs:
         """
         assert task in self.__params, f"Unknown task {task.value}. Must choose from {self.__params.keys()}"
         params = self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task)
-        if include_classification_metrics and isinstance(prompt_creator, ClassificationPromptCreator):
-            params = self.__add_params_for_task(TrainerTask.CLASSIFICATION, params)
-            params["classification_positive_class"] = prompt_creator.format_completion(prompt_creator.pos_class)
+        if isinstance(prompt_creator, ClassificationPromptCreator):
+            if "max_tokens" in params:
+                params["max_tokens"] = 1
+            if include_classification_metrics:
+                params = self.__add_params_for_task(TrainerTask.CLASSIFICATION, params)
+                params["classification_positive_class"] = prompt_creator.format_completion(prompt_creator.pos_class)
         return params
 
     def __add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:

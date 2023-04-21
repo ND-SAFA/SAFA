@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Type
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -6,6 +7,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.util.base_object import BaseObject
+from tgen.util.override import overrides
 
 
 class AbstractTrainer(BaseObject):
@@ -39,3 +41,15 @@ class AbstractTrainer(BaseObject):
         performs any necessary cleanup at the end of the job
         :return: None
         """
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        from tgen.train.trainers.supported_trainer import SupportedTrainer
+        return SupportedTrainer
+

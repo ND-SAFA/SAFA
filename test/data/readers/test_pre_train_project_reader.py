@@ -29,7 +29,7 @@ class TestPreTrainProjectReader(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         pre_train_reader = PreTrainProjectReader(TestMLMPreTrainDatasetCreator.PRETRAIN_DIR)
-        pre_train_reader.set_summarizer(Summarizer())
+        pre_train_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
         training_examples = pre_train_reader.read_project()
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         for i, example in enumerate(training_examples):

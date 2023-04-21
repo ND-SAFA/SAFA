@@ -32,7 +32,7 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         reader: PreTrainTraceReader = self.get_project_reader()
-        reader.set_summarizer(Summarizer())
+        reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
         lines = [SUMMARY_FORMAT.format(line) for line in FileUtil.read_file(reader.data_file).split(os.linesep)]
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)

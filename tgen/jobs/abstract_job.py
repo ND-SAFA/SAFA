@@ -35,7 +35,7 @@ class AbstractJob(threading.Thread, BaseObject):
         self.model_manager = model_manager
         self.result = JobResult()
         self.id = uuid.uuid4()
-        self.save_job_output = job_args.save_job_output
+        self.save_job_output = self.job_args.save_job_output
 
     def run(self) -> None:
         """

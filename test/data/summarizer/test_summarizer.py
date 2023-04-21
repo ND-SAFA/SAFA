@@ -25,7 +25,7 @@ class TestSummarizer(BaseTest):
     @mock.patch("openai.Completion.create", )
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        summarizer = Summarizer()
+        summarizer = Summarizer(code_or_exceeds_limit_only=False)
         summaries = summarizer._summarize_chunks(self.CHUNKS,
                                                  GenerationPromptCreator(BasePrompt.NL_SUMMARY), "text-davinci-003", OpenAiArgs())
         for i, summary in enumerate(summaries):
@@ -34,12 +34,12 @@ class TestSummarizer(BaseTest):
     @mock.patch("openai.Completion.create")
     def test_summarize(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        summarizer = Summarizer()
+        model_name = "code-cushman-002"
+        summarizer = Summarizer(code_or_exceeds_limit_only=False, model_path=model_name)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize(content=content)
         self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
 
-        model_name = summarizer._get_model_name_for_content(is_code=True)
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
         summaries = summarizer.summarize(path_to_file=path_to_file)
         expected_chunks = PythonChunker(model_name).chunk(FileUtil.read_file(path_to_file))

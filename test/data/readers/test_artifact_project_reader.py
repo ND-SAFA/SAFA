@@ -42,7 +42,7 @@ class TestArtifactProjectReader(BaseTest):
     def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
         mock_completion.side_effect = fake_open_ai_completion
         project_reader: AbstractProjectReader = test_project.get_project_reader()
-        project_reader.set_summarizer(Summarizer())
+        project_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
         artifact_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:

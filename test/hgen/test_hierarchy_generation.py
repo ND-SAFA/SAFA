@@ -23,6 +23,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
+from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 
 
@@ -201,9 +202,9 @@ class TestHierarchyGeneration(BaseTest):
         return PromptDatasetCreator(summarizer=Summarizer(), **params)
 
     def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
-        hgen_trainer_params = {"trainer_args": OpenAiArgs(metrics=[]),
-                               "prompt_creator": GenerationPromptCreator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
-        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_class=OpenAiTrainer, hgen_trainer_params=hgen_trainer_params,
+        hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[]),
+                               "hgen_prompt_creator": GenerationPromptCreator(base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY)}
+        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.OPEN_AI,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
-                        **params)
+                        **hgen_trainer_params, **params)
         return HierarchyGenerator(args)

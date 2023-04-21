@@ -27,7 +27,7 @@ class TestPromptDatasetCreator(BaseTest):
     def test_project_reader_artifact_with_summarizer(self):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=Summarizer())
+                                                          summarizer=Summarizer(code_or_exceeds_limit_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, artifacts_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -46,7 +46,7 @@ class TestPromptDatasetCreator(BaseTest):
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
-                                                          summarizer=Summarizer())
+                                                          summarizer=Summarizer(code_or_exceeds_limit_only=False))
         all_artifacts = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
                          for artifact in PromptTestProject.get_safa_artifacts()}
         artifact_entries = []

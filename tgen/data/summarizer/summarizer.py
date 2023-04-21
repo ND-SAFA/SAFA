@@ -19,9 +19,16 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, model_path: str = None, args: OpenAiArgs = None):
+    def __init__(self, model_path: str = None, args: OpenAiArgs = None, code_or_exceeds_limit_only: bool = True):
+        """
+        Initializes a summarizer for a specific model
+        :param model_path: path of the model that should be used for summarization
+        :param args: any additional args to use for summarization
+        :param code_or_exceeds_limit_only: if True, only performs summarization for text that exceeds the token limit or for code
+        """
         self.model_path = model_path
         self.args = OpenAiArgs() if not args else args
+        self.code_or_above_limit_only = code_or_exceeds_limit_only
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
         """
@@ -38,6 +45,8 @@ class Summarizer(BaseObject):
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content)
+        if self.code_or_above_limit_only and len(chunks) <= 1 and not is_code:
+            return content
         prompt_creator = GenerationPromptCreator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
         summarizations = self._summarize_chunks(chunks, prompt_creator, model_path, self.args)
         return os.linesep.join(summarizations)
@@ -90,4 +99,4 @@ class Summarizer(BaseObject):
         :param is_code: True if the content is code, else assumed to be Natural language
         :return: The best model for the content being summarized
         """
-        return "code-davinci-002" if is_code else "text-davinci-003"
+        return "text-davinci-003"

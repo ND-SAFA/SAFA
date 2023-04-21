@@ -7,6 +7,7 @@ from typing import List, Union
 import tiktoken
 
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.summarizer.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.util.override import overrides
 
 NODE = Union[ast.AST, ast.stmt]
@@ -35,7 +36,10 @@ class PythonChunker(AbstractChunker):
         :return: The nodes chunked into sizes beneath the token limit
         """
         lines = [self._replace_white_space_with_tab(line) for line in content.split(os.linesep)]
-        nodes = ast.parse(content)
+        try:
+            nodes = ast.parse(content)
+        except Exception:
+            return NaturalLanguageChunker(model_name=self.model_name).chunk(content)
         chunks = self.__chunk_helper(nodes, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks]
 

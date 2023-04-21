@@ -36,7 +36,7 @@ class TestPromptProjectReader(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         project_reader = self.get_project_reader()
-        project_reader.set_summarizer(Summarizer())
+        project_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
         prompts_df = project_reader.read_project()
         expected_prompts = []
         with open(self.PROJECT_PATH) as file:

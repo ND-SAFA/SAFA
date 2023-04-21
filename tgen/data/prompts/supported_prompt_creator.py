@@ -4,6 +4,6 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
 
 
-class SupportedPromptGenerator(Enum):
-    CREATION = GenerationPromptCreator
+class SupportedPromptCreator(Enum):
+    GENERATION = GenerationPromptCreator
     CLASSIFICATION = ClassificationPromptCreator

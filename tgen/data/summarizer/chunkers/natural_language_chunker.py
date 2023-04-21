@@ -14,6 +14,6 @@ class NaturalLanguageChunker(AbstractChunker):
         :param content: The content to chunk
         :return: The content chunked into sizes beneath the token limit
         """
-        return [content]
-        # TODO
-        raise NotImplementedError()
+        n_words_per_chunk = self.estimate_num_words_from_tokens(self.token_limit)
+        words = content.split()
+        return [" ".join(words[i:i + n_words_per_chunk]) for i in range(0, len(words), n_words_per_chunk)]

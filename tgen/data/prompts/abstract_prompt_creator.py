@@ -63,5 +63,5 @@ class AbstractPromptCreator(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.prompts.supported_prompt_creator import SupportedPromptGenerator
-        return SupportedPromptGenerator
+        from tgen.data.prompts.supported_prompt_creator import SupportedPromptCreator
+        return SupportedPromptCreator

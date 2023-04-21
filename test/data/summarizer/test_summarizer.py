@@ -35,13 +35,22 @@ class TestSummarizer(BaseTest):
     def test_summarize(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         model_name = "code-cushman-002"
+
+        # use file content
         summarizer = Summarizer(code_or_exceeds_limit_only=False, model_path=model_name)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize(content=content)
         self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
 
+        # use path to file
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
         summaries = summarizer.summarize(path_to_file=path_to_file)
         expected_chunks = PythonChunker(model_name).chunk(FileUtil.read_file(path_to_file))
         summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
         self.assertEqual("\n".join(summarized_chunks), summaries)
+
+        # set code_or_exceeds_limit_only to TRUE this time
+        summarizer = Summarizer(code_or_exceeds_limit_only=True, model_path=model_name)
+        short_text = "This is a short text under the token limit"
+        summaries = summarizer.summarize(content=short_text)
+        self.assertEqual(summaries, short_text) # shouldn't have summarized

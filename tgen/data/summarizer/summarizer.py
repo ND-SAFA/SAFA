@@ -3,9 +3,11 @@ from typing import List
 
 import pandas as pd
 
+from tgen.constants import SUMMARIZATION_MODEL_DEFAULT, GENERATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -19,15 +21,18 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, model_path: str = None, args: OpenAiArgs = None, code_or_exceeds_limit_only: bool = True):
+    def __init__(self, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
+                 args_for_summarizer_model: OpenAiArgs = None,
+                 code_or_exceeds_limit_only: bool = True):
         """
         Initializes a summarizer for a specific model
-        :param model_path: path of the model that should be used for summarization
+        :param model_for_summarizer: path of the model that should be used for summarization
         :param args: any additional args to use for summarization
         :param code_or_exceeds_limit_only: if True, only performs summarization for text that exceeds the token limit or for code
         """
-        self.model_path = model_path
-        self.args = OpenAiArgs() if not args else args
+        self.model_for_summarizer = model_for_summarizer
+        self.model_for_token_limit = model_for_token_limit
+        self.args_for_summarizer_model = OpenAiArgs() if not args_for_summarizer_model else args_for_summarizer_model
         self.code_or_above_limit_only = code_or_exceeds_limit_only
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
@@ -40,15 +45,14 @@ class Summarizer(BaseObject):
         """
         chunker = self._get_chunker(path_to_file)
         is_code = is_code or chunker != SupportedChunker.NL
-        model_path = self._get_model_name_for_content(is_code) if not self.model_path else self.model_path
-        chunker = chunker.value(model_path)
+        chunker = chunker.value(self.model_for_token_limit)
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content)
         if self.code_or_above_limit_only and len(chunks) <= 1 and not is_code:
             return content
         prompt_creator = GenerationPromptCreator(base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
-        summarizations = self._summarize_chunks(chunks, prompt_creator, model_path, self.args)
+        summarizations = self._summarize_chunks(chunks, prompt_creator, self.model_for_summarizer, self.args_for_summarizer_model)
         return os.linesep.join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str):
@@ -60,6 +64,16 @@ class Summarizer(BaseObject):
         """
         df[col2summarize] = df[col2summarize].apply(lambda item: self.summarize(content=item))
         return df
+
+    def exceeds_token_limit(self, content: str) -> bool:
+        """
+        Determines if the given content exceeds the token limit
+        :param content: The content
+        :return: True if the content exceeds the token limit else False
+        """
+        chunker_type: SupportedChunker = self._get_chunker()
+        chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit)
+        return chunker.exceeds_token_limit(content)
 
     @staticmethod
     def _summarize_chunks(chunks: List[str], prompt_creator: GenerationPromptCreator, model_path: str, args: OpenAiArgs) -> List[str]:
@@ -91,12 +105,3 @@ class Summarizer(BaseObject):
             return SupportedChunker[ext[1:].upper()]
         except Exception:
             return default
-
-    @staticmethod
-    def _get_model_name_for_content(is_code: bool) -> str:
-        """
-        Gets the best model for the content being summarized
-        :param is_code: True if the content is code, else assumed to be Natural language
-        :return: The best model for the content being summarized
-        """
-        return "text-davinci-003"

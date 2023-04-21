@@ -11,7 +11,7 @@ from tgen.util.override import overrides
 
 @dataclass
 class AbstractPromptCreator(BaseObject):
-    base_prompt = BasePrompt
+    base_prompt: BasePrompt
 
     _PROMPT_SEPARATOR = "\n\n###\n\n"
     _COMPLETION_SEPARATOR = "###"
@@ -33,7 +33,7 @@ class AbstractPromptCreator(BaseObject):
         """
         return f"{self.COMPLETION_START}{base_completion}{self._COMPLETION_SEPARATOR}"
 
-    def generate_base(self, base_prompt: str, base_completion: str) -> Dict[str, str]:
+    def generate_base(self, base_prompt: str, base_completion: str) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :return: Dictionary containing the prompt and completion
@@ -46,15 +46,15 @@ class AbstractPromptCreator(BaseObject):
         })
 
     @abstractmethod
-    def create(self, source_content: str, target_content: str, **kwargs) -> Dict[str, str]:
+    def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
-        :source_content: The content of the source artifact
-        :target_content: The content of the target artifact
-        :kwargs: Additional params for the generation
+        :param source_content: The content of the source artifact
+        :param target_content: The content of the target artifact
+        :param kwargs: Additional params for the generation
         :return: Dictionary containing the prompt and completion
         """
-    
+
     @classmethod
     @overrides(BaseObject)
     def _get_enum_class(cls, child_class_name: str) -> Type:

@@ -7,7 +7,7 @@ import mock
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

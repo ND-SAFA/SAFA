@@ -4,10 +4,12 @@ from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
+from tgen.constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -26,7 +28,7 @@ class OpenAiTrainer(AbstractTrainer):
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = "ada",
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = CLASSIFICATION_MODEL_DEFAULT,
                  trainer_args: OpenAiArgs = OpenAiArgs(),
                  prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()):
         """
@@ -40,6 +42,7 @@ class OpenAiTrainer(AbstractTrainer):
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
         self.prompt_creator = prompt_creator
+        self.summarizer = Summarizer(model_for_token_limit=base_model, code_or_exceeds_limit_only=False)
         super().__init__(trainer_dataset_manager)
 
     def perform_training(self) -> FineTune:
@@ -48,12 +51,12 @@ class OpenAiTrainer(AbstractTrainer):
         :return: The training response
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
-        training_file_id = train_dataset.get_project_file_id(self.prompt_creator)
+        training_file_id = train_dataset.get_project_file_id(prompt_creator=self.prompt_creator, summarizer=self.summarizer)
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         params = self.trainer_args.to_params(self.prompt_creator, TrainerTask.TRAIN, include_classification_metrics)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params["validation_file"] = val_dataset.get_project_file_id(self.prompt_creator)
+            params["validation_file"] = val_dataset.get_project_file_id(prompt_creator=self.prompt_creator, summarizer=self.summarizer)
         res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
                                                 model=self.base_model,
                                                 **params)
@@ -80,7 +83,7 @@ class OpenAiTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.to_trainer_dataset(self.prompt_creator)
+        prompt_df = dataset.get_prompts_dataframe(self.prompt_creator, summarizer=self.summarizer)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                  **self.trainer_args.to_params(self.prompt_creator, TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \

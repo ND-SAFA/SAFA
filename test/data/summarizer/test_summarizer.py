@@ -2,7 +2,7 @@ import os
 from unittest import mock
 
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer
@@ -37,7 +37,7 @@ class TestSummarizer(BaseTest):
         model_name = "code-cushman-002"
 
         # use file content
-        summarizer = Summarizer(code_or_exceeds_limit_only=False, model_path=model_name)
+        summarizer = Summarizer(code_or_exceeds_limit_only=False, model_for_token_limit=model_name)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize(content=content)
         self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
@@ -50,7 +50,7 @@ class TestSummarizer(BaseTest):
         self.assertEqual("\n".join(summarized_chunks), summaries)
 
         # set code_or_exceeds_limit_only to TRUE this time
-        summarizer = Summarizer(code_or_exceeds_limit_only=True, model_path=model_name)
+        summarizer = Summarizer(code_or_exceeds_limit_only=True, model_for_summarizer=model_name)
         short_text = "This is a short text under the token limit"
         summaries = summarizer.summarize(content=short_text)
         self.assertEqual(summaries, short_text) # shouldn't have summarized

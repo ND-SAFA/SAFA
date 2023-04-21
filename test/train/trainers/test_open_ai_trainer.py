@@ -6,7 +6,7 @@ from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import FINE_TUNE_RESPONSE_DICT, FINE_TUNE_REQUEST, COMPLETION_REQUEST, \

@@ -1,7 +1,7 @@
 from test.data.prompts.base_prompt_test import BasePromptTest
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.creation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.util.override import overrides
 
 

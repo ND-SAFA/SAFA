@@ -8,6 +8,7 @@ export type IconVariant =
   | "saving"
   | "delete"
   | "cancel"
+  | "leave"
   | "info"
   | "update"
   | "success"

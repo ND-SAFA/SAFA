@@ -16,6 +16,15 @@
     @row:edit="handleOpenEdit"
     @row:delete="handleOpenDelete"
   >
+    <template #cell-actions="{ row }">
+      <icon-button
+        v-if="row.members.length > 1"
+        icon="leave"
+        tooltip="Leave project"
+        data-cy="button-selector-leave"
+        @click="handleLeave(row)"
+      />
+    </template>
     <template #bottom>
       <confirm-project-delete
         :open="deleteOpen"
@@ -43,11 +52,16 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IdentifierSchema } from "@/types";
+import { IdentifierSchema, ProjectRole } from "@/types";
 import { projectExpandedColumns, projectNameColumn } from "@/util";
-import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import { handleGetProjects } from "@/api";
-import { SelectorTable } from "@/components/common";
+import {
+  identifierSaveStore,
+  logStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
+import { handleDeleteMember, handleGetProjects } from "@/api";
+import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 const props = defineProps<{
@@ -153,6 +167,25 @@ function handleConfirmDelete() {
  */
 function handleConfirmSave() {
   saveOpen.value = false;
+}
+
+/**
+ * Removes the current user from the project.
+ * @param project - The project to leave.
+ */
+function handleLeave(project: IdentifierSchema) {
+  const member = project.members.find(
+    (member) => member.email === sessionStore.user?.email
+  );
+  const ownerCount = project.members.filter(
+    (member) => member.role === ProjectRole.OWNER
+  ).length;
+
+  if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
+    logStore.onInfo("You cannot remove the only owner of this project.");
+  } else {
+    handleDeleteMember(member);
+  }
 }
 
 /**

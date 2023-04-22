@@ -25,7 +25,7 @@
       :open="jobLog.length > 0"
       @close="handleCloseLogs"
     >
-      <q-timeline>
+      <q-timeline data-cy="text-job-log">
         <template v-for="(items, idx) in jobLog" :key="idx">
           <q-timeline-entry
             v-for="item in items"

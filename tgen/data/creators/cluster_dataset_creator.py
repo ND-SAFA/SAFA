@@ -10,6 +10,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
+from tgen.util.logging.logger_manager import logger
 
 
 class ClusterDatasetCreator(AbstractDatasetCreator):
@@ -34,6 +35,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         :return: A dictionary mapping artifact id to its cluster num
         """
         if not self.__clusters:
+            logger.info(f"Creating clusters of artifacts using { self.cluster_method.name}")
             clustering_method_cls: iClusteringMethod = self.cluster_method.value
             clusters = clustering_method_cls.cluster(trace_dataset=self.trace_dataset)
             cluster_num_2_id = {cluster_num: str(uuid.uuid4()) for cluster_num in clusters.values()}

@@ -109,6 +109,8 @@ class SafaExporter(AbstractDatasetExporter):
         entries = []
         for source_id in source_artifacts.index:
             for target_id in target_artifacts.index:
+                if source_id == target_id:
+                    continue
                 trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
                 trace_link: EnumDict = self.get_dataset().trace_df.get_link(trace_link_id)
                 assert trace_link is not None, f"Expected trace (source: {source_id}, target: {target_id}) to exist but it does not"

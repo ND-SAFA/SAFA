@@ -1,3 +1,4 @@
+import os
 import uuid
 from copy import deepcopy
 from unittest import mock
@@ -5,12 +6,15 @@ from unittest import mock
 import networkx as nx
 
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.dataframes.layer_dataframe import LayerKeys, LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.readers.csv_project_reader import CsvProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -18,6 +22,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
@@ -38,9 +43,8 @@ class TestHierarchyGeneration(BaseTest):
 
         def create(self) -> TraceDataset:
             trace_dataset_creator = TestHierarchyGeneration.get_dataset_creator_with_trace_dataset_creator()
-            dataset = trace_dataset_creator.create().trace_dataset
-            dataset.artifact_df = TestHierarchyGeneration.set_all_artifacts_to_same_layer(dataset.artifact_df)
-            return dataset
+            trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
+            return trainer_dataset_manager[DatasetRole.EVAL]
 
     @mock.patch("community.best_partition")
     @mock.patch("openai.Completion.create")
@@ -53,19 +57,16 @@ class TestHierarchyGeneration(BaseTest):
         for i, dataset_creator in enumerate(dataset_creators):
             tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
 
-            hgen = self.get_hierarchy_generator(tgen_trainer, dataset_creator_for_sources=dataset_creator)
-            generated_dataset = hgen.run()
+            hgen = self.get_hierarchy_generator(tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator)
+            export_path = hgen.run(TEST_OUTPUT_DIR, save_dataset_checkpoints=False)
+            generated_dataset = TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=export_path)).create()
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
 
             self.assertEqual(len(orig_dataset.artifact_df) + 4, len(generated_dataset.artifact_df))
             expected_n_traces = len(orig_dataset.artifact_df) * 4
-            if hasattr(orig_dataset.trace_dataset, "trace_df"):
-                expected_n_traces += len(orig_dataset.trace_dataset)
             self.assertEqual(expected_n_traces, len(generated_dataset))
             expected_n_layers = 1
-            if hasattr(orig_dataset.trace_dataset, "layer_mapping_df"):
-                expected_n_layers += len(orig_dataset.trace_dataset.layer_mapping_df)
             self.assertEqual(expected_n_layers, len(generated_dataset.layer_mapping_df))
 
     def test_create_artifacts_df_with_generated_artifacts(self):
@@ -135,6 +136,14 @@ class TestHierarchyGeneration(BaseTest):
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
             self.assertLess(label - 0.4012, 0.001)
 
+    def test_save_dataset_checkpoint(self):
+        dataset = self.get_dataset_creator_with_prompt_project_reader().create()
+        export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
+        self.assertTrue(os.path.exists(export_path))
+
+        export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, False)
+        self.assertFalse(export_path)
+
     def test_create_trace_dataset_for_single_layer(self):
         artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
@@ -174,6 +183,12 @@ class TestHierarchyGeneration(BaseTest):
         dataset = trainer_dataset_manager[DatasetRole.EVAL]
         if dataset.artifact_df is not None:
             dataset.artifact_df = TestHierarchyGeneration.set_all_artifacts_to_same_layer(dataset.artifact_df)
+            if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
+                dataset.trace_dataset.layer_mapping_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
+                                                                         LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
+            elif isinstance(dataset, TraceDataset):
+                dataset.layer_mapping_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
+                                                           LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
         return trainer_dataset_manager
 
     @staticmethod

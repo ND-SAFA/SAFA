@@ -37,7 +37,7 @@ class PromptDataset(iDataset):
         :param data_export_path: The path to where data files will be saved if specified. May be to a directory or specific file
         """
         self.prompt_df = prompt_df
-        self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset else artifact_df
+        self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset is not None else artifact_df
         self.trace_dataset = trace_dataset
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
@@ -60,7 +60,19 @@ class PromptDataset(iDataset):
         """
         return self.get_prompts_dataframe(prompts_generator)
 
-    def export_prompt_dataset(self, prompt_df: pd.DataFrame, export_path: str = None) -> Tuple[str, bool]:
+    def to_dataframe(self) -> pd.DataFrame:
+        """
+        Converts the dataset into a dataframe
+        :return: A pandas dataframe of the dataset
+        """
+        if self.trace_dataset is not None:
+            return self.trace_dataset.to_dataframe()
+        elif self.artifact_df is not None:
+            return self.artifact_df
+        elif self.get_prompts_dataframe() is not None:
+            return self.get_prompts_dataframe()
+
+    def export_prompt_dataframe(self, prompt_df: pd.DataFrame, export_path: str = None) -> Tuple[str, bool]:
         """
         Exports the prompt dataset
         :param prompt_df: The dataframe containing prompts and completions
@@ -88,7 +100,7 @@ class PromptDataset(iDataset):
         """
         if not self.project_file_id:
             prompt_df = self.get_prompts_dataframe(prompt_creator, summarizer)
-            export_path, should_delete_path = self.export_prompt_dataset(prompt_df)
+            export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = OpenAiUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:

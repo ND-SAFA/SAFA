@@ -4,7 +4,6 @@ from typing import Dict, List
 
 import mock
 
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -12,9 +11,9 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.testres.testprojects.safa_test_project import SafaTestProject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
+import pandas as pd
 
 
 class TestResponse:
@@ -23,6 +22,14 @@ class TestResponse:
 
 class TestPromptDataset(BaseTest):
     DATASET_FAIL_MSG = "Dataset with param {} failed."
+
+    def test_to_dataframe(self):
+        outputs = self.all_datasets_test(
+            lambda dataset: dataset.to_dataframe(),
+            expected_exceptions=["id"]
+        )
+        for type_, output in outputs.items():
+            self.assertIsInstance(output, pd.DataFrame)
 
     @mock.patch("openai.File.create")
     def test_get_data_file_id(self, openai_file_create_mock: mock.MagicMock):
@@ -43,14 +50,14 @@ class TestPromptDataset(BaseTest):
 
     def test_export_and_get_dataframe(self):
         outputs = self.all_datasets_test(
-            lambda dataset: dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()),
-                                                          TEST_OUTPUT_DIR),
+            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(GenerationPromptCreator()),
+                                                            TEST_OUTPUT_DIR),
             ["id"]
         )
         dataset = self.get_dataset_with_prompt_df()
-        outputs["with_filename"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()),
-                                                                 os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
-        outputs["no_output_path"] = dataset.export_prompt_dataset(dataset.get_prompts_dataframe(GenerationPromptCreator()))
+        outputs["with_filename"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(GenerationPromptCreator()),
+                                                                   os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
+        outputs["no_output_path"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(GenerationPromptCreator()))
         expected_trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
         for type_, output in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)
@@ -61,7 +68,7 @@ class TestPromptDataset(BaseTest):
             elif type_ == "dataset":
                 PromptTestProject.verify_prompts_safa_project_artifacts(self, prompt_df,
                                                                         artifacts_df=expected_trace_dataset.artifact_df,
-                                                                        msg=fail_msg,)
+                                                                        msg=fail_msg, )
             else:
                 pos_links_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(expected_trace_dataset.trace_df,
                                                                              lambda row: row[TraceKeys.LABEL.value] == 1))

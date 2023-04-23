@@ -24,6 +24,8 @@ import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
+import edu.nd.crc.safa.features.graphql.services.GraphQlService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -156,10 +158,12 @@ public class ServiceProvider {
     private final DefaultProjectCreatorService defaultProjectCreatorService;
     // HTTP
     private final SafaRequestBuilder safaRequestBuilder;
+    private final GraphQlService graphQlService;
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubConnectionService githubConnectionService;
     private final GithubProjectRepository githubProjectRepository;
+    private final GithubGraphQlService githubGraphQlService;
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     private JobLoggingService jobLoggingService;

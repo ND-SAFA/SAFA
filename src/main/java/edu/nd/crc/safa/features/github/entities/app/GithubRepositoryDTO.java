@@ -27,8 +27,6 @@ public class GithubRepositoryDTO {
 
     private String owner;
 
-    private String nameWithOwner;
-
     @JsonProperty("private")
     private Boolean isPrivate;
 
@@ -96,7 +94,6 @@ public class GithubRepositoryDTO {
         ghDto.setId(repo.getId());
         ghDto.setName(repo.getName());
         ghDto.setOwner(repo.getOwner().getLogin());
-        ghDto.setNameWithOwner(repo.getNameWithOwner());
         ghDto.setIsPrivate(repo.isPrivate());
         ghDto.setUrl(repo.getUrl());
         ghDto.setDescription(repo.getDescription());

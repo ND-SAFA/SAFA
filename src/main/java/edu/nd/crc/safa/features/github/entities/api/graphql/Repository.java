@@ -9,7 +9,6 @@ public class Repository {
     private String id;
     private String name;
     private Owner owner;
-    private String nameWithOwner;
     private boolean isPrivate;
     private String url;
     private String description;

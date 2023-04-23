@@ -126,11 +126,11 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     }
 
     @Override
-    public GithubRepositoryDTO getUserRepository(GithubAccessCredentials credentials, String name) {
+    public GithubRepositoryDTO getRepository(GithubAccessCredentials credentials, String owner, String name) {
         return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.SINGLE_REPOSITORY.getMethod())
-                .uri(ApiRoute.SINGLE_REPOSITORY.getFullPath(), credentials.getGithubHandler(), name)
+                .uri(ApiRoute.SINGLE_REPOSITORY.getFullPath(), owner, name)
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
                 .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)

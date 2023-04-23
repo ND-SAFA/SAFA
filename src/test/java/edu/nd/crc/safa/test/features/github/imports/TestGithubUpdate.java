@@ -34,6 +34,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Github.Import.UPDATE)
             .withRepositoryName(repositoryName)
+            .withOwner(githubLogin)
             .withVersion(projectVersion)
             .putWithoutBody(MockMvcResultMatchers.status().is2xxSuccessful());
 

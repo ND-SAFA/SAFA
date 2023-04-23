@@ -46,10 +46,11 @@ public interface GithubConnectionService {
 
     /**
      * @param credentials User credentials
+     * @param owner       Repository owner
      * @param name        Repository name
      * @return Requested user repository
      */
-    GithubRepositoryDTO getUserRepository(GithubAccessCredentials credentials, String name);
+    GithubRepositoryDTO getRepository(GithubAccessCredentials credentials, String owner, String name);
 
     /**
      * @param credentials    User credentials

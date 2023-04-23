@@ -225,10 +225,10 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
-            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{owner}/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
-            public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
+            public static final String BY_NAME = Import.ROOT + "/github/{owner}/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = UPDATE;
         }
     }
 

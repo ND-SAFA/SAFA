@@ -56,17 +56,19 @@ public class GithubController extends BaseController {
      * Creates a job that imports a GitHub repository into a new SAFA project.
      *
      * @param repositoryName The name of the repository to import.
+     * @param owner The owner of the repository to import.
      * @return A {@link JobAppEntity} representing the import job.
      */
     @PostMapping(AppRoutes.Github.Import.BY_NAME)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> pullGithubProject(
-        @PathVariable("repositoryName") String repositoryName) {
+        @PathVariable("repositoryName") String repositoryName,
+        @PathVariable("owner") String owner) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
 
-            GithubIdentifier identifier = new GithubIdentifier(null, repositoryName);
+            GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
             CreateProjectViaGithubBuilder builder
                 = new CreateProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
@@ -84,19 +86,21 @@ public class GithubController extends BaseController {
      *
      * @param repositoryName The name of the repository to import.
      * @param versionId The ID of the project version to import into.
+     * @param owner The owner of the repository to import.
      * @return Information about the started job
      */
     @PutMapping(AppRoutes.Github.Import.UPDATE)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> updateGithubProject(
         @PathVariable("versionId") UUID versionId,
-        @PathVariable("repositoryName") String repositoryName) {
+        @PathVariable("repositoryName") String repositoryName,
+        @PathVariable("owner") String owner) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
 
             ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
-            GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
+            GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
                 = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
@@ -114,19 +118,21 @@ public class GithubController extends BaseController {
      *
      * @param repositoryName The name of the repository to import.
      * @param versionId The ID of the project version to import into.
+     * @param owner The owner of the repository to import.
      * @return Information about the started job
      */
     @PostMapping(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> importIntoExistingProject(
         @PathVariable("versionId") UUID versionId,
-        @PathVariable("repositoryName") String repositoryName) {
+        @PathVariable("repositoryName") String repositoryName,
+        @PathVariable("owner") String owner) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
 
             ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
-            GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
+            GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
                 = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, principal);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),

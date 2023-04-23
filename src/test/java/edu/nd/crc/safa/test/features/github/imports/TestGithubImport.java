@@ -27,6 +27,7 @@ public class TestGithubImport extends AbstractGithubTest {
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Github.Import.BY_NAME)
             .withRepositoryName(repositoryName)
+            .withOwner(githubLogin)
             .postWithoutBody(status().is2xxSuccessful());
 
         // We should have one version created
@@ -58,6 +59,7 @@ public class TestGithubImport extends AbstractGithubTest {
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
             .withRepositoryName(repositoryName)
+            .withOwner(githubLogin)
             .withVersion(projectVersion)
             .postWithoutBody(status().is2xxSuccessful());
 

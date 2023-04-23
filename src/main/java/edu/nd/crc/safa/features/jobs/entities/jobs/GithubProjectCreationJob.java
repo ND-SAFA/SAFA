@@ -104,8 +104,9 @@ public class GithubProjectCreationJob extends CommitJob {
     public void retrieveGitHubRepository(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
+        String owner = this.githubIdentifier.getRepositoryOwner();
 
-        this.githubRepositoryDTO = connectionService.getUserRepository(this.credentials, repositoryName);
+        this.githubRepositoryDTO = connectionService.getRepository(this.credentials, owner, repositoryName);
 
         logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
     }

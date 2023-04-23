@@ -73,8 +73,9 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         Mockito.when(serviceMock.getSelf(Mockito.any(GithubAccessCredentials.class)))
             .thenReturn(new GithubSelfResponseDTO(githubLogin));
 
-        Mockito.when(serviceMock.getUserRepository(
+        Mockito.when(serviceMock.getRepository(
             Mockito.any(GithubAccessCredentials.class),
+            Mockito.any(String.class),
             Mockito.any(String.class)
         )).thenReturn(
             this.readResourceFile(REPOSITORY_RESPONSE_FILE, GithubRepositoryDTO.class)

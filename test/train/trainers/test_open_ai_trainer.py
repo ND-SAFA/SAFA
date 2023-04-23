@@ -9,8 +9,7 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import FINE_TUNE_RESPONSE_DICT, FINE_TUNE_REQUEST, COMPLETION_REQUEST, \
-    COMPLETION_RESPONSE_DICT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import FINE_TUNE_RESPONSE_DICT, FINE_TUNE_REQUEST, COMPLETION_REQUEST, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
 

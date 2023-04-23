@@ -56,7 +56,8 @@ class OpenAiTrainer(AbstractTrainer):
         params = self.trainer_args.to_params(self.prompt_creator, TrainerTask.TRAIN, include_classification_metrics)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params["validation_file"] = val_dataset.get_project_file_id(prompt_creator=self.prompt_creator, summarizer=self.summarizer)
+            params[OpenAiUtil.Params.VALIDATION_FILE] = val_dataset.get_project_file_id(prompt_creator=self.prompt_creator,
+                                                                                        summarizer=self.summarizer)
         res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
                                                 model=self.base_model,
                                                 **params)

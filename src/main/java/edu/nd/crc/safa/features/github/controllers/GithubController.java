@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.github.controllers;
 
-import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -8,7 +7,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -25,7 +23,6 @@ import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,31 +50,6 @@ public class GithubController extends BaseController {
         this.executorDelegate = executorDelegate;
         this.githubConnectionService = githubConnectionService;
         this.githubControllerUtils = githubControllerUtils;
-    }
-
-    /**
-     * Returns a list of GitHub repositories that are accessible by the current user via
-     * an already connected GitHub integration.
-     *
-     * @return A list of {@link GithubRepositoryDTO}.
-     * @throws SafaError If there is no GitHub integration connected.
-     */
-    @GetMapping(AppRoutes.Github.RETRIEVE_GITHUB_REPOSITORIES)
-    public DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> retrieveGithubRepositories() {
-        DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> output =
-            executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
-            GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(principal)
-                .orElseThrow(() -> new SafaError("No GitHub credentials found"));
-            List<GithubRepositoryDTO> githubRepositoryDTOList = githubConnectionService
-                .getUserRepositories(githubAccessCredentials);
-
-            output.setResult(new GithubResponseDTO<>(githubRepositoryDTOList, GithubResponseMessage.OK));
-        });
-
-        return output;
     }
 
     /**

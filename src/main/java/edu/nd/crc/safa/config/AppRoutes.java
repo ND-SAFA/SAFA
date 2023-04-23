@@ -214,7 +214,6 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Github {
-        public static final String RETRIEVE_GITHUB_REPOSITORIES = Projects.ROOT + "/github";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Credentials {
@@ -261,5 +260,27 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Layout {
         public static final String REGENERATE_LAYOUT = Versions.BY_ID + "/layout";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Integrations {
+        public static final String ROOT = "/integrations";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Github {
+            public static final String ROOT = Integrations.ROOT + "/github";
+
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Repos {
+                public static final String ROOT = Github.ROOT + "/repos";
+                public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repo}";
+            }
+
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Branches {
+                public static final String BY_REPO = Repos.BY_OWNER_AND_NAME + "/branches";
+
+            }
+        }
     }
 }

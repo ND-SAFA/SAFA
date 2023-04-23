@@ -1,4 +1,5 @@
 import os
+import uuid
 from copy import deepcopy
 from datetime import datetime
 from typing import List, Any, Union
@@ -18,6 +19,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.logging.logger_manager import logger
@@ -40,14 +42,18 @@ class HierarchyGenerator(BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
+        export_path = os.path.join(export_path, str(uuid.uuid4()))
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
         if self.args.tgen_trainer:
+            self._update_trainer_args(self.args.tgen_trainer, export_path)
             logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
             trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
-            self._save_dataset_checkpoint(trace_dataset_with_sources, export_path, save_dataset_checkpoints)
+            self._save_dataset_checkpoint(trace_dataset_with_sources, export_path, save_dataset_checkpoints,
+                                          filename="initial_dataset_with_sources")
             assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
             source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(trace_dataset_with_sources.artifact_df)
-            self._save_dataset_checkpoint(source_layer_only_dataset, export_path, save_dataset_checkpoints)
+            if save_dataset_checkpoints:
+                source_layer_only_dataset.trace_df.to_csv(os.path.join(export_path, "linked_source_layer_dataset.csv"))
         else:
             trace_dataset_with_sources = self.args.dataset_creator_for_sources.create()
             source_layer_only_dataset = self._create_trace_dataset_with_single_layer(trace_dataset_with_sources.artifact_df,
@@ -63,6 +69,7 @@ class HierarchyGenerator(BaseObject):
                                                          prompt_creator=self.args.hgen_prompt_creator,
                                                          trainer_args=self.args.hgen_trainer_args,
                                                          base_model=self.args.hgen_base_model)
+        self._update_trainer_args(hgen_trainer, export_path)
         logger.info(f"Generating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         artifact_generations = hgen_trainer.perform_prediction().predictions
 
@@ -72,7 +79,8 @@ class HierarchyGenerator(BaseObject):
                                                                                 trace_dataset_with_sources,
                                                                                 cluster_dataset_creator.get_clusters(),
                                                                                 target_layer_id=cluster_dataset_creator.layer_id)
-        return self._save_dataset_checkpoint(generated_dataset, export_path, save_dataset_checkpoints=True)
+        return self._save_dataset_checkpoint(generated_dataset, export_path, save_dataset_checkpoints=True,
+                                             filename="final_generated_dataset")
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        hgen_dataset: TraceDataset,
@@ -161,7 +169,7 @@ class HierarchyGenerator(BaseObject):
             entry[TraceKeys.LABEL.value] = entry.pop("score")  # replace score with label to use scores as soft labels
         trace_df = TraceDataFrame(prediction_entries)
         trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
-                                                    layer_mapping_df=single_layer_dataset.layer_mapping_df)
+                                                               layer_mapping_df=single_layer_dataset.layer_mapping_df)
         return TraceDataset(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
                             layer_mapping_df=single_layer_dataset.layer_mapping_df)
 
@@ -187,17 +195,19 @@ class HierarchyGenerator(BaseObject):
         return TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_mapping_df=layer_df)
 
     @staticmethod
-    def _save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str, save_dataset_checkpoints: bool) -> str:
+    def _save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str, save_dataset_checkpoints: bool,
+                                 filename: str = None) -> str:
         """
         Exports the dataset to csv
         :param dataset: The dataset to export
         :param export_path: The base path to export to
+        :param filename: Name of the file to use when saving the dataset
         :return: The full export path
         """
         if not save_dataset_checkpoints:
             return ''
         current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
-        filename = current_time_string
+        filename = current_time_string if not filename else filename
         full_export_path = os.path.join(export_path, filename)
         exporter_class = SafaExporter if isinstance(dataset, TraceDataset) or dataset.trace_dataset is not None else CSVExporter
         if issubclass(exporter_class, CSVExporter):
@@ -206,3 +216,16 @@ class HierarchyGenerator(BaseObject):
         exporter.export()
         logger.info(f"Dataset checkpoint saved to {full_export_path} ")
         return full_export_path
+
+    @staticmethod
+    def _update_trainer_args(trainer: AbstractTrainer, export_path: str) -> None:
+        """
+        Sets the output directory of the trainer's args to the export path
+        :param trainer: The trainer to update output dir for
+        :param export_path: The path to set the output dir to
+        :return: None
+        """
+        if hasattr(trainer.trainer_args, "output_dir") and trainer.trainer_args.output_dir is None:
+            trainer.trainer_args.output_dir = export_path
+        if hasattr(trainer.trainer_args, "metrics"):
+            trainer.trainer_args.metrics = []

@@ -11,10 +11,10 @@ class CSVExporter(AbstractDatasetExporter):
         """
         return True
 
-    def export(self) -> None:
+    def export(self, include_index: bool = True, **kwargs) -> None:
         """
         Exports entities as a project in a CSV format.
         :return: None
         """
         df = self.get_dataset().to_dataframe()
-        df.to_csv(self.export_path, index=False)
+        df.to_csv(self.export_path, index=include_index)

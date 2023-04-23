@@ -41,7 +41,7 @@ class SafaExporter(AbstractDatasetExporter):
         return False
 
     @overrides(AbstractDatasetExporter)
-    def export(self) -> None:
+    def export(self, **kwargs) -> None:
         """
         Exports entities as a project in the safa format.
         :return: None

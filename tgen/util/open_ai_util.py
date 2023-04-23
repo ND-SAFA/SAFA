@@ -1,10 +1,7 @@
-from enum import Enum
-
+import openai
 from openai.openai_object import OpenAIObject
 
 from tgen.constants import OPEN_AI_ORG, OPEN_AI_KEY, IS_TEST
-import openai
-
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.list_util import ListUtil
 

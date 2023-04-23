@@ -39,11 +39,10 @@ class OpenAiTrainer(AbstractTrainer):
         :param prompt_creator: In charge of generator promtps for dataset
         """
         self.base_model = base_model
-        self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
         self.prompt_creator = prompt_creator
         self.summarizer = Summarizer(model_for_token_limit=base_model, code_or_exceeds_limit_only=False)
-        super().__init__(trainer_dataset_manager)
+        super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
 
     def perform_training(self) -> FineTune:
         """
@@ -85,6 +84,8 @@ class OpenAiTrainer(AbstractTrainer):
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompt_df = dataset.get_prompts_dataframe(self.prompt_creator, summarizer=self.summarizer)
+        if self.trainer_args.output_dir:
+            dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                  **self.trainer_args.to_params(self.prompt_creator, TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \

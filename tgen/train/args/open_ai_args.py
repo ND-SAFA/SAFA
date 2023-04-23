@@ -21,6 +21,7 @@ class OpenAiArgs:
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
+    output_dir: str = None
 
     def to_params(self, prompt_creator: AbstractPromptCreator, task: TrainerTask = TrainerTask.TRAIN,
                   include_classification_metrics: bool = False) -> Dict[str, Any]:

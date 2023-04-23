@@ -3,7 +3,7 @@ import uuid
 from typing import Any, Tuple
 
 import pandas as pd
-
+from tqdm import tqdm
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -81,7 +81,7 @@ class PromptDataset(iDataset):
         """
         export_path = export_path if export_path else self.data_export_path
         should_delete = not export_path
-        default_filename = f"{uuid.uuid4()}{PromptProjectReader.FILE_EXT}"
+        default_filename = f"prompt_df_{uuid.uuid4()}{PromptProjectReader.FILE_EXT}"
         if export_path:
             if not FileUtil.get_file_ext(export_path):
                 export_path = os.path.join(export_path, default_filename)
@@ -133,7 +133,7 @@ class PromptDataset(iDataset):
         """
         entries = []
         traces = self.trace_dataset.trace_df
-        for i, row in traces.itertuples():
+        for i, row in tqdm(traces.itertuples(), desc="Generating prompts dataframe from trace links"):
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = self._get_prompt_entry(source_content=source[ArtifactKeys.CONTENT], target_content=target[ArtifactKeys.CONTENT],
                                            label=row[TraceKeys.LABEL], prompt_creator=prompt_creator, summarizer=summarizer)
@@ -149,7 +149,7 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, row in self.artifact_df.itertuples():
+        for i, row in tqdm(self.artifact_df.itertuples(),  desc="Generating prompts dataframe from trace links"):
             entry = self._get_prompt_entry(target_content=row[ArtifactKeys.CONTENT], source_content='', prompt_creator=prompt_creator,
                                            summarizer=summarizer)
             entries.append(entry)
@@ -167,11 +167,11 @@ class PromptDataset(iDataset):
         :return: The prompt entry
         """
         entry = prompt_creator.create(source_content=source_content, target_content=target_content, **prompt_creator_params)
-        if summarizer and summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT]):
+        if summarizer and summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
             if source_content:
-                source_content = summarizer.summarize(source_content)
-            target_content = summarizer.summarize(target_content)
-            entry = self.prompt_creator.create(source_content, target_content, prompt_creator_params)
+                source_content = summarizer.summarize(content=source_content)
+            target_content = summarizer.summarize(content=target_content)
+            entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
         return entry
 
     def _has_trace_data(self) -> bool:

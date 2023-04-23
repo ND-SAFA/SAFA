@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
+from tgen.constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
 from tgen.data.summarizer.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
@@ -18,7 +19,7 @@ class AbstractChunker(BaseObject, ABC):
         :return: The approximate number of tokens
         """
         self.model_name = model_name
-        self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name)
+        self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name) - MAX_TOKENS_DEFAULT - MAX_TOKENS_BUFFER
 
     def chunk(self, content: str) -> List[str]:
         """

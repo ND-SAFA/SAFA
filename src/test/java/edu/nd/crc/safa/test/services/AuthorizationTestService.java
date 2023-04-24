@@ -92,6 +92,12 @@ public class AuthorizationTestService {
     }
 
     public void removeMemberFromProject(Project project, String username) throws Exception {
+        removeMemberFromProject(project, username, status().is2xxSuccessful());
+    }
+
+    public void removeMemberFromProject(Project project, String username, ResultMatcher resultMatcher)
+        throws Exception {
+
         Optional<SafaUser> safaUserOptional = this.serviceProvider
             .getSafaUserRepository()
             .findByEmail(username);
@@ -111,6 +117,6 @@ public class AuthorizationTestService {
         SafaRequest
             .withRoute(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
             .withProjectMembership(projectMembershipOptional.get())
-            .deleteWithJsonObject();
+            .deleteWithJsonObject(resultMatcher);
     }
 }

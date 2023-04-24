@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.graphql.services;
+package edu.nd.crc.safa.utilities.graphql.services;
 
 import java.io.IOException;
 import java.io.InputStream;

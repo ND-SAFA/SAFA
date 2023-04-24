@@ -3,10 +3,10 @@ package edu.nd.crc.safa.features.github.services;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.features.graphql.entities.GraphQlResponse;
-import edu.nd.crc.safa.features.graphql.services.GraphQlService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
+import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

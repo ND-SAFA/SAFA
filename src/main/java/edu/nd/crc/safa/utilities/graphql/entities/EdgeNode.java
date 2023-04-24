@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.graphql.entities;
+package edu.nd.crc.safa.utilities.graphql.entities;
 
 import lombok.Data;
 

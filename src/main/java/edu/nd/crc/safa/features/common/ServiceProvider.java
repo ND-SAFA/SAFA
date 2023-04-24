@@ -25,7 +25,6 @@ import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepos
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
-import edu.nd.crc.safa.features.graphql.services.GraphQlService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -59,6 +58,7 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

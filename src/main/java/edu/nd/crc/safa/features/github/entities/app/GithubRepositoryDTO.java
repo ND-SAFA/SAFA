@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
-import edu.nd.crc.safa.features.github.entities.api.graphql.EdgeNode;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
+import edu.nd.crc.safa.features.graphql.entities.EdgeNode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.github.entities.api.graphql;
 
 import java.util.Date;
 
+import edu.nd.crc.safa.features.graphql.entities.Edges;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

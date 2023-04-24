@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.features.github.entities.api;
 
-import edu.nd.crc.safa.features.github.entities.api.graphql.Edges;
-import edu.nd.crc.safa.features.github.entities.api.graphql.GithubResponse;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
+import edu.nd.crc.safa.features.graphql.entities.Edges;
+import edu.nd.crc.safa.features.graphql.entities.GraphQlResponse;
 
 import lombok.Data;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-public class GithubGraphQlRepositoriesResponse extends GithubResponse<GithubGraphQlRepositoriesResponse.Payload> {
+public class GithubGraphQlRepositoriesResponse extends GraphQlResponse<GithubGraphQlRepositoriesResponse.Payload> {
 
     @Data
     public static class Payload {

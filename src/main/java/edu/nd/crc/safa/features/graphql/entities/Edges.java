@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.github.entities.api.graphql;
+package edu.nd.crc.safa.features.graphql.entities;
 
 import java.util.List;
 

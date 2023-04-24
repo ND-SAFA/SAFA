@@ -1,17 +1,17 @@
-package edu.nd.crc.safa.features.github.entities.api.graphql;
+package edu.nd.crc.safa.features.graphql.entities;
 
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class GithubResponse<T> {
+public class GraphQlResponse<T> {
     private T data;
     private List<ResponseError> errors;
 
     @Data
     public static class ResponseError {
-        private String type; // TODO enum
+        private String type;
         private List<String> path;
         private List<ErrorLocation> locations;
         private String message;

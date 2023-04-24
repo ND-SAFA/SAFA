@@ -20,14 +20,15 @@ import org.junit.jupiter.api.Test;
 
 public class TestGithubImport extends AbstractGithubTest {
 
-    protected String repositoryName = "home_assistant_ro";
+    protected String repositoryName = "bend";
+    protected String owner = "ND-SAFA";
 
     @Test
     void intoNewProjectTest() throws Exception {
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Github.Import.BY_NAME)
             .withRepositoryName(repositoryName)
-            .withOwner(githubLogin)
+            .withOwner(owner)
             .postWithoutBody(status().is2xxSuccessful());
 
         // We should have one version created
@@ -70,7 +71,7 @@ public class TestGithubImport extends AbstractGithubTest {
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
 
         Assertions.assertTrue(serviceProvider.getGithubProjectRepository()
-            .findByProjectAndRepositoryName(project, repositoryName).isPresent());
+            .findByProjectAndOwnerAndRepositoryName(project, owner, repositoryName).isPresent());
 
         int importedArtifactsCount = serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
             .filesOnly().getTree().size();

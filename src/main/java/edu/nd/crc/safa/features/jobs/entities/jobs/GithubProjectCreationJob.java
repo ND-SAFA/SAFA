@@ -11,14 +11,15 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -57,7 +58,7 @@ public class GithubProjectCreationJob extends CommitJob {
     /**
      * Repository pulled data
      */
-    protected GithubRepositoryDTO githubRepositoryDTO;
+    protected Repository githubRepositoryDTO;
 
     /**
      * Internal project representation
@@ -102,11 +103,11 @@ public class GithubProjectCreationJob extends CommitJob {
      */
     @IJobStep(value = "Retrieving Github Repository", position = 2)
     public void retrieveGitHubRepository(JobLogger logger) {
-        GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
+        GithubGraphQlService ghService = serviceProvider.getGithubGraphQlService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
         String owner = this.githubIdentifier.getRepositoryOwner();
 
-        this.githubRepositoryDTO = connectionService.getRepository(this.credentials, owner, repositoryName);
+        this.githubRepositoryDTO = ghService.getGithubRepository(user, owner, repositoryName).getData().getRepository();
 
         logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
     }
@@ -146,7 +147,8 @@ public class GithubProjectCreationJob extends CommitJob {
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
-        githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranch());
+        githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranchRef().getName());
+        githubProject.setOwner(this.githubRepositoryDTO.getOwner().getLogin());
         githubProject.setRepositoryName(this.githubRepositoryDTO.getName());
 
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
@@ -154,12 +156,8 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
-        GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
-        String repositoryName = this.githubIdentifier.getRepositoryName();
-
         ProjectCommit commit = getProjectCommit();
-        this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
-            this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
+        this.commitSha = this.githubRepositoryDTO.getDefaultBranchRef().getTarget().getOid();
         commit.addArtifacts(ModificationType.ADDED, getArtifacts());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);

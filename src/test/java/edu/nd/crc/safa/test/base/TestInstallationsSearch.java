@@ -23,7 +23,7 @@ public class TestInstallationsSearch extends ApplicationBaseTest {
     public void allInstallationsForProjectAreLoaded() {
         Project project = dbEntityBuilder.newProject(PROJECT_NAME).getProject(PROJECT_NAME);
         JiraProject jiraProject = this.createJiraProject(UUID.randomUUID(), 10002L, project);
-        GithubProject githubProject = this.createGithubProject("repository", "branch", project);
+        GithubProject githubProject = this.createGithubProject("owner", "repository", "branch", project);
         List<InstallationDTO> installationDTOList = this.serviceProvider
             .getProjectRepository()
             .findInstallationsByProjectId(project.getProjectId());
@@ -39,9 +39,10 @@ public class TestInstallationsSearch extends ApplicationBaseTest {
         return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
     }
 
-    private GithubProject createGithubProject(String repository, String branch, Project project) {
+    private GithubProject createGithubProject(String owner, String repository, String branch, Project project) {
         GithubProject githubProject = new GithubProject();
 
+        githubProject.setOwner(owner);
         githubProject.setRepositoryName(repository);
         githubProject.setProject(project);
         githubProject.setBranch(branch);

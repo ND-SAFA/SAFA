@@ -29,6 +29,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         githubProject.setRepositoryName(repositoryName);
         githubProject.setBranch("branch");
         githubProject.setLastCommitSha("sha");
+        githubProject.setOwner(githubLogin);
         serviceProvider.getGithubProjectRepository().save(githubProject);
 
         JSONObject response = SafaRequest

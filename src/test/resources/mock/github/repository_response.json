@@ -1,124 +1,81 @@
 {
-  "allow_forking": true,
-  "archive_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/{archive_format}{/ref}",
-  "archived": false,
-  "assignees_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/assignees{/user}",
-  "blobs_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs{/sha}",
-  "branches_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/branches{/branch}",
-  "clone_url": "https://github.com/MarcusGitAccount/home_assistant_ro.git",
-  "collaborators_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/collaborators{/collaborator}",
-  "comments_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/comments{/number}",
-  "commits_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits{/sha}",
-  "compare_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/compare/{base}...{head}",
-  "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/{+path}",
-  "contributors_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contributors",
-  "created_at": "2020-05-07T20:48:43Z",
-  "default_branch": "master",
-  "deployments_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/deployments",
-  "description": "Dialogue manager for a digital home assistant in romanian. Processing various intents receveid from a RASA model using a finite automata combined with a knowledge base representation in Prolog. External resources acces was provided to fulfill certain intents via APIs(Google Calendar and weather).",
-  "disabled": false,
-  "downloads_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/downloads",
-  "events_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/events",
-  "fork": false,
-  "forks": 1,
-  "forks_count": 1,
-  "forks_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/forks",
-  "full_name": "MarcusGitAccount/home_assistant_ro",
-  "git_commits_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/commits{/sha}",
-  "git_refs_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/refs{/sha}",
-  "git_tags_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/tags{/sha}",
-  "git_url": "git://github.com/MarcusGitAccount/home_assistant_ro.git",
-  "has_downloads": true,
-  "has_issues": true,
-  "has_pages": false,
-  "has_projects": true,
-  "has_wiki": true,
-  "homepage": "",
-  "hooks_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/hooks",
-  "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro",
-  "id": 262155554,
-  "is_template": false,
-  "issue_comment_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/issues/comments{/number}",
-  "issue_events_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/issues/events{/number}",
-  "issues_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/issues{/number}",
-  "keys_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/keys{/key_id}",
-  "labels_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/labels{/name}",
-  "language": "Prolog",
-  "languages_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/languages",
-  "license": {
-    "key": "mit",
-    "name": "MIT License",
-    "node_id": "MDc6TGljZW5zZTEz",
-    "spdx_id": "MIT",
-    "url": "https://api.github.com/licenses/mit"
-  },
-  "merges_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/merges",
-  "milestones_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/milestones{/number}",
-  "mirror_url": null,
-  "name": "home_assistant_ro",
-  "network_count": 1,
-  "node_id": "MDEwOlJlcG9zaXRvcnkyNjIxNTU1NTQ=",
-  "notifications_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/notifications{?since,all,participating}",
-  "open_issues": 1,
-  "open_issues_count": 1,
-  "owner": {
-    "avatar_url": "https://avatars.githubusercontent.com/u/16170265?v=4",
-    "events_url": "https://api.github.com/users/MarcusGitAccount/events{/privacy}",
-    "followers_url": "https://api.github.com/users/MarcusGitAccount/followers",
-    "following_url": "https://api.github.com/users/MarcusGitAccount/following{/other_user}",
-    "gists_url": "https://api.github.com/users/MarcusGitAccount/gists{/gist_id}",
-    "gravatar_id": "",
-    "html_url": "https://github.com/MarcusGitAccount",
-    "id": 16170265,
-    "login": "MarcusGitAccount",
-    "node_id": "MDQ6VXNlcjE2MTcwMjY1",
-    "organizations_url": "https://api.github.com/users/MarcusGitAccount/orgs",
-    "received_events_url": "https://api.github.com/users/MarcusGitAccount/received_events",
-    "repos_url": "https://api.github.com/users/MarcusGitAccount/repos",
-    "site_admin": false,
-    "starred_url": "https://api.github.com/users/MarcusGitAccount/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/MarcusGitAccount/subscriptions",
-    "type": "User",
-    "url": "https://api.github.com/users/MarcusGitAccount"
-  },
-  "permissions": {
-    "admin": true,
-    "maintain": true,
-    "pull": true,
-    "push": true,
-    "triage": true
-  },
-  "private": false,
-  "pulls_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/pulls{/number}",
-  "pushed_at": "2021-05-06T20:14:10Z",
-  "releases_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/releases{/id}",
-  "size": 308,
-  "ssh_url": "git@github.com:MarcusGitAccount/home_assistant_ro.git",
-  "stargazers_count": 3,
-  "stargazers_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/stargazers",
-  "statuses_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/statuses/{sha}",
-  "subscribers_count": 3,
-  "subscribers_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/subscribers",
-  "subscription_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/subscription",
-  "svn_url": "https://github.com/MarcusGitAccount/home_assistant_ro",
-  "tags_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/tags",
-  "teams_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/teams",
-  "temp_clone_token": "",
-  "topics": [
-    "api-wrapper",
-    "dialogue-manager",
-    "finite-state-machine",
-    "google-calendar-api",
-    "home-assistant",
-    "knowledge-base",
-    "prolog",
-    "python"
-  ],
-  "trees_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees{/sha}",
-  "updated_at": "2022-04-07T17:48:18Z",
-  "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro",
-  "visibility": "public",
-  "watchers": 3,
-  "watchers_count": 3,
-  "web_commit_signoff_required": false
+  "data": {
+    "repository": {
+      "id": "MDEwOlJlcG9zaXRvcnkzODQxMDU3OTk=",
+      "name": "bend",
+      "owner": {
+        "login": "ND-SAFA"
+      },
+      "isPrivate": true,
+      "url": "https://github.com/ND-SAFA/bend",
+      "description": "API for SAFA app.",
+      "visibility": "PRIVATE",
+      "createdAt": "2021-07-08T11:45:39Z",
+      "primaryLanguage": {
+        "name": "Java"
+      },
+      "defaultBranchRef": {
+        "name": "development",
+        "target": {
+          "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+        }
+      },
+      "refs": {
+        "edges": [
+          {
+            "node": {
+              "name": "FEATURE/aws-integration",
+              "target": {
+                "oid": "e2f17701fe1387f0d11e53c6df9867360bfd81f6"
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "FEATURE/github-import-updates",
+              "target": {
+                "oid": "65fdc084dbd1eb38630cf956e5e2e984ef735897"
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "FEATURE-improve-db",
+              "target": {
+                "oid": "598f39edc5df399c75165143c28d23374aafd944"
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "REFACTOR/update-tgen",
+              "target": {
+                "oid": "16020117766ffe74ca8f87ed8e7c8469f8b0ba87"
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "development",
+              "target": {
+                "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "production",
+              "target": {
+                "oid": "78cdf2a2a1f17a71c12c540161ce568d465189ac"
+              }
+            }
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Ng"
+        }
+      }
+    }
+  }
 }

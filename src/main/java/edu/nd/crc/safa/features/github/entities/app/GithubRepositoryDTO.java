@@ -75,7 +75,7 @@ public class GithubRepositoryDTO {
         if (response == null) {
             return null;
         }
-        System.out.println(response);
+
         return fromGraphQlObject(response.getData().getRepository());
     }
 

@@ -41,8 +41,9 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     protected GithubProject getGithubProjectMapping(Project project) {
         GithubProjectRepository repository = this.serviceProvider.getGithubProjectRepository();
 
-        this.githubProject = repository.findByProjectAndRepositoryName(
+        this.githubProject = repository.findByProjectAndOwnerAndRepositoryName(
             project,
+            this.githubIdentifier.getRepositoryOwner(),
             this.githubIdentifier.getRepositoryName()
         ).orElseThrow(() -> new SafaError("Linked project not found"));
         return this.githubProject;

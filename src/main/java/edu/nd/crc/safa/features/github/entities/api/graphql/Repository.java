@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.github.entities.api.graphql;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -9,6 +10,7 @@ public class Repository {
     private String id;
     private String name;
     private Owner owner;
+    @JsonProperty("isPrivate")
     private boolean isPrivate;
     private String url;
     private String description;
@@ -31,5 +33,11 @@ public class Repository {
     @Data
     public static class Branch {
         private String name;
+        private Commit target;
+    }
+
+    @Data
+    public static class Commit {
+        private String oid;
     }
 }

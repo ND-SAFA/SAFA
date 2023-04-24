@@ -46,6 +46,12 @@ public class GithubProject {
     /**
      * Repository name
      */
+    @Column(name = "owner", nullable = false)
+    private String owner;
+
+    /**
+     * Repository name
+     */
     @Column(name = "repository_name", nullable = false)
     private String repositoryName;
 

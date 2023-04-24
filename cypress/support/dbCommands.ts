@@ -1,4 +1,4 @@
-import { validUser } from "@/fixtures";
+import { user } from "@/fixtures/data/user";
 
 const apiUrl = "https://dev-api.safa.ai";
 
@@ -18,7 +18,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("dbToken", () => {
-  cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
+  cy.request<{ token: string }>("POST", `${apiUrl}/login`, user.validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
@@ -127,5 +127,29 @@ Cypress.Commands.add("dbDeleteUser", (email, password) => {
       body: { password },
       failOnStatusCode: false,
     });
+  });
+});
+
+Cypress.Commands.add("generateUsers", () => {
+  // Create the account for validUser and editUser
+  cy.request<{ token: string }>({
+    method: "POST",
+    url: `${apiUrl}/user`,
+    body: user.validUser,
+  }).request<{ token: string }>({
+    method: "POST",
+    url: `${apiUrl}/user`,
+    body: user.editUser,
+  });
+});
+
+Cypress.Commands.add("deleteGeneratedUsers", () => {
+  // Delete the account for all the users in the user object
+  cy.request<{ token: string }>({
+    method: "DELETE",
+    url: `${apiUrl}/user/${user.validUser.email}`,
+  }).request<{ token: string }>({
+    method: "DELETE",
+    url: `${apiUrl}/user/${user.editUser.email}`,
   });
 });

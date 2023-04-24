@@ -1,5 +1,5 @@
-import { DataCy, inviteUser } from "@/fixtures";
-
+import { DataCy } from "@/fixtures";
+import { user } from "@/fixtures/data/user";
 describe("Project Members", () => {
   beforeEach(() => {
     cy.initEmptyProject().initProjectVersion(false).openProjectSettings();
@@ -7,13 +7,13 @@ describe("Project Members", () => {
 
   describe("As an owner, I can add a new member to a project", () => {
     it("Can't add an invalid member", () => {
-      cy.projectAddNewMember(inviteUser.invalidEmail, "Viewer");
+      cy.projectAddNewMember(user.inviteUser.invalidEmail, "Viewer");
 
       cy.getCy(DataCy.snackbarError).should("be.visible");
     });
 
     it("Can add a new member to the project", () => {
-      cy.projectAddNewMember(inviteUser.email, "Viewer");
+      cy.projectAddNewMember(user.inviteUser.email, "Viewer");
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
@@ -21,7 +21,7 @@ describe("Project Members", () => {
 
   describe("As an owner, I can edit a project member’s permissions", () => {
     it("Can edit the permissions of a project member", () => {
-      cy.projectAddNewMember(inviteUser.email, "Viewer");
+      cy.projectAddNewMember(user.inviteUser.email, "Viewer");
 
       cy.clickButton(DataCy.projectSettingsEditUserButton, "last");
 
@@ -37,7 +37,7 @@ describe("Project Members", () => {
 
   describe("As an owner, I can remove a member from a project", () => {
     it("Can remove a member from a project", () => {
-      cy.projectAddNewMember(inviteUser.email, "Viewer");
+      cy.projectAddNewMember(user.inviteUser.email, "Viewer");
 
       cy.clickButton(
         DataCy.projectSettingsDeleteUserButton,

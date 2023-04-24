@@ -4,14 +4,18 @@ import {
   simpleProjectFilesMap,
   testFileMap,
   testProject,
-  validUser,
 } from "@/fixtures";
 
+import { user } from "@/fixtures/data/user";
 describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.loginToPage(validUser.email, validUser.password, Routes.PROJECT_CREATOR);
+    cy.loginToPage(
+      user.validUser.email,
+      user.validUser.password,
+      Routes.PROJECT_CREATOR
+    );
   });
 
   describe("Project Artifact Uploading", () => {

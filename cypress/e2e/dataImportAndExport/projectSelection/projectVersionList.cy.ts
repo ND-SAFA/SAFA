@@ -1,5 +1,5 @@
-import { DataCy, Routes, validUser } from "@/fixtures";
-
+import { DataCy, Routes } from "@/fixtures";
+import { user } from "@/fixtures/data/user";
 describe("Project Version List", () => {
   before(() => {
     cy.initProject().clearAllCookies();
@@ -7,8 +7,8 @@ describe("Project Version List", () => {
 
   beforeEach(() => {
     cy.expandViewport().loginToPage(
-      validUser.email,
-      validUser.password,
+      user.validUser.email,
+      user.validUser.password,
       Routes.MY_PROJECTS
     );
   });

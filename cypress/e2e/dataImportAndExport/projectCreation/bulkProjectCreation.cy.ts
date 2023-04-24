@@ -1,11 +1,11 @@
 import {
-  validUser,
   simpleProjectFiles,
   simpleProjectFilesMap,
   DataCy,
   testProject,
   Routes,
 } from "@/fixtures";
+import { user } from "@/fixtures/data/user";
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();
@@ -14,8 +14,8 @@ describe("Bulk Project Creation", () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.loginToPage(
-      validUser.email,
-      validUser.password,
+      user.validUser.email,
+      user.validUser.password,
       Routes.PROJECT_CREATOR,
       { tab: "bulk" }
     );

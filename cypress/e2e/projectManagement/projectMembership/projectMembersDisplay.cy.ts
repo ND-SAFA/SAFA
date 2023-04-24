@@ -1,5 +1,5 @@
 import { DataCy } from "@/fixtures";
-import { inviteUser } from "@/fixtures/data/user.json";
+import { user } from "@/fixtures/data/user";
 
 describe("Project Members Display", () => {
   before(() => {
@@ -7,7 +7,7 @@ describe("Project Members Display", () => {
     cy.getCy(DataCy.appLoading).should("not.exist");
     cy.openProjectSettings();
 
-    cy.projectAddNewMember(inviteUser.email, "Admin");
+    cy.projectAddNewMember(user.inviteUser.email, "Admin");
   });
 
   beforeEach(() => {
@@ -18,10 +18,10 @@ describe("Project Members Display", () => {
 
   describe("I can search through a project’s members", () => {
     it("Can search for a specific member", () => {
-      cy.getCy(DataCy.selectorSearchInput).first().type(inviteUser.email);
+      cy.getCy(DataCy.selectorSearchInput).first().type(user.inviteUser.email);
 
       cy.withinTableRows(DataCy.projectSettingsTable, (tr) => {
-        tr.contains(inviteUser.email).should("have.length", 1);
+        tr.contains(user.inviteUser.email).should("have.length", 1);
       });
     });
   });

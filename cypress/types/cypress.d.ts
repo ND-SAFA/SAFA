@@ -205,6 +205,16 @@ declare namespace Cypress {
       waitForLoad?: boolean
     ): Chainable<void>;
 
+    /**
+     * Generates all the users that are needed for the tests.
+     */
+    generateUsers(): Chainable<void>;
+
+    /**
+     * Deletes all the created users after test run.
+     */
+    deleteGeneratedUsers(): Chainable<void>;
+
     // Authentication Commands
 
     /**

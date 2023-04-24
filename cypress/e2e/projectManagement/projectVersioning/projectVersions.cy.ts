@@ -1,5 +1,5 @@
 import { DataCy, Routes, simpleProjectFiles } from "@/fixtures";
-import { validUser } from "@/fixtures/data/user.json";
+import { user } from "@/fixtures/data/user";
 
 describe("Project Versions", () => {
   before(() => {
@@ -10,7 +10,7 @@ describe("Project Versions", () => {
     cy.dbResetVersions();
 
     cy.visit(Routes.MY_PROJECTS)
-      .login(validUser.email, validUser.password)
+      .login(user.validUser.email, user.validUser.password)
       .locationShouldEqual(Routes.MY_PROJECTS)
       .expandViewport();
   });

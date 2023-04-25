@@ -5,7 +5,6 @@ import java.util.Optional;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -26,14 +25,6 @@ public interface GithubConnectionService {
      * @return GitHub handler from the credentials
      */
     GithubSelfResponseDTO getSelf(GithubAccessCredentials credentials);
-
-    /**
-     * Get new credentials based on old ones
-     *
-     * @param credentials The credentials to refresh.
-     * @return Refreshed credentials.
-     */
-    GithubRefreshTokenDTO refreshAccessToken(GithubAccessCredentials credentials);
 
     /**
      * @param credentials    User credentials

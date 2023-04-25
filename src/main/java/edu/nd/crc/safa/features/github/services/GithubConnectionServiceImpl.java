@@ -6,7 +6,6 @@ import edu.nd.crc.safa.config.WebApiConfiguration;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -27,12 +26,9 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private static final String GITHUB_API_URL = "https://api.github.com";
     private static final String GITHUB_AUTH_URL = "https://github.com/login/oauth";
-    private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
 
     private static final String CLIENT_ID_PARAM = "client_id";
     private static final String CLIENT_SECRET_PARAM = "client_secret";
-    private static final String REFRESH_TOKEN_PARAM = "refresh_token";
-    private static final String GRANT_TYPE_PARAM = "grant_type";
 
     private static final String ACCESS_CODE_PARAM = "code";
 
@@ -75,22 +71,6 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                 .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
                 .retrieve()
                 .bodyToMono(GithubSelfResponseDTO.class)
-        ).orElseThrow(() -> new SafaError("Error while trying to refresh GitHub credentials"));
-    }
-
-    @Override
-    public GithubRefreshTokenDTO refreshAccessToken(GithubAccessCredentials credentials) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                .uri(ApiRoute.REFRESH_TOKEN.getFullPath(), builder ->
-                    this.setAuthorizationQueryParameters(builder, credentials)
-                        .queryParam(GRANT_TYPE_PARAM, REFRESH_TOKEN_REQUEST_GRANT_TYPE)
-                        .build()
-                )
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(GithubRefreshTokenDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh GitHub credentials"));
     }
 
@@ -177,13 +157,6 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private String buildAuthorizationHeaderValue(String token) {
         return String.format("token %s", token);
-    }
-
-    private UriBuilder setAuthorizationQueryParameters(UriBuilder builder, GithubAccessCredentials credentials) {
-        return builder
-            .queryParam(CLIENT_ID_PARAM, credentials.getClientId())
-            .queryParam(CLIENT_SECRET_PARAM, credentials.getClientSecret())
-            .queryParam(REFRESH_TOKEN_PARAM, credentials.getRefreshToken());
     }
 
     private UriBuilder setAuthorizationQueryParameters(UriBuilder builder, String clientId, String clientSecret) {

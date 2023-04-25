@@ -9,7 +9,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /**
@@ -135,44 +133,4 @@ public class GithubCredentialsController extends BaseController {
         return output;
     }
 
-    @PutMapping(AppRoutes.Github.Credentials.REFRESH)
-    public DeferredResult<GithubResponseDTO<Void>> refreshCredentials() {
-        DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
-            Optional<GithubAccessCredentials> githubAccessCredentialsOptional =
-                githubConnectionService.getGithubCredentials(principal);
-
-            if (githubAccessCredentialsOptional.isEmpty()) {
-                output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.MISSING));
-                return;
-            }
-
-            GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsOptional.get();
-
-            GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
-
-            if (GithubResponseMessage.EXPIRED.equals(responseDTO.getMessage())) {
-                log.error("Trying to refresh expired credentials");
-                output.setErrorResult(responseDTO);
-                return;
-            }
-
-            log.info("Refreshing GitHub credentials for {}", principal.getEmail());
-
-            GithubRefreshTokenDTO refreshTokenDTO = githubConnectionService.refreshAccessToken(githubAccessCredentials);
-
-            githubAccessCredentials.setAccessToken(refreshTokenDTO.getAccessToken());
-            githubAccessCredentials.setRefreshToken(refreshTokenDTO.getRefreshToken());
-            githubAccessCredentials.setAccessTokenExpiration(refreshTokenDTO.getAccessTokenExpiration());
-            githubAccessCredentials.setRefreshTokenExpiration(refreshTokenDTO.getRefreshTokenExpiration());
-            githubAccessCredentials.updateExpirationDates();
-            githubAccessCredentialsRepository.save(githubAccessCredentials);
-
-            output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.UPDATED));
-        });
-
-        return output;
-    }
 }

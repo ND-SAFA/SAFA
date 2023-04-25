@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.test.features.github.credentials;
 
-import java.time.LocalDateTime;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -35,7 +33,6 @@ public class TestGithubCredentials extends AbstractGithubTest {
     void checkingInvalidCredentialsDeletesThem() throws Exception {
         GithubAccessCredentials credentials = new GithubAccessCredentials();
 
-        credentials.setRefreshTokenExpirationDate(LocalDateTime.MIN);
         super.mockRepositoryFindByUser(credentials);
         super.mockRepositoryDelete();
 

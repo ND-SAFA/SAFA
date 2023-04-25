@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.test.features.github.base;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -103,9 +102,6 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         file.setContent(ENCODED_FILE_CONTENT);
         Mockito.when(serviceMock.getBlobInformation(Mockito.any(), Mockito.any()))
                 .thenReturn(file);
-
-        credentials.setAccessTokenExpirationDate(LocalDateTime.MAX);
-        credentials.setRefreshTokenExpirationDate(LocalDateTime.MAX);
     }
 
     protected void mockRepositoryFindByUser() {

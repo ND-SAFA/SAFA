@@ -99,8 +99,9 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     @Override
     public GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
                                                                       String repositoryName,
-                                                                      String baseCommitSha) {
-        String commitRange = String.format("%s...HEAD", baseCommitSha);
+                                                                      String baseCommitSha,
+                                                                      String branchName) {
+        String commitRange = String.format("%s...%s", baseCommitSha, branchName);
 
         return WebApiUtils.blockOptional(
             this.webClient

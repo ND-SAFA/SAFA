@@ -50,7 +50,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
 
         int diffArtifactsCount = serviceMock.getDiffBetweenOldCommitAndHead(credentials,
-            repositoryName, "sha").getFiles().size();
+            repositoryName, "sha", "master").getFiles().size();
 
         // We should have the correct number of artifacts and links
         Assertions.assertEquals(

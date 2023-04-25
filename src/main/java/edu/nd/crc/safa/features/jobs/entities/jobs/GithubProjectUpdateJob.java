@@ -66,7 +66,8 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
             credentials,
             githubProject.getRepositoryName(),
-            githubProject.getLastCommitSha()
+            githubProject.getLastCommitSha(),
+            githubProject.getBranch()
         );
 
         log.info("Retrieving diff");

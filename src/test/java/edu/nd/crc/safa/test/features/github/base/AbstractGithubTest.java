@@ -93,6 +93,7 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         Mockito.when(serviceMock.getDiffBetweenOldCommitAndHead(
                 Mockito.any(GithubAccessCredentials.class),
                 Mockito.any(String.class),
+                Mockito.any(String.class),
                 Mockito.any(String.class)
         )).thenReturn(
             this.readResourceFile(DIFF_RESPONSE_FILE, GithubCommitDiffResponseDTO.class)

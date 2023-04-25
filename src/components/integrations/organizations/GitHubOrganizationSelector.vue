@@ -54,7 +54,10 @@ async function handleReload() {
 
         organizations.value.push({ id: owner, name: owner });
       });
+
+      integrationsStore.gitHubProjectList = projects;
     },
+    onError: () => (organizations.value = []),
     onComplete: () => (loading.value = false),
   });
 }

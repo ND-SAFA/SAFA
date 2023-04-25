@@ -3,7 +3,6 @@
     title="GitHub Repositories"
     empty-message="There are no repositories."
     :item-count="projects.length"
-    :loading="loading"
   >
     <list>
       <list-item
@@ -33,11 +32,9 @@ export default {
 import { computed, ref, onMounted, watch } from "vue";
 import { GitHubProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
-import { handleLoadGitHubProjects } from "@/api";
 import { StepperListStep, List, ListItem } from "@/components/common";
 
 const projects = ref<GitHubProjectSchema[]>([]);
-const loading = ref(false);
 
 const organizationName = computed(
   () => integrationsStore.gitHubOrganization?.name
@@ -52,16 +49,10 @@ function handleReload() {
   if (!integrationsStore.gitHubOrganization) return;
 
   integrationsStore.gitHubProject = undefined;
-  loading.value = true;
 
-  handleLoadGitHubProjects({
-    onSuccess: (repositories) => {
-      projects.value = repositories.filter(
-        ({ owner }) => owner === organizationName.value
-      );
-    },
-    onComplete: () => (loading.value = false),
-  });
+  projects.value = integrationsStore.gitHubProjectList.filter(
+    ({ owner }) => owner === organizationName.value
+  );
 }
 
 /**

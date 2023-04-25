@@ -75,11 +75,11 @@ public class GithubProject {
     @Column(name = "last_update", nullable = false)
     private Date lastUpdate = new Date();
 
-    @Column(name = "include", nullable = false)
+    @Column(name = "include", nullable = false, columnDefinition = "mediumtext")
     @Lob
     private String include = "*";
 
-    @Column(name = "exclude", nullable = false)
+    @Column(name = "exclude", nullable = false, columnDefinition = "mediumtext")
     @Lob
     private String exclude = "";
 

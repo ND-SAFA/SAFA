@@ -1,12 +1,4 @@
 version: 0.2
-env:
-  secrets-manager:
-    $DOCKERHUB_USERNAME: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_USERNAME"
-    $DOCKERHUB_PASS: "arn:aws:secretsmanager:us-east-1:178003569110:secret:personal-docker-credentials-Dyjser:DOCKERHUB_PASSWORD"
-    $DB_INSTANCE: "arn:aws:secretsmanager:us-east-1:178003569110:secret:gcp-core-database-Rvq9es:instance"
-    $DB_USER: "arn:aws:secretsmanager:us-east-1:178003569110:secret:gcp-core-database-Rvq9es:username"
-    $DB_PASSWORD: "arn:aws:secretsmanager:us-east-1:178003569110:secret:gcp-core-database-Rvq9es:password"
-
 
 phases:
   build:

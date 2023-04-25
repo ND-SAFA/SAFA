@@ -1,0 +1,112 @@
+{
+  "data": {
+    "viewer": {
+      "repositories": {
+        "edges": [
+          {
+            "node": {
+              "id": "MDEwOlJlcG9zaXRvcnkzODQxMDU3OTk=",
+              "name": "bend",
+              "owner": {
+                "login": "ND-SAFA"
+              },
+              "isPrivate": true,
+              "url": "https://github.com/ND-SAFA/bend",
+              "description": "API for SAFA app.",
+              "visibility": "PRIVATE",
+              "createdAt": "2021-07-08T11:45:39Z",
+              "primaryLanguage": {
+                "name": "Java"
+              },
+              "defaultBranchRef": {
+                "name": "development",
+                "target": {
+                  "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+                }
+              },
+              "refs": {
+                "edges": [
+                  {
+                    "node": {
+                      "name": "development",
+                      "target": {
+                        "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "production",
+                      "target": {
+                        "oid": "78cdf2a2a1f17a71c12c540161ce568d465189ac"
+                      }
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false,
+                  "endCursor": "Ng"
+                }
+              }
+            }
+          },
+          {
+            "node": {
+              "id": "MDEwOlJlcG9zaXRvcnkzODQxMDYxMDE=",
+              "name": "fend",
+              "owner": {
+                "login": "ND-SAFA"
+              },
+              "isPrivate": true,
+              "url": "https://github.com/ND-SAFA/fend",
+              "description": "SAFA's VueJS front-end.",
+              "visibility": "PRIVATE",
+              "createdAt": "2021-07-08T11:46:49Z",
+              "primaryLanguage": {
+                "name": "TypeScript"
+              },
+              "defaultBranchRef": {
+                "name": "development",
+                "target": {
+                  "oid": "8abec6b74c08236cc8972687e566957a00de7521"
+                }
+              },
+              "refs": {
+                "edges": [
+                  {
+                    "node": {
+                      "name": "FEAT-aws-integration",
+                      "target": {
+                        "oid": "c56fdb05b91a229c07013d7c01c75563f56f7f1b"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "development",
+                      "target": {
+                        "oid": "8abec6b74c08236cc8972687e566957a00de7521"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "production",
+                      "target": {
+                        "oid": "042a4c0e4e3d518a5048d664ce13613db5edf41d"
+                      }
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false,
+                  "endCursor": "Mw"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

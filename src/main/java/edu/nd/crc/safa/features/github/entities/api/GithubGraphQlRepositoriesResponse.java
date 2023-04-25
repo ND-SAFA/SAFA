@@ -12,7 +12,7 @@ import lombok.ToString;
  * Response for {@code github/GetRepositories.graphql}.
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class GithubGraphQlRepositoriesResponse extends GraphQlResponse<GithubGraphQlRepositoriesResponse.Payload> {
 
     @Data

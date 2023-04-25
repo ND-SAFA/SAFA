@@ -273,7 +273,7 @@ public class AppRoutes {
             @NoArgsConstructor(access = AccessLevel.PRIVATE)
             public static class Repos {
                 public static final String ROOT = Github.ROOT + "/repos";
-                public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repo}";
+                public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repositoryName}";
             }
 
             @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -1,11 +1,10 @@
 package edu.nd.crc.safa.utilities.graphql.services;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +39,9 @@ public class GraphQlService {
 
         String query;
         try {
-            query = GraphqlSchemaReaderUtil.getSchemaFromFileName(queryLocation);
+            // TODO profile this to make sure we aren't taking the hit of going to disk on EVERY request
+            String resourcePath = "graphql/" + queryLocation + ".graphql";
+            query = FileUtilities.readClasspathFile(resourcePath);
         }  catch (Exception e) {
             throw new SafaError("Could not load query schema", e);
         }
@@ -65,23 +66,6 @@ public class GraphQlService {
             .retrieve()
             .bodyToMono(responseClass)
             .block();
-    }
-
-    /**
-     * Loads a graphql query definition from disk.
-     */
-    // TODO profile this to make sure we aren't taking the hit of going to disk on EVERY request
-    private static final class GraphqlSchemaReaderUtil {
-
-        public static String getSchemaFromFileName(String filename) throws IOException {
-            ClassLoader classLoader = GraphqlSchemaReaderUtil.class.getClassLoader();
-            String resourcePath = "graphql/" + filename + ".graphql";
-
-            try (InputStream in = classLoader.getResourceAsStream(resourcePath)) {
-                assert in != null;
-                return new String(in.readAllBytes());
-            }
-        }
     }
 
     @Data

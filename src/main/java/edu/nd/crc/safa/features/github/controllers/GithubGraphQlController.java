@@ -8,7 +8,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
-import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -23,7 +22,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class GithubGraphQlController extends BaseController {
     private final ExecutorDelegate executorDelegate;
     private final SafaUserService safaUserService;
-    private final GithubConnectionService githubConnectionService;
     private final GithubGraphQlService graphQlService;
 
     public GithubGraphQlController(ResourceBuilder resourceBuilder,
@@ -34,7 +32,6 @@ public class GithubGraphQlController extends BaseController {
         this.executorDelegate = executorDelegate;
 
         this.safaUserService = serviceProvider.getSafaUserService();
-        this.githubConnectionService = serviceProvider.getGithubConnectionService();
         this.graphQlService = serviceProvider.getGithubGraphQlService();
     }
 
@@ -58,7 +55,7 @@ public class GithubGraphQlController extends BaseController {
      */
     @GetMapping(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)
     public DeferredResult<GithubRepositoryDTO> retrieveGithubRepository(@PathVariable("owner") String owner,
-                                                                        @PathVariable("repo") String repo) {
+                                                                        @PathVariable("repositoryName") String repo) {
         return makeDeferredRequest(user ->
             GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepository(user, owner, repo)));
     }

@@ -7,12 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -72,6 +74,19 @@ public class GithubProject {
      */
     @Column(name = "last_update", nullable = false)
     private Date lastUpdate = new Date();
+
+    @Column(name = "include", nullable = false)
+    @Lob
+    private String include = "*";
+
+    @Column(name = "exclude", nullable = false)
+    @Lob
+    private String exclude = "";
+
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    @JoinColumn(name = "artifact_type_id", nullable = false)
+    private ArtifactType artifactType;
 
     @PreUpdate
     @PrePersist

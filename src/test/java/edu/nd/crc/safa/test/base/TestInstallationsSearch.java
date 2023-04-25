@@ -7,6 +7,7 @@ import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.installations.app.InstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
 import org.junit.jupiter.api.Assertions;
@@ -40,12 +41,15 @@ public class TestInstallationsSearch extends ApplicationBaseTest {
     }
 
     private GithubProject createGithubProject(String owner, String repository, String branch, Project project) {
+        ArtifactType type = dbEntityBuilder.newTypeAndReturn(PROJECT_NAME, "test type");
+
         GithubProject githubProject = new GithubProject();
 
         githubProject.setOwner(owner);
         githubProject.setRepositoryName(repository);
         githubProject.setProject(project);
         githubProject.setBranch(branch);
+        githubProject.setArtifactType(type);
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
 }

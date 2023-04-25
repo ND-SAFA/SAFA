@@ -3,6 +3,7 @@ package edu.nd.crc.safa.test.features.github.imports;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
@@ -23,6 +24,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
 
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         Project project = dbEntityBuilder.getProject(projectName);
+        ArtifactType type = dbEntityBuilder.newTypeAndReturn(project.getName(), "test type");
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
@@ -30,6 +32,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
         githubProject.setBranch("branch");
         githubProject.setLastCommitSha("sha");
         githubProject.setOwner(githubLogin);
+        githubProject.setArtifactType(type);
         serviceProvider.getGithubProjectRepository().save(githubProject);
 
         JSONObject response = SafaRequest

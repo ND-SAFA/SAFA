@@ -4,16 +4,16 @@ FROM public.ecr.aws/docker/library/node:14-alpine
 # set working directory
 WORKDIR /app
 
-# copy files & environment variables
+# install app dependencies & build
 COPY package*.json ./
+RUN npm install --silent
+
+# copy files & environment variables
 COPY src /app/src
 COPY public /app/public
 COPY tsconfig.json ./
 COPY .eslintrc.js ./
 COPY vue.config.js ./
-
-# install app dependencies & build
-RUN npm install --silent
 RUN npm run build
 RUN npm install -g serve
 

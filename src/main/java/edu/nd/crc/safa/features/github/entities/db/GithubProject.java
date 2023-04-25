@@ -77,7 +77,7 @@ public class GithubProject {
 
     @Column(name = "include", nullable = false, columnDefinition = "mediumtext")
     @Lob
-    private String include = "*";
+    private String include = "**";
 
     @Column(name = "exclude", nullable = false, columnDefinition = "mediumtext")
     @Lob

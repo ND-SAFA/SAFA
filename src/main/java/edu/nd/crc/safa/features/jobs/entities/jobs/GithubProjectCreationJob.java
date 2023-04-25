@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -26,8 +27,10 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
 import org.springframework.util.StringUtils;
 
@@ -58,12 +61,14 @@ public class GithubProjectCreationJob extends CommitJob {
     /**
      * Repository pulled data
      */
-    protected Repository githubRepositoryDTO;
+    protected Repository githubRepository;
 
     /**
      * Internal project representation
      */
     protected GithubProject githubProject;
+
+    protected GithubImportDTO importSettings;
 
     private final SafaUser user;
 
@@ -72,10 +77,12 @@ public class GithubProjectCreationJob extends CommitJob {
     public GithubProjectCreationJob(JobDbEntity jobDbEntity,
                                     ServiceProvider serviceProvider,
                                     GithubIdentifier githubIdentifier,
+                                    GithubImportDTO githubImportDTO,
                                     SafaUser user) {
         super(jobDbEntity, serviceProvider);
         this.githubIdentifier = githubIdentifier;
         this.user = user;
+        this.importSettings = githubImportDTO;
     }
 
     public static String createJobName(String repositoryName) {
@@ -107,16 +114,16 @@ public class GithubProjectCreationJob extends CommitJob {
         String repositoryName = this.githubIdentifier.getRepositoryName();
         String owner = this.githubIdentifier.getRepositoryOwner();
 
-        this.githubRepositoryDTO = ghService.getGithubRepository(user, owner, repositoryName).getData().getRepository();
+        this.githubRepository = ghService.getGithubRepository(user, owner, repositoryName).getData().getRepository();
 
-        logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
+        logger.log("GitHub repository '%s' retrieved.", githubRepository.getName());
     }
 
     @IJobStep(value = "Creating SAFA Project", position = CREATE_PROJECT_STEP_NUM)
     public void createSafaProject(JobLogger logger) {
         // Step - Save as SAFA project
-        String projectName = this.githubRepositoryDTO.getName();
-        String projectDescription = this.githubRepositoryDTO.getDescription();
+        String projectName = this.githubRepository.getName();
+        String projectDescription = this.githubRepository.getDescription();
 
         if (projectDescription == null) {
             projectDescription = projectName;
@@ -131,7 +138,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Creating SAFA Project -> Github Repository Mapping", position = 4)
     public void createSafaProjectMapping(JobLogger logger) {
-        String projectName = this.githubRepositoryDTO.getName();
+        String projectName = this.githubRepository.getName();
         Project project = this.githubIdentifier.getProjectVersion().getProject();
 
         // Step - Update job name
@@ -143,26 +150,103 @@ public class GithubProjectCreationJob extends CommitJob {
         logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
     }
 
+    /**
+     * Creates a github project mapping for this project based on the job settings.
+     *
+     * @param project The project we're importing into.
+     * @return The github project mapping.
+     */
     protected GithubProject getGithubProjectMapping(Project project) {
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
-        githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranchRef().getName());
-        githubProject.setOwner(this.githubRepositoryDTO.getOwner().getLogin());
-        githubProject.setRepositoryName(this.githubRepositoryDTO.getName());
+        githubProject.setOwner(this.githubRepository.getOwner().getLogin());
+        githubProject.setRepositoryName(this.githubRepository.getName());
+
+        applyImportSettings(project, githubProject);
 
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
+    }
+
+    /**
+     * Applies the import settings to the github project definition, updating values if they are present
+     * in the import settings.
+     *
+     * @param project The project we're importing into.
+     * @param ghProject The github project mapping.
+     */
+    protected void applyImportSettings(Project project, GithubProject ghProject) {
+        ghProject.setArtifactType(getArtifactTypeMapping(project));
+
+        if (importSettings.getInclude() != null) {
+            ghProject.setInclude(String.join(",", importSettings.getInclude()));
+        }
+
+        if (importSettings.getExclude() != null) {
+            ghProject.setExclude(String.join(",", importSettings.getExclude()));
+        }
+
+        if (importSettings.getBranch() != null) {
+            ghProject.setBranch(importSettings.getBranch());
+        } else {
+            ghProject.setBranch(this.githubRepository.getDefaultBranchRef().getName());
+        }
+    }
+
+    /**
+     * Gets the artifact type mapping for this import based on the job settings. If the
+     * type id is null, it will default to {@code "GitHub File"}. If the type does not exist,
+     * it will be created.
+     *
+     * @param project The project we're importing into.
+     * @return The artifact type we should use for importing.
+     */
+    protected ArtifactType getArtifactTypeMapping(Project project) {
+        String artifactTypeId = this.importSettings.getArtifactTypeId();
+        artifactTypeId = artifactTypeId != null ? artifactTypeId : getDefaultTypeName();
+
+        ArtifactType artifactType = serviceProvider.getTypeService().getArtifactType(project, artifactTypeId);
+
+        if (artifactType == null) {
+            artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeId);
+        }
+
+        return artifactType;
+    }
+
+    /**
+     * Gets the default artifact type name for this import.
+     *
+     * @return The default artifact type name.
+     */
+    protected String getDefaultTypeName() {
+        return "GitHub File";
     }
 
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         ProjectCommit commit = getProjectCommit();
-        this.commitSha = this.githubRepositoryDTO.getDefaultBranchRef().getTarget().getOid();
+        Repository.Branch branch = getBranch(this.githubProject.getBranch());
+        this.commitSha = branch.getTarget().getOid();
         commit.addArtifacts(ModificationType.ADDED, getArtifacts());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
 
         logger.log("Retrieved %d artifacts from project.", commit.getArtifacts().getSize());
+    }
+
+    /**
+     * Get the branch definition with the given name.
+     *
+     * @param targetBranch The name of the branch.
+     * @return The branch if it exists, otherwise the default branch.
+     */
+    protected Repository.Branch getBranch(String targetBranch) {
+        return this.githubRepository.getRefs().getEdges().stream()
+            .map(EdgeNode::getNode)
+            .filter(branch -> branch.getName().equals(targetBranch))
+            .findFirst()
+            .orElse(this.githubRepository.getDefaultBranchRef());
     }
 
     protected List<ArtifactAppEntity> getArtifacts() {
@@ -175,10 +259,11 @@ public class GithubProjectCreationJob extends CommitJob {
                 this.commitSha);
 
         for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
+            // TODO match against include/exclude
             GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
                 .getBlobInformation(this.credentials, file.getBlobApiUrl());
             String name = file.getPath();
-            String type = file.getType().getArtifactTypeName();
+            String type = githubProject.getArtifactType().getName();
             String summary = file.getSha();
             String body = "";
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -29,7 +30,7 @@ public class TestGithubImport extends AbstractGithubTest {
             .withRoute(AppRoutes.Github.Import.BY_NAME)
             .withRepositoryName(repositoryName)
             .withOwner(owner)
-            .postWithoutBody(status().is2xxSuccessful());
+            .postWithJsonObject(new GithubImportDTO(), status().is2xxSuccessful());
 
         // We should have one version created
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
@@ -62,7 +63,7 @@ public class TestGithubImport extends AbstractGithubTest {
             .withRepositoryName(repositoryName)
             .withOwner(githubLogin)
             .withVersion(projectVersion)
-            .postWithoutBody(status().is2xxSuccessful());
+            .postWithJsonObject(new GithubImportDTO(), status().is2xxSuccessful());
 
         // No other project was created during the import
         Assertions.assertEquals(1, serviceProvider.getProjectRepository().count());

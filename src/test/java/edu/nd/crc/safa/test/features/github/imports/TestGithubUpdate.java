@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.test.features.github.imports;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
@@ -40,7 +41,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
             .withRepositoryName(repositoryName)
             .withOwner(githubLogin)
             .withVersion(projectVersion)
-            .putWithoutBody(MockMvcResultMatchers.status().is2xxSuccessful());
+            .putWithJsonObject(new GithubImportDTO(), MockMvcResultMatchers.status().is2xxSuccessful());
 
         // No other project was created during the import
         Assertions.assertEquals(1, serviceProvider.getProjectRepository().count());

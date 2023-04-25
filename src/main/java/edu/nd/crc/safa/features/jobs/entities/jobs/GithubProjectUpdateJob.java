@@ -72,9 +72,13 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
         log.info("Retrieving diff");
         for (GithubCommitDiffResponseDTO.GithubFileDiffDTO diff : diffResponseDTO.getFiles()) {
-            // TODO check against include/exclude
-            log.info(diff.toString());
+
             String name = diff.getFilename();
+            if (shouldSkipFile(name)) {
+                continue;
+            }
+
+            log.info(diff.toString());
             String type = diff.getStatus().name();
             String summary = diff.getSha();
             String body = diff.getBlobUrl();

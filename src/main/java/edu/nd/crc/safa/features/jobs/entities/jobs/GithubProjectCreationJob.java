@@ -1,9 +1,12 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -72,6 +75,8 @@ public class GithubProjectCreationJob extends CommitJob {
 
     private final SafaUser user;
 
+    private Predicate<String> shouldImportPredicate;
+
     protected static final int CREATE_PROJECT_STEP_NUM = 3;
 
     public GithubProjectCreationJob(JobDbEntity jobDbEntity,
@@ -91,6 +96,44 @@ public class GithubProjectCreationJob extends CommitJob {
 
     public static String createJobName(GithubIdentifier identifier) {
         return createJobName(identifier.getRepositoryName());
+    }
+
+    /**
+     * Creates a predicate that determines whether a file should be imported. A file should be imported
+     * if it matches the include predicate and does not match the exclude predicate. See
+     * {@link #globListToPredicate(String)} for how these predicates are created.
+     */
+    private void createImportPredicate() {
+        Predicate<String> includePredicate = globListToPredicate(githubProject.getInclude());
+        Predicate<String> excludePredicate = globListToPredicate(githubProject.getExclude());
+        shouldImportPredicate = includePredicate.and(excludePredicate.negate());
+    }
+
+    /**
+     * Creates a matcher predicate from a list of glob patterns. The predicate will return true if
+     * the file path matches any of the glob patterns.
+     *
+     * @param globs List of glob patterns, comma separated
+     * @return Predicate that returns true if the file path matches any of the glob patterns
+     */
+    private Predicate<String> globListToPredicate(String globs) {
+        List<String> globList = List.of(globs.split(","));
+        return globList.stream()                            // For each glob pattern from the front end:
+            .map(pattern -> "glob:" + pattern)              //   Prepend "glob:" (needed for path matcher)
+            .map(FileSystems.getDefault()::getPathMatcher)  //   Create a path matcher
+            .map(this::matcherToPredicate)                  //   Convert to a predicate
+            .reduce(Predicate::or)                          //   Or the predicates together (if any match, return true)
+            .orElse(path -> false);                         // If no glob patterns, return false
+    }
+
+    /**
+     * Converts a path matcher to a predicate
+     *
+     * @param matcher Path matcher
+     * @return Predicate that returns true if the file path matches the path matcher
+     */
+    private Predicate<String> matcherToPredicate(PathMatcher matcher) {
+        return string -> matcher.matches(FileSystems.getDefault().getPath(string));
     }
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)
@@ -146,6 +189,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
+        createImportPredicate();
 
         logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
     }
@@ -259,13 +303,18 @@ public class GithubProjectCreationJob extends CommitJob {
                 this.commitSha);
 
         for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
-            // TODO match against include/exclude
-            GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
-                .getBlobInformation(this.credentials, file.getBlobApiUrl());
+
             String name = file.getPath();
+            if (shouldSkipFile(name)) {
+                continue;
+            }
+
             String type = githubProject.getArtifactType().getName();
             String summary = file.getSha();
             String body = "";
+
+            GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
+                .getBlobInformation(this.credentials, file.getBlobApiUrl());
 
             if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
                 body = base64Decode(blobDTO.getContent());
@@ -285,6 +334,17 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         return artifacts;
+    }
+
+    /**
+     * Determines if the given filename should be imported based on the include/exclude settings.
+     * If the include list is empty, no files are included. If the exclude list is empty, no files are excluded.
+     *
+     * @param filename The filename to check.
+     * @return True if the file should be imported, otherwise false.
+     */
+    protected boolean shouldSkipFile(String filename) {
+        return !shouldImportPredicate.test(filename);
     }
 
     /**

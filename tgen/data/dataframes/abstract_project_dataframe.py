@@ -126,12 +126,13 @@ class AbstractProjectDataFrame(pd.DataFrame):
 
     @classmethod
     def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
-               ignore_index: bool = False) -> "AbstractProjectDataFrame":
+               ignore_index: bool = False, remove_duplicates: bool = True) -> "AbstractProjectDataFrame":
         """
         Combines two dataframes
         :param dataframe1: The first dataframe
         :param dataframe2: The second dataframe
         :param ignore_index: If True, do not use the index values along the concatenation axis.
+        :param remove_duplicates: If True, removes any duplicates from both dataframes
         :return: The new combined dataframe
         """
         orient = 'records' if ignore_index else 'index'
@@ -139,11 +140,13 @@ class AbstractProjectDataFrame(pd.DataFrame):
         data2 = dataframe2.to_dict(orient=orient)
         if ignore_index:
             data1.extend(data2)
-            return cls(data1)
-        data1.update(data2)
-        for index, cols in data1.items():
-            cols[cls.index_name()] = index
-        return cls.from_dict(data1.values())
+            result = cls(data1)
+        else:
+            data1.update(data2)
+            for index, cols in data1.items():
+                cols[cls.index_name()] = index
+            result = cls.from_dict(data1.values())
+        return result
 
     @overrides(pd.DataFrame)
     def itertuples(self, index: bool = True, name: str = "Pandas") -> EnumDict:

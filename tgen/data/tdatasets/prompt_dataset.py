@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import pandas as pd
 from tqdm import tqdm
@@ -25,6 +25,7 @@ class PromptDataset(iDataset):
     """
     Represents a dataset for prompt-based (generative) models such as GPT
     """
+    __MAX_SUMMARIZATIONS = 3
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
                  trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
@@ -43,6 +44,7 @@ class PromptDataset(iDataset):
         self.data_export_path = data_export_path
         if not self.project_file_id and prompt_df is None:
             assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe must be provided to generate dataset."
+        self.__summarized_artifacts = {}
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -135,9 +137,10 @@ class PromptDataset(iDataset):
         traces = self.trace_dataset.trace_df
         for i, row in tqdm(traces.itertuples(), desc="Generating prompts dataframe from trace links"):
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
-            entry = self._get_prompt_entry(source_content=source[ArtifactKeys.CONTENT], target_content=target[ArtifactKeys.CONTENT],
+            entry = self._get_prompt_entry(source_artifact=source, target_artifact=target,
                                            label=row[TraceKeys.LABEL], prompt_creator=prompt_creator, summarizer=summarizer)
-            entries.append(entry)
+            if entry is not None:
+                entries.append(entry)
         return PromptDataFrame(entries)
 
     def _generate_prompts_dataframe_from_artifacts(self, prompt_creator: AbstractPromptCreator,
@@ -149,14 +152,15 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, row in tqdm(self.artifact_df.itertuples(),  desc="Generating prompts dataframe from trace links"):
-            entry = self._get_prompt_entry(target_content=row[ArtifactKeys.CONTENT], source_content='', prompt_creator=prompt_creator,
+        for i, artifact in tqdm(self.artifact_df.itertuples(), desc="Generating prompts dataframe from trace links"):
+            entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
                                            summarizer=summarizer)
-            entries.append(entry)
+            if entry is not None:
+                entries.append(entry)
         return PromptDataFrame(entries)
 
-    def _get_prompt_entry(self, source_content: str, target_content: str, prompt_creator: AbstractPromptCreator,
-                          summarizer: Summarizer = None, **prompt_creator_params) -> EnumDict:
+    def _get_prompt_entry(self, target_artifact: EnumDict, prompt_creator: AbstractPromptCreator, source_artifact: EnumDict = None,
+                          summarizer: Summarizer = None, **prompt_creator_params) -> Optional[EnumDict]:
         """
         Creates a prompt entry using the given creator and summarizing if the prompt exceeds the token limit and a summarizer is given
         :param source_content: The content of the source artifact
@@ -166,13 +170,39 @@ class PromptDataset(iDataset):
         :param prompt_creator_params: Additional params to give the prompt creator
         :return: The prompt entry
         """
-        entry = prompt_creator.create(source_content=source_content, target_content=target_content, **prompt_creator_params)
-        if summarizer and summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-            if source_content:
-                source_content = summarizer.summarize(content=source_content)
-            target_content = summarizer.summarize(content=target_content)
+        source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else ''
+        entry = prompt_creator.create(source_content=source_content,
+                                      target_content=target_artifact[ArtifactKeys.CONTENT], **prompt_creator_params)
+        if not summarizer:
+            return entry
+
+        # Ensure prompt fits in token limit
+        for i in range(self.__MAX_SUMMARIZATIONS):
+            if not summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
+                return entry
+            force_create_new_summarization = i > 0
+            if source_artifact:
+                source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
+            target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
-        return entry
+        return None
+
+    def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:
+        """
+        Gets a summarization of the artifact from cache if it exists, otherwise creates a summarization
+        :param artifact: The artifact to summarize
+        :param summarizer: The summarizer to use
+        :return: The summarized content
+        """
+        artifact_id = artifact[ArtifactKeys.ID]
+        if artifact_id not in self.__summarized_artifacts:
+            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT])
+            self.__summarized_artifacts[artifact_id] = summary
+            return summary
+        if force_create_new:
+            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id])
+            return summary
+        return self.__summarized_artifacts[artifact_id]
 
     def _has_trace_data(self) -> bool:
         """

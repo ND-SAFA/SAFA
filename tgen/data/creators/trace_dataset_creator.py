@@ -127,7 +127,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         if len(self.trace_df[self.trace_df[TraceKeys.LABEL] == 0]) < 1:
             self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
-        trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_mapping_df=self.layer_mapping_df)
+        trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)
         return trace_dataset
 
     def _filter_artifacts_by_ids(self, artifact_ids: Set[str]) -> None:

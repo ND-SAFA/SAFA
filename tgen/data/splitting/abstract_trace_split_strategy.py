@@ -41,5 +41,5 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
                     for col in ArtifactDataFrame.column_names():
                         artifacts[col].append(artifact[col])
         return TraceDataset(artifact_df=ArtifactDataFrame(artifacts), trace_df=TraceDataFrame(traces),
-                            layer_mapping_df=trace_dataset.layer_mapping_df, pos_link_ids=slice_pos_link_ids,
+                            layer_df=trace_dataset.layer_df, pos_link_ids=slice_pos_link_ids,
                             neg_link_ids=slice_neg_link_ids)

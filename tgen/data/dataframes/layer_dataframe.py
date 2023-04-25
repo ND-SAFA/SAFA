@@ -3,6 +3,7 @@ from typing import Type
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.util.enum_util import EnumDict
+from tgen.util.logging.logger_manager import logger
 
 LayerKeys = StructuredKeys.LayerMapping
 
@@ -37,3 +38,17 @@ class LayerDataFrame(AbstractProjectDataFrame):
         """
         return self.add_new_row({LayerKeys.SOURCE_TYPE: source_type,
                                  LayerKeys.TARGET_TYPE: target_type})
+
+    @classmethod
+    def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
+               ignore_index: bool = True) -> "AbstractProjectDataFrame":
+        """
+        Combines two dataframes
+        :param dataframe1: The first dataframe
+        :param dataframe2: The second dataframe
+        :param ignore_index: If True, do not use the index values along the concatenation axis.
+        :return: The new combined dataframe
+        """
+        if not ignore_index:
+            logger.warning("Index should be ignored for concatenating layer dataframe since they are not unique")
+        return super().concat(dataframe1, dataframe2, ignore_index=True)

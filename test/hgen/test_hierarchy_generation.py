@@ -13,7 +13,7 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
-from tgen.data.readers.csv_project_reader import CsvProjectReader
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -23,8 +23,8 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
@@ -32,8 +32,14 @@ from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 
 
-def fake_clustering(G: nx.Graph):
-    return {node: i % 4 for i, node in enumerate(G.nodes)}
+def fake_clustering(trace_dataset: TraceDataset, cluster_method):
+    artifact_to_cluster = {node: str(i % 4) for i, node in enumerate(list(trace_dataset.artifact_df.index))}
+    clusters = {}
+    for artifact_id, cluster_num in artifact_to_cluster.items():
+        if cluster_num not in clusters:
+            clusters[cluster_num] = []
+        clusters[cluster_num].append(artifact_id)
+    return {str(uuid.uuid4()): artifacts for cluster_num, artifacts in clusters.items()}
 
 
 class TestHierarchyGeneration(BaseTest):
@@ -46,11 +52,11 @@ class TestHierarchyGeneration(BaseTest):
             trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
             return trainer_dataset_manager[DatasetRole.EVAL]
 
-    @mock.patch("community.best_partition")
+    @mock.patch("tgen.data.creators.cluster_dataset_creator.ClusterDatasetCreator._cluster")
     @mock.patch("openai.Completion.create")
-    def test_run(self, mock_completion: mock.MagicMock, mock_partition: mock.MagicMock):
+    def test_run(self, mock_completion: mock.MagicMock, mock_cluster: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        mock_partition.side_effect = fake_clustering
+        mock_cluster.side_effect = fake_clustering
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
                             self.get_dataset_creator_with_trace_dataset_creator(),
                             self.FakeDatasetCreator()]
@@ -59,7 +65,7 @@ class TestHierarchyGeneration(BaseTest):
 
             hgen = self.get_hierarchy_generator(tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator)
             export_path = hgen.run(TEST_OUTPUT_DIR, save_dataset_checkpoints=False)
-            generated_dataset = TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=export_path)).create()
+            generated_dataset = TraceDatasetCreator(project_reader=DataFrameProjectReader(project_path=export_path)).create()
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
 
@@ -67,7 +73,7 @@ class TestHierarchyGeneration(BaseTest):
             expected_n_traces = len(orig_dataset.artifact_df) * 4
             self.assertEqual(expected_n_traces, len(generated_dataset))
             expected_n_layers = 1
-            self.assertEqual(expected_n_layers, len(generated_dataset.layer_mapping_df))
+            self.assertEqual(expected_n_layers, len(generated_dataset.layer_df))
 
     def test_create_artifacts_df_with_generated_artifacts(self):
         hgen_dataset = PromptTestProject.get_trace_dataset_creator().create()
@@ -75,8 +81,8 @@ class TestHierarchyGeneration(BaseTest):
         artifact_generations = [generated_content for _ in hgen_dataset.artifact_df.index]
         orig_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ["original_id"], ArtifactKeys.CONTENT: ["original_content"],
                                               ArtifactKeys.LAYER_ID: ["original_layer"]})
-        artifact_df = HierarchyGenerator._create_artifact_df_with_generated_artifacts(artifact_generations, orig_artifact_df,
-                                                                                      hgen_dataset)
+        artifact_df = HierarchyGenerator._create_artifact_df_with_generated_artifacts(artifact_generations, hgen_dataset.artifact_df,
+                                                                                      orig_artifact_df)
         expected_entities = [EnumDict({ArtifactKeys.ID: id_, ArtifactKeys.CONTENT: artifact[ArtifactKeys.CONTENT]})
                              for id_, artifact in orig_artifact_df.itertuples()]
         expected_entities.extend([EnumDict({ArtifactKeys.ID: id_, ArtifactKeys.CONTENT: generated_content})
@@ -98,15 +104,18 @@ class TestHierarchyGeneration(BaseTest):
         new_artifacts_df = deepcopy(dataset.artifact_df)
         for i in range(n_clusters):
             new_artifacts_df.add_artifact(str(i), "generated content")
+        hgen_trace_df = TraceDataFrame()
+        for source_id, artifact in layer_artifacts.itertuples():
+            for target_id in range(n_clusters):
+                hgen_trace_df.add_link(source_id, str(target_id), 1)
 
         # Without original trace df
-        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(new_artifacts_df, clusters)
-        total_traces = (len(clusters) - len(layer_artifacts)) + (len(layer_artifacts) * n_clusters)
-        verify_trace_df(trace_df, total_traces)
+        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(hgen_trace_df, new_artifacts_df)
+        verify_trace_df(trace_df, len(hgen_trace_df))
 
         # With original trace df
-        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(new_artifacts_df, clusters, dataset.trace_df)
-        total_traces += len(dataset.trace_df)
+        trace_df = HierarchyGenerator._create_trace_df_with_generated_artifacts(hgen_trace_df, new_artifacts_df, dataset.trace_df)
+        total_traces = len(hgen_trace_df) + len(dataset.trace_df)
         verify_trace_df(trace_df, total_traces)
         for id_, trace in dataset.trace_df.itertuples():
             self.assertIsNotNone(trace_df.get_link(id_))
@@ -114,14 +123,15 @@ class TestHierarchyGeneration(BaseTest):
     def test_create_layer_df_with_generated_artifacts(self):
         # Without original layer dataframe
         expected_entities = [EnumDict({LayerKeys.SOURCE_TYPE: "source_layer", LayerKeys.TARGET_TYPE: "target_layer"})]
-        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts("source_layer", "target_layer")
+        hgen_layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: ["source_layer"], LayerKeys.TARGET_TYPE: ["target_layer"]})
+        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts(hgen_layer_df)
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
         # With original layer dataframe
         trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
-        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts("source_layer", "target_layer",
-                                                                                trace_dataset.layer_mapping_df)
-        expected_entities.extend([layer for i, layer in trace_dataset.layer_mapping_df.itertuples()])
+        layer_df = HierarchyGenerator._create_layer_df_with_generated_artifacts(hgen_layer_df,
+                                                                                trace_dataset.layer_df)
+        expected_entities.extend([layer for i, layer in trace_dataset.layer_df.itertuples()])
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
     @mock.patch("openai.Completion.create")
@@ -169,7 +179,7 @@ class TestHierarchyGeneration(BaseTest):
         for id_, link in dataset.trace_df.itertuples():
             self.assertIn(link[TraceKeys.SOURCE], layer_artifacts)
             self.assertIn(link[TraceKeys.TARGET], layer_artifacts)
-        self.assertEqual(1, len(dataset.layer_mapping_df))
+        self.assertEqual(1, len(dataset.layer_df))
 
     @staticmethod
     def get_tgen_trainer(dataset_creator):
@@ -184,11 +194,11 @@ class TestHierarchyGeneration(BaseTest):
         if dataset.artifact_df is not None:
             dataset.artifact_df = TestHierarchyGeneration.set_all_artifacts_to_same_layer(dataset.artifact_df)
             if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
-                dataset.trace_dataset.layer_mapping_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
-                                                                         LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
+                dataset.trace_dataset.layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
+                                                                 LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
             elif isinstance(dataset, TraceDataset):
-                dataset.layer_mapping_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
-                                                           LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
+                dataset.layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [TestHierarchyGeneration.LAYER_ID],
+                                                   LayerKeys.TARGET_TYPE: [TestHierarchyGeneration.LAYER_ID]})
         return trainer_dataset_manager
 
     @staticmethod

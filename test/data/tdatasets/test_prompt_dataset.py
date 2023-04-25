@@ -7,6 +7,7 @@ import mock
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -22,6 +23,33 @@ class TestResponse:
 
 class TestPromptDataset(BaseTest):
     DATASET_FAIL_MSG = "Dataset with param {} failed."
+    summarization_calls = 0
+    trace_link_summarizations = 0
+
+    @staticmethod
+    def fake_summarize(content):
+        return "@*&" + content
+
+    @staticmethod
+    def fake_exceeds_token_limit(prompt):
+        if "3" in prompt:
+            return True
+        if "@*&"*2 in prompt:
+            return False
+        return True
+
+    @mock.patch.object(Summarizer, "summarize")
+    @mock.patch.object(Summarizer, "exceeds_token_limit")
+    def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, summarize_mock: mock.MagicMock):
+        exceeds_token_limit_mock.side_effect = self.fake_exceeds_token_limit
+        summarize_mock.side_effect = self.fake_summarize
+        artifact_prompt_dataset = self.get_dataset_with_artifact_df()
+        prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(GenerationPromptCreator(), Summarizer())
+        self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df) - 2)
+
+        traces_prompt_dataset = self.get_dataset_with_trace_dataset()
+        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(GenerationPromptCreator(), Summarizer())
+        self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df) - 2)
 
     def test_to_dataframe(self):
         outputs = self.all_datasets_test(

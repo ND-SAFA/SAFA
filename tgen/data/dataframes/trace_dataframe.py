@@ -79,7 +79,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: The link if one is found with the specified params, else None
         """
         if link_id is None:
-            assert source_id and target_id, "Requires source_id and target_id if no link_id is provided."
+            assert source_id is not None and target_id is not None, "Requires source_id and target_id if no link_id is provided."
             link_id = TraceDataFrame.generate_link_id(source_id, target_id)
         return self.get_row(link_id)
 

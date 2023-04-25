@@ -43,7 +43,7 @@ class CreateSourceSplitsJob(AbstractJob):
         :return: JobResult containing empty message.
         """
         dataset = self.exporter.get_dataset()
-        for layer_mapping_i, layer_mapping_row in dataset.layer_mapping_df.itertuples():
+        for layer_mapping_i, layer_mapping_row in dataset.layer_df.itertuples():
             source_name, target_name = self.get_layer_types(layer_mapping_row)
             task_name = f"task_{layer_mapping_i}"
 
@@ -63,7 +63,7 @@ class CreateSourceSplitsJob(AbstractJob):
                 logger.info("Creating split trace links")
                 split_links = CreateSourceSplitsJob.create_split_links(dataset.trace_df, task_split_ids)
                 split_project_data = TraceDataset(artifact_df=split_artifact_df,
-                                                  layer_mapping_df=LayerDataFrame([layer_mapping_row]),
+                                                  layer_df=LayerDataFrame([layer_mapping_row]),
                                                   trace_df=split_links)
                 export_path = os.path.join(self.exporter.export_path, task_name, f"{stage.value}")
                 split_exporter = self.exporter.make_new(export_path=export_path, dataset=split_project_data)

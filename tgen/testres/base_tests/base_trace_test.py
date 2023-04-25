@@ -29,4 +29,4 @@ class BaseTraceTest(BaseTest):
                 trace_df.at[index, TraceKeys.LABEL.value] = 1
             else:
                 negative_link_ids.append(index)
-        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_mapping_df=LayerDataFrame())
+        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_df=LayerDataFrame())

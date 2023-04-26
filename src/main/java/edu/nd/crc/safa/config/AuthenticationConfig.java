@@ -40,7 +40,9 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
         "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
         "https://dev.safa.ai",
-        "https://app.safa.ai"
+        "https://app.safa.ai",
+        "https://dev-fend.safa.ai",
+        "https://prod-fend.safa.ai"
     );
 
     private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");

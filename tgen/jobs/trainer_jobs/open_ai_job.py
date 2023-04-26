@@ -19,21 +19,17 @@ class OpenAiJob(AbstractTrainerJob):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: OpenAiArgs = OpenAiArgs(),
-                 base_model: str = "ada", task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None,
-                 prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()):
+                 base_model: str = "ada", task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None):
         """
         Initializes job with necessary args
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_creator: Determines the expected prompt and completion format
-        :param job_args: Args for all tgen jobs
         """
         super().__init__(model_manager=ModelManager(model_path=base_model), trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task, job_args=job_args)
         self.base_model = base_model
         self.trainer_args = trainer_args
-        self.prompt_creator = prompt_creator
 
     @overrides(AbstractTrainerJob)
     def get_trainer(self, **kwargs) -> OpenAiTrainer:
@@ -45,8 +41,7 @@ class OpenAiJob(AbstractTrainerJob):
         if self._trainer is None:
             self._trainer = OpenAiTrainer(trainer_args=self.trainer_args,
                                           trainer_dataset_manager=self.trainer_dataset_manager,
-                                          base_model=self.base_model,
-                                          prompt_creator=self.prompt_creator)
+                                          base_model=self.base_model)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

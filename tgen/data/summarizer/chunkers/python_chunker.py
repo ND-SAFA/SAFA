@@ -21,14 +21,6 @@ class PythonChunker(AbstractChunker):
     IGNORED_NODES = [ast.Import, ast.ImportFrom]
     N_SPACE_TO_TAB = 4
 
-    def __init__(self, model_name: str):
-        """
-        Initializes chunker with for a given model.
-        :param model_name: The model that will be doing the tokenization
-        :return: The approximate number of tokens
-        """
-        super().__init__(model_name)
-
     def _chunk(self, content: str) -> List[str]:
         """
         Chunks the given python code into pieces that are beneath the model's token limit

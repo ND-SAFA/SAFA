@@ -8,7 +8,7 @@ from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAiUtil
+from tgen.util.ai.params.openai_params import OpenAiParams
 
 
 @dataclass
@@ -40,14 +40,14 @@ class OpenAiArgs:
         :param include_classification_metrics: If True, includes the params necessary for calculating classification metrics
         :return: A dictionary mapping param name to its value
         """
-        assert task in OpenAiUtil.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
-                                                            f" Must choose from {OpenAiUtil.EXPECTED_PARAMS_FOR_TASK.keys()}"
+        assert task in OpenAiParams.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
+                                                              f" Must choose from {OpenAiParams.EXPECTED_PARAMS_FOR_TASK.keys()}"
         params = {}
         if isinstance(self.prompt_creator, ClassificationPromptCreator):
             self.max_tokens = 1
             if include_classification_metrics:
                 params = self.__add_params_for_task(TrainerTask.CLASSIFICATION)
-                params[OpenAiUtil.Params.CLASSIFICATION_POSITIVE_CLASS] = self.prompt_creator.format_completion(
+                params[OpenAiParams.CLASSIFICATION_POSITIVE_CLASS] = self.prompt_creator.format_completion(
                     self.prompt_creator.pos_class)
         return self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)
 
@@ -60,7 +60,7 @@ class OpenAiArgs:
         """
         if params is None:
             params = {}
-        for name in OpenAiUtil.EXPECTED_PARAMS_FOR_TASK[task]:
+        for name in OpenAiParams.EXPECTED_PARAMS_FOR_TASK[task]:
             val = getattr(self, name)
             if val is None:
                 continue

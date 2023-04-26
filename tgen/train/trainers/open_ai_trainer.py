@@ -19,6 +19,7 @@ from tgen.train.trace_output.trace_prediction_output import TracePredictionOutpu
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.ai.open_ai_util import OpenAiUtil
+from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.logging.logger_manager import logger
 
 
@@ -54,7 +55,7 @@ class OpenAiTrainer(AbstractTrainer):
         params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params[OpenAiUtil.Params.VALIDATION_FILE] = val_dataset.get_project_file_id(
+            params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 prompt_creator=self.trainer_args.prompt_creator,
                 summarizer=self.summarizer)
         res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,

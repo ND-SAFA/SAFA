@@ -4,11 +4,11 @@ from typing import Any, Dict, List
 from tgen.constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
     MAX_TOKENS_DEFAULT, \
     TEMPERATURE_DEFAULT
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.util.open_ai_util import OpenAiUtil
+from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.open_ai_util import OpenAiUtil
 
 
 @dataclass

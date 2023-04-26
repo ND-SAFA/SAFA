@@ -1,8 +1,9 @@
 import openai
 from openai.openai_object import OpenAIObject
 
-from tgen.constants import OPEN_AI_ORG, OPEN_AI_KEY, IS_TEST
+from tgen.constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.ai_util import AiUtil
 from tgen.util.list_util import ListUtil
 
 if not IS_TEST:
@@ -12,8 +13,7 @@ if not IS_TEST:
     openai.api_key = OPEN_AI_KEY
 
 
-class OpenAiUtil:
-
+class OpenAiUtil(AiUtil):
     class Params:
         COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
         MODEL_SUFFIX = "model_suffix"

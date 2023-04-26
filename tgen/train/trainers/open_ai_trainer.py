@@ -19,8 +19,8 @@ from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.open_ai_util import OpenAiUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.open_ai_util import OpenAiUtil
 
 
 class OpenAiTrainer(AbstractTrainer):

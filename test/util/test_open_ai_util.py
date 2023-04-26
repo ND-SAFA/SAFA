@@ -2,7 +2,7 @@ import mock.mock
 
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
-from tgen.util.open_ai_util import OpenAiUtil
+from tgen.util.ai.open_ai_util import OpenAiUtil
 
 
 class TestOpenAiUtil(BaseTest):

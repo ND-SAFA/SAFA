@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from tgen.constants import SUMMARIZATION_MODEL_DEFAULT, GENERATION_MODEL_DEFAULT
+from tgen.constants import GENERATION_MODEL_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -11,9 +11,9 @@ from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.open_ai_util import OpenAiUtil
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
-from tgen.util.open_ai_util import OpenAiUtil
 
 
 class Summarizer(BaseObject):

@@ -1,9 +1,10 @@
 import os
 import uuid
-from typing import Any, Tuple, Optional
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from tqdm import tqdm
+
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -16,9 +17,9 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.open_ai_util import OpenAiUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.util.open_ai_util import OpenAiUtil
 
 
 class PromptDataset(iDataset):

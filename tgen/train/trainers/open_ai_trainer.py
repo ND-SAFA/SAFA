@@ -28,13 +28,14 @@ class OpenAiTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = CLASSIFICATION_MODEL_DEFAULT,
-                 trainer_args: OpenAiArgs = OpenAiArgs()):
+                 trainer_args: OpenAiArgs = None):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
+        trainer_args = trainer_args if trainer_args is not None else OpenAiArgs()
         self.base_model = base_model
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)

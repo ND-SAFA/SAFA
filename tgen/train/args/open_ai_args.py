@@ -21,27 +21,35 @@ class OpenAiArgs:
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
+
+    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
     output_dir: str = None
 
-    def to_params(self, prompt_creator: AbstractPromptCreator, task: TrainerTask = TrainerTask.TRAIN,
-                  include_classification_metrics: bool = False) -> Dict[str, Any]:
+    def __post_init__(self) -> None:
+        """
+        Sets specific variables depending on the type of prompt creator
+        :return None
+        """
+        if isinstance(self.prompt_creator, ClassificationPromptCreator):
+            self.max_tokens = 1
+
+    def to_params(self, task: TrainerTask = TrainerTask.TRAIN, include_classification_metrics: bool = False) -> Dict[str, Any]:
         """
         Gets the params needed for an open ai task
-        :param prompt_creator: The prompt generator for the trainer
         :param task: The primary task being performed (fine_tune or predict)
         :param include_classification_metrics: If True, includes the params necessary for calculating classification metrics
         :return: A dictionary mapping param name to its value
         """
         assert task in OpenAiUtil.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
                                                             f" Must choose from {OpenAiUtil.EXPECTED_PARAMS_FOR_TASK.keys()}"
-        params = self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task)
-        if isinstance(prompt_creator, ClassificationPromptCreator):
-            if OpenAiUtil.Params.MAX_TOKENS in params:
-                params[OpenAiUtil.Params.MAX_TOKENS] = 1
+        params = {}
+        if isinstance(self.prompt_creator, ClassificationPromptCreator):
+            self.max_tokens = 1
             if include_classification_metrics:
-                params = self.__add_params_for_task(TrainerTask.CLASSIFICATION, params)
-                params[OpenAiUtil.Params.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(prompt_creator.pos_class)
-        return params
+                params = self.__add_params_for_task(TrainerTask.CLASSIFICATION)
+                params[OpenAiUtil.Params.CLASSIFICATION_POSITIVE_CLASS] = self.prompt_creator.format_completion(
+                    self.prompt_creator.pos_class)
+        return self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)
 
     def __add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
         """

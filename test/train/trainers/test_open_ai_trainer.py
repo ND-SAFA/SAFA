@@ -11,6 +11,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import FINE_TUNE_RESPONSE_DICT, FINE_TUNE_REQUEST, COMPLETION_REQUEST, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
+from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
 
 Res = namedtuple("Res", ["id"])
@@ -57,7 +58,8 @@ class TestOpenAiTrainer(BaseTest):
                 trainer = self.get_open_ai_trainer(dataset_creator, [DatasetRole.EVAL], prompt_creator=creator)
                 res = trainer.perform_prediction()
                 self.assertGreater(len(res.predictions), 1)
-                if (type_ == "dataset" or type_ == "trace") and isinstance(trainer.prompt_creator, ClassificationPromptCreator):
+                if (type_ == "dataset" or type_ == "trace") and isinstance(trainer.trainer_args.prompt_creator,
+                                                                           ClassificationPromptCreator):
                     self.assertIsNotNone(res.label_ids)
                     self.assertIsNotNone(res.prediction_entries)
                     self.assertIsNotNone(res.metrics)
@@ -113,4 +115,4 @@ class TestOpenAiTrainer(BaseTest):
 
     def get_open_ai_trainer(self, dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole], **params):
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
-        return OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, **params)
+        return OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(**params))

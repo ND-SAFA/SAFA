@@ -7,7 +7,6 @@ from scipy.special import softmax
 from tgen.constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -29,20 +28,18 @@ class OpenAiTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = CLASSIFICATION_MODEL_DEFAULT,
-                 trainer_args: OpenAiArgs = OpenAiArgs(),
-                 prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()):
+                 trainer_args: OpenAiArgs = OpenAiArgs()):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_creator: In charge of generator promtps for dataset
         """
         self.base_model = base_model
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.prompt_creator = prompt_creator
-        self.summarizer = Summarizer(model_for_token_limit=base_model, code_or_exceeds_limit_only=False)
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
+        self.summarizer = Summarizer(model_for_token_limit=base_model, code_or_exceeds_limit_only=False,
+                                     max_tokens=trainer_args.max_tokens)
 
     def perform_training(self) -> FineTune:
         """
@@ -50,13 +47,15 @@ class OpenAiTrainer(AbstractTrainer):
         :return: The training response
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
-        training_file_id = train_dataset.get_project_file_id(prompt_creator=self.prompt_creator, summarizer=self.summarizer)
+        training_file_id = train_dataset.get_project_file_id(prompt_creator=self.trainer_args.prompt_creator,
+                                                             summarizer=self.summarizer)
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
-        params = self.trainer_args.to_params(self.prompt_creator, TrainerTask.TRAIN, include_classification_metrics)
+        params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params[OpenAiUtil.Params.VALIDATION_FILE] = val_dataset.get_project_file_id(prompt_creator=self.prompt_creator,
-                                                                                        summarizer=self.summarizer)
+            params[OpenAiUtil.Params.VALIDATION_FILE] = val_dataset.get_project_file_id(
+                prompt_creator=self.trainer_args.prompt_creator,
+                summarizer=self.summarizer)
         res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
                                                 model=self.base_model,
                                                 **params)
@@ -83,13 +82,13 @@ class OpenAiTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompts_dataframe(self.prompt_creator, summarizer=self.summarizer)
+        prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.trainer_args.prompt_creator)
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
-                                                 **self.trainer_args.to_params(self.prompt_creator, TrainerTask.PREDICT))
+                                                 **self.trainer_args.to_params(TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \
-            if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
+            if isinstance(self.trainer_args.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
 
     def cleanup(self) -> None:
         """
@@ -147,13 +146,13 @@ class OpenAiTrainer(AbstractTrainer):
         :param probs: The probabilities of each top completion
         :return: The softmax score from the predicted completions
         """
-        assert isinstance(self.prompt_creator,
+        assert isinstance(self.trainer_args.prompt_creator,
                           ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
         if len(probs) < 1:
             return 0.5
         probs = probs[0]
-        v0 = probs.get(self.prompt_creator.COMPLETION_START + self.prompt_creator.pos_class, 0)
-        v1 = probs.get(self.prompt_creator.COMPLETION_START + self.prompt_creator.neg_class, 0)
+        v0 = probs.get(self.trainer_args.prompt_creator.COMPLETION_START + self.trainer_args.prompt_creator.pos_class, 0)
+        v1 = probs.get(self.trainer_args.prompt_creator.COMPLETION_START + self.trainer_args.prompt_creator.neg_class, 0)
         prob_v = [v0, v1]
         score = softmax(prob_v)[1]
         return score

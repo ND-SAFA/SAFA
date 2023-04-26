@@ -26,8 +26,8 @@ class TestSummarizer(BaseTest):
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         summarizer = Summarizer(code_or_exceeds_limit_only=False)
-        summaries = summarizer._summarize_chunks(self.CHUNKS,
-                                                 GenerationPromptCreator(BasePrompt.NL_SUMMARY), "text-davinci-003", OpenAiArgs())
+        summaries = summarizer._summarize_chunks(self.CHUNKS, "text-davinci-003",
+                                                 OpenAiArgs(prompt_creator=GenerationPromptCreator(BasePrompt.NL_SUMMARY)))
         for i, summary in enumerate(summaries):
             self.assertEqual(summary, SUMMARY_FORMAT.format(self.CHUNKS[i]))
 
@@ -53,4 +53,4 @@ class TestSummarizer(BaseTest):
         summarizer = Summarizer(code_or_exceeds_limit_only=True, model_for_summarizer=model_name)
         short_text = "This is a short text under the token limit"
         summaries = summarizer.summarize(content=short_text)
-        self.assertEqual(summaries, short_text) # shouldn't have summarized
+        self.assertEqual(summaries, short_text)  # shouldn't have summarized

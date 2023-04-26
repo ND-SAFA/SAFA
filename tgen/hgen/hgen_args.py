@@ -34,10 +34,6 @@ class HGenArgs:
     Any necessary params needed to initializing trainer to generate the higher-level artifacts
     """
     hgen_trainer_args: OpenAiArgs = OpenAiArgs()
-    """
-    The creator responsible for creating the prompt for the higher-level artifact generation
-    """
-    hgen_prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
 
     def __post_init__(self) -> None:
         """

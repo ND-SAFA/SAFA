@@ -6,11 +6,11 @@ phases:
       - echo Build started on `date`
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 178003569110.dkr.ecr.us-east-1.amazonaws.com
       - docker build -t fend
-        --build-arg VUE_APP_API_ENDPOINT=$BEND_ENDPOINT
-        --build-arg VUE_APP_JIRA_CLIENT_ID=$JIRA_CLIENT_ID
-        --build-arg VUE_APP_JIRA_REDIRECT_LINK=$JIRA_REDIRECT_LINK
-        --build-arg VUE_GITHUB_REDIRECT_LINK=$GITHUB_REDIRECT_LINK
-        --build-arg VUE_GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID .
+        --build-arg VUE_APP_API_ENDPOINT=${API_ENDPOINT}
+        --build-arg VUE_APP_JIRA_CLIENT_ID=${JIRA_CLIENT_ID}
+        --build-arg VUE_APP_JIRA_REDIRECT_LINK=${JIRA_REDIRECT_LINK}
+        --build-arg VUE_GITHUB_REDIRECT_LINK=${GITHUB_REDIRECT_LINK}
+        --build-arg VUE_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID} .
       - docker tag fend 178003569110.dkr.ecr.us-east-1.amazonaws.com/fend:$STAGE
   post_build:
     commands:

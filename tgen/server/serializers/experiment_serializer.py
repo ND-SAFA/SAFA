@@ -1,8 +1,5 @@
 from typing import Dict
 
-from rest_framework import serializers
-
-from tgen.server.serializers.serializer_utility import SerializerUtility
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.multi_variable import MultiVariable
@@ -13,7 +10,6 @@ from tgen.variables.variable import Variable
 
 class ExperimentSerializer:
     KEY = "definition"
-    definition = serializers.DictField(required=True)
 
     @staticmethod
     def create(validated_data: Dict) -> Dict[str, Variable]:

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
-from util.base_object import BaseObject
+from tgen.util.base_object import BaseObject
 
 
 @dataclass

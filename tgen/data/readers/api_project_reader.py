@@ -1,6 +1,4 @@
-from typing import Dict, Tuple, Generic
-
-import pandas as pd
+from typing import Dict
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -34,9 +32,9 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         artifact_map = {}
         layer_mapping = []
 
-        source_layers = self.api_definition["source_layers"]
-        target_layers = self.api_definition["target_layers"]
-        links = self.api_definition["true_links"]
+        source_layers = self.api_definition.source_layers
+        target_layers = self.api_definition.target_layers
+        links = self.api_definition.get_links()
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
             source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, i)

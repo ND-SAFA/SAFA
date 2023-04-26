@@ -4,7 +4,6 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.testprojects.dataframe_test_project import DataFrameTestProject
 
 
 class TestDataFrameExporter(BaseTest):

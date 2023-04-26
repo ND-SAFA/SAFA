@@ -1,10 +1,8 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
-
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.json_util import JsonUtil
 from tgen.util.status import Status
@@ -34,11 +32,6 @@ class JobResult(BaseObject):
     EXPORT_PATH = "export_path"
     PREDICTION_OUTPUT = "prediction_output"
     LABEL_IDS = "label_ids"
-
-    _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
-                   STATUS: Schema(type=TYPE_INTEGER),
-                   MODEL_PATH: Schema(type=TYPE_STRING),
-                   EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
         """

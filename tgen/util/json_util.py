@@ -44,6 +44,25 @@ class JsonUtil:
     """
 
     @staticmethod
+    def read_jsonl_file(file_path: str, as_uncased_dict: bool = False) -> Union[Dict, UncasedDict]:
+        """
+        Reads JSON from file at path.
+        :param file_path: Path to JSON file.
+        :param as_uncased_dict: Whether to convert output to uncased dict
+        :return: Dictionary content of file.
+        """
+        content = {}
+        with open(file_path) as file:
+            lines = file.readlines()
+        for line in lines:
+            json_dict = json.loads(line)
+            for key, val in json_dict.items():
+                if key not in content:
+                    content[key] = []
+                content[key].append(val)
+        return UncasedDict(content) if as_uncased_dict else content
+
+    @staticmethod
     def read_json_file(file_path: str, as_uncased_dict: bool = False) -> Union[Dict, UncasedDict]:
         """
         Reads JSON from file at path.

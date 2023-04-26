@@ -7,7 +7,7 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from tgen.data.keys.safa_format import SafaKeys
+from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.util.dataframe_util import DataFrameUtil
@@ -41,7 +41,7 @@ class SafaExporter(AbstractDatasetExporter):
         return False
 
     @overrides(AbstractDatasetExporter)
-    def export(self) -> None:
+    def export(self, **kwargs) -> None:
         """
         Exports entities as a project in the safa format.
         :return: None
@@ -56,9 +56,9 @@ class SafaExporter(AbstractDatasetExporter):
         :return: None
         """
         artifact_types = set()
-        for _, row in self.get_dataset().layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        for _, row in self.get_dataset().layer_df.itertuples():
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             artifact_types.update({source_type, target_type})
 
         artifact_type_to_artifacts = {}
@@ -83,9 +83,9 @@ class SafaExporter(AbstractDatasetExporter):
         Create trace definition between each layer in trace creator.
         :return: None
         """
-        for _, row in self.get_dataset().layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        for _, row in self.get_dataset().layer_df.itertuples():
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             matrix_name = f"{source_type}2{target_type}"
             file_name = matrix_name + ".csv"
             export_file_path = os.path.join(self.export_path, file_name)
@@ -109,6 +109,8 @@ class SafaExporter(AbstractDatasetExporter):
         entries = []
         for source_id in source_artifacts.index:
             for target_id in target_artifacts.index:
+                if source_id == target_id:
+                    continue
                 trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
                 trace_link: EnumDict = self.get_dataset().trace_df.get_link(trace_link_id)
                 assert trace_link is not None, f"Expected trace (source: {source_id}, target: {target_id}) to exist but it does not"

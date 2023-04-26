@@ -1,14 +1,16 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Callable
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
 from tgen.util import enum_util
+from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
+from tgen.util.override import overrides
 
 
 class AbstractProjectDataFrame(pd.DataFrame):
@@ -21,7 +23,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         Extends the pandas dataframe for all trace project information
         """
-        if isinstance(data, dict):
+        if isinstance(data, dict) and not isinstance(data, EnumDict):
             data = EnumDict(data)
         if columns is not None and isinstance(columns[0], Enum):
             columns = [col.value for col in columns]
@@ -124,12 +126,13 @@ class AbstractProjectDataFrame(pd.DataFrame):
 
     @classmethod
     def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
-               ignore_index: bool = False) -> "AbstractProjectDataFrame":
+               ignore_index: bool = False, remove_duplicates: bool = True) -> "AbstractProjectDataFrame":
         """
         Combines two dataframes
         :param dataframe1: The first dataframe
         :param dataframe2: The second dataframe
         :param ignore_index: If True, do not use the index values along the concatenation axis.
+        :param remove_duplicates: If True, removes any duplicates from both dataframes
         :return: The new combined dataframe
         """
         orient = 'records' if ignore_index else 'index'
@@ -137,11 +140,47 @@ class AbstractProjectDataFrame(pd.DataFrame):
         data2 = dataframe2.to_dict(orient=orient)
         if ignore_index:
             data1.extend(data2)
-            return cls(data1)
-        data1.update(data2)
-        for index, cols in data1.items():
-            cols[cls.index_name()] = index
-        return cls.from_dict(data1.values())
+            result = cls(data1)
+        else:
+            data1.update(data2)
+            for index, cols in data1.items():
+                cols[cls.index_name()] = index
+            result = cls.from_dict(data1.values())
+        return result
+
+    @overrides(pd.DataFrame)
+    def itertuples(self, index: bool = True, name: str = "Pandas") -> EnumDict:
+        """
+        Iterate over DataFrame rows as namedtuples.
+        :param index: if True, return the index as the first element of the tuple.
+        :param name : The name of the returned namedtuples or None to return regular tuples.
+        :return enum dictionary of data
+        """
+        for row in super().itertuples(index, name):
+            if hasattr(row, "_asdict"):
+                dict_ = EnumDict(row._asdict())
+                index = dict_.pop("Index")
+                if self.index_name():
+                    dict_[self.index_name()] = index
+                yield index, dict_
+            else:
+                yield row
+
+    def filter_by_row(self, filter_lambda: Callable) -> "AbstractProjectDataFrame":
+        """
+        Returns a copy of the dataframe with filter applied to rows
+        :param filter_lambda: The lambda used to filter out rows
+        :return: A copy of the dataframe with filter applied to rows
+        """
+        return self.__class__(DataFrameUtil.filter_df_by_row(self, filter_lambda))
+
+    def filter_by_index(self, index_to_filter: List) -> "AbstractProjectDataFrame":
+        """
+        Returns a copy of the dataframe with filter applied to rows
+        :param index_to_filter: The list of indices to filter out
+        :return: A copy of the dataframe with filter applied to rows
+        """
+        return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

@@ -3,7 +3,8 @@
     {
       "jobs": [
         {
-          "object_type": "PUSH_MODEL",
+          "object_type": "HUGGING_FACE",
+          "task": "PUSH",
           "job_args": {
             "random_seed": 42
           },

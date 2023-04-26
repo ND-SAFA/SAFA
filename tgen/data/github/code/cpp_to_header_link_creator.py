@@ -5,6 +5,7 @@ from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.data.github.gtraces.glink import GLink
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 
 ARTIFACTS_TYPE = Dict[str, GCodeFile]
 LINKS_TYPE = Dict[str, GLink]
@@ -46,7 +47,7 @@ class CPPToHeaderLinkCreator:
                     self._add_artifact_to_dict(GLink(cpp_file.get_id(), hpp_file.get_id()), self._links)
                 except Exception as e:
                     if verbose:
-                        print(f"Unable to create link for {cpp_file_path} because {e}")
+                        logger.warning(f"Unable to create link for {cpp_file_path} because {e}")
         return self._artifacts, self._links
 
     @staticmethod

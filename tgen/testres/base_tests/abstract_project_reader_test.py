@@ -1,6 +1,11 @@
 from typing import Dict, List
+from unittest import mock
 
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 
@@ -19,6 +24,24 @@ class AbstractProjectReaderTest(BaseTest):
         project_reader = test_project.get_project_reader()
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
+        TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
+        TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
+
+    @mock.patch("openai.Completion.create", )
+    def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
+        """
+        Verifies that entries are properly summarized by reader
+        :param test_project: Project containing entities to compare data frames to.
+        :return: None
+        """
+        mock_completion.side_effect = fake_open_ai_completion
+        project_reader: AbstractProjectReader = test_project.get_project_reader()
+        project_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
+        artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
+        summary_artifacts = test_project.get_artifact_entries()
+        for row in summary_artifacts:
+            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+        TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
 

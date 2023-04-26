@@ -25,4 +25,3 @@ class TestEnsembleExperiment(TestCase):
         """
         predictions = [[1.1, 1.2, 1.3], [0.1, 0.2, 0.3]]
         scaled_scores = EnsembleExperiment.scale_predictions(predictions)
-        print(scaled_scores)

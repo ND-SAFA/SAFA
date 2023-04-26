@@ -10,6 +10,15 @@ from tgen.util.json_util import JsonUtil
 class FileUtil:
 
     @staticmethod
+    def get_file_ext(path: str) -> str:
+        """
+        Gets the file extension for a given path
+        :param path: The path to get the extension for
+        :return: The extension of the file
+        """
+        return os.path.splitext(path)[-1]
+
+    @staticmethod
     def create_dir_safely(output_path: str, *additional_path_parts) -> str:
         """
         Makes a directory, by first checking if the directory exists

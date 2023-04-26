@@ -26,7 +26,7 @@ class TestSupportedEntityFormat(BaseTest):
         """
         for entity_format, data_path in self.DATUM.items():
             retrieved_parser = SupportedEntityFormats.get_parser(data_path)
-            self.assertEqual(retrieved_parser, entity_format.get_parser())
+            self.assertEqual(retrieved_parser, entity_format)
 
     def test_get_entity_parser_explicit(self):
         """
@@ -35,4 +35,4 @@ class TestSupportedEntityFormat(BaseTest):
         for entity_format_name, entity_format in SupportedEntityFormats.FORMATS.items():
             data_path = self.DATUM[entity_format]
             retrieved_parser = SupportedEntityFormats.get_parser(data_path, {StructuredKeys.PARSER: entity_format_name})
-            self.assertEqual(retrieved_parser, entity_format.get_parser())
+            self.assertEqual(retrieved_parser, entity_format)

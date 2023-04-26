@@ -31,4 +31,4 @@ class DefinitionCreator:
         :return: The data as a definition var
         """
         definition = {ExperimentSerializer.KEY: data}
-        return ExperimentSerializer.create_variable(definition)
+        return ExperimentSerializer.create(definition)

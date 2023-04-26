@@ -1,14 +1,18 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple, Type
+from typing import Dict, Type, TypeVar, Generic, Tuple, Optional
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
+PROJECT_DATA = TypeVar("PROJECT_DATA")
+TraceDataFramesTypes = Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]
 
-class AbstractProjectReader(BaseObject, ABC):
+
+class AbstractProjectReader(BaseObject, ABC, Generic[PROJECT_DATA]):
     """
     Defines interface for objects responsible for reading projects.
     """
@@ -19,12 +23,13 @@ class AbstractProjectReader(BaseObject, ABC):
         :param overrides: The overrides to apply to project creator.
         """
         self.overrides = overrides if overrides else {}
+        self.summarizer: Optional[Summarizer] = None
 
     @abstractmethod
-    def read_project(self) -> Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]:
+    def read_project(self) -> PROJECT_DATA:
         """
-        Reads artifact and trace links from files.
-        :return: Returns data frames containing artifacts, trace links, and layer mappings.
+        Reads project data from files.
+        :return: Returns data frames containing project data
         """
 
     @abstractmethod
@@ -47,6 +52,14 @@ class AbstractProjectReader(BaseObject, ABC):
         :return: Dictionary of parameter names to their new values to override.
         """
         return self.overrides
+
+    def set_summarizer(self, summarizer: Summarizer):
+        """
+        Sets the summarizer used to summarize content read by the reader
+        :param summarizer: The summarizer to use
+        :return: None
+        """
+        self.summarizer = summarizer
 
     @classmethod
     @overrides(BaseObject)

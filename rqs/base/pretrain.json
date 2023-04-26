@@ -3,7 +3,8 @@
     {
       "jobs": [
         {
-          "object_type": "MLM_PRE_TRAIN",
+          "object_type": "HUGGING_FACE",
+          "task": "PRE_TRAIN",
           "job_args": {},
           "model_manager": {
             "model_path": "[MODEL]"

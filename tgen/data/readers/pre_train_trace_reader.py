@@ -1,16 +1,17 @@
 import os
 import random
-from typing import List, Tuple
+import uuid
+from typing import List, Tuple, Generic
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.util.file_util import FileUtil
 
 
-class PreTrainTraceReader(AbstractProjectReader):
-    LAYER_ID = "layer_1"
+class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
+    LAYER_ID = uuid.uuid4()
 
     def __init__(self, data_file: str, overrides: dict = None):
         """
@@ -21,12 +22,14 @@ class PreTrainTraceReader(AbstractProjectReader):
         super().__init__(overrides)
         self.data_file = data_file
 
-    def read_project(self) -> Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]:
+    def read_project(self) -> TraceDataFramesTypes:
         """
         Reads a text file and converts to the trace format
         :return:
         """
         artifacts_df = self._get_artifacts_df(self.data_file)
+        if self.summarizer is not None:
+            artifacts_df = self.summarizer.summarize_dataframe(artifacts_df, ArtifactKeys.CONTENT.value)
         trace_df = self._get_trace_df(list(artifacts_df.index))
         layer_df = self._get_layer_dataframe()
         return artifacts_df, trace_df, layer_df
@@ -52,6 +55,7 @@ class PreTrainTraceReader(AbstractProjectReader):
         return ArtifactDataFrame({ArtifactKeys.ID: all_ids,
                                   ArtifactKeys.CONTENT: content,
                                   ArtifactKeys.LAYER_ID: [PreTrainTraceReader.LAYER_ID for i in range(len(content))]})
+
 
     @staticmethod
     def _get_trace_df(artifact_ids: List[int]) -> TraceDataFrame:

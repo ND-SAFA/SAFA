@@ -42,10 +42,10 @@ class TestMetricAtK(BaseTest, ABC):
         trace_links = self.create_trace_links(prefix, n_artifacts, self.labels)
         targets = [self.TARGET_PREFIX + str(i) for i in range(self.n_targets)]
         i = 0
-        for _, trace_link in trace_links.iterrows():
-            self.assertEqual(trace_link[TraceKeys.SOURCE.value], "S0")
-            self.assertEqual(trace_link[TraceKeys.TARGET.value], targets[i])
-            self.assertEqual(trace_link[TraceKeys.LABEL.value], self.labels[i])
+        for _, trace_link in trace_links.itertuples():
+            self.assertEqual(trace_link[TraceKeys.SOURCE], "S0")
+            self.assertEqual(trace_link[TraceKeys.TARGET], targets[i])
+            self.assertEqual(trace_link[TraceKeys.LABEL], self.labels[i])
             i += 1
 
     @property

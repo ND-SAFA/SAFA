@@ -63,7 +63,7 @@ class AbstractDatasetExporter(BaseObject):
         """
 
     @abstractmethod
-    def export(self):
+    def export(self, **kwargs):
         """
         Exports entities as a project in the appropriate format.
         :return: None

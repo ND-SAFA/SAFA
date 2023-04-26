@@ -2,14 +2,15 @@ import os
 from typing import List
 
 from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.entity.entity_reader import EntityReader
-from tgen.util.base_object import BaseObject
 
 
-class PreTrainProjectReader(BaseObject):
+class PreTrainProjectReader(AbstractProjectReader[List]):
     """
     Responsible for reading pre-training examples from series of files.
     """
+
     DELIMINATOR = "\n"
 
     def __init__(self, data_path: str):
@@ -17,21 +18,32 @@ class PreTrainProjectReader(BaseObject):
         Constructs pre-training reader targeted at path to folder.
         :param data_path: Path to folder containing pre-training files.
         """
-        base_path, file_name = os.path.split(data_path)
-        self.entity_reader = EntityReader(base_path, {
-            StructuredKeys.PATH: file_name,
-            StructuredKeys.PARSER: "FOLDER"
-        })
+        super().__init__()
+        self.base_path, self.file_name = os.path.split(data_path)
 
-    def create(self) -> List[str]:
+    def read_project(self) -> List:
         """
         Reads files in folder and aggregates examples in each file.
         :return: List lines found across files in folder.
         """
-        entity_df = self.entity_reader.read_entities()
+        entity_reader = EntityReader(self.base_path, {
+            StructuredKeys.PATH: self.file_name,
+            StructuredKeys.PARSER: "FOLDER"
+        })
+        entity_df = entity_reader.read_entities()
         examples = []
         for _, entity_row in entity_df.iterrows():
-            file_content = entity_row[StructuredKeys.Artifact.CONTENT.value]
+            col_name = StructuredKeys.Artifact.CONTENT.value
+            file_content = entity_row[col_name]
             for example in file_content.split(self.DELIMINATOR):
+                if self.summarizer is not None:
+                    example = self.summarizer.summarize(content=example)
                 examples.append(example)
         return examples
+
+    def get_project_name(self) -> str:
+        """
+        Get the name of the project
+        :return: The name of the project
+        """
+        return self.file_name

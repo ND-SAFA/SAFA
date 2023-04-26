@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Generic
 
 import pandas as pd
 
@@ -6,13 +6,13 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.server.api.api_definition import ApiDefinition
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 
 
-class ApiProjectReader(AbstractProjectReader):
+class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
     """
     Responsible for converting JSON from API into DataFrames containing artifacts and traces.
     """
@@ -26,7 +26,7 @@ class ApiProjectReader(AbstractProjectReader):
         super().__init__(overrides)
         self.api_definition = api_definition
 
-    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def read_project(self) -> TraceDataFramesTypes:
         """
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.
@@ -34,9 +34,9 @@ class ApiProjectReader(AbstractProjectReader):
         artifact_map = {}
         layer_mapping = []
 
-        source_layers = self.api_definition.source_layers
-        target_layers = self.api_definition.target_layers
-        links = self.api_definition.get_links()
+        source_layers = self.api_definition["source_layers"]
+        target_layers = self.api_definition["target_layers"]
+        links = self.api_definition["true_links"]
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
             source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, i)
@@ -57,6 +57,8 @@ class ApiProjectReader(AbstractProjectReader):
             }))
 
         artifact_df = ArtifactDataFrame(artifact_map)
+        if self.summarizer is not None:
+            artifact_df = self.summarizer.summarize_dataframe(artifact_df, StructuredKeys.Artifact.CONTENT.value)
         trace_df = TraceDataFrame(trace_df_entries)
         layer_mapping_df = LayerDataFrame(layer_mapping)
         return artifact_df, trace_df, layer_mapping_df

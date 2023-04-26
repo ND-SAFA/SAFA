@@ -8,12 +8,12 @@ from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tgen.constants import DELETE_TEST_OUTPUT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tgen.util.logging.logger_config import LoggerConfig
 from tgen.util.logging.logger_manager import LoggerManager
 
@@ -114,8 +114,8 @@ class BaseTest(TestCase):
         target_artifacts = BaseTest.create_artifacts(target_prefix, n_target)
         trace_links = {TraceKeys.SOURCE.value: [], TraceKeys.TARGET.value: [], TraceKeys.LABEL.value: []}
         label_index = 0
-        for s_id, source_artifact in source_artifacts.iterrows():
-            for t_id, target_artifact in target_artifacts.iterrows():
+        for s_id, source_artifact in source_artifacts.itertuples():
+            for t_id, target_artifact in target_artifacts.itertuples():
                 trace_links[TraceKeys.SOURCE.value].append(s_id)
                 trace_links[TraceKeys.TARGET.value].append(t_id)
                 trace_links[TraceKeys.LABEL.value].append(labels[label_index])
@@ -136,3 +136,5 @@ class BaseTest(TestCase):
         layer_ids = [1 for i in range(n_artifacts)]
         return ArtifactDataFrame(
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
+
+

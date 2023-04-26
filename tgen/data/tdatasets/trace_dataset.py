@@ -9,7 +9,7 @@ from datasets import Dataset
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -22,25 +22,27 @@ from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger
 from tgen.util.thread_util import ThreadUtil
 
+import networkx as nx
+
 
 class TraceDataset(iDataset):
     """
     Represents the config format for all data used by the huggingface trainer.
     """
 
-    def __init__(self, artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame, layer_mapping_df: LayerDataFrame,
+    def __init__(self, artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame, layer_df: LayerDataFrame,
                  pos_link_ids: List[int] = None, neg_link_ids: List[int] = None, randomize: bool = False):
         """
         Initializes trace dataset to contain links in link ids lists. 
-        :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
+        :param layer_df: DataFrame containing the comparisons between artifact types present in project.
         :param artifact_df: DataFrame containing information about the artifact in the project.
         :param trace_df: DataFrame containing true links present in project.
         :param pos_link_ids: List of link ids for True links
         :param neg_link_ids: List of link ids for False links
         :param randomize: Whether to randomize the trace links.
         """
-        self.__assert_dataframe_types(artifact_df, trace_df, layer_mapping_df)
-        self.layer_mapping_df = layer_mapping_df
+        self.__assert_dataframe_types(artifact_df, trace_df, layer_df)
+        self.layer_df = layer_df
         self.artifact_df = artifact_df
         self.trace_df = trace_df
         if not pos_link_ids or not neg_link_ids:
@@ -246,6 +248,17 @@ class TraceDataset(iDataset):
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
 
+    def construct_graph_from_traces(self) -> nx.Graph:
+        """
+        Constructs a graph using the artifacts as nodes and positive trace links as edges
+        :return: A graph representation of the dataset
+        """
+        G = nx.Graph()
+        G.add_nodes_from(self.artifact_df.index)
+        G.add_edges_from([(row[TraceKeys.SOURCE], row[TraceKeys.TARGET],
+                           {'weight': row[TraceKeys.LABEL]}) for i, row in self.trace_df.itertuples() if row[TraceKeys.LABEL] > 0.8])
+        return G
+
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
         Gets the data entries (link source, target, token pairs) for the augmentation
@@ -360,8 +373,8 @@ class TraceDataset(iDataset):
         """
         pos_link_ids = []
         neg_link_ids = []
-        for index, row in trace_df.iterrows():
-            if row[TraceKeys.LABEL.value]:
+        for index, row in trace_df.itertuples():
+            if round(row[TraceKeys.LABEL]) == 1:
                 pos_link_ids.append(index)
             else:
                 neg_link_ids.append(index)
@@ -393,12 +406,12 @@ class TraceDataset(iDataset):
         :param other: Dataset to combine
         :return: The combined dataset
         """
-        layer_mapping_df = LayerDataFrame.concat(self.layer_mapping_df, other.layer_mapping_df, ignore_index=True)
+        layer_mapping_df = LayerDataFrame.concat(self.layer_df, other.layer_df, ignore_index=True)
         artifact_df = ArtifactDataFrame.concat(self.artifact_df, other.artifact_df)
         trace_df = TraceDataFrame.concat(self.trace_df, other.trace_df)
         pos_link_ids = deepcopy(self.pos_link_ids) + deepcopy(other.pos_link_ids)
         neg_link_ids = deepcopy(self.neg_link_ids) + deepcopy(other.neg_link_ids)
-        return TraceDataset(artifact_df=artifact_df, trace_df=trace_df, layer_mapping_df=layer_mapping_df,
+        return TraceDataset(artifact_df=artifact_df, trace_df=trace_df, layer_df=layer_mapping_df,
                             pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids)
 
     def __getitem__(self, item: Any) -> Any:

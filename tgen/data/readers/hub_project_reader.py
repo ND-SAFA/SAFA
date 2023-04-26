@@ -49,4 +49,7 @@ class HubProjectReader(AbstractProjectReader):
         return self.project_reader.get_overrides()
 
     def should_generate_negative_links(self) -> bool:
+        """
+       :return: Returns whether negative links should be implied by comparing artifacts.
+       """
         return self.project_reader.should_generate_negative_links()

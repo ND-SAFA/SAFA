@@ -55,8 +55,8 @@ class TraceDataFrame(AbstractProjectDataFrame):
             return
         if TraceKeys.LINK_ID.value not in self.columns and self.index.name != self.index_name():
             link_ids = []
-            for index, row in self.iterrows():
-                link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE.value], row[TraceKeys.TARGET.value]))
+            for index, row in self.itertuples():
+                link_ids.append(TraceDataFrame.generate_link_id(row[TraceKeys.SOURCE], row[TraceKeys.TARGET]))
             self[TraceKeys.LINK_ID] = link_ids
 
     def add_link(self, source_id: str, target_id: str, label: int = 0) -> EnumDict:
@@ -79,7 +79,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: The link if one is found with the specified params, else None
         """
         if link_id is None:
-            assert source_id and target_id, "Requires source_id and target_id if no link_id is provided."
+            assert source_id is not None and target_id is not None, "Requires source_id and target_id if no link_id is provided."
             link_id = TraceDataFrame.generate_link_id(source_id, target_id)
         return self.get_row(link_id)
 
@@ -98,7 +98,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         return dict_
 
     @staticmethod
-    def generate_link_id(source_id: str, target_id: str) -> int:
+    def generate_link_id(source_id: Any, target_id: Any) -> int:
         """
         Generates a unique id for a source, target link
         :param source_id: id of source artifact

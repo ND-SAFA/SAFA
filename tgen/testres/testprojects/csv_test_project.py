@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 
-from tgen.data.keys.csv_format import CSVKeys
+from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH

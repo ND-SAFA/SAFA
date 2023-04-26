@@ -34,7 +34,8 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         :param output_dir: where to save the datasets to
         :param random_seed: the random seed for this split
         """
-        super().__init__(pre_train_dataset_creator, train_dataset_creator, val_dataset_creator, eval_dataset_creator, augmenter)
+        super().__init__(pre_train_dataset_creator, train_dataset_creator, val_dataset_creator, eval_dataset_creator,
+                         augmenter=augmenter)
         self.output_dir = output_dir
         self.dataset_name = self.get_creator(DatasetRole.TRAIN).get_name() if self.get_creator(DatasetRole.TRAIN) is not None \
             else "Unknown_Dataset"

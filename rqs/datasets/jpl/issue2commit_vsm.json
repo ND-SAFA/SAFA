@@ -3,7 +3,8 @@
     {
       "jobs": [
         {
-          "object_type": "VSM",
+          "object_type": "HUGGING_FACE",
+          "task": "TRAIN",
           "job_args": {
             "random_seed": 812
           },

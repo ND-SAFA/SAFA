@@ -25,4 +25,4 @@ class TestSafaExporter(BaseTest):
 
         self.assertEqual(len(safa_exporter._dataset.artifact_df), len(other_dataset.artifact_df))
         self.assertEqual(len(safa_exporter._dataset.trace_df), len(other_dataset.trace_df))
-        self.assertEqual(len(safa_exporter._dataset.layer_mapping_df), len(other_dataset.layer_mapping_df))
+        self.assertEqual(len(safa_exporter._dataset.layer_df), len(other_dataset.layer_df))

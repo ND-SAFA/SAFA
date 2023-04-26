@@ -9,12 +9,13 @@ from tgen.constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
-from tgen.jobs.abstract_trace_job import AbstractTraceJob
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.predict_job import PredictJob
-from tgen.jobs.vsm_job import VSMJob
+from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
+from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.models.single_layer.single_layer_model import SingleLayerModel, predict, train
 from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_config import LoggerConfig
@@ -66,7 +67,7 @@ class EnsembleExperiment(Experiment):
         self.set_cross_step_vars(self.steps)
 
         if not self.load_previous_predictions:
-            jobs: List[AbstractTraceJob] = super().run()
+            jobs: List[AbstractTrainerJob] = super().run()
             assert self.status == Status.SUCCESS, "Experiment step has failed."
             train_jobs, predict_on_train_jobs = jobs[:len(train_step.jobs)], jobs[len(train_step.jobs):]
         else:
@@ -175,7 +176,7 @@ class EnsembleExperiment(Experiment):
         FileUtil.write(json_output, job_output_path)
 
     @staticmethod
-    def _create_predict_on_train_step(train_step_jobs: List[AbstractTraceJob]) -> ExperimentStep:
+    def _create_predict_on_train_step(train_step_jobs: List[AbstractTrainerJob]) -> ExperimentStep:
         """
         Creates an experiment step to perform a prediction on the training data
         :param train_step_jobs: The original train step jobs
@@ -184,9 +185,9 @@ class EnsembleExperiment(Experiment):
         predict_on_train_jobs = []
         for train_job in train_step_jobs:
             tmp_job = deepcopy(train_job)
-            predict_job = PredictJob(job_args=tmp_job.job_args, trainer_dataset_manager=tmp_job.trainer_dataset_manager,
-                                     model_manager=tmp_job.model_manager, trainer_args=tmp_job.trainer_args) \
-                if not isinstance(tmp_job, VSMJob) else deepcopy(tmp_job)
+            predict_job = HuggingFaceJob(job_args=tmp_job.job_args, trainer_dataset_manager=tmp_job.trainer_dataset_manager,
+                                         model_manager=tmp_job.model_manager, trainer_args=tmp_job.trainer_args,
+                                         task=TrainerTask.PREDICT) if not isinstance(tmp_job, VSMJob) else deepcopy(tmp_job)
             train_dataset = predict_job.trainer_dataset_manager.get_datasets()[DatasetRole.TRAIN]
             predict_job.trainer_dataset_manager.replace_dataset(train_dataset, DatasetRole.EVAL)
             predict_on_train_jobs.append(predict_job)

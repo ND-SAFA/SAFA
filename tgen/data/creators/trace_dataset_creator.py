@@ -125,9 +125,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: Mapping of trace link ids to the link.
         """
         if len(self.trace_df[self.trace_df[TraceKeys.LABEL] == 0]) < 1:
-            self.trace_df = self._generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
+            self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
-        trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_mapping_df=self.layer_mapping_df)
+        trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)
         return trace_dataset
 
     def _filter_artifacts_by_ids(self, artifact_ids: Set[str]) -> None:
@@ -165,8 +165,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         return self.linked_artifact_ids
 
     @staticmethod
-    def _generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
-                                 trace_df: TraceDataFrame, n_threads=20) -> TraceDataFrame:
+    def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
+                                trace_df: TraceDataFrame, n_threads=20) -> TraceDataFrame:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
@@ -176,9 +176,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
-        for _, row in layer_mapping_df.iterrows():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+        for _, row in layer_mapping_df.itertuples():
+            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
+            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             source_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == source_type].index
             target_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == target_type].index
 
@@ -192,7 +192,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                 for target_artifact_id in target_artifact_ids:
                     target_artifact = artifact_df.get_artifact(target_artifact_id)
                     trace_link_id = TraceDataFrame.generate_link_id(artifact_id, target_artifact_id)
-                    if trace_link_id not in trace_df.index:
+                    if trace_link_id not in trace_df.index and artifact_id != target_artifact_id:
                         negative_links[trace_link_id] = trace_df.link_as_dict(source_id=artifact[ArtifactKeys.ID],
                                                                               target_id=target_artifact[ArtifactKeys.ID],
                                                                               label=0)
@@ -218,15 +218,15 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         valid_artifact_ids = set(artifact_df.index)
         missing_sources = []
         missing_targets = []
-        for _, row in trace_df.iterrows():
-            source_id = row[StructuredKeys.Trace.SOURCE.value]
-            target_id = row[StructuredKeys.Trace.TARGET.value]
+        for _, row in trace_df.itertuples():
+            source_id = row[StructuredKeys.Trace.SOURCE]
+            target_id = row[StructuredKeys.Trace.TARGET]
             if source_id not in valid_artifact_ids:
                 missing_sources.append(source_id)
             elif target_id not in valid_artifact_ids:
                 missing_targets.append(target_id)
             else:
-                valid_traces.append(row.to_dict())
+                valid_traces.append(row)
 
         TraceDatasetCreator.assert_missing_artifact_ids(missing_sources, max_missing_sources, "source")
         TraceDatasetCreator.assert_missing_artifact_ids(missing_targets, max_missing_targets, "target")

@@ -13,7 +13,7 @@ if not IS_TEST:
     openai.api_key = OPEN_AI_KEY
 
 
-class OpenAiUtil(AiUtil):
+class OpenAiUtil(AiUtil[OpenAIObject]):
     class Params:
         COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
         MODEL_SUFFIX = "model_suffix"

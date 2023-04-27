@@ -115,4 +115,4 @@ class TestOpenAiTrainer(BaseTest):
 
     def get_open_ai_trainer(self, dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole], **params):
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
-        return AITrainer(trainer_dataset_manager=trainer_dataset_manager, ai_trainer_args=OpenAiArgs(**params))
+        return AITrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(**params))

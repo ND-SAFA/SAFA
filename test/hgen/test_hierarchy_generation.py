@@ -181,7 +181,7 @@ class TestHierarchyGeneration(BaseTest):
     @staticmethod
     def get_tgen_trainer(dataset_creator):
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
-        return AITrainer(trainer_dataset_manager=trainer_dataset_manager, ai_trainer_args=OpenAiArgs(metrics=[]))
+        return AITrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]))
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):

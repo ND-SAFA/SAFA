@@ -37,7 +37,7 @@ class OpenAiJob(AbstractTrainerJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = AITrainer(ai_trainer_args=self.trainer_args,
+            self._trainer = AITrainer(trainer_args=self.trainer_args,
                                       trainer_dataset_manager=self.trainer_dataset_manager,
                                       base_model=self.base_model)
         return self._trainer

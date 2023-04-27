@@ -70,6 +70,8 @@ export const useTypeOptions = defineStore("typeOptions", {
       this.tim = createTIM(project);
       this.allArtifactTypes = project.artifactTypes;
       this.initializeTypeIcons(project.artifactTypes);
+
+      console.log(JSON.stringify(this.tim, null, 2));
     },
     /**
      * Initializes the icons for artifact types.

@@ -6,12 +6,12 @@ from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trainers.ai_trainer import AITrainer
+from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.override import overrides
 
 
-class OpenAiJob(AbstractTrainerJob):
+class LLMJob(AbstractTrainerJob):
     """
     Job to handle open ai tasks
     """
@@ -30,16 +30,16 @@ class OpenAiJob(AbstractTrainerJob):
         self.trainer_args = trainer_args
 
     @overrides(AbstractTrainerJob)
-    def get_trainer(self, **kwargs) -> AITrainer:
+    def get_trainer(self, **kwargs) -> LLMTrainer:
         """
         Gets the trace trainer for the job
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = AITrainer(trainer_args=self.trainer_args,
-                                      trainer_dataset_manager=self.trainer_dataset_manager,
-                                      base_model=self.base_model)
+            self._trainer = LLMTrainer(trainer_args=self.trainer_args,
+                                       trainer_dataset_manager=self.trainer_dataset_manager,
+                                       base_model=self.base_model)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

@@ -24,7 +24,7 @@ from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.logging.logger_manager import logger
 
 
-class AITrainer(AbstractTrainer):
+class LLMTrainer(AbstractTrainer):
     """
     Interfaces with open-ai server to fine-tune models and make predictions
     """

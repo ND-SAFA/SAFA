@@ -18,7 +18,7 @@ from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.hgen_jobs.hgen_job import HGenJob
-from tgen.train.trainers.ai_trainer import AITrainer
+from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 
 DO_SUMMARIZE = False
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         dataset_creator_for_sources = None
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=PromptDatasetCreator(
             project_reader=ArtifactProjectReader(project_path=project_path), summarizer=summarizer))
-        tgen_trainer = AITrainer(trainer_dataset_manager=trainer_dataset_manager)
+        tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager)
 
     args = HGenArgs(hgen_trainer_type=SupportedTrainer.OPEN_AI,
                     hgen_trainer_args=OpenAiArgs(prompt_creator=GenerationPromptCreator()),

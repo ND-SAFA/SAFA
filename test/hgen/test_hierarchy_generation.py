@@ -3,18 +3,15 @@ import uuid
 from copy import deepcopy
 from unittest import mock
 
-import networkx as nx
-
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerKeys, LayerDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -229,7 +226,7 @@ class TestHierarchyGeneration(BaseTest):
     def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
         hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[],
                                                                prompt_creator=GenerationPromptCreator(
-                                                                   base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY))}
+                                                                   base_prompt=SupportedPrompts.SHALL_REQUIREMENT_SUMMARY))}
         args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.OPEN_AI,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **hgen_trainer_params, **params)

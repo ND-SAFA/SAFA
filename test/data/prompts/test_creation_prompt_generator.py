@@ -1,14 +1,14 @@
 from test.data.prompts.base_prompt_test import BasePromptTest
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.override import overrides
 
 
 class TestClassificationPromptGenerater(BasePromptTest):
 
     def test_generate(self):
-        prompt_creator = GenerationPromptCreator(BasePrompt.SYSTEM_REQUIREMENT_CREATION)
+        prompt_creator = GenerationPromptCreator(base_prompt=SupportedPrompts.SYSTEM_REQUIREMENT_CREATION)
 
         # No Label
         generated_prompt = prompt_creator.create("source1", "target1")
@@ -17,5 +17,6 @@ class TestClassificationPromptGenerater(BasePromptTest):
     @overrides(BasePromptTest)
     def verify_prompt(self, generated_prompt):
         self.assertIn("source1", generated_prompt[PromptKeys.COMPLETION])
-        self.assertTrue(generated_prompt[PromptKeys.PROMPT].startswith(BasePrompt.SYSTEM_REQUIREMENT_CREATION.value.split("{}")[0]))
-        super().verify_prompt(generated_prompt)
+        self.assertTrue(
+            generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.SYSTEM_REQUIREMENT_CREATION.value.split("{}")[0]))
+        super().verify_prompt(generated_prompt)  # assumed using openai

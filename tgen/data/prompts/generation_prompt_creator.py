@@ -1,13 +1,23 @@
-from dataclasses import dataclass
-
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.base_prompt import BasePrompt
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.data.prompts.supported_ai_prompt_args import SupportedAIPromptArgs
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.enum_util import EnumDict
 
 
-@dataclass
 class GenerationPromptCreator(AbstractPromptCreator):
-    base_prompt: BasePrompt = BasePrompt.SYSTEM_REQUIREMENT_CREATION
+    """
+    Constructs prompt datasets for generation tasks.
+    """
+
+    def __init__(self, ai_library: SupportedAIPromptArgs = SupportedAIPromptArgs.OPENAI,
+                 base_prompt: SupportedPrompts = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION):
+        """
+        Constructs generation prompt dataset creator for specified library.
+        :param ai_library: The AI library to generate prompts for.
+        :param base_prompt: The base prompt to use to generate final prompt.
+        """
+        super().__init__(PromptArgs(base_prompt, ai_library.value))
 
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:
         """
@@ -16,4 +26,4 @@ class GenerationPromptCreator(AbstractPromptCreator):
         :param target_content: The content of the target artifact
         :return: Dictionary containing the prompt and completion
         """
-        return self.generate_base(self.base_prompt.value.format(target_content), source_content)
+        return self.generate_base(self.args.base_prompt.value.format(target_content), source_content)

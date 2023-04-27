@@ -153,8 +153,8 @@ class OpenAiTrainer(AbstractTrainer):
         if len(probs) < 1:
             return 0.5
         probs = probs[0]
-        v0 = probs.get(self.trainer_args.prompt_creator.COMPLETION_START + self.trainer_args.prompt_creator.pos_class, 0)
-        v1 = probs.get(self.trainer_args.prompt_creator.COMPLETION_START + self.trainer_args.prompt_creator.neg_class, 0)
+        v0 = probs.get(self.trainer_args.prompt_creator.args.completion_start + self.trainer_args.prompt_creator.pos_class, 0)
+        v1 = probs.get(self.trainer_args.prompt_creator.args.completion_start + self.trainer_args.prompt_creator.neg_class, 0)
         prob_v = [v0, v1]
         score = softmax(prob_v)[1]
         return score

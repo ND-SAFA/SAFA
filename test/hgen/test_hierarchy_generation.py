@@ -3,18 +3,14 @@ import uuid
 from copy import deepcopy
 from unittest import mock
 
-import networkx as nx
-
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerKeys, LayerDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -27,7 +23,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
-from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
+from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 
@@ -54,15 +50,14 @@ class TestHierarchyGeneration(BaseTest):
 
     @mock.patch("tgen.data.creators.cluster_dataset_creator.ClusterDatasetCreator._cluster")
     @mock.patch("openai.Completion.create")
-    def test_run(self, mock_completion: mock.MagicMock, mock_cluster: mock.MagicMock):
-        mock_completion.side_effect = fake_open_ai_completion
+    def test_run(self, mock_completion_api: mock.MagicMock, mock_cluster: mock.MagicMock):
+        mock_completion_api.side_effect = fake_open_ai_completion
         mock_cluster.side_effect = fake_clustering
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
                             self.get_dataset_creator_with_trace_dataset_creator(),
                             self.FakeDatasetCreator()]
         for i, dataset_creator in enumerate(dataset_creators):
             tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
-
             hgen = self.get_hierarchy_generator(tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator)
             export_path = hgen.run(TEST_OUTPUT_DIR, save_dataset_checkpoints=False)
             generated_dataset = TraceDatasetCreator(project_reader=DataFrameProjectReader(project_path=export_path)).create()
@@ -183,8 +178,10 @@ class TestHierarchyGeneration(BaseTest):
 
     @staticmethod
     def get_tgen_trainer(dataset_creator):
+        prompt_creator = ClassificationPromptCreator()
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
-        return OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]))
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]),
+                          prompt_creator=prompt_creator)
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):
@@ -226,11 +223,10 @@ class TestHierarchyGeneration(BaseTest):
     def get_dataset_creator(**params):
         return PromptDatasetCreator(summarizer=Summarizer(), **params)
 
-    def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
-        hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[],
-                                                               prompt_creator=GenerationPromptCreator(
-                                                                   base_prompt=BasePrompt.SHALL_REQUIREMENT_SUMMARY))}
-        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.OPEN_AI,
+    def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
+
+        hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[])}
+        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.LLM,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **hgen_trainer_params, **params)
         return HierarchyGenerator(args)

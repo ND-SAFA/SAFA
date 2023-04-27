@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Tuple, Optional
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from tqdm import tqdm
@@ -18,9 +18,9 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.util.open_ai_util import OpenAiUtil
 
 
 class PromptDataset(iDataset):
@@ -105,7 +105,7 @@ class PromptDataset(iDataset):
         if not self.project_file_id:
             prompt_df = self.get_prompts_dataframe(prompt_creator, summarizer)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
-            res = OpenAiUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
+            res = OpenAIUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)

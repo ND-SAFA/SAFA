@@ -8,8 +8,8 @@ from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.paths.paths import TEST_DATA_DIR
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.util.file_util import FileUtil
 
@@ -27,8 +27,7 @@ class TestSummarizer(BaseTest):
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         summarizer = Summarizer(code_or_exceeds_limit_only=False)
-        summaries = summarizer._summarize_chunks(self.CHUNKS, "text-davinci-003",
-                                                 OpenAiArgs(prompt_creator=GenerationPromptCreator(BasePrompt.NL_SUMMARY)))
+        summaries = summarizer._summarize_chunks(summarizer.nl_prompt_creator, self.CHUNKS, "text-davinci-003", OpenAiArgs())
         for i, summary in enumerate(summaries):
             self.assertEqual(summary, SUMMARY_FORMAT.format(self.CHUNKS[i]))
 

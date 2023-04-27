@@ -1,40 +1,27 @@
-from abc import abstractmethod, ABC
-from dataclasses import dataclass
-from typing import Dict, Type
+from abc import abstractmethod
+from typing import Type
 
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.base_prompt import BasePrompt
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
 
 
-@dataclass
 class AbstractPromptCreator(BaseObject):
     """
     Responsible for formatting and creating prompts and completions for Language Models
     """
     base_prompt: BasePrompt
 
-    _PROMPT_SEPARATOR = "\n\n###\n\n"
-    _COMPLETION_SEPARATOR = "###"
-    COMPLETION_START = " "
-
-    def format_prompt(self, base_prompt: str) -> str:
+    def __init__(self, prompt_args: PromptArgs, base_prompt: SupportedPrompts):
         """
-        Formats the prompt with expected prefix + suffix tokens
-        :param base_prompt: The base prompt
-        :return: The formatted prompt
+        Constructs prompt creator with prompt arguments as configuration.
+        :param prompt_args: The arguments customizing prompt generation.
         """
-        return f"{base_prompt}{self._PROMPT_SEPARATOR}"
-
-    def format_completion(self, base_completion: str) -> str:
-        """
-        Formats the completion with expected prefix + suffix tokens
-        :param base_completion: The base completion
-        :return: The formatted completion
-        """
-        return f"{self.COMPLETION_START}{base_completion}{self._COMPLETION_SEPARATOR}"
+        self.args = prompt_args
+        self.base_prompt = base_prompt
 
     def generate_base(self, base_prompt: str, base_completion: str) -> EnumDict[str, str]:
         """
@@ -47,6 +34,22 @@ class AbstractPromptCreator(BaseObject):
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
         })
+
+    def format_prompt(self, base_prompt: str) -> str:
+        """
+        Formats the prompt with expected prefix + suffix tokens
+        :param base_prompt: The base prompt
+        :return: The formatted prompt
+        """
+        return f"{base_prompt}{self.args.prompt_separator}"
+
+    def format_completion(self, base_completion: str) -> str:
+        """
+        Formats the completion with expected prefix + suffix tokens
+        :param base_completion: The base completion
+        :return: The formatted completion
+        """
+        return f"{self.args.completion_prefix}{base_completion}{self.args.completion_suffix}"
 
     @abstractmethod
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:

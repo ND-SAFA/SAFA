@@ -1,18 +1,34 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
     MAX_TOKENS_DEFAULT, \
     TEMPERATURE_DEFAULT
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.train.args.llm_args import LLMArgs
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.util.open_ai_util import OpenAiUtil
+from tgen.util.ai.params.openai_params import OpenAiParams
+
+
+class OpenAIParams:
+    """
+    Contains possible parameters to OpenAI API.
+    """
+    COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
+    MODEL_SUFFIX = "model_suffix"
+    N_EPOCHS = "n_epochs"
+    LEARNING_RATE_MULTIPLIER = "learning_rate_multiplier"
+    TEMPERATURE = "temperature"
+    MAX_TOKENS = "max_tokens"
+    LOG_PROBS = "logprobs"
+    PROMPT = "prompt"
+    VALIDATION_FILE = "validation_file"
+    CLASSIFICATION_POSITIVE_CLASS = "classification_positive_class"
 
 
 @dataclass
-class OpenAiArgs:
+class OpenAiArgs(LLMArgs):
     temperature: float = TEMPERATURE_DEFAULT
     max_tokens: int = MAX_TOKENS_DEFAULT
     logprobs: int = LOGPROBS_DEFAULT
@@ -21,48 +37,27 @@ class OpenAiArgs:
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-
-    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
+    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
     output_dir: str = None
+    expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
+                            TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
+                                                OpenAIParams.LEARNING_RATE_MULTIPLIER],
+                            TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}
+    base_model = CLASSIFICATION_MODEL_DEFAULT
 
-    def __post_init__(self) -> None:
+    def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
-        Sets specific variables depending on the type of prompt creator
-        :return None
+        Allows the usage of custom params defined in instructions. Includes classification metrics.
+        :param task: The task being performed.
+        :param params: The parameters current being constructed.
+        :param instructions: Any custom instruction flags.
+        :return: Parameters with customizations added.
         """
-        if isinstance(self.prompt_creator, ClassificationPromptCreator):
-            self.max_tokens = 1
-
-    def to_params(self, task: TrainerTask = TrainerTask.TRAIN, include_classification_metrics: bool = False) -> Dict[str, Any]:
-        """
-        Gets the params needed for an open ai task
-        :param task: The primary task being performed (fine_tune or predict)
-        :param include_classification_metrics: If True, includes the params necessary for calculating classification metrics
-        :return: A dictionary mapping param name to its value
-        """
-        assert task in OpenAiUtil.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
-                                                            f" Must choose from {OpenAiUtil.EXPECTED_PARAMS_FOR_TASK.keys()}"
-        params = {}
-        if isinstance(self.prompt_creator, ClassificationPromptCreator):
-            self.max_tokens = 1
-            if include_classification_metrics:
-                params = self.__add_params_for_task(TrainerTask.CLASSIFICATION)
-                params[OpenAiUtil.Params.CLASSIFICATION_POSITIVE_CLASS] = self.prompt_creator.format_completion(
-                    self.prompt_creator.pos_class)
-        return self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)
-
-    def __add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
-        """
-        Adds the params for a given task
-        :param task: The task to add params for
-        :param params: The current parameters to add to
-        :return: The parameters with task-specific ones added
-        """
-        if params is None:
-            params = {}
-        for name in OpenAiUtil.EXPECTED_PARAMS_FOR_TASK[task]:
-            val = getattr(self, name)
-            if val is None:
-                continue
-            params[name] = val
+        if instructions.get("include_classification_metrics", None):
+            assert "prompt_creator" in instructions, "Expected prompt_creator to be defined when including classification metrics."
+            prompt_creator = instructions["prompt_creator"]
+            assert hasattr(prompt_creator, "pos_class"), "Expected prompt creator to define `pos_class`"
+            pos_class = getattr(prompt_creator, "pos_class")
+            params = self._add_params_for_task(TrainerTask.CLASSIFICATION)
+            params[OpenAiParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
         return params

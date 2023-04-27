@@ -1,10 +1,10 @@
 import os
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
@@ -94,11 +94,11 @@ class PromptTestProject:
         test_case.assertEqual(len(trace_df), len(prompt_df), **params)
         artifacts = PromptTestProject.get_safa_artifact_id_to_content()
         for i, (link_id, link) in enumerate(trace_df.itertuples()):
-            prompt = prompt_df.get_row(i)
+            prompt = prompt_df.get_row(i)[PromptKeys.PROMPT]
             source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
             source, target = artifacts[source_id], artifacts[target_id]
-            test_case.assertIn(target, prompt[PromptKeys.PROMPT], **params)
-            test_case.assertIn(source, prompt[PromptKeys.PROMPT], **params)
+            test_case.assertIn(target, prompt, **params)
+            test_case.assertIn(source, prompt, **params)
 
     @staticmethod
     def verify_prompts_safa_project_traces_for_generation(test_case: BaseTest, prompt_df: PromptDataFrame, trace_df: TraceDataFrame,

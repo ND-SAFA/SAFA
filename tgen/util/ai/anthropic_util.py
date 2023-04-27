@@ -2,7 +2,7 @@ from typing import TypedDict
 
 import anthropic
 
-from tgen.constants import ANTHROPIC_KEY
+from tgen.constants import ANTHROPIC_KEY, IS_TEST
 from tgen.util.ai.ai_util import AIUtil
 
 
@@ -16,7 +16,7 @@ class AnthropicUtil(AIUtil[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """
-    CLIENT = None
+    Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
 
     @staticmethod
@@ -44,8 +44,7 @@ class AnthropicUtil(AIUtil[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        client = AnthropicUtil.get_client()
-        return client.completion(**params)
+        return AnthropicUtil.Client.completion(**params)
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:
@@ -56,11 +55,8 @@ class AnthropicUtil(AIUtil[AnthropicResponse]):
         """
         raise NotImplementedError(NotImplementedError)
 
-    @staticmethod
-    def get_client() -> anthropic.Client:
-        """
-        :return: Returns static client to anthropic model.
-        """
-        if AnthropicUtil.CLIENT is None:
-            AnthropicUtil.CLIENT = anthropic.Client(ANTHROPIC_KEY)
-        return AnthropicUtil.CLIENT
+
+if not IS_TEST:
+    assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
+    if AnthropicUtil.Client is None:
+        AnthropicUtil.Client = anthropic.Client(ANTHROPIC_KEY)

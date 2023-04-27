@@ -22,7 +22,7 @@ class PythonChunker(AbstractChunker):
     IGNORED_NODES = [ast.Import, ast.ImportFrom]
     N_SPACE_TO_TAB = 4
 
-    def _chunk(self, content: str) -> List[str]:
+    def chunk(self, content: str) -> List[str]:
         """
         Chunks the given python code into pieces that are beneath the model's token limit
         :param content: The code to be chunked
@@ -122,3 +122,4 @@ class PythonChunker(AbstractChunker):
             tabs = TAB * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
             return re.sub(r'^[ ]{2,}', tabs, orig_str)
         return orig_str
+

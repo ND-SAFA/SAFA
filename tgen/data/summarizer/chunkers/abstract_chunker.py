@@ -22,15 +22,13 @@ class AbstractChunker(BaseObject, ABC):
         self.model_name = model_name
         self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name) - max_tokens - MAX_TOKENS_BUFFER
 
+    @abstractmethod
     def chunk(self, content: str) -> List[str]:
         """
         Chunks the given content into pieces that are beneath the model's token limit
         :param content: The content to chunk
         :return: The content chunked into sizes beneath the token limit
         """
-        if not self.exceeds_token_limit(content):
-            return [content]
-        return self._chunk(content)
 
     def exceeds_token_limit(self, content: str) -> bool:
         """
@@ -39,14 +37,6 @@ class AbstractChunker(BaseObject, ABC):
         :return: True if the content exceeds the token limit for the model else False
         """
         return self.estimate_num_tokens(content, self.model_name) > self.token_limit
-
-    @abstractmethod
-    def _chunk(self, content: str) -> List[str]:
-        """
-        Chunks the given content into pieces that are beneath the model's token limit
-        :param content: The content to chunk
-        :return: The content chunked into sizes beneath the token limit
-        """
 
     @staticmethod
     def estimate_num_tokens(content: str, model_name: str) -> int:

@@ -19,7 +19,7 @@ from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAiUtil
+from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.logging.logger_manager import logger
 
@@ -60,7 +60,7 @@ class AITrainer(AbstractTrainer):
             params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 prompt_creator=self.trainer_args.prompt_creator,
                 summarizer=self.summarizer)
-        res = OpenAiUtil.make_fine_tune_request(training_file=training_file_id,
+        res = OpenAIUtil.make_fine_tune_request(training_file=training_file_id,
                                                 model=self.base_model,
                                                 **params)
         logger.info(res.events[-1].message)
@@ -73,7 +73,7 @@ class AITrainer(AbstractTrainer):
         :param fine_tune_id: The id of the fine tune job
         :return: The response for the fine tune job
         """
-        res = OpenAiUtil.retrieve_fine_tune_request(id=fine_tune_id)
+        res = OpenAIUtil.retrieve_fine_tune_request(id=fine_tune_id)
         logger.info(res.events[-1].message)
         return res
 
@@ -89,7 +89,7 @@ class AITrainer(AbstractTrainer):
         prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.trainer_args.prompt_creator)
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
-        res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
+        res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                  **self.trainer_args.to_params(TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \
             if isinstance(self.trainer_args.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)

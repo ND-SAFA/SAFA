@@ -12,7 +12,7 @@ from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAiUtil
+from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
 
@@ -94,7 +94,7 @@ class Summarizer(BaseObject):
         """
         prompts = [args.prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
                    for chunk in chunks]
-        res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
+        res = OpenAIUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(TrainerTask.PREDICT))
         return [choice.text.strip() for choice in res.choices]
 

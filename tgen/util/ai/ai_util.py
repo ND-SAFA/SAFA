@@ -4,7 +4,7 @@ from typing import Generic, TypeVar
 AIObject = TypeVar("AIObject")
 
 
-class AiUtil(ABC, Generic[AIObject]):
+class AIUtil(ABC, Generic[AIObject]):
     """
     Interface for all AI utility classes.
     """

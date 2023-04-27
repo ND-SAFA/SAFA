@@ -3,7 +3,7 @@ from typing import TypedDict
 import anthropic
 
 from tgen.constants import ANTHROPIC_KEY
-from tgen.util.ai.ai_util import AiUtil
+from tgen.util.ai.ai_util import AIUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -12,7 +12,7 @@ class AnthropicResponse(TypedDict):
     """
 
 
-class AnthropicUtil(AiUtil[AnthropicResponse]):
+class AnthropicUtil(AIUtil[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """

@@ -18,8 +18,7 @@ class GenerationPromptCreator(AbstractPromptCreator):
         """
         if prompt_args is None:
             prompt_args = OpenAiArgs.prompt_args
-        super().__init__(prompt_args=prompt_args),
-        self.base_prompt = base_prompt
+        super().__init__(prompt_args=prompt_args, base_prompt=base_prompt),
 
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:
         """

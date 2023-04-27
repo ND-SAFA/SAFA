@@ -22,11 +22,10 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         if prompt_args is None:
             from tgen.train.args.open_ai_args import OpenAiArgs  # used to automatically have args for tests
             prompt_args = OpenAiArgs.prompt_args
-        super().__init__(prompt_args)
+        super().__init__(prompt_args, base_prompt)
         self.pos_class = pos_class
         self.neg_class = neg_class
         self.artifact_prompt_format = artifact_prompt_format
-        self.base_prompt = base_prompt
 
     def create(self, source_content: str, target_content: str, label: int = None) -> EnumDict[str, str]:
         """

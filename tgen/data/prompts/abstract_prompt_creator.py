@@ -3,6 +3,7 @@ from typing import Type
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
@@ -13,12 +14,13 @@ class AbstractPromptCreator(BaseObject):
     Creates prompt dataframes according to configuration.
     """
 
-    def __init__(self, prompt_args: PromptArgs):
+    def __init__(self, prompt_args: PromptArgs, base_prompt: SupportedPrompts):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompt_args: The arguments customizing prompt generation.
         """
         self.args = prompt_args
+        self.base_prompt = base_prompt
 
     def generate_base(self, base_prompt: str, base_completion: str) -> EnumDict[str, str]:
         """

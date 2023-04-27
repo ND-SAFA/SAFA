@@ -4,8 +4,8 @@ from openai.openai_object import OpenAIObject
 from tgen.constants.environment_constants import IS_TEST
 from tgen.constants.environment_constants import OPEN_AI_ORG, OPEN_AI_KEY
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.util.ai.ai_util import AIUtil
-from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.list_util import ListUtil
 
 if not IS_TEST:
@@ -17,10 +17,6 @@ if not IS_TEST:
 
 class OpenAIUtil(AIUtil[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
-    EXPECTED_PARAMS_FOR_TASK = {TrainerTask.CLASSIFICATION: [OpenAiParams.COMPUTE_CLASSIFICATION_METRICS],
-                                TrainerTask.TRAIN: [OpenAiParams.MODEL_SUFFIX, OpenAiParams.N_EPOCHS,
-                                                    OpenAiParams.LEARNING_RATE_MULTIPLIER],
-                                TrainerTask.PREDICT: [OpenAiParams.TEMPERATURE, OpenAiParams.MAX_TOKENS, OpenAiParams.LOG_PROBS]}
 
     @staticmethod
     def make_fine_tune_request(**params) -> OpenAIObject:
@@ -47,11 +43,11 @@ class OpenAIUtil(AIUtil[OpenAIObject]):
         :param params: Params necessary for request
         :return: The response from open  ai
         """
-        prompt = params.get(OpenAiParams.PROMPT)
+        prompt = params.get(OpenAIParams.PROMPT)
         batches = ListUtil.batch(prompt, n=OpenAIUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
         for batch in batches:
-            params[OpenAiParams.PROMPT] = batch
+            params[OpenAIParams.PROMPT] = batch
             batch_res = openai.Completion.create(**params)
             if res is None:
                 res = batch_res

@@ -20,8 +20,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         :param base_prompt: The base classification prompt to use.
         """
         if prompt_args is None:
-            from tgen.train.args.open_ai_args import OpenAiArgs  # used to automatically have args for tests
-            prompt_args = OpenAiArgs.prompt_args
+            from tgen.train.args.open_ai_args import OpenAIArgs  # used to automatically have args for tests
+            prompt_args = OpenAIArgs.prompt_args
         super().__init__(prompt_args, base_prompt)
         self.pos_class = pos_class
         self.neg_class = neg_class

@@ -11,7 +11,7 @@ from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.ai.ai_util import AIUtil
 from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
@@ -25,7 +25,7 @@ class Summarizer(BaseObject):
     """
 
     def __init__(self, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
-                 args_for_summarizer_model: OpenAiArgs = None, max_tokens: int = MAX_TOKENS_DEFAULT,
+                 args_for_summarizer_model: OpenAIArgs = None, max_tokens: int = MAX_TOKENS_DEFAULT,
                  code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY,
                  ai_utils: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
@@ -41,7 +41,7 @@ class Summarizer(BaseObject):
         """
         self.model_for_summarizer = model_for_summarizer
         self.model_for_token_limit = model_for_token_limit
-        self.args_for_summarizer_model = OpenAiArgs() if not args_for_summarizer_model else args_for_summarizer_model
+        self.args_for_summarizer_model = OpenAIArgs() if not args_for_summarizer_model else args_for_summarizer_model
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.max_tokens = max_tokens
         self.prompt_args = self.args_for_summarizer_model.prompt_args
@@ -96,7 +96,7 @@ class Summarizer(BaseObject):
 
     @staticmethod
     def _summarize_chunks(ai_utils: AIUtil, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
-                          args: OpenAiArgs) -> List[str]:
+                          args: OpenAIArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model.
         :param ai_utils: The utility file containing API to AI library.

@@ -15,12 +15,11 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.train.args.llm_args import LLMArgs
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
 from tgen.util.logging.logger_manager import logger
 
@@ -31,24 +30,20 @@ class LLMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 trainer_args: LLMArgs = None, base_model: str = None, llm_util: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
+                 trainer_args: LLMArgs = None, llm_util: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
         """
         Initializes the trainer with the necessary arguments for training and prediction
-        :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         :param prompt_creator: Creates the prompts for trace link prediction.
         """
         if trainer_args is None:
-            trainer_args = OpenAiArgs()
+            trainer_args = OpenAIArgs()
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
-        if base_model is None:
-            base_model = trainer_args.base_model
-        self.base_model = base_model
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
-        self.summarizer = Summarizer(model_for_token_limit=self.base_model, code_or_exceeds_limit_only=False,
+        self.summarizer = Summarizer(model_for_token_limit=self.trainer_args.base_model, code_or_exceeds_limit_only=False,
                                      max_tokens=trainer_args.max_tokens)
         self.prompt_creator = prompt_creator
         self.llm_util = llm_util.value
@@ -67,11 +62,11 @@ class LLMTrainer(AbstractTrainer):
                                              prompt_creator=self.prompt_creator)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
+            params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 prompt_creator=self.prompt_creator,
                 summarizer=self.summarizer)
         res = self.llm_util.make_fine_tune_request(training_file=training_file_id,
-                                                   model=self.base_model,
+                                                   model=self.trainer_args.base_model,
                                                    **params)
         logger.info(res.events[-1].message)
         return res
@@ -89,7 +84,8 @@ class LLMTrainer(AbstractTrainer):
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        res = self.llm_util.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]), **params)
+        res = self.llm_util.make_completion_request(model=self.trainer_args.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
+                                                    **params)
         output = self._create_classification_output(res, dataset) \
             if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
         return output

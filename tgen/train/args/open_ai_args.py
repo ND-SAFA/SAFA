@@ -9,7 +9,6 @@ from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.llm_args import LLMArgs
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.params.openai_params import OpenAiParams
 
 
 class OpenAIParams:
@@ -29,22 +28,21 @@ class OpenAIParams:
 
 
 @dataclass
-class OpenAiArgs(LLMArgs):
+class OpenAIArgs(LLMArgs):
     temperature: float = TEMPERATURE_DEFAULT
-    max_tokens: int = MAX_TOKENS_DEFAULT
     logprobs: int = LOGPROBS_DEFAULT
     model_suffix: str = None
     n_epochs: int = 1
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
     output_dir: str = None
+    base_model = CLASSIFICATION_MODEL_DEFAULT
+    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
     expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
                             TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
                                                 OpenAIParams.LEARNING_RATE_MULTIPLIER],
                             TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}
-    base_model = CLASSIFICATION_MODEL_DEFAULT
 
     def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
@@ -60,5 +58,5 @@ class OpenAiArgs(LLMArgs):
             assert hasattr(prompt_creator, "pos_class"), "Expected prompt creator to define `pos_class`"
             pos_class = getattr(prompt_creator, "pos_class")
             params = self._add_params_for_task(TrainerTask.CLASSIFICATION)
-            params[OpenAiParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
+            params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
         return params

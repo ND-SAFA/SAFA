@@ -1,4 +1,6 @@
-import { user } from "@/fixtures/data/user";
+import { Routes } from "@/fixtures";
+
+const user = Cypress.env();
 
 const apiUrl = "https://dev-api.safa.ai";
 
@@ -117,7 +119,7 @@ Cypress.Commands.add("dbResetVersions", () => {
 Cypress.Commands.add("dbDeleteUser", (email, password) => {
   cy.request<{ token: string }>({
     method: "POST",
-    url: `${apiUrl}/login`,
+    url: `${apiUrl}/accounts/delete`,
     body: { email, password },
     failOnStatusCode: false,
   }).then(() => {
@@ -134,22 +136,26 @@ Cypress.Commands.add("generateUsers", () => {
   // Create the account for validUser and editUser
   cy.request<{ token: string }>({
     method: "POST",
-    url: `${apiUrl}/user`,
-    body: user.validUser,
+    url: `${apiUrl}/accounts/create`,
+    body: { email: user.validUser.email, password: user.validUser.password },
   }).request<{ token: string }>({
     method: "POST",
-    url: `${apiUrl}/user`,
-    body: user.editUser,
+    url: `${apiUrl}/accounts/create`,
+    body: { email: user.editUser.email, password: user.editUser.password },
   });
 });
 
+//TODO: This is not working and is causing newly created accounts to remain undeleted
 Cypress.Commands.add("deleteGeneratedUsers", () => {
   // Delete the account for all the users in the user object
-  cy.request<{ token: string }>({
-    method: "DELETE",
-    url: `${apiUrl}/user/${user.validUser.email}`,
-  }).request<{ token: string }>({
-    method: "DELETE",
-    url: `${apiUrl}/user/${user.editUser.email}`,
-  });
+  cy.loginToPage(
+    user.validUser.email,
+    user.validUser.password,
+    Routes.LOGIN_ACCOUNT
+  ).dbDeleteUser(user.validUser.email, user.validUser.password);
+  cy.loginToPage(
+    user.editUser.email,
+    user.editUser.password,
+    Routes.LOGIN_ACCOUNT
+  ).dbDeleteUser(user.editUser.email, user.editUser.password);
 });

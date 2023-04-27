@@ -1,5 +1,5 @@
 import { DataCy, Routes, testProject } from "@/fixtures";
-import { user } from "@/fixtures/data/user";
+const user = Cypress.env();
 describe("Project List", () => {
   before(() => {
     cy.initEmptyProject().clearAllCookies();

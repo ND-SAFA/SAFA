@@ -1,6 +1,5 @@
 import { DataCy, Routes } from "@/fixtures";
-import { user } from "@/support/e2e";
-
+const user = Cypress.env();
 describe("Account Creation", () => {
   beforeEach(() => {
     cy.visit(Routes.LOGIN_ACCOUNT);

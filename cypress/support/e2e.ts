@@ -13,20 +13,20 @@ import "./projectDocumentCommands";
 import "./projectSettingCommands";
 import "./traceLinkGenerationCommands";
 import "./customAttributesCommands";
-import { user } from "fixtures/data/user";
+
+before(() => {
+  // Load users into the environment
+  cy.loadEnv();
+
+  // Now let's create these accounts
+  cy.generateUsers();
+});
 
 /**
  * Ignore the following error:
  * - ResizeObserver loop limit exceeded
  * - Cannot read properties of _
  */
-before(() => {
-  // Export the user object so it stays constant
-  // and can be used in the tests
-  const userObject = user;
-
-  // Generate the accounts that we need for the tests
-});
 
 Cypress.on("uncaught:exception", (err) => {
   if (
@@ -36,4 +36,12 @@ Cypress.on("uncaught:exception", (err) => {
     // ignore the error
     return false;
   }
+});
+
+after(() => {
+  // Delete the users we created
+  cy.deleteGeneratedUsers();
+
+  // Clear the env
+  cy.clearEnv();
 });

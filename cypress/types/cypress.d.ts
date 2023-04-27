@@ -206,6 +206,16 @@ declare namespace Cypress {
     ): Chainable<void>;
 
     /**
+     * Loads any variables into the Cypress environment.
+     */
+    loadEnv(): Chainable<void>;
+
+    /**
+     * Clears all variables from the Cypress environment.
+     */
+    clearEnv(): Chainable<void>;
+
+    /**
      * Generates all the users that are needed for the tests.
      */
     generateUsers(): Chainable<void>;

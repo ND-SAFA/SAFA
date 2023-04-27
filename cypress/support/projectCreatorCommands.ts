@@ -4,8 +4,9 @@ import {
   Routes,
   simpleProjectFilesMap,
   testProject,
-  validUser,
 } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
 
 Cypress.Commands.add("initEmptyProject", () => {
   cy.dbResetJobs().dbResetProjects();

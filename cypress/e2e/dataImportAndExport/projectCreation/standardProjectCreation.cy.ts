@@ -6,7 +6,7 @@ import {
   testProject,
 } from "@/fixtures";
 
-import { user } from "@/fixtures/data/user";
+const user = Cypress.env();
 describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();

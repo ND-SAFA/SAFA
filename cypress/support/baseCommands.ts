@@ -1,4 +1,5 @@
 import "cypress-file-upload";
+import { user } from "@/fixtures";
 
 Cypress.Commands.add("expandViewport", (size) => {
   if (size === "l") {
@@ -85,4 +86,22 @@ Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
 
       fn(cy.get("tr"));
     });
+});
+
+Cypress.Commands.add("loadEnv", () => {
+  Cypress.env("validUser", user.validUser);
+  Cypress.env("invalidUser", user.invalidUser);
+  Cypress.env("editUser", user.editUser);
+  Cypress.env("createUser", user.createUser);
+  Cypress.env("deleteUser", user.deleteUser);
+  Cypress.env("inviteUser", user.inviteUser);
+});
+
+Cypress.Commands.add("clearEnv", () => {
+  Cypress.env("validUser", { email: "", password: "" });
+  Cypress.env("invalidUser", { email: "", password: "" });
+  Cypress.env("editUser", { email: "", password: "", newPassword: "" });
+  Cypress.env("createUser", { email: "", password: "" });
+  Cypress.env("deleteUser", { email: "", password: "" });
+  Cypress.env("inviteUser", { email: "", invalidEmail: "" });
 });

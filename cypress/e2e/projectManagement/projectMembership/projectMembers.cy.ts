@@ -1,5 +1,5 @@
 import { DataCy } from "@/fixtures";
-import { user } from "@/fixtures/data/user";
+const user = Cypress.env();
 describe("Project Members", () => {
   beforeEach(() => {
     cy.initEmptyProject().initProjectVersion(false).openProjectSettings();

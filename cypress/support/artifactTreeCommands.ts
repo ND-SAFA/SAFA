@@ -1,4 +1,4 @@
-import { DataCy, validUser } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("getNode", (name) => {
   return cy.get(`[data-cy-name="${name}"]`);

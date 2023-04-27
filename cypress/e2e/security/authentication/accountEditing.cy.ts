@@ -1,5 +1,5 @@
 import { Routes, DataCy } from "@/fixtures";
-import { user } from "@/fixtures/data/user";
+const user = Cypress.env();
 
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {

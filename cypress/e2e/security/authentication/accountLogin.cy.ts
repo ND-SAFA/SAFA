@@ -1,5 +1,5 @@
 import { DataCy, Routes } from "@/fixtures";
-import { user } from "@/fixtures/data/user";
+const user = Cypress.env();
 describe("Account Login", () => {
   beforeEach(() => {
     cy.visit(Routes.LOGIN_ACCOUNT);

@@ -23,7 +23,8 @@ class Summarizer(BaseObject):
 
     def __init__(self, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
                  args_for_summarizer_model: OpenAiArgs = None, max_tokens: int = MAX_TOKENS_DEFAULT,
-                 code_or_exceeds_limit_only: bool = True, base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY):
+                 code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
+                 code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
         """
         Initializes a summarizer for a specific model
         :param model_for_summarizer: path of the model that should be used for summarization
@@ -31,7 +32,8 @@ class Summarizer(BaseObject):
         :param args_for_summarizer_model: any additional args to use for summarization
         :param max_tokens: the max number of tokens that the model can return as the completion
         :param code_or_exceeds_limit_only: if True, only performs summarization for text that exceeds the token limit or for code
-        :param base_prompt: The default prompt to use for summarization. If code is detected then it will change to code summarizer.
+        :param nl_base_prompt: The default prompt to use for summarization.
+        :param code_base_prompt: The default summarization prompt to use for code.
         """
         self.model_for_summarizer = model_for_summarizer
         self.model_for_token_limit = model_for_token_limit
@@ -39,9 +41,12 @@ class Summarizer(BaseObject):
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.max_tokens = max_tokens
         self.prompt_args = self.args_for_summarizer_model.prompt_args
-        self.prompt_creator = self.prompt_creator = GenerationPromptCreator(
+        self.code_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
-            base_prompt=base_prompt)
+            base_prompt=code_base_prompt)
+        self.nl_prompt_creator = GenerationPromptCreator(
+            prompt_args=self.prompt_args,
+            base_prompt=nl_base_prompt)
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
         """
@@ -59,8 +64,8 @@ class Summarizer(BaseObject):
         chunks = chunker.chunk(content=content)
         if self.code_or_above_limit_only and len(chunks) <= 1 and not is_code:
             return content
-        self.prompt_creator.base_prompt = SupportedPrompts.CODE_SUMMARY if is_code else SupportedPrompts.NL_SUMMARY
-        summarizations = self._summarize_chunks(chunks, self.model_for_summarizer, self.args_for_summarizer_model)
+        prompt_creator = self.code_prompt_creator if is_code else self.nl_prompt_creator
+        summarizations = self._summarize_chunks(prompt_creator, chunks, self.model_for_summarizer, self.args_for_summarizer_model)
         return os.linesep.join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str):
@@ -83,15 +88,15 @@ class Summarizer(BaseObject):
         chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
         return chunker.exceeds_token_limit(content)
 
-    def _summarize_chunks(self, chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:
+    @staticmethod
+    def _summarize_chunks(prompt_creator, chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model
         :param model_path: The model to use for summarizations
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        prompts = [self.prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
-                   for chunk in chunks]
+        prompts = [prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value] for chunk in chunks]
         res = OpenAIUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(TrainerTask.PREDICT))
         return [choice.text.strip() for choice in res.choices]

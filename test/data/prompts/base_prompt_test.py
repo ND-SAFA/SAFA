@@ -1,6 +1,7 @@
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
+from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.train.args.open_ai_args import OpenAiArgs
 
 
 class BasePromptTest(BaseTest):
@@ -8,15 +9,16 @@ class BasePromptTest(BaseTest):
     Provides utility testing methods for prompt testing.
     """
 
-    def verify_prompt(self, generated_prompt, ai_args: SupportedAIPromptArgs = SupportedAIPromptArgs.OPENAI) -> None:
+    def verify_prompt(self, generated_prompt, prompt_args: PromptArgs = None) -> None:
         """
         Verifies that generated prompt contains separators and other library specific formatting.
         :param generated_prompt: The generated prompt to check.
-        :param ai_args: The prompt arguments for library used.
+        :param prompt_args: The prompt arguments for library used.
         :return: None
         """
-        prompt_args = ai_args.value
+        if prompt_args is None:
+            prompt_args = OpenAiArgs.prompt_args
         self.assertIn("target1", generated_prompt[PromptKeys.PROMPT])
         self.assertTrue(generated_prompt[PromptKeys.PROMPT].endswith(prompt_args.prompt_separator))
-        self.assertTrue(generated_prompt[PromptKeys.COMPLETION].startswith(prompt_args.completion_start))
-        self.assertTrue(generated_prompt[PromptKeys.COMPLETION].endswith(prompt_args.completion_end))
+        self.assertTrue(generated_prompt[PromptKeys.COMPLETION].startswith(prompt_args.completion_prefix))
+        self.assertTrue(generated_prompt[PromptKeys.COMPLETION].endswith(prompt_args.completion_suffix))

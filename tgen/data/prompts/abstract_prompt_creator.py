@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Type
 
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.args.iprompt_args import PromptArgs
+from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
@@ -46,7 +46,7 @@ class AbstractPromptCreator(BaseObject):
         :param base_completion: The base completion
         :return: The formatted completion
         """
-        return f"{self.args.completion_start}{base_completion}{self.args.completion_end}"
+        return f"{self.args.completion_prefix}{base_completion}{self.args.completion_suffix}"
 
     @abstractmethod
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:

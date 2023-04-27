@@ -1,18 +1,35 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import List
 
 from tgen.constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
     MAX_TOKENS_DEFAULT, \
     TEMPERATURE_DEFAULT
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.train.args.ai_args import AIArgs
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.params.openai_params import OpenAiParams
+
+
+class OpenAIParams:
+    """
+    Contains possible parameters to OpenAI API.
+    """
+    COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
+    MODEL_SUFFIX = "model_suffix"
+    N_EPOCHS = "n_epochs"
+    LEARNING_RATE_MULTIPLIER = "learning_rate_multiplier"
+    TEMPERATURE = "temperature"
+    MAX_TOKENS = "max_tokens"
+    LOG_PROBS = "logprobs"
+    PROMPT = "prompt"
+    VALIDATION_FILE = "validation_file"
+    CLASSIFICATION_POSITIVE_CLASS = "classification_positive_class"
 
 
 @dataclass
-class OpenAiArgs:
+class OpenAiArgs(AIArgs):
     temperature: float = TEMPERATURE_DEFAULT
     max_tokens: int = MAX_TOKENS_DEFAULT
     logprobs: int = LOGPROBS_DEFAULT
@@ -21,48 +38,10 @@ class OpenAiArgs:
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-
-    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
+    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
+    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator(prompt_args=prompt_args)
     output_dir: str = None
-
-    def __post_init__(self) -> None:
-        """
-        Sets specific variables depending on the type of prompt creator
-        :return None
-        """
-        if isinstance(self.prompt_creator, ClassificationPromptCreator):
-            self.max_tokens = 1
-
-    def to_params(self, task: TrainerTask = TrainerTask.TRAIN, include_classification_metrics: bool = False) -> Dict[str, Any]:
-        """
-        Gets the params needed for an open ai task
-        :param task: The primary task being performed (fine_tune or predict)
-        :param include_classification_metrics: If True, includes the params necessary for calculating classification metrics
-        :return: A dictionary mapping param name to its value
-        """
-        assert task in OpenAiParams.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
-                                                              f" Must choose from {OpenAiParams.EXPECTED_PARAMS_FOR_TASK.keys()}"
-        params = {}
-        if isinstance(self.prompt_creator, ClassificationPromptCreator):
-            self.max_tokens = 1
-            if include_classification_metrics:
-                params = self.__add_params_for_task(TrainerTask.CLASSIFICATION)
-                params[OpenAiParams.CLASSIFICATION_POSITIVE_CLASS] = self.prompt_creator.format_completion(
-                    self.prompt_creator.pos_class)
-        return self.__add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)
-
-    def __add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
-        """
-        Adds the params for a given task
-        :param task: The task to add params for
-        :param params: The current parameters to add to
-        :return: The parameters with task-specific ones added
-        """
-        if params is None:
-            params = {}
-        for name in OpenAiParams.EXPECTED_PARAMS_FOR_TASK[task]:
-            val = getattr(self, name)
-            if val is None:
-                continue
-            params[name] = val
-        return params
+    expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
+                            TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
+                                                OpenAIParams.LEARNING_RATE_MULTIPLIER],
+                            TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}

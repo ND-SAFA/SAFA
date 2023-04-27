@@ -5,8 +5,8 @@ import pandas as pd
 
 from tgen.constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
@@ -24,7 +24,7 @@ class Summarizer(BaseObject):
 
     def __init__(self, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
                  args_for_summarizer_model: OpenAiArgs = None, max_tokens: int = MAX_TOKENS_DEFAULT,
-                 code_or_exceeds_limit_only: bool = True, ai_library=SupportedAIPromptArgs.OPENAI):
+                 code_or_exceeds_limit_only: bool = True, prompt_args: PromptArgs = None):
         """
         Initializes a summarizer for a specific model
         :param model_for_summarizer: path of the model that should be used for summarization
@@ -33,12 +33,14 @@ class Summarizer(BaseObject):
         :param max_tokens: the max number of tokens that the model can return as the completion
         :param code_or_exceeds_limit_only: if True, only performs summarization for text that exceeds the token limit or for code
         """
+        if prompt_args is None:
+            prompt_args = OpenAiArgs.prompt_args
         self.model_for_summarizer = model_for_summarizer
         self.model_for_token_limit = model_for_token_limit
         self.args_for_summarizer_model = OpenAiArgs() if not args_for_summarizer_model else args_for_summarizer_model
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.max_tokens = max_tokens
-        self.ai_library = ai_library
+        self.prompt_args = prompt_args
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
         """
@@ -57,7 +59,7 @@ class Summarizer(BaseObject):
         if self.code_or_above_limit_only and len(chunks) <= 1 and not is_code:
             return content
         self.args_for_summarizer_model.prompt_creator = GenerationPromptCreator(
-            ai_library=self.ai_library,
+            prompt_args=self.prompt_args,
             base_prompt=SupportedPrompts.CODE_SUMMARY if is_code else SupportedPrompts.NL_SUMMARY)
         summarizations = self._summarize_chunks(chunks, self.model_for_summarizer, self.args_for_summarizer_model)
         return os.linesep.join(summarizations)

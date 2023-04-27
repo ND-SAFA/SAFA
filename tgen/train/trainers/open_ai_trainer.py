@@ -13,6 +13,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.train.args.ai_args import AIArgs
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
@@ -29,14 +30,15 @@ class OpenAiTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = CLASSIFICATION_MODEL_DEFAULT,
-                 trainer_args: OpenAiArgs = None):
+                 trainer_args: AIArgs = None):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
-        trainer_args = trainer_args if trainer_args is not None else OpenAiArgs()
+        if trainer_args is None:
+            trainer_args = OpenAiArgs()
         self.base_model = base_model
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
@@ -153,8 +155,8 @@ class OpenAiTrainer(AbstractTrainer):
         if len(probs) < 1:
             return 0.5
         probs = probs[0]
-        v0 = probs.get(self.trainer_args.prompt_creator.args.completion_start + self.trainer_args.prompt_creator.pos_class, 0)
-        v1 = probs.get(self.trainer_args.prompt_creator.args.completion_start + self.trainer_args.prompt_creator.neg_class, 0)
+        v0 = probs.get(self.trainer_args.prompt_creator.args.completion_prefix + self.trainer_args.prompt_creator.pos_class, 0)
+        v1 = probs.get(self.trainer_args.prompt_creator.args.completion_prefix + self.trainer_args.prompt_creator.neg_class, 0)
         prob_v = [v0, v1]
         score = softmax(prob_v)[1]
         return score

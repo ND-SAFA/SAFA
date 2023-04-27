@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 
-from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.train.args.open_ai_args import OpenAiArgs
 
 load_dotenv()
@@ -50,7 +49,7 @@ if __name__ == "__main__":
         tgen_trainer = OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager)
 
     args = HGenArgs(hgen_trainer_type=SupportedTrainer.OPEN_AI,
-                    hgen_trainer_args=OpenAiArgs(prompt_creator=GenerationPromptCreator(ai_library=SupportedAIPromptArgs.OPENAI)),
+                    hgen_trainer_args=OpenAiArgs(prompt_creator=GenerationPromptCreator()),
                     hgen_base_model=GENERATION_MODEL_DEFAULT,
                     source_layer_id="Code", tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator_for_sources)
     job = HGenJob(hgen_args=args, export_path=export_path, save_dataset_checkpoints=True)

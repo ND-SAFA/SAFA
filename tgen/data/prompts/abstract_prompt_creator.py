@@ -1,8 +1,9 @@
 from abc import abstractmethod
 from typing import Type
 
+from tgen.data.prompts.args.prompt_args import PromptArgs
+
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import EnumDict

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tgen.data.prompts.prompt_args import AIPromptArgs
+from tgen.data.prompts.args.prompt_args import AIPromptArgs
 
 
 @dataclass

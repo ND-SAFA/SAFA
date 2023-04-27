@@ -1,5 +1,5 @@
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.supported_ai_prompt_args import SupportedAIPromptArgs
+from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.testres.base_tests.base_test import BaseTest
 
 

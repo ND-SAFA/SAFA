@@ -4,7 +4,7 @@ from tgen.data.prompts.supported_prompts import SupportedPrompts
 
 
 @dataclass
-class AIPromptArgs:
+class iPromptArgs:
     """
     Defines an AI library's arguments for prompt completion.
     """
@@ -14,13 +14,13 @@ class AIPromptArgs:
 
 
 @dataclass
-class PromptArgs(AIPromptArgs):
+class PromptArgs(iPromptArgs):
     """
     Defines arguments for defining properties for prompt dataset creation.
     """
     base_prompt: SupportedPrompts  # Defines the base prompt for the task being performed.
 
-    def __init__(self, base_prompt: SupportedPrompts, ai_prompt_args: AIPromptArgs):
+    def __init__(self, base_prompt: SupportedPrompts, ai_prompt_args: iPromptArgs):
         """
         Constructs prompt args using base prompt and all arguments defined in AI prompt args.
         :param base_prompt: The base prompt to use throughout prompt creation.

@@ -5,8 +5,8 @@ import pandas as pd
 
 from tgen.constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
-from tgen.data.prompts.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker

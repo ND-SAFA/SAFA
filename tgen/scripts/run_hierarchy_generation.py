@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from tgen.data.prompts.supported_ai_prompt_args import SupportedAIPromptArgs
+from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.train.args.open_ai_args import OpenAiArgs
 
 load_dotenv()

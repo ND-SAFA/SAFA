@@ -2,7 +2,8 @@ from typing import TypedDict
 
 import anthropic
 
-from tgen.constants import ANTHROPIC_KEY, IS_TEST
+from tgen.constants.anthropic_constants import ANTHROPIC_KEY
+from tgen.constants.environment_constants import IS_TEST
 from tgen.util.ai.ai_util import AIUtil
 
 

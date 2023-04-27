@@ -1,7 +1,7 @@
-from enum import Enum
+from tgen.util.supported_enum import SupportedEnum
 
 
-class BasePrompt(Enum):
+class BasePrompt(SupportedEnum):
     CLASSIFICATION = "Are these two artifacts related?"
     CODE_SUMMARY = "Summarize this code, focus on main functionality and ignore implementation specifics'{}'"
     NL_SUMMARY = "Summarize the following '{}'"

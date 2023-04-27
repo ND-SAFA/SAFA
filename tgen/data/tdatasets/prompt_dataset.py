@@ -20,7 +20,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
 from tgen.util.open_ai_util import OpenAiUtil
 
 

@@ -11,6 +11,9 @@ from tgen.util.override import overrides
 
 @dataclass
 class AbstractPromptCreator(BaseObject):
+    """
+    Responsible for formatting and creating prompts and completions for Language Models
+    """
     base_prompt: BasePrompt
 
     _PROMPT_SEPARATOR = "\n\n###\n\n"

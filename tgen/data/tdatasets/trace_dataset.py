@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 from datasets import Dataset
 
+from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -257,7 +258,8 @@ class TraceDataset(iDataset):
         G = nx.Graph()
         G.add_nodes_from(self.artifact_df.index)
         G.add_edges_from([(row[TraceKeys.SOURCE], row[TraceKeys.TARGET],
-                           {'weight': row[TraceKeys.LABEL]}) for i, row in self.trace_df.itertuples() if row[TraceKeys.LABEL] > 0.8])
+                           {'weight': row[TraceKeys.LABEL]}) for i, row in self.trace_df.itertuples()
+                          if row[TraceKeys.LABEL] > TRACE_THRESHOLD])
         return G
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:

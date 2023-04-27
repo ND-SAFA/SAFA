@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
@@ -29,7 +30,7 @@ class HGenArgs:
     """
     The model to use to generate the higher-level artifacts
     """
-    hgen_base_model: str = "ada"
+    hgen_base_model: str = GENERATION_MODEL_DEFAULT
     """
     Any necessary params needed to initializing trainer to generate the higher-level artifacts
     """

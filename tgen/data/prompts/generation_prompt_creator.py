@@ -7,6 +7,9 @@ from tgen.util.enum_util import EnumDict
 
 @dataclass
 class GenerationPromptCreator(AbstractPromptCreator):
+    """
+    Responsible for creating prompts for generation (e.g artifact creation, summarization)
+    """
     base_prompt: BasePrompt = BasePrompt.SYSTEM_REQUIREMENT_CREATION
 
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:

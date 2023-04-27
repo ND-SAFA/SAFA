@@ -22,7 +22,7 @@ class OpenAiArgs:
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
 
-    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator(prompt_args)
+    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
     output_dir: str = None
 
     def __post_init__(self) -> None:

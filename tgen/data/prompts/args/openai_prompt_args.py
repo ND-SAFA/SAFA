@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from tgen.data.prompts.args.prompt_args import AIPromptArgs
+from tgen.data.prompts.args.iprompt_args import PromptArgs
 
 
 @dataclass
-class OpenAIPromptArgs(AIPromptArgs):
+class OpenAIPromptArgs(PromptArgs):
     """
     Defines the prompt arguments for OpenAI API.
     """

@@ -1,6 +1,5 @@
-from tgen.data.prompts.args.prompt_args import PromptArgs
-
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
+from tgen.data.prompts.args.iprompt_args import PromptArgs
 from tgen.data.prompts.args.supported_ai_prompt_args import SupportedAIPromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.enum_util import EnumDict

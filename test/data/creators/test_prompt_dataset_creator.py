@@ -3,14 +3,15 @@ from unittest import mock
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
@@ -41,7 +42,8 @@ class TestPromptDatasetCreator(BaseTest):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator)
         trace_df = TraceDatasetCreator(PromptTestProject.SAFA_PROJECT.get_project_reader()).create().trace_df
-        self.verify_dataset_creator(dataset_creator, prompt_creator=ClassificationPromptCreator(), trace_df=trace_df)
+        prompt_creator = ClassificationPromptCreator()
+        self.verify_dataset_creator(dataset_creator, prompt_creator=prompt_creator, trace_df=trace_df)
 
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
@@ -66,7 +68,7 @@ class TestPromptDatasetCreator(BaseTest):
         self.assertEqual(trace_dataset.project_file_id, "id")
 
     def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame, use_targets_only: bool = False,
-                               prompt_creator=GenerationPromptCreator()):
+                               prompt_creator: AbstractPromptCreator = GenerationPromptCreator()):
         prompt_dataset = dataset_creator.create()
         prompts_df = prompt_dataset.get_prompts_dataframe(prompt_creator)
         if not use_targets_only:

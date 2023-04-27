@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from typing import List, Any, Union
+from typing import Any, List, Union
 
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
@@ -13,6 +13,7 @@ from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -65,8 +66,11 @@ class HierarchyGenerator(BaseObject):
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
+        prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_trainer_args.prompt_args,
+                                                 base_prompt=self.args.hgen_base_prompt)
         hgen_trainer = self.args.hgen_trainer_type.value(trainer_dataset_manager=hgen_dataset_manager,
                                                          trainer_args=self.args.hgen_trainer_args,
+                                                         prompt_creator=prompt_creator,
                                                          base_model=self.args.hgen_base_model)
         self._update_trainer_args(hgen_trainer, export_path)
         logger.info(f"Generating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
@@ -128,7 +132,7 @@ class HierarchyGenerator(BaseObject):
         """
         trace_df = TraceDataFrame.concat(hgen_trace_df, orig_trace_df) if orig_trace_df is not None else hgen_trace_df
         return trace_df.filter_by_row(lambda row: artifact_df.get_artifact(row[TraceKeys.SOURCE.value])[ArtifactKeys.LAYER_ID] !=
-                                      artifact_df.get_artifact(row[TraceKeys.TARGET.value])[ArtifactKeys.LAYER_ID])
+                                                  artifact_df.get_artifact(row[TraceKeys.TARGET.value])[ArtifactKeys.LAYER_ID])
 
     @staticmethod
     def _create_layer_df_with_generated_artifacts(hgen_layer_df: LayerDataFrame,

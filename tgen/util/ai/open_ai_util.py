@@ -1,8 +1,10 @@
 import openai
 from openai.openai_object import OpenAIObject
 
-from tgen.constants import OPEN_AI_ORG, OPEN_AI_KEY, IS_TEST
+from tgen.constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.ai.ai_util import AIUtil
+from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.list_util import ListUtil
 
 if not IS_TEST:
@@ -12,24 +14,12 @@ if not IS_TEST:
     openai.api_key = OPEN_AI_KEY
 
 
-class OpenAiUtil:
-
-    class Params:
-        COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
-        MODEL_SUFFIX = "model_suffix"
-        N_EPOCHS = "n_epochs"
-        LEARNING_RATE_MULTIPLIER = "learning_rate_multiplier"
-        TEMPERATURE = "temperature"
-        MAX_TOKENS = "max_tokens"
-        LOG_PROBS = "logprobs"
-        PROMPT = "prompt"
-        VALIDATION_FILE = "validation_file"
-        CLASSIFICATION_POSITIVE_CLASS = "classification_positive_class"
-
+class OpenAIUtil(AIUtil[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
-    EXPECTED_PARAMS_FOR_TASK = {TrainerTask.CLASSIFICATION: [Params.COMPUTE_CLASSIFICATION_METRICS],
-                                TrainerTask.TRAIN: [Params.MODEL_SUFFIX, Params.N_EPOCHS, Params.LEARNING_RATE_MULTIPLIER],
-                                TrainerTask.PREDICT: [Params.TEMPERATURE, Params.MAX_TOKENS, Params.LOG_PROBS]}
+    EXPECTED_PARAMS_FOR_TASK = {TrainerTask.CLASSIFICATION: [OpenAiParams.COMPUTE_CLASSIFICATION_METRICS],
+                                TrainerTask.TRAIN: [OpenAiParams.MODEL_SUFFIX, OpenAiParams.N_EPOCHS,
+                                                    OpenAiParams.LEARNING_RATE_MULTIPLIER],
+                                TrainerTask.PREDICT: [OpenAiParams.TEMPERATURE, OpenAiParams.MAX_TOKENS, OpenAiParams.LOG_PROBS]}
 
     @staticmethod
     def make_fine_tune_request(**params) -> OpenAIObject:
@@ -56,11 +46,11 @@ class OpenAiUtil:
         :param params: Params necessary for request
         :return: The response from open  ai
         """
-        prompt = params.get(OpenAiUtil.Params.PROMPT)
-        batches = ListUtil.batch(prompt, n=OpenAiUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
+        prompt = params.get(OpenAiParams.PROMPT)
+        batches = ListUtil.batch(prompt, n=OpenAIUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
         for batch in batches:
-            params[OpenAiUtil.Params.PROMPT] = batch
+            params[OpenAiParams.PROMPT] = batch
             batch_res = openai.Completion.create(**params)
             if res is None:
                 res = batch_res

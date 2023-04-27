@@ -4,6 +4,7 @@ from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
+from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator

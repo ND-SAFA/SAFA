@@ -1,15 +1,17 @@
 import os
 from typing import Dict
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader, PROJECT_DATA, TraceDataFramesTypes
+from tgen.data.readers.abstract_project_reader import AbstractProjectReader, ProjectData, TraceDataFramesTypes
 import pandas as pd
 
 
 class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
-
+    """
+    Reads projects exported by the DataFrameExporter
+    """
     def __init__(self, project_path: str, artifact_df_filename: str = "artifact_df.csv", trace_df_filename: str = "trace_df.csv",
                  layer_df_filename: str = "layer_df.csv", overrides: Dict = None):
         """
@@ -35,6 +37,9 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         for filename, dataframe_cls in self.filename_to_dataframe_cls.items():
             params = {"index_col": 0} if dataframe_cls.index_name() is None else {}
             df: pd.DataFrame = pd.read_csv(os.path.join(self.project_path, filename), **params)
+            if isinstance(df, ArtifactDataFrame) and self.summarizer:
+                for i, row in df.itertuples():
+                    row[ArtifactKeys.CONTENT] = self.summarizer.summarize(content=row[ArtifactKeys.CONTENT])
             dataframes.append(dataframe_cls(df))
         return tuple(dataframes)
 

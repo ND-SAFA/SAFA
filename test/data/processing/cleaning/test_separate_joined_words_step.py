@@ -1,3 +1,4 @@
+from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
@@ -17,7 +18,7 @@ class TestSeparateJoinedWordsStep(BaseTest):
     def test_separate_deliminated_word(self):
         test_camel_case = "snake_case"
         expected_result = ["snake", "case"]
-        result = SeparateJoinedWordsStep._separate_deliminated_word(test_camel_case, deliminator="_")
+        result = SeparateJoinedWordsStep._separate_deliminated_word(test_camel_case, deliminator=UNDERSCORE)
         self.assertListEqual(result, expected_result)
         test_regular_word = "Regular"
         result = SeparateJoinedWordsStep._separate_deliminated_word(test_regular_word)

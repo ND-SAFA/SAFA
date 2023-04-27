@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.constants import VSM_THRESHOLD_DEFAULT
+from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager

@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Dict, Type, TypeVar
 
-from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager

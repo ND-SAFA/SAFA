@@ -11,7 +11,7 @@ from tgen.util.override import overrides
 
 class AbstractPromptCreator(BaseObject):
     """
-    Creates prompt dataframes according to configuration.
+    Responsible for formatting and creating prompts and completions for Language Models
     """
 
     def __init__(self, prompt_args: PromptArgs, base_prompt: SupportedPrompts):

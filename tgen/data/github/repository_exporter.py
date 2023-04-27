@@ -2,6 +2,7 @@ import os
 import re
 from typing import Dict, Union
 
+from tgen.constants.deliminator_constants import SPACE
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
@@ -247,7 +248,7 @@ class RepositoryExporter:
         :return: Commits with equal or greater content length than minimum.
         """
         long_messages = [a for a in commit_artifact_set.artifacts if
-                         len(a.content.split(" ")) >= min_artifact_length and len(a.diffs) >= min_code_length]
+                         len(a.content.split(SPACE)) >= min_artifact_length and len(a.diffs) >= min_code_length]
         return GArtifactSet(long_messages, GArtifactType.COMMIT)
 
     @staticmethod

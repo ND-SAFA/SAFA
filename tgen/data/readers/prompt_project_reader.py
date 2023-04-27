@@ -7,8 +7,7 @@ from tgen.util.json_util import JsonUtil
 
 class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
     """
-    Responsible for reading artifacts and trace links and constructing
-    a trace dataset.
+    Responsible for reading prompt dataframes containing prompt, completion for LLMs
     """
 
     FILE_EXT = ".jsonl"

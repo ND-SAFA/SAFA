@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Union
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -194,7 +195,7 @@ class HierarchyGenerator(BaseObject):
         :return: The full export path
         """
         if not save_dataset_checkpoints:
-            return ''
+            return EMPTY_STRING
         current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
         filename = current_time_string if not filename else filename
         full_export_path = os.path.join(export_path, filename)

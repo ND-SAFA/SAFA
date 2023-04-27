@@ -67,7 +67,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :return: The definition for reading the project in the correct format
         """
         if not self.conversions:
-            self.conversions = self.get_project_definition().get(StructuredKeys.CONVERSIONS)
+            self.conversions = self.get_project_definition().get(StructuredKeys.CONVERSIONS, {})
         return self.conversions
 
     def get_project_name(self) -> str:

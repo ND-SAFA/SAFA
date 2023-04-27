@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
-from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
@@ -21,7 +22,7 @@ class SplitDatasetCreator(AbstractDatasetCreator):
         super().__init__(data_cleaner)
         self.val_percentage = val_percentage
         self.split_strategy = split_strategy
-        self.name = ''
+        self.name = EMPTY_STRING
 
     def create(self) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """

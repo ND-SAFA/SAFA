@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.constants import MIN_LENGTH_DEFAULT
+from tgen.constants.hugging_face_constants import MIN_LENGTH_DEFAULT
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 

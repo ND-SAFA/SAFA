@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Set
 
 import pandas as pd
 
-from tgen.constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
+from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
+from tgen.constants.deliminator_constants import NEW_LINE, COMMA
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -259,8 +260,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         artifact_ids = list(set(artifact_ids))
         n_artifacts = len(artifact_ids)
         if n_artifacts > n_allowed:
-            artifact_id_str = "\n".join(
-                [",".join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)])
+            artifact_id_str = NEW_LINE.join(
+                [COMMA.join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)])
             raise ValueError(f"{error_msg}. Expected {n_allowed} but found {n_artifacts}.\n {artifact_id_str}")
         else:
             if default_msg:
@@ -277,7 +278,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         counter = Counter(artifact_df.layer_id)
         for layer_id, count in counter.items():
             artifact_type_summary.append(f"[{layer_id.title()}: {count}]")
-        logger.info(",".join(artifact_type_summary))
+        logger.info(COMMA.join(artifact_type_summary))
 
     @staticmethod
     def _log_trace_dataset(trace_dataset: TraceDataset) -> None:

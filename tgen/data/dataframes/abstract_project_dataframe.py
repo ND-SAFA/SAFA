@@ -126,13 +126,12 @@ class AbstractProjectDataFrame(pd.DataFrame):
 
     @classmethod
     def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",
-               ignore_index: bool = False, remove_duplicates: bool = True) -> "AbstractProjectDataFrame":
+               ignore_index: bool = False) -> "AbstractProjectDataFrame":
         """
         Combines two dataframes
         :param dataframe1: The first dataframe
         :param dataframe2: The second dataframe
         :param ignore_index: If True, do not use the index values along the concatenation axis.
-        :param remove_duplicates: If True, removes any duplicates from both dataframes
         :return: The new combined dataframe
         """
         orient = 'records' if ignore_index else 'index'
@@ -162,7 +161,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
                 index = dict_.pop("Index")
                 if self.index_name():
                     dict_[self.index_name()] = index
-                yield index, dict_
+                yield index, dict_  # return index and row to match iterrow api
             else:
                 yield row
 

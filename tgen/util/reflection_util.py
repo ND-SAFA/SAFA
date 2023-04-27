@@ -2,6 +2,8 @@ import typing
 from enum import Enum
 from typing import Any, Dict, List, Type
 
+from tgen.constants.deliminator_constants import PERIOD, UNDERSCORE
+
 
 class ParamScope(Enum):
     PUBLIC = 0
@@ -61,13 +63,13 @@ class ReflectionUtil:
         """
         class_prefix = None
         if class_name:
-            if class_name.startswith("_"):
+            if class_name.startswith(UNDERSCORE):
                 raise ValueError("Expected class name to not start with underscore: " + class_name)
             class_prefix = "_%s" % class_name
         prefix = field_name[:2]
         if "__" == prefix:
             return ParamScope.PRIVATE
-        elif "_" == prefix[:1]:
+        elif UNDERSCORE == prefix[:1]:
             if class_prefix and field_name.startswith(class_prefix):
                 return ReflectionUtil.get_field_scope(field_name.replace(class_prefix, ""))
             return ParamScope.PROTECTED
@@ -107,7 +109,7 @@ class ReflectionUtil:
         for enum_key in enum:
             if isinstance(instance, enum_key.value):
                 return enum_key.name
-        raise ValueError("Could not convert " + str(type(instance)) + " into" + str(enum) + ".")
+        raise ValueError("Could not convert " + str(type(instance)) + " into" + str(enum) + PERIOD)
 
     @staticmethod
     def set_attributes(instance: Any, params: Dict, missing_ok=False) -> Any:

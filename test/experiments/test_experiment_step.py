@@ -3,11 +3,12 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.constants.deliminator_constants import PERIOD
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.constants import BASE_EXPERIMENT_NAME
+from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
@@ -162,7 +163,7 @@ class TestExperimentStep(BaseExperimentTest):
             self.assertIn(JobResult.EXPERIMENTAL_VARS, job.result)
             job_experiment_vars = job.result[JobResult.EXPERIMENTAL_VARS]
             for experiment_var_path in self.EXPERIMENT_VARS:
-                path_attrs = experiment_var_path.split(".")
+                path_attrs = experiment_var_path.split(PERIOD)
                 attr = job
                 for i, attr_name in enumerate(path_attrs):
                     if not hasattr(attr, attr_name):

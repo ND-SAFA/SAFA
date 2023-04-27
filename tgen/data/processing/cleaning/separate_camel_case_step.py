@@ -1,6 +1,7 @@
 import re
 from typing import List
 
+from tgen.constants.deliminator_constants import SPACE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -26,4 +27,4 @@ class SeparateCamelCaseStep(AbstractDataProcessingStep):
         :return: Processed document.
         """
         split_doc = re.sub("([A-Z][a-z]+)", r" \1", re.sub("([A-Z]+)", r" \1", doc)).split()
-        return " ".join(split_doc)
+        return SPACE.join(split_doc)

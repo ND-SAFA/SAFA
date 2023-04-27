@@ -5,7 +5,8 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from tgen.constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES, OUTPUT_FILENAME
+from tgen.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
+from tgen.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.jobs.components.job_result import JobResult
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.util.file_util import FileUtil

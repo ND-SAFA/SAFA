@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List, Type
 
+from tgen.constants.deliminator_constants import SPACE
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
@@ -18,8 +19,6 @@ class ProcessingOrder(enum.Enum):
 
 @total_ordering
 class AbstractDataProcessingStep(BaseObject, ABC):
-    WORD_SEP = " "
-
     def __init__(self, order: ProcessingOrder = ProcessingOrder.ANY):
         """
         :param order: the order the step should be run in
@@ -51,7 +50,7 @@ class AbstractDataProcessingStep(BaseObject, ABC):
         :param word_list: the list of words in the content
         :return: the content as a string
         """
-        return AbstractDataProcessingStep.WORD_SEP.join(word_list)
+        return SPACE.join(word_list)
 
     @classmethod
     @overrides(BaseObject)

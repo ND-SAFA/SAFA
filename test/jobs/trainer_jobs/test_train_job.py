@@ -3,7 +3,8 @@ from unittest import mock
 from unittest.mock import patch
 
 
-from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -48,7 +49,7 @@ class TestTrainJob(BaseJobTest):
                                                                                       job.trainer_dataset_manager.dataset_name))
 
     def _get_job(self, deterministic: bool = False, use_llama: bool = False) -> HuggingFaceJob:
-        dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
+        dataset_param = UNDERSCORE.join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
         trainer_dataset_manager = ObjectCreator.get_definition(TrainerDatasetManager)
         if deterministic:
             trainer_dataset_manager[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = self.DETERMINISTIC_ID

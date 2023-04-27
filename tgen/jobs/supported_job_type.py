@@ -10,9 +10,10 @@ from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
+from tgen.util.supported_enum import SupportedEnum
 
 
-class SupportedJobType(Enum):
+class SupportedJobType(SupportedEnum):
     HUGGING_FACE = HuggingFaceJob
     HGEN = HGenJob
     EXPORT_ARTIFACTS = ExportArtifactsJob

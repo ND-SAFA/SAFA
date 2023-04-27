@@ -7,7 +7,7 @@ from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.constants import BEST_MODEL_NAME
+from tgen.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole

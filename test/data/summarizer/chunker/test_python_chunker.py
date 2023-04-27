@@ -1,6 +1,7 @@
 import ast
 import os
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
@@ -15,8 +16,8 @@ class TestPythonChunker(BaseTest):
         chunker = self.get_chunker()
         content = FileUtil.read_file(self.DATA_PATH)
         chunks = chunker.chunk(content=content)
-        all_content = content.split("\n")
-        chunked_content = "\n".join(chunks)
+        all_content = content.split(NEW_LINE)
+        chunked_content = NEW_LINE.join(chunks)
         for line in all_content:
             line = line.strip()
             if line.startswith("import") or line.startswith("from") or line.startswith("@") or not line:
@@ -53,7 +54,7 @@ class TestPythonChunker(BaseTest):
         lines = words.split()
         class_def.end_lineno = 4
         content = PythonChunker._get_node_content(class_def, lines)
-        self.assertEqual(len(content.split("\n")), 4)
+        self.assertEqual(len(content.split(NEW_LINE)), 4)
 
     def test_node2use(self):
         self.assertTrue(PythonChunker._node2use(ast.ClassDef()))

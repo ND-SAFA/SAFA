@@ -39,7 +39,6 @@ public class GraphQlService {
 
         String query;
         try {
-            // TODO profile this to make sure we aren't taking the hit of going to disk on EVERY request
             String resourcePath = "graphql/" + queryLocation + ".graphql";
             query = FileUtilities.readClasspathFile(resourcePath);
         }  catch (Exception e) {

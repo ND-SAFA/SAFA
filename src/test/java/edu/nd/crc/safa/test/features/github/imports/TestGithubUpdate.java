@@ -49,8 +49,53 @@ public class TestGithubUpdate extends AbstractGithubTest {
         // We should have one GitHub project created
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
 
-        int diffArtifactsCount = serviceMock.getDiffBetweenOldCommitAndHead(credentials,
-            repositoryName, "sha", "master").getFiles().size();
+        int diffArtifactsCount = 3;
+
+        // We should have the correct number of artifacts and links
+        Assertions.assertEquals(
+            initialArtifactCount + diffArtifactsCount,
+            serviceProvider.getArtifactRepository().findByProject(project).size());
+
+        Assertions.assertEquals(0,
+            serviceProvider.getTraceLinkRepository().count());
+    }
+
+    @Test
+    void intoExistingProjectWithIncludeAndExcludeTest() throws Exception {
+        String projectName = "githubImport";
+        int initialArtifactCount = 5;
+
+        this.createBaseSafaProject(projectName, initialArtifactCount);
+
+        ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
+        Project project = dbEntityBuilder.getProject(projectName);
+        ArtifactType type = dbEntityBuilder.newTypeAndReturn(project.getName(), "test type");
+        GithubProject githubProject = new GithubProject();
+
+        githubProject.setProject(project);
+        githubProject.setRepositoryName(repositoryName);
+        githubProject.setBranch("branch");
+        githubProject.setLastCommitSha("sha");
+        githubProject.setOwner(githubLogin);
+        githubProject.setArtifactType(type);
+        githubProject.setInclude("**/*.pl");
+        githubProject.setExclude("modules/weather/**");
+        serviceProvider.getGithubProjectRepository().save(githubProject);
+
+        JSONObject response = SafaRequest
+            .withRoute(AppRoutes.Github.Import.UPDATE)
+            .withRepositoryName(repositoryName)
+            .withOwner(githubLogin)
+            .withVersion(projectVersion)
+            .putWithJsonObject(new GithubImportDTO(), MockMvcResultMatchers.status().is2xxSuccessful());
+
+        // No other project was created during the import
+        Assertions.assertEquals(1, serviceProvider.getProjectRepository().count());
+
+        // We should have one GitHub project created
+        Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
+
+        int diffArtifactsCount = 1;
 
         // We should have the correct number of artifacts and links
         Assertions.assertEquals(

@@ -19,8 +19,8 @@ from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.ai.params.openai_params import OpenAiParams
+from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
 from tgen.util.logging.logger_manager import logger
 
 
@@ -30,7 +30,7 @@ class LLMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 trainer_args: LLMArgs = None, base_model: str = None):
+                 trainer_args: LLMArgs = None, base_model: str = None, llm_util: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
@@ -50,6 +50,7 @@ class LLMTrainer(AbstractTrainer):
         self.summarizer = Summarizer(model_for_token_limit=self.base_model, code_or_exceeds_limit_only=False,
                                      max_tokens=trainer_args.max_tokens)
         self.prompt_creator = prompt_creator
+        self.llm_util = llm_util.value
 
     def perform_training(self) -> FineTune:
         """
@@ -68,20 +69,9 @@ class LLMTrainer(AbstractTrainer):
             params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 prompt_creator=self.prompt_creator,
                 summarizer=self.summarizer)
-        res = OpenAIUtil.make_fine_tune_request(training_file=training_file_id,
-                                                model=self.base_model,
-                                                **params)
-        logger.info(res.events[-1].message)
-        return res
-
-    @staticmethod
-    def check_fine_tune_status(fine_tune_id: str) -> OpenAIObject:
-        """
-        Checks on the status of a fine tune job
-        :param fine_tune_id: The id of the fine tune job
-        :return: The response for the fine tune job
-        """
-        res = OpenAIUtil.retrieve_fine_tune_request(id=fine_tune_id)
+        res = self.llm_util.make_fine_tune_request(training_file=training_file_id,
+                                                   model=self.base_model,
+                                                   **params)
         logger.info(res.events[-1].message)
         return res
 
@@ -98,7 +88,7 @@ class LLMTrainer(AbstractTrainer):
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]), **params)
+        res = self.llm_util.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]), **params)
         output = self._create_classification_output(res, dataset) \
             if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
         return output

@@ -6,6 +6,9 @@ from tgen.util.ai.open_ai_util import OpenAIUtil
 
 
 class TestOpenAiUtil(BaseTest):
+    """
+    Tests the OpenAi Utility class.
+    """
 
     @mock.patch("openai.Completion.create")
     def test_completion_request(self, mock_completion: mock.MagicMock):

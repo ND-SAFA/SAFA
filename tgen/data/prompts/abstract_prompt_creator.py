@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import Dict, Type
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.util.base_object import BaseObject
@@ -34,6 +35,8 @@ class AbstractPromptCreator(BaseObject):
         :param base_completion: The base completion
         :return: The formatted completion
         """
+        if not base_completion:
+            return EMPTY_STRING
         return f"{self.COMPLETION_START}{base_completion}{self._COMPLETION_SEPARATOR}"
 
     def generate_base(self, base_prompt: str, base_completion: str) -> EnumDict[str, str]:

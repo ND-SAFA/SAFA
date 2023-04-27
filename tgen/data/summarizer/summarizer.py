@@ -57,6 +57,7 @@ class Summarizer(BaseObject):
             return content
         self.args_for_summarizer_model.prompt_creator = GenerationPromptCreator(
             base_prompt=BasePrompt.CODE_SUMMARY if is_code else BasePrompt.NL_SUMMARY)
+        self.args_for_summarizer_model.max_tokens = MAX_TOKENS_DEFAULT # TODO hopefully wont need this after betito refactor
         summarizations = self._summarize_chunks(chunks, self.model_for_summarizer, self.args_for_summarizer_model)
         return os.linesep.join(summarizations)
 
@@ -79,6 +80,15 @@ class Summarizer(BaseObject):
         chunker_type: SupportedChunker = self._get_chunker()
         chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
         return chunker.exceeds_token_limit(content)
+
+    def get_word_limit(self) -> int:
+        """
+        Determines the word limit for the model
+        :return: The max number of words accepted by the model
+        """
+        chunker_type: SupportedChunker = self._get_chunker()
+        chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
+        return chunker.get_word_limit()
 
     @staticmethod
     def _summarize_chunks(chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:

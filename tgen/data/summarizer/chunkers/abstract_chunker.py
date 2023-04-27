@@ -57,6 +57,13 @@ class AbstractChunker(BaseObject, ABC):
         """
         return round(n_tokens / 4)  # open ai's rule of thumb for approximating tokens from number of words
 
+    def get_word_limit(self) -> int:
+        """
+        Approximates the number of words that will make up the token limit
+        :return: The approximate number of words that the model will accept
+        """
+        return self.estimate_num_words_from_tokens(self.token_limit)
+
     @classmethod
     @overrides(BaseObject)
     def _get_enum_class(cls, child_class_name: str) -> Type:

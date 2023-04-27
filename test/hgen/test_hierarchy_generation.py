@@ -24,7 +24,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
-from tgen.train.trainers.open_ai_trainer import AITrainer
+from tgen.train.trainers.ai_trainer import AITrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 

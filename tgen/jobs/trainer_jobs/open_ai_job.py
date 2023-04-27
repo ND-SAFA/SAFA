@@ -6,7 +6,7 @@ from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trainers.open_ai_trainer import AITrainer
+from tgen.train.trainers.ai_trainer import AITrainer
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.override import overrides
 

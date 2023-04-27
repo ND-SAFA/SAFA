@@ -18,7 +18,7 @@ from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.hgen_jobs.hgen_job import HGenJob
-from tgen.train.trainers.open_ai_trainer import AITrainer
+from tgen.train.trainers.ai_trainer import AITrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 
 DO_SUMMARIZE = False

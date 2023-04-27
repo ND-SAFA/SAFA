@@ -12,7 +12,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
-from tgen.train.trainers.open_ai_trainer import AITrainer
+from tgen.train.trainers.ai_trainer import AITrainer
 
 Res = namedtuple("Res", ["id"])
 

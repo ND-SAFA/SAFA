@@ -1,5 +1,6 @@
 import os
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.testres.base_tests.base_test import BaseTest
@@ -26,7 +27,7 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
         dataset_creator = self.get_mlm_pre_train_dataset_creator()
         dataset = dataset_creator.create()
         self.assertTrue(isinstance(dataset, PreTrainDataset), "create results in PreTrainDataset")
-        training_content = FileUtil.read_file(dataset.training_file_path).split("\n")
+        training_content = FileUtil.read_file(dataset.training_file_path).split(NEW_LINE)
         expected_lines = self.FILE1_LINES + self.FILE2_LINES
         TestAssertions.assert_lists_have_the_same_vals(self, training_content, expected_lines)
 

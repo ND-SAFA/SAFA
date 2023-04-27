@@ -4,6 +4,7 @@ from copy import deepcopy
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Tuple, Union
 
+from tgen.constants.deliminator_constants import F_SLASH
 from tgen.util.json_util import JsonUtil
 
 
@@ -146,7 +147,7 @@ class FileUtil:
         index = index if index >= 0 else len(path_list) + index + 1
         path_list.insert(index, addition)
         if os.path.isabs(path):
-            path_list.insert(0, "/")
+            path_list.insert(0, F_SLASH)
         return os.path.join(*path_list)
 
     @staticmethod

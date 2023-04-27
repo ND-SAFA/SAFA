@@ -1,6 +1,7 @@
 import uuid
 from typing import Dict, Any, List, Union
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -92,7 +93,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
                     traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
                                                                     TraceKeys.LABEL: 1}))  # add link between artifact and cluster
                     source_layers.add(artifact[ArtifactKeys.LAYER_ID])
-                cluster_id_to_content[cluster_id] = "\n".join(artifact_content)  # combines the content of all artifacts in cluster
+                cluster_id_to_content[cluster_id] = NEW_LINE.join(artifact_content)  # combines the content of all artifacts in cluster
         new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: list(cluster_id_to_content.keys()),
                                              ArtifactKeys.CONTENT: list(cluster_id_to_content.values()),
                                              ArtifactKeys.LAYER_ID: [cluster_layer_id for _ in cluster_id_to_content]})

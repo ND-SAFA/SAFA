@@ -1,3 +1,4 @@
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -54,7 +55,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
             return FileUtil.get_file_name(self.data_export_path)
         if self.project_file_id:
             return self.project_file_id
-        return ''
+        return EMPTY_STRING
 
     def set_summarizers(self, summarizer: Summarizer) -> None:
         """

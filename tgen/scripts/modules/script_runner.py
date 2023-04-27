@@ -3,7 +3,7 @@ from typing import Dict, Type
 
 from django.core.wsgi import get_wsgi_application
 
-from tgen.constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
+from tgen.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from tgen.experiments.experiment import Experiment
 from tgen.scripts.modules.experiment_types import ExperimentTypes
 from tgen.scripts.modules.script_definition import ScriptDefinition

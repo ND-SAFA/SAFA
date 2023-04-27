@@ -1,3 +1,4 @@
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -29,7 +30,7 @@ class TestExportArtifactsJob(BaseJobTest):
         """
         export_path = job_result[JobResult.EXPORT_PATH]
         self.assertIsNotNone(export_path)
-        file_lines = FileUtil.read_file(export_path).split("\n")
+        file_lines = FileUtil.read_file(export_path).split(NEW_LINE)
         artifacts = TestDataManager.get_artifact_map()
         self.assertEqual(len(artifacts), len(file_lines))
         for _, a_body in artifacts.items():

@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Tuple
 
-from tgen.constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from tgen.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
 

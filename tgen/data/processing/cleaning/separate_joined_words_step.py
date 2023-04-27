@@ -1,11 +1,12 @@
 from typing import Callable, Iterable, List
 
+from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
 class SeparateJoinedWordsStep(AbstractDataProcessingStep):
     ORDER = ProcessingOrder.FIRST
-    DELIMINATORS = ("_", "/")
+    DELIMINATORS = (UNDERSCORE, "/")
 
     def __init__(self, deliminators: Iterable[str] = DELIMINATORS):
         """
@@ -29,7 +30,7 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
         return [word[i:j] for i, j in zip(split_start, split_end)]
 
     @staticmethod
-    def _separate_deliminated_word(word: str, deliminator: str = "_") -> List[str]:
+    def _separate_deliminated_word(word: str, deliminator: str = UNDERSCORE) -> List[str]:
         """
         Splits a deliminated word (e.g. snake_case)
         :param word: the word to split

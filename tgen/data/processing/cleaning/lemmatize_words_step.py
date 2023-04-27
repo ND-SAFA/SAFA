@@ -2,6 +2,7 @@ from typing import List
 
 from nltk import PorterStemmer
 
+from tgen.constants.deliminator_constants import SPACE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -34,4 +35,4 @@ class LemmatizeWordStep(AbstractDataProcessingStep):
         """
         if doc is None:
             raise Exception("Received None as text document")
-        return " ".join([self.ps.stem(word) for word in doc.split(" ")])
+        return SPACE.join([self.ps.stem(word) for word in doc.split(SPACE)])

@@ -3,6 +3,7 @@ from typing import Dict, Generic, Optional, TypeVar, Tuple
 
 import pandas as pd
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
@@ -33,7 +34,7 @@ class EntityReader(Generic[EntityType]):
         self.conversions: Dict[str, Dict] = conversions
         self.entity_type = None
 
-    def read_entities(self, summarizer: Summarizer = None, col2summarize: str = '') -> pd.DataFrame:
+    def read_entities(self, summarizer: Summarizer = None, col2summarize: str = EMPTY_STRING) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
         :return: DataFrame containing processed entities.

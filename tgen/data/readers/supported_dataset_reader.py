@@ -9,9 +9,10 @@ from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.data.readers.repository_project_reader import RepositoryProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.util.supported_enum import SupportedEnum
 
 
-class SupportedDatasetReader(Enum):
+class SupportedDatasetReader(SupportedEnum):
     ARTIFACT = ArtifactProjectReader
     DATAFRAME = DataFrameProjectReader
     STRUCTURE = StructuredProjectReader

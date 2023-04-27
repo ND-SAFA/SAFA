@@ -2,7 +2,8 @@ import os
 from copy import deepcopy
 from typing import Dict
 
-from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.deliminator_constants import PERIOD
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
@@ -119,7 +120,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
         """
         supported_formats = list(TimProjectDefinition.CONVERSIONS.keys())
         for format_name in supported_formats:
-            format_id = "." + format_name
+            format_id = PERIOD + format_name
             if format_id in file_path:
                 return format_name
         raise ValueError(file_path, "did not have a supported format:", supported_formats)

@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from tgen.constants.dataset_constants import EXCLUDED_FILES
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.summarizer.summarizer import Summarizer
@@ -42,6 +43,7 @@ class FolderEntityFormat(AbstractEntityFormat):
         :param exclude_ext: list of file extensions to exclude
         :return: DataFrame containing artifact ids and tokens.
         """
+        exclude = EXCLUDED_FILES if exclude is None else exclude + EXCLUDED_FILES
         files_in_path = FileUtil.get_file_list(path, exclude=exclude, exclude_ext=exclude_ext)
         return FolderEntityFormat.read_files_as_artifacts(files_in_path, base_path=path, **kwargs)
 

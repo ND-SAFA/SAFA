@@ -3,6 +3,7 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
@@ -55,7 +56,7 @@ class SerializerUtility:
 
     @staticmethod
     def to_camel_case(word: str):
-        words = word.lower().split("_")
+        words = word.lower().split(UNDERSCORE)
         words = words[:1] + [w.title() for w in words[1:]]
         return "".join(words)
 
@@ -66,4 +67,4 @@ class SerializerUtility:
         :param word: The string to convert.
         :return: word in snake_case.
         """
-        return "_".join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep.separate_camel_case_word(word))))
+        return UNDERSCORE.join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep.separate_camel_case_word(word))))

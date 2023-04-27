@@ -6,6 +6,7 @@ from typing import List, Union
 
 import tiktoken
 
+from tgen.constants.deliminator_constants import TAB
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.util.override import overrides
@@ -21,7 +22,7 @@ class PythonChunker(AbstractChunker):
     IGNORED_NODES = [ast.Import, ast.ImportFrom]
     N_SPACE_TO_TAB = 4
 
-    def _chunk(self, content: str) -> List[str]:
+    def chunk(self, content: str) -> List[str]:
         """
         Chunks the given python code into pieces that are beneath the model's token limit
         :param content: The code to be chunked
@@ -118,6 +119,7 @@ class PythonChunker(AbstractChunker):
         needs_tab = re.match('^[ ]{2,}', orig_str)
         if needs_tab:
             num_spaces = needs_tab.regs[0][1] - needs_tab.regs[0][0]
-            tabs = '\t' * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
+            tabs = TAB * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
             return re.sub(r'^[ ]{2,}', tabs, orig_str)
         return orig_str
+

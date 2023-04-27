@@ -1,6 +1,7 @@
 import os
 from typing import Iterable
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob
@@ -15,7 +16,7 @@ class ExportArtifactsJob(AbstractJob):
     """
 
     def __init__(self, trace_dataset_creator: TraceDatasetCreator, job_args: JobArgs = None, file_name: str = None,
-                 delimiter: str = "\n"):
+                 delimiter: str = NEW_LINE):
         """
         Initializes export job with args and with dataset creator to export.
         :param job_args: the arguments for the job

@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from unittest import TestCase
 
+from tgen.constants.deliminator_constants import COMMA
 from tgen.data.github.gtraces.glink_finder import GLinkTarget
 from tgen.data.github.gtraces.glink_store import GLinkStore
 from tgen.testres.testprojects.github_test_project import GithubTestProject
@@ -47,7 +48,7 @@ class TestGTraceStore(TestCase):
             if link.source == source_id and link.target == target_id:
                 return
             links_display.append(f"{link.source}-{link.target}")
-        links_display = ",".join(links_display)
+        links_display = COMMA.join(links_display)
         self.fail(f"Searched {source_type}->{target_type}. Could not find {source_id}-{target_id} in {links_display}")
 
     @staticmethod

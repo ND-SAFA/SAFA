@@ -3,7 +3,7 @@ from typing import Callable, Dict, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from tgen.constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, \
+from tgen.constants.hugging_face_constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, \
     GRADIENT_ACCUMULATION_DEFAULT, \
     GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, \

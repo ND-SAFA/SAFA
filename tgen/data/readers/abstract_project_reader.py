@@ -8,11 +8,11 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 
-PROJECT_DATA = TypeVar("PROJECT_DATA")
+ProjectData = TypeVar("ProjectData")
 TraceDataFramesTypes = Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]
 
 
-class AbstractProjectReader(BaseObject, ABC, Generic[PROJECT_DATA]):
+class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
     """
     Defines interface for objects responsible for reading projects.
     """
@@ -26,7 +26,7 @@ class AbstractProjectReader(BaseObject, ABC, Generic[PROJECT_DATA]):
         self.summarizer: Optional[Summarizer] = None
 
     @abstractmethod
-    def read_project(self) -> PROJECT_DATA:
+    def read_project(self) -> ProjectData:
         """
         Reads project data from files.
         :return: Returns data frames containing project data

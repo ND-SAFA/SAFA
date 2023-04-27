@@ -1,5 +1,7 @@
 from typing import List
 
+from tgen.constants.deliminator_constants import UNDERSCORE
+
 
 class DataKey:
     """
@@ -14,7 +16,7 @@ class DataKey:
     TOKEN_TYPE_IDS = "token_type_ids"
     ATTEN_MASK = "attention_mask"
     SOURCE_TARGET_PAIRS = "source_target_pairs"
-    SEP = "_"
+    SEP = UNDERSCORE
 
     @staticmethod
     def get_feature_entry_keys() -> List[str]:

@@ -1,5 +1,6 @@
 from typing import List
 
+from tgen.constants.deliminator_constants import SPACE, PERIOD
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -18,7 +19,7 @@ class SplitChainedCallsStep(AbstractDataProcessingStep):
         return [SplitChainedCallsStep.split_chained_calls(s) for s in data_entries]
 
     @staticmethod
-    def split_chained_calls(doc, chained_call_delimiter=".", word_delimiter=" "):
+    def split_chained_calls(doc, chained_call_delimiter=PERIOD, word_delimiter=SPACE):
         """
         Replaces chained called delimiter with space delimiter.
         :param doc: The document being processed.

@@ -5,6 +5,7 @@ from typing import Any, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -171,7 +172,7 @@ class PromptDataset(iDataset):
         :param prompt_creator_params: Additional params to give the prompt creator
         :return: The prompt entry
         """
-        source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else ''
+        source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else EMPTY_STRING
         entry = prompt_creator.create(source_content=source_content,
                                       target_content=target_artifact[ArtifactKeys.CONTENT], **prompt_creator_params)
         if not summarizer:
@@ -180,13 +181,13 @@ class PromptDataset(iDataset):
         # Ensure prompt fits in token limit
         for i in range(self.__MAX_SUMMARIZATIONS):
             if not summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-                return entry
+                break
             force_create_new_summarization = i > 0
             if source_artifact:
                 source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
             target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
-        return None
+        return None if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]) else entry
 
     def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:
         """

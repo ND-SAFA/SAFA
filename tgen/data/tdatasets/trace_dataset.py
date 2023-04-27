@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 from datasets import Dataset
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -351,7 +352,7 @@ class TraceDataset(iDataset):
         return reduction_func(data, k=new_length)
 
     @staticmethod
-    def _extract_feature_info(feature: Dict[str, any], prefix: str = '') -> Dict[str, any]:
+    def _extract_feature_info(feature: Dict[str, any], prefix: str = EMPTY_STRING) -> Dict[str, any]:
         """
         Extracts the required info from a feature for data creation
         :param feature: dictionary of features

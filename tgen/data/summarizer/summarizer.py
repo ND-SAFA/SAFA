@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import SUMMARIZATION_MODEL_DEFAULT, GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
@@ -88,7 +89,7 @@ class Summarizer(BaseObject):
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        prompts = [args.prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value]
+        prompts = [args.prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value]
                    for chunk in chunks]
         res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(TrainerTask.PREDICT))

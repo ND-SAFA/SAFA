@@ -1,6 +1,7 @@
 import os
 from typing import Dict, Optional, Union
 
+from tgen.constants.deliminator_constants import COMMA, UNDERSCORE, EMPTY_STRING, F_SLASH
 from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.constants.script_constants import EXPERIMENTAL_VARS_IGNORE
 
@@ -53,7 +54,7 @@ class Wandb:
         :param v: The variable to clean.
         :return: The cleaned variable.
         """
-        if isinstance(v, str) and "/" in v:
+        if isinstance(v, str) and F_SLASH in v:
             v = os.path.split(v)[1]
         if isinstance(v, float):
             v = round(v, 2)
@@ -79,7 +80,7 @@ class Wandb:
         :return: String of experimental vars.
         """
         clean_vars = [f"{Wandb.get_key_display_name(k)}={v}" for k, v in experimental_vars.items()]
-        return default_value if len(clean_vars) == 0 else ",".join(clean_vars)
+        return default_value if len(clean_vars) == 0 else COMMA.join(clean_vars)
 
     @staticmethod
     def get_key_display_name(key_name: str):
@@ -87,9 +88,9 @@ class Wandb:
         :param key_name: The name whose display identifier is returned.
         :return: Returns the initials of each word in given key name.
         """
-        if "_" in key_name:
-            group_parts = key_name.split("_")
+        if UNDERSCORE in key_name:
+            group_parts = key_name.split(UNDERSCORE)
             group_parts = [g[0] for g in group_parts]
         else:
             group_parts = [key_name[0]]
-        return "".join(group_parts)
+        return EMPTY_STRING.join(group_parts)

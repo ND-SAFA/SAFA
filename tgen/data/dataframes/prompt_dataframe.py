@@ -1,5 +1,6 @@
 from typing import Type
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.util.enum_util import EnumDict
@@ -26,7 +27,7 @@ class PromptDataFrame(AbstractProjectDataFrame):
         """
         return PromptKeys
 
-    def add_prompt(self, prompt: str, completion: str = '') -> EnumDict:
+    def add_prompt(self, prompt: str, completion: str = EMPTY_STRING) -> EnumDict:
         """
         Adds prompt and completion pair to dataframe
         :param prompt: The prompt

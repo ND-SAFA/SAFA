@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Callable, Type, Union, Dict, Any, OrderedDict
 
-SEP_SYM = "_"
+from tgen.constants.deliminator_constants import UNDERSCORE
+
+SEP_SYM = UNDERSCORE
 
 
 def get_enum_from_name(enum_class: Type, enum_name: str) -> Enum:

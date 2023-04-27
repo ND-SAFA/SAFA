@@ -5,7 +5,7 @@ from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
 from tgen.constants.path_constants import JAVA_KEYWORDS_PATH
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.util.logging.logger_manager import logger
 
@@ -73,7 +73,7 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
             return class_text
 
         comments = ExtractCodeIdentifiersStep.extract_class_comments(class_text)
-        return " ".join(identifiers) + " ".join(comments)
+        return SPACE.join(identifiers) + SPACE.join(comments)
 
     @staticmethod
     def extract_class_comments(class_text, mime_type="text/x-java-source"):

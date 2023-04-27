@@ -3,6 +3,7 @@ from typing import Callable, Dict, List, Union
 
 from github import Issue
 
+from tgen.constants.deliminator_constants import SPACE
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.util.date_time_util import DateTimeUtil
@@ -46,7 +47,7 @@ class GIssue(AbstractGithubArtifact):
         :return: Dictionary entry.
         """
         texts = [t for t in [self.title, self.body] if t is not None]
-        return {"id": self.issue_id, "content": " ".join(texts)}
+        return {"id": self.issue_id, "content": SPACE.join(texts)}
 
     @overrides(AbstractGithubArtifact)
     def get_id(self) -> str:

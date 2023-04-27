@@ -6,6 +6,7 @@ from typing import List, Union
 
 import tiktoken
 
+from tgen.constants.deliminator_constants import TAB
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.util.override import overrides
@@ -118,6 +119,6 @@ class PythonChunker(AbstractChunker):
         needs_tab = re.match('^[ ]{2,}', orig_str)
         if needs_tab:
             num_spaces = needs_tab.regs[0][1] - needs_tab.regs[0][0]
-            tabs = '\t' * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
+            tabs = TAB * math.floor(num_spaces / PythonChunker.N_SPACE_TO_TAB)
             return re.sub(r'^[ ]{2,}', tabs, orig_str)
         return orig_str

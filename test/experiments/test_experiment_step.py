@@ -3,6 +3,7 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.constants.deliminator_constants import PERIOD
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
@@ -162,7 +163,7 @@ class TestExperimentStep(BaseExperimentTest):
             self.assertIn(JobResult.EXPERIMENTAL_VARS, job.result)
             job_experiment_vars = job.result[JobResult.EXPERIMENTAL_VARS]
             for experiment_var_path in self.EXPERIMENT_VARS:
-                path_attrs = experiment_var_path.split(".")
+                path_attrs = experiment_var_path.split(PERIOD)
                 attr = job
                 for i, attr_name in enumerate(path_attrs):
                     if not hasattr(attr, attr_name):

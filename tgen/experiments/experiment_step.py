@@ -2,6 +2,7 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
+from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
@@ -81,7 +82,7 @@ class ExperimentStep(BaseObject):
         """
         results = {}
         for var_name, var_value in vars(self).items():
-            if var_name.startswith("_") or callable(var_value):
+            if var_name.startswith(UNDERSCORE) or callable(var_value):
                 continue
             results[var_name] = var_value
         return results

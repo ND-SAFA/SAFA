@@ -8,6 +8,7 @@ from typing import Dict, List
 import pandas as pd
 from dotenv import load_dotenv
 
+from tgen.constants.deliminator_constants import PERIOD
 from tgen.constants.path_constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 
 load_dotenv()
@@ -57,7 +58,7 @@ def read_aggregate_df(folder_path: str, column_sort: List[str]):
     :param folder_path: The path to the folder to aggregate
     :return: DataFrame
     """
-    result_files = list(filter(lambda f: f[0] != ".", os.listdir(folder_path)))
+    result_files = list(filter(lambda f: f[0] != PERIOD, os.listdir(folder_path)))
     result_files = list(map(lambda f: os.path.join(folder_path, f), result_files))
     df = None
     for data_path in result_files:

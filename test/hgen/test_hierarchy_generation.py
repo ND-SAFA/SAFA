@@ -24,7 +24,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAiArgs
-from tgen.train.trainers.open_ai_trainer import OpenAiTrainer
+from tgen.train.trainers.open_ai_trainer import AITrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 
@@ -181,7 +181,7 @@ class TestHierarchyGeneration(BaseTest):
     @staticmethod
     def get_tgen_trainer(dataset_creator):
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
-        return OpenAiTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]))
+        return AITrainer(trainer_dataset_manager=trainer_dataset_manager, ai_trainer_args=OpenAiArgs(metrics=[]))
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):
@@ -223,7 +223,7 @@ class TestHierarchyGeneration(BaseTest):
     def get_dataset_creator(**params):
         return PromptDatasetCreator(summarizer=Summarizer(), **params)
 
-    def get_hierarchy_generator(self, tgen_trainer: OpenAiTrainer, layer_id: str = None, **params):
+    def get_hierarchy_generator(self, tgen_trainer: AITrainer, layer_id: str = None, **params):
         hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[],
                                                                prompt_creator=GenerationPromptCreator(
                                                                    base_prompt=SupportedPrompts.SHALL_REQUIREMENT_SUMMARY))}

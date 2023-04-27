@@ -24,26 +24,26 @@ from tgen.util.ai.params.openai_params import OpenAiParams
 from tgen.util.logging.logger_manager import logger
 
 
-class OpenAiTrainer(AbstractTrainer):
+class AITrainer(AbstractTrainer):
     """
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, base_model: str = CLASSIFICATION_MODEL_DEFAULT,
-                 trainer_args: AIArgs = None):
+                 ai_trainer_args: AIArgs = None):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param base_model: The name of the model
-        :param trainer_args: The arguments for training and prediction calls
+        :param ai_trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
-        if trainer_args is None:
-            trainer_args = OpenAiArgs()
+        if ai_trainer_args is None:
+            ai_trainer_args = OpenAiArgs()
         self.base_model = base_model
         self.trainer_dataset_manager = trainer_dataset_manager
-        super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
+        super().__init__(trainer_dataset_manager, trainer_args=ai_trainer_args)
         self.summarizer = Summarizer(model_for_token_limit=base_model, code_or_exceeds_limit_only=False,
-                                     max_tokens=trainer_args.max_tokens)
+                                     max_tokens=ai_trainer_args.max_tokens)
 
     def perform_training(self) -> FineTune:
         """

@@ -1,7 +1,6 @@
 import os
 from unittest import mock
 
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
@@ -25,10 +24,8 @@ class TestSummarizer(BaseTest):
     @mock.patch("openai.Completion.create", )
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        summarizer = Summarizer(code_or_exceeds_limit_only=False)
-        prompt_generator = GenerationPromptCreator(base_prompt=SupportedPrompts.NL_SUMMARY)
-        summaries = summarizer._summarize_chunks(self.CHUNKS, "text-davinci-003",
-                                                 OpenAiArgs(prompt_creator=prompt_generator))
+        summarizer = Summarizer(code_or_exceeds_limit_only=False, base_prompt=SupportedPrompts.NL_SUMMARY)
+        summaries = summarizer._summarize_chunks(self.CHUNKS, "text-davinci-003", OpenAiArgs())
         for i, summary in enumerate(summaries):
             self.assertEqual(summary, SUMMARY_FORMAT.format(self.CHUNKS[i]))
 

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
@@ -34,6 +33,10 @@ class HGenArgs:
     Any necessary params needed to initializing trainer to generate the higher-level artifacts
     """
     hgen_trainer_args: OpenAiArgs = OpenAiArgs()
+    """
+    The base prompt to use for generation.
+    """
+    base_prompt: SupportedPrompts = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION
 
     def __post_init__(self) -> None:
         """

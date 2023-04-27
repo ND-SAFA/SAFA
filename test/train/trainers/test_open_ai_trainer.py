@@ -5,6 +5,7 @@ from unittest import mock
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -25,17 +26,9 @@ class TestOpenAiTrainer(BaseTest):
                                              mock_fine_tune_create: mock.MagicMock = None):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create
+        prompt_creator = ClassificationPromptCreator()
         for dataset_creator in self.get_all_dataset_creators().values():
-            trainer = self.get_open_ai_trainer(dataset_creator, [DatasetRole.TRAIN])
-            res = trainer.perform_training()
-
-    @mock.patch("openai.FineTune.create")
-    @mock.patch("openai.File.create")
-    def test_perform_training_generation(self, mock_file_create: mock.MagicMock = None, mock_fine_tune_create: mock.MagicMock = None):
-        mock_file_create.return_value = Res(id="file_id")
-        mock_fine_tune_create.side_effect = self.fake_fine_tune_create
-        for dataset_creator in self.get_all_dataset_creators().values():
-            trainer = self.get_open_ai_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_creator=GenerationPromptCreator())
+            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_creator=prompt_creator)
             res = trainer.perform_training()
 
     @mock.patch("openai.FineTune.create")
@@ -44,8 +37,18 @@ class TestOpenAiTrainer(BaseTest):
                                               mock_fine_tune_create: mock.MagicMock = None):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create_classification_metrics
+        prompt_creator = ClassificationPromptCreator()
         for type_, dataset_creator in self.get_all_dataset_creators().items():
-            trainer = self.get_open_ai_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL])
+            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL], prompt_creator=prompt_creator)
+            res = trainer.perform_training()
+
+    @mock.patch("openai.FineTune.create")
+    @mock.patch("openai.File.create")
+    def test_perform_training_generation(self, mock_file_create: mock.MagicMock = None, mock_fine_tune_create: mock.MagicMock = None):
+        mock_file_create.return_value = Res(id="file_id")
+        mock_fine_tune_create.side_effect = self.fake_fine_tune_create
+        for dataset_creator in self.get_all_dataset_creators().values():
+            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_creator=GenerationPromptCreator())
             res = trainer.perform_training()
 
     @mock.patch("openai.Completion.create")
@@ -55,10 +58,10 @@ class TestOpenAiTrainer(BaseTest):
         dataset_creators.pop("id")
         for creator in [ClassificationPromptCreator(), GenerationPromptCreator()]:
             for type_, dataset_creator in dataset_creators.items():
-                trainer = self.get_open_ai_trainer(dataset_creator, [DatasetRole.EVAL], prompt_creator=creator)
+                trainer: LLMTrainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_creator=creator)
                 res = trainer.perform_prediction()
                 self.assertGreater(len(res.predictions), 1)
-                if (type_ == "dataset" or type_ == "trace") and isinstance(trainer.trainer_args.prompt_creator,
+                if (type_ == "dataset" or type_ == "trace") and isinstance(trainer.prompt_creator,
                                                                            ClassificationPromptCreator):
                     self.assertIsNotNone(res.label_ids)
                     self.assertIsNotNone(res.prediction_entries)
@@ -113,6 +116,9 @@ class TestOpenAiTrainer(BaseTest):
         self.assertIn("validation_file", params)
         return self.fake_fine_tune_create(not_classification=False, **params)
 
-    def get_open_ai_trainer(self, dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole], **params):
+    @staticmethod
+    def get_llm_trainer(dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole],
+                        prompt_creator: AbstractPromptCreator, **params) -> LLMTrainer:
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(**params))
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(**params),
+                          prompt_creator=prompt_creator)

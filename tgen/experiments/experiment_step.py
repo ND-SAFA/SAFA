@@ -2,7 +2,7 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
-from tgen.constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
+from tgen.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob

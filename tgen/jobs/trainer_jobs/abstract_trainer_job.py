@@ -3,7 +3,7 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Optional, Type, Union
 
-from tgen.constants import BEST_MODEL_NAME
+from tgen.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob

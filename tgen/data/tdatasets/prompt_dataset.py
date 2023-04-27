@@ -18,6 +18,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 from tgen.util.open_ai_util import OpenAiUtil
 
 
@@ -179,13 +180,13 @@ class PromptDataset(iDataset):
         # Ensure prompt fits in token limit
         for i in range(self.__MAX_SUMMARIZATIONS):
             if not summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-                return entry
+                break
             force_create_new_summarization = i > 0
             if source_artifact:
                 source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
             target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
-        return None
+        return None if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]) else entry
 
     def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:
         """

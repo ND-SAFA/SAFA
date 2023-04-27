@@ -3,9 +3,8 @@ import uuid
 from os.path import dirname
 from typing import List
 
-import pandas as pd
-
-from tgen.constants import BLOCK_SIZE_DEFAULT
+from tgen.constants.dataset_constants import BLOCK_SIZE_DEFAULT
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
@@ -15,7 +14,7 @@ from tgen.util.logging.logger_manager import logger
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
-    DELIMINATOR = "\n"
+    DELIMINATOR = NEW_LINE
     OUTPUT_FILE_EXT = ".txt"
 
     def __init__(self, orig_data_path: str, training_data_dir: str = None,

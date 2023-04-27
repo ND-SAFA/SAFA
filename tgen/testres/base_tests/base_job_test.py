@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
@@ -48,7 +49,7 @@ class BaseJobTest(BaseTraceTest, ABC):
             failure_msg = job_result[JobResult.EXCEPTION] if JobResult.EXCEPTION in job_result \
                 else "Status is FAILURE but should be SUCCESS"
             if JobResult.TRACEBACK in job_result:
-                failure_msg += "\n " + job_result[JobResult.TRACEBACK]
+                failure_msg += NEW_LINE + SPACE + job_result[JobResult.TRACEBACK]
             self.fail(failure_msg)
         self.assertEquals(job_result[JobResult.STATUS], Status.SUCCESS)
         self._assert_success(job, job_result)

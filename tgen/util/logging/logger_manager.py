@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from huggingface_hub.utils import logging as hf_logging
 
-from tgen.constants import LOG_FORMAT
+from tgen.constants.logging_constants import LOG_FORMAT
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_config import LoggerConfig
 from tgen.util.logging.tgen_logger import TGenLogger

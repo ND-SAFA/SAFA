@@ -4,7 +4,7 @@ import random
 
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.constants import OUTPUT_FILENAME
+from tgen.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.train.trainers.trainer_task import TrainerTask

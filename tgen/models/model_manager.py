@@ -7,7 +7,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from tgen.constants import MAX_SEQ_LENGTH_DEFAULT
+from tgen.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 from tgen.util.base_object import BaseObject
 from tgen.util.logging.logger_manager import logger

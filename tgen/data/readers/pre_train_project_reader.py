@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.entity.entity_reader import EntityReader
@@ -11,7 +12,7 @@ class PreTrainProjectReader(AbstractProjectReader[List]):
     Responsible for reading pre-training examples from series of files.
     """
 
-    DELIMINATOR = "\n"
+    DELIMINATOR = NEW_LINE
 
     def __init__(self, data_path: str):
         """

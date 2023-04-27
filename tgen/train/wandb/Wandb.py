@@ -1,7 +1,8 @@
 import os
 from typing import Dict, Optional, Union
 
-from tgen.constants import BASE_EXPERIMENT_NAME, EXPERIMENTAL_VARS_IGNORE
+from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
+from tgen.constants.script_constants import EXPERIMENTAL_VARS_IGNORE
 
 GROUP_EXCLUDE = ["random_seed"]
 

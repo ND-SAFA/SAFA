@@ -2,7 +2,7 @@ import os
 from copy import deepcopy
 from typing import Dict
 
-from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition

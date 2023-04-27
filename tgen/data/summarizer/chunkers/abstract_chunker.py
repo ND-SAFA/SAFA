@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from tgen.constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
 from tgen.data.summarizer.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides

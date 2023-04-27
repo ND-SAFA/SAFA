@@ -3,7 +3,8 @@ from typing import Union
 
 from transformers.data.data_collator import DataCollatorForLanguageModeling
 
-from tgen.constants import BEST_MODEL_NAME, MLM_PROBABILITY_DEFAULT
+from tgen.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
+from tgen.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset

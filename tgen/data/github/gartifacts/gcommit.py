@@ -2,6 +2,7 @@ from typing import Callable, Dict, List, Union
 
 from git import Commit
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.util.override import overrides
 
@@ -42,7 +43,7 @@ class GCommit(AbstractGithubArtifact):
         Exports commit for saving.
         :return:
         """
-        body = "\n".join(self.diffs) if dataset_type == "PL" else self.content
+        body = NEW_LINE.join(self.diffs) if dataset_type == "PL" else self.content
         return {"id": self.commit_id, "content": body}
 
     @overrides(AbstractGithubArtifact)
@@ -88,7 +89,7 @@ class GCommit(AbstractGithubArtifact):
         commit = commit if has_parent else EMPTY_TREE_SHA
         differs = set()
         for diff in parent.diff(commit, create_patch=True):  # TODO: Use actual diff objects instead of parsing string
-            diff_lines = str(diff).split("\n")
+            diff_lines = str(diff).split(NEW_LINE)
             for diff_line in diff_lines:
                 if diff_line.startswith("+") or diff_line.startswith("-") and '@' not in diff_line and not diff_line.startswith("---"):
                     differs.add(diff_line)

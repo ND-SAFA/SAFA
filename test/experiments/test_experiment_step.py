@@ -7,7 +7,7 @@ from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.constants import BASE_EXPERIMENT_NAME
+from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader

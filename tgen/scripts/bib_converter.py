@@ -8,7 +8,7 @@ from typing import Dict, List
 import pandas as pd
 from dotenv import load_dotenv
 
-from tgen.constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from tgen.constants.path_constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 
 load_dotenv()
 

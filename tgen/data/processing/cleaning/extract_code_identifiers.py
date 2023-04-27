@@ -4,7 +4,8 @@ import javac_parser
 from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
-from tgen.constants import JAVA_KEYWORDS_PATH
+from tgen.constants.path_constants import JAVA_KEYWORDS_PATH
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.util.logging.logger_manager import logger
 
@@ -85,7 +86,7 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
         """
         try:
             comments = comment_parser.extract_comments_from_str(str(class_text), mime_type)
-            comments = [c.text().replace("\n", ". ") for c in comments]
+            comments = [c.text().replace(NEW_LINE, ". ") for c in comments]
         except UnsupportedError as e:
             logger.exception(e)
             return class_text
@@ -101,7 +102,7 @@ class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):
         reserved_keywords_file = open(JAVA_KEYWORDS_PATH, "r")
         words_file_content = reserved_keywords_file.read()
         reserved_keywords_file.close()
-        words = map(lambda word: word.strip(), words_file_content.split("\n"))
+        words = map(lambda word: word.strip(), words_file_content.split(NEW_LINE))
         words = filter(lambda word: len(word) != 0, words)
         words = list(words)
         assert len(words) > 0

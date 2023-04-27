@@ -2,7 +2,7 @@ import os
 from abc import ABC
 from typing import List
 
-from tgen.constants import STAGES
+from tgen.constants.experiment_constants import STAGES
 from tgen.data.hub.abstract_hub_id import AbstractHubId
 
 

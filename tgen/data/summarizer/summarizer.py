@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from tgen.constants import SUMMARIZATION_MODEL_DEFAULT, GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.constants.open_ai_constants import SUMMARIZATION_MODEL_DEFAULT, GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.base_prompt import BasePrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -13,6 +13,7 @@ from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 from tgen.util.open_ai_util import OpenAiUtil
 
 

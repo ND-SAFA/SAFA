@@ -5,7 +5,7 @@ from typing import Callable, List
 import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
-from tgen.constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
+from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep

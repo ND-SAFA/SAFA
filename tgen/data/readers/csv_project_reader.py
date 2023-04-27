@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Generic
 
 import pandas as pd
 
-from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame

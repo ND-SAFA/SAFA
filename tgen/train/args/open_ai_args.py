@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from tgen.constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
+from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
     MAX_TOKENS_DEFAULT, \
     TEMPERATURE_DEFAULT
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -22,7 +22,7 @@ class OpenAiArgs:
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
 
-    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator()
+    prompt_creator: AbstractPromptCreator = ClassificationPromptCreator(prompt_args)
     output_dir: str = None
 
     def __post_init__(self) -> None:

@@ -3,7 +3,7 @@ from unittest import mock
 from unittest.mock import patch
 
 
-from tgen.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole

@@ -1,7 +1,8 @@
 import openai
 from openai.openai_object import OpenAIObject
 
-from tgen.constants import OPEN_AI_ORG, OPEN_AI_KEY, IS_TEST
+from tgen.constants.environment_constants import IS_TEST
+from tgen.constants.open_ai_constants import OPEN_AI_ORG, OPEN_AI_KEY
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.list_util import ListUtil
 

@@ -1,3 +1,4 @@
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -51,7 +52,7 @@ class TestClusterDatasetCreator(BaseTest):
         for artifact_id, cluster_num in self.ARTIFACT2CLUSTERS.items():
             self.assertIn(int(cluster_num), list(cluster_artifact_df.index))
             cluster = cluster_artifact_df.get_artifact(cluster_num)
-            cluster_content = cluster[ArtifactKeys.CONTENT].split("\n")
+            cluster_content = cluster[ArtifactKeys.CONTENT].split(NEW_LINE)
             orig_artifact_content = orig_artifact_df.get_artifact(artifact_id)[ArtifactKeys.CONTENT]
             self.assertIn(orig_artifact_content, cluster_content)
             if includes_orig_artifact:

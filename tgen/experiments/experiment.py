@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import List
 
-from tgen.constants import EXPERIMENT_ID_DEFAULT
+from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT
 from tgen.experiments.experiment_step import ExperimentStep
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.util.base_object import BaseObject

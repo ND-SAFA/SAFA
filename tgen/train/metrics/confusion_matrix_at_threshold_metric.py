@@ -1,6 +1,6 @@
 import datasets
 
-from tgen.constants import THRESHOLD_DEFAULT
+from tgen.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

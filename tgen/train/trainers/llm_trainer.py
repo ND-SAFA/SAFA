@@ -61,10 +61,8 @@ class LLMTrainer(AbstractTrainer):
                                                              summarizer=self.summarizer)
         custom_params = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
-        if include_classification_metrics:
-            custom_params["include_classification_metrics"] = include_classification_metrics
-            custom_params["prompt_creator"] = self.prompt_creator
-        params = self.trainer_args.to_params(TrainerTask.TRAIN, **custom_params)
+        params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics=include_classification_metrics,
+                                             prompt_creator=self.prompt_creator)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(

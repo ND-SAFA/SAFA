@@ -2,6 +2,7 @@ from test.data.prompts.base_prompt_test import BasePromptTest
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.util.override import overrides
 
 
@@ -19,4 +20,4 @@ class TestClassificationPromptGenerater(BasePromptTest):
         self.assertIn("source1", generated_prompt[PromptKeys.COMPLETION])
         self.assertTrue(
             generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.SYSTEM_REQUIREMENT_CREATION.value.split("{}")[0]))
-        super().verify_prompt(generated_prompt)  # assumed using openai
+        super().verify_prompt(generated_prompt, OpenAiArgs.prompt_args)  # assumed using openai

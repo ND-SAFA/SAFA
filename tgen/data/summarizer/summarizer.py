@@ -5,6 +5,7 @@ import pandas as pd
 
 from tgen.constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
@@ -89,9 +90,10 @@ class Summarizer(BaseObject):
         return chunker.exceeds_token_limit(content)
 
     @staticmethod
-    def _summarize_chunks(prompt_creator, chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:
+    def _summarize_chunks(prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model
+        :param prompt_creator: The creator responsible for creating summarization prompts.
         :param model_path: The model to use for summarizations
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks

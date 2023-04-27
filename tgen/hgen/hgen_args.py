@@ -36,7 +36,7 @@ class HGenArgs:
     """
     The base prompt to use for generation.
     """
-    base_prompt: SupportedPrompts = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION
+    hgen_base_prompt: SupportedPrompts = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION
 
     def __post_init__(self) -> None:
         """

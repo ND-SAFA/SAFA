@@ -19,7 +19,7 @@ class SupportedJobType(Enum):
     CREATE_DATASETS = CreateDatasetsJob
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
-    OPEN_AI = LLMJob
+    LLM = LLMJob
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob

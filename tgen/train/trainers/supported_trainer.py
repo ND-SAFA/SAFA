@@ -7,5 +7,5 @@ from tgen.train.trainers.vsm_trainer import VSMTrainer
 
 class SupportedTrainer(Enum):
     HF = HuggingFaceTrainer
-    OPEN_AI = LLMTrainer
+    LLM = LLMTrainer
     VSM = VSMTrainer

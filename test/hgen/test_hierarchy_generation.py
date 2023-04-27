@@ -226,7 +226,7 @@ class TestHierarchyGeneration(BaseTest):
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
 
         hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[])}
-        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.OPEN_AI,
+        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.LLM,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **hgen_trainer_params, **params)
         return HierarchyGenerator(args)

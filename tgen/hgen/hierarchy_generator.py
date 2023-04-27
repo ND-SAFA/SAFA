@@ -67,7 +67,7 @@ class HierarchyGenerator(BaseObject):
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
         prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_trainer_args.prompt_args,
-                                                 base_prompt=self.args.base_prompt)
+                                                 base_prompt=self.args.hgen_base_prompt)
         hgen_trainer = self.args.hgen_trainer_type.value(trainer_dataset_manager=hgen_dataset_manager,
                                                          trainer_args=self.args.hgen_trainer_args,
                                                          prompt_creator=prompt_creator,

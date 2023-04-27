@@ -13,7 +13,6 @@ class AbstractPromptCreator(BaseObject):
     """
     Responsible for formatting and creating prompts and completions for Language Models
     """
-    base_prompt: BasePrompt
 
     def __init__(self, prompt_args: PromptArgs, base_prompt: SupportedPrompts):
         """

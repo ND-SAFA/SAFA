@@ -2,8 +2,6 @@ import os
 from unittest import mock
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.prompts.base_prompt import BasePrompt
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer

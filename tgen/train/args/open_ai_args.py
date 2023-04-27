@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
-from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
+from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
+    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
     MAX_TOKENS_DEFAULT, \
     TEMPERATURE_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs

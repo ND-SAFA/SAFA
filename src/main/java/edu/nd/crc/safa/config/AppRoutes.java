@@ -88,12 +88,11 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Models {
-        public static final String MODEL_ROOT = Projects.BY_ID + "/models";
-        public static final String MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
-        public static final String DELETE_MODEL_BY_ID = MODEL_BY_ID;
-        public static final String TRAIN_MODEL = MODEL_BY_ID;
+        public static final String MODEL_ROOT = "/models";
+        public static final String MODEL_ROOT_BY_ID = Projects.BY_ID + MODEL_ROOT;
+        public static final String MODEL_BY_PROJECT_AND_ID = Models.MODEL_ROOT_BY_ID + "/{modelId}";
+        public static final String DELETE_MODEL_BY_ID = MODEL_BY_PROJECT_AND_ID;
         public static final String SHARE_MODEL = Projects.ROOT + "/models/share";
-
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -227,9 +226,9 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
         }
     }
 

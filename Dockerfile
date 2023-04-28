@@ -1,71 +1,38 @@
-# Step 1 - Create production environment
-FROM ubuntu:12.04 as config
-ADD src/main/resources /app/src/main/resources
-ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
-
-ARG DB_INSTANCE_ARG
-
-RUN if [ ! -z "$DB_INSTANCE_ARG" ] ; \
-    then \
-      echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE_ARG" >> $PathToProperties && \
-      echo "spring.datasource.hikari.data-source-properties.socketFactory=com.google.cloud.sql.mysql.SocketFactory" >> $PathToProperties ; \
-    fi
-RUN cat $PathToProperties
-
 # Step 1 - Install necessary dependencies
-FROM gradle:6.9-jdk11 AS builder
+FROM public.ecr.aws/amazoncorretto/amazoncorretto:11 AS builder
+SHELL ["/bin/bash", "-c"]
 
-# ... - Copy source code
-COPY --from=config /app/src/main/resources /app/src/main/resources
-ADD src/main/java /app/src/main/java
-ADD src/test /app/src/test
-ADD build.gradle /app/
+# Step 2 - Install gradle
+ARG GRADLE_VERSION=8.1
+RUN yum update -y -q && yum install -y -q wget unzip zip
+RUN curl -q -s "https://get.sdkman.io" | bash
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install gradle $GRADLE_VERSION
 
-# ... - Compile code
+# Step 3 - Copy source code
+ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 WORKDIR /app
-RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
+ADD src/main/resources src/main/resources
+ADD src/main/java src/main/java
+ADD src/test src/test
+ADD build.gradle .
+ADD gradle gradle
 
-# Step - Lint source code
-ADD checkstyle.xml /app/
-RUN gradle checkstyleMain
+# Step 4 - Install gradle version for building
+COPY gradlew .
+RUN chmod +x gradlew
+RUN ./gradlew build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
 
-# Step - Test application
-ADD resources/ /app/resources/
-RUN gradle test
-
-# Step - Create endpoint
-FROM openjdk:11 AS runner
-
-ARG DB_URL_ARG=jdbc:mysql://host.docker.internal/safa-db
-ARG DB_USER_ARG=root
-ARG DB_PASSWORD_ARG=secret2
-ARG JWT_KEY_ARG=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
-ARG TGEN_ENDPOINT_ARG=http://52.45.70.109
-ARG JIRA_REDIRECT_LINK_ARG="https://localhost.safa.ai:8080/create?tab=jira"
-ARG JIRA_CLIENT_ID_ARG="lWzIreg3PMSqkjkkvKyqR6xvHJDXvRAF"
-ARG JIRA_SECRET_ARG="YhfXF-mR0-ZZoH1RD0T504nAfAB002dNVmsmd-JES3LL3_X6kvebRUWh3Ja0IgdT"
-ARG GITHUB_CLIENT_ID_ARG="Iv1.75905e8f5ace1f4b"
-ARG GITHUB_SECRET_ARG="2d6bd433619bebf523cef951bd1296ac2d2795c3"
-
+## Step - Create endpoint
 ENV RUN_SCRIPT="/app/run.sh"
-
+ARG JAR_PATH="/app.jar"
+ARG SPRING_PROFILE=deployment
 RUN \
     mkdir -p "$(dirname $RUN_SCRIPT)"; \
     touch "$RUN_SCRIPT"; \
     chmod +x "$RUN_SCRIPT"; \
-    if [ ! -z "$DB_URL_ARG" ]; then echo "export DB_URL='$DB_URL_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$DB_USER_ARG" ]; then echo "export DB_USER='$DB_USER_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$DB_PASSWORD_ARG" ]; then echo "export DB_PASSWORD='$DB_PASSWORD_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JWT_KEY_ARG" ]; then echo "export JWT_KEY='$JWT_KEY_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$TGEN_ENDPOINT_ARG" ]; then echo "export TGEN_ENDPOINT='$TGEN_ENDPOINT_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_REDIRECT_LINK_ARG" ]; then echo "export JIRA_REDIRECT_LINK='$JIRA_REDIRECT_LINK_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_CLIENT_ID_ARG" ]; then echo "export JIRA_CLIENT_ID='$JIRA_CLIENT_ID_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$JIRA_SECRET_ARG" ]; then echo "export JIRA_SECRET='$JIRA_SECRET_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$GITHUB_CLIENT_ID_ARG" ]; then echo "export GITHUB_CLIENT_ID='$GITHUB_CLIENT_ID_ARG'" >> "$RUN_SCRIPT"; fi; \
-    if [ ! -z "$GITHUB_SECRET_ARG" ]; then echo "export GITHUB_SECRET='$GITHUB_SECRET_ARG'" >> "$RUN_SCRIPT"; fi; \
-    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT"; \
+    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=${SPRING_PROFILE} ${JAR_PATH}" >> "$RUN_SCRIPT"; \
     cat "$RUN_SCRIPT"
 
-COPY --from=config /app/src/main/resources /app/src/main/resources
-COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
+ENV PORT=80
+RUN mv /app/build/libs/edu.nd.crc.safa-0.1.0.jar $JAR_PATH
 ENTRYPOINT /bin/bash $RUN_SCRIPT

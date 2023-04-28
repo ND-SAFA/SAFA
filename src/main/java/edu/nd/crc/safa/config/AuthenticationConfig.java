@@ -40,7 +40,9 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
         "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
         "https://dev.safa.ai",
-        "https://app.safa.ai"
+        "https://app.safa.ai",
+        "https://dev-fend.safa.ai",
+        "https://prod-fend.safa.ai"
     );
 
     private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
@@ -70,35 +72,36 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                 return cors;
             })
             .and()
-                .csrf()
-                .disable()
-                // Endpoint Settings
-                .authorizeRequests()
-                .antMatchers(
-                    AppRoutes.Accounts.LOGIN,
-                    AppRoutes.Accounts.CREATE_ACCOUNT,
-                    AppRoutes.Accounts.FORGOT_PASSWORD,
-                    AppRoutes.Accounts.RESET_PASSWORD,
-                    "/websocket/**",
-                    "/swagger-ui/**", // Needed to get config
-                    "/v3/api-docs/**",
-                    "/docs")
-                .permitAll()
+            .csrf()
+            .disable()
+            // Endpoint Settings
+            .authorizeRequests()
+            .antMatchers(
+                AppRoutes.Accounts.LOGIN,
+                AppRoutes.Accounts.CREATE_ACCOUNT,
+                AppRoutes.Accounts.FORGOT_PASSWORD,
+                AppRoutes.Accounts.RESET_PASSWORD,
+                "/websocket/**",
+                "/swagger-ui/**", // Needed to get config
+                "/v3/api-docs/**",
+                "/docs/**")
+            .permitAll()
             .and()
-                .logout()
-                .logoutUrl(AppRoutes.Accounts.LOGOUT)
-                .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
-                .logoutSuccessHandler((a,b,c) -> { })
+            .logout()
+            .logoutUrl(AppRoutes.Accounts.LOGOUT)
+            .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
+            .logoutSuccessHandler((a, b, c) -> {
+            })
             .and()
-                .authorizeRequests()
-                // Close authentication settings
-                .anyRequest()
-                .authenticated()
+            .authorizeRequests()
+            // Close authentication settings
+            .anyRequest()
+            .authenticated()
             // Authentication Filters
             .and()
-                .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-                .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
+            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean

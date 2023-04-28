@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
@@ -74,7 +74,8 @@ class OpenAiTrainer(AbstractTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) \
+            -> Optional[TracePredictionOutput]:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -85,7 +86,7 @@ class OpenAiTrainer(AbstractTrainer):
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.trainer_args.prompt_creator)
         if self.trainer_args.output_dir:
-            dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
+            dataset.export_prompt_dataframe(prompt_df, export_path=self.trainer_args.output_dir)
         res = OpenAiUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                  **self.trainer_args.to_params(TrainerTask.PREDICT))
         return self._create_classification_output(res, dataset) \

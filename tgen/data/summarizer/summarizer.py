@@ -14,6 +14,7 @@ from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 from tgen.util.open_ai_util import OpenAiUtil
 
 
@@ -102,6 +103,9 @@ class Summarizer(BaseObject):
                    for chunk in chunks]
         res = OpenAiUtil.make_completion_request(model=model_path, prompt=prompts,
                                                  **args.to_params(TrainerTask.PREDICT))
+        if not res:
+            logger.warning("OpenAI is a piece of garbage and failed to return anything!!")
+            return []
         return [choice.text.strip() for choice in res.choices]
 
     @staticmethod

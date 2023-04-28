@@ -34,7 +34,7 @@ class PythonChunker(AbstractChunker):
         except Exception:
             return NaturalLanguageChunker(model_name=self.model_name).chunk(content)
         chunks = self.__chunk_helper(nodes, lines)
-        return [self._get_node_content(chunk, lines) for chunk in chunks if abs(chunk.lineno - chunk.end_lineno) > 1]
+        return [self._get_node_content(chunk, lines) for chunk in chunks if abs(chunk.lineno - chunk.end_lineno) >= 1]
 
     def __chunk_helper(self, p_node: Node, lines: List[str]) -> List[Node]:
         """

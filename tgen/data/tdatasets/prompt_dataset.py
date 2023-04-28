@@ -28,6 +28,8 @@ class PromptDataset(iDataset):
     Represents a dataset for prompt-based (generative) models such as GPT
     """
     __MAX_SUMMARIZATIONS = 3
+    __SAVE_AFTER_N = 100
+    __SAVE_FILENAME = "prompt_dataframe_checkpoint.csv"
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
                  trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
@@ -137,11 +139,15 @@ class PromptDataset(iDataset):
         """
         entries = []
         traces = self.trace_dataset.trace_df
+        save_path = os.path.join(os.getcwd(), self.__SAVE_FILENAME)
         for i, row in tqdm(traces.itertuples(), desc="Generating prompts dataframe from trace links"):
+            if i % self.__SAVE_AFTER_N == 0:
+                PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = self._get_prompt_entry(source_artifact=source, target_artifact=target,
                                            label=row[TraceKeys.LABEL], prompt_creator=prompt_creator, summarizer=summarizer)
             entries.append(entry)
+        FileUtil.delete_file_safely(save_path)
         return PromptDataFrame(entries)
 
     def _generate_prompts_dataframe_from_artifacts(self, prompt_creator: AbstractPromptCreator,

@@ -243,3 +243,13 @@ class FileUtil:
                 if condition(f):
                     file_paths.append(os.path.join(subdir, f))
         return file_paths
+
+    @staticmethod
+    def delete_file_safely(file_path: str) -> None:
+        """
+        Deletes a file if it exists, else does nothing
+        :param file_path: The path to the file
+        :return: None
+        """
+        if os.path.exists(file_path):
+            os.remove(file_path)

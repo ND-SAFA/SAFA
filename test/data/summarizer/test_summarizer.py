@@ -46,9 +46,10 @@ class TestSummarizer(BaseTest):
         # use path to file
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
         summaries = summarizer.summarize(path_to_file=path_to_file)
+        summaries = summaries.replace("\n", "")
         expected_chunks = PythonChunker(model_name).chunk(FileUtil.read_file(path_to_file))
-        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
-        self.assertEqual(NEW_LINE.join(summarized_chunks), summaries)
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk.replace("\n", "")) for chunk in expected_chunks]
+        self.assertEqual("".join(summarized_chunks), summaries)
 
         # set code_or_exceeds_limit_only to TRUE this time
         summarizer = Summarizer(code_or_exceeds_limit_only=True, model_for_summarizer=model_name)

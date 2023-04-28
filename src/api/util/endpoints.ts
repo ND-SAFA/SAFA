@@ -3,6 +3,10 @@
  */
 export const baseURL = process.env.VUE_APP_API_ENDPOINT;
 
+if (!process.env.VUE_APP_API_ENDPOINT) {
+  console.error("API Endpoint environment variable not defined.");
+}
+
 /**
  * Enumerates all of the possible endpoint paths.
  */

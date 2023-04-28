@@ -14,7 +14,7 @@ public enum BaseGenerationModels {
     /**
      * The Bert model trained on automotive data.
      */
-    AutomotiveBert("thearod5/automotive"),
+    AutomotiveBert("thearod5/automotive-bert"),
     /**
      * Bert model trained on NL-NL trace links.
      */

@@ -3,7 +3,6 @@ from typing import List
 
 import pandas as pd
 
-from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
@@ -13,10 +12,10 @@ from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.ai_util import AIUtil
-from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
+from tgen.util.llm.llm_util import LLMUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 
 class Summarizer(BaseObject):
@@ -51,7 +50,7 @@ class Summarizer(BaseObject):
         self.nl_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
             base_prompt=nl_base_prompt)
-        self.ai_utils: AIUtil = ai_utils.value
+        self.ai_utils: LLMUtil = ai_utils.value
 
     def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
         """
@@ -95,7 +94,7 @@ class Summarizer(BaseObject):
         return chunker.exceeds_token_limit(content)
 
     @staticmethod
-    def _summarize_chunks(ai_utils: AIUtil, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
+    def _summarize_chunks(ai_utils: LLMUtil, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
                           args: OpenAIArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model.

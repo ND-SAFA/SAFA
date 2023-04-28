@@ -9,8 +9,8 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
 from tgen.util.file_util import FileUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 
 class TestSummarizer(BaseTest):

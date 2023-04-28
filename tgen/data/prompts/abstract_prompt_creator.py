@@ -40,7 +40,7 @@ class AbstractPromptCreator(BaseObject):
         :param base_prompt: The base prompt
         :return: The formatted prompt
         """
-        return f"{base_prompt}{self.args.prompt_separator}"
+        return f"{self.args.prompt_prefix}{base_prompt}{self.args.prompt_suffix}"
 
     def format_completion(self, base_completion: str) -> str:
         """

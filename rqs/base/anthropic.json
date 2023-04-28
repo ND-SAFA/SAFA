@@ -4,14 +4,16 @@
       "jobs": [
         {
           "object_type": "LLM",
-          "task": "TRAIN",
+          "task": "PREDICT",
+          "llm_util": {
+            "object_type": "ANTHROPIC"
+          },
           "job_args": {
             "random_seed": 812
           },
-          "base_model": "claude-instant-v1",
           "trainer_args": {
             "object_type": "ANTHROPIC",
-            "base_model": "claude-instant-v1"
+            "model": "claude-instant-v1"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

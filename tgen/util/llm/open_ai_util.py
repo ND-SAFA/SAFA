@@ -1,12 +1,10 @@
 import openai
 from openai.openai_object import OpenAIObject
 
-from tgen.constants.environment_constants import IS_TEST
-from tgen.constants.environment_constants import OPEN_AI_ORG, OPEN_AI_KEY
-from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.args.open_ai_args import OpenAIParams
-from tgen.util.ai.ai_util import AIUtil
 from tgen.util.list_util import ListUtil
+from tgen.util.llm.llm_util import LLMUtil
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
@@ -15,7 +13,7 @@ if not IS_TEST:
     openai.api_key = OPEN_AI_KEY
 
 
-class OpenAIUtil(AIUtil[OpenAIObject]):
+class OpenAIUtil(LLMUtil[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
 
     @staticmethod

@@ -2,9 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
-    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, \
-    MAX_TOKENS_DEFAULT, \
-    TEMPERATURE_DEFAULT
+    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.llm_args import LLMArgs
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -29,16 +27,14 @@ class OpenAIParams:
 
 @dataclass
 class OpenAIArgs(LLMArgs):
-    temperature: float = TEMPERATURE_DEFAULT
     logprobs: int = LOGPROBS_DEFAULT
     model_suffix: str = None
     n_epochs: int = 1
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-    output_dir: str = None
-    base_model = CLASSIFICATION_MODEL_DEFAULT
-    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
+    model = CLASSIFICATION_MODEL_DEFAULT
+    prompt_args = PromptArgs(prompt_suffix="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
     expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
                             TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
                                                 OpenAIParams.LEARNING_RATE_MULTIPLIER],

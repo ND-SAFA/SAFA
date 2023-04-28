@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, Type, TypeVar
+
+from tgen.util.base_object import BaseObject
 
 AIObject = TypeVar("AIObject")
 
 
-class AIUtil(ABC, Generic[AIObject]):
+class LLMUtil(BaseObject, ABC, Generic[AIObject]):
     """
     Interface for all AI utility classes.
     """
@@ -44,3 +46,13 @@ class AIUtil(ABC, Generic[AIObject]):
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
+
+    @classmethod
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the supported enum class for LLM args.
+        :param child_class_name: The name of the child to be created.
+        :return: The supported enum class.
+        """
+        from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
+        return SupportedLLMUtils

@@ -18,9 +18,9 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.supported_ai_utils import SupportedLLMUtils
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 
 class PromptDataset(iDataset):

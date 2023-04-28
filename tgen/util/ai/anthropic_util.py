@@ -1,0 +1,62 @@
+from typing import TypedDict
+
+import anthropic
+
+from tgen.constants import ANTHROPIC_KEY, IS_TEST
+from tgen.util.ai.ai_util import AIUtil
+
+
+class AnthropicResponse(TypedDict):
+    """
+    Contains anthropic response to their API.
+    """
+
+
+class AnthropicUtil(AIUtil[AnthropicResponse]):
+    """
+    Defines AI interface for anthropic API.
+    """
+    Client = None
+    NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
+
+    @staticmethod
+    def make_fine_tune_request(**params) -> AnthropicResponse:
+        """
+        Raises exception noting that anthropic has not implemented this feature.
+        :param params: Ignored.
+        :return: None
+        """
+        raise NotImplementedError(NotImplementedError)
+
+    @staticmethod
+    def retrieve_fine_tune_request(**params) -> AnthropicResponse:
+        """
+        Raises exception noting that anthropic has not implemented this feature.
+        :param params: Ignored.
+        :return: None
+        """
+        raise NotImplementedError(NotImplementedError)
+
+    @staticmethod
+    def make_completion_request(**params) -> AnthropicResponse:
+        """
+        Makes a completion request to anthropic api.
+        :param params: Named parameters to anthropic API.
+        :return: Anthropic's response to completion request.
+        """
+        return AnthropicUtil.Client.completion(**params)
+
+    @staticmethod
+    def upload_file(**params) -> AnthropicResponse:
+        """
+        Raises exception noting that anthropic has not implemented this feature.
+        :param params: Ignored.
+        :return: None
+        """
+        raise NotImplementedError(NotImplementedError)
+
+
+if not IS_TEST:
+    assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
+    if AnthropicUtil.Client is None:
+        AnthropicUtil.Client = anthropic.Client(ANTHROPIC_KEY)

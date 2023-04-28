@@ -3,9 +3,10 @@ from collections import Callable
 from typing import Dict, List
 
 import mock
+import pandas as pd
 
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
@@ -15,7 +16,6 @@ from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
-import pandas as pd
 
 
 class TestResponse:
@@ -34,7 +34,7 @@ class TestPromptDataset(BaseTest):
     def fake_exceeds_token_limit(prompt):
         if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in prompt:
             return True
-        if "@*&"*2 in prompt:
+        if "@*&" * 2 in prompt:
             return False
         return True
 
@@ -88,8 +88,9 @@ class TestPromptDataset(BaseTest):
                 self.assertEqual("id_from_res", file_id, msg=fail_msg)
 
     def test_export_and_get_dataframe(self):
+        prompt_creator = GenerationPromptCreator()
         outputs = self.all_datasets_test(
-            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(GenerationPromptCreator()),
+            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_creator),
                                                             TEST_OUTPUT_DIR),
             ["id"]
         )

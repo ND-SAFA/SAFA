@@ -1,6 +1,6 @@
 import openai
 from openai.openai_object import OpenAIObject
-
+from tqdm import tqdm
 from tgen.constants.environment_constants import IS_TEST
 from tgen.constants.environment_constants import OPEN_AI_ORG, OPEN_AI_KEY
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -50,7 +50,7 @@ class OpenAIUtil(AIUtil[OpenAIObject]):
         prompt = params.get(OpenAiParams.PROMPT)
         batches = ListUtil.batch(prompt, n=OpenAIUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
-        for batch in batches:
+        for batch in tqdm(batches, desc="Making completion requests to Open AI"):
             params[OpenAiParams.PROMPT] = batch
             batch_res = openai.Completion.create(**params)
             if res is None:

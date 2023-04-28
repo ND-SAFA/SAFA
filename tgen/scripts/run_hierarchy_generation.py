@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 
 load_dotenv()
 
@@ -22,7 +23,7 @@ from tgen.jobs.hgen_jobs.hgen_job import HGenJob
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 
-DO_SUMMARIZE = False
+DO_SUMMARIZE = True
 USE_DATASET_CREATOR_FOR_SOURCES = False
 
 if __name__ == "__main__":
@@ -47,11 +48,12 @@ if __name__ == "__main__":
         dataset_creator_for_sources = None
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=PromptDatasetCreator(
             project_reader=ArtifactProjectReader(project_path=project_path), summarizer=summarizer))
-        tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager)
+        tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, prompt_creator=ClassificationPromptCreator())
 
     args = HGenArgs(hgen_trainer_type=SupportedTrainer.LLM,
-                    hgen_trainer_args=OpenAiArgs(prompt_creator=GenerationPromptCreator()),
+                    hgen_trainer_args=OpenAiArgs(),
                     hgen_base_model=GENERATION_MODEL_DEFAULT,
-                    source_layer_id="Code", tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator_for_sources)
+                    source_layer_id="Code", tgen_trainer=tgen_trainer,
+                    dataset_creator_for_sources=dataset_creator_for_sources)
     job = HGenJob(hgen_args=args, export_path=export_path, save_dataset_checkpoints=True)
     job_result = job.run()

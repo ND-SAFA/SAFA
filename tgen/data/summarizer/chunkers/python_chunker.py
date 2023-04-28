@@ -9,6 +9,7 @@ import tiktoken
 from tgen.constants.deliminator_constants import TAB
 from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.summarizer.chunkers.natural_language_chunker import NaturalLanguageChunker
+from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 
 Node = Union[ast.AST, ast.stmt]
@@ -22,16 +23,19 @@ class PythonChunker(AbstractChunker):
     IGNORED_NODES = [ast.Import, ast.ImportFrom]
     N_SPACE_TO_TAB = 4
 
-    def chunk(self, content: str) -> List[str]:
+    def chunk(self, content: str, id_: str = None) -> List[str]:
         """
         Chunks the given python code into pieces that are beneath the model's token limit
         :param content: The code to be chunked
+        :param id_: The id associated with the content to summarize
         :return: The nodes chunked into sizes beneath the token limit
         """
         lines = [self._replace_white_space_with_tab(line) for line in content.split(os.linesep)]
         try:
             nodes = ast.parse(content)
         except Exception:
+            msg_end = id_ if id_ else f"starting with {lines[0]}"
+            logger.warning(f"Unable to parse file {msg_end}")
             return NaturalLanguageChunker(model_name=self.model_name).chunk(content)
         chunks = self.__chunk_helper(nodes, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks if abs(chunk.lineno - chunk.end_lineno) >= 1]

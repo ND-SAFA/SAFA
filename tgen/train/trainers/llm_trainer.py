@@ -59,7 +59,6 @@ class LLMTrainer(AbstractTrainer):
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(prompt_creator=self.prompt_creator,
                                                              summarizer=self.summarizer)
-        custom_params = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics=include_classification_metrics,
                                              prompt_creator=self.prompt_creator)

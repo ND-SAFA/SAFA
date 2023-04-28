@@ -37,9 +37,8 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         for filename, dataframe_cls in self.filename_to_dataframe_cls.items():
             params = {"index_col": 0} if dataframe_cls.index_name() is None else {}
             df: pd.DataFrame = pd.read_csv(os.path.join(self.project_path, filename), **params)
-            if isinstance(df, ArtifactDataFrame) and self.summarizer:
-                for i, row in df.itertuples():
-                    row[ArtifactKeys.CONTENT] = self.summarizer.summarize(content=row[ArtifactKeys.CONTENT])
+            if self.summarizer:
+                self.summarizer.summarize_dataframe(df, col2summarize=ArtifactKeys.CONTENT.value)
             dataframes.append(dataframe_cls(df))
         return tuple(dataframes)
 

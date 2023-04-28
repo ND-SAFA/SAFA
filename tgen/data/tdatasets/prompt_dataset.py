@@ -140,7 +140,7 @@ class PromptDataset(iDataset):
         entries = []
         traces = self.trace_dataset.trace_df
         save_path = os.path.join(os.getcwd(), self.__SAVE_FILENAME)
-        for i, row in tqdm(traces.itertuples(), desc="Generating prompts dataframe from trace links"):
+        for i, row in tqdm(traces.itertuples(), total=len(traces), desc="Generating prompts dataframe from trace links"):
             if i % self.__SAVE_AFTER_N == 0:
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
@@ -159,7 +159,8 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, artifact in tqdm(self.artifact_df.itertuples(), desc="Generating prompts dataframe from trace links"):
+        for i, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
+                                desc="Generating prompts dataframe from artifacts"):
             entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
                                            summarizer=summarizer)
             entries.append(entry)
@@ -205,11 +206,11 @@ class PromptDataset(iDataset):
         """
         artifact_id = artifact[ArtifactKeys.ID]
         if artifact_id not in self.__summarized_artifacts:
-            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT])
+            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT], id_=artifact_id)
             self.__summarized_artifacts[artifact_id] = summary
             return summary
         if force_create_new:
-            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id])
+            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id], id_=artifact_id)
             return summary
         return self.__summarized_artifacts[artifact_id]
 

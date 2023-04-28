@@ -27,7 +27,7 @@ class TestPromptDataset(BaseTest):
     EXCEEDS_TOKEN_LIMIT_ARTIFACT = "3"
 
     @staticmethod
-    def fake_summarize(content):
+    def fake_summarize(content, id_=None):
         return "@*&" + content
 
     @staticmethod

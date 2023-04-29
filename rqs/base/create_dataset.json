@@ -1,0 +1,27 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_DATASETS",
+          "job_args": {
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "iceoryx_code2issue"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_type": "SPLIT_BY_LINK",
+              "validation_percentage": 0.5
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "artifacts": {
+    "source": {
+      "path": "source.csv"
+    },
+    "target": {
+      "path": "target.csv"
+    }
+  },
+  "traces": {
+    "source2target": {
+      "source": "source",
+      "target": "target",
+      "path": "traces.csv"
+    }
+  }
+}

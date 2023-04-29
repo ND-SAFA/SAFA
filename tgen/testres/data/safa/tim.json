@@ -1,0 +1,26 @@
+{
+  "DataFiles": {
+    "Layer 1: Source": {
+      "File": "Layer1Source.json"
+    },
+    "Layer 1: Target": {
+      "File": "Layer1Target.json"
+    },
+    "Layer 2: Source": {
+      "File": "Layer2Source.json"
+    },
+    "Layer 2: Target": {
+      "File": "Layer2Target.json"
+    }
+  },
+  "Layer1: Source->Target": {
+    "File": "Layer1Source2Target.json",
+    "Source": "Layer 1: Source",
+    "Target": "Layer 1: Target"
+  },
+  "Layer2: Source->Target": {
+    "File": "Layer2Source2Target.json",
+    "Source": "Layer 2: Source",
+    "Target": "Layer 2: Target"
+  }
+}

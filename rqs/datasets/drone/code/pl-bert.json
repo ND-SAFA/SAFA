@@ -1,0 +1,69 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "TRAIN",
+          "job_args": {
+            "random_seed": 812
+          },
+          "model_manager": {
+            "model_path": "thearod5/pl-bert"
+          },
+          "trainer_args": {
+            "num_train_epochs": 30,
+            "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 16,
+            "gradient_accumulation_steps": 250,
+            "learning_rate": 5e-5,
+            "skip_save": false,
+            "load_best_model_at_end": true,
+            "evaluation_strategy": "steps",
+            "save_strategy": "steps",
+            "logging_strategy": "steps",
+            "save_steps": 5,
+            "eval_steps": 5,
+            "logging_steps": 1
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_1",
+                "stage": "train"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_1",
+                "stage": "val"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "drone",
+                "task": "task_1",
+                "stage": "eval"
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

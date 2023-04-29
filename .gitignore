@@ -2,7 +2,8 @@
 /**/venv
 /**/__pycache__
 cache
-storage
+/storage/**
+/**/.ipynb_checkpoints/**
 
 # IDEs
 .idea
@@ -11,14 +12,18 @@ storage
 /**/.DS_Store
 
 # Transformers
-src/test/output/runs/**
-/**/output.json
+src/tes/output/runs/**
+
 /**/output
 
 # Deployment
 /deployment/**
 
+# Datasets
+datasets/**
+
 # Secrets
 application-credentials.json
 *.pem
 .env
+wandb/**

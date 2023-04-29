@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<entities>
+    <title>Should be ignored by parser</title>
+    <summary>Should also be ignored by parser</summary>
+    <entity>
+        <name>1</name>
+    </entity>
+    <entity>
+        <name>2</name>
+    </entity>
+</entities>

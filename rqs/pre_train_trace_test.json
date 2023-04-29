@@ -1,0 +1,63 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "TRAIN",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                812,
+                23
+              ]
+            }
+          },
+          "model_manager": {
+            "model_path": "hf-internal-testing/tiny-random-bert"
+          },
+          "trainer_args": {
+            "evaluation_strategy": "steps",
+            "save_strategy": "steps",
+            "logging_strategy": "steps",
+            "save_steps": 1,
+            "eval_steps": 1,
+            "logging_steps": 1,
+            "num_train_epochs": 3,
+            "gradient_accumulation_steps": 1,
+            "learning_rate": 5e-5,
+            "skip_save": false,
+            "use_balanced_batches": true,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "PRE_TRAIN_TRACE",
+                "data_file": "[DATA_PATH]/automotive/handbook.txt"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.30
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.50
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

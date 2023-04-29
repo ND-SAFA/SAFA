@@ -1,0 +1,16 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "EXTRACT_REPO",
+          "job_args": {
+          },
+          "repo_name": "eclipse-iceoryx/iceoryx",
+          "repo_path": "~/desktop/safa/repos",
+          "output_path": "~/desktop/safa/datasets/iceoryx"
+        }
+      ]
+    }
+  ]
+}

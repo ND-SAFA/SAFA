@@ -1,0 +1,18 @@
+{
+  "type": "commit",
+  "artifacts": [
+    {
+      "commit_id": "85fdb4e8f2b90adf1b9604b93cab78fa21ff237f",
+      "summary": "The following PR implements the solution detailed in #1.",
+      "diff": [
+        "+ This line was added.",
+        "- This line is old.",
+        "- This line was necessary"
+      ],
+      "files": [
+        "File(sha=\"ee71f44205576ef9204625b57f10c7cda483b635\", filename=\"udsoncan/connections.py\")"
+      ],
+      "commit_time": null
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "TRAIN",
+          "job_args": {
+            "random_seed": 812
+          },
+          "model_manager": {
+            "model_path": "thearod5/nl-bert"
+          },
+          "trainer_args": {
+            "num_train_epochs": 20,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 250,
+            "learning_rate": 5e-5,
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "jpl",
+                "task": "task_0",
+                "stage": "train"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "jpl",
+                "task": "task_0",
+                "stage": "val"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "jpl",
+                "task": "task_0",
+                "stage": "eval"
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

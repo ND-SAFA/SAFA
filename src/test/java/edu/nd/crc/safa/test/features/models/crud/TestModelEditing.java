@@ -49,7 +49,7 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setName("newName");
 
         JSONObject response = SafaRequest
-            .withRoute(AppRoutes.Models.MODEL_BY_ID)
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
             .withProject(project)
             .withModelId(model.getId())
             .putWithJsonObject(editedModel, status().is2xxSuccessful());
@@ -68,7 +68,7 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setId(UUID.randomUUID());
 
         SafaRequest
-            .withRoute(AppRoutes.Models.MODEL_BY_ID)
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
             .withProject(project)
             .withModelId(model.getId())
             .putWithJsonObject(editedModel, status().is4xxClientError());
@@ -91,7 +91,7 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setBaseModel(BaseGenerationModels.VSM);
 
         SafaRequest
-            .withRoute(AppRoutes.Models.MODEL_BY_ID)
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
             .withProject(project)
             .withModelId(model.getId())
             .putWithJsonObject(editedModel, status().is4xxClientError());

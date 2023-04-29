@@ -36,9 +36,19 @@ public class ModelController extends BaseController {
      * @param projectId - The id of the project whose models are returned.
      * @return List of models created for project.
      */
-    @GetMapping(AppRoutes.Models.MODEL_ROOT)
+    @GetMapping(AppRoutes.Models.MODEL_ROOT_BY_ID)
     public List<ModelAppEntity> getProjectModels(@PathVariable UUID projectId) {
         this.resourceBuilder.fetchProject(projectId).withViewProject();
+        return DefaultModels.getDefaultModels();
+    }
+
+    /**
+     * Returns the list of registered models. No project is required.
+     *
+     * @return List of available models.
+     */
+    @GetMapping(AppRoutes.Models.MODEL_ROOT)
+    public List<ModelAppEntity> getModels() {
         return DefaultModels.getDefaultModels();
     }
 
@@ -49,7 +59,7 @@ public class ModelController extends BaseController {
      * @param modelAppEntity The model to create or update.
      * @return {@link ModelAppEntity} The model created.
      */
-    @PostMapping(AppRoutes.Models.MODEL_ROOT)
+    @PostMapping(AppRoutes.Models.MODEL_ROOT_BY_ID)
     public ModelAppEntity createOrUpdateModel(@PathVariable UUID projectId,
                                               @RequestBody ModelAppEntity modelAppEntity) {
         throw new NotImplementedException("Creating or updating models has been deprecated. Please use default models"
@@ -77,7 +87,7 @@ public class ModelController extends BaseController {
      * @return The newly updated model
      * @throws SafaError When an attempt is made to update a field that is not allowed to change
      */
-    @PutMapping(AppRoutes.Models.MODEL_BY_ID)
+    @PutMapping(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
     public ModelAppEntity editModelById(@PathVariable UUID projectId,
                                         @PathVariable UUID modelId,
                                         @RequestBody ModelAppEntity modelAppEntity) throws SafaError {

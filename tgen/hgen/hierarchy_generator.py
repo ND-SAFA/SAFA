@@ -6,6 +6,7 @@ from typing import Any, List, Union
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -15,6 +16,7 @@ from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -48,11 +50,11 @@ class HierarchyGenerator(BaseObject):
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
         if self.args.tgen_trainer:
             self._update_trainer_args(self.args.tgen_trainer, export_path)
-            logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
             trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
             self._save_dataset_checkpoint(trace_dataset_with_sources, export_path, save_dataset_checkpoints,
                                           filename="initial_dataset_with_sources")
             assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
+            logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
             source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(trace_dataset_with_sources.artifact_df)
             if save_dataset_checkpoints:
                 source_layer_only_dataset.trace_df.to_csv(os.path.join(export_path, "linked_source_layer_dataset.csv"))

@@ -4,10 +4,14 @@ from typing import List
 import pandas as pd
 
 from tgen.constants.dataset_constants import EXCLUDED_FILES
+from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
+from tqdm import tqdm
 
 
 class FolderEntityFormat(AbstractEntityFormat):
@@ -60,17 +64,21 @@ class FolderEntityFormat(AbstractEntityFormat):
         :return: DataFrame containing artifact properties id and body.
         """
         entries = []
-        for file_path in file_paths:
+        summarize_desc = "and summarizing" if summarizer is not None else EMPTY_STRING
+        for file_path in tqdm(file_paths, f"Adding files as artifacts {summarize_desc}"):
             artifact_name = os.path.basename(file_path) if use_file_name else os.path.sep + os.path.relpath(file_path, base_path)
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]
             entry = {
-                StructuredKeys.Artifact.ID.value: artifact_name,
-                StructuredKeys.Artifact.CONTENT.value: FileUtil.read_file(file_path) if summarizer is None
+                ArtifactKeys.ID.value: artifact_name,
+                ArtifactKeys.CONTENT.value: FileUtil.read_file(file_path) if summarizer is None
                 else summarizer.summarize(path_to_file=file_path)
             }
+            if not entry[ArtifactKeys.CONTENT.value]:
+                logger.warning(f"{artifact_name} does not contain any content. Skipping...")
+                continue
             entries.append(entry)
-        return pd.DataFrame(entries).sort_values([StructuredKeys.Artifact.ID.value], ignore_index=True)
+        return pd.DataFrame(entries).sort_values([ArtifactKeys.ID.value], ignore_index=True)
 
     @staticmethod
     def performs_summarization() -> bool:

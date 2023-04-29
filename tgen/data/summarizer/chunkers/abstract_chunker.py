@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER, TOKENS_2_WORDS_CONVERSION
 from tgen.data.summarizer.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
@@ -23,10 +23,11 @@ class AbstractChunker(BaseObject, ABC):
         self.token_limit = ModelTokenLimits.get_token_limit_for_model(self.model_name) - max_tokens - MAX_TOKENS_BUFFER
 
     @abstractmethod
-    def chunk(self, content: str) -> List[str]:
+    def chunk(self, content: str, id_: str = None) -> List[str]:
         """
         Chunks the given content into pieces that are beneath the model's token limit
         :param content: The content to chunk
+        :param id_: The id associated with the content (optional)
         :return: The content chunked into sizes beneath the token limit
         """
 
@@ -46,7 +47,7 @@ class AbstractChunker(BaseObject, ABC):
         :param model_name: The model that will be doing the tokenization
         :return: The approximate number of tokens
         """
-        return len(content.split()) * 4  # open ai's rule of thumb for approximating tokens from number of words
+        return round(len(content.split()) * (1 / TOKENS_2_WORDS_CONVERSION))
 
     @staticmethod
     def estimate_num_words_from_tokens(n_tokens: int) -> int:
@@ -55,7 +56,14 @@ class AbstractChunker(BaseObject, ABC):
         :param n_tokens: The number of tokens
         :return: The approximate number of words per n_tokens
         """
-        return round(n_tokens / 4)  # open ai's rule of thumb for approximating tokens from number of words
+        return round(n_tokens * TOKENS_2_WORDS_CONVERSION)
+
+    def get_word_limit(self) -> int:
+        """
+        Approximates the number of words that will make up the token limit
+        :return: The approximate number of words that the model will accept
+        """
+        return self.estimate_num_words_from_tokens(self.token_limit)
 
     @classmethod
     @overrides(BaseObject)

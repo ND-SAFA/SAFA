@@ -2,7 +2,7 @@ import os
 from typing import List
 
 import pandas as pd
-
+from tqdm import tqdm
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -16,6 +16,7 @@ from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.logger_manager import logger
 
 
 class Summarizer(BaseObject):
@@ -40,6 +41,7 @@ class Summarizer(BaseObject):
         self.model_for_summarizer = model_for_summarizer
         self.model_for_token_limit = model_for_token_limit
         self.args_for_summarizer_model = OpenAiArgs() if not args_for_summarizer_model else args_for_summarizer_model
+        assert self.args_for_summarizer_model.max_tokens > 1, "Summarizer needs more tokens for completion for a good summary."
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.max_tokens = max_tokens
         self.prompt_args = self.args_for_summarizer_model.prompt_args
@@ -50,20 +52,22 @@ class Summarizer(BaseObject):
             prompt_args=self.prompt_args,
             base_prompt=nl_base_prompt)
 
-    def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False) -> str:
+    def summarize(self, path_to_file: str = None, content: str = None, is_code: bool = False, id_: str = None) -> str:
         """
         Summarizes a file or body of text  to create shorter, more succinct input for model
         :param path_to_file: Path to the file to summarize
         :param content: Content to summarize
         :param is_code: If true, code summarization prompt is used. Otherwise natural language one is used.
+        :param id_: The id associated with the content
         :return: The summarization
         """
+        id_ = path_to_file if not id_ else id_
         chunker = self._get_chunker(path_to_file)
         is_code = is_code or chunker != SupportedChunker.NL
         chunker = chunker.value(self.model_for_token_limit, max_tokens=self.max_tokens)
         content = FileUtil.read_file(path_to_file) if path_to_file else content
         assert content is not None, "No content to summarize."
-        chunks = chunker.chunk(content=content)
+        chunks = chunker.chunk(content=content, id_=id_)
         if self.code_or_above_limit_only and len(chunks) <= 1 and not is_code:
             return content
         prompt_creator = self.code_prompt_creator if is_code else self.nl_prompt_creator
@@ -77,7 +81,14 @@ class Summarizer(BaseObject):
         :param col2summarize: The name of the column in the dataframe to summarize
         :return: The dataframe with the contents in the given column summarized
         """
-        df[col2summarize] = df[col2summarize].apply(lambda item: self.summarize(content=item))
+        loading_bar = tqdm(total=len(df), desc="Summarizing dataframe.")
+
+        def summarize_item(item: str):
+            summary = self.summarize(content=item)
+            loading_bar.update()
+            return summary
+
+        df[col2summarize] = df[col2summarize].apply(summarize_item)
         return df
 
     def exceeds_token_limit(self, content: str) -> bool:
@@ -90,6 +101,15 @@ class Summarizer(BaseObject):
         chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
         return chunker.exceeds_token_limit(content)
 
+    def get_word_limit(self) -> int:
+        """
+        Determines the word limit for the model
+        :return: The max number of words accepted by the model
+        """
+        chunker_type: SupportedChunker = self._get_chunker()
+        chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
+        return chunker.get_word_limit()
+
     @staticmethod
     def _summarize_chunks(prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str, args: OpenAiArgs) -> List[str]:
         """
@@ -101,9 +121,13 @@ class Summarizer(BaseObject):
         """
         prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value]
                    for chunk in chunks]
-        res = OpenAIUtil.make_completion_request(model=model_path, prompt=prompts,
-                                                 **args.to_params(TrainerTask.PREDICT))
-        return [choice.text.strip() for choice in res.choices]
+        try:
+            res = OpenAIUtil.make_completion_request(model=model_path, prompt=prompts,
+                                                     **args.to_params(TrainerTask.PREDICT))
+        except Exception:
+            logger.exception("Summarizing failed.")
+            res = None
+        return [choice.text.strip() for choice in res.choices] if res else [EMPTY_STRING]
 
     @staticmethod
     def _get_chunker(path_to_file: str = None) -> SupportedChunker:

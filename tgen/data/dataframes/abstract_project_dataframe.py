@@ -10,6 +10,7 @@ from pandas.core.internals.construction import dict_to_mgr
 from tgen.util import enum_util
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
+from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 
 
@@ -135,8 +136,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: The new combined dataframe
         """
         orient = 'records' if ignore_index else 'index'
-        data1 = dataframe1.to_dict(orient=orient)
-        data2 = dataframe2.to_dict(orient=orient)
+        data1 = dataframe1.remove_duplicate_indices().to_dict(orient=orient)
+        data2 = dataframe2.remove_duplicate_indices().to_dict(orient=orient)
         if ignore_index:
             data1.extend(data2)
             result = cls(data1)
@@ -180,6 +181,16 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: A copy of the dataframe with filter applied to rows
         """
         return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))
+
+    def remove_duplicate_indices(self) -> "AbstractProjectDataFrame":
+        """
+        Removes duplicated indices
+        :return: The DataFrame without duplicated indices
+        """
+        is_duplicated = self.index.duplicated(keep='first')
+        duplicated_indices = set(self.index[is_duplicated])
+        logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
+        return self[~is_duplicated]
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

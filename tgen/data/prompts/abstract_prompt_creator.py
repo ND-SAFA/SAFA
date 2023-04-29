@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Type
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
@@ -48,6 +49,8 @@ class AbstractPromptCreator(BaseObject):
         :param base_completion: The base completion
         :return: The formatted completion
         """
+        if not base_completion:
+            return EMPTY_STRING
         return f"{self.args.completion_prefix}{base_completion}{self.args.completion_suffix}"
 
     @abstractmethod

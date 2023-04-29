@@ -9,10 +9,11 @@ class NaturalLanguageChunker(AbstractChunker):
     Handles chunking NL text into chunks within a model's token limit
     """
 
-    def chunk(self, content: str) -> List[str]:
+    def chunk(self, content: str, id_: str = None) -> List[str]:
         """
         Chunks the given natural language content into pieces that are beneath the model's token limit
         :param content: The content to chunk
+        :param id_: The id_ associated with the content
         :return: The content chunked into sizes beneath the token limit
         """
         if not self.exceeds_token_limit(content):

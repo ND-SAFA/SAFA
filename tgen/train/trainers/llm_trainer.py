@@ -1,10 +1,9 @@
-from typing import Dict, List, Union
+from typing import Optional, Union, List, Dict
 
 from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
-from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
@@ -60,7 +59,6 @@ class LLMTrainer(AbstractTrainer):
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(prompt_creator=self.prompt_creator,
                                                              summarizer=self.summarizer)
-        custom_params = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics=include_classification_metrics,
                                              prompt_creator=self.prompt_creator)
@@ -86,7 +84,8 @@ class LLMTrainer(AbstractTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) \
+            -> Optional[TracePredictionOutput]:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -97,7 +96,7 @@ class LLMTrainer(AbstractTrainer):
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.prompt_creator)
         if self.trainer_args.output_dir:
-            dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
+            dataset.export_prompt_dataframe(prompt_df, export_path=self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
         res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]), **params)
         output = self._create_classification_output(res, dataset) \

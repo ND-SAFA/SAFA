@@ -18,7 +18,7 @@ class TestPythonChunker(BaseTest):
         chunks = chunker.chunk(content=content)
         all_content = content.split(NEW_LINE)
         chunked_content = NEW_LINE.join(chunks)
-        for line in all_content:
+        for i, line in enumerate(all_content):
             line = line.strip()
             if line.startswith("import") or line.startswith("from") or line.startswith("@") or not line:
                 continue

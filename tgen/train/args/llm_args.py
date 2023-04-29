@@ -33,7 +33,7 @@ class LLMArgs(ABC):
         assert task in OpenAiParams.EXPECTED_PARAMS_FOR_TASK, f"Unknown task {task.value}." \
                                                               f" Must choose from {OpenAiParams.EXPECTED_PARAMS_FOR_TASK.keys()}"
         params = {}
-        if task in [TrainerTask.PREDICT]:  # crete
+        if task in [TrainerTask.CLASSIFICATION]:
             self.max_tokens = 1
         params = self.add_custom_params(task, params, instructions=kwargs)
         return self._add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)

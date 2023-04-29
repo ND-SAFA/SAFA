@@ -28,6 +28,8 @@ class PromptDataset(iDataset):
     Represents a dataset for prompt-based (generative) models such as GPT
     """
     __MAX_SUMMARIZATIONS = 3
+    __SAVE_AFTER_N = 100
+    __SAVE_FILENAME = "prompt_dataframe_checkpoint.csv"
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
                  trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
@@ -137,12 +139,15 @@ class PromptDataset(iDataset):
         """
         entries = []
         traces = self.trace_dataset.trace_df
-        for i, row in tqdm(traces.itertuples(), desc="Generating prompts dataframe from trace links"):
+        save_path = os.path.join(os.getcwd(), self.__SAVE_FILENAME)
+        for i, row in tqdm(traces.itertuples(), total=len(traces), desc="Generating prompts dataframe from trace links"):
+            if i % self.__SAVE_AFTER_N == 0:
+                PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = self._get_prompt_entry(source_artifact=source, target_artifact=target,
                                            label=row[TraceKeys.LABEL], prompt_creator=prompt_creator, summarizer=summarizer)
-            if entry is not None:
-                entries.append(entry)
+            entries.append(entry)
+        FileUtil.delete_file_safely(save_path)
         return PromptDataFrame(entries)
 
     def _generate_prompts_dataframe_from_artifacts(self, prompt_creator: AbstractPromptCreator,
@@ -154,11 +159,11 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, artifact in tqdm(self.artifact_df.itertuples(), desc="Generating prompts dataframe from trace links"):
+        for i, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
+                                desc="Generating prompts dataframe from artifacts"):
             entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
                                            summarizer=summarizer)
-            if entry is not None:
-                entries.append(entry)
+            entries.append(entry)
         return PromptDataFrame(entries)
 
     def _get_prompt_entry(self, target_artifact: EnumDict, prompt_creator: AbstractPromptCreator, source_artifact: EnumDict = None,
@@ -187,7 +192,10 @@ class PromptDataset(iDataset):
                 source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
             target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
-        return None if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]) else entry
+        if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
+            required_length = max(summarizer.get_word_limit() - len(entry[PromptKeys.COMPLETION]), 1)
+            entry[PromptKeys.PROMPT] = entry[PromptKeys.PROMPT][:required_length]
+        return entry
 
     def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:
         """
@@ -198,11 +206,11 @@ class PromptDataset(iDataset):
         """
         artifact_id = artifact[ArtifactKeys.ID]
         if artifact_id not in self.__summarized_artifacts:
-            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT])
+            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT], id_=artifact_id)
             self.__summarized_artifacts[artifact_id] = summary
             return summary
         if force_create_new:
-            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id])
+            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id], id_=artifact_id)
             return summary
         return self.__summarized_artifacts[artifact_id]
 

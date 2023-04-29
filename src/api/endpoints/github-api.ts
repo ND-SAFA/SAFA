@@ -98,15 +98,18 @@ export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
 /**
  * Creates a new project based on a GitHub project.
  *
+ * @param owner - The owner of the repository to create a project from.
  * @param repositoryName - The repository to create a project from.
  * @return The created import job.
  */
 export async function createGitHubProject(
+  owner: string,
   repositoryName: string
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubCreateProject, {
+        owner,
         repositoryName,
       }),
       {
@@ -119,18 +122,21 @@ export async function createGitHubProject(
 /**
  * Synchronizes the state of GitHub artifacts in a project.
  *
- * @param versionId - The project version to sync.
+ * @param versionId - The project version to sync data with.
+ * @param owner - The owner of the repository to sync a project from.
  * @param repositoryName - The repository to create a project from.
  * @return The created import job.
  */
 export async function createGitHubProjectSync(
   versionId: string,
+  owner: string,
   repositoryName: string
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubSyncProject, {
         versionId,
+        owner,
         repositoryName,
       }),
       {

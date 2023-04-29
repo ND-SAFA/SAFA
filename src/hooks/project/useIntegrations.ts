@@ -39,6 +39,10 @@ export const useIntegrations = defineStore("integrations", {
      */
     gitHubOrganization: undefined as GitHubOrganizationSchema | undefined,
     /**
+     * All GitHub projects for this user.
+     */
+    gitHubProjectList: [] as GitHubProjectSchema[],
+    /**
      * A selected GitHub project to import.
      */
     gitHubProject: undefined as GitHubProjectSchema | undefined,

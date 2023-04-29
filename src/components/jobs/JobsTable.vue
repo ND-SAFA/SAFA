@@ -19,14 +19,29 @@
       </template>
     </data-table>
 
-    <modal title="Logs" :open="jobLog.length > 0" @close="handleCloseLogs">
-      <typography
-        t="4"
-        default-expanded
-        variant="code"
-        :value="logText"
-        data-cy="text-job-log"
-      />
+    <modal
+      size="xl"
+      title="Logs"
+      :open="jobLog.length > 0"
+      @close="handleCloseLogs"
+    >
+      <q-timeline data-cy="text-job-log">
+        <template v-for="(items, idx) in jobLog" :key="idx">
+          <q-timeline-entry
+            v-for="item in items"
+            :key="item.entry"
+            :subtitle="timestampToDisplay(item.timestamp)"
+            :title="jobSteps[idx]"
+          >
+            <typography
+              v-for="line in item.entry.split('\n')"
+              :key="line"
+              el="p"
+              :value="line"
+            />
+          </q-timeline-entry>
+        </template>
+      </q-timeline>
     </modal>
   </panel-card>
 </template>
@@ -43,17 +58,17 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { JobLogSchema, JobSchema } from "@/types";
-import { jobColumns } from "@/util";
+import { jobColumns, timestampToDisplay } from "@/util";
 import { appStore, jobStore } from "@/hooks";
 import { getJobLog, handleReloadJobs } from "@/api";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";
 
-const jobLog = ref<JobLogSchema[]>([]);
+const jobLog = ref<JobLogSchema[][]>([]);
+const jobSteps = ref<string[]>([]);
 
 const rows = computed(() => jobStore.jobs);
 const loading = computed(() => appStore.isLoading > 0);
-const logText = computed(() => JSON.stringify(jobLog.value, null, 2));
 const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []
 );
@@ -71,6 +86,7 @@ function handleReload() {
  */
 async function handleViewLogs(job: JobSchema): Promise<void> {
   jobLog.value = await getJobLog(job.id);
+  jobSteps.value = job.steps;
 }
 
 /**
@@ -78,6 +94,7 @@ async function handleViewLogs(job: JobSchema): Promise<void> {
  */
 function handleCloseLogs(): void {
   jobLog.value = [];
+  jobSteps.value = [];
 }
 
 onMounted(() => handleReload());

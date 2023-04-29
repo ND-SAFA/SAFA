@@ -14,7 +14,7 @@ export function authorizeGitHub(): void {
     `https://github.com/login/oauth/authorize?` +
       `client_id=${process.env.VUE_APP_GITHUB_CLIENT_ID}&` +
       `redirect_uri=${process.env.VUE_APP_GITHUB_REDIRECT_LINK}&` +
-      `scopes=${scopes}`
+      `scope=${scopes}`
   );
 }
 

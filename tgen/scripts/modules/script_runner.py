@@ -1,8 +1,6 @@
 import os
 from typing import Dict, Type
 
-from django.core.wsgi import get_wsgi_application
-
 from tgen.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from tgen.experiments.experiment import Experiment
 from tgen.scripts.modules.experiment_types import ExperimentTypes
@@ -95,11 +93,9 @@ class ScriptRunner:
         and loading django related application code.
         :return:
         """
-        if TraceAccelerator.is_main_process and self.experiment.delete_prev_experiment_dir:
+        if self.experiment.delete_prev_experiment_dir:
             FileUtil.delete_dir(self.experiment_dir)
             FileUtil.create_dir_safely(self.experiment_dir)
-        TraceAccelerator.wait_for_everyone()
-        get_wsgi_application()
 
     @staticmethod
     def get_experiment_class(experiment_definition: Dict) -> Type[Experiment]:

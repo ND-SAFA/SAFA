@@ -5,12 +5,14 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * The model to create for project.
  */
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class ModelAppEntity implements IAppEntity {
@@ -29,17 +31,18 @@ public class ModelAppEntity implements IAppEntity {
      */
     BaseGenerationModels baseModel;
 
-    public ModelAppEntity(Model model) {
-        this.id = model.getId();
-        this.name = model.getName();
-        this.baseModel = model.getBaseModel();
+    /**
+     * @param baseGenerationModel The base model whose state is returned.
+     * @return Returns the state of the associated model
+     */
+    public static String getStatePath(BaseGenerationModels baseGenerationModel) {
+        return baseGenerationModel.getStatePath();
     }
 
-    public static String getStatePath(UUID modelId) {
-        return String.format("models/%s", modelId);
-    }
-
+    /**
+     * @return Returns the state path associated with base model.
+     */
     public String getStatePath() {
-        return ModelAppEntity.getStatePath(this.id);
+        return ModelAppEntity.getStatePath(this.baseModel);
     }
 }

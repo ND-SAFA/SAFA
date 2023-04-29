@@ -2,27 +2,21 @@ package edu.nd.crc.safa.features.models.tgen.generator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevelRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.models.tgen.method.bert.BertMethodIdentifier;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
-import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +30,13 @@ public class TraceGenerationService {
     private static final String DELIMITER = "*";
     private final SafaRequestBuilder safaRequestBuilder;
 
-    private final Map<BaseGenerationModels, BertMethodIdentifier> bertModelIdentifiers = Map.of(
-        BaseGenerationModels.AutomotiveBert, new BertMethodIdentifier("NL_BERT", "thearod5/automotive"),
-        BaseGenerationModels.PLBert, new BertMethodIdentifier("PL_BERT", "thearod5/pl-bert"),
-        BaseGenerationModels.NLBert, new BertMethodIdentifier("NL_BERT", "thearod5/nl-bert")
-    );
-
+    /**
+     * Retrieves artifacts associated with the source and target types defined in the tracing request.
+     *
+     * @param tracingRequest   The request detailing the artifacts to trace and the model to do so with.
+     * @param projectAppEntity The project app entity containing artifacts and links.
+     * @return TracingPayload detailing the artifacts and the method to trace with.
+     */
     public static TracingPayload extractPayload(TracingRequest tracingRequest,
                                                 ProjectAppEntity projectAppEntity) {
         List<ArtifactLevel> artifactLevels = new ArrayList<>();
@@ -69,7 +64,7 @@ public class TraceGenerationService {
     }
 
     public List<TraceAppEntity> generateLinksWithMethod(TracingPayload tracingPayload) {
-        ITraceLinkGeneration generationMethod = buildGenerationMethod(tracingPayload.getMethod());
+        ITraceGenerationController generationMethod = tracingPayload.getMethod().createController();
         return new ArrayList<>(generationMethod.generateLinksWithBaselineState(tracingPayload));
     }
 
@@ -87,26 +82,5 @@ public class TraceGenerationService {
                 return !approvedLinks.contains(tId);
             })
             .collect(Collectors.toList());
-    }
-
-    public TBert getBertModel(BaseGenerationModels generationModel, SafaRequestBuilder safaRequestBuilder) {
-        BertMethodIdentifier methodIdentifier = bertModelIdentifiers.get(generationModel);
-        if (methodIdentifier == null) {
-            throw new NotImplementedException("Trace method not implemented:" + generationModel);
-        }
-        return new TBert(safaRequestBuilder, methodIdentifier);
-    }
-
-    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
-        switch (baseGenerationModels) {
-            case VSM:
-                return new VSMController();
-            case PLBert:
-            case NLBert:
-            case AutomotiveBert:
-                return getBertModel(baseGenerationModels, safaRequestBuilder);
-            default:
-                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModels);
-        }
     }
 }

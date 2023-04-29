@@ -19,9 +19,11 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Disabled("Deprecating editing model functionality.")
 public class TestModelEditing extends ApplicationBaseTest {
 
     @Autowired
@@ -47,10 +49,10 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setName("newName");
 
         JSONObject response = SafaRequest
-                .withRoute(AppRoutes.Models.MODEL_BY_ID)
-                .withProject(project)
-                .withModelId(model.getId())
-                .putWithJsonObject(editedModel, status().is2xxSuccessful());
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
+            .withProject(project)
+            .withModelId(model.getId())
+            .putWithJsonObject(editedModel, status().is2xxSuccessful());
 
         ModelAppEntity returnedModel = jacksonObjectMapper.readValue(response.toString(), ModelAppEntity.class);
         assertThat(returnedModel.getName()).isEqualTo(editedModel.getName());
@@ -66,10 +68,10 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setId(UUID.randomUUID());
 
         SafaRequest
-                .withRoute(AppRoutes.Models.MODEL_BY_ID)
-                .withProject(project)
-                .withModelId(model.getId())
-                .putWithJsonObject(editedModel, status().is4xxClientError());
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
+            .withProject(project)
+            .withModelId(model.getId())
+            .putWithJsonObject(editedModel, status().is4xxClientError());
 
         Model updatedModelInDb = serviceProvider.getModelService().getModelById(model.getId());
         assertThat(updatedModelInDb).isNotNull();
@@ -89,10 +91,10 @@ public class TestModelEditing extends ApplicationBaseTest {
         editedModel.setBaseModel(BaseGenerationModels.VSM);
 
         SafaRequest
-                .withRoute(AppRoutes.Models.MODEL_BY_ID)
-                .withProject(project)
-                .withModelId(model.getId())
-                .putWithJsonObject(editedModel, status().is4xxClientError());
+            .withRoute(AppRoutes.Models.MODEL_BY_PROJECT_AND_ID)
+            .withProject(project)
+            .withModelId(model.getId())
+            .putWithJsonObject(editedModel, status().is4xxClientError());
 
         Model updatedModelInDb = serviceProvider.getModelService().getModelById(model.getId());
         assertThat(updatedModelInDb).isNotNull();

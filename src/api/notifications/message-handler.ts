@@ -48,21 +48,20 @@ export async function handleEntityChangeMessage(
   // Skip updates by the current user that don't involve a layout update.
   if (isCurrentUser && !updateLayout) return;
 
-  appStore.enqueueChanges(async () => {
-    // Step - Iterate through message and delete entities.
-
-    for (const change of message.changes) {
-      if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
-        if (change.action === ActionType.DELETE) {
-          await handleDeleteChange(change);
-        } else if (change.action === ActionType.UPDATE) {
-          await handleUpdateChange(change, project);
-        }
+  // Step - Iterate through message and delete entities.
+  for (const change of message.changes) {
+    if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
+      if (change.action === ActionType.DELETE) {
+        await handleDeleteChange(change);
+      } else if (change.action === ActionType.UPDATE) {
+        await handleUpdateChange(change, project);
       }
     }
+  }
 
-    if (!updateLayout) return;
+  if (!updateLayout) return;
 
+  appStore.enqueueChanges(async () => {
     // Step - Update default layout after changes are stored.
     documentStore.updateBaseLayout(project.layout);
   });

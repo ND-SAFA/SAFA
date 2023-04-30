@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 import {
   ArtifactCytoElementData,
   ArtifactSchema,
-  ArtifactTypeDirections,
   ArtifactTypeSchema,
   ProjectSchema,
   SafetyCaseType,

@@ -13,10 +13,23 @@ import { sanitizeText } from "./node-helper";
  */
 export function svgText(
   text: string,
-  style: { width: string | number; code?: boolean } & Omit<SvgStyle, "width">,
+  style: {
+    width: string | number;
+    code?: boolean;
+    icon?: string;
+  } & Omit<SvgStyle, "width">,
   dataCy: string,
   textStyle = ""
 ): string {
+  const icon = style.icon
+    ? svgIcon(
+        {
+          ...style,
+          width: 24,
+        },
+        style.icon
+      )
+    : "";
   const textNode = style.code
     ? `<pre
         class="text-body-1 ${style.class || ""}" 
@@ -27,7 +40,7 @@ export function svgText(
         class="text-body-1 ${style.class || ""}" 
         data-cy="tree-node-${dataCy}"
         style="${textStyle}"
-      >${sanitizeText(text)}</span>`;
+      >${icon}${sanitizeText(text)}</span>`;
 
   return `
     <foreignObject 

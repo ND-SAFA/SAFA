@@ -70,8 +70,6 @@ export const useTypeOptions = defineStore("typeOptions", {
       this.tim = createTIM(project);
       this.allArtifactTypes = project.artifactTypes;
       this.initializeTypeIcons(project.artifactTypes);
-
-      console.log(JSON.stringify(this.tim, null, 2));
     },
     /**
      * Initializes the icons for artifact types.
@@ -94,11 +92,8 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param directions - The artifact types to set.
      */
     initializeTypeDirections(directions: ArtifactTypeDirections): void {
-      Object.entries(directions).forEach(([type, allowedTypes]) => {
-        this.tim.artifacts[type] = {
-          ...this.tim.artifacts[type],
-          allowedTypes,
-        };
+      Object.entries(directions).forEach(([name, allowedTypes]) => {
+        this.updateLinkDirections({ name, allowedTypes });
       });
     },
     /**
@@ -107,11 +102,39 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param type - The type to update.
      * @param allowedTypes - The allowed types to set.
      */
-    updateLinkDirections({ name, allowedTypes }: TimArtifactLevelSchema): void {
+    updateLinkDirections({
+      name,
+      allowedTypes,
+    }: Pick<TimArtifactLevelSchema, "name" | "allowedTypes">): void {
+      const currentAllowedTypes = this.tim.artifacts[name].allowedTypes;
+      const newAllowedTypes = allowedTypes.filter(
+        (type) => !currentAllowedTypes.includes(type)
+      );
+      const newTraces: TimTraceMatrixSchema[] = [];
+
       this.tim.artifacts[name] = {
         ...this.tim.artifacts[name],
         allowedTypes,
       };
+
+      newAllowedTypes.forEach((allowedType) => {
+        const matrix = this.tim.traces.find(
+          ({ sourceType, targetType }) =>
+            sourceType === name && targetType === allowedType
+        );
+
+        if (matrix) return;
+
+        newTraces.push({
+          sourceType: name,
+          targetType: allowedType,
+          count: 0,
+          generatedCount: 0,
+          approvedCount: 0,
+        });
+      });
+
+      this.tim.traces = [...this.tim.traces, ...newTraces];
     },
     /**
      * Changes what icons each artifact uses.

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.common;
 
+import javax.annotation.PostConstruct;
+
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
@@ -80,6 +82,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Scope("singleton")
 public class ServiceProvider {
+    public static ServiceProvider instance;
     // Project
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
@@ -98,12 +101,10 @@ public class ServiceProvider {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
-
     // Custom Attributes
     private final AttributeService attributeService;
     private final AttributeValueService attributeValueService;
     private final AttributeLayoutService attributeLayoutService;
-
     //Traces
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;
@@ -167,4 +168,9 @@ public class ServiceProvider {
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     private JobLoggingService jobLoggingService;
+
+    @PostConstruct
+    public void postInit() {
+        ServiceProvider.instance = this;
+    }
 }

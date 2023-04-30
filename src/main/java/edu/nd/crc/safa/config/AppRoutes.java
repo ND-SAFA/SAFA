@@ -88,12 +88,11 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Models {
-        public static final String MODEL_ROOT = Projects.BY_ID + "/models";
-        public static final String MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
-        public static final String DELETE_MODEL_BY_ID = MODEL_BY_ID;
-        public static final String TRAIN_MODEL = MODEL_BY_ID;
+        public static final String MODEL_ROOT = "/models";
+        public static final String MODEL_ROOT_BY_ID = Projects.BY_ID + MODEL_ROOT;
+        public static final String MODEL_BY_PROJECT_AND_ID = Models.MODEL_ROOT_BY_ID + "/{modelId}";
+        public static final String DELETE_MODEL_BY_ID = MODEL_BY_PROJECT_AND_ID;
         public static final String SHARE_MODEL = Projects.ROOT + "/models/share";
-
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -162,9 +161,6 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Installations {
             public static final String BY_PROJECT = Projects.ROOT + "/installations/by-project/{id}";
-            public static final String GITHUB_BY_IMPORTED =
-                Projects.ROOT + "/installations/by-github-repositories/{ids}";
-            public static final String JIRA_BY_IMPORTED = Projects.ROOT + "/installations/by-jira-projects/{ids}";
         }
     }
 
@@ -218,7 +214,6 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Credentials {
             public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
-            public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
             public static final String DELETE = Accounts.PREFIX + "/github/credentials";
             public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
         }
@@ -274,12 +269,6 @@ public class AppRoutes {
             public static class Repos {
                 public static final String ROOT = Github.ROOT + "/repos";
                 public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repositoryName}";
-            }
-
-            @NoArgsConstructor(access = AccessLevel.PRIVATE)
-            public static class Branches {
-                public static final String BY_REPO = Repos.BY_OWNER_AND_NAME + "/branches";
-
             }
         }
     }

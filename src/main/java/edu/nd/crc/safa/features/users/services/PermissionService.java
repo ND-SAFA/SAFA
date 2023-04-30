@@ -40,6 +40,17 @@ public class PermissionService {
         }
     }
 
+    public void requireAdminPermission(Project project) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        requireAdminPermission(project, currentUser);
+    }
+
+    public void requireAdminPermission(Project project, SafaUser user) {
+        if (!hasAdminPermission(project, user)) {
+            throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.ADMIN));
+        }
+    }
+
     public void requireEditPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         requireEditPermission(project, currentUser);
@@ -64,6 +75,10 @@ public class PermissionService {
 
     private boolean hasOwnerPermission(Project project, SafaUser user) {
         return hasPermissionOrGreater(project, user, ProjectRole.OWNER);
+    }
+
+    private boolean hasAdminPermission(Project project, SafaUser user) {
+        return hasPermissionOrGreater(project, user, ProjectRole.ADMIN);
     }
 
     private boolean hasEditPermission(Project project, SafaUser user) {

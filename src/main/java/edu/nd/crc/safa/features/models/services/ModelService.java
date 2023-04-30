@@ -1,11 +1,8 @@
 package edu.nd.crc.safa.features.models.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.models.entities.Model;
@@ -13,7 +10,7 @@ import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.ModelProject;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
+import edu.nd.crc.safa.features.models.tgen.entities.DefaultModels;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
@@ -78,28 +75,9 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
      * @param user the user accessing the models
      * @return The list of models.
      */
+    // Replace method body to return the models in DefaultModels.java
     public List<ModelAppEntity> getUserModels(SafaUser user) {
-        List<String> projectIds = this.projectService
-            .getProjectsForUser(user)
-            .stream()
-            .map(ProjectIdAppEntity::getProjectId)
-            .collect(Collectors.toList());
-
-        HashMap<UUID, Model> modelProjectHashMap = new HashMap<>();
-        List<ModelAppEntity> userModels = new ArrayList<>();
-
-        this.modelProjectRepository
-            .getAllModels()
-            .stream()
-            .filter(mp -> projectIds.contains(mp.getProject().getProjectId().toString()))
-            .forEach(mp -> {
-                Model model = mp.getModel();
-                if (!modelProjectHashMap.containsKey(model.getId())) {
-                    modelProjectHashMap.put(mp.getModel().getId(), mp.getModel());
-                    userModels.add(new ModelAppEntity(model));
-                }
-            });
-        return userModels;
+        return DefaultModels.getDefaultModels();
     }
 
     @Override

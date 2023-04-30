@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.users.controllers;
 
 import java.io.IOException;
 import java.util.Date;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.TokenService;
@@ -111,6 +112,7 @@ public class SafaUserController extends BaseController {
      *
      * @param user The user to send the reset password email to.
      */
+    @Transactional
     @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD)
     public void forgotPassword(@Valid @RequestBody PasswordForgottenRequest user) {
         String username = user.getEmail();
@@ -130,6 +132,10 @@ public class SafaUserController extends BaseController {
             log.error("Error occurred while trying to send email to {} " + e, user.getEmail());
             throw new SafaError("Could not send email");
         }
+
+        // Just in case the user had a previous forget token they never clicked on
+        this.passwordResetTokenRepository.deleteByUser(retrievedUser);
+        this.passwordResetTokenRepository.flush();
 
         this.passwordResetTokenRepository.save(passwordResetToken);
     }

@@ -1,0 +1,6 @@
+[
+  {
+    "name": "bend-prod",
+    "imageUri": "178003569110.dkr.ecr.us-east-1.amazonaws.com/bend:prod"
+  }
+]

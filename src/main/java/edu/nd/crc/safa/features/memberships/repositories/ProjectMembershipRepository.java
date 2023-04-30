@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,6 @@ public interface ProjectMembershipRepository extends CrudRepository<ProjectMembe
     List<ProjectMembership> findByProject(Project project);
 
     Optional<ProjectMembership> findByProjectAndMember(Project project, SafaUser user);
+
+    List<ProjectMembership> findByProjectAndRoleIn(Project project, List<ProjectRole> roles);
 }

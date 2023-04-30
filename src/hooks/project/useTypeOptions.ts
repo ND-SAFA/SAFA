@@ -245,7 +245,8 @@ export const useTypeOptions = defineStore("typeOptions", {
     ): TimTraceMatrixSchema | undefined {
       return this.tim.traces.find(
         ({ sourceType, targetType }) =>
-          sourceType === source && targetType === target
+          sourceType.replace(/ /g, "") === source &&
+          targetType.replace(/ /g, "") === target
       );
     },
   },

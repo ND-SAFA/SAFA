@@ -89,16 +89,6 @@ export const useTypeOptions = defineStore("typeOptions", {
     /**
      * Changes what directions of trace links between artifacts are allowed.
      *
-     * @param directions - The artifact types to set.
-     */
-    initializeTypeDirections(directions: ArtifactTypeDirections): void {
-      Object.entries(directions).forEach(([name, allowedTypes]) => {
-        this.updateLinkDirections({ name, allowedTypes });
-      });
-    },
-    /**
-     * Changes what directions of trace links between artifacts are allowed.
-     *
      * @param type - The type to update.
      * @param allowedTypes - The allowed types to set.
      */

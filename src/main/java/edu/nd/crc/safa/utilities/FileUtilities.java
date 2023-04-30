@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -233,5 +234,22 @@ public class FileUtilities {
         }
 
         FileUtils.cleanDirectory(myDir);
+    }
+
+    /**
+     * Reads a file that is located in the classpath (i.e. in the resources folder)
+     * and returns the contents of the file as a string.
+     *
+     * @param path Path to the file (relative to the resources folder).
+     * @return The contents of the file.
+     * @throws IOException If the file could not be read.
+     */
+    public static String readClasspathFile(String path) throws IOException {
+        ClassLoader classLoader = FileUtilities.class.getClassLoader();
+
+        try (InputStream in = classLoader.getResourceAsStream(path)) {
+            assert in != null;
+            return new String(in.readAllBytes());
+        }
     }
 }

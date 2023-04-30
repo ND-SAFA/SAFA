@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
@@ -31,8 +32,9 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     public GithubProjectUpdateJob(JobDbEntity jobDbEntity,
                                   ServiceProvider serviceProvider,
                                   GithubIdentifier githubIdentifier,
+                                  GithubImportDTO githubImportDTO,
                                   SafaUser user) {
-        super(jobDbEntity, serviceProvider, githubIdentifier, user);
+        super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, user);
         setProjectCommit(new ProjectCommit(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
@@ -41,11 +43,20 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     protected GithubProject getGithubProjectMapping(Project project) {
         GithubProjectRepository repository = this.serviceProvider.getGithubProjectRepository();
 
-        this.githubProject = repository.findByProjectAndRepositoryName(
+        this.githubProject = repository.findByProjectAndOwnerAndRepositoryName(
             project,
+            this.githubIdentifier.getRepositoryOwner(),
             this.githubIdentifier.getRepositoryName()
         ).orElseThrow(() -> new SafaError("Linked project not found"));
+
+        applyImportSettings(project, this.githubProject);
+
         return this.githubProject;
+    }
+
+    @Override
+    protected String getDefaultTypeName() {
+        return this.githubProject.getArtifactType().getName();
     }
 
     @Override
@@ -55,13 +66,19 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
             credentials,
             githubProject.getRepositoryName(),
-            githubProject.getLastCommitSha()
+            githubProject.getLastCommitSha(),
+            githubProject.getBranch()
         );
 
         log.info("Retrieving diff");
         for (GithubCommitDiffResponseDTO.GithubFileDiffDTO diff : diffResponseDTO.getFiles()) {
-            log.info(diff.toString());
+
             String name = diff.getFilename();
+            if (shouldSkipFile(name)) {
+                continue;
+            }
+
+            log.info(diff.toString());
             String type = diff.getStatus().name();
             String summary = diff.getSha();
             String body = diff.getBlobUrl();

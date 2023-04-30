@@ -259,6 +259,30 @@
       "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
       "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
       "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
+    },
+    {
+      "sha": "4d6903a5d0cfa07ae8097c08ea33573c87deb792",
+      "filename": "modules/calendar/file.pl",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/MarcusGitAccount/home_assistant_ro/blob/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
+    },
+    {
+      "sha": "4d6903a5d0cfa07ae8097c08ea33573c87deb792",
+      "filename": "modules/weather/file.pl",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/MarcusGitAccount/home_assistant_ro/blob/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
     }
   ]
 }

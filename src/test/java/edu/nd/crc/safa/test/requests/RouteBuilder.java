@@ -122,6 +122,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withOwner(String owner) {
+        this.path = this.path.replace("{owner}", owner);
+        return (T) this;
+    }
+
     public T withId(UUID id) {
         this.path = this.path.replace("{id}", id.toString());
         return (T) this;

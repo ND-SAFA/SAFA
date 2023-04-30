@@ -1,15 +1,11 @@
 package edu.nd.crc.safa.features.github.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.WebApiConfiguration;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryBranchDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -21,7 +17,6 @@ import edu.nd.crc.safa.utilities.WebApiUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,17 +26,9 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private static final String GITHUB_API_URL = "https://api.github.com";
     private static final String GITHUB_AUTH_URL = "https://github.com/login/oauth";
-    private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
 
     private static final String CLIENT_ID_PARAM = "client_id";
     private static final String CLIENT_SECRET_PARAM = "client_secret";
-    private static final String REFRESH_TOKEN_PARAM = "refresh_token";
-    private static final String GRANT_TYPE_PARAM = "grant_type";
-
-    private static final String REPOSITORIES_SORT_PARAM = "sort";
-    private static final String REPOSITORIES_SORT_DIR_PARAM = "direction";
-    private static final String REPOSITORIES_AFFILIATION_PARAM = "affiliation";
-    private static final String REPOSITORIES_PAGE_SIZE_PARAM = "per_page";
 
     private static final String ACCESS_CODE_PARAM = "code";
 
@@ -88,93 +75,6 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     }
 
     @Override
-    public GithubRefreshTokenDTO refreshAccessToken(GithubAccessCredentials credentials) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                .uri(ApiRoute.REFRESH_TOKEN.getFullPath(), builder ->
-                    this.setAuthorizationQueryParameters(builder, credentials)
-                        .queryParam(GRANT_TYPE_PARAM, REFRESH_TOKEN_REQUEST_GRANT_TYPE)
-                        .build()
-                )
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(GithubRefreshTokenDTO.class)
-        ).orElseThrow(() -> new SafaError("Error while trying to refresh GitHub credentials"));
-    }
-
-    @Override
-    public List<GithubRepositoryDTO> getUserRepositories(GithubAccessCredentials credentials) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REPOSITORIES.getMethod())
-                .uri(ApiRoute.REPOSITORIES.getFullPath(), builder ->
-                    builder
-                        .queryParam(REPOSITORIES_SORT_PARAM, "updated")
-                        .queryParam(REPOSITORIES_SORT_DIR_PARAM, "desc")
-                        .queryParam(REPOSITORIES_AFFILIATION_PARAM,
-                            "owner,collaborator,organization_member")
-                        .queryParam(REPOSITORIES_PAGE_SIZE_PARAM, 100)
-                        .build()
-                )
-                .header(HttpHeaders.AUTHORIZATION,
-                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryDTO>>() {})
-        ).orElseThrow(() -> new SafaError("Error while trying to retrieve repositories"));
-    }
-
-    @Override
-    public GithubRepositoryDTO getUserRepository(GithubAccessCredentials credentials, String name) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.SINGLE_REPOSITORY.getMethod())
-                .uri(ApiRoute.SINGLE_REPOSITORY.getFullPath(), credentials.getGithubHandler(), name)
-                .header(HttpHeaders.AUTHORIZATION,
-                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(GithubRepositoryDTO.class)
-        ).orElseThrow(() -> new SafaError("Error while trying to retrieve repository " + name));
-    }
-
-    @Override
-    public List<GithubRepositoryBranchDTO> getRepositoryBranches(GithubAccessCredentials credentials,
-                                                                 String repositoryName) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.REPOSITORY_BRANCHES.getMethod())
-                .uri(ApiRoute.REPOSITORY_BRANCHES.getFullPath(),
-                    credentials.getGithubHandler(), repositoryName
-                )
-                .header(HttpHeaders.AUTHORIZATION,
-                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryBranchDTO>>() {})
-        ).orElseThrow(() -> new SafaError("Error while trying to retrieve repository branches for " + repositoryName));
-    }
-
-    @Override
-    public GithubRepositoryBranchDTO getRepositoryBranch(GithubAccessCredentials credentials,
-                                                         String repositoryName,
-                                                         String repositoryBranch) {
-        return WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.SINGLE_REPOSITORY_BRANCH.getMethod())
-                .uri(ApiRoute.SINGLE_REPOSITORY_BRANCH.getFullPath(),
-                    credentials.getGithubHandler(), repositoryName, repositoryBranch
-                )
-                .header(HttpHeaders.AUTHORIZATION,
-                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                .retrieve()
-                .bodyToMono(GithubRepositoryBranchDTO.class)
-        ).orElseThrow(() -> new SafaError("Error while trying to retrieve single repository branch"));
-    }
-
-    @Override
     public GithubRepositoryFiletreeResponseDTO getRepositoryFiles(GithubAccessCredentials credentials,
                                                                   String repositoryName,
                                                                   String commitSha) {
@@ -199,8 +99,9 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     @Override
     public GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
                                                                       String repositoryName,
-                                                                      String baseCommitSha) {
-        String commitRange = String.format("%s...HEAD", baseCommitSha);
+                                                                      String baseCommitSha,
+                                                                      String branchName) {
+        String commitRange = String.format("%s...%s", baseCommitSha, branchName);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -257,13 +158,6 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private String buildAuthorizationHeaderValue(String token) {
         return String.format("token %s", token);
-    }
-
-    private UriBuilder setAuthorizationQueryParameters(UriBuilder builder, GithubAccessCredentials credentials) {
-        return builder
-            .queryParam(CLIENT_ID_PARAM, credentials.getClientId())
-            .queryParam(CLIENT_SECRET_PARAM, credentials.getClientSecret())
-            .queryParam(REFRESH_TOKEN_PARAM, credentials.getRefreshToken());
     }
 
     private UriBuilder setAuthorizationQueryParameters(UriBuilder builder, String clientId, String clientSecret) {

@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GithubProjectRepository extends JpaRepository<GithubProject, Long> {
 
-    Optional<GithubProject> findByProjectAndRepositoryName(Project project, String repositoryName);
+    Optional<GithubProject> findByProjectAndOwnerAndRepositoryName(Project project, String owner, String repositoryName);
 
 }

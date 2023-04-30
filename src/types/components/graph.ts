@@ -182,6 +182,10 @@ export interface TimNodeCytoElementData extends CytoElementData {
    * The number of artifacts of this artifact type.
    */
   count: number;
+  /**
+   * The icon for this artifact type.
+   */
+  icon?: string;
 }
 
 /**

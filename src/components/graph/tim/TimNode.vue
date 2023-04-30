@@ -20,6 +20,7 @@ import { CyElement3 } from "../base";
 const props = defineProps<{
   artifactType: string;
   count: number;
+  icon?: string;
 }>();
 
 const { darkMode } = useTheme();
@@ -31,6 +32,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
     id: props.artifactType.replace(/ /g, ""),
     artifactType: props.artifactType,
     count: props.count,
+    icon: props.icon,
     dark: darkMode.value,
   },
 }));

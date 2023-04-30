@@ -31,6 +31,7 @@
         :key="level.typeId"
         :count="level.count"
         :artifact-type="level.name"
+        :icon="level.icon"
       />
       <tim-link
         v-for="matrix in tim.traces"

@@ -3,6 +3,7 @@ import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import {
   deleteProjectMember,
   getProjectMembers,
+  handleGetProjects,
   saveProjectMember,
 } from "@/api";
 
@@ -69,6 +70,7 @@ export function handleDeleteMember(member: MembershipSchema): void {
         .then(() => {
           membersStore.deleteMembers([member.projectMembershipId]);
           logStore.onSuccess(`Deleted a member: ${member.email}`);
+          handleGetProjects({});
         })
         .catch((e) => {
           logStore.onError(`Unable to delete member: ${member.email}`);

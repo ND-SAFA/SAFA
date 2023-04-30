@@ -1,5 +1,6 @@
 <template>
   <q-select
+    v-if="project.projectId"
     v-model="project"
     dense
     outlined
@@ -13,9 +14,6 @@
     class="nav-input"
     color="accent"
   >
-    <template #selected>
-      {{ projectName }}
-    </template>
     <template #after-options>
       <text-button
         text
@@ -33,6 +31,7 @@
       />
     </template>
   </q-select>
+  <typography v-else variant="subtitle" value="No Project Selected" />
 </template>
 
 <script lang="ts">
@@ -53,7 +52,7 @@ import {
   handleLoadVersion,
   handleGetProjects,
 } from "@/api";
-import { TextButton } from "@/components/common";
+import { TextButton, Typography } from "@/components/common";
 import { ProjectIdentifierModal } from "../base";
 
 const openCreateProject = ref(false);
@@ -72,10 +71,6 @@ const project = computed({
     });
   },
 });
-
-const projectName = computed(() =>
-  project.value ? project.value.name : "No Project Selected"
-);
 
 /**
  * Reloads projects when a new one is created.

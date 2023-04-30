@@ -113,6 +113,7 @@ const rows = computed(() => projectStore.allProjects);
  */
 function handleReload() {
   loading.value = true;
+  selected.value = undefined;
 
   handleGetProjects({
     onComplete: () => (loading.value = false),

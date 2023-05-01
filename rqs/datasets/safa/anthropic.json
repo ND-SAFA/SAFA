@@ -1,0 +1,29 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "LLM",
+          "task": "PREDICT",
+          "prompt_creator": {
+            "object_type": "CLASSIFICATION",
+            "pos_class": "Yes",
+            "neg_class": "No",
+            "base_prompt": "Are the following software system artifacts traced? Answer \"yes\" or \"no\".\n",
+            "artifact_prompt_format": "\n1. {}\n2. {}\n>"
+          },
+          "base_model": "text-davinci-003",
+          "trainer_dataset_manager": {
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "~/desktop/safa/datasets/safa/exported/safa_eval.csv"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

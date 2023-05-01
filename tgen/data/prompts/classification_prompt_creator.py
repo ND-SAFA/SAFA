@@ -10,7 +10,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     """
 
     def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "yes", neg_class: str = "no",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}", base_prompt: SupportedPrompts = SupportedPrompts.CLASSIFICATION):
+                 artifact_prompt_format: str = "\n1. {}\n2. {}", base_prompt: str = SupportedPrompts.CLASSIFICATION.value):
         """
         Constructs classification prompt creator
         :param prompt_args: The arguments used to construct prompts.
@@ -36,6 +36,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         :return: Dictionary containing the prompt and completion
         """
         artifact_prompt = self.artifact_prompt_format.format(source_content, target_content, label)
-        prompt = f"{self.base_prompt.value}{artifact_prompt}"
+        prompt = f"{self.base_prompt}{artifact_prompt}"
         class_ = self.pos_class if label == 1 else self.neg_class
-        return self.generate_base(prompt, class_)
+        prompt = self.generate_base(prompt, class_)
+        return prompt

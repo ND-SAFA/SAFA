@@ -1,4 +1,4 @@
-from typing import Optional, Union, List, Dict
+from typing import Dict, List, Optional, Union
 
 from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
@@ -98,7 +98,8 @@ class LLMTrainer(AbstractTrainer):
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, export_path=self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=list(prompt_df[PromptKeys.PROMPT]), **params)
+        prompts = list(prompt_df[PromptKeys.PROMPT])
+        res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=prompts, **params)
         output = self._create_classification_output(res, dataset) \
             if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
         return output

@@ -38,7 +38,7 @@ class OpenAiArgs(LLMArgs):
     learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-    prompt_args = PromptArgs(prompt_separator="\n\n###\n\n", completion_prefix=" ", completion_suffix="###")
+    prompt_args = PromptArgs(prompt_separator="", completion_prefix="", completion_suffix="")
     output_dir: str = None
     expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
                             TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,

@@ -5,7 +5,7 @@
         {
           "object_type": "HGen",
           "hgen_args": {
-            "hgen_trainer_class": "OPEN_AI",
+            "hgen_trainer_class": "LLM",
             "hgen_prompt_creator": {
               "prompt_creator": {
                 "object_type": "GENERATION"
@@ -13,7 +13,7 @@
             },
             "source_layer_id": "Code",
             "tgen_trainer": {
-              "object_type": "OPEN_AI",
+              "object_type": "LLM",
               "trainer_dataset_manager": {
                 "train_dataset_creator": {
                   "object_type": "PROMPT",

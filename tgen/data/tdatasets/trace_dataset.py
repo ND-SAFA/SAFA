@@ -2,9 +2,11 @@ import random
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple
 
+import networkx as nx
 import pandas as pd
 import torch
 from datasets import Dataset
+from tqdm import tqdm
 
 from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
@@ -23,8 +25,6 @@ from tgen.models.model_properties import ModelArchitectureType
 from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger
 from tgen.util.thread_util import ThreadUtil
-
-import networkx as nx
 
 
 class TraceDataset(iDataset):
@@ -79,7 +79,7 @@ class TraceDataset(iDataset):
         logger.info(f"Trace links after processing: {hf_dataset.num_rows}")
         return hf_dataset
 
-    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=1) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=20) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
@@ -110,7 +110,7 @@ class TraceDataset(iDataset):
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
-        for index in self.trace_df.index:
+        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format."):
             link = self.trace_df.get_link(index)
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])

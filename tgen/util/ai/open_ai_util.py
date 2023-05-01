@@ -1,8 +1,10 @@
+import time
+
 import openai
 from openai.openai_object import OpenAIObject
 from tqdm import tqdm
-from tgen.constants.environment_constants import IS_TEST
-from tgen.constants.environment_constants import OPEN_AI_ORG, OPEN_AI_KEY
+
+from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.ai.ai_util import AIUtil
 from tgen.util.ai.params.openai_params import OpenAiParams
@@ -57,6 +59,7 @@ class OpenAIUtil(AIUtil[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
+            time.sleep(.1)
         return res
 
     @staticmethod

@@ -3,7 +3,7 @@
     {
       "jobs": [
         {
-          "object_type": "OPEN_AI",
+          "object_type": "LLM",
           "data_output_path": "[DATA_PATH]/open_ai/lhp/heating",
           "task": "PREDICT",
           "trainer_dataset_manager": {

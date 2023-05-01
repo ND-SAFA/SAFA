@@ -1,4 +1,3 @@
-import argparse
 import os
 import sys
 
@@ -14,13 +13,8 @@ RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 if __name__ == "__main__":
     from tgen.scripts.modules.script_runner import ScriptRunner
 
-    parser = argparse.ArgumentParser(
-        prog='Experiment',
-        description='Runs experiment definitions')
-    parser.add_argument('file')
-    parser.add_argument('--local_rank', default=0)
-    args, unknown = parser.parse_known_args()
-    file_path = os.path.join(RQ_PATH, args.file)
+    file_name = sys.argv[1]
+    file_path = os.path.join(RQ_PATH, file_name)
     script_runner = ScriptRunner(file_path)
     script_runner.run()
     script_runner.print_results()

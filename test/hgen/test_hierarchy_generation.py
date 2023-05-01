@@ -22,7 +22,7 @@ from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
@@ -180,7 +180,7 @@ class TestHierarchyGeneration(BaseTest):
     def get_tgen_trainer(dataset_creator):
         prompt_creator = ClassificationPromptCreator()
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(metrics=[]),
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAIArgs(metrics=[]),
                           prompt_creator=prompt_creator)
 
     @staticmethod
@@ -225,7 +225,7 @@ class TestHierarchyGeneration(BaseTest):
 
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
 
-        hgen_trainer_params = {"hgen_trainer_args": OpenAiArgs(metrics=[])}
+        hgen_trainer_params = {"hgen_trainer_args": OpenAIArgs(metrics=[])}
         args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.LLM,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **hgen_trainer_params, **params)

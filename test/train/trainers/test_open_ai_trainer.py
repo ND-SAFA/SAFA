@@ -12,7 +12,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 
 Res = namedtuple("Res", ["id"])
@@ -120,5 +120,5 @@ class TestOpenAiTrainer(BaseTest):
     def get_llm_trainer(dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole],
                         prompt_creator: AbstractPromptCreator, **params) -> LLMTrainer:
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAiArgs(**params),
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAIArgs(**params),
                           prompt_creator=prompt_creator)

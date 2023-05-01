@@ -1,7 +1,7 @@
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.enum_util import EnumDict
 
 
@@ -17,7 +17,7 @@ class GenerationPromptCreator(AbstractPromptCreator):
         :param base_prompt: The base prompt to use to generate final prompt.
         """
         if prompt_args is None:
-            prompt_args = OpenAiArgs.prompt_args
+            prompt_args = OpenAIArgs.prompt_args
         super().__init__(prompt_args=prompt_args, base_prompt=base_prompt),
 
     def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:

@@ -2,8 +2,9 @@ from typing import TypedDict
 
 import anthropic
 
-from tgen.constants import ANTHROPIC_KEY, IS_TEST
-from tgen.util.ai.ai_util import AIUtil
+from tgen.constants.anthropic_constants import ANTHROPIC_KEY
+from tgen.constants.environment_constants import IS_TEST
+from tgen.util.llm.llm_util import LLMUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -12,7 +13,7 @@ class AnthropicResponse(TypedDict):
     """
 
 
-class AnthropicUtil(AIUtil[AnthropicResponse]):
+class AnthropicUtil(LLMUtil[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """
@@ -44,7 +45,20 @@ class AnthropicUtil(AIUtil[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        return AnthropicUtil.Client.completion(**params)
+        assert "prompt" in params, f"Expected {params} to include `params`"
+        prompts = params["prompt"]
+        response = []
+        if isinstance(prompts, list):
+            for prompt in params["prompt"]:
+                prompt_params = {**params, "prompt": prompt}
+                prompt_response = AnthropicUtil.Client.completion(**prompt_params)
+                response.append(prompt_response)
+        elif isinstance(prompts, str):
+            prompt_response = AnthropicUtil.Client.completion(**params)
+            response.append(prompt_response)
+        else:
+            raise Exception(f"Prompt format is not supported. Expected list or string: {prompts}")
+        return response
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:

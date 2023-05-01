@@ -16,6 +16,6 @@ class BasePromptTest(BaseTest):
         :return: None
         """
         self.assertIn("target1", generated_prompt[PromptKeys.PROMPT])
-        self.assertTrue(generated_prompt[PromptKeys.PROMPT].endswith(prompt_args.prompt_separator))
+        self.assertTrue(generated_prompt[PromptKeys.PROMPT].endswith(prompt_args.prompt_suffix))
         self.assertTrue(generated_prompt[PromptKeys.COMPLETION].startswith(prompt_args.completion_prefix))
         self.assertTrue(generated_prompt[PromptKeys.COMPLETION].endswith(prompt_args.completion_suffix))

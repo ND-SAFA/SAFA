@@ -6,6 +6,7 @@ class PromptArgs:
     """
     Defines arguments for defining properties for prompt dataset creation.
     """
-    prompt_separator: str  # Goes in between the prompt and completion
+    prompt_prefix: str  # Goes before the prompt.
+    prompt_suffix: str  # Goes after the prompt.
     completion_prefix: str  # Goes before the completion label during fine-tuning for classification
     completion_suffix: str  # Goes after the completion label during fine-tuning for classification

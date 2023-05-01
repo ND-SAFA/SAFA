@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 from openai.openai_object import OpenAIObject
@@ -14,13 +14,13 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.train.args.llm_args import LLMArgs
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAIUtil
-from tgen.util.ai.params.openai_params import OpenAiParams
+from tgen.util.llm.llm_util import LLMUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 from tgen.util.logging.logger_manager import logger
 
 
@@ -30,26 +30,25 @@ class LLMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 trainer_args: LLMArgs = None, base_model: str = None):
+                 trainer_args: LLMArgs = None, llm_util: LLMUtil = None):
         """
         Initializes the trainer with the necessary arguments for training and prediction
-        :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         :param prompt_creator: Creates the prompts for trace link prediction.
         """
         if trainer_args is None:
-            trainer_args = OpenAiArgs()
+            trainer_args = OpenAIArgs()
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
-        if base_model is None:
-            base_model = trainer_args.base_model
-        self.base_model = base_model
+        if llm_util is None:
+            llm_util = SupportedLLMUtils.OPENAI.value
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
-        self.summarizer = Summarizer(model_for_token_limit=self.base_model, code_or_exceeds_limit_only=False,
+        self.summarizer = Summarizer(model_for_token_limit=self.trainer_args.model, code_or_exceeds_limit_only=False,
                                      max_tokens=trainer_args.max_tokens)
         self.prompt_creator = prompt_creator
+        self.llm_util = llm_util
 
     def perform_training(self) -> FineTune:
         """
@@ -59,33 +58,20 @@ class LLMTrainer(AbstractTrainer):
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(prompt_creator=self.prompt_creator,
                                                              summarizer=self.summarizer)
+        custom_params = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         params = self.trainer_args.to_params(TrainerTask.TRAIN, include_classification_metrics=include_classification_metrics,
                                              prompt_creator=self.prompt_creator)
         if include_classification_metrics:
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
-            params[OpenAiParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
+            params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 prompt_creator=self.prompt_creator,
                 summarizer=self.summarizer)
-        res = OpenAIUtil.make_fine_tune_request(training_file=training_file_id,
-                                                model=self.base_model,
-                                                **params)
+        res = self.llm_util.make_fine_tune_request(training_file=training_file_id, **params)
         logger.info(res.events[-1].message)
         return res
 
-    @staticmethod
-    def check_fine_tune_status(fine_tune_id: str) -> OpenAIObject:
-        """
-        Checks on the status of a fine tune job
-        :param fine_tune_id: The id of the fine tune job
-        :return: The response for the fine tune job
-        """
-        res = OpenAIUtil.retrieve_fine_tune_request(id=fine_tune_id)
-        logger.info(res.events[-1].message)
-        return res
-
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) \
-            -> Optional[TracePredictionOutput]:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -96,10 +82,10 @@ class LLMTrainer(AbstractTrainer):
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
         prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.prompt_creator)
         if self.trainer_args.output_dir:
-            dataset.export_prompt_dataframe(prompt_df, export_path=self.trainer_args.output_dir)
+            dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        prompts = list(prompt_df[PromptKeys.PROMPT])
-        res = OpenAIUtil.make_completion_request(model=self.base_model, prompt=prompts, **params)
+        res = self.llm_util.make_completion_request(model=self.trainer_args.model, prompt=list(prompt_df[PromptKeys.PROMPT]),
+                                                    **params)
         output = self._create_classification_output(res, dataset) \
             if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
         return output

@@ -12,7 +12,13 @@
             "base_prompt": "Are the following software system artifacts traced? Answer \"yes\" or \"no\".\n",
             "artifact_prompt_format": "\n1. {}\n2. {}\n>"
           },
-          "base_model": "text-davinci-003",
+          "trainer_args": {
+            "object_type": "ANTHROPIC",
+            "model": "claude-instant-v1"
+          },
+          "llm_util": {
+            "object_type": "ANTHROPIC"
+          },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {
               "object_type": "TRACE",

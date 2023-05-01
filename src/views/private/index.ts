@@ -6,3 +6,4 @@ export { default as UploadStatusView } from "./UploadStatusView.vue";
 export { default as HomeView } from "./HomeView.vue";
 export { default as MyAccountView } from "./MyAccountView.vue";
 export { default as ProjectSelectorView } from "./ProjectSelectorView.vue";
+export { default as SearchView } from "./SearchView.vue";

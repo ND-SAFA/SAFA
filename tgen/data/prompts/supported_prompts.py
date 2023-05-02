@@ -5,7 +5,7 @@ class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = "Are these two artifacts related?"
+    CLASSIFICATION = "Are the following software system artifacts related? Answer \"yes\" or \"no\"."
     CODE_SUMMARY = "Provide 5 sentence paragraph describing the high-level usage of the code below. Do not focus on implementation " \
                    "details and assume your audience works on this system. '{}'"
     NL_SUMMARY = "Summarize the following '{}'"

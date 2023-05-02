@@ -9,8 +9,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     Creates prompt datasets used for classification for some defined AI libray.
     """
 
-    def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "yes", neg_class: str = "no",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}", base_prompt: str = SupportedPrompts.CLASSIFICATION.value):
+    def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "Yes", neg_class: str = "No",
+                 artifact_prompt_format: str = "\n1. {}\n2. {}\n>", base_prompt: str = SupportedPrompts.CLASSIFICATION.value):
         """
         Constructs classification prompt creator
         :param prompt_args: The arguments used to construct prompts.

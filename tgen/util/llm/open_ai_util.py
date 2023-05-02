@@ -39,10 +39,6 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
         """
         return openai.FineTune.retrieve(**params)
 
-    @classmethod
-    def make_completion_request(cls, **params) -> OpenAIObject:
-        return cls.make_completion_request_impl(**params)
-
     @staticmethod
     def make_completion_request_impl(**params) -> AIObject:
         """
@@ -65,10 +61,19 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
 
     @staticmethod
     def translate_to_response(task: LLMTask, res: OpenAIObject, **params) -> SupportedLLMResponses:
+        """
+        Translates the response to the response for task.
+        :param task: The task to translate to.
+        :param res: OpenAI response.
+        :param params: The parameters to the API.
+        :return: A response for the supported types.
+        """
         if task == LLMTask.GENERATION:
             return GenerationResponse([choice.text.strip() for choice in res.choices])
         elif task == LLMTask.CLASSIFICATION:
             return ClassificationResponse([r.logprobs.top_logprobs[0] for r in res.choices])
+        else:
+            raise NotImplementedError(f"No handler for {task.name} is implemented")
 
     @staticmethod
     def upload_file(**params) -> OpenAIObject:

@@ -41,7 +41,7 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
         :return: The response from AI library.
         """
         llm_response = cls.make_completion_request_impl(**params)
-        return cls.translate_to_response(llm_response, task)
+        return cls.translate_to_response(task, llm_response, **params)
 
     @staticmethod
     @abstractmethod

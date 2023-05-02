@@ -14,7 +14,7 @@
           },
           "trainer_args": {
             "object_type": "OPENAI",
-            "model": "text-ada-001"
+            "model": "text-davinci-003"
           },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {

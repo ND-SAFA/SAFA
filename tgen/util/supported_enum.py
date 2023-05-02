@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, List, Type
+from typing import Any, List
 
 from tgen.util.reflection_util import ReflectionUtil
 
@@ -59,12 +59,3 @@ class SupportedEnum(Enum):
         :return: Returns the values of the supported enums.
         """
         return [v for v in cls._value2member_map_.keys()]
-
-    @classmethod
-    def _get_enum_class(cls, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param child_class_name: the name of the child class
-        :return: self, the enum class mapping name to class
-        """
-        return cls

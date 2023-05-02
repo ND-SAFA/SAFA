@@ -132,7 +132,7 @@ class LLMTrainer(AbstractTrainer):
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        scores = list(map(lambda r: self._get_score(r.logprobs.top_logprobs), res.batch_label_probs))
+        scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores)
         if trace_dataset is not None:
@@ -146,7 +146,7 @@ class LLMTrainer(AbstractTrainer):
             output.prediction_entries = metrics_manager.get_trace_predictions()
         return output
 
-    def _get_score(self, probs: List[Dict]) -> float:
+    def _get_score(self, probs: Dict) -> float:
         """
         Gets the score from the predicted completions
         :param probs: The probabilities of each top completion
@@ -154,9 +154,8 @@ class LLMTrainer(AbstractTrainer):
         """
         assert isinstance(self.prompt_creator,
                           ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
-        if len(probs) < 1:
+        if len(probs) == 0:
             return 0.5
-        probs = probs[0]
 
         neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
         pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class

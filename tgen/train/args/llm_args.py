@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Type
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, TEMPERATURE_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 
@@ -15,18 +16,21 @@ class LLMArgs(BaseObject, ABC):
     temperature: float = TEMPERATURE_DEFAULT
 
     def __init__(self, prompt_args: PromptArgs, expected_task_params: Dict[TrainerTask, List[str]], model: str,
-                 max_tokens: int = MAX_TOKENS_DEFAULT, output_dir: str = None):
+                 max_tokens: int = MAX_TOKENS_DEFAULT, output_dir: str = None, metrics: List[str] = None):
         """
         Constructs AI arguments customized for given prompt arguments and prompt types in creator.
         :param prompt_args: The argument customizing the prompt content.
         :param expected_task_params: Mapping of task names to their expected properties.
         :param max_tokens: The maximum number of allowable tokens to LLM API.
         """
+        if metrics is None:
+            metrics = SupportedTraceMetric.get_keys()
         self.prompt_args = prompt_args
         self.expected_task_params = expected_task_params
         self.max_tokens = max_tokens
         self.model = model
         self.output_dir = output_dir
+        self.metrics = metrics
 
     def to_params(self, task: TrainerTask = TrainerTask.TRAIN, **kwargs) -> Dict[str, Any]:
         """

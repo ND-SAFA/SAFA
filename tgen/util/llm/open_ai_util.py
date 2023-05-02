@@ -1,5 +1,8 @@
+import time
+
 import openai
 from openai.openai_object import OpenAIObject
+from tqdm import tqdm
 
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.args.open_ai_args import OpenAIParams
@@ -44,13 +47,14 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
         prompt = params.get(OpenAIParams.PROMPT)
         batches = ListUtil.batch(prompt, n=OpenAIUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
-        for batch in batches:
+        for batch in tqdm(batches, desc="Making completion requests"):
             params[OpenAIParams.PROMPT] = batch
             batch_res = openai.Completion.create(**params)
             if res is None:
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
+            time.sleep(.1)  # trying to avoid rate limit
         return res
 
     @staticmethod

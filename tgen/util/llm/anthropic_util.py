@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 import anthropic
+from tqdm import tqdm
 
 from tgen.constants.anthropic_constants import ANTHROPIC_KEY
 from tgen.constants.environment_constants import IS_TEST
@@ -49,7 +50,7 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
         prompts = params["prompt"]
         response = []
         if isinstance(prompts, list):
-            for prompt in params["prompt"]:
+            for prompt in tqdm(params["prompt"]):
                 prompt_params = {**params, "prompt": prompt}
                 prompt_response = AnthropicUtil.Client.completion(**prompt_params)
                 response.append(prompt_response)

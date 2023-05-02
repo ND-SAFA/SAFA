@@ -9,12 +9,18 @@
             "object_type": "CLASSIFICATION",
             "pos_class": "Yes",
             "neg_class": "No",
-            "base_prompt": "Are the following software system artifacts traced? Answer \"yes\" or \"no\".\n",
-            "artifact_prompt_format": "\n1. {}\n2. {}\n>"
+            "base_prompt": "Are the following software system artifacts related? Answer \"yes\" or \"no\".\n",
+            "artifact_prompt_format": "\n1. {}\n2. {}\n>",
+            "prompt_args": {
+              "prompt_prefix": "\n\nHuman:",
+              "prompt_suffix": "\n\nAssistant:",
+              "completion_prefix": "",
+              "completion_suffix": ""
+            }
           },
           "trainer_args": {
             "object_type": "ANTHROPIC",
-            "model": "claude-instant-v1"
+            "model": "claude-v1.3"
           },
           "llm_util": {
             "object_type": "ANTHROPIC"

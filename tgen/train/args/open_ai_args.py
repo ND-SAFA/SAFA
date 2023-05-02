@@ -1,11 +1,10 @@
-from dataclasses import dataclass, field
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict
 
 from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
     LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.llm_args import LLMArgs
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
 
 
@@ -27,18 +26,29 @@ class OpenAIParams:
 
 @dataclass
 class OpenAIArgs(LLMArgs):
-    logprobs: int = LOGPROBS_DEFAULT
-    model_suffix: str = None
-    n_epochs: int = 1
-    learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
-    compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
-    metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
-    model = CLASSIFICATION_MODEL_DEFAULT
+    TASK_PARAMS = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
+                   TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
+                                       OpenAIParams.LEARNING_RATE_MULTIPLIER],
+                   TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}
     prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
-    expected_task_params = {TrainerTask.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
-                            TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
-                                                OpenAIParams.LEARNING_RATE_MULTIPLIER],
-                            TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}
+
+    def __init__(self, model: str = CLASSIFICATION_MODEL_DEFAULT, prompt_args: PromptArgs = None, logprobs: int = LOGPROBS_DEFAULT,
+                 n_epochs: int = 1, learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT,
+                 compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT, model_suffix: str = None,
+                 **kwargs):
+        """
+        Constructs OpenAI args with given model
+        :param model:
+        :param kwargs:
+        """
+        if prompt_args is None:
+            prompt_args = self.prompt_args
+        self.logprobs = logprobs
+        self.n_epochs = n_epochs
+        self.learning_rate_multiplier = learning_rate_multiplier,
+        self.compute_classification_metrics = compute_classification_metrics
+        self.model_suffix = model_suffix
+        super().__init__(prompt_args=prompt_args, model=model, expected_task_params=self.TASK_PARAMS, **kwargs)
 
     def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """

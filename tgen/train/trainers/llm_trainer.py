@@ -151,8 +151,19 @@ class LLMTrainer(AbstractTrainer):
         if len(probs) < 1:
             return 0.5
         probs = probs[0]
-        v0 = probs.get(self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class, 0)
-        v1 = probs.get(self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class, 0)
-        prob_v = [v0, v1]
-        score = softmax(prob_v)[1]
+
+        neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
+        pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
+
+        if pos_str in probs and neg_str in probs:
+            v0 = probs.get(neg_str, 0)
+            v1 = probs.get(pos_str, 0)
+            prob_v = [v0, v1]
+            score = softmax(prob_v)[1]
+        elif pos_str in probs:
+            score = 1
+        elif neg_str in probs:
+            score = 0
+        else:
+            score = 0.5
         return score

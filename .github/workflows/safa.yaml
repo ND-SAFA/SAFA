@@ -10,8 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: contains(github.event.comment.body, '/build')
     steps:
+      - name: Check if comment contains /build
+        if: contains(github.event.comment.body, '/build')
+        run: |
+          echo "Build trigger has been activated."
       - name: Checkout code
         uses: actions/checkout@v2
       - uses: actions/setup-python@v2

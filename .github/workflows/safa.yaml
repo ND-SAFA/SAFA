@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - development
-    types: [ opened, synchronize ]
+    types: [ opened ]
   issue_comment:
     types: [ created ]
     body: /build

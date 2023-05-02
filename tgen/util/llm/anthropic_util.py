@@ -3,8 +3,7 @@ from typing import TypedDict
 import anthropic
 from tqdm import tqdm
 
-from tgen.constants.anthropic_constants import ANTHROPIC_KEY
-from tgen.constants.environment_constants import IS_TEST
+from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.util.llm.llm_util import LLMUtil
 
 

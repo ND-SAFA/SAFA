@@ -2,6 +2,7 @@ import os
 from typing import List
 
 import pandas as pd
+from tqdm import tqdm
 
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys

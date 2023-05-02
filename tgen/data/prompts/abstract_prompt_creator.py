@@ -1,9 +1,10 @@
 from abc import abstractmethod
-from typing import Type
+from typing import Type, Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
@@ -14,14 +15,14 @@ class AbstractPromptCreator(BaseObject):
     Responsible for formatting and creating prompts and completions for Language Models
     """
 
-    def __init__(self, prompt_args: PromptArgs, base_prompt: str):
+    def __init__(self, prompt_args: PromptArgs, base_prompt: Union[str, SupportedPrompts]):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompt_args: The arguments customizing prompt generation.
         :param base_prompt: The base prompt prefacing all prompt information.
         """
         self.args = prompt_args
-        self.base_prompt = base_prompt
+        self.base_prompt = base_prompt if isinstance(base_prompt, str) else base_prompt.value
 
     def generate_base(self, base_prompt: str, base_completion: str) -> EnumDict[str, str]:
         """

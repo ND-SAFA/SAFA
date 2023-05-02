@@ -7,10 +7,10 @@ on:
     types: [ opened ]
   issue_comment:
     types: [ created ]
-    body: /build
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, '/build')
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

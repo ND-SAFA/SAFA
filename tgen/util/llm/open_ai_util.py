@@ -7,7 +7,9 @@ from tqdm import tqdm
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.util.list_util import ListUtil
-from tgen.util.llm.llm_util import LLMUtil
+from tgen.util.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.util.llm.llm_task import LLMTask
+from tgen.util.llm.llm_util import AIObject, LLMUtil
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
@@ -37,8 +39,12 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
         """
         return openai.FineTune.retrieve(**params)
 
+    @classmethod
+    def make_completion_request(cls, **params) -> OpenAIObject:
+        return cls.make_completion_request_impl(**params)
+
     @staticmethod
-    def make_completion_request(**params) -> OpenAIObject:
+    def make_completion_request_impl(**params) -> AIObject:
         """
         Makes a request to completion a model
         :param params: Params necessary for request
@@ -56,6 +62,13 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
                 res.choices.extend(batch_res.choices)
             time.sleep(.1)  # trying to avoid rate limit
         return res
+
+    @staticmethod
+    def translate_to_response(task: LLMTask, res: OpenAIObject, **params) -> SupportedLLMResponses:
+        if task == LLMTask.GENERATION:
+            return GenerationResponse([choice.text.strip() for choice in res.choices])
+        elif task == LLMTask.CLASSIFICATION:
+            return ClassificationResponse([r.logprobs.top_logprobs[0] for r in res.choices])
 
     @staticmethod
     def upload_file(**params) -> OpenAIObject:

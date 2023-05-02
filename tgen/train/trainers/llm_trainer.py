@@ -1,7 +1,6 @@
 from typing import Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
-from openai.openai_object import OpenAIObject
 from scipy.special import softmax
 
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -19,6 +18,8 @@ from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.llm.llm_responses import ClassificationResponse, GenerationResponse
+from tgen.util.llm.llm_task import LLMTask
 from tgen.util.llm.llm_util import LLMUtil
 from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 from tgen.util.logging.logger_manager import logger
@@ -84,10 +85,17 @@ class LLMTrainer(AbstractTrainer):
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        res = self.llm_util.make_completion_request(model=self.trainer_args.model, prompt=list(prompt_df[PromptKeys.PROMPT]),
+        task = LLMTask.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) else LLMTask.GENERATION
+        res = self.llm_util.make_completion_request(task=task, model=self.trainer_args.model,
+                                                    prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                     **params)
-        output = self._create_classification_output(res, dataset) \
-            if isinstance(self.prompt_creator, ClassificationPromptCreator) else self._create_generation_output(res)
+
+        if isinstance(res, ClassificationResponse):
+            output = self._create_classification_output(res, dataset)
+        elif isinstance(res, GenerationResponse):
+            output = self._create_generation_output(res.batch_responses)
+        else:
+            raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
 
     def cleanup(self) -> None:
@@ -109,26 +117,24 @@ class LLMTrainer(AbstractTrainer):
         return dataset
 
     @staticmethod
-    def _create_generation_output(res: OpenAIObject):
+    def _create_generation_output(responses: List[str]):
         """
         Creates the output for a generation
         :param res: The response from the completion
         :return: The generation output
         """
-        return TracePredictionOutput(predictions=[choice.text.strip() for choice in res.choices],
-                                     additional_output={"id": res.id})
+        return TracePredictionOutput(predictions=[r.strip() for r in responses])  #
 
-    def _create_classification_output(self, res: OpenAIObject, dataset: PromptDataset):
+    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset):
         """
         Creates the output for a classification
         :param res: The response from the completion
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        scores = list(map(lambda r: self._get_score(r.logprobs.top_logprobs), res.choices))
+        scores = list(map(lambda r: self._get_score(r.logprobs.top_logprobs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
-        output = TracePredictionOutput(predictions=scores,
-                                       additional_output={"id": res.id})
+        output = TracePredictionOutput(predictions=scores)
         if trace_dataset is not None:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              link_ids=trace_dataset.get_ordered_link_ids(),

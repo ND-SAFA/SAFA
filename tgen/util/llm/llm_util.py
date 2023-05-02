@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar
 
 from tgen.util.base_object import BaseObject
+from tgen.util.llm.llm_responses import SupportedLLMResponses
+from tgen.util.llm.llm_task import LLMTask
 
 AIObject = TypeVar("AIObject")
 
@@ -29,13 +31,36 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
         :return: The response from AI library.
         """
 
+    @classmethod
+    @abstractmethod
+    def make_completion_request(cls, task: LLMTask, **params) -> AIObject:
+        """
+        Makes a request to fine-tune a model.
+        :param task: The task to translate response to.
+        :param params: Named parameters to pass to AI library.
+        :return: The response from AI library.
+        """
+        llm_response = cls.make_completion_request_impl(**params)
+        return cls.translate_to_response(llm_response, task)
+
     @staticmethod
     @abstractmethod
-    def make_completion_request(**params) -> AIObject:
+    def make_completion_request_impl(**params) -> AIObject:
         """
         Makes a completion request to model.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+        """
+        Translates the LLM library response to task specific response.
+        :param task: The task to translate to.
+        :param res: The response from the LLM library.
+        :param params: Any additional parameters to customize translation.
+        :return: A task-specific response.
         """
 
     @staticmethod

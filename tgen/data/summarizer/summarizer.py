@@ -15,6 +15,8 @@ from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.file_util import FileUtil
+from tgen.util.llm.llm_responses import GenerationResponse
+from tgen.util.llm.llm_task import LLMTask
 from tgen.util.llm.llm_util import LLMUtil
 from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
@@ -124,9 +126,9 @@ class Summarizer(BaseObject):
         :return: The summaries of all chunks
         """
         prompts = [prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value] for chunk in chunks]
-        res = ai_utils.make_completion_request(model=model_path, prompt=prompts,
-                                               **args.to_params(TrainerTask.PREDICT))
-        return [choice.text.strip() for choice in res.choices]
+        res: GenerationResponse = ai_utils.make_completion_request(task=LLMTask.GENERATION, model=model_path, prompt=prompts,
+                                                                   **args.to_params(TrainerTask.PREDICT))
+        return [r.strip() for r in res.batch_responses]
 
     @staticmethod
     def _get_chunker(path_to_file: str = None) -> SupportedChunker:

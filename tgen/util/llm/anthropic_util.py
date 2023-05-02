@@ -4,7 +4,9 @@ import anthropic
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
-from tgen.util.llm.llm_util import LLMUtil
+from tgen.util.llm.llm_responses import SupportedLLMResponses
+from tgen.util.llm.llm_task import LLMTask
+from tgen.util.llm.llm_util import AIObject, LLMUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -17,6 +19,7 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """
+
     Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
 
@@ -39,7 +42,7 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
         raise NotImplementedError(NotImplementedError)
 
     @staticmethod
-    def make_completion_request(**params) -> AnthropicResponse:
+    def make_completion_request_impl(**params) -> AnthropicResponse:
         """
         Makes a completion request to anthropic api.
         :param params: Named parameters to anthropic API.
@@ -59,6 +62,10 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
         else:
             raise Exception(f"Prompt format is not supported. Expected list or string: {prompts}")
         return response
+
+    @staticmethod
+    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+        raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:

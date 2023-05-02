@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+os.environ["DEPLOYMENT"] = "development"
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)

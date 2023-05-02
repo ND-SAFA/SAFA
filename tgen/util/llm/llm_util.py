@@ -32,7 +32,6 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
         """
 
     @classmethod
-    @abstractmethod
     def make_completion_request(cls, task: LLMTask, **params) -> AIObject:
         """
         Makes a request to fine-tune a model.

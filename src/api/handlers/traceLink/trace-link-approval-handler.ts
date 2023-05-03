@@ -224,12 +224,8 @@ function linkAPIHandler(
   linkAPI: (traceLink: TraceLinkSchema) => Promise<TraceLinkSchema[]>,
   { onSuccess, onError, onComplete }: IOHandlerCallback<TraceLinkSchema[]>
 ): void {
-  appStore.onLoadStart();
   linkAPI(link)
     .then((updatedLinks) => onSuccess?.(updatedLinks))
     .catch((e) => onError?.(e))
-    .finally(() => {
-      appStore.onLoadEnd();
-      onComplete?.();
-    });
+    .finally(onComplete);
 }

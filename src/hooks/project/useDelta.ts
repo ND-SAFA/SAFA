@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import {
+  ApprovalType,
   ArtifactDeltaState,
   ArtifactSchema,
   EntityModification,
@@ -108,7 +109,7 @@ export const useDelta = defineStore("delta", {
       ]);
       traceStore.addOrUpdateTraceLinks([
         ...Object.values(payload.traces.added),
-        ...Object.values(payload.traces.removed),
+        ...Object.values(payload.traces.modified).map(({ before }) => before),
       ]);
       await subtreeStore.restoreHiddenNodesAfter(async () =>
         layoutStore.setArtifactTreeLayout()
@@ -149,7 +150,14 @@ export const useDelta = defineStore("delta", {
       } else if (id in this.projectDelta.traces.added) {
         return ArtifactDeltaState.ADDED;
       } else if (id in this.projectDelta.traces.modified) {
-        return ArtifactDeltaState.MODIFIED;
+        if (
+          this.projectDelta.traces.modified[id].after.approvalStatus ===
+          ApprovalType.DECLINED
+        ) {
+          return ArtifactDeltaState.REMOVED;
+        } else {
+          return ArtifactDeltaState.MODIFIED;
+        }
       } else if (id in this.projectDelta.traces.removed) {
         return ArtifactDeltaState.REMOVED;
       } else {

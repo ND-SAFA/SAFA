@@ -1,16 +1,40 @@
 import { TimArtifactLevelSchema } from "@/types";
-import { typeOptionsStore, projectStore } from "@/hooks";
-import { deleteTraceMatrix, getTraceMatrices } from "@/api";
+import { typeOptionsStore, projectStore, logStore } from "@/hooks";
+import { createTraceMatrix, deleteTraceMatrix } from "@/api";
 
 /**
- * Updates the trace matrices for the project.
+ * Creates traces from the given source to target artifact types.
  *
- * @return The current trace matrices.
+ * @param sourceArtifactTypeName - The source artifact type name.
+ * @param targetArtifactTypeName - The target artifact type name.
  */
-export async function handleLoadTraceMatrices(): Promise<void> {
-  typeOptionsStore.initializeTypeDirections(
-    await getTraceMatrices(projectStore.projectId)
-  );
+export async function handleCreateTraceType(
+  sourceArtifactTypeName: string,
+  targetArtifactTypeName: string
+): Promise<void> {
+  try {
+    await createTraceMatrix(
+      projectStore.projectId,
+      sourceArtifactTypeName,
+      targetArtifactTypeName
+    );
+
+    typeOptionsStore.updateLinkDirections({
+      name: sourceArtifactTypeName,
+      allowedTypes: [
+        ...typeOptionsStore.tim.artifacts[sourceArtifactTypeName].allowedTypes,
+        targetArtifactTypeName,
+      ],
+    });
+
+    logStore.onSuccess(
+      `Created trace direction: ${sourceArtifactTypeName} -> ${targetArtifactTypeName}`
+    );
+  } catch (e) {
+    logStore.onError(
+      `Unable to create trace direction: ${sourceArtifactTypeName} -> ${targetArtifactTypeName}`
+    );
+  }
 }
 
 /**
@@ -23,11 +47,21 @@ export async function handleRemoveTraceType(
   sourceArtifactTypeName: string,
   targetArtifactTypeName: string
 ): Promise<void> {
-  await deleteTraceMatrix(
-    projectStore.projectId,
-    sourceArtifactTypeName,
-    targetArtifactTypeName
-  );
+  try {
+    await deleteTraceMatrix(
+      projectStore.projectId,
+      sourceArtifactTypeName,
+      targetArtifactTypeName
+    );
+
+    logStore.onSuccess(
+      `Deleted trace direction: ${sourceArtifactTypeName} -> ${targetArtifactTypeName}`
+    );
+  } catch (e) {
+    logStore.onError(
+      `Unable to delete trace direction: ${sourceArtifactTypeName} -> ${targetArtifactTypeName}`
+    );
+  }
 }
 
 /**

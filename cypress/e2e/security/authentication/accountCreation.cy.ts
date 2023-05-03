@@ -1,5 +1,7 @@
 import { DataCy, Routes } from "@/fixtures";
-const user = Cypress.env();
+
+const { createUser, validUser } = Cypress.env();
+
 describe("Account Creation", () => {
   beforeEach(() => {
     cy.visit(Routes.LOGIN_ACCOUNT);
@@ -11,15 +13,15 @@ describe("Account Creation", () => {
         Routes.CREATE_ACCOUNT
       );
 
-      cy.inputText(DataCy.newAccountEmailInput, user.createUser.email)
-        .inputText(DataCy.newAccountPasswordInput, user.createUser.password)
+      cy.inputText(DataCy.newAccountEmailInput, createUser.email)
+        .inputText(DataCy.newAccountPasswordInput, createUser.password)
         .clickButton(DataCy.createAccountButton);
 
       cy.contains("p", "Your account has been successfully created.").should(
         "be.visible"
       );
 
-      cy.dbDeleteUser(user.createUser.email, user.createUser.password);
+      cy.dbDeleteUser(createUser.email, createUser.password);
     });
   });
 
@@ -29,8 +31,8 @@ describe("Account Creation", () => {
         Routes.CREATE_ACCOUNT
       );
 
-      cy.inputText(DataCy.newAccountEmailInput, user.validUser.email)
-        .inputText(DataCy.newAccountPasswordInput, user.validUser.password)
+      cy.inputText(DataCy.newAccountEmailInput, validUser.email)
+        .inputText(DataCy.newAccountPasswordInput, validUser.password)
         .clickButton(DataCy.createAccountButton);
 
       cy.contains("Unable to create an account").should("be.visible");

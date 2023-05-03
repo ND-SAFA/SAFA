@@ -6,32 +6,33 @@ export default defineConfig({
   chromeWebSecurity: false,
   e2e: {
     baseUrl: "https://localhost.safa.ai:8080",
+    experimentalInteractiveRunEvents: true,
     env: {
       // Get with `cy.env("key")`
       validUser: {
-        email: "",
-        password: "",
+        email: `test-${Math.random()}@test.com`,
+        password: "123",
       },
       invalidUser: {
-        email: "",
-        password: "",
+        email: `test-invalid-${Math.random()}@test.com`,
+        password: "super-invalid-password",
       },
       editUser: {
-        email: "",
-        password: "",
-        newPassword: "",
+        email: `test-edit-${Math.random()}@test.com`,
+        password: "123",
+        newPassword: "newPassword",
       },
       createUser: {
-        email: "",
-        password: "",
+        email: `test-create-${Math.random()}@test.com`,
+        password: "123",
       },
       deleteUser: {
-        email: "",
-        password: "",
+        email: `test-delete-${Math.random()}@test.com`,
+        password: "123",
       },
       inviteUser: {
-        email: "",
-        invalidEmail: "",
+        email: `test-invite-${Math.random()}@test.com`,
+        invalidEmail: `test-invite-${Math.random()}@test.com`,
       },
     },
   },

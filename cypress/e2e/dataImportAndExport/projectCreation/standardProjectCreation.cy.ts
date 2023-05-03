@@ -6,16 +6,13 @@ import {
   testProject,
 } from "@/fixtures";
 
-const user = Cypress.env();
+const validUser = Cypress.env("validUser");
+
 describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.loginToPage(
-      user.validUser.email,
-      user.validUser.password,
-      Routes.PROJECT_CREATOR
-    );
+    cy.loginToPage(validUser.email, validUser.password, Routes.PROJECT_CREATOR);
   });
 
   describe("Project Artifact Uploading", () => {

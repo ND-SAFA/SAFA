@@ -14,20 +14,11 @@ import "./projectSettingCommands";
 import "./traceLinkGenerationCommands";
 import "./customAttributesCommands";
 
-before(() => {
-  // Load users into the environment
-  cy.loadEnv();
-
-  // Now let's create these accounts
-  cy.generateUsers();
-});
-
 /**
  * Ignore the following error:
  * - ResizeObserver loop limit exceeded
  * - Cannot read properties of _
  */
-
 Cypress.on("uncaught:exception", (err) => {
   if (
     err.message.includes("ResizeObserver loop limit exceeded") ||
@@ -38,10 +29,18 @@ Cypress.on("uncaught:exception", (err) => {
   }
 });
 
-after(() => {
-  // Delete the users we created
-  cy.deleteGeneratedUsers();
+/**
+ * Generate users before running tests.
+ */
+before(() => {
+  cy.log("Generating users...");
+  cy.dbGenerateUsers();
+});
 
-  // Clear the env
-  cy.clearEnv();
+/**
+ * Delete users after running tests.
+ */
+after(() => {
+  cy.log("Cleaning up users...");
+  cy.dbDeleteGeneratedUsers();
 });

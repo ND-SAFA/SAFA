@@ -1,5 +1,7 @@
 import { DataCy, Routes } from "@/fixtures";
-const user = Cypress.env();
+
+const validUser = Cypress.env("validUser");
+
 describe("Project Version List", () => {
   before(() => {
     cy.initProject().clearAllCookies();
@@ -7,8 +9,8 @@ describe("Project Version List", () => {
 
   beforeEach(() => {
     cy.expandViewport().loginToPage(
-      user.validUser.email,
-      user.validUser.password,
+      validUser.email,
+      validUser.password,
       Routes.MY_PROJECTS
     );
   });

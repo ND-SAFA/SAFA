@@ -91,6 +91,16 @@ declare namespace Cypress {
      */
     dbDeleteUser(email: string, password: string): Chainable<void>;
 
+    /**
+     * Generates all the users that are needed for the tests.
+     */
+    dbGenerateUsers(): Chainable<void>;
+
+    /**
+     * Deletes all the created users after test run.
+     */
+    dbDeleteGeneratedUsers(): Chainable<void>;
+
     // Should Commands
 
     /**
@@ -204,26 +214,6 @@ declare namespace Cypress {
       fn: (tr: Chainable<JQuery<HTMLElement>>) => void,
       waitForLoad?: boolean
     ): Chainable<void>;
-
-    /**
-     * Loads any variables into the Cypress environment.
-     */
-    loadEnv(): Chainable<void>;
-
-    /**
-     * Clears all variables from the Cypress environment.
-     */
-    clearEnv(): Chainable<void>;
-
-    /**
-     * Generates all the users that are needed for the tests.
-     */
-    generateUsers(): Chainable<void>;
-
-    /**
-     * Deletes all the created users after test run.
-     */
-    deleteGeneratedUsers(): Chainable<void>;
 
     // Authentication Commands
 

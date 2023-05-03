@@ -1,7 +1,5 @@
 import { Routes } from "@/fixtures";
 
-const user = Cypress.env();
-
 const apiUrl = "https://dev-api.safa.ai";
 
 Cypress.on("window:before:load", (window) => {
@@ -20,7 +18,9 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("dbToken", () => {
-  cy.request<{ token: string }>("POST", `${apiUrl}/login`, user.validUser);
+  const validUser = Cypress.env("validUser");
+
+  cy.request("POST", `${apiUrl}/login`, validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
@@ -117,13 +117,8 @@ Cypress.Commands.add("dbResetVersions", () => {
 });
 
 Cypress.Commands.add("dbDeleteUser", (email, password) => {
-  cy.request<{ token: string }>({
-    method: "POST",
-    url: `${apiUrl}/accounts/delete`,
-    body: { email, password },
-    failOnStatusCode: false,
-  }).then(() => {
-    cy.request<{ token: string }>({
+  cy.request("POST", `${apiUrl}/login`, { email, password }).then(() => {
+    cy.request({
       method: "POST",
       url: `${apiUrl}/accounts/delete`,
       body: { password },
@@ -132,30 +127,23 @@ Cypress.Commands.add("dbDeleteUser", (email, password) => {
   });
 });
 
-Cypress.Commands.add("generateUsers", () => {
-  // Create the account for validUser and editUser
-  cy.request<{ token: string }>({
-    method: "POST",
-    url: `${apiUrl}/accounts/create`,
-    body: { email: user.validUser.email, password: user.validUser.password },
-  }).request<{ token: string }>({
-    method: "POST",
-    url: `${apiUrl}/accounts/create`,
-    body: { email: user.editUser.email, password: user.editUser.password },
-  });
+Cypress.Commands.add("dbGenerateUsers", () => {
+  const { validUser, editUser } = Cypress.env();
+
+  for (const user of [validUser, editUser]) {
+    cy.request<{ token: string }>({
+      failOnStatusCode: false,
+      method: "POST",
+      url: `${apiUrl}/accounts/create`,
+      body: user,
+    });
+  }
 });
 
-//TODO: This is not working and is causing newly created accounts to remain undeleted
-Cypress.Commands.add("deleteGeneratedUsers", () => {
-  // Delete the account for all the users in the user object
-  cy.loginToPage(
-    user.validUser.email,
-    user.validUser.password,
-    Routes.LOGIN_ACCOUNT
-  ).dbDeleteUser(user.validUser.email, user.validUser.password);
-  cy.loginToPage(
-    user.editUser.email,
-    user.editUser.password,
-    Routes.LOGIN_ACCOUNT
-  ).dbDeleteUser(user.editUser.email, user.editUser.password);
+Cypress.Commands.add("dbDeleteGeneratedUsers", () => {
+  const { validUser, editUser } = Cypress.env();
+
+  for (const user of [validUser, editUser]) {
+    cy.dbDeleteUser(user.email, user.password);
+  }
 });

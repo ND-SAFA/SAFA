@@ -1,5 +1,6 @@
 import { DataCy, Routes, simpleProjectFiles } from "@/fixtures";
-const user = Cypress.env();
+
+const validUser = Cypress.env("validUser");
 
 describe("Project Versions", () => {
   before(() => {
@@ -10,7 +11,7 @@ describe("Project Versions", () => {
     cy.dbResetVersions();
 
     cy.visit(Routes.MY_PROJECTS)
-      .login(user.validUser.email, user.validUser.password)
+      .login(validUser.email, validUser.password)
       .locationShouldEqual(Routes.MY_PROJECTS)
       .expandViewport();
   });

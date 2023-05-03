@@ -1,5 +1,7 @@
 import { DataCy, Routes, testProject } from "@/fixtures";
-const user = Cypress.env();
+
+const validUser = Cypress.env("validUser");
+
 describe("Project List", () => {
   before(() => {
     cy.initEmptyProject().clearAllCookies();
@@ -7,11 +9,7 @@ describe("Project List", () => {
 
   beforeEach(() => {
     cy.viewport(1080, 1080);
-    cy.loginToPage(
-      user.validUser.email,
-      user.validUser.password,
-      Routes.MY_PROJECTS
-    );
+    cy.loginToPage(validUser.email, validUser.password, Routes.MY_PROJECTS);
   });
 
   describe("I can search for projects by name", () => {

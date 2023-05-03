@@ -5,7 +5,9 @@ import {
   testProject,
   Routes,
 } from "@/fixtures";
-const user = Cypress.env();
+
+const validUser = Cypress.env("validUser");
+
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();
@@ -14,8 +16,8 @@ describe("Bulk Project Creation", () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.loginToPage(
-      user.validUser.email,
-      user.validUser.password,
+      validUser.email,
+      validUser.password,
       Routes.PROJECT_CREATOR,
       { tab: "bulk" }
     );

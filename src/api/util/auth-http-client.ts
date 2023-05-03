@@ -38,16 +38,15 @@ export default async function authHttpClient<T>(
 
   const content = await res.text();
 
-  if (res.status === 403) {
+  if (res.status === 403 && !relativeUrl.includes("credentials")) {
+    // Log out of the app if credentials expire.
+    // Ensure that we don't log out if the expired credential status is for an integration.
     const message = "Session has timed out. Please log back in.";
 
     await handleLogout();
 
     logStore.onWarning(message);
     throw Error(message);
-  } else if (res.status === 204 || content === "" || content === "created") {
-    // TODO: is this legacy code even necessary?
-    return {} as T;
   } else if (!parseResponse) {
     return content as unknown as T;
   }

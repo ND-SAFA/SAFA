@@ -25,7 +25,8 @@ export function svgText(
     ? svgIcon(
         {
           ...style,
-          width: 24,
+          width: 20,
+          x: 8,
         },
         style.icon
       )
@@ -40,9 +41,10 @@ export function svgText(
         class="text-body-1 ${style.class || ""}" 
         data-cy="tree-node-${dataCy}"
         style="${textStyle}"
-      >${icon}${sanitizeText(text)}</span>`;
+      >${sanitizeText(text)}</span>`;
 
   return `
+    ${icon}
     <foreignObject 
       x="${style.x}" y="${style.y}" 
       width="${style.width}" 

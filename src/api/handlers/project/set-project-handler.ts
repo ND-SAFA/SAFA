@@ -3,8 +3,8 @@ import { createProject } from "@/util";
 import { documentStore, subtreeStore, projectStore } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
 import {
+  getTraceMatrices,
   handleLoadInstallations,
-  handleLoadTraceMatrices,
   handleLoadVersion,
   handleSelectVersion,
 } from "@/api";
@@ -31,10 +31,10 @@ export async function handleSetProject(project: ProjectSchema): Promise<void> {
   const versionId = project.projectVersion?.versionId || "";
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
+  project.typeDirections = await getTraceMatrices(projectId);
   projectStore.initializeProject(project);
 
   await handleSelectVersion(projectId, versionId);
-  await handleLoadTraceMatrices();
   await handleLoadInstallations({});
   await setCurrentDocument(project);
   await updateParam(QueryParams.VERSION, versionId);

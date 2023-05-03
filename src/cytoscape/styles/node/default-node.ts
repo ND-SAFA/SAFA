@@ -4,7 +4,7 @@ import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 
 /**
- * Creates the SVG safety case context.
+ * Creates the default SVG node.
  *
  * @param data - The artifact data to render.
  *

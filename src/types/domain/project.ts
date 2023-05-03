@@ -9,6 +9,7 @@ import {
   WarningSchema,
   AttributeSchema,
   AttributeLayoutSchema,
+  ArtifactTypeDirections,
 } from "@/types";
 
 /**
@@ -87,6 +88,10 @@ export interface ProjectSchema extends IdentifierSchema {
    * The artifact types present in the project.
    */
   artifactTypes: ArtifactTypeSchema[];
+  /**
+   * The directions of allowed links between artifact types.
+   */
+  typeDirections: ArtifactTypeDirections;
 
   /**
    * The current document id.

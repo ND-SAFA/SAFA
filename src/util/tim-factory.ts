@@ -18,6 +18,21 @@ export function createTIM(project?: ProjectSchema): TimSchema {
     artifactTypes[id] = type;
   });
 
+  // Add trace counts from the artifact types, in case a type direction exists with 0 links.
+  Object.entries(project?.typeDirections || {}).forEach(
+    ([name, allowedTypes]) => {
+      allowedTypes.forEach((allowedType) => {
+        const type = `${name}${delimiter}${allowedType}`;
+
+        traceCounts[type] = {
+          total: 0,
+          generated: 0,
+          approved: 0,
+        };
+      });
+    }
+  );
+
   project?.traces.forEach(
     ({ sourceId, targetId, approvalStatus, traceType }) => {
       const type = `${artifactTypes[sourceId]}${delimiter}${artifactTypes[targetId]}`;
@@ -46,7 +61,7 @@ export function createTIM(project?: ProjectSchema): TimSchema {
           name: artifactType,
           count,
           icon: defaultTypeIcon,
-          allowedTypes: [],
+          allowedTypes: project?.typeDirections[artifactType] || [],
           iconIndex: 0,
         },
       }))

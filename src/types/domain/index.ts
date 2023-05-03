@@ -13,3 +13,4 @@ export * from "./model";
 export * from "./attribute";
 export * from "./installations";
 export * from "./tim";
+export * from "./search";

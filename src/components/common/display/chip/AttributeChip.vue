@@ -21,6 +21,7 @@
     <typography
       ellipsis
       inherit-color
+      :small="text.length >= 10"
       :l="iconVisible ? '1' : ''"
       :value="text"
     />

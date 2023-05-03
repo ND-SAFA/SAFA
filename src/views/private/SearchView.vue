@@ -1,7 +1,7 @@
 <template>
   <private-page full-window>
     <flex-box full-width justify="center" t="10">
-      <panel-card>
+      <q-card>
         <flex-box>
           <q-select
             v-model="mode"
@@ -43,6 +43,7 @@
                   <artifact-type-input
                     v-model="searchTypes"
                     multiple
+                    clearable
                     label="Search Artifact Types"
                     hint="What types am I generating relationships to."
                     class="full-width"
@@ -53,12 +54,13 @@
                     type="number"
                     label="Max Results"
                     class="q-ml-sm"
-                    style="min-width: 100px; width: 100px"
+                    style="min-width: 125px; width: 125px"
                   />
                 </flex-box>
                 <artifact-type-input
                   v-model="relateTypes"
                   multiple
+                  clearable
                   label="Include Artifact Types"
                   hint="What types do I want to see related to my search."
                   class="full-width q-my-md"
@@ -71,7 +73,7 @@
             </template>
           </q-select>
         </flex-box>
-      </panel-card>
+      </q-card>
     </flex-box>
   </private-page>
 </template>

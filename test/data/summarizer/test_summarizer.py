@@ -2,8 +2,8 @@ import os
 from unittest import mock
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
-from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
+from tgen.data.chunkers.python_chunker import PythonChunker
+from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR

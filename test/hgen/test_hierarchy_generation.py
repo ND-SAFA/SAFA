@@ -48,7 +48,7 @@ class TestHierarchyGeneration(BaseTest):
             trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
             return trainer_dataset_manager[DatasetRole.EVAL]
 
-    @mock.patch("tgen.data.creators.cluster_dataset_creator.ClusterDatasetCreator._cluster")
+    @mock.patch("tgen.data.creators.clustering.cluster_dataset_creator.ClusterDatasetCreator._cluster")
     @mock.patch("openai.Completion.create")
     def test_run(self, mock_completion_api: mock.MagicMock, mock_cluster: mock.MagicMock):
         mock_completion_api.side_effect = fake_open_ai_completion

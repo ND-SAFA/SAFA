@@ -19,9 +19,9 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.ai.open_ai_util import OpenAIUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 
 class PromptDataset(iDataset):
@@ -33,7 +33,8 @@ class PromptDataset(iDataset):
     __SAVE_FILENAME = "prompt_dataframe_checkpoint.csv"
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
-                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
+                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None,
+                 llm_util: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
         """
         Initializes the dataset with necessary artifact/trace information and generator for the prompts
         :param prompt_df: The prompt dataframe
@@ -41,6 +42,7 @@ class PromptDataset(iDataset):
         :param trace_dataset: The dataset containing trace links and artifacts
         :param project_file_id: The file id used by open AI
         :param data_export_path: The path to where data files will be saved if specified. May be to a directory or specific file
+        :param llm_util: The utility class for access LLM API
         """
         self.prompt_df = prompt_df
         self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset is not None else artifact_df
@@ -50,6 +52,7 @@ class PromptDataset(iDataset):
         if not self.project_file_id and prompt_df is None:
             assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe must be provided to generate dataset."
         self.__summarized_artifacts = {}
+        self.llm_util = llm_util.value
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -108,7 +111,7 @@ class PromptDataset(iDataset):
         if not self.project_file_id:
             prompt_df = self.get_prompts_dataframe(prompt_creator, summarizer)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
-            res = OpenAIUtil.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
+            res = self.llm_util.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)

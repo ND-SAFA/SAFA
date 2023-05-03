@@ -9,8 +9,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     Creates prompt datasets used for classification for some defined AI libray.
     """
 
-    def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "yes", neg_class: str = "no",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}", base_prompt: SupportedPrompts = SupportedPrompts.CLASSIFICATION):
+    def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "Yes", neg_class: str = "No",
+                 artifact_prompt_format: str = "\n1. {}\n2. {}\n>", base_prompt: str = SupportedPrompts.CLASSIFICATION.value):
         """
         Constructs classification prompt creator
         :param prompt_args: The arguments used to construct prompts.
@@ -20,8 +20,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         :param base_prompt: The base classification prompt to use.
         """
         if prompt_args is None:
-            from tgen.train.args.open_ai_args import OpenAiArgs  # used to automatically have args for tests
-            prompt_args = OpenAiArgs.prompt_args
+            from tgen.train.args.open_ai_args import OpenAIArgs  # used to automatically have args for tests
+            prompt_args = OpenAIArgs.prompt_args
         super().__init__(prompt_args, base_prompt)
         self.pos_class = pos_class
         self.neg_class = neg_class
@@ -36,6 +36,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         :return: Dictionary containing the prompt and completion
         """
         artifact_prompt = self.artifact_prompt_format.format(source_content, target_content, label)
-        prompt = f"{self.base_prompt.value}{artifact_prompt}"
+        prompt = f"{self.base_prompt}{artifact_prompt}"
         class_ = self.pos_class if label == 1 else self.neg_class
-        return self.generate_base(prompt, class_)
+        prompt = self.generate_base(prompt, class_)
+        return prompt

@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.train.args.open_ai_args import OpenAIArgs
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, prompt_creator=ClassificationPromptCreator())
 
     args = HGenArgs(hgen_trainer_type=SupportedTrainer.LLM,
-                    hgen_trainer_args=OpenAiArgs(),
+                    hgen_trainer_args=OpenAIArgs(prompt_creator=GenerationPromptCreator()),
                     hgen_base_model=GENERATION_MODEL_DEFAULT,
                     source_layer_id="Code", tgen_trainer=tgen_trainer,
                     dataset_creator_for_sources=dataset_creator_for_sources)

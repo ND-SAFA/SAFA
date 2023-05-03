@@ -202,7 +202,10 @@ class BaseObject(ABC):
         :return: the expected type
         """
         abstract_class = cls._get_base_class(abstract_class)
-        return get_enum_from_name(abstract_class._get_enum_class(child_class_name), child_class_name).value
+        assert hasattr(abstract_class, "_get_enum_class"), f"{abstract_class} does not implement `_get_enum_class`"
+        enum_class = abstract_class._get_enum_class(child_class_name)
+        enum_value = get_enum_from_name(enum_class, child_class_name).value
+        return enum_value
 
     @staticmethod
     def _get_base_class(typing_obj: Any) -> Optional[Type["BaseObject"]]:
@@ -253,6 +256,7 @@ class BaseObject(ABC):
         try:
             if not isinstance(val, UndeterminedVariable):
                 check_type(param_name, val, expected_type)
-        except TypeError:
+        except TypeError as e:
+            traceback.print_exc()
             return False
         return True

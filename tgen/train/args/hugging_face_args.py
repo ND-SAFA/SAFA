@@ -80,23 +80,22 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
-        self.__set_args(**kwargs)
-        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
-                         num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
-                         save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
-                         load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,
-                         logging_steps=self.logging_steps, report_to="wandb", weight_decay=self.weight_decay,
-                         learning_rate=self.learning_rate, deepspeed=self.deepspeed_path,
-                         gradient_checkpointing=self.gradient_checkpointing, fp16=self.fp16)
+        super_args = self.__set_unique_args(**kwargs)
+        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,  # args whose name is different from parent
+                         report_to="wandb", deepspeed=self.deepspeed_path, **super_args)
 
-    def __set_args(self, **kwargs) -> None:
+    def __set_unique_args(self, **kwargs) -> Dict:
         """
-        Sets class args
-        :param kwargs: optional arguments for Trainer
-        :return: None
+        Sets arguments that are unique to this class and returns those belonging to super class.
+        :param kwargs: Keyword arguments for class.
+        :return: Keyword arguments belonging to parent class.
         """
+        super_args = {}
         for arg_name, arg_value in kwargs.items():
+            if hasattr(super(), arg_name):
+                super_args[arg_name] = arg_value
             if hasattr(self, arg_name):
                 setattr(self, arg_name, arg_value)
             else:
                 raise Exception("Unrecognized training arg: " + arg_name)
+        return super_args

@@ -4,17 +4,20 @@ on:
   pull_request:
     branches:
       - development
-    types: [ opened, synchronize ]
+    types: [ opened ]
   issue_comment:
     types: [ created ]
-    body: /build
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check if comment contains /build
+        if: contains(github.event.comment.body, '/build')
+        run: |
+          echo "Build trigger has been activated."
       - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+        uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.9'
           cache: 'pip'

@@ -1,9 +1,13 @@
 from typing import TypedDict
 
 import anthropic
+from tqdm import tqdm
 
-from tgen.constants import ANTHROPIC_KEY, IS_TEST
-from tgen.util.ai.ai_util import AIUtil
+from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
+from tgen.train.args.anthropic_args import AnthropicParams
+from tgen.util.llm.llm_responses import SupportedLLMResponses
+from tgen.util.llm.llm_task import LLMTask
+from tgen.util.llm.llm_util import AIObject, LLMUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -12,10 +16,11 @@ class AnthropicResponse(TypedDict):
     """
 
 
-class AnthropicUtil(AIUtil[AnthropicResponse]):
+class AnthropicUtil(LLMUtil[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """
+
     Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
 
@@ -38,13 +43,26 @@ class AnthropicUtil(AIUtil[AnthropicResponse]):
         raise NotImplementedError(NotImplementedError)
 
     @staticmethod
-    def make_completion_request(**params) -> AnthropicResponse:
+    def make_completion_request_impl(**params) -> AnthropicResponse:
         """
         Makes a completion request to anthropic api.
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        return AnthropicUtil.Client.completion(**params)
+        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `params`"
+        prompts = params["prompt"]
+        response = []
+        if isinstance(prompts, str):
+            prompts = [prompts]
+        for p in tqdm(prompts):
+            prompt_params = {**params, "prompt": p}
+            prompt_response = AnthropicUtil.Client.completion(**prompt_params)
+            response.append(prompt_response)
+        return response
+
+    @staticmethod
+    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+        raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:

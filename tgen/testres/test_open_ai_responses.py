@@ -1,7 +1,5 @@
 from copy import deepcopy
 
-from openai.openai_object import OpenAIObject
-
 from tgen.util.attr_dict import AttrDict
 
 FINE_TUNE_REQUEST = AttrDict({
@@ -91,7 +89,6 @@ COMPLETION_RESPONSE_DICT = AttrDict({
         "completion_tokens": 7,
         "total_tokens": 12
     })})
-
 
 SUMMARY_FORMAT = "Summary of {}"
 

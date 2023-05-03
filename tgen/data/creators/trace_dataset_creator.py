@@ -5,7 +5,7 @@ import pandas as pd
 
 from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
-from tgen.constants.deliminator_constants import NEW_LINE, COMMA
+from tgen.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -167,12 +167,13 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
     @staticmethod
     def generate_negative_links(layer_mapping_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
-                                trace_df: TraceDataFrame, n_threads=20) -> TraceDataFrame:
+                                trace_df: TraceDataFrame, n_threads=10) -> TraceDataFrame:
         """
         Compares source and target artifacts for each entry in layer mapping and generates negative links between them.
         :param layer_mapping_df: DataFrame containing the comparisons between artifact types present in project.
         :param artifact_df: DataFrame containing information about the artifacts in the project.
         :param trace_df: DataFrame containing true links present in project.
+        :param n_threads: The maximum number of threads to use for pre-processing.
         :return: None
         """
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}

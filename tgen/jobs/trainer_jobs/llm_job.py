@@ -1,13 +1,18 @@
 from typing import Union
 
+from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.models.model_manager import ModelManager
-from tgen.train.args.open_ai_args import OpenAiArgs
+from tgen.train.args.llm_args import LLMArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.llm.llm_util import LLMUtil
+from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 from tgen.util.override import overrides
 
 
@@ -16,18 +21,26 @@ class LLMJob(AbstractTrainerJob):
     Job to handle open ai tasks
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: OpenAiArgs = OpenAiArgs(),
-                 base_model: str = "ada", task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: LLMArgs = None,
+                 task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None, prompt_creator: AbstractPromptCreator = None,
+                 llm_util: LLMUtil = None):
         """
         Initializes job with necessary args
-        :param base_model: The name of the model
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
-        super().__init__(model_manager=ModelManager(model_path=base_model), trainer_dataset_manager=trainer_dataset_manager,
+        if trainer_args is None:
+            trainer_args = OpenAIArgs()
+        if llm_util is None:
+            llm_util = SupportedLLMUtils.OPENAI.value
+            assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
+        if prompt_creator is None:
+            prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
+        super().__init__(model_manager=None, trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task, job_args=job_args)
-        self.base_model = base_model
         self.trainer_args = trainer_args
+        self.prompt_creator = prompt_creator
+        self.llm_util = llm_util
 
     @overrides(AbstractTrainerJob)
     def get_trainer(self, **kwargs) -> LLMTrainer:
@@ -39,7 +52,8 @@ class LLMJob(AbstractTrainerJob):
         if self._trainer is None:
             self._trainer = LLMTrainer(trainer_args=self.trainer_args,
                                        trainer_dataset_manager=self.trainer_dataset_manager,
-                                       base_model=self.base_model)
+                                       prompt_creator=self.prompt_creator,
+                                       llm_util=self.llm_util)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

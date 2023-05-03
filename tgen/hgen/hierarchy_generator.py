@@ -73,8 +73,7 @@ class HierarchyGenerator(BaseObject):
                                                  base_prompt=self.args.hgen_base_prompt)
         hgen_trainer = self.args.hgen_trainer_type.value(trainer_dataset_manager=hgen_dataset_manager,
                                                          trainer_args=self.args.hgen_trainer_args,
-                                                         prompt_creator=prompt_creator,
-                                                         base_model=self.args.hgen_base_model)
+                                                         prompt_creator=prompt_creator)
         self._update_trainer_args(hgen_trainer, export_path)
         logger.info(f"Generating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         artifact_generations = hgen_trainer.perform_prediction().predictions

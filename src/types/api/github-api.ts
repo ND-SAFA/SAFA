@@ -21,7 +21,7 @@ export interface GitHubImportSchema {
   /**
    * The artifact type id to import as.
    */
-  artifact_type_id?: string;
+  artifactType?: string;
 }
 
 /**
@@ -57,7 +57,7 @@ export interface GitHubProjectSchema {
   /**
    * The project's url.
    */
-  html_url?: string;
+  htmlUrl?: string;
   /**
    * The project's size.
    */
@@ -65,7 +65,7 @@ export interface GitHubProjectSchema {
   /**
    * A timestamp for the project was created.
    */
-  created_at: string;
+  createdAt: string;
   /**
    * The owner of this project.
    */

@@ -60,8 +60,9 @@ export async function handleSyncInstallation(
     if (installation.type === "GITHUB") {
       const job = await createGitHubProjectSync(
         projectStore.versionId,
-        installation.owner,
-        installation.installationId
+        installation.installationOrgId,
+        installation.installationId,
+        integrationsStore.gitHubConfig
       );
 
       await handleJobSubmission(job);

@@ -4,6 +4,7 @@ import anthropic
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
+from tgen.train.args.anthropic_args import AnthropicParams
 from tgen.util.llm.llm_responses import SupportedLLMResponses
 from tgen.util.llm.llm_task import LLMTask
 from tgen.util.llm.llm_util import AIObject, LLMUtil
@@ -48,19 +49,15 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        assert "prompt" in params, f"Expected {params} to include `params`"
+        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `params`"
         prompts = params["prompt"]
         response = []
-        if isinstance(prompts, list):
-            for prompt in tqdm(params["prompt"]):
-                prompt_params = {**params, "prompt": prompt}
-                prompt_response = AnthropicUtil.Client.completion(**prompt_params)
-                response.append(prompt_response)
-        elif isinstance(prompts, str):
-            prompt_response = AnthropicUtil.Client.completion(**params)
+        if isinstance(prompts, str):
+            prompts = [prompts]
+        for p in tqdm(prompts):
+            prompt_params = {**params, "prompt": p}
+            prompt_response = AnthropicUtil.Client.completion(**prompt_params)
             response.append(prompt_response)
-        else:
-            raise Exception(f"Prompt format is not supported. Expected list or string: {prompts}")
         return response
 
     @staticmethod

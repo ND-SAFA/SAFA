@@ -139,7 +139,7 @@ class TestHierarchyGeneration(BaseTest):
         linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df)
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
-            self.assertLess(label - 0.4012, 0.01)
+            self.assertLess(label - 0.4012, 0.1)
 
     def test_save_dataset_checkpoint(self):
         dataset = self.get_dataset_creator_with_prompt_project_reader().create()

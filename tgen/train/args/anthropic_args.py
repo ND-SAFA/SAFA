@@ -42,6 +42,7 @@ class AnthropicArgs(LLMArgs):
         :param instructions: Any additional instructions passed to param construction.
         :return: Params with customizations.
         """
+        # TODO: Create better solution for mapping common attributes to custom names
         if "max_tokens" in params:
             max_tokens = params.pop("max_tokens")
             params[AnthropicParams.MAX_TOKENS_TO_SAMPLE] = max_tokens

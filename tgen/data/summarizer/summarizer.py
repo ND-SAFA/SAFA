@@ -4,6 +4,7 @@ from typing import List
 import pandas as pd
 from tqdm import tqdm
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
@@ -125,10 +126,11 @@ class Summarizer(BaseObject):
         :param chunks: The chunks of text to summarize
         :return: The summaries of all chunks
         """
-        prompts = [prompt_creator.create(target_content=chunk, source_content='')[PromptKeys.PROMPT.value] for chunk in chunks]
+        prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value] for chunk in
+                   chunks]
         res: GenerationResponse = ai_utils.make_completion_request(task=LLMTask.GENERATION, model=model_path, prompt=prompts,
                                                                    **args.to_params(TrainerTask.PREDICT))
-        return [r.strip() for r in res.batch_responses]
+        return [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]
 
     @staticmethod
     def _get_chunker(path_to_file: str = None) -> SupportedChunker:

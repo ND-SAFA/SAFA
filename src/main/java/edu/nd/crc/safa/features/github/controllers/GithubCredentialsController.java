@@ -9,8 +9,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
@@ -60,9 +58,9 @@ public class GithubCredentialsController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Github.Credentials.REGISTER)
-    public DeferredResult<GithubResponseDTO<Void>> createCredentials(
+    public DeferredResult<Void> createCredentials(
         @NotNull @NotEmpty @PathVariable("accessCode") String accessCode) {
-        DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
+        DeferredResult<Void> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
@@ -86,16 +84,14 @@ public class GithubCredentialsController extends BaseController {
             credentials.setGithubHandler(selfResponseDTO.getLogin());
             credentials.setUser(principal);
             githubAccessCredentialsRepository.save(credentials);
-
-            output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.CREATED));
         });
 
         return output;
     }
 
     @DeleteMapping(AppRoutes.Github.Credentials.DELETE)
-    public DeferredResult<GithubResponseDTO<Void>> deleteCredentials() {
-        DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<Void> deleteCredentials() {
+        DeferredResult<Void> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
@@ -103,31 +99,28 @@ public class GithubCredentialsController extends BaseController {
                 .findByUser(principal);
 
             if (credentials.isEmpty()) {
-                output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.MISSING));
                 return;
             }
 
             githubAccessCredentialsRepository.delete(credentials.get());
-            output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.DELETED));
         });
 
         return output;
     }
 
     @GetMapping(AppRoutes.Github.Credentials.VALID)
-    public DeferredResult<GithubResponseDTO<Boolean>> validCredentials() {
-        DeferredResult<GithubResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<Boolean> validCredentials() {
+        DeferredResult<Boolean> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
             Optional<GithubAccessCredentials> credentials = githubConnectionService.getGithubCredentials(principal);
 
             if (credentials.isEmpty()) {
-                output.setResult(new GithubResponseDTO<>(false, GithubResponseMessage.MISSING));
-                return;
+                output.setResult(false);
+            } else {
+                output.setResult(githubControllerUtils.checkCredentials(credentials.get()));
             }
-
-            output.setResult(githubControllerUtils.checkCredentials(credentials.get()));
         });
 
         return output;

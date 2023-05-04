@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.controllers.utils;
 
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 
@@ -17,8 +16,8 @@ public class GithubControllerUtils {
 
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
 
-    public GithubResponseDTO<Boolean> checkCredentials(GithubAccessCredentials credentials) {
+    public boolean checkCredentials(GithubAccessCredentials credentials) {
         // TODO this doesn't actually check the credentials
-        return new GithubResponseDTO<>(true, GithubResponseDTO.GithubResponseMessage.OK);
+        return true;
     }
 }

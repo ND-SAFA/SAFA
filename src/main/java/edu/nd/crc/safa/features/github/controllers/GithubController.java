@@ -8,8 +8,6 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
@@ -63,11 +61,11 @@ public class GithubController extends BaseController {
      * @return A {@link JobAppEntity} representing the import job.
      */
     @PostMapping(AppRoutes.Github.Import.BY_NAME)
-    public DeferredResult<GithubResponseDTO<JobAppEntity>> pullGithubProject(
-        @PathVariable("repositoryName") String repositoryName,
-        @PathVariable("owner") String owner,
-        @RequestBody GithubImportDTO importSettings) {
-        DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<JobAppEntity> pullGithubProject(@PathVariable("repositoryName") String repositoryName,
+                                                          @PathVariable("owner") String owner,
+                                                          @RequestBody GithubImportDTO importSettings) {
+
+        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
@@ -75,10 +73,8 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
             CreateProjectViaGithubBuilder builder
                 = new CreateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
-            GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
-                GithubResponseMessage.OK);
 
-            output.setResult(responseDTO);
+            output.setResult(builder.perform());
         });
 
         return output;
@@ -95,12 +91,12 @@ public class GithubController extends BaseController {
      * @return Information about the started job
      */
     @PutMapping(AppRoutes.Github.Import.UPDATE)
-    public DeferredResult<GithubResponseDTO<JobAppEntity>> updateGithubProject(
-        @PathVariable("versionId") UUID versionId,
-        @PathVariable("repositoryName") String repositoryName,
-        @PathVariable("owner") String owner,
-        @RequestBody GithubImportDTO importSettings) {
-        DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<JobAppEntity> updateGithubProject(@PathVariable("versionId") UUID versionId,
+                                                            @PathVariable("repositoryName") String repositoryName,
+                                                            @PathVariable("owner") String owner,
+                                                            @RequestBody GithubImportDTO importSettings) {
+
+        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
@@ -109,10 +105,8 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
                 = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
-            GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
-                GithubResponseMessage.OK);
 
-            output.setResult(responseDTO);
+            output.setResult(builder.perform());
         });
 
         return output;
@@ -129,12 +123,12 @@ public class GithubController extends BaseController {
      * @return Information about the started job
      */
     @PostMapping(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
-    public DeferredResult<GithubResponseDTO<JobAppEntity>> importIntoExistingProject(
-        @PathVariable("versionId") UUID versionId,
-        @PathVariable("repositoryName") String repositoryName,
-        @PathVariable("owner") String owner,
-        @RequestBody GithubImportDTO importSettings) {
-        DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<JobAppEntity> importIntoExistingProject(@PathVariable("versionId") UUID versionId,
+                                                                  @PathVariable("repositoryName") String repositoryName,
+                                                                  @PathVariable("owner") String owner,
+                                                                  @RequestBody GithubImportDTO importSettings) {
+
+        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
 
         SafaUser principal = this.checkCredentials();
         executorDelegate.submit(output, () -> {
@@ -143,10 +137,8 @@ public class GithubController extends BaseController {
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
                 = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
-            GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
-                GithubResponseMessage.OK);
 
-            output.setResult(responseDTO);
+            output.setResult(builder.perform());
         });
 
         return output;
@@ -157,10 +149,10 @@ public class GithubController extends BaseController {
         GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(principal)
             .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-        GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
+        boolean response = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
-        if (responseDTO.getMessage() != GithubResponseMessage.OK) {
-            throw new SafaError("Invalid GitHub credentials: " + responseDTO.getMessage());
+        if (!response) {
+            throw new SafaError("Invalid GitHub credentials");
         }
 
         return principal;

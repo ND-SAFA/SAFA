@@ -47,7 +47,7 @@ class LLMTrainer(AbstractTrainer):
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
         self.summarizer = Summarizer(model_for_token_limit=self.trainer_args.model, code_or_exceeds_limit_only=False,
-                                     max_tokens=trainer_args.max_tokens)
+                                     max_tokens_for_token_limit=trainer_args.max_tokens)
         self.prompt_creator = prompt_creator
         self.llm_util = llm_util
 

@@ -2,8 +2,8 @@ import os
 from unittest import mock
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
-from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
+from tgen.data.chunkers.python_chunker import PythonChunker
+from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
@@ -15,12 +15,6 @@ from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 class TestSummarizer(BaseTest):
     CHUNKS = ["The cat in the hat sat", "on a log with a frog and a hog."]
-
-    def test_get_chunker(self):
-        self.assertEqual(Summarizer._get_chunker("file.py"), SupportedChunker.PY)
-        self.assertEqual(Summarizer._get_chunker("file.java"), SupportedChunker.JAVA)
-        self.assertEqual(Summarizer._get_chunker("file.txt"), SupportedChunker.NL)
-        self.assertEqual(Summarizer._get_chunker(), SupportedChunker.NL)
 
     @mock.patch("openai.Completion.create", )
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
@@ -44,9 +38,10 @@ class TestSummarizer(BaseTest):
 
         # use path to file
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
-        summaries = summarizer.summarize(path_to_file=path_to_file)
+        content = FileUtil.read_file(path_to_file)
+        summaries = summarizer.summarize(content, chunker_type=SupportedChunker.PY)
         summaries = summaries.replace("\n", "")
-        expected_chunks = PythonChunker(model_name).chunk(FileUtil.read_file(path_to_file))
+        expected_chunks = PythonChunker(model_name, summarizer.token_limit).chunk(FileUtil.read_file(path_to_file))
         summarized_chunks = [SUMMARY_FORMAT.format(chunk.replace("\n", "")) for chunk in expected_chunks]
         self.assertEqual("".join(summarized_chunks), summaries)
 

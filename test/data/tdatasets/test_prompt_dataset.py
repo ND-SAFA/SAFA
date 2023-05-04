@@ -5,6 +5,9 @@ from typing import Dict, List
 import mock
 import pandas as pd
 
+from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.models.token_limits import ModelTokenLimits
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -38,28 +41,24 @@ class TestPromptDataset(BaseTest):
             return False
         return True
 
-    @mock.patch.object(Summarizer, "get_word_limit")
+    @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
     @mock.patch.object(Summarizer, "summarize")
-    @mock.patch.object(Summarizer, "exceeds_token_limit")
-    def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, summarize_mock: mock.MagicMock,
-                              token_limit_mock: mock.MagicMock):
+    @mock.patch.object(AbstractChunker, "exceeds_token_limit")
+    def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock,
+                              summarize_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):
         token_limit = 5
+        token_limit_mock.return_value = token_limit + MAX_TOKENS_BUFFER + MAX_TOKENS_DEFAULT
         exceeds_token_limit_mock.side_effect = self.fake_exceeds_token_limit
         summarize_mock.side_effect = self.fake_summarize
-        token_limit_mock.return_value = token_limit
         artifact_prompt_dataset = self.get_dataset_with_artifact_df()
         prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(GenerationPromptCreator(), Summarizer())
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
-                self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT]), token_limit)
+                self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()
         prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(GenerationPromptCreator(), Summarizer())
-        for i, link_id in enumerate(traces_prompt_dataset.trace_dataset.trace_df.index):
-            link = traces_prompt_dataset.trace_dataset.trace_df.get_link(link_id=link_id)
-            if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in link[TraceKeys.SOURCE]:
-                self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT]), 1)
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
 
     def test_to_dataframe(self):

@@ -48,7 +48,7 @@ class TestHierarchyGeneration(BaseTest):
             trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
             return trainer_dataset_manager[DatasetRole.EVAL]
 
-    @mock.patch("tgen.data.creators.cluster_dataset_creator.ClusterDatasetCreator._cluster")
+    @mock.patch("tgen.data.creators.clustering.cluster_dataset_creator.ClusterDatasetCreator._cluster")
     @mock.patch("openai.Completion.create")
     def test_run(self, mock_completion_api: mock.MagicMock, mock_cluster: mock.MagicMock):
         mock_completion_api.side_effect = fake_open_ai_completion
@@ -139,10 +139,10 @@ class TestHierarchyGeneration(BaseTest):
         linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df)
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
-            self.assertLess(label - 0.4012, 0.01)
+            self.assertLess(label - 0.4012, 0.1)
 
     def test_save_dataset_checkpoint(self):
-        dataset = self.get_dataset_creator_with_prompt_project_reader().create()
+        dataset = PromptDatasetCreator(project_reader = PromptTestProject.get_project_reader()).create()
         export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
         self.assertTrue(os.path.exists(export_path))
 

@@ -45,7 +45,7 @@ class LLMArgs(BaseObject, ABC):
         if task in [TrainerTask.CLASSIFICATION]:
             self.max_tokens = 1
         params = self._add_params_for_task(TrainerTask.TRAIN if task == TrainerTask.CLASSIFICATION else task, params)
-        params = self.add_custom_params(task, params, instructions=kwargs)
+        params = self._add_library_params(task, params, instructions=kwargs)
         return params
 
     def _add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
@@ -65,7 +65,7 @@ class LLMArgs(BaseObject, ABC):
         return params
 
     @abstractmethod
-    def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
+    def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
         Adds custom parameters to pass to API for given task.
         :param task: The task being performed with params.

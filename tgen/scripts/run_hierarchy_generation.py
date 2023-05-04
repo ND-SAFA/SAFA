@@ -8,14 +8,11 @@ load_dotenv()
 
 os.environ["DEPLOYMENT"] = "development"
 
-
-from tgen.train.args.open_ai_args import OpenAiArgs
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hgen_args import HGenArgs

@@ -36,7 +36,7 @@ class AnthropicArgs(LLMArgs):
                                      TrainerTask.PREDICT: [AnthropicParams.TEMPERATURE, AnthropicParams.MAX_TOKENS_TO_SAMPLE]}
         super().__init__(self.prompt_args, self.expected_task_params, model, **kwargs)
 
-    def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
+    def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
         Adds any custom parameters.
         :param task: The task being performed.
@@ -44,6 +44,7 @@ class AnthropicArgs(LLMArgs):
         :param instructions: Any additional instructions passed to param construction.
         :return: Params with customizations.
         """
+        # TODO: Create better solution for mapping common attributes to custom names
         if "max_tokens" in params:
             max_tokens = params.pop("max_tokens")
             params[AnthropicParams.MAX_TOKENS_TO_SAMPLE] = max_tokens

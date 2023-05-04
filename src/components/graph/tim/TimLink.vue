@@ -31,10 +31,10 @@ const definition = computed<TimEdgeCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
     graph: GraphMode.tim,
-    id: getTraceId(props.sourceType, props.targetType),
+    id: getTraceId(props.sourceType, props.targetType).replace(/ /g, ""),
     // Reversed to show arrow toward parent.
-    source: props.targetType,
-    target: props.sourceType,
+    source: props.targetType.replace(/ /g, ""),
+    target: props.sourceType.replace(/ /g, ""),
     count: props.count,
     label: props.count === 1 ? `1 Link` : `${props.count} Links`,
     dark: darkMode.value,

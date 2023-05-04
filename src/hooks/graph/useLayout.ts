@@ -46,7 +46,7 @@ export const useLayout = defineStore("layout", {
     /**
      * The current view mode of the graph.
      */
-    mode: GraphMode.tree as GraphMode,
+    mode: GraphMode.tim as GraphMode,
   }),
   getters: {
     /**

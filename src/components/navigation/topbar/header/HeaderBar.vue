@@ -6,6 +6,7 @@
       <flex-box align="center">
         <update-button />
         <saving-icon />
+        <project-selector />
         <version-selector />
       </flex-box>
     </flex-box>
@@ -27,7 +28,7 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
-import { VersionSelector } from "@/components/project";
+import { VersionSelector, ProjectSelector } from "@/components/project";
 import ProjectSearchbar from "./ProjectSearchbar.vue";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";

@@ -74,18 +74,27 @@ export function svgNode(
  * @param title - The title to render.
  * @param y - The y position to start drawing at.
  * @param dataCy - The data cy selector to append.
+ * @param icon - The icon to render.
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, y: number, dataCy: string): string {
+export function svgTitle(
+  title: string,
+  y: number,
+  dataCy: string,
+  icon?: string
+): string {
   return svgText(
     title,
     {
-      class: "align-center q-mx-sm text-ellipsis artifact-text",
+      class: icon
+        ? "q-mx-lg text-ellipsis artifact-text"
+        : "q-mx-sm text-ellipsis artifact-text",
       x: 0,
       y,
       width: "100%",
       height: 26,
+      icon,
     },
     dataCy
   );

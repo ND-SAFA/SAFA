@@ -1,26 +1,22 @@
-from typing import Union
-
-from tgen.constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.jobs.components.job_args import JobArgs
-from tgen.jobs.open_ai_job import OpenAIJob
-from tgen.jobs.predict_job import PredictJob
+from tgen.jobs.components.args.job_args import JobArgs
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
+from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
+from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.open_ai.open_ai_args import OpenAIArgs
-from tgen.train.open_ai.open_ai_task import OpenAITask
-from tgen.train.trainer_args import TrainerArgs
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
+from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.supported_enum import SupportedEnum
 
 
 class PredictionJobTypes(SupportedEnum):
     OPENAI = "openai"
     BASE = "base"
-
-
-PredictionJobs = Union[OpenAIJob, PredictJob]
 
 
 class JobCreator:
@@ -30,7 +26,7 @@ class JobCreator:
 
     @staticmethod
     def create_prediction_definition(dataset: ApiDefinition, output_dir: str, prediction_job_type: PredictionJobTypes,
-                                     model_path: str = None) -> PredictionJobs:
+                                     model_path: str = None) -> AbstractTrainerJob:
         """
         Creates experiment definition for predicting on dataset using defined job type.
         :param dataset: The dataset to predict on.
@@ -46,21 +42,19 @@ class JobCreator:
 
         if prediction_job_type == PredictionJobTypes.OPENAI:
             trainer_args = OpenAIArgs(metrics=None)
-            job = OpenAIJob(data_output_path=output_dir,
-                            base_model="ada:ft-safa:cm1-test-2023-03-29-20-25-19",
-                            task=OpenAITask.PREDICT,
-                            trainer_dataset_manager=trainer_dataset_manager,
-                            trainer_args=trainer_args,
-                            job_args=job_args)
+            job = LLMJob(task=TrainerTask.PREDICT,
+                         trainer_dataset_manager=trainer_dataset_manager,
+                         trainer_args=trainer_args,
+                         job_args=job_args)
             return job
         elif prediction_job_type == PredictionJobTypes.BASE:
             assert model_path is not None, "Expected model_path to be defined for prediction job."
-            trainer_args = TrainerArgs(output_dir=output_dir, metrics=None)
+            trainer_args = HuggingFaceArgs(output_dir=output_dir, metrics=None)
             model_manager = ModelManager(model_path=model_path)
-            job = PredictJob(job_args=job_args,
-                             model_manager=model_manager,
-                             trainer_dataset_manager=trainer_dataset_manager,
-                             trainer_args=trainer_args)
+            job = HuggingFaceJob(job_args=job_args,
+                                 model_manager=model_manager,
+                                 trainer_dataset_manager=trainer_dataset_manager,
+                                 trainer_args=trainer_args)
             return job
         else:
             raise NotImplementedError(f"Prediction job is not supported for job type:{prediction_job_type.name}")

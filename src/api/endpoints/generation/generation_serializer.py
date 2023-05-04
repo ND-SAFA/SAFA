@@ -2,24 +2,17 @@ from typing import Dict
 
 from rest_framework import serializers
 
-from api.serializers.dataset_serializer import DatasetSerializer
-from api.serializers.serializer_utility import SerializerUtility
+from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
+from api.utils.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
 
 
-class PredictionSerializer(serializers.Serializer):
+class GenerationSerializer(AbstractSerializer):
     """
-    Serializes prediction payload.
+    Serialized the generation payload
     """
-    KEY = "definition"
     model = serializers.CharField(max_length=512)
-    dataset = DatasetSerializer()
-
-    def update(self, instance, validated_data):
-        """
-        Not implemented. Throws error if called.
-        """
-        SerializerUtility.update_error()
+    prompt = serializers.CharField(max_length=512)
 
     def create(self, validated_data: Dict) -> Dict[str, Variable]:
         """

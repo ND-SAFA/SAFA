@@ -1,12 +1,8 @@
 import json
-from typing import Any, Dict, Union
+from typing import Any
 from uuid import UUID
 
 from django.http import HttpRequest
-from drf_yasg.openapi import Schema, TYPE_OBJECT
-from rest_framework import status
-
-from tgen.jobs.components.job_result import JobResult
 
 
 class ViewUtil:
@@ -40,14 +36,3 @@ class ViewUtil:
         except ValueError:
             return False
         return str(uuid_obj) == model_id
-
-    @staticmethod
-    def get_responses(response_keys: Union[str, list]) -> Dict:
-        """
-        Gets properties used to generate response documentation
-        :param response_keys: either a single response key or a list of response keys to get properties for
-        :return: the response dictionary
-        """
-        return {
-            status.HTTP_200_OK: Schema(type=TYPE_OBJECT,
-                                       properties=JobResult.get_properties(response_keys))}

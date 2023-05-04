@@ -22,21 +22,18 @@ public class TBertConfig {
         return TBertConfig.staticConfig;
     }
 
+    /**
+     * @return Returns path to TGEN completion endpoint.
+     */
+    public String getPromptCompletionEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "complete") + "/";
+    }
+
+    /**
+     * @return Returns path to Tgen prediction endpint.
+     */
     public String getPredictEndpoint() {
         return FileUtilities.buildPath(baseEndpoint, "predict") + "/";
-    }
-
-    public String getTrainEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "train") + "/";
-    }
-
-    public String getCreateModelEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "model", "create") + "/";
-    }
-
-    public String getDeleteModelEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "model", "delete") + "/";
-
     }
 
     @PostConstruct

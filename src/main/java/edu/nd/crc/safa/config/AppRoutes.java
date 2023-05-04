@@ -137,6 +137,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Prompts {
+        public static final String COMPLETE = "/prompt";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";

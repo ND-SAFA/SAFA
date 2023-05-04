@@ -12,13 +12,13 @@ import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
+import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
-import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -50,7 +50,7 @@ public class TGen {
      * @return The completion string.
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
-        String generatePromptEndpoint = "http://localhost:4000/generate/";
+        String generatePromptEndpoint = TBertConfig.get().getPromptCompletionEndpoint();
         TGenPromptResponse output = this.safaRequestBuilder
             .sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
         return output;

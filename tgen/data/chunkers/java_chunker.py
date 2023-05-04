@@ -5,7 +5,7 @@ import javalang.ast
 from javalang.tree import Declaration, Import, PackageDeclaration, SwitchStatement
 from javalang import tree as javatree
 
-from tgen.constants.deliminator_constants import NEW_LINE, SEMI_COLON, PAREN_OPEN, PAREN_CLOSE
+from tgen.constants.deliminator_constants import NEW_LINE, SEMI_COLON, BRACKET_OPEN, BRACKET_CLOSE
 from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 
@@ -145,8 +145,8 @@ class JavaChunker(AbstractCodeChunker):
         end = start + 1
         if len(children_end_linenos) > 0 and max(children_end_linenos) != start + 1:
             end = max(children_end_linenos)  # parent end should go to at least the end of the last child
-        if PAREN_OPEN in lines[start] and PAREN_CLOSE not in lines[end]:
-            return JavaChunker._find_line_with_sym(PAREN_CLOSE, end, lines)
+        if BRACKET_OPEN in lines[start] and BRACKET_CLOSE not in lines[end]:
+            return JavaChunker._find_line_with_sym(BRACKET_CLOSE, end, lines)
         return end
 
     @staticmethod

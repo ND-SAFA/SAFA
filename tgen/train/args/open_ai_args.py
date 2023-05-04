@@ -6,6 +6,7 @@ from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPU
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.llm_args import LLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.override import overrides
 
 
 class OpenAIParams:
@@ -50,7 +51,8 @@ class OpenAIArgs(LLMArgs):
         self.model_suffix = model_suffix
         super().__init__(prompt_args=prompt_args, model=model, expected_task_params=self.TASK_PARAMS, **kwargs)
 
-    def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
+    @overrides(LLMArgs)
+    def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
         Allows the usage of custom params defined in instructions. Includes classification metrics.
         :param task: The task being performed.

@@ -34,7 +34,7 @@ class AnthropicArgs(LLMArgs):
                                      TrainerTask.PREDICT: [AnthropicParams.TEMPERATURE, AnthropicParams.MAX_TOKENS_TO_SAMPLE]}
         super().__init__(self.prompt_args, self.expected_task_params, model, **kwargs)
 
-    def add_custom_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
+    def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
         Adds any custom parameters.
         :param task: The task being performed.

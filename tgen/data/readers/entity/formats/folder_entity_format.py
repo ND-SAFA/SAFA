@@ -2,16 +2,17 @@ import os
 from typing import List
 
 import pandas as pd
+from tqdm import tqdm
 
 from tgen.constants.dataset_constants import EXCLUDED_FILES
 from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
-from tqdm import tqdm
 
 
 class FolderEntityFormat(AbstractEntityFormat):
@@ -69,12 +70,14 @@ class FolderEntityFormat(AbstractEntityFormat):
             artifact_name = os.path.basename(file_path) if use_file_name else os.path.sep + os.path.relpath(file_path, base_path)
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]
-            entry = {
-                ArtifactKeys.ID.value: artifact_name,
-                ArtifactKeys.CONTENT.value: FileUtil.read_file(file_path) if summarizer is None
-                else summarizer.summarize(path_to_file=file_path)
-            }
-            if not entry[ArtifactKeys.CONTENT.value]:
+            entry = EnumDict({
+                ArtifactKeys.ID: artifact_name,
+                ArtifactKeys.CONTENT: FileUtil.read_file(file_path)
+            })
+            if summarizer is not None:
+                chunker_type = SupportedChunker.determine_from_path(file_path)
+                entry[ArtifactKeys.CONTENT] = summarizer.summarize(entry[ArtifactKeys.CONTENT], chunker_type, id_=file_path)
+            if not entry[ArtifactKeys.CONTENT]:
                 logger.warning(f"{artifact_name} does not contain any content. Skipping...")
                 continue
             entries.append(entry)

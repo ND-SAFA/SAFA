@@ -198,7 +198,7 @@ class PromptDataset(iDataset):
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
         if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
             # Since summarization failed, just cut off anything that exceeds the limit
-            chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit)
+            chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit, token_limit=summarizer.token_limit)
             entry[PromptKeys.PROMPT] = chunker.chunk(entry[PromptKeys.PROMPT])[0]
         return entry
 

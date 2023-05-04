@@ -1,15 +1,12 @@
 import ast
 import os
 
-from test.data.summarizer.chunker.base_code_chunker_test import BaseCodeChunkerTest
-from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.constants.path_constants import PROJ_PATH
-from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
+from test.data.chunker.base_code_chunker_test import BaseCodeChunkerTest
+
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.util.file_util import FileUtil
 
 
 class TestPythonChunker(BaseTest):
@@ -41,4 +38,4 @@ class TestPythonChunker(BaseTest):
         self.assertEqual(str_no_tab.find("\t"), -1)
 
     def get_chunker(self):
-        return PythonChunker(self.MODEL)
+        return PythonChunker(self.MODEL, 1000)

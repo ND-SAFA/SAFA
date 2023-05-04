@@ -8,10 +8,10 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevelRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.method.TGen;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -64,8 +64,8 @@ public class TraceGenerationService {
     }
 
     public List<TraceAppEntity> generateLinksWithMethod(TracingPayload tracingPayload) {
-        ITraceGenerationController generationMethod = tracingPayload.getMethod().createController();
-        return new ArrayList<>(generationMethod.generateLinksWithBaselineState(tracingPayload));
+        TGen generationMethod = tracingPayload.getMethod().createTGenController();
+        return new ArrayList<>(generationMethod.generateLinks(tracingPayload));
     }
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,

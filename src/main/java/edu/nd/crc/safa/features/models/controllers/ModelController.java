@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.DefaultModels;
+import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -39,7 +39,7 @@ public class ModelController extends BaseController {
     @GetMapping(AppRoutes.Models.MODEL_ROOT_BY_ID)
     public List<ModelAppEntity> getProjectModels(@PathVariable UUID projectId) {
         this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return DefaultModels.getDefaultModels();
+        return BaseGenerationModels.getDefaultModels();
     }
 
     /**
@@ -49,7 +49,7 @@ public class ModelController extends BaseController {
      */
     @GetMapping(AppRoutes.Models.MODEL_ROOT)
     public List<ModelAppEntity> getModels() {
-        return DefaultModels.getDefaultModels();
+        return BaseGenerationModels.getDefaultModels();
     }
 
     /**

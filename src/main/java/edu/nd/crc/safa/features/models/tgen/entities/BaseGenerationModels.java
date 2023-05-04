@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.features.models.tgen.entities;
 
-import edu.nd.crc.safa.features.models.tgen.method.bert.BertMethodIdentifier;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
-import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
+import java.util.List;
+import java.util.UUID;
+
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.tgen.method.BertMethodIdentifier;
+import edu.nd.crc.safa.features.models.tgen.method.TGen;
 
 import lombok.Getter;
 
@@ -24,10 +27,6 @@ public enum BaseGenerationModels {
      */
     PLBert("thearod5/pl-bert"),
     /**
-     * Vector-space-model with cosine similarity.
-     */
-    VSM("vsm"), //Not real state, placeholder.
-    /**
      * OpenAI's GPT3.5 ada model trained on traceability links
      */
     GPT("gpt");
@@ -39,39 +38,38 @@ public enum BaseGenerationModels {
     }
 
     public static BaseGenerationModels getDefault() {
-        return BaseGenerationModels.VSM;
+        return BaseGenerationModels.GPT;
+    }
+
+    /**
+     * @return Returns list of models available to user.
+     */
+    public static List<ModelAppEntity> getDefaultModels() {
+        return List.of(
+            getDefaultModel(),
+            new ModelAppEntity(UUID.randomUUID(), "AutomotiveBert", BaseGenerationModels.AutomotiveBert),
+            new ModelAppEntity(UUID.randomUUID(), "Natural Language Bert", BaseGenerationModels.NLBert),
+            new ModelAppEntity(UUID.randomUUID(), "Programming Language Bert", BaseGenerationModels.NLBert)
+        );
+    }
+
+    /**
+     * @return Returns the default model.
+     */
+    public static ModelAppEntity getDefaultModel() {
+        return new ModelAppEntity(UUID.randomUUID(), "TraceGPT", BaseGenerationModels.GPT);
+    }
+
+    /**
+     * @return TGen controller for base generation method.
+     */
+    public TGen createTGenController() {
+        BertMethodIdentifier bertId = new BertMethodIdentifier(this.toString(), this.getStatePath());
+        return new TGen(bertId);
     }
 
     @Override
     public String toString() {
         return this.name();
-    }
-
-    /**
-     * Constructs the bert model identifier for generation model.
-     *
-     * @return Model identifier.
-     */
-    public BertMethodIdentifier getBertMethodIdentifier() {
-        if (this.equals(BaseGenerationModels.VSM)) {
-            throw new UnsupportedOperationException("VSM does not use the bert method identifier.");
-        }
-        return new BertMethodIdentifier(this.toString(), this.getStatePath());
-    }
-
-    public TGen createTGenController() {
-        return new TGen(this.getBertMethodIdentifier());
-    }
-
-    /**
-     * Constructs a trace link generation controller for the base generation method.
-     *
-     * @return Trace link generation controller.
-     */
-    public ITraceGenerationController createController() {
-        if (this == BaseGenerationModels.VSM) {
-            return new VSMController();
-        }
-        return this.createTGenController();
     }
 }

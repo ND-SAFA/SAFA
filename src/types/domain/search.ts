@@ -27,6 +27,11 @@ export interface ProjectSearchQuerySchema {
    */
   searchTypes: string[];
   /**
+   * The model to predict links with.
+   * @default Our best model.
+   */
+  model?: string;
+  /**
    * How many of the top predictions to include.
    * @default 5
    */
@@ -36,9 +41,4 @@ export interface ProjectSearchQuerySchema {
    * if they have existing links to the artifacts retrieved with the search artifacts + `searchTypes` artifacts.
    */
   relatedTypes?: string[];
-  /**
-   * The model to predict links with.
-   * @default Our best model.
-   */
-  model?: string;
 }

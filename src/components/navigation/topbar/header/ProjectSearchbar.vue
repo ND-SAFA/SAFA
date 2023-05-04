@@ -90,6 +90,11 @@ const value = computed({
   },
 });
 
+/**
+ * Filters the options based on the search text.
+ * @param search - The search text.
+ * @param update - A function called to update the options.
+ */
 function filterOptions(search: string, update: (fn: () => void) => void) {
   if (search === "") {
     update(() => (options.value = artifactStore.currentArtifacts));

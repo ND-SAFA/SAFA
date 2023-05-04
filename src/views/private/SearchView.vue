@@ -30,13 +30,38 @@
             use-input
             clearable
             :label="placeholder"
+            :options="options"
+            :option-label="artifactLikeMode ? 'name' : undefined"
+            :option-value="artifactLikeMode ? 'id' : undefined"
+            input-debounce="0"
             class="nav-search-prompt"
             style="min-width: 600px"
+            @filter="filterOptions"
           >
             <template #append>
               <icon variant="search" />
             </template>
-            <template #before-options> </template>
+            <template #before-options>
+              <flex-box x="3" t="1" justify="end">
+                <typography
+                  align="end"
+                  variant="caption"
+                  :value="matchText"
+                  data-cy="text-artifact-search-count"
+                />
+              </flex-box>
+            </template>
+            <template #option="{ opt, itemProps }">
+              <artifact-body-display
+                v-if="artifactLikeMode"
+                v-bind="itemProps"
+                clickable
+                display-title
+                :artifact="opt"
+                data-cy="text-artifact-search-item"
+              />
+              <list-item v-else v-bind="itemProps" clickable :title="opt" />
+            </template>
             <template v-if="mode !== 'Search'" #no-option>
               <flex-box column y="2" x="2">
                 <flex-box full-width>
@@ -88,17 +113,19 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { SelectOption } from "@/types";
+import { computed, ref, watch } from "vue";
+import { ArtifactSchema, SelectOption } from "@/types";
+import { filterArtifacts } from "@/util";
 import { artifactStore, typeOptionsStore } from "@/hooks";
 import {
   PrivatePage,
   FlexBox,
-  PanelCard,
   Icon,
   ArtifactTypeInput,
   ListItem,
   TextInput,
+  ArtifactBodyDisplay,
+  Typography,
 } from "@/components";
 
 type Mode = "Prompt" | "Artifact" | "Artifact Type" | "Search";
@@ -121,6 +148,11 @@ const prompt = ref<string>("");
 const searchTypes = ref<string[]>([]);
 const maxResults = ref<number>(5);
 const relateTypes = ref<string[]>([]);
+const options = ref<ArtifactSchema[] | string[]>([]);
+
+const artifactLikeMode = computed(() =>
+  ["Artifact", "Search"].includes(mode.value)
+);
 
 const placeholder = computed(
   () =>
@@ -132,15 +164,46 @@ const placeholder = computed(
     }[mode.value])
 );
 
-// const searchOptions = computed(() => {
-//   if (["Artifact", "Search"].includes(mode.value)) {
-//     return artifactStore.currentArtifacts;
-//   } else if (mode.value === "Artifact Type") {
-//     return typeOptionsStore.artifactTypes;
-//   } else {
-//     return [];
-//   }
-// });
+/**
+ * Returns the display text for how many matches there are.
+ */
+const matchText = computed(() => {
+  const count = options.value.length;
+
+  return count === 1 ? "1 Match" : `${count} Matches`;
+});
+
+/**
+ * Filters the options based on the search text.
+ * @param search - The search text.
+ * @param update - A function called to update the options.
+ */
+function filterOptions(search: string, update: (fn: () => void) => void) {
+  if (search === "") {
+    update(() => (options.value = []));
+  } else {
+    update(() => {
+      if (artifactLikeMode.value) {
+        options.value = artifactStore.currentArtifacts.filter((artifact) =>
+          filterArtifacts(artifact, search)
+        );
+      } else if (mode.value === "Artifact Type") {
+        const lowercaseSearch = search.toLowerCase();
+
+        return typeOptionsStore.artifactTypes.filter((type) =>
+          type.toLowerCase().includes(lowercaseSearch)
+        );
+      } else {
+        return [];
+      }
+    });
+  }
+}
+
+watch(
+  () => mode.value,
+  () => (prompt.value = "")
+);
 </script>
 
 <style lang="scss">

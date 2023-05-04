@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.ModelProject;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
-import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;

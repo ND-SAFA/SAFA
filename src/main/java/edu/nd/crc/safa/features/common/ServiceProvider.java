@@ -40,7 +40,7 @@ import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.models.services.ModelService;
-import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;

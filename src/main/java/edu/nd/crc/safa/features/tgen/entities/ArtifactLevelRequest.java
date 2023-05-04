@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.tgen.entities;
+package edu.nd.crc.safa.features.tgen.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

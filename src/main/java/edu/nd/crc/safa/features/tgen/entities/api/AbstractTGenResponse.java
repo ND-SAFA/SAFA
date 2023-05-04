@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.tgen.entities.api;
+package edu.nd.crc.safa.features.tgen.entities.api;
 
 import lombok.Data;
 

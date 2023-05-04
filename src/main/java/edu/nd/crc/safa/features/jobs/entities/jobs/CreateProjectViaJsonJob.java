@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;

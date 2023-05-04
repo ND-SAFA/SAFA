@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import org.apache.commons.lang3.NotImplementedException;

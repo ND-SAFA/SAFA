@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IDataFile;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionParser;
-import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.tgen.method.bert;
+package edu.nd.crc.safa.features.tgen.method;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,29 +12,26 @@ import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.models.entities.api.ModelIdentifierDTO;
-import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.api.TGenDataset;
-import edu.nd.crc.safa.features.models.tgen.entities.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.models.tgen.entities.api.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
+import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */
-public class TGen implements ITraceGenerationController {
+public class TGen {
 
     private static final Logger log = LoggerFactory.getLogger(TGen.class);
 
@@ -47,58 +44,29 @@ public class TGen implements ITraceGenerationController {
     }
 
     /**
-     * Copies model defined by given subclass and saves it in new output path.
+     * Performs a completion request to TGen.
      *
-     * @param newModelPath The path to save the new model to.
+     * @param request The request containing prompt.
+     * @return The completion string.
      */
-    public void createModel(String newModelPath) {
-        copyModel(methodId.getStatePath(), newModelPath);
-    }
-
-    /**
-     * Copies model state in source path to target path.
-     *
-     * @param sourceStatePath The path to the state of the model to copy.
-     * @param targetStatePath The path to store the new model at.
-     */
-    public void copyModel(String sourceStatePath, String targetStatePath) {
-        ModelIdentifierDTO creationRequest = new ModelIdentifierDTO(
-            methodId.getBaseModel(),
-            sourceStatePath,
-            targetStatePath
-        );
-        this.safaRequestBuilder
-            .sendPost(TBertConfig.get().getCreateModelEndpoint(),
-                creationRequest,
-                ModelIdentifierDTO.class);
-    }
-
-    /**
-     * Deletes model by sending request to TGEN to delete model files
-     */
-    public void deleteModel() {
-        ModelIdentifierDTO creationRequest = new ModelIdentifierDTO();
-        creationRequest.setModelPath(methodId.getStatePath());
-        this.safaRequestBuilder
-            .sendPost(TBertConfig.get().getDeleteModelEndpoint(),
-                creationRequest,
-                ModelIdentifierDTO.class);
-    }
-
-    @Override
-    public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
-        return this.generateLinksWithState(methodId.getStatePath(), tracingPayload);
+    public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
+        String generatePromptEndpoint = "http://localhost:4000/generate/";
+        TGenPromptResponse output = this.safaRequestBuilder
+            .sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
+        return output;
     }
 
     /**
      * Generates trace link predictions for each pair of source and target artifacts.
      *
-     * @param statePath      The path to the initial model state.
      * @param tracingPayload Levels of artifacts defining sources and targets.
      * @return List of generated trace links.
      */
-    @Override
-    public List<TraceAppEntity> generateLinksWithState(
+    public List<TraceAppEntity> generateLinks(TracingPayload tracingPayload) {
+        return this.generateLinksWithState(methodId.getStatePath(), tracingPayload);
+    }
+
+    private List<TraceAppEntity> generateLinksWithState(
         String statePath,
         TracingPayload tracingPayload) {
         // Step - Build request
@@ -111,20 +79,6 @@ public class TGen implements ITraceGenerationController {
         TGenPredictionOutput output = this.safaRequestBuilder
             .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
         return convertPredictionsToLinks(output.getPredictions());
-    }
-
-    /**
-     * Trains model defined by subclass to predict the given trace links.
-     * Trace links not present in `traces` are assumed to be non-links (score = 0).
-     *
-     * @param statePath        Path to starting weights of model.
-     * @param tracingRequests  Levels of artifacts defining sources and targets.
-     * @param projectAppEntity The project to extract the artifacts from.
-     */
-    public void trainModel(String statePath,
-                           TracingRequest tracingRequests,
-                           ProjectAppEntity projectAppEntity) {
-        throw new NotImplementedException("Training a model is deprecated. Please use a default model instead.");
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {

@@ -1,11 +1,11 @@
-package edu.nd.crc.safa.features.models.tgen.entities;
+package edu.nd.crc.safa.features.tgen.entities;
 
 import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.models.tgen.method.BertMethodIdentifier;
-import edu.nd.crc.safa.features.models.tgen.method.TGen;
+import edu.nd.crc.safa.features.tgen.method.BertMethodIdentifier;
+import edu.nd.crc.safa.features.tgen.method.TGen;
 
 import lombok.Getter;
 

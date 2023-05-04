@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.tgen.controllers;
+package edu.nd.crc.safa.features.tgen.controllers;
 
 import java.util.List;
 import java.util.UUID;

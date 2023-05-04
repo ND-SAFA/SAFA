@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import lombok.Data;

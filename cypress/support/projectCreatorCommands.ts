@@ -48,6 +48,8 @@ Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
     .projectSelectorContinue("version")
     .locationShouldEqual(Routes.ARTIFACT);
 
+  cy.clickButton(DataCy.navTreeButton);
+
   cy.waitForProjectLoad(waitForComplete);
 });
 

@@ -142,7 +142,7 @@ class TestHierarchyGeneration(BaseTest):
             self.assertLess(label - 0.4012, 0.1)
 
     def test_save_dataset_checkpoint(self):
-        dataset = self.get_dataset_creator_with_prompt_project_reader().create()
+        dataset = PromptDatasetCreator(project_reader = PromptTestProject.get_project_reader()).create()
         export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
         self.assertTrue(os.path.exists(export_path))
 

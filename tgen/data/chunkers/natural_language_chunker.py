@@ -3,6 +3,7 @@ from typing import List
 
 from tgen.constants.deliminator_constants import SPACE
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.models.token_limits import TokenLimitCalculator
 
 
 class NaturalLanguageChunker(AbstractChunker):
@@ -22,11 +23,11 @@ class NaturalLanguageChunker(AbstractChunker):
         chunks, new_chunk = [], []
         n_tokens_for_chunk = 0
         for word in content.split():
-            n_tokens_for_chunk += self.estimate_num_tokens(word, self.model_name)
+            n_tokens_for_chunk += TokenLimitCalculator.estimate_num_tokens(word, self.model_name)
             if n_tokens_for_chunk > self.token_limit:
                 chunks.append(deepcopy(new_chunk))
                 new_chunk = [word]
-                n_tokens_for_chunk = self.estimate_num_tokens(word, self.model_name)
+                n_tokens_for_chunk = TokenLimitCalculator.estimate_num_tokens(word, self.model_name)
             else:
                 new_chunk.append(word)
         if len(new_chunk) > 0:

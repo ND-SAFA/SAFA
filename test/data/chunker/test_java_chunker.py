@@ -1,6 +1,6 @@
 import os
 
-from test.data.summarizer.chunker.base_code_chunker_test import BaseCodeChunkerTest
+from test.data.chunker.base_code_chunker_test import BaseCodeChunkerTest
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
@@ -20,5 +20,5 @@ class TestJavaChunker(BaseTest):
         BaseCodeChunkerTest.verify_common_methods(self, self.get_chunker())
 
     def get_chunker(self):
-        chunker = JavaChunker(self.MODEL)
+        chunker = JavaChunker(self.MODEL, 1000)
         return chunker

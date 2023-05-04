@@ -7,7 +7,7 @@ import pandas as pd
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
-from tgen.data.chunkers.open_ai_token_limits import ModelTokenLimits
+from tgen.models.token_limits import ModelTokenLimits
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys

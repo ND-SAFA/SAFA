@@ -2,6 +2,7 @@ from collections import Callable, Counter
 
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.chunkers.chunked_node import ChunkedNode
+from tgen.models.token_limits import TokenLimitCalculator
 from tgen.util.file_util import FileUtil
 
 
@@ -89,7 +90,7 @@ class BaseCodeChunkerTest:
             test.fail(f"The following differences were found between the original content and the chunked content\n {differences}")
         extra_tokens = []
         for i, chunk in enumerate(chunks):
-            extra_token_count = chunker.estimate_num_tokens(chunk, test.MODEL) - chunker.token_limit
+            extra_token_count = TokenLimitCalculator.estimate_num_tokens(chunk, test.MODEL) - chunker.token_limit
             if extra_token_count >= 100:
                 extra_tokens.append(extra_token_count)
         if len(extra_tokens) > 0:

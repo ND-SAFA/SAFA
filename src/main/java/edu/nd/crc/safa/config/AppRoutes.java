@@ -259,7 +259,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Search {
-        public static final String SEARCH = "/search";
+        public static final String SEARCH = "/search/{versionId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

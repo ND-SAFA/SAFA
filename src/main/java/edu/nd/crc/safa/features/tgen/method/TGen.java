@@ -75,10 +75,14 @@ public class TGen {
             tracingPayload);
 
         // Step - Send request
-        String predictEndpoint = TBertConfig.get().getPredictEndpoint();
-        TGenPredictionOutput output = this.safaRequestBuilder
-            .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
+        TGenPredictionOutput output = this.performPrediction(payload);
         return convertPredictionsToLinks(output.getPredictions());
+    }
+
+    public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
+        String predictEndpoint = TBertConfig.get().getPredictEndpoint();
+        return this.safaRequestBuilder
+            .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {

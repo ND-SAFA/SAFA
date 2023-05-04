@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Type, List
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER, TOKENS_2_WORDS_CONVERSION
-from tgen.data.summarizer.chunkers.open_ai_token_limits import ModelTokenLimits
+from tgen.data.chunkers.open_ai_token_limits import ModelTokenLimits
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
+import tiktoken
 
 
 class AbstractChunker(BaseObject, ABC):
@@ -42,28 +43,27 @@ class AbstractChunker(BaseObject, ABC):
     @staticmethod
     def estimate_num_tokens(content: str, model_name: str) -> int:
         """
-        Approximates the number of tokens that some content will be tokenized into by a given model.
+        Approximates the number of tokens that some content will be tokenized into by a given model by trying to tokenize
+            and giving a rough estimate using a words to tokens conversion if that fails
         :param content: The content to be tokenized
         :param model_name: The model that will be doing the tokenization
         :return: The approximate number of tokens
         """
-        return round(len(content.split()) * (1 / TOKENS_2_WORDS_CONVERSION))
+        try:
+            encoding = tiktoken.encoding_for_model(model_name)
+            num_tokens = len(encoding.encode(content))
+            return num_tokens
+        except Exception:
+            return AbstractChunker._rough_estimate_num_tokens(content)
 
     @staticmethod
-    def estimate_num_words_from_tokens(n_tokens: int) -> int:
+    def _rough_estimate_num_tokens(content: str) -> int:
         """
-        Approximates the number of words that will make up the given number of tokens
-        :param n_tokens: The number of tokens
-        :return: The approximate number of words per n_tokens
+        Gives a rough estimate the number of tokens that some content will be tokenized into using the 4/3 rule used by open ai
+        :param content: The content to be tokenized
+        :return: The approximate number of tokens
         """
-        return round(n_tokens * TOKENS_2_WORDS_CONVERSION)
-
-    def get_word_limit(self) -> int:
-        """
-        Approximates the number of words that will make up the token limit
-        :return: The approximate number of words that the model will accept
-        """
-        return self.estimate_num_words_from_tokens(self.token_limit)
+        return round(len(content.split()) * (1 / TOKENS_2_WORDS_CONVERSION))
 
     @classmethod
     @overrides(BaseObject)
@@ -73,5 +73,5 @@ class AbstractChunker(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
+        from tgen.data.chunkers.supported_chunker import SupportedChunker
         return SupportedChunker

@@ -13,6 +13,7 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
+from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -196,8 +197,9 @@ class PromptDataset(iDataset):
             target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
             entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
         if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-            required_length = max(summarizer.get_word_limit() - len(entry[PromptKeys.COMPLETION]), 1)
-            entry[PromptKeys.PROMPT] = entry[PromptKeys.PROMPT][:required_length]
+            # Since summarization failed, just cut off anything that exceeds the limit
+            chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit)
+            entry[PromptKeys.PROMPT] = chunker.chunk(entry[PromptKeys.PROMPT])[0]
         return entry
 
     def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:

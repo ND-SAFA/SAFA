@@ -6,12 +6,12 @@ from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
+from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
-from tgen.data.summarizer.chunkers.abstract_chunker import AbstractChunker
-from tgen.data.summarizer.chunkers.supported_chunker import SupportedChunker
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
@@ -105,15 +105,6 @@ class Summarizer(BaseObject):
         chunker_type: SupportedChunker = self._get_chunker()
         chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
         return chunker.exceeds_token_limit(content)
-
-    def get_word_limit(self) -> int:
-        """
-        Determines the word limit for the model
-        :return: The max number of words accepted by the model
-        """
-        chunker_type: SupportedChunker = self._get_chunker()
-        chunker: AbstractChunker = chunker_type.value(self.model_for_token_limit, max_tokens=self.max_tokens)
-        return chunker.get_word_limit()
 
     @staticmethod
     def _summarize_chunks(ai_utils: LLMUtil, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,

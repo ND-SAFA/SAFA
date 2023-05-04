@@ -1,8 +1,12 @@
 import ast
 import os
 
+from test.data.summarizer.chunker.base_code_chunker_test import BaseCodeChunkerTest
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.summarizer.chunkers.python_chunker import PythonChunker
+from tgen.constants.path_constants import PROJ_PATH
+from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
+from tgen.data.chunkers.chunked_node import ChunkedNode
+from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.util.file_util import FileUtil
@@ -12,62 +16,28 @@ class TestPythonChunker(BaseTest):
     DATA_PATH = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
     MODEL = "code-cushman-001"
 
+    @staticmethod
+    def lines_to_ignore(line):
+        return line.startswith("import") or line.startswith("from")
+
     def test_chunk(self):
-        chunker = self.get_chunker()
-        content = FileUtil.read_file(self.DATA_PATH)
-        chunks = chunker.chunk(content=content)
-        all_content = content.split(NEW_LINE)
-        chunked_content = NEW_LINE.join(chunks)
-        for i, line in enumerate(all_content):
-            line = line.strip()
-            if line.startswith("import") or line.startswith("from") or line.startswith("@") or not line:
-                continue
-            if line not in chunked_content:
-                self.fail("Line %s in original file is missing from chunked content" % line)
-        for chunk in chunks:
-            if PythonChunker.estimate_num_tokens(chunk, self.MODEL) > chunker.token_limit:
-                self.fail("Chunk exceeds token limit")
+        BaseCodeChunkerTest.verify_chunk(self, self.get_chunker(), self.lines_to_ignore, lambda line: line.startswith("@"))
 
-    def test_exceeds_token_limit(self):
-        chunker = self.get_chunker()
-        words = "word" * (chunker.token_limit * 2)
-        self.assertTrue(chunker.exceeds_token_limit(words))
-        self.assertFalse(chunker.exceeds_token_limit("word"))
-
-    def test_resize_node(self):
-        chunker = self.get_chunker()
-        class_def = ast.ClassDef()
-        class_def.lineno = 1
-        words = "word " * chunker.token_limit
-        lines = words.split()
-        class_def.end_lineno = len(lines)-1
-        orig_content = chunker._get_node_content(class_def, lines)
-        self.assertTrue(chunker.exceeds_token_limit(orig_content))
-        resized_class_def = chunker._resize_node(class_def, lines)
-        new_content = chunker._get_node_content(resized_class_def, lines)
-        self.assertFalse(chunker.exceeds_token_limit(new_content))
-
-    def test_get_node_content(self):
-        class_def = ast.ClassDef()
-        class_def.lineno = 1
-        words = "word " * 2000
-        lines = words.split()
-        class_def.end_lineno = 4
-        content = PythonChunker._get_node_content(class_def, lines)
-        self.assertEqual(len(content.split(NEW_LINE)), 4)
+    def test_common_methods(self):
+        BaseCodeChunkerTest.verify_common_methods(self, self.get_chunker())
 
     def test_node2use(self):
-        self.assertTrue(PythonChunker._node2use(ast.ClassDef()))
-        self.assertFalse(PythonChunker._node2use(ast.Import()))
+        self.assertTrue(PythonChunker._is_node_2_use(ChunkedNode.from_python_ast(ast.ClassDef())))
+        self.assertFalse(PythonChunker._is_node_2_use(ChunkedNode.from_python_ast(ast.Import())))
 
-    def test_replace_white_space_with_tab(self):
-        str_one_tab = PythonChunker._replace_white_space_with_tab("    test ")
+    def test_preprocess_line(self):
+        str_one_tab = PythonChunker._preprocess_line("    test ")
         self.assertTrue(str_one_tab.startswith("\t"))
         self.assertEqual(str_one_tab.find("\t", 1), -1)
-        str_two_tabs = PythonChunker._replace_white_space_with_tab("        test ")
+        str_two_tabs = PythonChunker._preprocess_line("        test ")
         self.assertTrue(str_two_tabs.startswith("\t\t"))
         self.assertEqual(str_two_tabs.find("\t", 2), -1)
-        str_no_tab = PythonChunker._replace_white_space_with_tab(" test ")
+        str_no_tab = PythonChunker._preprocess_line(" test ")
         self.assertEqual(str_no_tab.find("\t"), -1)
 
     def get_chunker(self):

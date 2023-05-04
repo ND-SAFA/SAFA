@@ -2,7 +2,7 @@ import uuid
 from typing import Dict, Any, List, Union
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame

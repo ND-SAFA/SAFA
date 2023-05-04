@@ -30,17 +30,14 @@ public class GithubRepositoryDTO {
     @JsonProperty("private")
     private Boolean isPrivate;
 
-    @JsonProperty("html_url")
     private String url;
 
     private String description;
 
     private String visibility;
 
-    @JsonProperty("default_branch")
     private String defaultBranch;
 
-    @JsonProperty("created_at")
     private Date creationDate;
 
     private String language;

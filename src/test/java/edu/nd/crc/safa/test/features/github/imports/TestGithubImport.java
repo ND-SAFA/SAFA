@@ -63,7 +63,7 @@ public class TestGithubImport extends AbstractGithubTest {
         GithubImportDTO importSettings = new GithubImportDTO();
         importSettings.setInclude(List.of("**/*.pl"));
         importSettings.setExclude(List.of("modules/weather/**"));
-        importSettings.setArtifactTypeId(typeName);
+        importSettings.setArtifactType(typeName);
 
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Github.Import.BY_NAME)
@@ -152,7 +152,7 @@ public class TestGithubImport extends AbstractGithubTest {
         GithubImportDTO importSettings = new GithubImportDTO();
         importSettings.setInclude(List.of("**/*.pl"));
         importSettings.setExclude(List.of("modules/weather/**"));
-        importSettings.setArtifactTypeId(typeName);
+        importSettings.setArtifactType(typeName);
 
         String projectName = "githubImport";
         int initialArtifactCount = 5;

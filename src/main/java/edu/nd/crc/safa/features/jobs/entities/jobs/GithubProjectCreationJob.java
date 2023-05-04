@@ -246,7 +246,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * @return The artifact type we should use for importing.
      */
     protected ArtifactType getArtifactTypeMapping(Project project) {
-        String artifactTypeId = this.importSettings.getArtifactTypeId();
+        String artifactTypeId = this.importSettings.getArtifactType();
         artifactTypeId = artifactTypeId != null ? artifactTypeId : getDefaultTypeName();
 
         ArtifactType artifactType = serviceProvider.getTypeService().getArtifactType(project, artifactTypeId);

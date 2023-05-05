@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, List
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
-from tgen.models.token_limits import TokenLimitCalculator
+from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
 

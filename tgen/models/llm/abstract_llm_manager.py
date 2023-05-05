@@ -25,16 +25,15 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         self.llm_args = llm_args
         self.prompt_args = prompt_args
 
-    def make_completion_request(self, trainer_task: TrainerTask, completion_type: LLMCompletionType,
+    def make_completion_request(self, completion_type: LLMCompletionType,
                                 **params) -> SupportedLLMResponses:
         """
         Makes a request to fine-tune a model.
-        :param trainer_task: The task defining the required params.
         :param completion_type: The task to translate response to.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
-        completion_params = self.llm_args.to_params(trainer_task, completion_type)
+        completion_params = self.llm_args.to_params(TrainerTask.PREDICT, completion_type)
         llm_response = self.make_completion_request_impl(**completion_params, **params)
         return self.translate_to_response(completion_type, llm_response, **params)
 

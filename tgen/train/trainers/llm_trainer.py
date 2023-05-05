@@ -87,7 +87,7 @@ class LLMTrainer(AbstractTrainer):
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
         task = LLMCompletionType.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) \
             else LLMCompletionType.GENERATION
-        res = self.llm_manager.make_completion_request(trainer_task=TrainerTask.PREDICT, completion_type=task,
+        res = self.llm_manager.make_completion_request(completion_type=task,
                                                        model=self.llm_manager.llm_args.model,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
 

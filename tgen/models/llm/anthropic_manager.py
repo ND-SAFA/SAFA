@@ -50,7 +50,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         raise NotImplementedError(NotImplementedError)
 
-    def retrieve_fine_tune_request(self, completion_type: LLMCompletionType, **kwargs) -> AnthropicResponse:
+    def retrieve_fine_tune_request(self, **kwargs) -> AnthropicResponse:
         """
         Raises exception noting that anthropic has not implemented this feature.
         :param kwargs: Ignored.
@@ -59,25 +59,32 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         raise NotImplementedError(NotImplementedError)
 
     @staticmethod
-    def make_completion_request_impl(**params) -> AnthropicResponse:
+    def make_completion_request_impl(**params) -> List[AnthropicResponse]:
         """
         Makes a completion request to anthropic api.
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `params`"
-        prompts = params["prompt"]
+        prompts = params[AnthropicParams.PROMPT]
         response = []
         if isinstance(prompts, str):
             prompts = [prompts]
         for p in tqdm(prompts):
-            prompt_params = {**params, "prompt": p}
+            prompt_params = {**params, AnthropicParams.PROMPT: p}
             prompt_response = AnthropicManager.Client.completion(**prompt_params)
             response.append(prompt_response)
         return response
 
     @staticmethod
     def translate_to_response(task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+        """
+        Translates the LLM library response to task specific response.
+        :param task: The task to translate to.
+        :param res: The response from the LLM library.
+        :param params: Any additional parameters to customize translation.
+        :return: A task-specific response.
+        """
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")

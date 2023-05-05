@@ -14,7 +14,7 @@ from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.token_limits import TokenLimitCalculator
+from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 
@@ -106,7 +106,6 @@ class Summarizer(BaseObject):
         """
         prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value] for chunk in
                    chunks]
-        res: GenerationResponse = llm_manager.make_completion_request(trainer_task=TrainerTask.PREDICT,
-                                                                      completion_type=LLMCompletionType.GENERATION,
+        res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
                                                                       prompt=prompts)
         return [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]

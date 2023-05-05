@@ -14,7 +14,7 @@ from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.models.token_limits import ModelTokenLimits
+from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject

@@ -10,7 +10,6 @@ from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.list_util import ListUtil
 
 if not IS_TEST:
@@ -40,14 +39,12 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         """
         return openai.FineTune.create(**kwargs)
 
-    def retrieve_fine_tune_request(self, task: TrainerTask, **kwargs) -> OpenAIObject:
+    def retrieve_fine_tune_request(self,  **params) -> OpenAIObject:
         """
         Retrieves s a request to fine-tune a model
-        :param params: Params necessary for request
         :return: The response from open  ai
         """
-        self.llm_args.to_params(task, **kwargs)
-        return openai.FineTune.retrieve()
+        return openai.FineTune.retrieve(**params)
 
     def make_completion_request_impl(self, **params) -> AIObject:
         """

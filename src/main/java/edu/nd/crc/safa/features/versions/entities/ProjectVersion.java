@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -57,12 +58,12 @@ public class ProjectVersion implements Serializable {
     int majorVersion;
 
     @NotNull
-    @Positive
+    @PositiveOrZero
     @Column(name = "minor_version", nullable = false)
     int minorVersion;
 
     @NotNull
-    @Positive
+    @PositiveOrZero
     @Column(name = "revision", nullable = false)
     int revision;
 

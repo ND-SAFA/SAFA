@@ -7,20 +7,19 @@ from tqdm import tqdm
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, SUMMARIZATION_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
-from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.models.token_limits import TokenLimitCalculator
-from tgen.train.args.llm_args import LLMArgs
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
-from tgen.util.llm.llm_responses import GenerationResponse
-from tgen.util.llm.llm_task import LLMTask
-from tgen.util.llm.llm_util import LLMUtil
-from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
+from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 
 
 class Summarizer(BaseObject):
@@ -32,7 +31,7 @@ class Summarizer(BaseObject):
                  args_for_summarizer_model: OpenAIArgs = None, max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT,
                  code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY,
-                 llm_utils: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
+                 llm_utils: SupportedLLMManager = SupportedLLMManager.OPENAI):
         """
         Initializes a summarizer for a specific model
         :param model_for_summarizer: path of the model that should be used for summarization
@@ -55,7 +54,7 @@ class Summarizer(BaseObject):
         self.nl_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
             base_prompt=nl_base_prompt)
-        self.ai_utils: LLMUtil = llm_utils.value
+        self.ai_utils: AbstractLLMManager = llm_utils.value
 
     def summarize(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
@@ -103,8 +102,8 @@ class Summarizer(BaseObject):
         return TokenLimitCalculator.estimate_num_tokens(content, self.model_for_summarizer) > self.token_limit
 
     @staticmethod
-    def _summarize_chunks(ai_utils: LLMUtil, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
-                          args: LLMArgs) -> List[str]:
+    def _summarize_chunks(ai_utils: AbstractLLMManager, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
+                          args: AbstractLLMArgs) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model.
         :param ai_utils: The utility file containing API to AI library.
@@ -115,6 +114,6 @@ class Summarizer(BaseObject):
         """
         prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value] for chunk in
                    chunks]
-        res: GenerationResponse = ai_utils.make_completion_request(task=LLMTask.GENERATION, model=model_path, prompt=prompts,
+        res: GenerationResponse = ai_utils.make_completion_request(task=LLMCompletionType.GENERATION, model=model_path, prompt=prompts,
                                                                    **args.to_params(TrainerTask.PREDICT))
         return [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]

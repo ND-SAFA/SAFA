@@ -4,10 +4,11 @@ import anthropic
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
-from tgen.train.args.anthropic_args import AnthropicParams
-from tgen.util.llm.llm_responses import SupportedLLMResponses
-from tgen.util.llm.llm_task import LLMTask
-from tgen.util.llm.llm_util import AIObject, LLMUtil
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.train.args.anthropic_args import AnthropicParams, AnthropicArgs
+from tgen.models.llm.llm_responses import SupportedLLMResponses
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 
 
 class AnthropicResponse(TypedDict):
@@ -16,13 +17,23 @@ class AnthropicResponse(TypedDict):
     """
 
 
-class AnthropicUtil(LLMUtil[AnthropicResponse]):
+class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
     """
 
     Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
+
+    def __init__(self, llm_args: AnthropicArgs):
+        """
+        Initializes with args used for the requests to Anthropic's model
+        :param llm_args: args used for the requests to Anthropic's model
+        """
+        assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
+        prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
+                                 completion_suffix="###")
+        super().__init__(llm_args=llm_args, prompt_args=prompt_args)
 
     @staticmethod
     def make_fine_tune_request(**params) -> AnthropicResponse:
@@ -56,12 +67,12 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
             prompts = [prompts]
         for p in tqdm(prompts):
             prompt_params = {**params, "prompt": p}
-            prompt_response = AnthropicUtil.Client.completion(**prompt_params)
+            prompt_response = AnthropicManager.Client.completion(**prompt_params)
             response.append(prompt_response)
         return response
 
     @staticmethod
-    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+    def translate_to_response(task: LLMCompletionType, res: AIObject, **params) -> SupportedLLMResponses:
         raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod
@@ -76,5 +87,5 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
 
 if not IS_TEST:
     assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-    if AnthropicUtil.Client is None:
-        AnthropicUtil.Client = anthropic.Client(ANTHROPIC_KEY)
+    if AnthropicManager.Client is None:
+        AnthropicManager.Client = anthropic.Client(ANTHROPIC_KEY)

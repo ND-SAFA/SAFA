@@ -21,7 +21,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 
 
 class PromptDataset(iDataset):
@@ -34,7 +34,7 @@ class PromptDataset(iDataset):
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
                  trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None,
-                 llm_util: SupportedLLMUtils = SupportedLLMUtils.OPENAI):
+                 llm_util: SupportedLLMManager = SupportedLLMManager.OPENAI):
         """
         Initializes the dataset with necessary artifact/trace information and generator for the prompts
         :param prompt_df: The prompt dataframe

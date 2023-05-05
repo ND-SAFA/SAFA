@@ -2,7 +2,8 @@ from typing import Dict
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.train.args.llm_args import LLMArgs
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 
 
@@ -20,19 +21,17 @@ class AnthropicParams:
     top_p = "top_p"  # Nucleus sampling selects top probability tokens, alter temperature or top_p.
 
 
-class AnthropicArgs(LLMArgs):
+class AnthropicArgs(AbstractLLMArgs):
     """
     Defines allowable arguments to anthropic API.
     """
     max_tokens_to_sample = MAX_TOKENS_DEFAULT
 
     def __init__(self, model: str, **kwargs):
-        self.prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
-                                      completion_suffix="###")
-        self.expected_task_params = {TrainerTask.CLASSIFICATION: [],
+        self.expected_task_params = {LLMCompletionType.CLASSIFICATION: [],
                                      TrainerTask.TRAIN: [AnthropicParams.MODEL],
                                      TrainerTask.PREDICT: [AnthropicParams.TEMPERATURE, AnthropicParams.MAX_TOKENS_TO_SAMPLE]}
-        super().__init__(self.prompt_args, self.expected_task_params, model, **kwargs)
+        super().__init__(self.expected_task_params, model, **kwargs)
 
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """

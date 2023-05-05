@@ -1,50 +1,57 @@
 from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar
 
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.util.base_object import BaseObject
-from tgen.util.llm.llm_responses import SupportedLLMResponses
-from tgen.util.llm.llm_task import LLMTask
+from tgen.models.llm.llm_responses import SupportedLLMResponses
+from tgen.models.llm.llm_task import LLMCompletionType
 
 AIObject = TypeVar("AIObject")
 
 
-class LLMUtil(BaseObject, ABC, Generic[AIObject]):
+class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     """
     Interface for all AI utility classes.
     """
 
-    @staticmethod
+    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs):
+        """
+        Initializes the manager with args used for each request and the prompt args used for creating dataset
+        :param llm_args: args used for each request
+        :param prompt_args: args used for creating dataset
+        """
+        self.llm_args = llm_args
+        self.prompt_args = prompt_args
+
     @abstractmethod
-    def make_fine_tune_request(**params) -> AIObject:
+    def make_fine_tune_request(self, **params) -> AIObject:
         """
         Makes a request to fine-tune a model.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
 
-    @staticmethod
     @abstractmethod
-    def retrieve_fine_tune_request(**params) -> AIObject:
+    def retrieve_fine_tune_request(self, **params) -> AIObject:
         """
         Retrieves the results of a fine-tuning job.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
 
-    @classmethod
-    def make_completion_request(cls, task: LLMTask, **params) -> AIObject:
+    def make_completion_request(self, task: LLMCompletionType, **params) -> AIObject:
         """
         Makes a request to fine-tune a model.
         :param task: The task to translate response to.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
-        llm_response = cls.make_completion_request_impl(**params)
-        return cls.translate_to_response(task, llm_response, **params)
+        llm_response = self.make_completion_request_impl(**params)
+        return self.translate_to_response(task, llm_response, **params)
 
-    @staticmethod
     @abstractmethod
-    def make_completion_request_impl(**params) -> AIObject:
+    def make_completion_request_impl(self, **params) -> AIObject:
         """
         Makes a completion request to model.
         :param params: Named parameters to pass to AI library.
@@ -53,7 +60,7 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
 
     @staticmethod
     @abstractmethod
-    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+    def translate_to_response(task: LLMCompletionType, res: AIObject, **params) -> SupportedLLMResponses:
         """
         Translates the LLM library response to task specific response.
         :param task: The task to translate to.
@@ -62,9 +69,8 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
         :return: A task-specific response.
         """
 
-    @staticmethod
     @abstractmethod
-    def upload_file(**params) -> AIObject:
+    def upload_file(self, **params) -> AIObject:
         """
         Makes a request to upload a file.
         :param params: Named parameters to pass to AI library.
@@ -78,5 +84,5 @@ class LLMUtil(BaseObject, ABC, Generic[AIObject]):
         :param child_class_name: The name of the child to be created.
         :return: The supported enum class.
         """
-        from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
-        return SupportedLLMUtils
+        from tgen.models.llm.supported_llm_manager import SupportedLLMManager
+        return SupportedLLMManager

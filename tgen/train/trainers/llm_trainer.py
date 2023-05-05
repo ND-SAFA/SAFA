@@ -12,16 +12,16 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.train.args.llm_args import LLMArgs
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.llm.llm_responses import ClassificationResponse, GenerationResponse
-from tgen.util.llm.llm_task import LLMTask
-from tgen.util.llm.llm_util import LLMUtil
-from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.util.logging.logger_manager import logger
 
 
@@ -31,7 +31,7 @@ class LLMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 trainer_args: LLMArgs = None, llm_util: LLMUtil = None):
+                 trainer_args: AbstractLLMArgs = None, llm_util: AbstractLLMManager = None):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param trainer_args: The arguments for training and prediction calls
@@ -43,7 +43,7 @@ class LLMTrainer(AbstractTrainer):
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
         if llm_util is None:
-            llm_util = SupportedLLMUtils.OPENAI.value
+            llm_util = SupportedLLMManager.OPENAI.value
         self.trainer_dataset_manager = trainer_dataset_manager
         super().__init__(trainer_dataset_manager, trainer_args=trainer_args)
         self.summarizer = Summarizer(model_for_token_limit=self.trainer_args.model, code_or_exceeds_limit_only=False,
@@ -85,7 +85,8 @@ class LLMTrainer(AbstractTrainer):
         if self.trainer_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.trainer_args.output_dir)
         params = self.trainer_args.to_params(TrainerTask.PREDICT)
-        task = LLMTask.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) else LLMTask.GENERATION
+        task = LLMCompletionType.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) \
+            else LLMCompletionType.GENERATION
         res = self.llm_util.make_completion_request(task=task, model=self.trainer_args.model,
                                                     prompt=list(prompt_df[PromptKeys.PROMPT]),
                                                     **params)

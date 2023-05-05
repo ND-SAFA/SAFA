@@ -1,18 +1,17 @@
 from typing import Union
 
-from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.train.args.llm_args import LLMArgs
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.llm.llm_util import LLMUtil
-from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.util.override import overrides
 
 
@@ -21,9 +20,9 @@ class LLMJob(AbstractTrainerJob):
     Job to handle open ai tasks
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: LLMArgs = None,
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: AbstractLLMArgs = None,
                  task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None, prompt_creator: AbstractPromptCreator = None,
-                 llm_util: LLMUtil = None):
+                 llm_util: AbstractLLMManager = None):
         """
         Initializes job with necessary args
         :param trainer_args: The arguments for training and prediction calls
@@ -32,7 +31,7 @@ class LLMJob(AbstractTrainerJob):
         if trainer_args is None:
             trainer_args = OpenAIArgs()
         if llm_util is None:
-            llm_util = SupportedLLMUtils.OPENAI.value
+            llm_util = SupportedLLMManager.OPENAI.value
             assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)

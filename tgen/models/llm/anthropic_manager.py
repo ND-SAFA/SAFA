@@ -31,6 +31,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
     Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
+    prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
+                             completion_suffix="###")
 
     def __init__(self, llm_args: AnthropicArgs):
         """
@@ -38,9 +40,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param llm_args: args used for the requests to Anthropic's model
         """
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
-        prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
-                                 completion_suffix="###")
-        super().__init__(llm_args=llm_args, prompt_args=prompt_args)
+        super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """

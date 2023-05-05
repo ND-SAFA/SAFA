@@ -16,6 +16,7 @@ Options:
             commands.
       -e    Specify the environment (local, dev, or prod). If not specified,
             it defaults to local.
+      -f    Specifies an environment file to source before commands.
 
 Commands:
       build    Build the backend with Gradle
@@ -67,12 +68,13 @@ ENVIRONMENT=local
 BUILD=false
 RUN=false
 while [ $OPTIND -le "$#" ]; do
-  if getopts ':hnte:' option; then
+  if getopts ':hntef:' option; then
     case $option in
       h) help;;
       n) TEST=false;;
       t) TEST=true;;
       e) ENVIRONMENT="$OPTARG";;
+      f) source "$OPTARG";;
       :) echo -e "option requires an argument."; help 1;;
       ?) echo -e "Invalid command option."; help 1;;
     esac

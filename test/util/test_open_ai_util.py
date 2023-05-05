@@ -19,6 +19,5 @@ class TestOpenAiUtil(BaseTest):
         mock_completion.side_effect = fake_open_ai_completion
         llm_manager = OpenAIManager(OpenAIArgs())
         res: GenerationResponse = llm_manager.make_completion_request(
-            completion_type=LLMCompletionType.GENERATION,
-            model="ada", prompt=["prompt" for i in range(30)])
+            completion_type=LLMCompletionType.GENERATION, prompt=["prompt" for i in range(30)])
         self.assertEqual(len(res.batch_responses), 30)

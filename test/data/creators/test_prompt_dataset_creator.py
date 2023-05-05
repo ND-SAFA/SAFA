@@ -1,5 +1,6 @@
 from unittest import mock
 
+from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -101,4 +102,4 @@ class TestPromptDatasetCreator(BaseTest):
 
     @staticmethod
     def create_llm_manager() -> AbstractLLMManager:
-        return OpenAIManager(OpenAIArgs())
+        return OpenAIManager(OpenAIArgs(model=GENERATION_MODEL_DEFAULT))

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Type
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Type, Union
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, TEMPERATURE_DEFAULT
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -8,32 +9,31 @@ from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 
 
+@dataclass
 class AbstractLLMArgs(BaseObject, ABC):
     """
     Defines abstract class for arguments of an AI library.
     """
-    max_tokens = MAX_TOKENS_DEFAULT
+    expected_task_params: Dict[TrainerTask, List[str]]
+    model: str
     temperature: float = TEMPERATURE_DEFAULT
+    output_dir: str = None
+    metrics: List[str] = field(default_factory=SupportedTraceMetric.get_keys)
 
-    def __init__(self, expected_task_params: Dict[TrainerTask, List[str]], model: str,
-                 max_tokens: int = MAX_TOKENS_DEFAULT, output_dir: str = None, metrics: List[str] = None):
+    def __post_init__(self) -> None:
         """
-        Constructs AI arguments customized for given prompt arguments and prompt types in creator.
-        :param expected_task_params: Mapping of task names to their expected properties.
-        :param max_tokens: The maximum number of allowable tokens to LLM API.
+        Ensures that all completion types are in the expected task params
+        :return: None
         """
-        if metrics is None:
-            metrics = SupportedTraceMetric.get_keys()
-        self.expected_task_params = expected_task_params
-        self.max_tokens = max_tokens
-        self.model = model
-        self.output_dir = output_dir
-        self.metrics = metrics
+        for completion_type in LLMCompletionType:
+            if completion_type not in self.expected_task_params:
+                self.expected_task_params[completion_type] = []
 
     def to_params(self, task: TrainerTask, completion_type: LLMCompletionType, instructions: Dict = None, **kwargs) -> Dict[str, Any]:
         """
         Retrieves the necessary parameters to LLM API using the required parameters defined by task.
         :param task: The task whose required parameters are extracted.
+        :param completion_type: Whether the model should complete with generative output or classification
         :param instructions: Commands passed to parameter constructor.
         :param kwargs: Additional instructions to pass to custom parameter construction.
         :return: Mapping of param name to value.
@@ -45,12 +45,13 @@ class AbstractLLMArgs(BaseObject, ABC):
         params = {}
         if completion_type == LLMCompletionType.CLASSIFICATION:
             self.max_tokens = 1
-        params = self._add_params_for_task(task, params)
-        params = self._add_library_params(task, params, instructions=instructions)
+        for task_type in [task, completion_type]:
+            params = self._add_params_for_task(task_type, params)
+            params = self._add_library_params(task_type, params, instructions=instructions)
         params.update(kwargs)
         return params
 
-    def _add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
+    def _add_params_for_task(self, task: Union[TrainerTask, LLMCompletionType], params: Dict = None) -> Dict:
         """
         Adds the params for a given task
         :param task: The task to add params for

@@ -34,7 +34,8 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         :return: The response from AI library.
         """
         completion_params = self.llm_args.to_params(TrainerTask.PREDICT, completion_type)
-        llm_response = self.make_completion_request_impl(**completion_params, **params)
+        completion_params.update(params)
+        llm_response = self.make_completion_request_impl(**completion_params)
         return self.translate_to_response(completion_type, llm_response, **params)
 
     @abstractmethod

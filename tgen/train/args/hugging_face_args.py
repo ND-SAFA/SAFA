@@ -12,6 +12,7 @@ from tgen.constants.hugging_face_constants import EVALUATION_STRATEGY_DEFAULT, E
     USE_BALANCED_BATCHES_DEFAULT
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.util.base_object import BaseObject
+from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.enum_util import FunctionalWrapper
 
 
@@ -80,7 +81,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
-        super_args = self.__set_unique_args(**kwargs)
+        super_args = DataclassUtil.set_unique_args(self, TrainingArguments, **kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,  # args whose name is different from parent
                          report_to="wandb", deepspeed=self.deepspeed_path, **super_args)
 

@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from typing import Dict
 
 from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
-    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT
+    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.override import overrides
 
 
@@ -13,6 +14,7 @@ class OpenAIParams:
     """
     Contains possible parameters to OpenAI API.
     """
+    MODEL = "model"
     COMPUTE_CLASSIFICATION_METRICS = "compute_classification_metrics"
     MODEL_SUFFIX = "model_suffix"
     N_EPOCHS = "n_epochs"
@@ -27,26 +29,26 @@ class OpenAIParams:
 
 @dataclass
 class OpenAIArgs(AbstractLLMArgs):
-    TASK_PARAMS = {LLMCompletionType.CLASSIFICATION: [OpenAIParams.COMPUTE_CLASSIFICATION_METRICS],
-                   TrainerTask.TRAIN: [OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
-                                       OpenAIParams.LEARNING_RATE_MULTIPLIER],
-                   TrainerTask.PREDICT: [OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS, OpenAIParams.LOG_PROBS]}
+    logprobs: int = LOGPROBS_DEFAULT
+    n_epochs: int = 1
+    learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT
+    compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
+    model_suffix: str = None
+    max_tokens: int = MAX_TOKENS_DEFAULT
+    _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [OpenAIParams.MODEL, OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
+                                                 OpenAIParams.LEARNING_RATE_MULTIPLIER],
+                             TrainerTask.PREDICT: [OpenAIParams.MODEL, OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS,
+                                                   OpenAIParams.LOG_PROBS]}
 
-    def __init__(self, model: str = CLASSIFICATION_MODEL_DEFAULT, logprobs: int = LOGPROBS_DEFAULT,
-                 n_epochs: int = 1, learning_rate_multiplier: float = LEARNING_RATE_MULTIPLIER_DEFAULT,
-                 compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT, model_suffix: str = None,
-                 **kwargs):
+    def __init__(self, **kwargs):
         """
-        Constructs OpenAI args with given model
-        :param model:
-        :param kwargs:
+        Sets all necessary args for OpenAI
+        :param kwargs: Contains all necessary arg name to value mappings
         """
-        self.logprobs = logprobs
-        self.n_epochs = n_epochs
-        self.learning_rate_multiplier = learning_rate_multiplier,
-        self.compute_classification_metrics = compute_classification_metrics
-        self.model_suffix = model_suffix
-        super().__init__(model=model, expected_task_params=self.TASK_PARAMS, **kwargs)
+        super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
+        if "model" not in super_args:
+            super_args["model"] = GENERATION_MODEL_DEFAULT
+        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
 
     @overrides(AbstractLLMArgs)
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
@@ -62,7 +64,6 @@ class OpenAIArgs(AbstractLLMArgs):
             prompt_creator = instructions["prompt_creator"]
             assert hasattr(prompt_creator, "pos_class"), "Expected prompt creator to define `pos_class`"
             pos_class = getattr(prompt_creator, "pos_class")
-            params = self._add_params_for_task(LLMCompletionType.CLASSIFICATION)
             params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
             params[OpenAIParams.COMPUTE_CLASSIFICATION_METRICS] = True
         return params

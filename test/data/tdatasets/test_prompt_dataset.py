@@ -5,7 +5,7 @@ from typing import Dict, List
 import mock
 import pandas as pd
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, GENERATION_MODEL_DEFAULT
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys

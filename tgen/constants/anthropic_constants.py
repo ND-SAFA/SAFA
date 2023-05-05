@@ -1,0 +1,1 @@
+ANTHROPIC_MODEL_DEFAULT = "claude-v1.3"

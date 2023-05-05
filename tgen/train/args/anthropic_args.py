@@ -1,5 +1,6 @@
 from typing import Dict
 
+from tgen.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.llm_args import LLMArgs
@@ -25,10 +26,11 @@ class AnthropicArgs(LLMArgs):
     Defines allowable arguments to anthropic API.
     """
     max_tokens_to_sample = MAX_TOKENS_DEFAULT
+    prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
+                             completion_suffix="###")
 
-    def __init__(self, model: str, **kwargs):
-        self.prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
-                                      completion_suffix="###")
+    def __init__(self, model: str = ANTHROPIC_MODEL_DEFAULT, **kwargs):
+        self.prompt_args = self.prompt_args
         self.expected_task_params = {TrainerTask.CLASSIFICATION: [],
                                      TrainerTask.TRAIN: [AnthropicParams.MODEL],
                                      TrainerTask.PREDICT: [AnthropicParams.TEMPERATURE, AnthropicParams.MAX_TOKENS_TO_SAMPLE]}

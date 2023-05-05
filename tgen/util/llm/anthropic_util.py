@@ -1,19 +1,26 @@
-from typing import TypedDict
+from typing import List, TypedDict
 
 import anthropic
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.train.args.anthropic_args import AnthropicParams
-from tgen.util.llm.llm_responses import SupportedLLMResponses
+from tgen.util.llm.llm_responses import GenerationResponse, SupportedLLMResponses
 from tgen.util.llm.llm_task import LLMTask
-from tgen.util.llm.llm_util import AIObject, LLMUtil
+from tgen.util.llm.llm_util import LLMUtil
 
 
 class AnthropicResponse(TypedDict):
     """
     Contains anthropic response to their API.
     """
+    completion: str
+    stop: str
+    stop_reason: str
+    truncated: bool
+    log_id: str
+    model: str
+    exception: str
 
 
 class AnthropicUtil(LLMUtil[AnthropicResponse]):
@@ -61,7 +68,9 @@ class AnthropicUtil(LLMUtil[AnthropicResponse]):
         return response
 
     @staticmethod
-    def translate_to_response(task: LLMTask, res: AIObject, **params) -> SupportedLLMResponses:
+    def translate_to_response(task: LLMTask, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+        if task == LLMTask.GENERATION:
+            return GenerationResponse([r["completion"] for r in res])
         raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod

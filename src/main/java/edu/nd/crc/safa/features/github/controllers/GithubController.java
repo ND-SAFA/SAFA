@@ -58,7 +58,7 @@ public class GithubController extends BaseController {
      * Creates a job that imports a GitHub repository into a new SAFA project.
      *
      * @param repositoryName The name of the repository to import.
-     * @param owner          The owner of the repository to import.
+     * @param owner The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return A {@link JobAppEntity} representing the import job.
      */
@@ -89,8 +89,8 @@ public class GithubController extends BaseController {
      * already been previously imported.
      *
      * @param repositoryName The name of the repository to import.
-     * @param versionId      The ID of the project version to import into.
-     * @param owner          The owner of the repository to import.
+     * @param versionId The ID of the project version to import into.
+     * @param owner The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return Information about the started job
      */
@@ -123,8 +123,8 @@ public class GithubController extends BaseController {
      * not previously had that repository imported into it.
      *
      * @param repositoryName The name of the repository to import.
-     * @param versionId      The ID of the project version to import into.
-     * @param owner          The owner of the repository to import.
+     * @param versionId The ID of the project version to import into.
+     * @param owner The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return Information about the started job
      */

@@ -13,6 +13,11 @@ import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
@@ -86,13 +91,17 @@ public class GenerateLinksJob extends CommitJob {
                 tracingRequest.getArtifactLevels());
 
             TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-            ModelAppEntity model = tracingPayload.getModel();
-            if (model == null) {
-                model = BaseGenerationModels.getDefaultModel();
+            if (tracingPayload.getModel() == null) {
+                this.generatedTraces = new ArrayList<>();
+                this.generatedTraces.addAll(this.serviceProvider
+                    .getTraceGenerationService()
+                    .generateLinksWithMethod(tracingPayload));
+            } else {
+                ModelAppEntity model = tracingPayload.getModel();
+                TGen bertModel = model.getBaseModel().createTGenController();
+                String statePath = model.getStatePath();
+                this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
             }
-
-            TGen bertModel = model.getBaseModel().createTGenController();
-            this.generatedTraces = bertModel.generateLinks(tracingPayload);
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

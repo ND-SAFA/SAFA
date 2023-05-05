@@ -7,7 +7,6 @@ from datasets import disable_caching
 
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
@@ -15,7 +14,6 @@ from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
@@ -37,8 +35,6 @@ class TrainerDatasetManager(BaseObject):
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
-                 summarize_dataset_creator: PromptDatasetCreator = None,
-                 summarizer: Summarizer = None,
                  augmenter: DataAugmenter = None
                  ):
         """
@@ -49,14 +45,11 @@ class TrainerDatasetManager(BaseObject):
         :param eval_dataset_creator: The training dataset creator.data
         :param augmenter: augmenter to use for augmenting datasets
         """
-        if summarize_dataset_creator and not summarize_dataset_creator.summarizer:
-            assert summarizer is not None, "Expected summarizer to be passed in alongside summarizer dataset creator."
-            summarize_dataset_creator.set_summarizers(summarizer)
+
         self._dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator,
-                                  DatasetRole.EVAL: eval_dataset_creator,
-                                  DatasetRole.SUMMARIZE: summarize_dataset_creator}
+                                  DatasetRole.EVAL: eval_dataset_creator}
         self._datasets = None
         self._hf_datasets = None
         self.augmenter = augmenter

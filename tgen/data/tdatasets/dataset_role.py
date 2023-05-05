@@ -6,4 +6,3 @@ class DatasetRole(Enum):
     VAL = "val"
     TRAIN = "train"
     EVAL = "eval"
-    SUMMARIZE = "summarize"

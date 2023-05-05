@@ -20,8 +20,7 @@ class TestSummarizer(BaseTest):
         mock_completion.side_effect = fake_open_ai_completion
         llm_manager = OpenAIManager(OpenAIArgs())
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
-        summaries = summarizer._summarize_chunks(llm_manager, summarizer.nl_prompt_creator, self.CHUNKS,
-                                                 "text-davinci-003")
+        summaries = summarizer._summarize_chunks(llm_manager, summarizer.nl_prompt_creator, self.CHUNKS)
         for i, summary in enumerate(summaries):
             self.assertEqual(summary, SUMMARY_FORMAT.format(self.CHUNKS[i]))
 
@@ -48,7 +47,7 @@ class TestSummarizer(BaseTest):
 
         # set code_or_exceeds_limit_only to TRUE this time
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=True, model_for_summarizer=model_name)
+        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=True)
         short_text = "This is a short text under the token limit"
         summaries = summarizer.summarize(content=short_text)
         self.assertEqual(summaries, short_text)  # shouldn't have summarized

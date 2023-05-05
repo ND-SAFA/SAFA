@@ -29,18 +29,21 @@ class LLMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 llm_manager: AbstractLLMManager, **kwargs):
+                 llm_manager: AbstractLLMManager, summarizer: Summarizer = None, **kwargs):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param trainer_dataset_manager: The dataset manager for training and prediction
         :param prompt_creator: Creates the prompts for trace link prediction.
+        :param summarizer: The summarizer to use for shortening artifacts over the token limit.
         :param kwargs: Ignored.
         """
+        if summarizer is None:
+            summarizer = Summarizer(llm_manager, model_for_token_limit=llm_manager.llm_args.model,
+                                    code_or_exceeds_limit_only=False,
+                                    max_tokens_for_token_limit=llm_manager.llm_args.max_tokens)
         super().__init__(trainer_dataset_manager)
         self.llm_manager = llm_manager
-        self.summarizer = Summarizer(llm_manager, model_for_token_limit=self.llm_manager.llm_args.model,
-                                     code_or_exceeds_limit_only=False,
-                                     max_tokens_for_token_limit=self.llm_manager.llm_args.max_tokens)
+        self.summarizer = summarizer
         self.prompt_creator = prompt_creator
         self.trainer_args = llm_manager.llm_args  # Used to satisfy the AbstractTrainer interface. TODO: Remove this eventually.
 

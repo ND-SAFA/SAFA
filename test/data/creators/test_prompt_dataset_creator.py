@@ -9,11 +9,14 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
+from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestPromptDatasetCreator(BaseTest):
@@ -27,8 +30,9 @@ class TestPromptDatasetCreator(BaseTest):
 
     def test_project_reader_artifact_with_summarizer(self):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
+        llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=Summarizer(code_or_exceeds_limit_only=False))
+                                                          summarizer=Summarizer(llm_manager, code_or_exceeds_limit_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, artifacts_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -47,8 +51,9 @@ class TestPromptDatasetCreator(BaseTest):
 
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
+        llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
-                                                          summarizer=Summarizer(code_or_exceeds_limit_only=False))
+                                                          summarizer=Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         all_artifacts = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
                          for artifact in PromptTestProject.get_safa_artifacts()}
         artifact_entries = []
@@ -90,5 +95,10 @@ class TestPromptDatasetCreator(BaseTest):
             else prompt_dataset.trace_dataset.artifact_df
         TestAssertions.verify_entities_in_df(self, artifacts_entries, artifacts_df)
 
-    def get_prompt_dataset_creator(self, **params):
+    @staticmethod
+    def get_prompt_dataset_creator(**params):
         return PromptDatasetCreator(**params)
+
+    @staticmethod
+    def create_llm_manager() -> AbstractLLMManager:
+        return OpenAIManager(OpenAIArgs())

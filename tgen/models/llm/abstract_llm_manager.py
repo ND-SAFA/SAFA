@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Type, TypeVar
+from typing import Dict, Generic, Type, TypeVar
 
 from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.util.base_object import BaseObject
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
+from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.base_object import BaseObject
 
 AIObject = TypeVar("AIObject")
 
@@ -24,31 +25,18 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         self.llm_args = llm_args
         self.prompt_args = prompt_args
 
-    @abstractmethod
-    def make_fine_tune_request(self, **params) -> AIObject:
+    def make_completion_request(self, trainer_task: TrainerTask, completion_type: LLMCompletionType,
+                                **params) -> SupportedLLMResponses:
         """
         Makes a request to fine-tune a model.
+        :param trainer_task: The task defining the required params.
+        :param completion_type: The task to translate response to.
         :param params: Named parameters to pass to AI library.
         :return: The response from AI library.
         """
-
-    @abstractmethod
-    def retrieve_fine_tune_request(self, **params) -> AIObject:
-        """
-        Retrieves the results of a fine-tuning job.
-        :param params: Named parameters to pass to AI library.
-        :return: The response from AI library.
-        """
-
-    def make_completion_request(self, task: LLMCompletionType, **params) -> AIObject:
-        """
-        Makes a request to fine-tune a model.
-        :param task: The task to translate response to.
-        :param params: Named parameters to pass to AI library.
-        :return: The response from AI library.
-        """
-        llm_response = self.make_completion_request_impl(**params)
-        return self.translate_to_response(task, llm_response, **params)
+        completion_params = self.llm_args.to_params(trainer_task, completion_type)
+        llm_response = self.make_completion_request_impl(**completion_params, **params)
+        return self.translate_to_response(completion_type, llm_response, **params)
 
     @abstractmethod
     def make_completion_request_impl(self, **params) -> AIObject:
@@ -67,6 +55,34 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         :param res: The response from the LLM library.
         :param params: Any additional parameters to customize translation.
         :return: A task-specific response.
+        """
+
+    def make_fine_tune_request(self, completion_type: LLMCompletionType, instructions: Dict, **kwargs) -> AIObject:
+        """
+        Makes a fine-tuning request to LLM library.
+        :param completion_type: The completion type being trained.
+        :param instructions: Instructions to library parameter constructor. Not params.
+        :param kwargs: Additional parameters to pass to LLM API.
+        :return: Response from AI library.
+        """
+        params = self.llm_args.to_params(TrainerTask.TRAIN, completion_type, instructions=instructions, **kwargs)
+        return self._make_fine_tune_request_impl(**params)
+
+    @abstractmethod
+    def _make_fine_tune_request_impl(self, **kwargs) -> AIObject:
+        """
+        Makes a request to fine-tune a model.
+        :param completion_type: The type of task being trained on. Used to get params to API.
+        :param kwargs: Named parameters to pass to AI library.
+        :return: The response from AI library.
+        """
+
+    @abstractmethod
+    def retrieve_fine_tune_request(self, **kwargs) -> AIObject:
+        """
+        Retrieves the results of a fine-tuning job.
+        :param kwargs: Named parameters to pass to AI library.
+        :return: The response from AI library.
         """
 
     @abstractmethod

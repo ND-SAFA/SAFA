@@ -6,12 +6,12 @@ from tqdm import tqdm
 
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.train.args.open_ai_args import OpenAIParams, OpenAIArgs
-from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.list_util import ListUtil
+from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
+from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
+from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.list_util import ListUtil
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
@@ -22,23 +22,23 @@ if not IS_TEST:
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
+    prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
 
     def __init__(self, llm_args: OpenAIArgs):
         """
-        Initializes with args used for the requests to Anthropic's model
-        :param llm_args: args used for the requests to Anthropic's model
+        Initializes with args used for the requests to Anthropic model
+        :param llm_args: args used for the requests to Anthropic model
         """
         assert isinstance(llm_args, OpenAIArgs), "Must use OpenAI args with OpenAI manager"
-        prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
-        super().__init__(llm_args=llm_args, prompt_args=prompt_args)
+        super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
 
-    def make_fine_tune_request(self, **params) -> OpenAIObject:
+    def _make_fine_tune_request_impl(self, **kwargs) -> OpenAIObject:
         """
         Makes a request to fine-tune a model
-        :param params: Params necessary for request
+        :param kwargs: Params necessary for request
         :return: The response from open  ai
         """
-        return openai.FineTune.create(**params)
+        return openai.FineTune.create(**kwargs)
 
     def retrieve_fine_tune_request(self, task: TrainerTask, **kwargs) -> OpenAIObject:
         """

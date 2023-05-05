@@ -13,16 +13,15 @@ from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
+from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.wandb.trace_callback import TraceCallback
-from tgen.util.base_object import BaseObject
 from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 
@@ -51,7 +50,8 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
         trainer_args.__post_init__()
-        super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
+        super().__init__(trainer_dataset_manager=trainer_dataset_manager)
+        self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)

@@ -2,6 +2,9 @@ import os
 
 from dotenv import load_dotenv
 
+from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 load_dotenv()
@@ -29,7 +32,8 @@ if __name__ == "__main__":
 
     project_path = os.path.join(data_path, "dr_onboard_autonomy") if DO_SUMMARIZE else \
         os.path.join(data_path, "dr_onboard_autonomy_summarizations")
-    summarizer = Summarizer() if DO_SUMMARIZE else None
+    llm_manager = OpenAIManager(OpenAIArgs())
+    summarizer = Summarizer(llm_manager) if DO_SUMMARIZE else None
     export_path = os.path.join(output_path, "hgen", "dr_onboard_autonomy")
 
     if USE_DATASET_CREATOR_FOR_SOURCES:

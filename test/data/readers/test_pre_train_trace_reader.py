@@ -5,9 +5,11 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.file_util import FileUtil
 
 
@@ -32,7 +34,8 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         reader: PreTrainTraceReader = self.get_project_reader()
-        reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
+        llm_manager = OpenAIManager(OpenAIArgs())
+        reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
         lines = [SUMMARY_FORMAT.format(line) for line in FileUtil.read_file(reader.data_file).split(os.linesep)]
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
@@ -62,4 +65,3 @@ class TestPreTrainingTraceReader(BaseTest):
         self.assertEquals(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
         for i, row in artifacts_df.itertuples():
             self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT].strip(), msg="Item {} failed.".format(i))
-

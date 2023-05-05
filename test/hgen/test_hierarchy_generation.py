@@ -17,6 +17,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
@@ -142,7 +143,7 @@ class TestHierarchyGeneration(BaseTest):
             self.assertLess(label - 0.4012, 0.1)
 
     def test_save_dataset_checkpoint(self):
-        dataset = PromptDatasetCreator(project_reader = PromptTestProject.get_project_reader()).create()
+        dataset = PromptDatasetCreator(project_reader=PromptTestProject.get_project_reader()).create()
         export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
         self.assertTrue(os.path.exists(export_path))
 
@@ -180,8 +181,8 @@ class TestHierarchyGeneration(BaseTest):
     def get_tgen_trainer(dataset_creator):
         prompt_creator = ClassificationPromptCreator()
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, trainer_args=OpenAIArgs(metrics=[]),
-                          prompt_creator=prompt_creator)
+        llm_manager = OpenAIManager(llm_args=OpenAIArgs(metrics=[]))
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager, prompt_creator=prompt_creator)
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):
@@ -221,12 +222,13 @@ class TestHierarchyGeneration(BaseTest):
 
     @staticmethod
     def get_dataset_creator(**params):
-        return PromptDatasetCreator(summarizer=Summarizer(), **params)
+        llm_manager = OpenAIManager(OpenAIArgs())
+        return PromptDatasetCreator(summarizer=Summarizer(llm_manager), **params)
 
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
-
+        llm_manager = OpenAIManager(OpenAIArgs())
         hgen_trainer_params = {"hgen_trainer_args": OpenAIArgs(metrics=[])}
         args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.LLM,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
                         **hgen_trainer_params, **params)
-        return HierarchyGenerator(args)
+        return HierarchyGenerator(args, llm_manager)

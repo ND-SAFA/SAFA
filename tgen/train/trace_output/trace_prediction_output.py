@@ -17,7 +17,7 @@ class TracePredictionEntry(TypedDict):
     source: str
     target: str
     score: float
-    label: float
+    label: float = -1
 
 
 class TracePredictionOutput(AbstractTraceOutput):
@@ -25,7 +25,7 @@ class TracePredictionOutput(AbstractTraceOutput):
     The output of predicting on the trace trainer.
     """
 
-    def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray]]] = None,
+    def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray], List]] = None,
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
                  prediction_entries: List[TracePredictionEntry] = None,
                  prediction_output: PredictionOutput = None, additional_output: Dict = None):

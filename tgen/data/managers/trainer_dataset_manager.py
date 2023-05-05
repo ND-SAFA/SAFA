@@ -38,6 +38,7 @@ class TrainerDatasetManager(BaseObject):
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
                  summarize_dataset_creator: PromptDatasetCreator = None,
+                 summarizer: Summarizer = None,
                  augmenter: DataAugmenter = None
                  ):
         """
@@ -49,7 +50,8 @@ class TrainerDatasetManager(BaseObject):
         :param augmenter: augmenter to use for augmenting datasets
         """
         if summarize_dataset_creator and not summarize_dataset_creator.summarizer:
-            summarize_dataset_creator.set_summarizers(Summarizer())
+            assert summarizer is not None, "Expected summarizer to be passed in alongside summarizer dataset creator."
+            summarize_dataset_creator.set_summarizers(summarizer)
         self._dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator,

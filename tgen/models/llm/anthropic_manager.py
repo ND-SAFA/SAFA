@@ -4,11 +4,11 @@ import anthropic
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
-from tgen.train.args.anthropic_args import AnthropicParams, AnthropicArgs
-from tgen.models.llm.llm_responses import SupportedLLMResponses
-from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
 
 
 class AnthropicResponse(TypedDict):
@@ -42,20 +42,18 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                  completion_suffix="###")
         super().__init__(llm_args=llm_args, prompt_args=prompt_args)
 
-    @staticmethod
-    def make_fine_tune_request(**params) -> AnthropicResponse:
+    def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """
         Raises exception noting that anthropic has not implemented this feature.
-        :param params: Ignored.
+        :param kwargs: Ignored.
         :return: None
         """
         raise NotImplementedError(NotImplementedError)
 
-    @staticmethod
-    def retrieve_fine_tune_request(**params) -> AnthropicResponse:
+    def retrieve_fine_tune_request(self, completion_type: LLMCompletionType, **kwargs) -> AnthropicResponse:
         """
         Raises exception noting that anthropic has not implemented this feature.
-        :param params: Ignored.
+        :param kwargs: Ignored.
         :return: None
         """
         raise NotImplementedError(NotImplementedError)
@@ -79,8 +77,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return response
 
     @staticmethod
-    def translate_to_response(task: LLMTask, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
-        if task == LLMTask.GENERATION:
+    def translate_to_response(task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+        if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 

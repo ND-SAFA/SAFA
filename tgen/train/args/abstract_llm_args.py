@@ -30,20 +30,24 @@ class AbstractLLMArgs(BaseObject, ABC):
         self.output_dir = output_dir
         self.metrics = metrics
 
-    def to_params(self, task: TrainerTask, completion_type: LLMCompletionType, **kwargs) -> Dict[str, Any]:
+    def to_params(self, task: TrainerTask, completion_type: LLMCompletionType, instructions: Dict = None, **kwargs) -> Dict[str, Any]:
         """
         Retrieves the necessary parameters to LLM API using the required parameters defined by task.
         :param task: The task whose required parameters are extracted.
+        :param instructions: Commands passed to parameter constructor.
         :param kwargs: Additional instructions to pass to custom parameter construction.
         :return: Mapping of param name to value.
         """
+        if instructions is None:
+            instructions = {}
         assert task in self.expected_task_params, f"Unknown task {task.value}." \
                                                   f" Must choose from {self.expected_task_params.keys()}"
         params = {}
-        if task in [LLMCompletionType.CLASSIFICATION]:
+        if completion_type == LLMCompletionType.CLASSIFICATION:
             self.max_tokens = 1
-        params = self._add_params_for_task(TrainerTask.TRAIN if task == LLMCompletionType.CLASSIFICATION else task, params)
-        params = self._add_library_params(task, params, instructions=kwargs)
+        params = self._add_params_for_task(task, params)
+        params = self._add_library_params(task, params, instructions=instructions)
+        params.update(kwargs)
         return params
 
     def _add_params_for_task(self, task: TrainerTask, params: Dict = None) -> Dict:
@@ -62,6 +66,16 @@ class AbstractLLMArgs(BaseObject, ABC):
             params[name] = val
         return params
 
+    @classmethod
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the supported enum class for LLM args.
+        :param child_class_name: The name of the child to be created.
+        :return: The supported enum class.
+        """
+        from tgen.train.args.supported_llm_args import SupportedLLMArgs
+        return SupportedLLMArgs
+
     @abstractmethod
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
@@ -72,12 +86,10 @@ class AbstractLLMArgs(BaseObject, ABC):
         :return: Dict representing the new parameters.
         """
 
-    @classmethod
-    def _get_enum_class(cls, child_class_name: str) -> Type:
+    @abstractmethod
+    def set_max_tokens(self, max_tokens: int) -> None:
         """
-        Returns the supported enum class for LLM args.
-        :param child_class_name: The name of the child to be created.
-        :return: The supported enum class.
+        Sets the max tokens parameter for library.
+        :param max_tokens: The tokens to set it to.
+        :return: None
         """
-        from tgen.train.args.supported_llm_args import SupportedLLMArgs
-        return SupportedLLMArgs

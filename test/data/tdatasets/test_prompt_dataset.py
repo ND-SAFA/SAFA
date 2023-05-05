@@ -5,18 +5,20 @@ from typing import Dict, List
 import mock
 import pandas as pd
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
-from tgen.models.token_limits import ModelTokenLimits
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.models.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
 
@@ -51,14 +53,16 @@ class TestPromptDataset(BaseTest):
         exceeds_token_limit_mock.side_effect = self.fake_exceeds_token_limit
         summarize_mock.side_effect = self.fake_summarize
         artifact_prompt_dataset = self.get_dataset_with_artifact_df()
-        prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(GenerationPromptCreator(), Summarizer())
+        llm_manager = OpenAIManager(OpenAIArgs())
+        prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(GenerationPromptCreator(),
+                                                                                        Summarizer(llm_manager))
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
                 self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()
-        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(GenerationPromptCreator(), Summarizer())
+        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(GenerationPromptCreator(), Summarizer(llm_manager))
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
 
     def test_to_dataframe(self):
@@ -72,13 +76,16 @@ class TestPromptDataset(BaseTest):
     @mock.patch("openai.File.create")
     def test_get_data_file_id(self, openai_file_create_mock: mock.MagicMock):
         openai_file_create_mock.return_value = TestResponse()
+        llm_manager = OpenAIManager(OpenAIArgs())
         outputs = self.all_datasets_test(
             lambda dataset: dataset.get_project_file_id(
+                llm_manager,
                 prompt_creator=GenerationPromptCreator() if dataset._has_trace_data else None),
         )
         dataset = self.get_dataset_with_prompt_df()
         dataset.data_export_path = TEST_OUTPUT_DIR
-        outputs["with_output_path"] = dataset.get_project_file_id(GenerationPromptCreator())
+        llm_manager = OpenAIManager(OpenAIArgs())
+        outputs["with_output_path"] = dataset.get_project_file_id(llm_manager, GenerationPromptCreator())
         for type_, file_id in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)
             if type_ == "id":

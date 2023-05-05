@@ -5,13 +5,13 @@ from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.util.override import overrides
 
 
@@ -52,7 +52,7 @@ class LLMJob(AbstractTrainerJob):
             self._trainer = LLMTrainer(trainer_args=self.trainer_args,
                                        trainer_dataset_manager=self.trainer_dataset_manager,
                                        prompt_creator=self.prompt_creator,
-                                       llm_util=self.llm_util)
+                                       llm_manager=self.llm_util)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

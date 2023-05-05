@@ -6,6 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -13,15 +14,14 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 
 
 class PromptDataset(iDataset):
@@ -33,8 +33,7 @@ class PromptDataset(iDataset):
     __SAVE_FILENAME = "prompt_dataframe_checkpoint.csv"
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
-                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None,
-                 llm_util: SupportedLLMManager = SupportedLLMManager.OPENAI):
+                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
         """
         Initializes the dataset with necessary artifact/trace information and generator for the prompts
         :param prompt_df: The prompt dataframe
@@ -42,7 +41,7 @@ class PromptDataset(iDataset):
         :param trace_dataset: The dataset containing trace links and artifacts
         :param project_file_id: The file id used by open AI
         :param data_export_path: The path to where data files will be saved if specified. May be to a directory or specific file
-        :param llm_util: The utility class for access LLM API
+        :param llm_manager: The utility class for access LLM API
         """
         self.prompt_df = prompt_df
         self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset is not None else artifact_df
@@ -52,7 +51,6 @@ class PromptDataset(iDataset):
         if not self.project_file_id and prompt_df is None:
             assert self._has_trace_data(), "Either artifacts dataframe or trace dataframe must be provided to generate dataset."
         self.__summarized_artifacts = {}
-        self.llm_util = llm_util.value
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -101,7 +99,8 @@ class PromptDataset(iDataset):
         prompt_df.to_json(export_path, orient='records', lines=True)
         return export_path, should_delete
 
-    def get_project_file_id(self, prompt_creator: AbstractPromptCreator = None, summarizer: Summarizer = None) -> str:
+    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_creator: AbstractPromptCreator = None,
+                            summarizer: Summarizer = None) -> str:
         """
         Gets the project file id used by open_ai
         :param prompt_creator: The generator of prompts for the dataset
@@ -111,13 +110,13 @@ class PromptDataset(iDataset):
         if not self.project_file_id:
             prompt_df = self.get_prompts_dataframe(prompt_creator, summarizer)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
-            res = self.llm_util.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
+            res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompts_dataframe(self, prompt_creator: AbstractPromptCreator = None, summarizer: Summarizer = None) -> pd.DataFrame:
+    def get_prompts_dataframe(self, prompt_creator: AbstractPromptCreator = None, summarizer: Summarizer = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_creator: The generator of prompts for the dataset

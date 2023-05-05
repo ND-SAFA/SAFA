@@ -11,15 +11,12 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
-from tgen.models.token_limits import TokenLimitCalculator
-from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.base_object import BaseObject
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
+from tgen.models.token_limits import TokenLimitCalculator
+from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.base_object import BaseObject
 
 
 class Summarizer(BaseObject):
@@ -27,11 +24,10 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
-                 args_for_summarizer_model: OpenAIArgs = None, max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT,
+    def __init__(self, llm_manager: AbstractLLMManager, model_for_summarizer: str = SUMMARIZATION_MODEL_DEFAULT,
+                 model_for_token_limit: str = GENERATION_MODEL_DEFAULT, max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT,
                  code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
-                 code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY,
-                 llm_utils: SupportedLLMManager = SupportedLLMManager.OPENAI):
+                 code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
         """
         Initializes a summarizer for a specific model
         :param model_for_summarizer: path of the model that should be used for summarization
@@ -42,19 +38,19 @@ class Summarizer(BaseObject):
         :param nl_base_prompt: The default prompt to use for summarization.
         :param code_base_prompt: The default summarization prompt to use for code.
         """
+        self.llm_manager = llm_manager
         self.model_for_summarizer = model_for_summarizer
         self.model_for_token_limit = model_for_token_limit
         self.token_limit = TokenLimitCalculator.calculate_token_limit(self.model_for_token_limit, max_tokens_for_token_limit)
-        self.args_for_summarizer_model = OpenAIArgs() if not args_for_summarizer_model else args_for_summarizer_model
+        self.args_for_summarizer_model = llm_manager.llm_args
         self.code_or_above_limit_only = code_or_exceeds_limit_only
-        self.prompt_args = self.args_for_summarizer_model.prompt_args
+        self.prompt_args = llm_manager.prompt_args
         self.code_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
             base_prompt=code_base_prompt)
         self.nl_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
             base_prompt=nl_base_prompt)
-        self.ai_utils: AbstractLLMManager = llm_utils.value
 
     def summarize(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
@@ -71,8 +67,7 @@ class Summarizer(BaseObject):
         if self.code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return content  # skip summarizing content below token limit unless code
         prompt_creator = self.code_prompt_creator if chunker_type else self.nl_prompt_creator
-        summarizations = self._summarize_chunks(self.ai_utils, prompt_creator, chunks, self.model_for_summarizer,
-                                                self.args_for_summarizer_model)
+        summarizations = self._summarize_chunks(self.llm_manager, prompt_creator, chunks, self.model_for_summarizer)
         return os.linesep.join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str, chunker_type=SupportedChunker.NL):
@@ -102,11 +97,12 @@ class Summarizer(BaseObject):
         return TokenLimitCalculator.estimate_num_tokens(content, self.model_for_summarizer) > self.token_limit
 
     @staticmethod
-    def _summarize_chunks(ai_utils: AbstractLLMManager, prompt_creator: AbstractPromptCreator, chunks: List[str], model_path: str,
-                          args: AbstractLLMArgs) -> List[str]:
+    def _summarize_chunks(llm_manager: AbstractLLMManager, prompt_creator: AbstractPromptCreator, chunks: List[str],
+                          model_path: str) -> \
+            List[str]:
         """
         Summarizes all chunks using a given OpenAI model.
-        :param ai_utils: The utility file containing API to AI library.
+        :param llm_manager: The utility file containing API to AI library.
         :param prompt_creator: The creator responsible for creating summarization prompts.
         :param model_path: The model to use for summarizations
         :param chunks: The chunks of text to summarize
@@ -114,6 +110,7 @@ class Summarizer(BaseObject):
         """
         prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value] for chunk in
                    chunks]
-        res: GenerationResponse = ai_utils.make_completion_request(task=LLMCompletionType.GENERATION, model=model_path, prompt=prompts,
-                                                                   **args.to_params(TrainerTask.PREDICT))
+        res: GenerationResponse = llm_manager.make_completion_request(trainer_task=TrainerTask.PREDICT,
+                                                                      completion_type=LLMCompletionType.GENERATION,
+                                                                      model=model_path, prompt=prompts)
         return [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]

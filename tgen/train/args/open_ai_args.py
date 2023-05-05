@@ -3,7 +3,6 @@ from typing import Dict
 
 from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
     LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT
-from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -65,4 +64,13 @@ class OpenAIArgs(AbstractLLMArgs):
             pos_class = getattr(prompt_creator, "pos_class")
             params = self._add_params_for_task(LLMCompletionType.CLASSIFICATION)
             params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
+            params[OpenAIParams.COMPUTE_CLASSIFICATION_METRICS] = True
         return params
+
+    def set_max_tokens(self, max_tokens: int) -> None:
+        """
+        Sets the number of max tokens for the LLM library.
+        :param max_tokens: The new max tokens to set it too.
+        :return: None
+        """
+        self.max_tokens = max_tokens

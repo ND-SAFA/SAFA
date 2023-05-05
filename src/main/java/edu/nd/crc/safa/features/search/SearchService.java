@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class SearchService {
-    private final static String PROMPT_KEY = "PROMPT";
-    private final static double THRESHOLD = 0.5;
+    private static final String PROMPT_KEY = "PROMPT";
+    private static final double THRESHOLD = 0.5;
     ProjectRetrievalService projectRetrievalService;
 
     /**
@@ -103,8 +103,9 @@ public class SearchService {
     /**
      * Performs a search between source and target artifacts using TGEN tracing.
      *
-     * @param sourceLayer Source artifacts mapping id to body.
-     * @param targetLayer Target artifacts mapping id to body.
+     * @param sourceLayer   Source artifacts mapping id to body.
+     * @param targetLayer   Target artifacts mapping id to body.
+     * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
      * @return Target Artifact IDs that matched source artifacts.
      */
     public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,

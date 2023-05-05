@@ -25,9 +25,14 @@ public class SearchController extends BaseController {
 
     /**
      * Performs search function for different modes of searching (e.g. prompt / artifacts / artifactTypes).
+     *
+     * @param versionId The ID of the project version to search in.
+     * @param request   The request containing search criteria.
+     * @return SearchResponse containing artifact ids and bodies.
      */
     @PostMapping(AppRoutes.Search.SEARCH)
-    public SearchResponse search(@PathVariable UUID versionId, @RequestBody @Valid SearchRequest request) throws InvalidAttributeValueException {
+    public SearchResponse search(@PathVariable UUID versionId, @RequestBody @Valid SearchRequest request)
+        throws InvalidAttributeValueException {
         ProjectVersion projectVersion =
             this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         switch (request.mode) {

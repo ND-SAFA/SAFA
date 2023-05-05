@@ -1,15 +1,12 @@
 package edu.nd.crc.safa.features.search;
 
 /***
+ * <p></p>
  * Enumerates the different search modes.
+ *
  */
 public enum SearchMode {
-    PROMPT("prompt"),
-    ARTIFACTS("artifacts"),
-    ARTIFACTTYPES("artifactTypes");
-    String value;
-
-    SearchMode(String value) {
-        this.value = value;
-    }
+    PROMPT,
+    ARTIFACTS,
+    ARTIFACTTYPES //Typed like this so that artifactTypes is typed.
 }

@@ -14,9 +14,9 @@ public class TGenDataset {
     /**
      * Map of source artifact ids to content body.
      */
-    List<Map<String, String>> source_layers;
+    List<Map<String, String>> source_layers; // snake_case to match TGEN
     /**
      * Map of target artifact ids to content body.
      */
-    List<Map<String, String>> target_layers;
+    List<Map<String, String>> target_layers; // snake_case to match TGEN
 }

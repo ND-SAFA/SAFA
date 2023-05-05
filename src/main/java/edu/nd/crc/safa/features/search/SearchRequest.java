@@ -15,7 +15,7 @@ public class SearchRequest {
     @NotNull
     SearchMode mode;
     /**
-     * Used in "propmpt" mode.
+     * Used in "prompt" mode.
      * This string of text will be treated as an artifact to predict links from.
      */
     @Nullable
@@ -52,4 +52,9 @@ public class SearchRequest {
      */
     @Nullable
     String model;
+    /**
+     * The prompt used to decide whether two artifacts should be traced.
+     */
+    @Nullable
+    String tracingPrompt;
 }

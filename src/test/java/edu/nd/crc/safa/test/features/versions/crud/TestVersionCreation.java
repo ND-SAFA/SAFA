@@ -30,60 +30,61 @@ class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     void createFirstVersionThroughRevision() throws Exception {
-        Project project = dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .getProject(projectName);
-        JSONObject projectVersionJson =
-            SafaRequest
-                .withRoute(AppRoutes.Versions.CREATE_NEW_REVISION_VERSION)
-                .withProject(project)
-                .postWithJsonObject(new JSONObject());
-
-        // VP - Verify that the correct version numbers appear
-        assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
-        assertThat(projectVersionJson.get("minorVersion")).isEqualTo(1);
-        assertThat(projectVersionJson.get("revision")).isEqualTo(2);
-        assertThat(projectVersionJson.get("versionId")).isNotNull();
-
+        Project project = makeProject();
+        JSONObject projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_REVISION_VERSION);
+        assertVersion(projectVersionJson, 1, 0, 1);
         this.projectVersionRepository.findByProject(project);
     }
 
     @Test
     void createNewMinorVersion() throws Exception {
-        Project project = dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .getProject(projectName);
-        JSONObject projectVersionJson = SafaRequest
-            .withRoute(AppRoutes.Versions.CREATE_NEW_MINOR_VERSION)
-            .withProject(project)
-            .postWithJsonObject(new JSONObject());
-
-        assertThat(projectVersionJson.get("majorVersion")).isEqualTo(1);
-        assertThat(projectVersionJson.get("minorVersion")).isEqualTo(2);
-        assertThat(projectVersionJson.get("revision")).isEqualTo(1);
-        assertThat(projectVersionJson.get("versionId")).isNotNull();
-
+        Project project = makeProject();
+        JSONObject projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_MINOR_VERSION);
+        assertVersion(projectVersionJson, 1, 1, 0);
         this.projectVersionRepository.findByProject(project);
     }
 
     @Test
     void createNewMajorVersion() throws Exception {
-        Project project = dbEntityBuilder
+        Project project = makeProject();
+        JSONObject projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_MAJOR_VERSION);
+        assertVersion(projectVersionJson, 2, 0, 0);
+        this.projectVersionRepository.findByProject(project);
+    }
+
+    @Test
+    void testVersionReset() throws Exception {
+        Project project = makeProject();
+
+        JSONObject projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_REVISION_VERSION);
+        assertVersion(projectVersionJson, 1, 0, 1);
+
+        projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_MINOR_VERSION);
+        assertVersion(projectVersionJson, 1, 1, 0);
+
+        projectVersionJson = makeNewVersion(project, AppRoutes.Versions.CREATE_NEW_MAJOR_VERSION);
+        assertVersion(projectVersionJson, 2, 0, 0);
+        this.projectVersionRepository.findByProject(project);
+    }
+
+    private void assertVersion(JSONObject projectVersionJson, int majorVersion, int minorVersion, int revision) {
+        assertThat(projectVersionJson.get("majorVersion")).isEqualTo(majorVersion);
+        assertThat(projectVersionJson.get("minorVersion")).isEqualTo(minorVersion);
+        assertThat(projectVersionJson.get("revision")).isEqualTo(revision);
+        assertThat(projectVersionJson.get("versionId")).isNotNull();
+    }
+
+    private JSONObject makeNewVersion(Project project, String newVersionEndpoint) throws Exception {
+        return SafaRequest
+            .withRoute(newVersionEndpoint)
+            .withProject(project)
+            .postWithJsonObject(new JSONObject());
+    }
+
+    private Project makeProject() {
+        return dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .getProject(projectName);
-        JSONObject projectVersionJson = SafaRequest
-            .withRoute(AppRoutes.Versions.CREATE_NEW_MAJOR_VERSION)
-            .withProject(project)
-            .postWithJsonObject(new JSONObject());
-
-        assertThat(projectVersionJson.get("majorVersion")).isEqualTo(2);
-        assertThat(projectVersionJson.get("minorVersion")).isEqualTo(1);
-        assertThat(projectVersionJson.get("revision")).isEqualTo(1);
-        assertThat(projectVersionJson.get("versionId")).isNotNull();
-
-        this.projectVersionRepository.findByProject(project);
     }
 }

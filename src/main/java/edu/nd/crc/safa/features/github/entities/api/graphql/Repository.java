@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.github.entities.api.graphql;
 import java.util.Date;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
@@ -25,10 +26,10 @@ public class Repository implements Paginatable {
     private Edges<Branch> refs;
 
     @Override
-    public void paginate() {
+    public void paginate(SafaUser user) {
         if (refs != null) {
             ServiceProvider.instance.getGithubGraphQlService()
-                .paginateBranches(refs.getEdges(), name, owner.getLogin(), refs.getPageInfo());
+                .paginateBranches(user, refs.getEdges(), name, owner.getLogin(), refs.getPageInfo());
         }
     }
 }

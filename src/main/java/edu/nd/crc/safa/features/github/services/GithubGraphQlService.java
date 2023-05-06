@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.github.services;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlPaginateBranchesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
@@ -11,6 +12,7 @@ import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
+import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 import edu.nd.crc.safa.utilities.graphql.entities.PageInfo;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
@@ -39,9 +41,12 @@ public class GithubGraphQlService {
      * @return The repositories the user has access to.
      */
     public GithubGraphQlRepositoriesResponse getGithubRepositories(SafaUser user) {
-        return makeGraphQlRequest(user,
+        GithubGraphQlRepositoriesResponse response = makeGraphQlRequest(user,
             GithubGraphQlQueries.GET_REPOSITORIES,
             GithubGraphQlRepositoriesResponse.class);
+
+        response.paginate(user);
+        return response;
     }
 
     /**
@@ -53,26 +58,59 @@ public class GithubGraphQlService {
      * @return The repository.
      */
     public GithubGraphQlRepositoryResponse getGithubRepository(SafaUser user, String owner, String name) {
-        return makeGraphQlRequest(user,
+        GithubGraphQlRepositoryResponse response = makeGraphQlRequest(user,
             GithubGraphQlQueries.GET_REPOSITORY_BY_NAME,
             GithubGraphQlRepositoryResponse.class,
             "repoOwner", owner,
             "repoName", name);
+
+        response.paginate(user);
+        return response;
     }
 
     /**
      * Paginate through all repositories the user has access to.
      *
+     * @param user The user making the request.
      * @param currentRepositories The current list of repositories from the original request.
      * @param pageInfo The page info from the original request.
      */
-    public void paginateRepositories(List<EdgeNode<Repository>> currentRepositories, PageInfo pageInfo) {
-        System.out.println("Paginating repositories");
+    public void paginateRepositories(SafaUser user, List<EdgeNode<Repository>> currentRepositories, PageInfo pageInfo) {
+        while (pageInfo.hasNextPage()) {
+            GithubGraphQlRepositoriesResponse response = makeGraphQlRequest(user,
+                GithubGraphQlQueries.PAGINATE_REPOSITORIES,
+                GithubGraphQlRepositoriesResponse.class,
+                "after", pageInfo.getEndCursor());
+
+            Edges<Repository> repositoryEdges = response.getData().getViewer().getRepositories();
+            currentRepositories.addAll(repositoryEdges.getEdges());
+            pageInfo = repositoryEdges.getPageInfo();
+        }
     }
 
-    public void paginateBranches(List<EdgeNode<Branch>> currentBranches, String repoName,
+    /**
+     * Paginate through all branches in a repository.
+     *
+     * @param user The user making the request.
+     * @param currentBranches The current list of branches from the original request.
+     * @param repoName The name of the repository.
+     * @param repoOwner The owner of the repository.
+     * @param pageInfo The page info from the original request.
+     */
+    public void paginateBranches(SafaUser user, List<EdgeNode<Branch>> currentBranches, String repoName,
                                  String repoOwner, PageInfo pageInfo) {
-        System.out.println("Paginating branches for " + repoOwner + "/" + repoName);
+        while (pageInfo.hasNextPage()) {
+            GithubGraphQlPaginateBranchesResponse response = makeGraphQlRequest(user,
+                GithubGraphQlQueries.PAGINATE_BRANCHES,
+                GithubGraphQlPaginateBranchesResponse.class,
+                "after", pageInfo.getEndCursor(),
+                "repoName", repoName,
+                "repoOwner", repoOwner);
+
+            Edges<Branch> branches = response.getData().getRepository().getRefs();
+            currentBranches.addAll(branches.getEdges());
+            pageInfo = branches.getPageInfo();
+        }
     }
 
     /**

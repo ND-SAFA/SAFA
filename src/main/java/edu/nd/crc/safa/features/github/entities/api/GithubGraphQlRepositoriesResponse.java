@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.github.entities.api;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.graphql.entities.DefaultPaginatable;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
@@ -28,11 +29,11 @@ public class GithubGraphQlRepositoriesResponse extends GraphQlResponse<GithubGra
             private Edges<Repository> repositories;
 
             @Override
-            public void paginate() {
-                ServiceProvider.instance.getGithubGraphQlService().paginateRepositories(repositories.getEdges(),
+            public void paginate(SafaUser user) {
+                ServiceProvider.instance.getGithubGraphQlService().paginateRepositories(user, repositories.getEdges(),
                         repositories.getPageInfo());
 
-                repositories.getEdges().forEach(edge -> edge.getNode().paginate());
+                repositories.getEdges().forEach(edge -> edge.paginate(user));
             }
         }
     }

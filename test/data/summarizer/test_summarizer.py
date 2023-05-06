@@ -1,16 +1,15 @@
 import os
 from unittest import mock
 
-from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.file_util import FileUtil
-from tgen.util.llm.supported_ai_utils import SupportedLLMUtils
 
 
 class TestSummarizer(BaseTest):
@@ -19,9 +18,9 @@ class TestSummarizer(BaseTest):
     @mock.patch("openai.Completion.create", )
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
-        summarizer = Summarizer(code_or_exceeds_limit_only=False)
-        summaries = summarizer._summarize_chunks(SupportedLLMUtils.OPENAI.value, summarizer.nl_prompt_creator, self.CHUNKS,
-                                                 "text-davinci-003", OpenAIArgs())
+        llm_manager = OpenAIManager(OpenAIArgs())
+        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
+        summaries = summarizer._summarize_chunks(llm_manager, summarizer.nl_prompt_creator, self.CHUNKS)
         for i, summary in enumerate(summaries):
             self.assertEqual(summary, SUMMARY_FORMAT.format(self.CHUNKS[i]))
 
@@ -31,7 +30,8 @@ class TestSummarizer(BaseTest):
         model_name = "code-cushman-002"
 
         # use file content
-        summarizer = Summarizer(code_or_exceeds_limit_only=False, model_for_token_limit=model_name)
+        llm_manager = OpenAIManager(OpenAIArgs())
+        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False, model_for_token_limit=model_name)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize(content=content)
         self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
@@ -46,7 +46,8 @@ class TestSummarizer(BaseTest):
         self.assertEqual("".join(summarized_chunks), summaries)
 
         # set code_or_exceeds_limit_only to TRUE this time
-        summarizer = Summarizer(code_or_exceeds_limit_only=True, model_for_summarizer=model_name)
+        llm_manager = OpenAIManager(OpenAIArgs())
+        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=True)
         short_text = "This is a short text under the token limit"
         summaries = summarizer.summarize(content=short_text)
         self.assertEqual(summaries, short_text)  # shouldn't have summarized

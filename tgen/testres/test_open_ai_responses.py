@@ -93,7 +93,7 @@ COMPLETION_RESPONSE_DICT = AttrDict({
 SUMMARY_FORMAT = "Summary of {}"
 
 
-def fake_open_ai_completion(model, prompt, **args):
+def fake_open_ai_completion(prompt, **args):
     choice = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0])
     choice["text"] = SUMMARY_FORMAT
     tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]

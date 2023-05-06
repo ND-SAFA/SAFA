@@ -1,6 +1,7 @@
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
+
 from tgen.util.enum_util import EnumDict
 
 
@@ -20,8 +21,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         :param base_prompt: The base classification prompt to use.
         """
         if prompt_args is None:
-            from tgen.train.args.open_ai_args import OpenAIArgs  # used to automatically have args for tests
-            prompt_args = OpenAIArgs.prompt_args
+            from tgen.models.llm.open_ai_manager import OpenAIManager  # used to automatically have args for tests
+            prompt_args = OpenAIManager.prompt_args
         super().__init__(prompt_args, base_prompt)
         self.pos_class = pos_class
         self.neg_class = neg_class

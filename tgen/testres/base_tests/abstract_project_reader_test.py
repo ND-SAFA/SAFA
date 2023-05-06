@@ -4,10 +4,12 @@ from unittest import mock
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
+from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class AbstractProjectReaderTest(BaseTest):
@@ -36,7 +38,8 @@ class AbstractProjectReaderTest(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         project_reader: AbstractProjectReader = test_project.get_project_reader()
-        project_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
+        llm_manager = OpenAIManager(OpenAIArgs())
+        project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:

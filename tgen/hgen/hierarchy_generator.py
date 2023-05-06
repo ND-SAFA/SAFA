@@ -3,9 +3,8 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Union
 
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
-
 from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -20,7 +19,9 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.logging.logger_manager import logger
@@ -33,12 +34,13 @@ class HierarchyGenerator(BaseObject):
 
     CLUSTER_METHODS = [SupportedClusteringMethod.LOUVAIN]
 
-    def __init__(self, args: HGenArgs):
+    def __init__(self, args: HGenArgs, llm_manager: AbstractLLMManager):
         """
         Initializes the generator with necessary trainer information
         :param args: The arguments required for the hierarchy generation
         """
         self.args = args
+        self.llm_manager = llm_manager
 
     def run(self, export_path: str, save_dataset_checkpoints: bool = True) -> str:
         """
@@ -68,11 +70,12 @@ class HierarchyGenerator(BaseObject):
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
-        prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_trainer_args.prompt_args,
+        prompt_creator = GenerationPromptCreator(prompt_args=self.llm_manager.prompt_args,
                                                  base_prompt=self.args.hgen_base_prompt)
-        hgen_trainer = self.args.hgen_trainer_type.value(trainer_dataset_manager=hgen_dataset_manager,
-                                                         trainer_args=self.args.hgen_trainer_args,
-                                                         prompt_creator=prompt_creator)
+        hgen_trainer = LLMTrainer(llm_manager=self.llm_manager,
+                                  trainer_dataset_manager=hgen_dataset_manager,
+                                  trainer_args=self.args.hgen_trainer_args,
+                                  prompt_creator=prompt_creator)
         self._update_trainer_args(hgen_trainer, export_path)
         logger.info(f"Generating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         artifact_generations = hgen_trainer.perform_prediction().predictions

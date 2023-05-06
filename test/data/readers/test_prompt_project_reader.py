@@ -5,10 +5,12 @@ from unittest import mock
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestPromptProjectReader(BaseTest):
@@ -36,13 +38,14 @@ class TestPromptProjectReader(BaseTest):
         """
         mock_completion.side_effect = fake_open_ai_completion
         project_reader = self.get_project_reader()
-        project_reader.set_summarizer(Summarizer(code_or_exceeds_limit_only=False))
+        llm_manager = OpenAIManager(OpenAIArgs())
+        project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         prompts_df = project_reader.read_project()
         expected_prompts = []
         with open(self.PROJECT_PATH) as file:
             for line in file.readlines():
                 prompt_dict = json.loads(line)
-                prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.format(prompt_dict[PromptKeys.PROMPT.value])\
+                prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.format(prompt_dict[PromptKeys.PROMPT.value]) \
                     .replace(os.linesep, "")
                 expected_prompts.append(prompt_dict)
         prompts_df[PromptKeys.PROMPT] = [row[PromptKeys.PROMPT].replace(os.linesep, "") for i, row in prompts_df.itertuples()]

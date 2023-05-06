@@ -2,9 +2,10 @@ from typing import Dict
 
 from tgen.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
-from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.train.args.llm_args import LLMArgs
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.dataclass_util import DataclassUtil
 
 
 class AnthropicParams:
@@ -21,31 +22,39 @@ class AnthropicParams:
     top_p = "top_p"  # Nucleus sampling selects top probability tokens, alter temperature or top_p.
 
 
-class AnthropicArgs(LLMArgs):
+class AnthropicArgs(AbstractLLMArgs):
     """
     Defines allowable arguments to anthropic API.
     """
-    max_tokens_to_sample = MAX_TOKENS_DEFAULT
-    prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
-                             completion_suffix="###")
+    max_tokens_to_sample: int = MAX_TOKENS_DEFAULT
+    _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [],
+                             TrainerTask.PREDICT: [AnthropicParams.MODEL, AnthropicParams.TEMPERATURE,
+                                                   AnthropicParams.MAX_TOKENS_TO_SAMPLE]}
 
-    def __init__(self, model: str = ANTHROPIC_MODEL_DEFAULT, **kwargs):
-        self.prompt_args = self.prompt_args
-        self.expected_task_params = {TrainerTask.CLASSIFICATION: [],
-                                     TrainerTask.TRAIN: [AnthropicParams.MODEL],
-                                     TrainerTask.PREDICT: [AnthropicParams.TEMPERATURE, AnthropicParams.MAX_TOKENS_TO_SAMPLE]}
-        super().__init__(self.prompt_args, self.expected_task_params, model, **kwargs)
+    def __init__(self, **kwargs):
+        """
+        Sets all necessary args for Anthropic
+        :param kwargs: Contains all necessary arg name to value mappings
+        """
+        super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
+        if "model" not in super_args:
+            super_args["model"] = AnthropicArgs
+        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS,  **super_args)
 
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
         """
-        Adds any custom parameters.
+        Allows the usage of custom params defined in instructions. Currently unused for Anthropic
         :param task: The task being performed.
-        :param params: The base parameters
-        :param instructions: Any additional instructions passed to param construction.
-        :return: Params with customizations.
+        :param params: The parameters current being constructed.
+        :param instructions: Any custom instruction flags.
+        :return: Parameters with customizations added.
         """
-        # TODO: Create better solution for mapping common attributes to custom names
-        if "max_tokens" in params:
-            max_tokens = params.pop("max_tokens")
-            params[AnthropicParams.MAX_TOKENS_TO_SAMPLE] = max_tokens
-        return params
+        pass
+
+    def set_max_tokens(self, max_tokens: int) -> None:
+        """
+        Sets the max tokens of anthropic params.
+        :param max_tokens: The max tokens to set it to.
+        :return: None
+        """
+        self.max_tokens_to_sample = max_tokens

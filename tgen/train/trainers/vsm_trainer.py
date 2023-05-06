@@ -45,7 +45,7 @@ class VSMTrainer(AbstractTrainer):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics
-        super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
+        super().__init__(trainer_dataset_manager=trainer_dataset_manager)
 
     @overrides(AbstractTrainer)
     def perform_training(self) -> TraceTrainOutput:

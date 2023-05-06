@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from dataclasses import dataclass
 from typing import Type
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -13,13 +12,12 @@ from tgen.util.override import overrides
 
 class AbstractTrainer(BaseObject):
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: dataclass):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager):
         """
         Initializes the trainer with a dataset manager used for training and predictions
         :param trainer_dataset_manager: The dataset manager used for training and predictions
         """
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.trainer_args = trainer_args
 
     @abstractmethod
     def perform_training(self) -> TraceTrainOutput:
@@ -54,4 +52,3 @@ class AbstractTrainer(BaseObject):
         """
         from tgen.train.trainers.supported_trainer import SupportedTrainer
         return SupportedTrainer
-

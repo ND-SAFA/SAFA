@@ -5,11 +5,12 @@ from openai.openai_object import OpenAIObject
 from tqdm import tqdm
 
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
-from tgen.train.args.open_ai_args import OpenAIParams
+from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.util.list_util import ListUtil
-from tgen.util.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
-from tgen.util.llm.llm_task import LLMTask
-from tgen.util.llm.llm_util import AIObject, LLMUtil
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
@@ -18,36 +19,41 @@ if not IS_TEST:
     openai.api_key = OPEN_AI_KEY
 
 
-class OpenAIUtil(LLMUtil[OpenAIObject]):
+class OpenAIManager(AbstractLLMManager[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
+    prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
 
-    @staticmethod
-    def make_fine_tune_request(**params) -> OpenAIObject:
+    def __init__(self, llm_args: OpenAIArgs):
+        """
+        Initializes with args used for the requests to Anthropic model
+        :param llm_args: args used for the requests to Anthropic model
+        """
+        assert isinstance(llm_args, OpenAIArgs), "Must use OpenAI args with OpenAI manager"
+        super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
+
+    def _make_fine_tune_request_impl(self, **kwargs) -> OpenAIObject:
         """
         Makes a request to fine-tune a model
-        :param params: Params necessary for request
+        :param kwargs: Params necessary for request
         :return: The response from open  ai
         """
-        return openai.FineTune.create(**params)
+        return openai.FineTune.create(**kwargs)
 
-    @staticmethod
-    def retrieve_fine_tune_request(**params) -> OpenAIObject:
+    def retrieve_fine_tune_request(self,  **params) -> OpenAIObject:
         """
         Retrieves s a request to fine-tune a model
-        :param params: Params necessary for request
         :return: The response from open  ai
         """
         return openai.FineTune.retrieve(**params)
 
-    @staticmethod
-    def make_completion_request_impl(**params) -> AIObject:
+    def make_completion_request_impl(self, **params) -> AIObject:
         """
         Makes a request to completion a model
         :param params: Params necessary for request
         :return: The response from open  ai
         """
         prompt = params.get(OpenAIParams.PROMPT)
-        batches = ListUtil.batch(prompt, n=OpenAIUtil.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
+        batches = ListUtil.batch(prompt, n=OpenAIManager.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
         for batch in tqdm(batches, desc="Making completion requests"):
             params[OpenAIParams.PROMPT] = batch
@@ -60,7 +66,7 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
         return res
 
     @staticmethod
-    def translate_to_response(task: LLMTask, res: OpenAIObject, **params) -> SupportedLLMResponses:
+    def translate_to_response(task: LLMCompletionType, res: OpenAIObject, **params) -> SupportedLLMResponses:
         """
         Translates the response to the response for task.
         :param task: The task to translate to.
@@ -68,15 +74,14 @@ class OpenAIUtil(LLMUtil[OpenAIObject]):
         :param params: The parameters to the API.
         :return: A response for the supported types.
         """
-        if task == LLMTask.GENERATION:
+        if task == LLMCompletionType.GENERATION:
             return GenerationResponse([choice.text.strip() for choice in res.choices])
-        elif task == LLMTask.CLASSIFICATION:
+        elif task == LLMCompletionType.CLASSIFICATION:
             return ClassificationResponse([r.logprobs.top_logprobs[0] for r in res.choices])
         else:
             raise NotImplementedError(f"No handler for {task.name} is implemented")
 
-    @staticmethod
-    def upload_file(**params) -> OpenAIObject:
+    def upload_file(self, **params) -> OpenAIObject:
         """
         Makes a request to upload a file
         :param params: Params necessary for request

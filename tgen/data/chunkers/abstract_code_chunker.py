@@ -6,7 +6,7 @@ from typing import List, Tuple, Type
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
-from tgen.models.token_limits import TokenLimitCalculator
+from tgen.models.llm.token_limits import TokenLimitCalculator
 
 
 class AbstractCodeChunker(AbstractChunker, ABC):

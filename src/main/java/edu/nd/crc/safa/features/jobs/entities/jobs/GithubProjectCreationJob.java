@@ -7,7 +7,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -332,7 +331,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
             String type = githubProject.getArtifactType().getName();
             String summary = "";  // TODO I don't think this field is shown to the user at all
-            String body = Objects.requireNonNullElse(file.getContents(), "null");
+            String body = file.isBinary() ? "<binary file>" : file.getContents();
 
             Map<String, JsonNode> attributes = new HashMap<>();
             attributes.put(ReservedAttributes.Github.REPO_PATH.getKey(), TextNode.valueOf(file.getPath()));

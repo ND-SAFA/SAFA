@@ -23,6 +23,8 @@ public class GithubRepositoryFileDTO {
 
     private String contents;
 
+    private boolean isBinary;
+
     /**
      * Convert a GitHub GraphQL API response to a list of repository files. This list will only contain items
      * in the folder that was originally requested, and will contain items that are a mix of files, folders,
@@ -43,6 +45,7 @@ public class GithubRepositoryFileDTO {
 
             if (entry.getObject() != null) {
                 file.setContents(entry.getObject().getText());
+                file.setBinary(entry.getObject().isBinary());
             }
 
             return file;

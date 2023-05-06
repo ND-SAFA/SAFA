@@ -5,6 +5,7 @@ import java.util.List;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileType;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 public class GithubGraphQlTreeObjectsResponse extends GraphQlResponse<GithubGraphQlTreeObjectsResponse.Payload> {
@@ -35,5 +36,8 @@ public class GithubGraphQlTreeObjectsResponse extends GraphQlResponse<GithubGrap
     @Data
     public static class TreeObject {
         private String text;
+
+        @JsonProperty("isBinary")  // Come on jackson why do I have to do this
+        private boolean isBinary;
     }
 }

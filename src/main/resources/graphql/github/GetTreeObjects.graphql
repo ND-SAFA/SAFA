@@ -8,6 +8,7 @@ query ($repoName: String!, $repoOwner: String!, $location: String!) {
                     object {
                         ... on Blob {
                             text
+                            isBinary
                         }
                     }
                     path

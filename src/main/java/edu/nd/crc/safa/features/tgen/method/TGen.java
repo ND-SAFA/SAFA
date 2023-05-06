@@ -8,7 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.config.TBertConfig;
+import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -52,7 +52,7 @@ public class TGen implements ITraceGenerationController {
      * @return The completion string.
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
-        String generatePromptEndpoint = TBertConfig.get().getPromptCompletionEndpoint();
+        String generatePromptEndpoint = TGenConfig.get().getPromptCompletionEndpoint();
         TGenPromptResponse output = this.safaRequestBuilder
             .sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
         return output;
@@ -82,7 +82,7 @@ public class TGen implements ITraceGenerationController {
     }
 
     public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
-        String predictEndpoint = TBertConfig.get().getPredictEndpoint();
+        String predictEndpoint = TGenConfig.get().getPredictEndpoint();
         return this.safaRequestBuilder
             .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
     }

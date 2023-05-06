@@ -13,31 +13,35 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @Getter
-public class TBertConfig {
-    private static TBertConfig staticConfig;
+public class TGenConfig {
+    private static TGenConfig staticConfig;
     @Value("${tgen.endpoint}")
     private String baseEndpoint;
 
-    public static TBertConfig get() {
-        return TBertConfig.staticConfig;
+    public static TGenConfig get() {
+        return TGenConfig.staticConfig;
     }
 
     /**
      * @return Returns path to TGEN completion endpoint.
      */
     public String getPromptCompletionEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "complete") + "/";
+        return createTGenEndpoint(baseEndpoint, "complete");
     }
 
     /**
      * @return Returns path to Tgen prediction endpint.
      */
     public String getPredictEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "predict") + "/";
+        return createTGenEndpoint(baseEndpoint, "predict");
     }
 
     @PostConstruct
     public void init() {
-        TBertConfig.staticConfig = this;
+        TGenConfig.staticConfig = this;
+    }
+
+    public String createTGenEndpoint(String... components) {
+        return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
     }
 }

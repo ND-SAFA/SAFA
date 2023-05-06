@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.github.services;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
+import edu.nd.crc.safa.features.github.entities.api.graphql.GithubGraphQlQueries;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -33,7 +34,7 @@ public class GithubGraphQlService {
      */
     public GithubGraphQlRepositoriesResponse getGithubRepositories(SafaUser user) {
         return makeGraphQlRequest(user,
-            "github/GetRepositories",
+            GithubGraphQlQueries.GET_REPOSITORIES,
             GithubGraphQlRepositoriesResponse.class);
     }
 
@@ -47,7 +48,7 @@ public class GithubGraphQlService {
      */
     public GithubGraphQlRepositoryResponse getGithubRepository(SafaUser user, String owner, String name) {
         return makeGraphQlRequest(user,
-            "github/GetRepositoryByName",
+            GithubGraphQlQueries.GET_REPOSITORY_BY_NAME,
             GithubGraphQlRepositoryResponse.class,
             "repoOwner", owner,
             "repoName", name);

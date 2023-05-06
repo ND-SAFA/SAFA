@@ -29,7 +29,6 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */

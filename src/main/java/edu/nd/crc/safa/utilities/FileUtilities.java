@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
-    final static public String URL_SEP = "/";
+    public static final String URL_SEP = "/";
 
     public static CSVParser readCSVFile(String pathToFile) throws IOException {
         File csvData = new File(pathToFile);

@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
+    public static final String URL_SEP = "/";
 
     public static CSVParser readCSVFile(String pathToFile) throws IOException {
         File csvData = new File(pathToFile);
@@ -122,7 +123,7 @@ public class FileUtilities {
         }
         return result;
     }
-    
+
     /**
      * Extracts files in given zip bytearray as a string.
      *
@@ -195,6 +196,16 @@ public class FileUtilities {
      */
     public static String buildPath(String... directories) {
         return String.join(File.separator, directories);
+    }
+
+    /**
+     * Creates a URL by combining given parts.
+     *
+     * @param directories Directories that once joined create path.
+     * @return String representing built path.
+     */
+    public static String buildUrl(String... directories) {
+        return String.join(URL_SEP, directories);
     }
 
     /**

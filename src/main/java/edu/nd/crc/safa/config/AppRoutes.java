@@ -137,6 +137,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Prompts {
+        public static final String COMPLETE = "/prompt";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
@@ -221,9 +226,9 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String UPDATE = Versions.BY_ID + "/import/github/{owner}/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = UPDATE;
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{owner}/{repositoryName}";
-            public static final String IMPORT_INTO_EXISTING = UPDATE;
         }
     }
 
@@ -250,6 +255,11 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Sync {
         public static final String GET_CHANGES = Versions.BY_ID + "/changes";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Search {
+        public static final String SEARCH = "/search/{versionId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

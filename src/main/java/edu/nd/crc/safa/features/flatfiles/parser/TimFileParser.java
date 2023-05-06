@@ -15,9 +15,9 @@ import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimSchema;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimTraceDefinition;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -44,7 +44,8 @@ public class TimFileParser implements IProjectDefinitionParser {
     public TimFileParser(JSONObject timFileJson, String pathToFiles) throws JsonProcessingException {
         super();
         this.pathToFiles = pathToFiles;
-        this.timSchema = new ObjectMapper().readValue(timFileJson.toString(), new TypeReference<>() {});
+        this.timSchema = new ObjectMapper().readValue(timFileJson.toString(), new TypeReference<>() {
+        });
     }
 
     @Override
@@ -94,8 +95,8 @@ public class TimFileParser implements IProjectDefinitionParser {
 
             // Step - If generation is set, create generation request.\
             if (trace.generateLinks()) {
-                //TODO do we ever set this to anything else?
-                BaseGenerationModels baseGenerationModels = BaseGenerationModels.getDefault();
+                String generationMethod = trace.getGenerationMethod();
+                BaseGenerationModels baseGenerationModels = BaseGenerationModels.valueOf(generationMethod);
                 traceGenerationRequest.addTracingRequest(baseGenerationModels, null, source, target);
             }
 

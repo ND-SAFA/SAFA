@@ -20,6 +20,8 @@ public class TimTraceDefinition {
 
     private Boolean generateLinks;
 
+    private String generationMethod;
+
     public boolean isValid() {
         return sourceType != null
             && targetType != null

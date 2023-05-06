@@ -1,0 +1,47 @@
+package edu.nd.crc.safa.config;
+
+import javax.annotation.PostConstruct;
+
+import edu.nd.crc.safa.utilities.FileUtilities;
+
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Responsible for any parameters surrounding TBert.
+ */
+@Configuration
+@Getter
+public class TGenConfig {
+    private static TGenConfig staticConfig;
+    @Value("${tgen.endpoint}")
+    private String baseEndpoint;
+
+    public static TGenConfig get() {
+        return TGenConfig.staticConfig;
+    }
+
+    /**
+     * @return Returns path to TGEN completion endpoint.
+     */
+    public String getPromptCompletionEndpoint() {
+        return createTGenEndpoint(baseEndpoint, "complete");
+    }
+
+    /**
+     * @return Returns path to Tgen prediction endpint.
+     */
+    public String getPredictEndpoint() {
+        return createTGenEndpoint(baseEndpoint, "predict");
+    }
+
+    @PostConstruct
+    public void init() {
+        TGenConfig.staticConfig = this;
+    }
+
+    public String createTGenEndpoint(String... components) {
+        return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
+    }
+}

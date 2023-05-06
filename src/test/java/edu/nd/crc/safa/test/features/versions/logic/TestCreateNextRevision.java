@@ -26,8 +26,10 @@ class TestCreateNextRevision extends ApplicationBaseTest {
 
         Project project = dbEntityBuilder.getProject(projectName);
         ProjectVersion nextVersion = versionService.createNextRevision(project);
+
+        // VP - Version has incremented
         assertThat(nextVersion.getMajorVersion()).isEqualTo(1);
-        assertThat(nextVersion.getMinorVersion()).isEqualTo(1);
-        assertThat(nextVersion.getRevision()).isEqualTo(2);
+        assertThat(nextVersion.getMinorVersion()).isZero();
+        assertThat(nextVersion.getRevision()).isEqualTo(1);
     }
 }

@@ -9,10 +9,10 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
-import edu.nd.crc.safa.features.models.tgen.generator.TraceLinkConstructor;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.generator.TraceLinkConstructor;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**

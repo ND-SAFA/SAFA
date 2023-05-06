@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -138,5 +139,12 @@ public class ProjectAppEntity implements IAppEntity {
     @JsonIgnore
     public List<ArtifactAppEntity> getByArtifactType(String artifactType) {
         return filterByArtifactType(this.artifacts, artifactType);
+    }
+
+    @JsonIgnore
+    public Map<UUID, ArtifactAppEntity> getArtifactIdMap() {
+        Map<UUID, ArtifactAppEntity> artifactMap = new HashMap<>();
+        this.artifacts.forEach(a -> artifactMap.put(a.getId(), a));
+        return artifactMap;
     }
 }

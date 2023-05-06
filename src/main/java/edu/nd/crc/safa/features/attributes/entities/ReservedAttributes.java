@@ -1,28 +1,20 @@
 package edu.nd.crc.safa.features.attributes.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.List;
 
 public interface ReservedAttributes {
 
     String PREFIX = "~";
 
-    @AllArgsConstructor
-    enum Github {
+    interface Github {
+        String PREFIX = ReservedAttributes.PREFIX + "gh:";
 
-        REPO_PATH("repo_path", "Full Path"),
-        LINK("link", "Link");
+        CustomAttributeAppEntity REPO_PATH =
+            new CustomAttributeAppEntity(PREFIX + "repo_path", "Full Path", CustomAttributeType.TEXT);
+        CustomAttributeAppEntity LINK =
+            new CustomAttributeAppEntity(PREFIX + "link", "Link", CustomAttributeType.TEXT);
 
-        private static final String PREFIX = ReservedAttributes.PREFIX + "gh:";
-
-        private final String key;
-
-        @Getter
-        private final String displayName;
-
-        public String getKey() {
-            return PREFIX + key;
-        }
+        List<CustomAttributeAppEntity> ALL_ATTRIBUTES = List.of(REPO_PATH, LINK);
     }
 
     static boolean isReservedAttribute(String attributeKey) {

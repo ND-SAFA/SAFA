@@ -4,11 +4,16 @@ import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
+import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -32,6 +37,9 @@ import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Responsible for providing step implementations for importing a GitHub project:
@@ -183,11 +191,28 @@ public class GithubProjectCreationJob extends CommitJob {
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
+        createCustomAttributes(project);
+
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
         createImportPredicate();
 
         logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
+    }
+
+    /**
+     * Creates custom attributes that are used for the github import.
+     *
+     * @param project The project we're importing into
+     */
+    private void createCustomAttributes(Project project) {
+        for (CustomAttributeAppEntity attribute : ReservedAttributes.Github.ALL_ATTRIBUTES) {
+            AttributeService attributeService = serviceProvider.getAttributeService();
+
+            if (attributeService.getByProjectAndKeyname(project, attribute.getKey()).isEmpty()) {
+                serviceProvider.getAttributeService().saveEntity(attribute, project, true);
+            }
+        }
     }
 
     /**
@@ -249,6 +274,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
         if (artifactType == null) {
             artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeId);
+
         }
 
         return artifactType;
@@ -306,7 +332,12 @@ public class GithubProjectCreationJob extends CommitJob {
 
             String type = githubProject.getArtifactType().getName();
             String summary = "";  // TODO I don't think this field is shown to the user at all
-            String body = file.getContents();
+            String body = Objects.requireNonNullElse(file.getContents(), "null");
+
+            Map<String, JsonNode> attributes = new HashMap<>();
+            attributes.put(ReservedAttributes.Github.REPO_PATH.getKey(), TextNode.valueOf(file.getPath()));
+            attributes.put(ReservedAttributes.Github.LINK.getKey(),
+                TextNode.valueOf(buildGithubFileUrl(file.getPath())));
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
@@ -315,13 +346,23 @@ public class GithubProjectCreationJob extends CommitJob {
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                attributes
             );
 
             artifacts.add(artifact);
         }
 
         return artifacts;
+    }
+
+    private String buildGithubFileUrl(String filePath) {
+        return String.join("/",
+            "https://github.com",
+            githubProject.getOwner(),
+            githubProject.getRepositoryName(),
+            "blob",
+            githubProject.getBranch(),
+            filePath);
     }
 
     /**

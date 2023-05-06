@@ -19,7 +19,7 @@ class SummarizeArtifactsJob(AbstractJob):
     """
     TYPE_KEY = "type"
 
-    def __init__(self, artifacts: Dict[Dict], summarizer: Summarizer = None, job_args: JobArgs = None):
+    def __init__(self, artifacts: Dict[str, Dict], summarizer: Summarizer = None, job_args: JobArgs = None):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
@@ -28,10 +28,10 @@ class SummarizeArtifactsJob(AbstractJob):
         """
         super().__init__(job_args)
         if summarizer is None:
-            summarizer = Summarizer(OpenAIManager(OpenAIArgs(model=GENERATION_MODEL_DEFAULT)))
+            summarizer = Summarizer(OpenAIManager(OpenAIArgs(model=GENERATION_MODEL_DEFAULT)), code_or_exceeds_limit_only=False)
         self.artifacts = artifacts
-        self.id2chunker = {id_: SupportedChunker.determine_from_ext(type_) for id_, type_ in artifacts.items()}
-        self.artifact_df = pd.DataFrame(artifacts)
+        self.id2chunker = {id_: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for id_, artifact in artifacts.items()}
+        self.artifact_df = pd.DataFrame.from_dict(self.artifacts, orient="index")
         self.summarizer = summarizer
 
     def _run(self) -> JobResult:

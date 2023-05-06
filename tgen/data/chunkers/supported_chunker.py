@@ -13,7 +13,7 @@ class SupportedChunker(SupportedEnum):
     NL = NaturalLanguageChunker
 
     @staticmethod
-    def determine_from_ext(path_to_file: str = None) -> "SupportedChunker":
+    def determine_from_path(path_to_file: str = None) -> "SupportedChunker":
         """
         Gets the chunker responsible for breaking a file or content into smaller pieces for the model
         :param path_to_file: The path to the file being chunked
@@ -23,7 +23,16 @@ class SupportedChunker(SupportedEnum):
         if not path_to_file:
             return default
         ext = FileUtil.get_file_ext(path_to_file)
+        SupportedChunker.get_chunker_from_ext(ext)
+
+    @staticmethod
+    def get_chunker_from_ext(ext: str) -> "SupportedChunker":
+        """
+        Gets the chunker responsible for breaking content into smaller pieces for the model
+        :param ext: The ext of the file being chunked
+        :return: The chunker to use
+        """
         try:
-            return SupportedChunker[ext[1:].upper()]
-        except Exception:
-            return default
+            return SupportedChunker[ext.upper()]
+        except KeyError:
+            return SupportedChunker.NL

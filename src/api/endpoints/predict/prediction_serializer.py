@@ -14,6 +14,7 @@ class PredictionSerializer(serializers.Serializer):
     KEY = "definition"
     model = serializers.CharField(max_length=512)
     dataset = DatasetSerializer()
+    prompt = serializers.CharField(max_length=512, required=False, allow_null=True)
 
     def update(self, instance, validated_data):
         """

@@ -1,6 +1,7 @@
 from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.components.args.job_args import JobArgs
@@ -26,7 +27,7 @@ class JobCreator:
 
     @staticmethod
     def create_prediction_definition(dataset: ApiDefinition, output_dir: str, prediction_job_type: PredictionJobTypes,
-                                     model_path: str = None) -> AbstractTrainerJob:
+                                     model_path: str = None, prompt_creator: AbstractPromptCreator = None) -> AbstractTrainerJob:
         """
         Creates experiment definition for predicting on dataset using defined job type.
         :param dataset: The dataset to predict on.
@@ -45,7 +46,8 @@ class JobCreator:
             job = LLMJob(task=TrainerTask.PREDICT,
                          trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args,
-                         job_args=job_args)
+                         job_args=job_args,
+                         prompt_creator=prompt_creator)
             return job
         elif prediction_job_type == PredictionJobTypes.BASE:
             assert model_path is not None, "Expected model_path to be defined for prediction job."

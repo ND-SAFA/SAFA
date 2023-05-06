@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.github.services;
 
-import java.util.List;
+import java.util.function.Function;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlPaginateBranchesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
@@ -11,10 +11,8 @@ import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
-import edu.nd.crc.safa.utilities.graphql.entities.PageInfo;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -72,45 +70,43 @@ public class GithubGraphQlService {
      * Paginate through all repositories the user has access to.
      *
      * @param user The user making the request.
-     * @param currentRepositories The current list of repositories from the original request.
-     * @param pageInfo The page info from the original request.
+     * @param edges The edges object we are expanding in this pagination.
      */
-    public void paginateRepositories(SafaUser user, List<EdgeNode<Repository>> currentRepositories, PageInfo pageInfo) {
-        while (pageInfo.hasNextPage()) {
-            GithubGraphQlRepositoriesResponse response = makeGraphQlRequest(user,
-                GithubGraphQlQueries.PAGINATE_REPOSITORIES,
-                GithubGraphQlRepositoriesResponse.class,
-                "after", pageInfo.getEndCursor());
-
-            Edges<Repository> repositoryEdges = response.getData().getViewer().getRepositories();
-            currentRepositories.addAll(repositoryEdges.getEdges());
-            pageInfo = repositoryEdges.getPageInfo();
-        }
+    public void paginateRepositories(SafaUser user, Edges<Repository> edges) {
+        paginate(
+            user,
+            edges,
+            GithubGraphQlRepositoriesResponse.class,
+            GithubGraphQlQueries.PAGINATE_REPOSITORIES,
+            response -> response.getData().getViewer().getRepositories());
     }
 
     /**
      * Paginate through all branches in a repository.
      *
      * @param user The user making the request.
-     * @param currentBranches The current list of branches from the original request.
      * @param repoName The name of the repository.
      * @param repoOwner The owner of the repository.
-     * @param pageInfo The page info from the original request.
+     * @param edges The edges object we are expanding in this pagination.
      */
-    public void paginateBranches(SafaUser user, List<EdgeNode<Branch>> currentBranches, String repoName,
-                                 String repoOwner, PageInfo pageInfo) {
-        while (pageInfo.hasNextPage()) {
-            GithubGraphQlPaginateBranchesResponse response = makeGraphQlRequest(user,
-                GithubGraphQlQueries.PAGINATE_BRANCHES,
-                GithubGraphQlPaginateBranchesResponse.class,
-                "after", pageInfo.getEndCursor(),
-                "repoName", repoName,
-                "repoOwner", repoOwner);
+    public void paginateBranches(SafaUser user, Edges<Branch> edges, String repoName, String repoOwner) {
+        paginate(
+            user,
+            edges,
+            GithubGraphQlPaginateBranchesResponse.class,
+            GithubGraphQlQueries.PAGINATE_BRANCHES,
+            response -> response.getData().getRepository().getRefs(),
+            "repoName", repoName,
+            "repoOwner", repoOwner);
+    }
 
-            Edges<Branch> branches = response.getData().getRepository().getRefs();
-            currentBranches.addAll(branches.getEdges());
-            pageInfo = branches.getPageInfo();
-        }
+    private <T, U extends GraphQlResponse<?>> void paginate(SafaUser user, Edges<T> edges, Class<U> responseClass,
+                                                            String queryLocation, Function<U, Edges<T>> edgesRetriever,
+                                                            String... variables) {
+
+        String authorization = getAuthorization(user);
+        graphQlService.paginate(githubGraphqlUrl, queryLocation, authorization, responseClass,
+            edges, edgesRetriever, variables);
     }
 
     /**
@@ -125,13 +121,23 @@ public class GithubGraphQlService {
      */
     private <T extends GraphQlResponse<?>> T makeGraphQlRequest(SafaUser user, String queryLocation,
                                                                 Class<T> responseClass, String... variables) {
+
+        String authorization = getAuthorization(user);
+        return graphQlService.makeGraphQlRequest(githubGraphqlUrl, queryLocation,
+            authorization, responseClass, variables);
+    }
+
+    /**
+     * Gets the authorization header for the user.
+     * 
+     * @param user The user making the request.
+     * @return The authorization header.
+     */
+    private String getAuthorization(SafaUser user) {
         GithubAccessCredentials githubAccessCredentials =
             githubConnectionService.getGithubCredentials(user)
                 .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-        String authorization = String.format("token %s", githubAccessCredentials.getAccessToken());
-
-        return graphQlService.makeGraphQlRequest(githubGraphqlUrl, queryLocation,
-            authorization, responseClass, variables);
+        return String.format("token %s", githubAccessCredentials.getAccessToken());
     }
 }

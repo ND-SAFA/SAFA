@@ -1,12 +1,18 @@
 package edu.nd.crc.safa.utilities.graphql.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
+import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
+import edu.nd.crc.safa.utilities.graphql.entities.PageInfo;
 import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import lombok.AllArgsConstructor;
@@ -22,6 +28,56 @@ import reactor.core.publisher.Mono;
 public class GraphQlService {
 
     private final WebClient webClient;
+
+    /**
+     * Perform pagination on a list of edges from a previous request. This method is provided to cut down
+     * on repeated code, but it requires many parameters to make it work. Many of the items are the same or
+     * similar to {@link #makeGraphQlRequest(String, String, String, Class, String...)}.
+     *
+     * @param url The url for the GraphQL request that will get more items.
+     * @param queryLocation Location relative to {@code src/main/resources/graphql} of the pagination query definition.
+     *                      The pagination query must have a variable named {@code "after"} which specifies where
+     *                      the end cursor from the previous request goes.
+     * @param authorization The authorization header to send with the request.
+     *                      Can be null if no authorization is needed.
+     * @param responseClass The class that represents the schema that will be returned by the pagination query.
+     * @param edges The {@link Edges} object that we are performing pagination on.
+     * @param edgesRetriever Given the response from a pagination query, this function retrieves the {@link Edges}
+     *                       object which represents the new edges we have just retrieved.
+     * @param variables Addition variables that will be passed to the query.
+     * @param <T> The type the {@link Edges} object contains.
+     * @param <U> The type of the response of the pagination query.
+     */
+    public <T, U extends GraphQlResponse<?>> void paginate(String url, String queryLocation, String authorization,
+                                                           Class<U> responseClass, Edges<T> edges,
+                                                           Function<U, Edges<T>> edgesRetriever,
+                                                           String... variables) {
+
+        // It would almost be possible to put this code in Edges
+        // as it provides most of the information we need, but some queries
+        // need extra parameters, so we need to have different instantiations
+        // for everything we want to paginate. This function pulls together all
+        // the common parts.
+
+        PageInfo pageInfo = edges.getPageInfo();
+        List<EdgeNode<T>> currentList = edges.getEdges();
+
+        while (pageInfo.hasNextPage()) {
+            List<String> variablesList = new ArrayList<>(List.of(variables));
+            variablesList.add("after");
+            variablesList.add(pageInfo.getEndCursor());
+
+            U response = makeGraphQlRequest(url,
+                queryLocation,
+                authorization,
+                responseClass,
+                variablesList.toArray(new String[0]));
+
+            Edges<T> newEdges = edgesRetriever.apply(response);
+            currentList.addAll(newEdges.getEdges());
+            pageInfo = newEdges.getPageInfo();
+        }
+    }
 
     /**
      * Performs a request against the GitHub GraphQL endpoint. Users should be aware of if their query

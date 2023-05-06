@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
@@ -270,7 +271,7 @@ public class GithubProjectCreationJob extends CommitJob {
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         ProjectCommit commit = getProjectCommit();
-        Repository.Branch branch = getBranch(this.githubProject.getBranch());
+        Branch branch = getBranch(this.githubProject.getBranch());
         this.commitSha = branch.getTarget().getOid();
         commit.addArtifacts(ModificationType.ADDED, getArtifacts());
         this.githubProject.setLastCommitSha(this.commitSha);
@@ -285,7 +286,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * @param targetBranch The name of the branch.
      * @return The branch if it exists, otherwise the default branch.
      */
-    protected Repository.Branch getBranch(String targetBranch) {
+    protected Branch getBranch(String targetBranch) {
         return this.githubRepository.getRefs().getEdges().stream()
             .map(EdgeNode::getNode)
             .filter(branch -> branch.getName().equals(targetBranch))

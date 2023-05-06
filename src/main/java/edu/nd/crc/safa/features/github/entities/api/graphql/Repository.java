@@ -3,12 +3,14 @@ package edu.nd.crc.safa.features.github.entities.api.graphql;
 import java.util.Date;
 
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
+import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.apache.commons.lang3.NotImplementedException;
 
 @Data
-public class Repository {
+public class Repository implements Paginatable {
     private String id;
     private String name;
     private Owner owner;
@@ -22,24 +24,9 @@ public class Repository {
     private Branch defaultBranchRef;
     private Edges<Branch> refs;
 
-    @Data
-    public static class Owner {
-        private String login;
+    @Override
+    public String getPaginationQuery() {
+        throw new NotImplementedException("Not implemented yet.");
     }
 
-    @Data
-    public static class Language {
-        private String name;
-    }
-
-    @Data
-    public static class Branch {
-        private String name;
-        private Commit target;
-    }
-
-    @Data
-    public static class Commit {
-        private String oid;
-    }
 }

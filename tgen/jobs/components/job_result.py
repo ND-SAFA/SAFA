@@ -32,6 +32,7 @@ class JobResult(BaseObject):
     EXPORT_PATH = "export_path"
     PREDICTION_OUTPUT = "prediction_output"
     LABEL_IDS = "label_ids"
+    ARTIFACTS = "artifacts"
 
     def __init__(self, result_dict: Dict = None):
         """

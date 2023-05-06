@@ -13,7 +13,7 @@ class SupportedChunker(SupportedEnum):
     NL = NaturalLanguageChunker
 
     @staticmethod
-    def determine_from_path(path_to_file: str = None) -> "SupportedChunker":
+    def determine_from_ext(path_to_file: str = None) -> "SupportedChunker":
         """
         Gets the chunker responsible for breaking a file or content into smaller pieces for the model
         :param path_to_file: The path to the file being chunked

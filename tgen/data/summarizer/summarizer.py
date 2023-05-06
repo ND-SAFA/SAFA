@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 from tqdm import tqdm
@@ -15,7 +15,6 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 
 
@@ -67,22 +66,25 @@ class Summarizer(BaseObject):
         summarizations = self._summarize_chunks(self.llm_manager, prompt_creator, chunks)
         return os.linesep.join(summarizations)
 
-    def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str, chunker_type=SupportedChunker.NL):
+    def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
+                            index_to_chunker_to_use: Dict[str, SupportedChunker] = None):
         """
         Summarizes the information in a dataframe in a given column
         :param df: The dataframe to summarize
         :param col2summarize: The name of the column in the dataframe to summarize
-        :param chunker_type: The type of chunker to use
+        :param index_to_chunker_to_use: Dictionary mapping index to the chunker to use for that row
         :return: The dataframe with the contents in the given column summarized
         """
+        index_to_chunker_to_use = {} if index_to_chunker_to_use is None else index_to_chunker_to_use
         loading_bar = tqdm(total=len(df), desc="Summarizing dataframe.")
 
-        def summarize_item(item: str):
-            summary = self.summarize(content=item, chunker_type=chunker_type)
+        def summarize_item(row):
+            summary = self.summarize(content=row[col2summarize], id_=row.name,
+                                     chunker_type=index_to_chunker_to_use.get(row.name, SupportedChunker.NL))
             loading_bar.update()
             return summary
 
-        df[col2summarize] = df[col2summarize].apply(summarize_item)
+        df[col2summarize] = df.apply(summarize_item, axis=1)
         return df
 
     def exceeds_token_limit(self, content: str) -> bool:

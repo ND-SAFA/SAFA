@@ -100,6 +100,18 @@ public class GithubGraphQlService {
             "repoOwner", repoOwner);
     }
 
+    /**
+     * Performs pagination on the given edges variable with github authorization.
+     *
+     * @param user The user making the request.
+     * @param edges The edges object we are expanding in this pagination.
+     * @param responseClass The class that represents the schema that will be returned by the pagination query.
+     * @param queryLocation Location relative to {@code src/main/resources/graphql} of the query definition.
+     * @param edgesRetriever A function that retrieves the edges from the response.
+     * @param variables Variables to be passed to the query.
+     * @param <T> The type contained by edges.
+     * @param <U> The type of the response.
+     */
     private <T, U extends GraphQlResponse<?>> void paginate(SafaUser user, Edges<T> edges, Class<U> responseClass,
                                                             String queryLocation, Function<U, Edges<T>> edgesRetriever,
                                                             String... variables) {
@@ -110,7 +122,7 @@ public class GithubGraphQlService {
     }
 
     /**
-     * Makes q github graphql request.
+     * Makes a github graphql request.
      *
      * @param user The user making the request.
      * @param queryLocation Location relative to {@code src/main/resources/graphql} of the query definition.
@@ -129,7 +141,7 @@ public class GithubGraphQlService {
 
     /**
      * Gets the authorization header for the user.
-     * 
+     *
      * @param user The user making the request.
      * @return The authorization header.
      */

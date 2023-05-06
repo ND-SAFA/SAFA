@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.features.github.entities.api;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
+import edu.nd.crc.safa.utilities.graphql.entities.DefaultPaginatable;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
+import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import lombok.Data;
 import lombok.Getter;
@@ -16,13 +19,21 @@ import lombok.ToString;
 public class GithubGraphQlRepositoriesResponse extends GraphQlResponse<GithubGraphQlRepositoriesResponse.Payload> {
 
     @Data
-    public static class Payload {
+    public static class Payload implements DefaultPaginatable {
 
         private Viewer viewer;
 
         @Data
-        public static class Viewer {
+        public static class Viewer implements Paginatable {
             private Edges<Repository> repositories;
+
+            @Override
+            public void paginate() {
+                ServiceProvider.instance.getGithubGraphQlService().paginateRepositories(repositories.getEdges(),
+                        repositories.getPageInfo());
+
+                repositories.getEdges().forEach(edge -> edge.getNode().paginate());
+            }
         }
     }
 }

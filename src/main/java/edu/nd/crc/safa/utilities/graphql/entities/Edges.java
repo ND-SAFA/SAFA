@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Edges<T extends Paginatable> {
+public class Edges<T> {
     private List<EdgeNode<T>> edges;
     private PageInfo pageInfo;
 }

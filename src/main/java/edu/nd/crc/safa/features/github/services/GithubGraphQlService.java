@@ -1,12 +1,18 @@
 package edu.nd.crc.safa.features.github.services;
 
+import java.util.List;
+
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.GithubGraphQlQueries;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
+import edu.nd.crc.safa.utilities.graphql.entities.PageInfo;
 import edu.nd.crc.safa.utilities.graphql.services.GraphQlService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +58,21 @@ public class GithubGraphQlService {
             GithubGraphQlRepositoryResponse.class,
             "repoOwner", owner,
             "repoName", name);
+    }
+
+    /**
+     * Paginate through all repositories the user has access to.
+     *
+     * @param currentRepositories The current list of repositories from the original request.
+     * @param pageInfo The page info from the original request.
+     */
+    public void paginateRepositories(List<EdgeNode<Repository>> currentRepositories, PageInfo pageInfo) {
+        System.out.println("Paginating repositories");
+    }
+
+    public void paginateBranches(List<EdgeNode<Branch>> currentBranches, String repoName,
+                                 String repoOwner, PageInfo pageInfo) {
+        System.out.println("Paginating branches for " + repoOwner + "/" + repoName);
     }
 
     /**

@@ -1,18 +1,16 @@
 package edu.nd.crc.safa.features.github.entities.api.graphql;
 
 import java.util.Date;
-import java.util.List;
-import java.util.function.Consumer;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
 import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.apache.commons.lang3.NotImplementedException;
 
 @Data
-public class Repository implements Paginatable<Repository> {
+public class Repository implements Paginatable {
     private String id;
     private String name;
     private Owner owner;
@@ -27,8 +25,10 @@ public class Repository implements Paginatable<Repository> {
     private Edges<Branch> refs;
 
     @Override
-    public Consumer<List<Repository>> getPaginationFunction() {
-        throw new NotImplementedException("Not implemented yet.");
+    public void paginate() {
+        if (refs != null) {
+            ServiceProvider.instance.getGithubGraphQlService()
+                .paginateBranches(refs.getEdges(), name, owner.getLogin(), refs.getPageInfo());
+        }
     }
-
 }

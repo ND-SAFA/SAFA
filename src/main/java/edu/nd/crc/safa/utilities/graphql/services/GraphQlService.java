@@ -5,6 +5,7 @@ import java.util.Map;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +32,8 @@ public class GraphQlService {
      * @param <T> The query return type.
      * @return The result of the query.
      */
-    public <T> T makeGraphQlRequest(String url, String queryLocation, String authorization,
-                                    Class<T> responseClass, String... variables)  {
+    public <T extends GraphQlResponse<?>> T makeGraphQlRequest(String url, String queryLocation, String authorization,
+                                                               Class<T> responseClass, String... variables)  {
 
 
         GraphqlRequestBody graphQLRequestBody = new GraphqlRequestBody();
@@ -59,12 +60,17 @@ public class GraphQlService {
             responseBodySpec = responseBodySpec.header(HttpHeaders.AUTHORIZATION, authorization);
         }
 
-        return responseBodySpec
+        T response = responseBodySpec
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .bodyValue(graphQLRequestBody)
             .retrieve()
             .bodyToMono(responseClass)
             .block();
+
+        if (response != null) {
+            response.paginate();
+        }
+        return response;
     }
 
     @Data

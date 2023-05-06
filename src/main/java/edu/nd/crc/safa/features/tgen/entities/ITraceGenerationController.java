@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.models.tgen.entities;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**

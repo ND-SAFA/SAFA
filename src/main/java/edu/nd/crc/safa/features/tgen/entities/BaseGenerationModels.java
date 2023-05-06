@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
+import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
 import edu.nd.crc.safa.features.tgen.method.BertMethodIdentifier;
 import edu.nd.crc.safa.features.tgen.method.TGen;
 
@@ -29,7 +31,11 @@ public enum BaseGenerationModels {
     /**
      * OpenAI's GPT3.5 ada model trained on traceability links
      */
-    GPT("gpt");
+    GPT("gpt"),
+    /**
+     * The VSM method. Used primarily for testing.
+     */
+    VSM("vsm");
 
     String statePath;
 
@@ -66,6 +72,18 @@ public enum BaseGenerationModels {
     public TGen createTGenController() {
         BertMethodIdentifier bertId = new BertMethodIdentifier(this.toString(), this.getStatePath());
         return new TGen(bertId);
+    }
+
+    /**
+     * Constructs a trace link generation controller for the base generation method.
+     *
+     * @return Trace link generation controller.
+     */
+    public ITraceGenerationController createController() {
+        if (this == BaseGenerationModels.VSM) {
+            return new VSMController();
+        }
+        return this.createTGenController();
     }
 
     @Override

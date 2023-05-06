@@ -5,20 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.common.SafaRequestBuilder;
-import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
-import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
-import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.tgen.method.TGen;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 

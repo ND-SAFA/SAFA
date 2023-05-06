@@ -12,6 +12,7 @@ import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
@@ -28,10 +29,11 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */
-public class TGen {
+public class TGen implements ITraceGenerationController {
 
     private static final Logger log = LoggerFactory.getLogger(TGen.class);
 
@@ -62,11 +64,11 @@ public class TGen {
      * @param tracingPayload Levels of artifacts defining sources and targets.
      * @return List of generated trace links.
      */
-    public List<TraceAppEntity> generateLinks(TracingPayload tracingPayload) {
+    public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
         return this.generateLinksWithState(methodId.getStatePath(), tracingPayload);
     }
 
-    private List<TraceAppEntity> generateLinksWithState(
+    public List<TraceAppEntity> generateLinksWithState(
         String statePath,
         TracingPayload tracingPayload) {
         // Step - Build request

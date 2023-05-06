@@ -54,7 +54,7 @@ function run {
   setGoogleCredentials
   if [ -z "$my_var" ]; then
     echo "Running with environment: $2"
-    set -a && source $2 && set +a
+    source $2
   fi
 
   java -jar -Dspring.profiles.active="$1" "$JAR_PATH"

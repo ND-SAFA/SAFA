@@ -142,9 +142,9 @@ public class ProjectAppEntity implements IAppEntity {
     }
 
     @JsonIgnore
-    public Map<String, ArtifactAppEntity> getArtifactIdMap() {
-        Map<String, ArtifactAppEntity> artifactMap = new HashMap<>();
-        this.artifacts.forEach(a -> artifactMap.put(a.getId().toString(), a));
+    public Map<UUID, ArtifactAppEntity> getArtifactIdMap() {
+        Map<UUID, ArtifactAppEntity> artifactMap = new HashMap<>();
+        this.artifacts.forEach(a -> artifactMap.put(a.getId(), a));
         return artifactMap;
     }
 }

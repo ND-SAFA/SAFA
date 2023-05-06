@@ -43,8 +43,8 @@ public class SearchService {
         ProjectAppEntity projectAppEntity = projectRetrievalService.getProjectAppEntity(projectVersion);
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
-        Map<String, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, targetLayer, tracingPrompt);
+        Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
+        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt);
     }
 
     /**
@@ -61,10 +61,12 @@ public class SearchService {
                                                 List<String> searchTypes,
                                                 String tracingPrompt) {
         ProjectAppEntity projectAppEntity = projectRetrievalService.getProjectAppEntity(projectVersion);
-        Map<String, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
-        Map<String, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
-        Map<String, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, targetLayer, tracingPrompt);
+        Map<UUID, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
+        Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
+        Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
+        return searchSourceLayer(
+            convertArtifactMapToLayer(sourceLayer),
+            convertArtifactMapToLayer(targetLayer), tracingPrompt);
     }
 
     /**
@@ -74,11 +76,10 @@ public class SearchService {
      * @param artifactIdMap Map of id to artifacts to extract from.
      * @return Mapping between id and body of selected artifacts.
      */
-    private Map<String, String> createArtifactLayerFromIds(List<UUID> artifactIds,
-                                                           Map<String, ArtifactAppEntity> artifactIdMap) {
-        Map<String, String> sourceLayer = new HashMap<>();
-        for (UUID artifactUUID : artifactIds) {
-            String artifactId = artifactUUID.toString();
+    private Map<UUID, String> createArtifactLayerFromIds(List<UUID> artifactIds,
+                                                         Map<UUID, ArtifactAppEntity> artifactIdMap) {
+        Map<UUID, String> sourceLayer = new HashMap<>();
+        for (UUID artifactId : artifactIds) {
             sourceLayer.put(artifactId, artifactIdMap.get(artifactId).getBody());
         }
         return sourceLayer;
@@ -91,11 +92,11 @@ public class SearchService {
      * @param artifactTypes    The artifact types whose associated artifacts are being extracted.
      * @return The map between artifact id and body.
      */
-    private Map<String, String> constructTargetLayer(ProjectAppEntity projectAppEntity, List<String> artifactTypes) {
-        Map<String, String> targetLayer = new HashMap<>();
+    private Map<UUID, String> constructTargetLayer(ProjectAppEntity projectAppEntity, List<String> artifactTypes) {
+        Map<UUID, String> targetLayer = new HashMap<>();
         for (String artifactTypeName : artifactTypes) {
             List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(artifactTypeName);
-            artifacts.forEach(a -> targetLayer.put(a.getId().toString(), a.getBody()));
+            artifacts.forEach(a -> targetLayer.put(a.getId(), a.getBody()));
         }
         return targetLayer;
     }
@@ -110,6 +111,7 @@ public class SearchService {
      */
     public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,
                                             String tracingPrompt) {
+
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
         BaseGenerationModels model = BaseGenerationModels.GPT;
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
@@ -125,5 +127,10 @@ public class SearchService {
         List<String> matchedArtifactBodies =
             matchedArtifactIds.stream().map(UUID::toString).map(targetLayer::get).collect(Collectors.toList());
         return new SearchResponse(matchedArtifactIds, matchedArtifactBodies);
+    }
+
+    private Map<String, String> convertArtifactMapToLayer(Map<UUID, String> artifactMap) {
+        return artifactMap.entrySet().stream()
+            .collect(Collectors.toMap(entry -> entry.getKey().toString(), Map.Entry::getValue));
     }
 }

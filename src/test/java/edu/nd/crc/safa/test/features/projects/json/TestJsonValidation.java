@@ -74,7 +74,7 @@ class TestJsonValidation extends AbstractProjectJsonTest {
 
         // VP - Verify that minor version is the error received
         String errorMessage = response.getString("message");
-        assertThat(errorMessage).contains("minorVersion").contains("greater than 0");
+        assertThat(errorMessage).contains("minorVersion").contains("greater than or equal to 0");
     }
 
     /**

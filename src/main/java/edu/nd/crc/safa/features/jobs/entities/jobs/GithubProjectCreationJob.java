@@ -16,14 +16,11 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
-import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
@@ -35,8 +32,6 @@ import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
-
-import org.springframework.util.StringUtils;
 
 /**
  * Responsible for providing step implementations for importing a GitHub project:
@@ -296,35 +291,27 @@ public class GithubProjectCreationJob extends CommitJob {
 
     protected List<ArtifactAppEntity> getArtifacts() {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
-        GithubRepositoryFiletreeResponseDTO filetreeResponseDTO =
-            connectionService.getRepositoryFiles(
-                this.credentials,
-                this.githubIdentifier.getRepositoryName(),
-                this.commitSha);
+        GithubGraphQlService githubService = serviceProvider.getGithubGraphQlService();
+        List<GithubRepositoryFileDTO> files = githubService.getFilesInRepo(this.user,
+            this.githubIdentifier.getRepositoryOwner(),
+            this.githubIdentifier.getRepositoryName(),
+            this.githubProject.getBranch());
 
-        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
+        for (GithubRepositoryFileDTO file : files) {
 
-            String name = file.getPath();
-            if (shouldSkipFile(name)) {
+            String path = file.getPath();
+            if (shouldSkipFile(path)) {
                 continue;
             }
 
             String type = githubProject.getArtifactType().getName();
-            String summary = file.getSha();
-            String body = "";
-
-            GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
-                .getBlobInformation(this.credentials, file.getBlobApiUrl());
-
-            if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
-                body = base64Decode(blobDTO.getContent());
-            }
+            String summary = "";  // TODO I don't think this field is shown to the user at all
+            String body = file.getContents();
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
-                name,
+                file.getName(),
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,

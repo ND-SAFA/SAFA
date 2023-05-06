@@ -1,10 +1,12 @@
 package edu.nd.crc.safa.features.github.entities.app;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 
 /**
  * Transfer object describing metadata for a GitHub repository file
@@ -13,32 +15,38 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GithubRepositoryFileDTO {
 
-    private String mode;
+    private String name;
 
     private String path;
 
-    private String sha;
-
-    private Integer size;
-
     private GithubRepositoryFileType type;
 
-    @JsonProperty("url")
-    private String blobApiUrl;
+    private String contents;
 
-    @AllArgsConstructor
-    @Getter
-    public enum GithubRepositoryFileType {
-        @JsonProperty("blob")
-        FILE("GitHub File"),
+    /**
+     * Convert a GitHub GraphQL API response to a list of repository files. This list will only contain items
+     * in the folder that was originally requested, and will contain items that are a mix of files, folders,
+     * and submodules.
+     *
+     * @param response GraphQL API response.
+     * @return List of repository files.
+     */
+    public static List<GithubRepositoryFileDTO> fromGithubGraphQlResponse(GithubGraphQlTreeObjectsResponse response) {
+        List<GithubGraphQlTreeObjectsResponse.Entry> entries =
+            response.getData().getRepository().getObject().getEntries();
 
-        @JsonProperty("tree")
-        FOLDER("GitHub Folder"),
+        return entries.stream().map(entry -> {
+            GithubRepositoryFileDTO file = new GithubRepositoryFileDTO();
+            file.setName(entry.getName());
+            file.setPath(entry.getPath());
+            file.setType(entry.getType());
 
-        @JsonProperty("commit")
-        SUBMODULE("GitHub Submodule");
+            if (entry.getObject() != null) {
+                file.setContents(entry.getObject().getText());
+            }
 
-        private final String artifactTypeName;
+            return file;
+        }).collect(Collectors.toList());
     }
 
 }

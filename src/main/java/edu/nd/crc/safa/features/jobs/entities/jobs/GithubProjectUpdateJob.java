@@ -61,6 +61,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
     @Override
     protected List<ArtifactAppEntity> getArtifacts() {
+        // TODO graphql
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(

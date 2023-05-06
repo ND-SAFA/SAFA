@@ -2,7 +2,7 @@ import os
 
 from google.cloud import storage
 
-from api.cloud.icloud_storage import ICloudStorage
+from api.features.base.cloud.icloud_storage import ICloudStorage
 
 
 class GcpCloudStorage(ICloudStorage):

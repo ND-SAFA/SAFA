@@ -22,8 +22,8 @@ class SupportedChunker(SupportedEnum):
         default = SupportedChunker.NL
         if not path_to_file:
             return default
-        ext = FileUtil.get_file_ext(path_to_file)
-        SupportedChunker.get_chunker_from_ext(ext)
+        ext = FileUtil.get_file_ext(path_to_file).split(".")[-1]
+        return SupportedChunker.get_chunker_from_ext(ext)
 
     @staticmethod
     def get_chunker_from_ext(ext: str) -> "SupportedChunker":

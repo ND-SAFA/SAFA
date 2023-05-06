@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.tgen.entities.api;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +15,11 @@ public class TGenDataset {
     /**
      * Map of source artifact ids to content body.
      */
-    List<Map<String, String>> source_layers; // snake_case to match TGEN
+    @JsonProperty("source_layers")
+    List<Map<String, String>> sourceLayers; // snake_case to match TGEN
     /**
      * Map of target artifact ids to content body.
      */
-    List<Map<String, String>> target_layers; // snake_case to match TGEN
+    @JsonProperty("target_layers")
+    List<Map<String, String>> targetLayers; // snake_case to match TGEN
 }

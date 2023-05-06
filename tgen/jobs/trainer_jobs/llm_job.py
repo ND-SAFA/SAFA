@@ -6,7 +6,7 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -22,7 +22,7 @@ class LLMJob(AbstractTrainerJob):
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: AbstractLLMArgs = None,
                  task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None, prompt_creator: AbstractPromptCreator = None,
-                 llm_util: AbstractLLMManager = None):
+                 llm_manager: AbstractLLMManager = None):
         """
         Initializes job with necessary args
         :param trainer_args: The arguments for training and prediction calls
@@ -30,8 +30,8 @@ class LLMJob(AbstractTrainerJob):
         """
         if trainer_args is None:
             trainer_args = OpenAIArgs()
-        if llm_util is None:
-            llm_util = SupportedLLMManager.OPENAI.value
+        if llm_manager is None:
+            llm_manager = OpenAIManager(trainer_args)
             assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
@@ -39,7 +39,7 @@ class LLMJob(AbstractTrainerJob):
                          trainer_args=trainer_args, task=task, job_args=job_args)
         self.trainer_args = trainer_args
         self.prompt_creator = prompt_creator
-        self.llm_util = llm_util
+        self.llm_manager = llm_manager
 
     @overrides(AbstractTrainerJob)
     def get_trainer(self, **kwargs) -> LLMTrainer:
@@ -52,7 +52,7 @@ class LLMJob(AbstractTrainerJob):
             self._trainer = LLMTrainer(trainer_args=self.trainer_args,
                                        trainer_dataset_manager=self.trainer_dataset_manager,
                                        prompt_creator=self.prompt_creator,
-                                       llm_manager=self.llm_util)
+                                       llm_manager=self.llm_manager)
         return self._trainer
 
     @overrides(AbstractTrainerJob)

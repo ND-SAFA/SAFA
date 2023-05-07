@@ -53,7 +53,8 @@ class JobCreator:
             assert model_path is not None, "Expected model_path to be defined for prediction job."
             trainer_args = HuggingFaceArgs(output_dir=output_dir, metrics=None)
             model_manager = ModelManager(model_path=model_path)
-            job = HuggingFaceJob(job_args=job_args,
+            job = HuggingFaceJob(task=TrainerTask.PREDICT,
+                                 job_args=job_args,
                                  model_manager=model_manager,
                                  trainer_dataset_manager=trainer_dataset_manager,
                                  trainer_args=trainer_args)

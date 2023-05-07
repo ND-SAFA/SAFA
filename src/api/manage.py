@@ -21,4 +21,6 @@ def main():
 
 
 if __name__ == '__main__':
+    PATH_TO_SRC = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(PATH_TO_SRC)
     main()

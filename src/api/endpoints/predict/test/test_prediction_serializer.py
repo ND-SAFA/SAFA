@@ -1,6 +1,6 @@
-from api.features.base.serializers.tests.test_dataset_serializer import TestDatasetSerializer
-from api.features.predict.prediction_serializer import PredictionSerializer
+from api.endpoints.predict.prediction_serializer import PredictionSerializer
 from api.tests.api_base_test import ApiBaseTest
+from api.tests.test_data import TestData
 
 
 class TestPredictionSerializer(ApiBaseTest):
@@ -15,10 +15,10 @@ class TestPredictionSerializer(ApiBaseTest):
         model_name = "thearod5/pl-bert"
         payload = {
             "model": model_name,
-            "dataset": TestDatasetSerializer.dataset_payload
+            "dataset": TestData.dataset
         }
         serializer = PredictionSerializer(data=payload)
         self.assertTrue(serializer.is_valid())
         data = serializer.save()
         self.assertEqual(model_name, data["model"])
-        TestDatasetSerializer.assert_valid_dataset(self, data["dataset"])
+        TestData.assert_valid_dataset(self, data["dataset"])

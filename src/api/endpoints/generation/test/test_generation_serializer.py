@@ -1,4 +1,4 @@
-from api.features.generation.generation_serializer import GenerationSerializer
+from api.endpoints.generation.generation_serializer import GenerationSerializer
 from api.tests.api_base_test import ApiBaseTest
 
 

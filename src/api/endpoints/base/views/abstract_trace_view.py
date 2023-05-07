@@ -7,9 +7,9 @@ from drf_yasg.openapi import Schema, TYPE_OBJECT
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 
-from tgen.src.jobs.abstract_job import AbstractJob
-from tgen.src.jobs.components.job_result import JobResult
-from tgen.src.jobs.job_factory import JobFactory
+from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.job_factory import JobFactory
 
 AppEntity = TypeVar("AppEntity")
 

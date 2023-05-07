@@ -12,13 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Checkout TGEN
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          token: ${{ secrets.DEPLOYMENT_ACCESS_TOKEN }}
+          submodules: recursive
 
       - uses: actions/setup-python@v2
         with:

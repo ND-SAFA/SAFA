@@ -22,5 +22,7 @@ def main():
 
 if __name__ == '__main__':
     PATH_TO_SRC = os.path.dirname(os.path.dirname(__file__))
+    PATH_TO_TGEN = os.path.join(os.path.dirname(PATH_TO_SRC), "tgen")
     sys.path.append(PATH_TO_SRC)
+    sys.path.append(PATH_TO_TGEN)
     main()

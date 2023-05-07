@@ -12,11 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.DEPLOYMENT_ACCESS_TOKEN }}
-          submodules: recursive
+          submodules: 'recursive'
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v2
         with:

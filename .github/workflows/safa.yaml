@@ -17,7 +17,7 @@ jobs:
         with:
           submodules: 'recursive'
           ref: ${{ github.ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TGEN_TOKEN }}
 
       - uses: actions/setup-python@v2
         with:

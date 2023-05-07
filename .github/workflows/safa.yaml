@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: clone submodule
+      - name: Clone TGEN
         uses: actions/checkout@v2
         with:
         repository: ND-SAFA/tgen
@@ -23,7 +23,7 @@ jobs:
         ssh-key: ${{ secrets.SSH_KEY }}
         persist-credentials: true
 
-      - name: checkout submodule
+      - name: Checkout TGEN
         run: |
           git submodule init
           git submodule update

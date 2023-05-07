@@ -18,10 +18,10 @@ jobs:
       - name: Clone TGEN
         uses: actions/checkout@v2
         with:
-        repository: ND-SAFA/tgen
-        path: tgen
-        ssh-key: ${{ secrets.SSH_KEY }}
-        persist-credentials: true
+          repository: ND-SAFA/tgen
+          path: tgen
+          ssh-key: ${{ secrets.SSH_KEY }}
+          persist-credentials: true
 
       - name: Checkout TGEN
         run: |

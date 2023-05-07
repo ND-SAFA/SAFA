@@ -12,18 +12,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
-
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          submodules: 'true'
 
-      - name: Set up Git
-        uses: actions/setup-git@v2
+      - name: clone submodule
+        uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
+        repository: ND-SAFA/tgen
+        path: tgen
+        ssh-key: ${{ secrets.SSH_KEY }}
+        persist-credentials: true
+
+      - name: checkout submodule
+        run: |
+          git submodule init
+          git submodule update
+
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'

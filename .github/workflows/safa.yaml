@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - development
-    types: [ opened ]
+    types: [ opened, synchronize ]
   issue_comment:
     types: [ created ]
 jobs:

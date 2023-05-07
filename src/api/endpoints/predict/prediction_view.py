@@ -47,7 +47,7 @@ class PredictView(APIView):
         prediction_payload = ViewUtil.read_request(request, PredictionSerializer)
         model = prediction_payload["model"]
         dataset_definition: Dict = prediction_payload["dataset"]
-        prompt: Optional[str] = prediction_payload["prompt"]
+        prompt: Optional[str] = prediction_payload.get("prompt", None)
 
         dataset: ApiDefinition = DefinitionCreator.create(ApiDefinition, dataset_definition)
 

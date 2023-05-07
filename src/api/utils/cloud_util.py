@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from api.constants.api_constants import MODEL_CACHE_PATH
-from api.features.base.cloud import SupportedCloudStorage
+from api.endpoints.base.cloud.supported_cloud_storage import SupportedCloudStorage
 
 
 class CloudUtility:

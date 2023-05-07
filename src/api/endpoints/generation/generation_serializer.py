@@ -12,7 +12,7 @@ class GenerationSerializer(AbstractSerializer):
     Serialized the generation payload
     """
     model = serializers.CharField(max_length=512)
-    prompt = serializers.CharField(max_length=512)
+    prompt = serializers.CharField(max_length=512, trim_whitespace=False)
 
     def create(self, validated_data: Dict) -> Dict[str, Variable]:
         """

@@ -1,4 +1,6 @@
-import { DataCy, Routes, testProject, validUser } from "@/fixtures";
+import { DataCy, Routes, testProject } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
 
 describe("Project List", () => {
   before(() => {

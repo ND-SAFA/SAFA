@@ -29,7 +29,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
   data: {
     type: GraphElementType.node,
     graph: GraphMode.tim,
-    id: props.artifactType.replace(/ /g, ""),
+    id: props.artifactType?.replace(/ /g, "") || "",
     artifactType: props.artifactType,
     count: props.count,
     icon: props.icon,

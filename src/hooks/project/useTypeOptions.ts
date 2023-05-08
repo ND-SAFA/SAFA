@@ -77,9 +77,14 @@ export const useTypeOptions = defineStore("typeOptions", {
      */
     initializeTypeIcons(allArtifactTypes: ArtifactTypeSchema[]): void {
       allArtifactTypes.forEach((artifactType) => {
+        const existingType = this.tim.artifacts[artifactType.name];
         const icon = artifactType.icon.replace("mdi-help", defaultTypeIcon);
+
         this.tim.artifacts[artifactType.name] = {
-          ...this.tim.artifacts[artifactType.name],
+          typeId: existingType?.typeId || artifactType.typeId,
+          name: existingType?.name || artifactType.name,
+          count: existingType?.count || 0,
+          allowedTypes: existingType?.allowedTypes || [],
           icon,
           iconIndex: allTypeIcons.indexOf(icon),
         };

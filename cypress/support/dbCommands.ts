@@ -1,4 +1,4 @@
-import { validUser } from "@/fixtures";
+import { Routes } from "@/fixtures";
 
 const apiUrl = "https://dev-api.safa.ai";
 
@@ -18,7 +18,9 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("dbToken", () => {
-  cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
+  const validUser = Cypress.env("validUser");
+
+  cy.request("POST", `${apiUrl}/login`, validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
@@ -115,17 +117,38 @@ Cypress.Commands.add("dbResetVersions", () => {
 });
 
 Cypress.Commands.add("dbDeleteUser", (email, password) => {
-  cy.request<{ token: string }>({
+  cy.request({
     method: "POST",
     url: `${apiUrl}/login`,
-    body: { email, password },
     failOnStatusCode: false,
+    body: { email, password },
   }).then(() => {
-    cy.request<{ token: string }>({
+    cy.request({
       method: "POST",
       url: `${apiUrl}/accounts/delete`,
       body: { password },
       failOnStatusCode: false,
     });
   });
+});
+
+Cypress.Commands.add("dbGenerateUsers", () => {
+  const { validUser, editUser, deleteUser, inviteUser } = Cypress.env();
+
+  for (const user of [validUser, editUser, deleteUser, inviteUser]) {
+    cy.request<{ token: string }>({
+      failOnStatusCode: false,
+      method: "POST",
+      url: `${apiUrl}/accounts/create`,
+      body: { email: user.email, password: user.password },
+    });
+  }
+});
+
+Cypress.Commands.add("dbDeleteGeneratedUsers", () => {
+  const { validUser, editUser, deleteUser, inviteUser } = Cypress.env();
+
+  for (const user of [validUser, editUser, deleteUser, inviteUser]) {
+    cy.dbDeleteUser(user.email, user.password);
+  }
 });

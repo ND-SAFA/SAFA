@@ -1,11 +1,13 @@
 import {
-  validUser,
   simpleProjectFiles,
   simpleProjectFilesMap,
   DataCy,
   testProject,
   Routes,
 } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
+
 describe("Bulk Project Creation", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects();

@@ -29,8 +29,7 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         return versionToAppEntity(artifactVersions);
     }
-
-
+    
     public List<ArtifactAppEntity> getAppEntities(Project project) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository.findByProjectVersionProject(project);
         return versionToAppEntity(artifactVersions);

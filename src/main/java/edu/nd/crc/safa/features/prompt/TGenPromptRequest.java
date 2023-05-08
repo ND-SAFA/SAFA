@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.prompt;
 
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.api.AbstractGenerationRequest;
 
 import lombok.Data;
 
@@ -8,11 +8,7 @@ import lombok.Data;
  * Request to complete prompt with LLM model.
  */
 @Data
-public class TGenPromptRequest {
-    /**
-     * The model string to use. Either GPT or the path to a BERT model.
-     */
-    BaseGenerationModels model;
+public class TGenPromptRequest extends AbstractGenerationRequest {
     /**
      * The prompt to complete.
      */

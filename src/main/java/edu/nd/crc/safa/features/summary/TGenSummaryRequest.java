@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.summary;
 
 import java.util.Map;
 
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,5 +20,5 @@ public class TGenSummaryRequest {
     /**
      * The LLM to use. Either GPT or Anthropic
      */
-    String model;
+    BaseGenerationModels model;
 }

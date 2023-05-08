@@ -28,13 +28,12 @@ public class HGenService {
     /**
      * Generates artifacts for each cluster defined.
      *
-     * @param request The request defining artifacts, clusters, and model.
+     * @param projectVersion The version to retrieve artifacts in.
+     * @param request        The request defining artifacts, clusters, and model.
      * @return List of generated artifacts.
      */
     public List<String> generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
-        String modelName = request.getModel();
-        BaseGenerationModels baseModel = modelName == null ? BaseGenerationModels.getDefault() :
-            BaseGenerationModels.valueOf(modelName);
+        BaseGenerationModels baseModel = request.getModel();
         TGen controller = baseModel.createTGenController();
         Map<String, TGenSummaryArtifact> artifacts = createArtifacts(projectVersion, request.getArtifacts());
         List<List<String>> clusters = List.of(new ArrayList<>(artifacts.keySet()));

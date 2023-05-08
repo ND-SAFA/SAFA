@@ -26,7 +26,8 @@ public class HGenController extends BaseController {
     /**
      * Generates hierarchy above artifacts in request.
      *
-     * @param request Contains artifacts and clusters within them.
+     * @param versionId The Id of the version to collect artifacts in.
+     * @param request   Contains artifacts and clusters within them.
      * @return List of generates artifacts for new level.
      */
     @PostMapping(AppRoutes.HGen.GENERATE)

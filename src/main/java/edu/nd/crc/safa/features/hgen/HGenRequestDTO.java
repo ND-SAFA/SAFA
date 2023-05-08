@@ -3,6 +3,8 @@ package edu.nd.crc.safa.features.hgen;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.tgen.entities.api.AbstractGenerationRequest;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,13 +13,9 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class HGenRequestDTO {
+public class HGenRequestDTO extends AbstractGenerationRequest {
     /**
      * List of artifact ids to generate hierarchy for.
      */
     List<UUID> artifacts;
-    /**
-     * The model name.
-     */
-    String model;
 }

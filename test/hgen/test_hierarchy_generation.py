@@ -17,6 +17,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -60,8 +61,7 @@ class TestHierarchyGeneration(BaseTest):
         for i, dataset_creator in enumerate(dataset_creators):
             tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
             hgen = self.get_hierarchy_generator(tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator)
-            export_path = hgen.run(TEST_OUTPUT_DIR, save_dataset_checkpoints=False)
-            generated_dataset = TraceDatasetCreator(project_reader=DataFrameProjectReader(project_path=export_path)).create()
+            generated_dataset = hgen.run(TEST_OUTPUT_DIR)
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
 
@@ -144,10 +144,10 @@ class TestHierarchyGeneration(BaseTest):
 
     def test_save_dataset_checkpoint(self):
         dataset = PromptDatasetCreator(project_reader=PromptTestProject.get_project_reader()).create()
-        export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
         self.assertTrue(os.path.exists(export_path))
 
-        export_path = HierarchyGenerator._save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, False)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, False)
         self.assertFalse(export_path)
 
     def test_create_trace_dataset_for_single_layer(self):
@@ -227,8 +227,7 @@ class TestHierarchyGeneration(BaseTest):
 
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
         llm_manager = OpenAIManager(OpenAIArgs())
-        hgen_trainer_params = {"hgen_trainer_args": OpenAIArgs(metrics=[])}
-        args = HGenArgs(tgen_trainer=tgen_trainer, hgen_trainer_type=SupportedTrainer.LLM,
+        args = HGenArgs(tgen_trainer=tgen_trainer,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id,
-                        **hgen_trainer_params, **params)
+                        **params)
         return HierarchyGenerator(args, llm_manager)

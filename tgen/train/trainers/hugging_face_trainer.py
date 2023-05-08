@@ -50,8 +50,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if trainer_args.eager_load_data:
             trainer_dataset_manager.get_hf_datasets(model_manager)  # prepares datasets and caches them
         trainer_args.__post_init__()
-        super().__init__(trainer_dataset_manager=trainer_dataset_manager)
-        self.trainer_args = trainer_args
+        super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)

@@ -41,11 +41,10 @@ class LLMTrainer(AbstractTrainer):
             summarizer = Summarizer(llm_manager, model_for_token_limit=llm_manager.llm_args.model,
                                     code_or_exceeds_limit_only=False,
                                     max_tokens_for_token_limit=llm_manager.llm_args.max_tokens)
-        super().__init__(trainer_dataset_manager)
+        super().__init__(trainer_dataset_manager, trainer_args=llm_manager.llm_args)
         self.llm_manager = llm_manager
         self.summarizer = summarizer
         self.prompt_creator = prompt_creator
-        self.trainer_args = llm_manager.llm_args  # Used to satisfy the AbstractTrainer interface. TODO: Remove this eventually.
 
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """

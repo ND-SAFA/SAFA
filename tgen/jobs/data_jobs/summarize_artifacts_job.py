@@ -1,5 +1,6 @@
 from typing import Dict
 
+from tgen.constants.model_constants import get_default_llm_manager
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -28,7 +29,7 @@ class SummarizeArtifactsJob(AbstractJob):
         """
         super().__init__(job_args)
         if summarizer is None:
-            summarizer = Summarizer(OpenAIManager(OpenAIArgs(model=GENERATION_MODEL_DEFAULT)), code_or_exceeds_limit_only=False)
+            summarizer = Summarizer(get_default_llm_manager(), code_or_exceeds_limit_only=False)
         self.artifacts = artifacts
         self.id2chunker = {id_: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for id_, artifact in artifacts.items()}
         self.artifact_df = pd.DataFrame.from_dict(self.artifacts, orient="index")

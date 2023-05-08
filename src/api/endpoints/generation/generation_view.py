@@ -13,7 +13,6 @@ from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.json_util import NpEncoder
 from tgen.util.reflection_util import ReflectionUtil
 
@@ -45,7 +44,7 @@ class GenerationView(APIView):
         :return:
         """
         if ReflectionUtil.is_instance_or_subclass(llm_manager, OpenAIManager):
-            prompt_args = OpenAIArgs.prompt_args
+            prompt_args = OpenAIManager.prompt_args
         elif ReflectionUtil.is_instance_or_subclass(llm_manager, AnthropicManager):
             prompt_args = AnthropicManager.prompt_args
         else:

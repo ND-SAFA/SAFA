@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.summary;
 /**
  * Enumerates all the different types of artifacts that can be sumarized.
  */
-enum TGenSummaryArtifactType {
+public enum TGenSummaryArtifactType {
     /**
      * Identifies natural language artifacts.
      */

@@ -87,6 +87,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class HGen {
+        public static final String GENERATE = "/hgen/{versionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Models {
         public static final String MODEL_ROOT = "/models";
         public static final String MODEL_ROOT_BY_ID = Projects.BY_ID + MODEL_ROOT;

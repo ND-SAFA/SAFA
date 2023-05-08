@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Type, Union
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, TEMPERATURE_DEFAULT
+from tgen.constants.open_ai_constants import TEMPERATURE_DEFAULT
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -93,4 +93,10 @@ class AbstractLLMArgs(BaseObject, ABC):
         Sets the max tokens parameter for library.
         :param max_tokens: The tokens to set it to.
         :return: None
+        """
+
+    @abstractmethod
+    def get_max_tokens(self) -> int:
+        """
+        :return: Returns the max tokens of args.
         """

@@ -25,6 +25,7 @@ class AnthropicArgs(AbstractLLMArgs):
     """
     Defines allowable arguments to anthropic API.
     """
+
     max_tokens_to_sample: int = MAX_TOKENS_DEFAULT
     _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [],
                              TrainerTask.PREDICT: [AnthropicParams.MODEL, AnthropicParams.TEMPERATURE,
@@ -57,3 +58,9 @@ class AnthropicArgs(AbstractLLMArgs):
         :return: None
         """
         self.max_tokens_to_sample = max_tokens
+
+    def get_max_tokens(self) -> int:
+        """
+        :return: Returns the max tokens of args.
+        """
+        return self.max_tokens_to_sample

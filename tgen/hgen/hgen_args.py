@@ -7,10 +7,11 @@ from tgen.data.creators.clustering.supported_clustering_method import SupportedC
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.base_object import BaseObject
 
 
 @dataclass
-class HGenArgs:
+class HGenArgs(BaseObject):
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """

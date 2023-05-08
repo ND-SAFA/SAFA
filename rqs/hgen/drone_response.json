@@ -5,12 +5,6 @@
         {
           "object_type": "HGen",
           "hgen_args": {
-            "hgen_trainer_class": "LLM",
-            "hgen_prompt_creator": {
-              "prompt_creator": {
-                "object_type": "GENERATION"
-              }
-            },
             "source_layer_id": "Code",
             "tgen_trainer": {
               "object_type": "LLM",
@@ -24,8 +18,17 @@
                   "summarizer": {
                   }
                 }
+              },
+              "prompt_creator": {
+                "object_type": "CLASSIFICATION"
+              },
+              "llm_manager": {
+                "object_type": "OPENAI"
               }
             }
+          },
+          "llm_manager": {
+            "object_type": "OPENAI"
           },
           "export_path": "[OUTPUT_PATH]/hgen/dr_onboard_autonomy"
         }

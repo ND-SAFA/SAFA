@@ -59,3 +59,11 @@ class SupportedEnum(Enum):
         :return: Returns the values of the supported enums.
         """
         return [v for v in cls._value2member_map_.keys()]
+
+    def __deepcopy__(self, memodict={}) -> "SupportedEnum":
+        """
+        Makes a copy of the enum bc Python struggles for some reason
+        :param memodict: Unused
+        :return: A copy of the Enum
+        """
+        return self.__class__[self.name]

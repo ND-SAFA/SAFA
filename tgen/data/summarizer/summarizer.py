@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.constants.model_constants import get_default_llm_manager
 from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -13,7 +14,6 @@ from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.util.base_object import BaseObject
 
@@ -23,7 +23,7 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, llm_manager: AbstractLLMManager,
+    def __init__(self, llm_manager: AbstractLLMManager = None,
                  model_for_token_limit: str = GENERATION_MODEL_DEFAULT, max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT,
                  code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
@@ -35,12 +35,12 @@ class Summarizer(BaseObject):
         :param nl_base_prompt: The default prompt to use for summarization.
         :param code_base_prompt: The default summarization prompt to use for code.
         """
-        self.llm_manager = llm_manager
+        self.llm_manager = get_default_llm_manager() if llm_manager is None else llm_manager
         self.model_for_token_limit = model_for_token_limit
         self.token_limit = TokenLimitCalculator.calculate_token_limit(self.model_for_token_limit, max_tokens_for_token_limit)
-        self.args_for_summarizer_model = llm_manager.llm_args
+        self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = code_or_exceeds_limit_only
-        self.prompt_args = llm_manager.prompt_args
+        self.prompt_args = self.llm_manager.prompt_args
         self.code_prompt_creator = GenerationPromptCreator(
             prompt_args=self.prompt_args,
             base_prompt=code_base_prompt)

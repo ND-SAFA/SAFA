@@ -148,6 +148,7 @@ const modes: SelectOption[] = [
 
 const mode = ref<Mode>("Prompt");
 const searchItems = ref<string[]>([]);
+const searchText = ref<string>("");
 const searchTypes = ref<string[]>([]);
 const maxResults = ref<number>(5);
 const relateTypes = ref<string[]>([]);
@@ -189,6 +190,8 @@ function clearOptions(): void {
  * @param update - A function called to update the options.
  */
 function filterOptions(search: string, update: (fn: () => void) => void) {
+  searchText.value = search;
+
   if (search === "" || searchItems.value.length > 0) {
     update(() => (options.value = []));
   } else {

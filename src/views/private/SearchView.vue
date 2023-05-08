@@ -25,10 +25,12 @@
             </template>
           </q-select>
           <q-select
-            v-model="prompt"
+            ref="searchEl"
+            v-model="searchItems"
             outlined
             use-input
             clearable
+            multiple
             :label="placeholder"
             :options="options"
             :option-label="artifactLikeMode ? 'name' : undefined"
@@ -36,6 +38,7 @@
             input-debounce="0"
             class="nav-search-prompt"
             style="min-width: 600px"
+            @update:model-value="clearOptions"
             @filter="filterOptions"
           >
             <template #append>
@@ -144,7 +147,7 @@ const modes: SelectOption[] = [
 ];
 
 const mode = ref<Mode>("Prompt");
-const prompt = ref<string>("");
+const searchItems = ref<string[]>([]);
 const searchTypes = ref<string[]>([]);
 const maxResults = ref<number>(5);
 const relateTypes = ref<string[]>([]);
@@ -174,12 +177,19 @@ const matchText = computed(() => {
 });
 
 /**
+ * Clears options if an item has been selected.
+ */
+function clearOptions(): void {
+  options.value = searchItems.value.length > 0 ? [] : options.value;
+}
+
+/**
  * Filters the options based on the search text.
  * @param search - The search text.
  * @param update - A function called to update the options.
  */
 function filterOptions(search: string, update: (fn: () => void) => void) {
-  if (search === "") {
+  if (search === "" || searchItems.value.length > 0) {
     update(() => (options.value = []));
   } else {
     update(() => {
@@ -190,11 +200,11 @@ function filterOptions(search: string, update: (fn: () => void) => void) {
       } else if (mode.value === "Artifact Type") {
         const lowercaseSearch = search.toLowerCase();
 
-        return typeOptionsStore.artifactTypes.filter((type) =>
+        options.value = typeOptionsStore.artifactTypes.filter((type) =>
           type.toLowerCase().includes(lowercaseSearch)
         );
       } else {
-        return [];
+        options.value = [];
       }
     });
   }
@@ -202,7 +212,9 @@ function filterOptions(search: string, update: (fn: () => void) => void) {
 
 watch(
   () => mode.value,
-  () => (prompt.value = "")
+  () => {
+    searchItems.value = [];
+  }
 );
 </script>
 

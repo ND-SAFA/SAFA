@@ -22,6 +22,7 @@ class SummarySerializer(AbstractSerializer):
 
     artifacts = serializers.DictField(child=SummaryArtifactSerializer())
     model = serializers.CharField(max_length=512, required=False)
+    prompt = serializers.CharField(max_length=512, required=False)
 
     def create(self, validated_data: Dict):
         """

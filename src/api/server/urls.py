@@ -20,6 +20,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from api.endpoints.generation.generation_view import GenerationView
+from api.endpoints.hgen.hgen_view import HGenView
 from api.endpoints.predict.prediction_view import PredictView
 from api.endpoints.summary.summary_view import SummaryView
 
@@ -48,5 +49,6 @@ urlpatterns = [
     path('', homePageView),
     path('predict/', PredictView.as_view()),
     path('complete/', GenerationView.as_view()),
-    path('summarize/', SummaryView.as_view())
+    path('summarize/', SummaryView.as_view()),
+    path('hgen/', HGenView.as_view())
 ]

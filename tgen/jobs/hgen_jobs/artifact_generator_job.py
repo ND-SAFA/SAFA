@@ -1,9 +1,9 @@
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.prompts.supported_prompts import SupportedPrompts
@@ -33,7 +33,7 @@ class ArtifactGeneratorJob(HGenJob):
         :param llm_manager: Model Manager in charge of generating artifacts
         :pram job_args: The arguments need for the job
         """
-        self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
+        self.artifacts = self.summarize_artifacts(artifacts, summarizer, job_args)
         self.artifacts_by_cluster = artifact_ids_by_cluster
         dataset_creator = ClusterDatasetCreator(trace_dataset=self._create_trace_dataset_from_artifacts(self.artifacts),
                                                 manual_clusters={i: artifacts_in_cluster
@@ -68,7 +68,7 @@ class ArtifactGeneratorJob(HGenJob):
         return trace_dataset
 
     @staticmethod
-    def _summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:
+    def summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:
         """
         Runs summarize job on artifacts
         :param artifacts: The artifacts to summarize

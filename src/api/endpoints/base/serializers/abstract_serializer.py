@@ -15,5 +15,10 @@ class AbstractSerializer(serializers.Serializer):
         SerializerUtility.update_error()
 
     def create(self, validated_data):
+        """
+        Recursively creates child data. Under construction, currently non-functional.
+        :param validated_data: The data created.
+        :return: The validated data.
+        """
         data = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
         return data

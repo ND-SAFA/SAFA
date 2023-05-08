@@ -37,7 +37,7 @@ class AbstractJob(threading.Thread, BaseObject):
         self.id = uuid.uuid4()
         self.save_job_output = self.job_args.save_job_output
 
-    def run(self) -> None:
+    def run(self) -> JobResult:
         """
         Runs the job and saves the output
         """
@@ -59,6 +59,7 @@ class AbstractJob(threading.Thread, BaseObject):
             self.save(self.job_args.output_dir)
             wandb.finish()
         self.cleanup()
+        return self.result
 
     def cleanup(self) -> None:
         """

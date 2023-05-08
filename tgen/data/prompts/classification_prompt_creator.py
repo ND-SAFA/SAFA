@@ -1,3 +1,5 @@
+from typing import Union
+
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
@@ -11,7 +13,8 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     """
 
     def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "Yes", neg_class: str = "No",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}\n>", base_prompt: str = SupportedPrompts.CLASSIFICATION.value):
+                 artifact_prompt_format: str = "\n1. {}\n2. {}\n>",
+                 base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.CLASSIFICATION):
         """
         Constructs classification prompt creator
         :param prompt_args: The arguments used to construct prompts.

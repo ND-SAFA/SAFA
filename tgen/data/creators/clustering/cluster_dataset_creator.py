@@ -1,4 +1,5 @@
 import uuid
+from collections import Set
 from typing import Dict, Any, List, Union
 
 from tgen.constants.deliminator_constants import NEW_LINE
@@ -23,14 +24,20 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
     """
 
     def __init__(self, trace_dataset: TraceDataset,
-                 cluster_methods: Union[List[SupportedClusteringMethod], SupportedClusteringMethod]):
+                 cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
+                 manual_clusters: Dict = None):
         """
         Initializes with a dataset with artifacts to be clustered
         :param trace_dataset: The dataset to perform clustering on
         """
         super().__init__()
         self.trace_dataset = trace_dataset
-        self.cluster_methods = cluster_methods if isinstance(cluster_methods, List) else [cluster_methods]
+        self.cluster_methods = cluster_methods if isinstance(cluster_methods, Set) else {cluster_methods}
+        assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters is not None, \
+            "Must supply clusters for manual clustering"
+        if manual_clusters is not None:
+            self.cluster_methods.add(SupportedClusteringMethod.MANUAL)
+        self.manual_clusters = manual_clusters
         self.layer_id = str(uuid.uuid4())
         self.__method_to_clusters: Dict[SupportedClusteringMethod, Clusters] = {}
 
@@ -42,8 +49,11 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         if not self.__method_to_clusters:
             for cluster_method in self.cluster_methods:
                 logger.info(f"Creating clusters of artifacts using {cluster_method.name.capitalize()}")
-                self.__method_to_clusters[cluster_method] = self._cluster(trace_dataset=self.trace_dataset,
-                                                                          cluster_method=cluster_method)
+                if cluster_method == SupportedClusteringMethod.MANUAL:
+                    clusters = self.manual_clusters
+                else:
+                    clusters = self._cluster(trace_dataset=self.trace_dataset, cluster_method=cluster_method)
+                self.__method_to_clusters[cluster_method] = clusters
         return self.__method_to_clusters
 
     def create(self) -> PromptDataset:

@@ -15,6 +15,8 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
+import edu.nd.crc.safa.features.summary.TGenSummaryRequest;
+import edu.nd.crc.safa.features.summary.TGenSummaryResponse;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
@@ -42,6 +44,19 @@ public class TGen implements ITraceGenerationController {
     public TGen(BertMethodIdentifier methodId) {
         this.safaRequestBuilder = ServiceProvider.instance.getSafaRequestBuilder();
         this.methodId = methodId;
+    }
+
+    /**
+     * Generates summaries for given content.
+     *
+     * @param request Contains content to summarize and assocatied parameteres.
+     * @return TGen response.
+     */
+    public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
+        String summarizeEndpoint = TGenConfig.get().getSummarizeEndpoint();
+        TGenSummaryResponse output = this.safaRequestBuilder
+            .sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
+        return output;
     }
 
     /**

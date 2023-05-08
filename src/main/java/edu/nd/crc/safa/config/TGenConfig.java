@@ -23,6 +23,13 @@ public class TGenConfig {
     }
 
     /**
+     * @return Returns summarize endpoint.
+     */
+    public String getSummarizeEndpoint() {
+        return createTGenEndpoint(baseEndpoint, "summarize");
+    }
+
+    /**
      * @return Returns path to TGEN completion endpoint.
      */
     public String getPromptCompletionEndpoint() {

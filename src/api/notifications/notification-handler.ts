@@ -1,3 +1,4 @@
+import { logStore } from "@/hooks";
 import {
   clearSubscriptions,
   connect,
@@ -27,11 +28,17 @@ export async function handleSelectVersion(
 
   stompClient.subscribe(
     fillEndpoint(Endpoint.projectTopic, { projectId }),
-    (frame) => handleEntityChangeMessage(versionId, frame)
+    (frame) =>
+      handleEntityChangeMessage(versionId, frame).catch((e) =>
+        logStore.onError(e)
+      )
   );
 
   stompClient.subscribe(
     fillEndpoint(Endpoint.versionTopic, { versionId }),
-    (frame) => handleEntityChangeMessage(versionId, frame)
+    (frame) =>
+      handleEntityChangeMessage(versionId, frame).catch((e) =>
+        logStore.onError(e)
+      )
   );
 }

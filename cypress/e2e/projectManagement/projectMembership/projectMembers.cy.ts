@@ -1,4 +1,6 @@
-import { DataCy, inviteUser } from "@/fixtures";
+import { DataCy } from "@/fixtures";
+
+const inviteUser = Cypress.env("inviteUser");
 
 describe("Project Members", () => {
   beforeEach(() => {

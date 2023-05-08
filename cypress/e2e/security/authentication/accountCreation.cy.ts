@@ -1,4 +1,6 @@
-import { DataCy, Routes, createUser, validUser } from "@/fixtures";
+import { DataCy, Routes } from "@/fixtures";
+
+const { createUser, validUser } = Cypress.env();
 
 describe("Account Creation", () => {
   beforeEach(() => {

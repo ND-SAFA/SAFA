@@ -91,6 +91,16 @@ declare namespace Cypress {
      */
     dbDeleteUser(email: string, password: string): Chainable<void>;
 
+    /**
+     * Generates all the users that are needed for the tests.
+     */
+    dbGenerateUsers(): Chainable<void>;
+
+    /**
+     * Deletes all the created users after test run.
+     */
+    dbDeleteGeneratedUsers(): Chainable<void>;
+
     // Should Commands
 
     /**

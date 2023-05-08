@@ -76,9 +76,9 @@ function nextVersion(type: VersionType): string {
 
   switch (type) {
     case "major":
-      return `${majorVersion + 1}.${minorVersion}.${revision}`;
+      return `${majorVersion + 1}.0.0`;
     case "minor":
-      return `${majorVersion}.${minorVersion + 1}.${revision}`;
+      return `${majorVersion}.${minorVersion + 1}.0`;
     case "revision":
       return `${majorVersion}.${minorVersion}.${revision + 1}`;
   }

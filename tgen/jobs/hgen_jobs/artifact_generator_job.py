@@ -33,7 +33,7 @@ class ArtifactGeneratorJob(HGenJob):
         :param llm_manager: Model Manager in charge of generating artifacts
         :pram job_args: The arguments need for the job
         """
-        self.artifacts = self.summarize_artifacts(artifacts, summarizer, job_args)
+        self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
         self.artifacts_by_cluster = artifact_ids_by_cluster
         dataset_creator = ClusterDatasetCreator(trace_dataset=self._create_trace_dataset_from_artifacts(self.artifacts),
                                                 manual_clusters={i: artifacts_in_cluster
@@ -68,7 +68,7 @@ class ArtifactGeneratorJob(HGenJob):
         return trace_dataset
 
     @staticmethod
-    def summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:
+    def _summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:
         """
         Runs summarize job on artifacts
         :param artifacts: The artifacts to summarize

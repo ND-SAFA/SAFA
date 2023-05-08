@@ -7,7 +7,8 @@ from api.utils.model_util import ModelUtil
 from api.utils.view_util import ViewUtil
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.hgen_jobs.artifact_generator_job import ArtifactGeneratorJob
+from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.util.json_util import NpEncoder
 
 
@@ -30,5 +31,6 @@ class SummaryView(APIView):
         model, llm_manager = ModelUtil.get_model_manager(llm_name)
 
         summarizer = Summarizer(llm_manager)
-        result = ArtifactGeneratorJob.summarize_artifacts(artifacts, job_args=job_args, summarizer=summarizer)
-        return JsonResponse({"result": result}, encoder=NpEncoder)
+        summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args, summarizer=summarizer)
+        summarized_artifacts = summarize_job.run()[JobResult.ARTIFACTS]
+        return JsonResponse({"artifacts": summarized_artifacts}, encoder=NpEncoder)

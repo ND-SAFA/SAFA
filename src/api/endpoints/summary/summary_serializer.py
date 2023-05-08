@@ -8,6 +8,9 @@ from tgen.data.chunkers.supported_chunker import SupportedChunker
 
 
 class SummaryArtifactSerializer(serializers.Serializer):
+    """
+    Serializes a summary artifact request.
+    """
     content = serializers.CharField(max_length=2056)
     type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker])
 

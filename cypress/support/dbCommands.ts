@@ -133,22 +133,22 @@ Cypress.Commands.add("dbDeleteUser", (email, password) => {
 });
 
 Cypress.Commands.add("dbGenerateUsers", () => {
-  const { validUser, editUser, deleteUser } = Cypress.env();
+  const { validUser, editUser, deleteUser, inviteUser } = Cypress.env();
 
-  for (const user of [validUser, editUser, deleteUser]) {
+  for (const user of [validUser, editUser, deleteUser, inviteUser]) {
     cy.request<{ token: string }>({
       failOnStatusCode: false,
       method: "POST",
       url: `${apiUrl}/accounts/create`,
-      body: user,
+      body: { email: user.email, password: user.password },
     });
   }
 });
 
 Cypress.Commands.add("dbDeleteGeneratedUsers", () => {
-  const { validUser, editUser, deleteUser } = Cypress.env();
+  const { validUser, editUser, deleteUser, inviteUser } = Cypress.env();
 
-  for (const user of [validUser, editUser, deleteUser]) {
+  for (const user of [validUser, editUser, deleteUser, inviteUser]) {
     cy.dbDeleteUser(user.email, user.password);
   }
 });

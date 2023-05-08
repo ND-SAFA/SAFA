@@ -33,6 +33,7 @@ export default defineConfig({
       inviteUser: {
         email: `test-invite-${Math.random()}@test.com`,
         invalidEmail: `test-invite-${Math.random()}@test.com`,
+        password: "123",
       },
     },
   },

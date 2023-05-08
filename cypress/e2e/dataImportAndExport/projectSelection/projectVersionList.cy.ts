@@ -25,7 +25,8 @@ describe("Project Version List", () => {
     it("Selects and loads a project and version", () => {
       cy.projectSelectorContinue("project").projectSelectorContinue("version");
 
-      cy.getCy(DataCy.appLoading).should("be.visible");
+      cy.getCy(DataCy.appLoading).should("not.exist");
+      cy.clickButton(DataCy.navTreeButton);
       cy.waitForProjectLoad(true);
     });
   });

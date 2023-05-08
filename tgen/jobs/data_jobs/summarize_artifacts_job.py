@@ -12,6 +12,9 @@ from tgen.jobs.components.job_result import JobResult
 
 
 class SummaryArtifact(TypedDict):
+    """
+    The artifact properties needed for summarization.
+    """
     content: str
     type: Literal["java", "py"]
 

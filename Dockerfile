@@ -1,5 +1,5 @@
 ## Step - Build Arguments
-FROM amazonlinux:2 as base
+FROM public.ecr.aws/amazonlinux/amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
 
 ## Step - Install python (TODO: Replace version with variable)

@@ -61,7 +61,7 @@ function handleReload() {
  * @return The last updated time.
  */
 function getRepositoryTime(repository: GitHubProjectSchema): string {
-  const updated = new Date(repository.createdAt);
+  const updated = new Date(repository.creationDate);
 
   return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
 }

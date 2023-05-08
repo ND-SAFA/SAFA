@@ -57,7 +57,7 @@ export interface GitHubProjectSchema {
   /**
    * The project's url.
    */
-  htmlUrl?: string;
+  url?: string;
   /**
    * The project's size.
    */
@@ -65,7 +65,7 @@ export interface GitHubProjectSchema {
   /**
    * A timestamp for the project was created.
    */
-  createdAt: string;
+  creationDate: string;
   /**
    * The owner of this project.
    */
@@ -74,4 +74,8 @@ export interface GitHubProjectSchema {
    * The list of active branches in this repository.
    */
   branches: string[];
+  /**
+   * The default branch for this repository.
+   */
+  defaultBranch: string;
 }

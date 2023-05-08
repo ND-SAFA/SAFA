@@ -5,15 +5,11 @@ from rest_framework import serializers
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.data.chunkers.supported_chunker import SupportedChunker
-from tgen.jobs.data_jobs.summarize_artifacts_job import SummaryArtifact
 
 
 class SummaryArtifactSerializer(serializers.Serializer):
     content = serializers.CharField(max_length=2056)
     type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker])
-
-    def create(self, validated_data):
-        return SummaryArtifact(**validated_data)
 
 
 class SummarySerializer(AbstractSerializer):

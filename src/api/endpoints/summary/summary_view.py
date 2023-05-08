@@ -12,8 +12,17 @@ from tgen.util.json_util import NpEncoder
 
 
 class SummaryView(APIView):
+    """
+    Provides endpoint for summarizing artifacts.
+    """
+
     @csrf_exempt
     def post(self, request: HttpRequest):
+        """
+        Performs artifact summarization.
+        :param request: Request containing artifacts to summarize.
+        :return: The same artifacts with content as summary.
+        """
         request_data = ViewUtil.read_request(request, SummarySerializer)
         artifacts = request_data["artifacts"]
         llm_name = request_data.get("model", ModelUtil.get_default_model())

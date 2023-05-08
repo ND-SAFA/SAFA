@@ -34,11 +34,13 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
                              completion_suffix="###")
 
-    def __init__(self, llm_args: AnthropicArgs):
+    def __init__(self, llm_args: AnthropicArgs = None):
         """
         Initializes with args used for the requests to Anthropic's model
         :param llm_args: args used for the requests to Anthropic's model
         """
+        if llm_args is None:
+            llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
 

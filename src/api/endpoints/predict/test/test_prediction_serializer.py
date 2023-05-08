@@ -1,9 +1,9 @@
 from api.endpoints.predict.prediction_serializer import PredictionSerializer
-from api.tests.api_base_test import ApiBaseTest
+from api.tests.api_base_test import APIBaseTest
 from api.tests.test_data import TestData
 
 
-class TestPredictionSerializer(ApiBaseTest):
+class TestPredictionSerializer(APIBaseTest):
     """
     Tests that prediction payload can be serialized.
     """

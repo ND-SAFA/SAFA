@@ -21,6 +21,7 @@ from rest_framework import permissions
 
 from api.endpoints.generation.generation_view import GenerationView
 from api.endpoints.predict.prediction_view import PredictView
+from api.endpoints.summary.summary_view import SummaryView
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
@@ -46,5 +47,6 @@ urlpatterns = [
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
     path('predict/', PredictView.as_view()),
-    path('complete/', GenerationView.as_view())
+    path('complete/', GenerationView.as_view()),
+    path('summarize/', SummaryView.as_view())
 ]

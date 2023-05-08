@@ -7,7 +7,7 @@ from django.test import Client
 from dotenv import load_dotenv
 
 
-class ApiBaseTest(TestCase):
+class APIBaseTest(TestCase):
     """
     The common unit test for API layer.
     """

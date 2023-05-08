@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
 from api.endpoints.generation.generation_serializer import GenerationSerializer
+from api.utils.model_util import ModelUtil
 from api.utils.view_util import ViewUtil
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -29,21 +30,8 @@ class GenerationView(APIView):
         prediction_payload = ViewUtil.read_request(request, GenerationSerializer)
         llm_name = prediction_payload["model"].lower()
         prompt: str = prediction_payload["prompt"]
-
-        model_map = {
-            "gpt": {
-                "model": "text-davinci-003",
-                "util": OpenAIManager()
-            },
-            "anthropic": {
-                "model": "claude-v1.3",
-                "util": AnthropicManager()
-            }
-        }
-        assert llm_name in model_map, f"Model should be one of {list(model_map.keys())}"
-        model = model_map[llm_name]["model"]
-        llm_util = model_map[llm_name]["util"]
-        completion = self.perform_completion(model, prompt, llm_util)
+        model, llm_manager = ModelUtil.get_model_manager(llm_name)
+        completion = self.perform_completion(model, prompt, llm_manager)
         return JsonResponse({"completion": completion}, encoder=NpEncoder)
 
     @staticmethod

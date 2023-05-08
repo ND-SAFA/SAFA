@@ -117,7 +117,12 @@ Cypress.Commands.add("dbResetVersions", () => {
 });
 
 Cypress.Commands.add("dbDeleteUser", (email, password) => {
-  cy.request("POST", `${apiUrl}/login`, { email, password }).then(() => {
+  cy.request({
+    method: "POST",
+    url: `${apiUrl}/login`,
+    failOnStatusCode: false,
+    body: { email, password },
+  }).then(() => {
     cy.request({
       method: "POST",
       url: `${apiUrl}/accounts/delete`,
@@ -128,9 +133,9 @@ Cypress.Commands.add("dbDeleteUser", (email, password) => {
 });
 
 Cypress.Commands.add("dbGenerateUsers", () => {
-  const { validUser, editUser } = Cypress.env();
+  const { validUser, editUser, deleteUser } = Cypress.env();
 
-  for (const user of [validUser, editUser]) {
+  for (const user of [validUser, editUser, deleteUser]) {
     cy.request<{ token: string }>({
       failOnStatusCode: false,
       method: "POST",
@@ -141,9 +146,9 @@ Cypress.Commands.add("dbGenerateUsers", () => {
 });
 
 Cypress.Commands.add("dbDeleteGeneratedUsers", () => {
-  const { validUser, editUser } = Cypress.env();
+  const { validUser, editUser, deleteUser } = Cypress.env();
 
-  for (const user of [validUser, editUser]) {
+  for (const user of [validUser, editUser, deleteUser]) {
     cy.dbDeleteUser(user.email, user.password);
   }
 });

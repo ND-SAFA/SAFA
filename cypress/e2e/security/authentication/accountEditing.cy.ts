@@ -66,7 +66,7 @@ describe("Account Editing", () => {
     it("Successfully deletes my account", () => {
       cy.createNewAccount(deleteUser.email, deleteUser.password);
 
-      cy.loginToPage(deleteUser.email, deleteUser.password, Routes.ACCOUNT);
+      cy.visit(Routes.ACCOUNT);
 
       cy.inputText(DataCy.accountDeletePasswordInput, deleteUser.password)
         .clickButton(DataCy.accountDeleteButton)

@@ -23,11 +23,13 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
     prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
 
-    def __init__(self, llm_args: OpenAIArgs):
+    def __init__(self, llm_args: OpenAIArgs = None):
         """
         Initializes with args used for the requests to Anthropic model
         :param llm_args: args used for the requests to Anthropic model
         """
+        if llm_args is None:
+            llm_args = OpenAIArgs()
         assert isinstance(llm_args, OpenAIArgs), "Must use OpenAI args with OpenAI manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
 
@@ -39,7 +41,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         """
         return openai.FineTune.create(**kwargs)
 
-    def retrieve_fine_tune_request(self,  **params) -> OpenAIObject:
+    def retrieve_fine_tune_request(self, **params) -> OpenAIObject:
         """
         Retrieves s a request to fine-tune a model
         :return: The response from open  ai

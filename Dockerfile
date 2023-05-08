@@ -1,9 +1,6 @@
 ## Step - Build Arguments
-FROM amazonlinux:2 as base
+FROM public.ecr.aws/amazonlinux/amazonlinux:2 as base
 SHELL ["/bin/bash", "-c"]
-
-## Makes sure that submodule has been copied (temp fix)
-COPY tgen/requirements.txt /app/tgen/
 
 ## Step - Install python (TODO: Replace version with variable)
 RUN yum update -y && yum groupinstall -y "Development tools" &&  \
@@ -15,7 +12,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.p
 
 
 ## Step - Install TGEN requirements
-
+COPY tgen/requirements.txt /app/tgen/
 ADD tgen/requirements/ /app/tgen/requirements/
 RUN pip3 install -r /app/tgen/requirements.txt
 

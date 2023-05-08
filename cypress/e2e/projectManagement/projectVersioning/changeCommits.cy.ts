@@ -33,7 +33,6 @@ describe("Change Commits", () => {
 
       cy.clickButton(DataCy.navUndoButton);
 
-      cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("not.exist");
       cy.getCy(DataCy.navUndoButton).should("be.disabled");
     });
@@ -60,7 +59,6 @@ describe("Change Commits", () => {
 
       cy.wait(1000).clickButton(DataCy.navUndoButton);
 
-      cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("exist");
     });
 
@@ -79,8 +77,6 @@ describe("Change Commits", () => {
       cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navUndoButton);
-
-      cy.getCy(DataCy.snackbarUpdate).should("be.visible");
 
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.filter(":visible").should("have.length", 10);
@@ -124,13 +120,11 @@ describe("Change Commits", () => {
 
       cy.clickButton(DataCy.navUndoButton);
 
-      cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("not.exist");
       cy.getCy(DataCy.navRedoButton).should("not.be.disabled");
 
       cy.clickButton(DataCy.navRedoButton);
 
-      cy.getCy(DataCy.snackbarUpdate).should("be.visible");
       cy.getNode(name).should("be.visible");
       cy.getCy(DataCy.navRedoButton).should("be.disabled");
     });

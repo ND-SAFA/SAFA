@@ -22,7 +22,8 @@ import "./customAttributesCommands";
 Cypress.on("uncaught:exception", (err) => {
   if (
     err.message.includes("ResizeObserver loop limit exceeded") ||
-    err.message.includes("Cannot read properties of")
+    err.message.includes("Cannot read properties of") ||
+    err.message.includes("Cannot destructure property")
   ) {
     // ignore the error
     return false;

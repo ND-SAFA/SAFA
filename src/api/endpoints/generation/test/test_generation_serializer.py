@@ -1,8 +1,8 @@
 from api.endpoints.generation.generation_serializer import GenerationSerializer
-from api.tests.api_base_test import ApiBaseTest
+from api.tests.api_base_test import APIBaseTest
 
 
-class TestGenerationSerializer(ApiBaseTest):
+class TestGenerationSerializer(APIBaseTest):
     def test_pos_serialization(self):
         model_name = "davinci"
         prompt = "hello, my name is "

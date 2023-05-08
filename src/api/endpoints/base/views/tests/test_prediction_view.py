@@ -1,8 +1,8 @@
-from api.tests.api_base_test import ApiBaseTest
+from api.tests.api_base_test import APIBaseTest
 from api.tests.test_data import TestData
 
 
-class TestPredictionView(ApiBaseTest):
+class TestPredictionView(APIBaseTest):
     """
     Tests trace link prediction endpoint.
     """

@@ -1,14 +1,14 @@
 from dotenv import load_dotenv
 
 from api.endpoints.base.serializers.dataset_serializer import DatasetSerializer
-from api.tests.api_base_test import ApiBaseTest
+from api.tests.api_base_test import APIBaseTest
 from api.tests.test_data import TestData
 from tgen.server.api.api_definition import ApiDefinition
 
 load_dotenv()
 
 
-class TestDatasetSerializer(ApiBaseTest):
+class TestDatasetSerializer(APIBaseTest):
     """
     Tests that datasets are able to be serialized.
     """

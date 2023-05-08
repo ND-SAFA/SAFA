@@ -7,7 +7,7 @@ from api.utils.view_util import ViewUtil
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.hgen_jobs.artifact_generator_job import ArtifactGeneratorJob
 
-DEFAULT_PROMPT = "Describe the intersection of the following software artifact summaries."
+DEFAULT_PROMPT = "Generalize the following descriptions into one system requirement.\n\n{}"
 
 
 class HGenView(APIView):

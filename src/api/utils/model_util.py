@@ -26,12 +26,13 @@ class ModelUtil:
         return "gpt"
 
     @staticmethod
-    def get_model_manager(llm_name) -> AbstractLLMManager:
+    def get_model_manager(llm_name: str) -> AbstractLLMManager:
         """
         Returns the model and corresponding LLM manager for given library name.
         :param llm_name: The id of the LLM library.
         :return: The current best model and its manager.
         """
+        llm_name = llm_name.lower()
         assert llm_name in ModelUtil.model_map, f"Model should be one of {list(ModelUtil.model_map.keys())}"
         model = ModelUtil.model_map[llm_name]["model"]
         llm_manager = ModelUtil.model_map[llm_name]["util"]

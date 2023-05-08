@@ -1,17 +1,22 @@
-from typing import Dict
+from typing import Dict, Literal, TypedDict
+
+import pandas as pd
 
 from tgen.constants.model_constants import get_default_llm_manager
-from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
-import pandas as pd
 
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.train.args.open_ai_args import OpenAIArgs
+
+class SummaryArtifact(TypedDict):
+    """
+    The artifact properties needed for summarization.
+    """
+    content: str
+    type: Literal["java", "py"]
 
 
 class SummarizeArtifactsJob(AbstractJob):

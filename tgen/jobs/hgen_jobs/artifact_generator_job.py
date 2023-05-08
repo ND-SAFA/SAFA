@@ -1,9 +1,9 @@
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.prompts.supported_prompts import SupportedPrompts

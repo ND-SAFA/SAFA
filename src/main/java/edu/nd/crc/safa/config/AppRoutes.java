@@ -263,6 +263,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Summarize {
+        public static final String SUMMARIZE_ARTIFACTS = "/summarize";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Layout {
         public static final String REGENERATE_LAYOUT = Versions.BY_ID + "/layout";
     }

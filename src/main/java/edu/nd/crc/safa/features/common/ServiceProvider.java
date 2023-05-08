@@ -48,6 +48,7 @@ import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.search.SearchService;
+import edu.nd.crc.safa.features.summary.SummaryService;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
@@ -171,6 +172,8 @@ public class ServiceProvider {
     private JobLoggingService jobLoggingService;
     // Search
     private SearchService searchService;
+    // Summarize
+    private SummaryService summaryService;
 
     @PostConstruct
     public void postInit() {

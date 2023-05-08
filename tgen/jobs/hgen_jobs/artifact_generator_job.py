@@ -1,6 +1,5 @@
 from typing import Dict, List, Union
 
-from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -78,5 +77,5 @@ class ArtifactGeneratorJob(HGenJob):
         """
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args,
                                               summarizer=summarizer if summarizer is not None else
-                                              Summarizer(get_default_llm_manager(), code_or_exceeds_limit_only=True))
+                                              Summarizer(code_or_exceeds_limit_only=True))
         return summarize_job.run()[JobResult.ARTIFACTS]

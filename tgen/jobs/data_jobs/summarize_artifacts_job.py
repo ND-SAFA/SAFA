@@ -1,8 +1,6 @@
 from typing import Dict, Literal, TypedDict
 
 import pandas as pd
-
-from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.summarizer.summarizer import Summarizer
@@ -29,12 +27,11 @@ class SummarizeArtifactsJob(AbstractJob):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
-        :param summarizer: The summarizer to use to create the summarizations
         :param job_args: The arguments to the job.
         """
         super().__init__(job_args)
         if summarizer is None:
-            summarizer = Summarizer(get_default_llm_manager(), code_or_exceeds_limit_only=False)
+            summarizer = Summarizer(code_or_exceeds_limit_only=False)
         self.artifacts = artifacts
         self.id2chunker = {id_: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for id_, artifact in artifacts.items()}
         self.artifact_df = pd.DataFrame.from_dict(self.artifacts, orient="index")

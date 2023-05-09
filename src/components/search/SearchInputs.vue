@@ -28,7 +28,7 @@
       style="min-width: 250px"
     />
     <flex-box full-width justify="end">
-      <text-button color="primary" label="Search" @click="handleSearch" />
+      <text-button color="primary" label="Search" @click="emit('submit')" />
     </flex-box>
   </flex-box>
 </template>
@@ -51,12 +51,7 @@ import {
   TextButton,
 } from "@/components/common";
 
-/**
- * Runs a search operation.
- */
-function handleSearch(): void {
-  const searchQuery = searchStore.searchQuery;
-
-  console.log("searchQuery", searchQuery);
-}
+const emit = defineEmits<{
+  (e: "submit"): void;
+}>();
 </script>

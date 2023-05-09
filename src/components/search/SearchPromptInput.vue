@@ -32,7 +32,7 @@
       <search-option v-bind="itemProps" :option="opt" />
     </template>
     <template v-if="!searchStore.basicSearchMode" #no-option>
-      <search-inputs />
+      <search-inputs @submit="handleProjectSearch" />
     </template>
   </q-select>
 </template>
@@ -56,6 +56,7 @@ import {
   selectionStore,
   typeOptionsStore,
 } from "@/hooks";
+import { handleProjectSearch } from "@/api";
 import { Typography, Icon, FlexBox } from "@/components/common";
 import SearchOption from "./SearchOption.vue";
 import SearchInputs from "./SearchInputs.vue";

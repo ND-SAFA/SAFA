@@ -7,6 +7,7 @@ from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.models.llm.token_limits import TokenLimitCalculator
+from tgen.util.file_util import FileUtil
 
 
 class AbstractCodeChunker(AbstractChunker, ABC):
@@ -18,13 +19,13 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         :param id_: The id associated with the content to summarize
         :return: The nodes chunked into sizes beneath the token limit
         """
-        lines = [self._preprocess_line(line) for line in content.split(os.linesep)]
+        lines = [self._preprocess_line(line) for line in content.splitlines(keepends=True)]
         try:
             head_node = self._parse(content)
         except Exception as e:
             msg_end = id_ if id_ else f"starting with {lines[0]}"
             logger.warning(f"Unable to parse file {msg_end}")
-            return NaturalLanguageChunker(model_name=self.model_name).chunk(content)
+            return NaturalLanguageChunker(model_name=self.model_name, token_limit=self.token_limit).chunk(content)
         chunks = self.__chunk_helper(head_node, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks]
 

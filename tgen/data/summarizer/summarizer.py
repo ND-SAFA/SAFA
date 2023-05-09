@@ -65,7 +65,7 @@ class Summarizer(BaseObject):
             return content  # skip summarizing content below token limit unless code
         prompt_creator = self.code_prompt_creator if chunker_type else self.nl_prompt_creator
         summarizations = self._summarize_chunks(self.llm_manager, prompt_creator, chunks)
-        return os.linesep.join(summarizations)
+        return "".join(summarizations)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
                             index_to_chunker_to_use: Dict[str, SupportedChunker] = None):

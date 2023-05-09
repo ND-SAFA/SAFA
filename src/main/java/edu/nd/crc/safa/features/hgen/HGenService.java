@@ -2,8 +2,10 @@ package edu.nd.crc.safa.features.hgen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -45,20 +47,14 @@ public class HGenService {
     private Map<String, TGenSummaryArtifact> createArtifacts(ProjectVersion projectVersion, List<UUID> artifactIds) {
         List<ArtifactAppEntity> artifacts = artifactService.getAppEntities(projectVersion);
         Map<String, TGenSummaryArtifact> artifactMap = new HashMap<>();
+        Set<UUID> artifactIdSet = new HashSet<>(artifactIds);
+
         artifacts.stream()
-            .filter(a -> artifactIds.contains(a.getId()))
+            .filter(a -> artifactIdSet.contains(a.getId()))
             .forEach(a -> {
-                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getBody(), getArtifactSummaryType(a)));
+                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getBody(),
+                    TGenSummaryArtifactType.getArtifactType(a.getName())));
             });
         return artifactMap;
-    }
-
-    private TGenSummaryArtifactType getArtifactSummaryType(ArtifactAppEntity artifact) {
-        if (artifact.getName().contains(".py")) {
-            return TGenSummaryArtifactType.PY;
-        } else if (artifact.getName().contains(".java")) {
-            return TGenSummaryArtifactType.JAVA;
-        }
-        return TGenSummaryArtifactType.NL;
     }
 }

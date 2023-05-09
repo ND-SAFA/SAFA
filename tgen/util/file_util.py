@@ -37,8 +37,18 @@ class FileUtil:
         :param file_path: Path of the file to read.
         :return: The content of the file.
         """
-        with open(file_path, encoding='unicode_escape') as file:
+        with open(file_path) as file:
             return file.read()
+
+    @staticmethod
+    def read_file_lines(file_path: str) -> List[str]:
+        """
+        Reads file at given path if exists.
+        :param file_path: Path of the file to read.
+        :return: The content of the file.
+        """
+        with open(file_path) as file:
+            return file.readlines()
 
     @staticmethod
     def get_file_list(data_path: str, exclude: List[str] = None, exclude_ext: List[str] = None) -> List[str]:

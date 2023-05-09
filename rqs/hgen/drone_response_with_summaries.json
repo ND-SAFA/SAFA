@@ -1,0 +1,36 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HGen",
+          "hgen_args": {
+            "source_layer_id": "Code",
+            "tgen_trainer": {
+              "object_type": "LLM",
+              "trainer_dataset_manager": {
+                "eval_dataset_creator": {
+                  "object_type": "PROMPT",
+                  "project_reader": {
+                    "object_type": "Artifact",
+                    "project_path": "[DATA_PATH]/dr_onboard_autonomy_summarizations/main_code_summarizations.csv"
+                  }
+                }
+              },
+              "prompt_creator": {
+                "object_type": "CLASSIFICATION"
+              },
+              "llm_manager": {
+                "object_type": "OPENAI"
+              }
+            }
+          },
+          "llm_manager": {
+            "object_type": "OPENAI"
+          },
+          "export_path": "[OUTPUT_PATH]/hgen/dr_onboard_autonomy"
+        }
+      ]
+    }
+  ]
+}

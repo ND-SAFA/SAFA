@@ -10,7 +10,7 @@
     :options="projects"
     option-value="projectId"
     option-label="name"
-    class="nav-input"
+    class="nav-input q-ml-sm"
     color="accent"
   >
     <template #after-options>

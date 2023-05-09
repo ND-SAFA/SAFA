@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.features.search;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -14,7 +17,6 @@ import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.method.TGen;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,18 +31,18 @@ public class SearchService {
     private static final double THRESHOLD = 0.5;
     ProjectRetrievalService projectRetrievalService;
 
+
     /**
      * Searches for artifacts in search types that match the given prompt.
      *
-     * @param projectVersion The project version of artifacts to use.
-     * @param prompt         The prompt to match artifacts against.
-     * @param searchTypes    The types of artifacts to match against.
-     * @param tracingPrompt  The prompt used to determine if artifacts are related to prompt.
+     * @param projectAppEntity The project containing artifacts to search.
+     * @param prompt           The prompt to match artifacts against.
+     * @param searchTypes      The types of artifacts to match against.
+     * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
      * @return Ids of matched artifacts.
      */
-    public SearchResponse performPromptSearch(ProjectVersion projectVersion, String prompt, List<String> searchTypes,
+    public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt, List<String> searchTypes,
                                               String tracingPrompt) {
-        ProjectAppEntity projectAppEntity = projectRetrievalService.getProjectAppEntity(projectVersion);
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
@@ -50,23 +52,49 @@ public class SearchService {
     /**
      * Searches for artifacts in search types using the artifacts as queries.
      *
-     * @param projectVersion The project version of artifacts to search within.
-     * @param artifactIds    The ids of the artifacts to use as queries.
-     * @param searchTypes    The types of artifacts to match against.
-     * @param tracingPrompt  The prompt used to determine if two artifacts are linked.
+     * @param projectAppEntity The project containing artifacts to search.
+     * @param artifactIds      The ids of the artifacts to use as queries.
+     * @param searchTypes      The types of artifacts to match against.
+     * @param tracingPrompt    The prompt used to determine if two artifacts are linked.
      * @return List of matched artifacts.
      */
-    public SearchResponse performArtifactSearch(ProjectVersion projectVersion,
+    public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
                                                 List<UUID> artifactIds,
                                                 List<String> searchTypes,
                                                 String tracingPrompt) {
-        ProjectAppEntity projectAppEntity = projectRetrievalService.getProjectAppEntity(projectVersion);
         Map<UUID, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(
             convertArtifactMapToLayer(sourceLayer),
             convertArtifactMapToLayer(targetLayer), tracingPrompt);
+    }
+
+    /**
+     * Performs a search between source and target artifacts using TGEN tracing.
+     *
+     * @param sourceLayer   Source artifacts mapping id to body.
+     * @param targetLayer   Target artifacts mapping id to body.
+     * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
+     * @return Target Artifact IDs that matched source artifacts.
+     */
+    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,
+                                            String tracingPrompt) {
+
+        TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
+        BaseGenerationModels model = BaseGenerationModels.GPT;
+        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
+        TGen controller = model.createTGenController();
+        TGenPredictionOutput response = controller.performPrediction(payload);
+        List<UUID> matchedArtifactIds = response.getPredictions().stream()
+            .filter(t -> t.getScore() >= THRESHOLD)
+            .map(TGenPredictionOutput.PredictedLink::getTarget)
+            .filter(t -> !sourceLayer.containsKey(t))
+            .map(UUID::fromString)
+            .collect(Collectors.toList());
+        List<String> matchedArtifactBodies =
+            matchedArtifactIds.stream().map(UUID::toString).map(targetLayer::get).collect(Collectors.toList());
+        return new SearchResponse(matchedArtifactIds, matchedArtifactBodies);
     }
 
     /**
@@ -101,32 +129,46 @@ public class SearchService {
         return targetLayer;
     }
 
-    /**
-     * Performs a search between source and target artifacts using TGEN tracing.
-     *
-     * @param sourceLayer   Source artifacts mapping id to body.
-     * @param targetLayer   Target artifacts mapping id to body.
-     * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
-     * @return Target Artifact IDs that matched source artifacts.
-     */
-    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,
-                                            String tracingPrompt) {
 
-        TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
-        BaseGenerationModels model = BaseGenerationModels.GPT;
-        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
-        System.out.println("PAYLOAD:" + payload);
-        TGen controller = model.createTGenController();
-        TGenPredictionOutput response = controller.performPrediction(payload);
-        List<UUID> matchedArtifactIds = response.getPredictions().stream()
-            .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenPredictionOutput.PredictedLink::getTarget)
-            .filter(t -> !sourceLayer.containsKey(t))
-            .map(UUID::fromString)
-            .collect(Collectors.toList());
-        List<String> matchedArtifactBodies =
-            matchedArtifactIds.stream().map(UUID::toString).map(targetLayer::get).collect(Collectors.toList());
-        return new SearchResponse(matchedArtifactIds, matchedArtifactBodies);
+    /**
+     * Adds related types to search response.
+     *
+     * @param projectAppEntity The project to extract links between artifacts from.
+     * @param response         The response of the search query.
+     * @param relatedTypes     The related artifacts.
+     * @return SearchResponse with added related types.
+     */
+    public SearchResponse addRelatedTypes(ProjectAppEntity projectAppEntity, SearchResponse response,
+                                          List<String> relatedTypes) {
+        Set<UUID> selectedArtifactSet = new HashSet<>(response.getArtifactIds());
+        Set<String> relatedTypesSet = new HashSet<>(relatedTypes);
+        List<UUID> relatedArtifacts = calculateRelatedTypes(projectAppEntity, selectedArtifactSet, relatedTypesSet);
+        response.getArtifactIds().addAll(relatedArtifacts);
+        //TODO : Missing related types body, but removing in future
+        return response;
+    }
+
+    private List<UUID> calculateRelatedTypes(ProjectAppEntity projectAppEntity, Set<UUID> selectedArtifactIds,
+                                             Set<String> relatedTypes) {
+        Map<UUID, ArtifactAppEntity> artifactMap = projectAppEntity.getArtifactIdMap();
+        List<UUID> relatedArtifacts = new ArrayList<>();
+        projectAppEntity
+            .getTraces()
+            .forEach(t -> {
+                if (selectedArtifactIds.contains(t.getSourceId())) {
+                    ArtifactAppEntity targetArtifact = artifactMap.get(t.getTargetId());
+                    if (relatedTypes.contains(targetArtifact.getType())) {
+                        relatedArtifacts.add(targetArtifact.getId());
+                    }
+                }
+                if (selectedArtifactIds.contains(t.getTargetId())) {
+                    ArtifactAppEntity sourceArtifact = artifactMap.get(t.getSourceId());
+                    if (relatedTypes.contains(sourceArtifact.getType())) {
+                        relatedArtifacts.add(sourceArtifact.getId());
+                    }
+                }
+            });
+        return relatedArtifacts;
     }
 
     private Map<String, String> convertArtifactMapToLayer(Map<UUID, String> artifactMap) {
@@ -134,3 +176,5 @@ public class SearchService {
             .collect(Collectors.toMap(entry -> entry.getKey().toString(), Map.Entry::getValue));
     }
 }
+
+

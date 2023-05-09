@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.search;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -46,7 +47,7 @@ public class SearchRequest {
      * if they have existing links to the artifacts retrieved with the search artifacts + `searchTypes` artifacts.
      */
     @Nullable
-    List<String> relatedTypes;
+    List<String> relatedTypes = new ArrayList<>();
     /**
      * The model to predict links with. Defaults to current best model.
      */

@@ -8,6 +8,25 @@
   }
 }
 
+// Navigation - Searchbar
+.nav-search-mode {
+  & > .q-field__inner > .q-field__control {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+
+    &:before {
+      border-right: none;
+    }
+  }
+}
+
+.nav-search-prompt {
+  & > .q-field__inner > .q-field__control {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+}
+
 // Navigation - Inputs
 
 .nav-input {

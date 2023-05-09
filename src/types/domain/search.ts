@@ -1,11 +1,34 @@
 /**
+ * The search modes that are supported.
+ */
+export enum SearchMode {
+  /**
+   * Search by tracing a prompt string to some type of artifacts.
+   */
+  prompt = "prompt",
+  /**
+   * Search by tracing artifacts to some type of artifacts.
+   */
+  artifacts = "artifacts",
+  /**
+   * Search by tracing artifact types to other types of artifacts.
+   */
+  artifactTypes = "artifactTypes",
+  /**
+   * Font-end only.
+   * Search within the current view for artifacts.
+   */
+  search = "search",
+}
+
+/**
  * Represents a request to search for matching artifacts within a project.
  */
-export interface ProjectSearchQuerySchema {
+export interface SearchQuerySchema {
   /**
    * The type of information to predict traces to.
    */
-  mode: "prompt" | "artifacts" | "artifactTypes";
+  mode: SearchMode;
   /**
    * Used in "prompt" mode.
    * This string of text will be treated as an artifact to predict links from.
@@ -41,4 +64,11 @@ export interface ProjectSearchQuerySchema {
    * if they have existing links to the artifacts retrieved with the search artifacts + `searchTypes` artifacts.
    */
   relatedTypes?: string[];
+}
+
+/**
+ * Represents the artifacts that match a search request.
+ */
+export interface SearchResultsSchema {
+  artifactIds: string[];
 }

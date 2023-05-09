@@ -1,4 +1,3 @@
-from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.jobs.abstract_job import AbstractJob

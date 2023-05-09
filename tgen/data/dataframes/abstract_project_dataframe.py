@@ -189,7 +189,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         is_duplicated = self.index.duplicated(keep='first')
         duplicated_indices = set(self.index[is_duplicated])
-        logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
+        if len(duplicated_indices) > 0:
+            logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
         return self[~is_duplicated]
 
     def __setitem__(self, key: Any, value: Any) -> None:

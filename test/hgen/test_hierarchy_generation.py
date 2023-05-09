@@ -133,7 +133,7 @@ class TestHierarchyGeneration(BaseTest):
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
         hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()),
                                             layer_id=layer_id)
-        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df)
+        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, export_path=TEST_OUTPUT_DIR)
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
             self.assertLess(label - 0.4012, 0.1)

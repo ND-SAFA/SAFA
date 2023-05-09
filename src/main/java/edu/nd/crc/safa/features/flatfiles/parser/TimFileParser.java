@@ -96,7 +96,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             // Step - If generation is set, create generation request.\
             if (trace.generateLinks()) {
                 String generationMethod = trace.getGenerationMethod();
-                BaseGenerationModels baseGenerationModels = BaseGenerationModels.valueOf(generationMethod);
+                BaseGenerationModels baseGenerationModels = BaseGenerationModels.getModel(generationMethod);
                 traceGenerationRequest.addTracingRequest(baseGenerationModels, null, source, target);
             }
 

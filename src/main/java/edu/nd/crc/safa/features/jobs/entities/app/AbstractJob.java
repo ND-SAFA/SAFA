@@ -99,6 +99,7 @@ public abstract class AbstractJob implements Job {
                 executeJobStep(stepImplementation, nSteps);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             success = false;
             notifyJobFailed(e);
         } finally {
@@ -361,7 +362,7 @@ public abstract class AbstractJob implements Job {
     @ForOverride
     protected void jobFailed(Exception error) throws Exception {
     }
-    
+
     @Override
     @NonNull
     public String getName() {

@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from tgen.constants.open_ai_constants import CLASSIFICATION_MODEL_DEFAULT, COMPUTE_CLASSIFICATION_METRICS_DEFAULT, \
-    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
-from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, GENERATION_MODEL_DEFAULT, \
+    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.dataclass_util import DataclassUtil
@@ -75,3 +74,9 @@ class OpenAIArgs(AbstractLLMArgs):
         :return: None
         """
         self.max_tokens = max_tokens
+
+    def get_max_tokens(self) -> int:
+        """
+        :return: Returns the current max tokens.
+        """
+        return self.max_tokens

@@ -1,5 +1,6 @@
 from typing import Dict
 
+from tgen.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -24,6 +25,7 @@ class AnthropicArgs(AbstractLLMArgs):
     """
     Defines allowable arguments to anthropic API.
     """
+
     max_tokens_to_sample: int = MAX_TOKENS_DEFAULT
     _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [],
                              TrainerTask.PREDICT: [AnthropicParams.MODEL, AnthropicParams.TEMPERATURE,
@@ -36,7 +38,7 @@ class AnthropicArgs(AbstractLLMArgs):
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
         if "model" not in super_args:
-            super_args["model"] = AnthropicArgs
+            super_args["model"] = ANTHROPIC_MODEL_DEFAULT
         super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
 
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:
@@ -56,3 +58,9 @@ class AnthropicArgs(AbstractLLMArgs):
         :return: None
         """
         self.max_tokens_to_sample = max_tokens
+
+    def get_max_tokens(self) -> int:
+        """
+        :return: Returns the max tokens of args.
+        """
+        return self.max_tokens_to_sample

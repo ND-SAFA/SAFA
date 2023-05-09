@@ -144,10 +144,10 @@ class TestHierarchyGeneration(BaseTest):
 
     def test_save_dataset_checkpoint(self):
         dataset = PromptDatasetCreator(project_reader=PromptTestProject.get_project_reader()).create()
-        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR)
         self.assertTrue(os.path.exists(export_path))
 
-        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, False)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, None)
         self.assertFalse(export_path)
 
     def test_create_trace_dataset_for_single_layer(self):

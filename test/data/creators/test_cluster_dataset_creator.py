@@ -52,9 +52,8 @@ class TestClusterDatasetCreator(BaseTest):
         for artifact_id, cluster_num in self.ARTIFACT2CLUSTERS.items():
             self.assertIn(int(cluster_num), list(cluster_artifact_df.index))
             cluster = cluster_artifact_df.get_artifact(cluster_num)
-            cluster_content = cluster[ArtifactKeys.CONTENT].split(NEW_LINE)
             orig_artifact_content = orig_artifact_df.get_artifact(artifact_id)[ArtifactKeys.CONTENT]
-            self.assertIn(orig_artifact_content, cluster_content)
+            self.assertIn(orig_artifact_content, cluster[ArtifactKeys.CONTENT])
             if includes_orig_artifact:
                 self.assertIn(artifact_id, list(cluster_artifact_df.index))
 

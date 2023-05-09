@@ -43,6 +43,16 @@ public enum BaseGenerationModels {
         this.statePath = statePath;
     }
 
+    /**
+     * Returns the base model associated with name.
+     *
+     * @param name The name of the model.
+     * @return The base generation model with name.
+     */
+    public static BaseGenerationModels getModel(String name) {
+        return name == null ? getDefault() : BaseGenerationModels.valueOf(name);
+    }
+
     public static BaseGenerationModels getDefault() {
         return BaseGenerationModels.GPT;
     }

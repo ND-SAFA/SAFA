@@ -31,7 +31,7 @@ class HGenArgs(BaseObject):
     """
     The base prompt to use for generation.
     """
-    hgen_base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION
+    hgen_base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.USER_STORY_CREATION
     """
     The method to use to cluster source artifacts. Hierarchy will be built from these clusters
     """

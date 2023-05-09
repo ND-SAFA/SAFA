@@ -214,7 +214,7 @@ class HierarchyGenerator(BaseObject):
         return TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df)
 
     @staticmethod
-    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str, filename: str = None) -> str:
+    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None, filename: str = None) -> str:
         """
         Exports the dataset to csv
         :param dataset: The dataset to export

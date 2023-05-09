@@ -19,7 +19,6 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.logging.logger_manager import logger
 
 
@@ -40,7 +39,7 @@ class LLMTrainer(AbstractTrainer):
         if summarizer is None:
             summarizer = Summarizer(llm_manager, model_for_token_limit=llm_manager.llm_args.model,
                                     code_or_exceeds_limit_only=False,
-                                    max_tokens_for_token_limit=llm_manager.llm_args.max_tokens)
+                                    max_tokens_for_token_limit=llm_manager.llm_args.get_max_tokens())
         super().__init__(trainer_dataset_manager, trainer_args=llm_manager.llm_args)
         self.llm_manager = llm_manager
         self.summarizer = summarizer

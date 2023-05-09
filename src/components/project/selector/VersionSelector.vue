@@ -2,7 +2,6 @@
   <q-select
     v-if="isProjectDefined"
     v-model="version"
-    dense
     outlined
     dark
     :options-dark="darkMode"

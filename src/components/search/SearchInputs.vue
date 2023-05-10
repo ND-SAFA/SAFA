@@ -1,5 +1,5 @@
 <template>
-  <flex-box column y="2" x="2">
+  <flex-box column y="2" x="2" style="max-width: 40vw">
     <flex-box full-width>
       <artifact-type-input
         v-model="searchStore.searchTypes"

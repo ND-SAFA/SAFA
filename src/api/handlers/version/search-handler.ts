@@ -15,17 +15,20 @@ import { getProjectSearchQuery } from "@/api";
  */
 export async function handleProjectSearch(): Promise<void> {
   try {
+    const searchQuery = searchStore.searchQuery;
+
     appStore.onLoadStart();
+
     layoutStore.mode = GraphMode.tree;
 
     const searchResults = await getProjectSearchQuery(
       projectStore.versionId,
-      searchStore.searchQuery
+      searchQuery
     );
 
     const document = createDocument({
       project: projectStore.projectIdentifier,
-      name: "Search Query",
+      name: searchQuery.prompt || "Search Query",
       artifactIds: searchResults.artifactIds,
     });
 

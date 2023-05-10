@@ -11,7 +11,14 @@
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre v-if="isExpanded" :class="className">{{ value }}</pre>
+    <pre
+      v-if="isExpanded"
+      v-highlightjs
+      :class="className"
+      style="overflow-x: scroll"
+    >
+      <code>{{value}}</code>
+    </pre>
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>

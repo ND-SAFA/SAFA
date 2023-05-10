@@ -98,12 +98,14 @@ const width = computed(() => {
   if (openState.value === "displayTrace") {
     return 500;
   } else if (
-    openState.value === "displayArtifactBody" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"
   ) {
     return 600;
-  } else if (openState.value === "generateTrace") {
+  } else if (
+    openState.value === "displayArtifactBody" ||
+    openState.value === "generateTrace"
+  ) {
     return 800;
   } else {
     return 400;

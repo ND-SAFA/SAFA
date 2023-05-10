@@ -23,7 +23,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
     Responsible for clustering dataset artifacts
     """
 
-    CLUSTER_CONTENT_FORMAT = "({}) {}"
+    CLUSTER_CONTENT_FORMAT = "{}"
 
     def __init__(self, trace_dataset: TraceDataset,
                  cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
@@ -124,7 +124,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
                 artifact_content = []
                 for i, artifact_id in enumerate(artifacts):
                     artifact = orig_dataset.artifact_df.get_artifact(artifact_id)
-                    artifact_content.append(ClusterDatasetCreator.CLUSTER_CONTENT_FORMAT.format(i + 1, artifact[ArtifactKeys.CONTENT]))
+                    artifact_content.append(ClusterDatasetCreator.CLUSTER_CONTENT_FORMAT.format(artifact[ArtifactKeys.CONTENT]))
                     traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
                                                                     TraceKeys.LABEL: 1}))  # add link between artifact and cluster
                     source_layers.add(artifact[ArtifactKeys.LAYER_ID])

@@ -201,7 +201,8 @@ export enum DataCy {
 
   // Artifact Search
 
-  artifactSearchNavInput = "input-artifact-search-nav",
+  artifactSearchModeInput = "input-nav-search-mode",
+  artifactSearchNavInput = "input-nav-artifact-search",
   artifactSearchCount = "text-artifact-search-count",
   artifactSearchItem = "text-artifact-search-item",
 

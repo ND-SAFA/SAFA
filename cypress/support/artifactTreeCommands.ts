@@ -28,7 +28,14 @@ Cypress.Commands.add("centerGraph", () => {
   cy.clickButton(DataCy.navGraphCenterButton).wait(200);
 });
 
+Cypress.Commands.add("enableBasicSearch", () => {
+  cy.clickButton(DataCy.artifactSearchModeInput).clickMenuOption(
+    "currently displayed"
+  );
+});
+
 Cypress.Commands.add("selectArtifact", (name) => {
+  cy.enableBasicSearch();
   cy.inputText(DataCy.artifactSearchNavInput, name).clickButton(
     DataCy.artifactSearchItem,
     "first"

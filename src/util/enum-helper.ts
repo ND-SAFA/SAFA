@@ -9,6 +9,8 @@ import {
   ModelType,
   ProjectRole,
   SafetyCaseType,
+  SearchMode,
+  SearchSelectOption,
   SelectOption,
   SettingsTabTypes,
   TracePredictionTabTypes,
@@ -254,5 +256,41 @@ export function attributeTypeOptions(): SelectOption[] {
     createEnumOption(AttributeType.int, "Integer"),
     createEnumOption(AttributeType.float, "Number"),
     createEnumOption(AttributeType.boolean, "Yes/No"),
+  ];
+}
+
+/**
+ * Returns display names for search modes.
+ *
+ * @return The select option names, descriptions, and ids.
+ */
+export function searchModeOptions(): SearchSelectOption[] {
+  return [
+    {
+      id: SearchMode.prompt,
+      name: "Prompt",
+      description: "Find artifacts that match a search prompt.",
+      placeholder: "Enter a prompt...",
+    },
+    {
+      id: SearchMode.artifacts,
+      name: "Artifact",
+      description: "Find artifacts related to a specific artifact.",
+      placeholder: "Search artifacts...",
+      artifactSearch: true,
+    },
+    {
+      id: SearchMode.artifactTypes,
+      name: "Artifact Type",
+      description: "Find artifacts related to a specific artifact type.",
+      placeholder: "Search artifact types...",
+    },
+    {
+      id: SearchMode.search,
+      name: "Search",
+      description: "Search through currently displayed artifacts.",
+      placeholder: "Search current artifacts...",
+      artifactSearch: true,
+    },
   ];
 }

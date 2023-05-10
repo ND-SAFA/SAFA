@@ -8,7 +8,7 @@
     :data-cy="props.dataCy"
     @remove="emit('remove')"
   >
-    <q-tooltip :hidden="text.length < 10">
+    <q-tooltip :hidden="text.length < 15">
       {{ text }}
     </q-tooltip>
     <icon
@@ -21,6 +21,7 @@
     <typography
       ellipsis
       inherit-color
+      :small="text.length >= 15"
       :l="iconVisible ? '1' : ''"
       :value="text"
     />

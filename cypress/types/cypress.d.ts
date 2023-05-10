@@ -462,6 +462,11 @@ declare namespace Cypress {
     centerGraph(): Chainable<void>;
 
     /**
+     * Enables basic search when in artifact view.
+     */
+    enableBasicSearch(): Chainable<void>;
+
+    /**
      * Selects an artifact on the graph.
      *
      * @param name - The artifact name to select.

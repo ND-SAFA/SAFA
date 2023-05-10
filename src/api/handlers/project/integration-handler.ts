@@ -128,7 +128,7 @@ export function handleAuthorizeJira({
       .then(async (valid) => {
         if (valid) return;
 
-        const refreshValid = await refreshJiraCredentials();
+        const refreshValid = await refreshJiraCredentials().catch(() => false);
 
         if (!refreshValid) {
           throw new Error("Invalid refresh");

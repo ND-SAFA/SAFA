@@ -4,7 +4,7 @@
 
 <script lang="ts">
 /**
- * Displays trace link edge between artifacts.
+ * Displays trace link edges between artifacts.
  */
 export default {
   name: "TraceLink",

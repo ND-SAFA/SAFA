@@ -1,3 +1,5 @@
+import { SearchMode } from "@/types";
+
 /**
  * The variants of text that can be displayed.
  */
@@ -73,4 +75,26 @@ export interface SelectOption {
    * The name of the option to display.
    */
   name: string;
+}
+
+/**
+ * Represents an option for searching modes.
+ */
+export interface SearchSelectOption extends SelectOption {
+  /**
+   * The iud of the option to use as a stored.
+   */
+  id: SearchMode;
+  /**
+   * Describes this search mode.
+   */
+  description: string;
+  /**
+   * The placeholder for the search input.
+   */
+  placeholder: string;
+  /**
+   * Whether this mode searches for artifacts.
+   */
+  artifactSearch?: boolean;
 }

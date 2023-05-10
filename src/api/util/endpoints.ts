@@ -8,7 +8,7 @@ if (!process.env.VUE_APP_API_ENDPOINT) {
 }
 
 /**
- * Enumerates all of the possible endpoint paths.
+ * Enumerates all possible endpoint paths.
  */
 export enum Endpoint {
   // Accounts
@@ -127,6 +127,9 @@ export enum Endpoint {
 
   // Files
   getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
+
+  // Search
+  search = "search/:versionId",
 }
 
 /**

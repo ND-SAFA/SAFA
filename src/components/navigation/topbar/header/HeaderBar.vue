@@ -1,13 +1,17 @@
 <template>
   <div class="full-width">
     <flex-box full-width :wrap="false" justify="between" align="center" y="2">
+      <flex-box align="center">
+        <project-selector />
+        <version-selector />
+      </flex-box>
+      <q-space />
       <project-searchbar v-if="graphVisible" />
+      <q-space />
       <q-space />
       <flex-box align="center">
         <update-button />
         <saving-icon />
-        <project-selector />
-        <version-selector />
       </flex-box>
     </flex-box>
     <separator v-if="graphVisible" nav />
@@ -29,7 +33,7 @@ import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
-import ProjectSearchbar from "./ProjectSearchbar.vue";
+import { ProjectSearchbar } from "@/components/search";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 

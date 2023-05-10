@@ -25,6 +25,17 @@ class TracePredictionOutput(AbstractTraceOutput):
     The output of predicting on the trace trainer.
     """
 
+    PREDICTIONS = "predictions"
+    PREDICTION_ENTRIES = "prediction_entries"
+    METRICS = "metrics"
+    SOURCE = "source"
+    TARGET = "target"
+    SCORE = "score"
+    VAL_METRICS = "val_metrics"
+    EVAL_METRICS = "eval_metrics"
+    PREDICTION_OUTPUT = "prediction_output"
+    LABEL_IDS = "label_ids"
+
     def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray], List]] = None,
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
                  prediction_entries: List[TracePredictionEntry] = None,

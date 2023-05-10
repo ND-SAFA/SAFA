@@ -9,6 +9,7 @@ from tgen.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_I
 from tgen.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.jobs.components.job_result import JobResult
 from tgen.scripts.modules.script_definition import ScriptDefinition
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_manager import logger
@@ -133,11 +134,11 @@ class ScriptOutputReader:
         if base_entry is None:
             base_entry = {}
         val_metric_entries = []
-        if JobResult.VAL_METRICS not in job_result.get(JobResult.BODY, {}) or \
-                job_result[JobResult.BODY][JobResult.VAL_METRICS] is None:
+        if TracePredictionOutput.VAL_METRICS not in job_result.get(JobResult.BODY, {}) or \
+                job_result[JobResult.BODY][TracePredictionOutput.VAL_METRICS] is None:
             return val_metric_entries
 
-        for epoch_index, val_metric_entry in job_result[JobResult.BODY][JobResult.VAL_METRICS].items():
+        for epoch_index, val_metric_entry in job_result[JobResult.BODY][TracePredictionOutput.VAL_METRICS].items():
             metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
@@ -154,8 +155,8 @@ class ScriptOutputReader:
         if base_entry is None:
             base_entry = {}
         job_result = job_result[JobResult.BODY]
-        job_result = job_result[JobResult.PREDICTION_OUTPUT] if JobResult.PREDICTION_OUTPUT in job_result else job_result
-        metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
+        job_result = job_result[TracePredictionOutput.PREDICTION_OUTPUT] if TracePredictionOutput.PREDICTION_OUTPUT in job_result else job_result
+        metric_key = ScriptOutputReader.find_eval_key(job_result, [TracePredictionOutput.EVAL_METRICS, TracePredictionOutput.METRICS])
         if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}
         return None

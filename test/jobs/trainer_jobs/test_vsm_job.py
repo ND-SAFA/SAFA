@@ -6,6 +6,7 @@ from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.object_creator import ObjectCreator
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -27,5 +28,5 @@ class TestVSMJob(BaseJobTest):
 
     def _assert_success(self, job: VSMJob, output_dict: dict):
         eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]
-        output_dict = output_dict[JobResult.BODY][JobResult.PREDICTION_OUTPUT]
+        output_dict = output_dict[JobResult.BODY][TracePredictionOutput.PREDICTION_OUTPUT]
         TestAssertions.verify_prediction_output(self, output_dict, eval_dataset, base_score=0.0)

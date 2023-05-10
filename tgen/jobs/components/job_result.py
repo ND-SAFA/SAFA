@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple, Union
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.base_object import BaseObject
 from tgen.util.json_util import JsonUtil
 from tgen.util.status import Status
@@ -15,18 +16,7 @@ class JobResult(BaseObject):
     EXCEPTION = "exception"
     STATUS = "status"
     TRACEBACK = "traceback"
-    PREDICTIONS = "predictions"
-    PREDICTION_ENTRIES = "prediction_entries"
-    METRICS = "metrics"
-    SOURCE = "source"
-    TARGET = "target"
-    SCORE = "score"
-    VAL_METRICS = "val_metrics"
-    EVAL_METRICS = "eval_metrics"
     EXPERIMENTAL_VARS = "experimental_vars"
-    PREDICTION_OUTPUT = "prediction_output"
-    LABEL_IDS = "label_ids"
-    DATASET = "dataset"
 
     def __init__(self, result_dict: Dict = None, body: Any = None):
         """
@@ -146,9 +136,9 @@ class JobResult(BaseObject):
          """
         if not comparison_metric_name:
             return False
-        if JobResult.METRICS in self.get(JobResult.BODY, {}) and JobResult.METRICS in other[JobResult.BODY]:
-            if comparison_metric_name in self[JobResult.BODY][JobResult.METRICS] \
-                    and comparison_metric_name in other[JobResult.BODY][JobResult.METRICS]:
+        if TracePredictionOutput.METRICS in self.get(JobResult.BODY, {}) and TracePredictionOutput.METRICS in other[JobResult.BODY]:
+            if comparison_metric_name in self[JobResult.BODY][TracePredictionOutput.METRICS] \
+                    and comparison_metric_name in other[JobResult.BODY][TracePredictionOutput.METRICS]:
                 return True
         return False
 
@@ -159,8 +149,8 @@ class JobResult(BaseObject):
         :return: the values to use for comparison
         """
         if self._can_compare_with_metric(other, comparison_metric_name):
-            return self[JobResult.BODY][JobResult.METRICS][comparison_metric_name], \
-                   other[JobResult.BODY][JobResult.METRICS][comparison_metric_name]
+            return self[JobResult.BODY][TracePredictionOutput.METRICS][comparison_metric_name], \
+                   other[JobResult.BODY][TracePredictionOutput.METRICS][comparison_metric_name]
         return self.get_job_status(), other.get_job_status()
 
     def require_properties(self, properties: List[str]) -> None:

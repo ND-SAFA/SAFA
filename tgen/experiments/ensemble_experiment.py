@@ -161,9 +161,9 @@ class EnsembleExperiment(Experiment):
         """
         job_result = JobResult()
         job_result[JobResult.BODY] = {
-            JobResult.PREDICTIONS: ensemble_predictions,
-            JobResult.LABEL_IDS: ensemble_labels,
-            JobResult.METRICS: agg_metrics,
+            TracePredictionOutput.PREDICTIONS: ensemble_predictions,
+            TracePredictionOutput.LABEL_IDS: ensemble_labels,
+            TracePredictionOutput.METRICS: agg_metrics,
         }
         job_result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS] = {
             "model_path": model_name

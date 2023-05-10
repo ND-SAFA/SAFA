@@ -73,7 +73,7 @@ class TestJsonUtil(BaseTest):
                                               prediction_output=eval_prediction_output)
         output_json = JsonUtil.to_dict(trace_train_output)
         resulting_keys = list(output_json.keys())
-        expected_keys = ["global_step", "training_loss", JobResult.METRICS, JobResult.VAL_METRICS, JobResult.PREDICTION_OUTPUT,
+        expected_keys = ["global_step", "training_loss", TracePredictionOutput.METRICS, TracePredictionOutput.VAL_METRICS, TracePredictionOutput.PREDICTION_OUTPUT,
                          "training_time"]
         self.assertSetEqual(set(expected_keys), set(resulting_keys))
         self.assertEqual(t_loss, output_json["training_loss"])

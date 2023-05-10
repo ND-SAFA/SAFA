@@ -4,6 +4,7 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.status import Status
 
 
@@ -19,12 +20,12 @@ class TestJobResult(BaseTest):
         result1 = self.get_job_result()
         result2 = self.get_job_result({JobResult.STATUS: 1})
         result1.update(result2)
-        result1[JobResult.BODY][JobResult.PREDICTIONS] = [{"source": "s1", "target": "t2", "score": 0.9}]
-        self.assertIn(JobResult.METRICS.upper(), result1[JobResult.BODY])
-        self.assertIn(SupportedTraceMetric.PRECISION.name.lower(),  result1[JobResult.BODY][JobResult.METRICS])
+        result1[JobResult.BODY][TracePredictionOutput.PREDICTIONS] = [{"source": "s1", "target": "t2", "score": 0.9}]
+        self.assertIn(TracePredictionOutput.METRICS.upper(), result1[JobResult.BODY])
+        self.assertIn(SupportedTraceMetric.PRECISION.name.lower(),  result1[JobResult.BODY][TracePredictionOutput.METRICS])
         self.assertIn(JobResult.STATUS, result1)
         self.assertEquals(result1[JobResult.STATUS], 1)
-        self.assertIn(JobResult.PREDICTIONS, result1[JobResult.BODY])
+        self.assertIn(TracePredictionOutput.PREDICTIONS, result1[JobResult.BODY])
 
     def test_to_json_and_from_dict(self):
         result1 = self.get_job_result()
@@ -80,5 +81,5 @@ class TestJobResult(BaseTest):
 
     def get_job_result(self, results_dict=None, precision_at_k=0.8):
         if results_dict is None:
-            results_dict = {JobResult.BODY: {JobResult.METRICS: {SupportedTraceMetric.PRECISION.name: precision_at_k}}}
+            results_dict = {JobResult.BODY: {TracePredictionOutput.METRICS: {SupportedTraceMetric.PRECISION.name: precision_at_k}}}
         return JobResult(results_dict)

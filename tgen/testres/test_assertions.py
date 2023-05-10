@@ -6,6 +6,7 @@ import pandas as pd
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
 
@@ -43,17 +44,17 @@ class TestAssertions:
         """
         if isinstance(output, JobResult):
             output = output[JobResult.BODY]
-        prediction_entries = output[JobResult.PREDICTION_ENTRIES]
+        prediction_entries = output[TracePredictionOutput.PREDICTION_ENTRIES]
         test_case.assertEqual(len(eval_dataset), len(prediction_entries))
 
-        expected_keys = [JobResult.SOURCE, JobResult.TARGET, JobResult.SCORE]  # todo: replace with reflection
+        expected_keys = [TracePredictionOutput.SOURCE, TracePredictionOutput.TARGET, TracePredictionOutput.SCORE]  # todo: replace with reflection
         for prediction_entry in prediction_entries:
             JsonUtil.require_properties(prediction_entry, expected_keys)
-            score = prediction_entry[JobResult.SCORE]
+            score = prediction_entry[TracePredictionOutput.SCORE]
             if abs(score - base_score) >= threshold:
-                test_case.fail(cls._VAL_ERROR_MESSAGE.format(JobResult.SCORE, score, base_score, JobResult.PREDICTIONS))
+                test_case.fail(cls._VAL_ERROR_MESSAGE.format(TracePredictionOutput.SCORE, score, base_score, TracePredictionOutput.PREDICTIONS))
 
-        predicted_links: List[Tuple[str, str]] = [(p[JobResult.SOURCE], p[JobResult.TARGET]) for p in prediction_entries]
+        predicted_links: List[Tuple[str, str]] = [(p[TracePredictionOutput.SOURCE], p[TracePredictionOutput.TARGET]) for p in prediction_entries]
         expected_links: List[Tuple[str, str]] = eval_dataset.get_source_target_pairs()
         cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
 
@@ -67,11 +68,11 @@ class TestAssertions:
         """
         if isinstance(output, JobResult):
             output = output[JobResult.BODY]
-        JsonUtil.require_properties(output, [JobResult.METRICS])
+        JsonUtil.require_properties(output, [TracePredictionOutput.METRICS])
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
-            if metric not in output[JobResult.METRICS]:
+            if metric not in output[TracePredictionOutput.METRICS]:
                 test_case.fail(
-                    cls._KEY_ERROR_MESSAGE.format(metric, output[JobResult.METRICS]))
+                    cls._KEY_ERROR_MESSAGE.format(metric, output[TracePredictionOutput.METRICS]))
 
     @staticmethod
     def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict, expected_output=None):

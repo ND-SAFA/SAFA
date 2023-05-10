@@ -5,6 +5,7 @@ from tgen.scripts.modules.script_reader import ScriptOutputReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_RESULT_READER
 from tgen.testres.test_assertions import TestAssertions
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 
 
 class TestResultReader(BaseTest):
@@ -16,8 +17,8 @@ class TestResultReader(BaseTest):
     STEP_ID = "050139d9-3f4e-4c3e-af5a-abefae5e79dd"
     TEST_ENTRY = {
         JobResult.BODY: {
-            JobResult.METRICS: {"a": 1, "b": 2, "c": 3},
-            JobResult.VAL_METRICS: {
+            TracePredictionOutput.METRICS: {"a": 1, "b": 2, "c": 3},
+            TracePredictionOutput.VAL_METRICS: {
                 0: {"a": 1, "b": 2, "c": 3},
                 1: {"a": 3, "b": 6, "c": 9}
             }

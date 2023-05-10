@@ -11,6 +11,8 @@
 // Navigation - Searchbar
 
 .nav-search-mode {
+  min-width: 150px;
+
   & > .q-field__inner > .q-field__control {
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
@@ -30,6 +32,9 @@
 }
 
 .nav-search-prompt {
+  width: 600px;
+  max-width: 40vw;
+
   & > .q-field__inner > .q-field__control {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;

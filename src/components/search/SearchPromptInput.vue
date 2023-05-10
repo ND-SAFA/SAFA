@@ -13,7 +13,7 @@
     class="nav-search-prompt"
     menu-anchor="bottom middle"
     menu-self="top middle"
-    style="width: 600px; max-width: 40vw"
+    data-cy="input-nav-artifact-search"
     @update:model-value="clearOptions"
     @filter="filterOptions"
   >

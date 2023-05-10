@@ -7,7 +7,7 @@
     option-label="name"
     option-value="id"
     class="nav-search-mode"
-    style="min-width: 150px"
+    data-cy="input-nav-search-mode"
   >
     <template #option="{ opt, itemProps }">
       <separator v-if="opt.id === SearchMode.search" />

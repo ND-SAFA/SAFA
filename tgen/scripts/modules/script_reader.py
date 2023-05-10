@@ -22,6 +22,11 @@ class ScriptOutputReader:
     """
     HEADER = "-" * 10
 
+    METRICS = "metrics"
+    VAL_METRICS = "val_metrics"
+    EVAL_METRICS = "eval_metrics"
+    PREDICTION_OUTPUT = "prediction_output"
+
     def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
                  display_metrics: List[str] = None, export: bool = True):
         """
@@ -88,12 +93,12 @@ class ScriptOutputReader:
             output_path = os.path.join(job_path, OUTPUT_FILENAME)
             if not os.path.exists(output_path):
                 continue
-            job_result = JsonUtil.read_json_file(output_path)
-            JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
-            base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}
-            validation_metrics = self.read_validation_entries(job_result, self.metric_names, base_entry=base_entry)
+            job_result = JobResult.from_dict(JsonUtil.read_json_file(output_path))
+            base_entry = {k: v for k, v in job_result.experimental_vars.items() if
+                          k not in self.experiment_vars_ignore}
+            validation_metrics = self.read_validation_entries(job_result.body, self.metric_names, base_entry=base_entry)
             val_entries.extend(validation_metrics)
-            eval_metric_entry = self.read_eval_entry(job_result, self.metric_names, base_entry=base_entry)
+            eval_metric_entry = self.read_eval_entry(job_result.body, self.metric_names, base_entry=base_entry)
             if eval_metric_entry:
                 eval_entries.append(eval_metric_entry)
         self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
@@ -119,11 +124,11 @@ class ScriptOutputReader:
         return self.val_df
 
     @staticmethod
-    def read_validation_entries(job_result: Dict, metric_names: List[str], base_entry: Dict = None, entry_id_key: str = "epoch") -> \
+    def read_validation_entries(job_output: Dict, metric_names: List[str], base_entry: Dict = None, entry_id_key: str = "epoch") -> \
             List[Dict]:
         """
         Reads the validation metrics for job result
-        :param job_result: The result of a job run.
+        :param job_output: The result of a job run.
         :param base_entry: The entry whose properties will be contained in each metric entry.
         :param metric_names: The names of the metrics to extract.
         :param entry_id_key: The name of the key used to identify each entry.
@@ -132,31 +137,29 @@ class ScriptOutputReader:
         if base_entry is None:
             base_entry = {}
         val_metric_entries = []
-        if JobResult.VAL_METRICS not in job_result or job_result[JobResult.VAL_METRICS] is None:
+        if ScriptOutputReader.VAL_METRICS not in job_output or job_output[ScriptOutputReader.VAL_METRICS] is None:
             return val_metric_entries
 
-        for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
+        for epoch_index, val_metric_entry in job_output[ScriptOutputReader.VAL_METRICS].items():
             metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
 
     @staticmethod
-    def read_eval_entry(job_result: Dict, metrics: List[str], base_entry: Dict = None) -> Optional[Dict]:
+    def read_eval_entry(job_output: Dict, metrics: List[str], base_entry: Dict = None) -> Optional[Dict]:
         """
         Reads the results on the test set in results.
-        :param job_result: The result of a job.
+        :param job_output: The result of a job.
         :param metrics: The name of the metrics to extract.
         :param base_entry: Properties that each eval entry will contain.
         :return: List of evaluation entries.
         """
         if base_entry is None:
             base_entry = {}
-        if JobResult.PREDICTION_OUTPUT not in job_result:
-            return None
-        job_result = job_result[JobResult.PREDICTION_OUTPUT]
-        metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
-        if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
-            return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}
+        job_output = job_output[ScriptOutputReader.PREDICTION_OUTPUT] if ScriptOutputReader.PREDICTION_OUTPUT in job_output else job_output
+        metric_key = ScriptOutputReader.find_eval_key(job_output, [ScriptOutputReader.EVAL_METRICS, ScriptOutputReader.METRICS])
+        if metric_key is not None and job_output[metric_key] is not None and len(job_output[metric_key]) > 0:
+            return {**base_entry, **JsonUtil.read_params(job_output[metric_key], metrics)}
         return None
 
     @staticmethod

@@ -34,7 +34,7 @@ class DownloadRepositoryJob(AbstractJob):
         assert self.repo_name is not None, f"Repo id was none."
         assert self.output_path is not None, f"Output path is none."
 
-    def _run(self) -> JobResult:
+    def _run(self) -> str:
         """
         Downloads or loads repository issues, pulls, and commits exporting processed artifacts to output path.
         :return: JobResult containing empty message.
@@ -45,4 +45,4 @@ class DownloadRepositoryJob(AbstractJob):
         repo_path = os.path.join(self.artifact_store_path, self.repo_name)
         repository_extracter = RepositoryExporter(repo_path)
         repository_extracter.extract(self.output_path)
-        return JobResult.from_dict({"output_path": self.output_path})
+        return self.output_path

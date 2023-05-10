@@ -1,3 +1,4 @@
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.jobs.abstract_job import AbstractJob
@@ -23,10 +24,10 @@ class HGenJob(AbstractJob):
         self.hgen = HierarchyGenerator(self.hgen_args, self.llm_manager)
         super().__init__(job_args)
 
-    def _run(self) -> JobResult:
+    def _run(self) -> TraceDataset:
         """
         Runs the hierarchy generator and exports the resulting dataset
         :return: The result of the job
         """
         generated_dataset = self.hgen.run(export_path=self.export_path)
-        return JobResult({JobResult.DATASET: generated_dataset})
+        return generated_dataset

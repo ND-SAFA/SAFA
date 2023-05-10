@@ -34,7 +34,7 @@ class VSMJob(AbstractTrainerJob):
         self._trainer: Optional[VSMTrainer] = None
 
     @overrides(AbstractTrainerJob)
-    def _run(self) -> JobResult:
+    def _run(self) -> TraceTrainOutput:
         """
         Performs predictions and (optionally) evaluation of model
         :return: results of the prediction including prediction values and associated ids
@@ -43,7 +43,7 @@ class VSMJob(AbstractTrainerJob):
         training_output = trainer.perform_training()
         prediction_output = trainer.perform_prediction()
         train_output = TraceTrainOutput(prediction_output=prediction_output, training_time=training_output.training_time)
-        return JobResult.from_trace_output(train_output)
+        return train_output
 
     def get_trainer(self) -> AbstractTrainer:
         """

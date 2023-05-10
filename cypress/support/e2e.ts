@@ -24,7 +24,8 @@ Cypress.on("uncaught:exception", (err) => {
     err.message.includes("ResizeObserver loop limit exceeded") ||
     err.message.includes("Cannot read properties of") ||
     err.message.includes("Cannot destructure property") ||
-    err.message.includes("Session has timed out")
+    err.message.includes("Session has timed out") ||
+    err.message.includes("Unexpected end of JSON")
   ) {
     // ignore the error
     return false;

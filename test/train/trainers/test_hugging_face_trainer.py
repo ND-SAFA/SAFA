@@ -1,3 +1,4 @@
+import uuid
 from copy import deepcopy
 from typing import Dict
 
@@ -40,7 +41,7 @@ class TestHuggingFaceTrainer(BaseTraceTest):
         test_trace_trainer = self.get_custom_trace_trainer(dataset_container_args={"val_dataset_creator": None},
                                                            metrics=self.TEST_METRICS_NAMES)
         trace_prediction_output = test_trace_trainer.perform_prediction()
-        trace_prediction_job_result = JobResult.from_trace_output(trace_prediction_output)
+        trace_prediction_job_result = JobResult(job_id=uuid.uuid4(), body=trace_prediction_output)
         eval_dataset = test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL]
         TestAssertions.verify_prediction_output(self, trace_prediction_job_result, eval_dataset)
 

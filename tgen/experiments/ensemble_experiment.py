@@ -15,6 +15,7 @@ from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.models.single_layer.single_layer_model import SingleLayerModel, predict, train
 from tgen.train.metrics.metrics_manager import MetricsManager
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import JsonUtil
@@ -146,9 +147,9 @@ class EnsembleExperiment(Experiment):
         """
         for step in steps:
             for job in step.jobs:
-                job_experimental_vars = job.result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS]
+                job_experimental_vars = job.result.body[JobResult.EXPERIMENTAL_VARS]
                 if len(job_experimental_vars) == 0:
-                    job.result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS] = {"model_path": job.model_manager.model_path.lower()}
+                    job.result.body[JobResult.EXPERIMENTAL_VARS] = {"model_path": job.model_manager.model_path.lower()}
 
     def save_as_job_output(self, ensemble_predictions, ensemble_labels, agg_metrics, model_name: str) -> None:
         """
@@ -159,15 +160,10 @@ class EnsembleExperiment(Experiment):
         :param model_name: The name of the model.
         :return: None
         """
-        job_result = JobResult()
-        job_result[JobResult.BODY] = {
-            TracePredictionOutput.PREDICTIONS: ensemble_predictions,
-            TracePredictionOutput.LABEL_IDS: ensemble_labels,
-            TracePredictionOutput.METRICS: agg_metrics,
-        }
-        job_result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS] = {
-            "model_path": model_name
-        }
+        job_result = JobResult(job_id=self.id,
+                               body=TracePredictionOutput(predictions=ensemble_predictions, label_ids=ensemble_labels,
+                                                          metrics=agg_metrics),
+                               experimental_vars={"model_path": model_name})
         step_output_dir = self.get_step_output_dir(self.experiment_index, 0)
         job_output_dir = os.path.join(step_output_dir, f"mp={model_name}")
         FileUtil.create_dir_safely(job_output_dir)

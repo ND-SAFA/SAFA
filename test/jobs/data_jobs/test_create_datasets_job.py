@@ -22,7 +22,7 @@ class TestCreateDatasetsJob(BaseJobTest):
         """
         Verifies that output contains dataset output path.
         """
-        self.assertGreater(len(job_result[JobResult.BODY]), 0)
+        self.assertGreater(len(job_result.body), 0)
 
     def test_run_failure(self):
         """

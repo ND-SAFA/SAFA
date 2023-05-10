@@ -41,26 +41,20 @@ class BaseJobTest(BaseTraceTest, ABC):
     @staticmethod
     def _load_job_output(job: AbstractJob):
         with open(job.get_output_filepath(output_dir=job.job_args.output_dir)) as out_file:
-            return json.load(out_file)
+            return JobResult.from_dict(json.load(out_file))
 
     def assert_output_on_success(self, job: AbstractJob, job_result: JobResult):
-        self.assertIn(JobResult.STATUS, job_result)
-        if job_result[JobResult.STATUS] == Status.FAILURE:
-            failure_msg = job_result[JobResult.EXCEPTION] if JobResult.EXCEPTION in job_result \
-                else "Status is FAILURE but should be SUCCESS"
-            if JobResult.TRACEBACK in job_result:
-                failure_msg += NEW_LINE + SPACE + job_result[JobResult.TRACEBACK]
+        if job_result.status == Status.FAILURE:
+            failure_msg = job_result.body
             self.fail(failure_msg)
-        self.assertEquals(job_result[JobResult.STATUS], Status.SUCCESS)
+        self.assertEquals(job_result.status, Status.SUCCESS)
         self._assert_success(job, job_result)
 
-    def assert_output_on_failure(self, output_dict: dict):
-        self.assertIn(JobResult.EXCEPTION, output_dict)
-        self.assertIn(JobResult.STATUS, output_dict)
-        self.assertEquals(output_dict[JobResult.STATUS], Status.FAILURE)
+    def assert_output_on_failure(self, job_output: JobResult):
+        self.assertEquals(job_output.status, Status.FAILURE)
 
     @abstractmethod
-    def _assert_success(self, job: AbstractJob, output_dict: dict):
+    def _assert_success(self, job: AbstractJob, job_result: JobResult):
         pass
 
     @abstractmethod

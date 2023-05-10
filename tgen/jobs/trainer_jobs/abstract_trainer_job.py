@@ -1,18 +1,17 @@
 import os
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Optional, Type, Union
+from typing import Any, Optional, Type, Union, Dict
 
 from tgen.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.override import overrides
@@ -38,27 +37,20 @@ class AbstractTrainerJob(AbstractJob, ABC):
         self.kwargs = kwargs
         self._trainer: Optional[HuggingFaceTrainer] = None
 
-    @overrides(AbstractJob)
-    def run(self) -> None:
-        """
-        Runs the job and saves the output
-        """
-        if self.job_args.save_dataset_splits:
-            CreateDatasetsJob(self.trainer_dataset_manager, self.job_args).run()
-        return super().run()
-
-    def _run(self, **kwargs) -> JobResult:
+    def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
         Runs the trainer job
         :return: The result of the job
         """
+        if self.job_args.save_dataset_splits:
+            CreateDatasetsJob(self.trainer_dataset_manager, self.job_args).run()
         if self.task == TrainerTask.TRAIN:
             output = self.get_trainer(**kwargs).perform_training()
         elif self.task == TrainerTask.PREDICT:
             output = self.get_trainer(**kwargs).perform_prediction()
         else:
             output = self._run_trainer_specific_task(**kwargs)
-        return JobResult.from_trace_output(output) if isinstance(output, AbstractTraceOutput) else JobResult(body=output)
+        return output
 
     def get_trainer(self, **kwargs) -> HuggingFaceTrainer:
         """

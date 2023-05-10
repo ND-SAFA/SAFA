@@ -1,3 +1,5 @@
+from typing import List
+
 from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
@@ -20,11 +22,11 @@ class CreateDatasetsJob(AbstractJob):
         self.format_type = format_type
         self.export_path = export_path
 
-    def _run(self, **kwargs) -> JobResult:
+    def _run(self, **kwargs) -> List[str]:
         """
         Creates and saves the data
         :return: job results including location of saved data
         """
         saved_dataset_paths = self.trainer_dataset_manager.export_dataset_splits(self.export_path, self.format_type)
         assert len(saved_dataset_paths) > 0, "Either unable to save data or no data creators were provided"
-        return JobResult(body=saved_dataset_paths)
+        return saved_dataset_paths

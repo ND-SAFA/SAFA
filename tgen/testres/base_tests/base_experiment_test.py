@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import uuid
 
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -90,4 +91,4 @@ class BaseExperimentTest(BaseTest):
     def job_fake_run(self):
         accuracy = random.randint(1, 100) / 100
         self.accuracies.append(accuracy)
-        return JobResult({JobResult.BODY: {TracePredictionOutput.METRICS: {"accuracy": accuracy}}})
+        return TracePredictionOutput(metrics={"accuracy": accuracy})

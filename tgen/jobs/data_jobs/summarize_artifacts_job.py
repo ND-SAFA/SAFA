@@ -1,4 +1,4 @@
-from typing import Dict, Literal, TypedDict
+from typing import Dict, Literal, TypedDict, Any
 
 import pandas as pd
 from tgen.data.chunkers.supported_chunker import SupportedChunker
@@ -37,10 +37,10 @@ class SummarizeArtifactsJob(AbstractJob):
         self.artifact_df = pd.DataFrame.from_dict(self.artifacts, orient="index")
         self.summarizer = summarizer
 
-    def _run(self) -> JobResult:
+    def _run(self) -> Dict[Any, str]:
         """
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
         summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.id2chunker)
-        return JobResult(body=summarized_df.to_dict(orient='index'))
+        return summarized_df.to_dict(orient='index')

@@ -6,9 +6,12 @@ import pandas as pd
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.test_data_manager import TestDataManager
+from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.json_util import JsonUtil
+from tgen.util.status import Status
 
 
 class TestAssertions:
@@ -43,18 +46,20 @@ class TestAssertions:
         :return: None
         """
         if isinstance(output, JobResult):
-            output = output[JobResult.BODY]
-        prediction_entries = output[TracePredictionOutput.PREDICTION_ENTRIES]
+            output = output.body
+        if isinstance(output, TraceTrainOutput):
+            output = output.prediction_output
+        prediction_entries = output.prediction_entries
         test_case.assertEqual(len(eval_dataset), len(prediction_entries))
 
-        expected_keys = [TracePredictionOutput.SOURCE, TracePredictionOutput.TARGET, TracePredictionOutput.SCORE]  # todo: replace with reflection
+        expected_keys = ["source", "target", "score"]  # todo: replace with reflection
         for prediction_entry in prediction_entries:
             JsonUtil.require_properties(prediction_entry, expected_keys)
-            score = prediction_entry[TracePredictionOutput.SCORE]
+            score = prediction_entry["score"]
             if abs(score - base_score) >= threshold:
-                test_case.fail(cls._VAL_ERROR_MESSAGE.format(TracePredictionOutput.SCORE, score, base_score, TracePredictionOutput.PREDICTIONS))
+                test_case.fail(cls._VAL_ERROR_MESSAGE.format("score", score, base_score, "predictions"))
 
-        predicted_links: List[Tuple[str, str]] = [(p[TracePredictionOutput.SOURCE], p[TracePredictionOutput.TARGET]) for p in prediction_entries]
+        predicted_links: List[Tuple[str, str]] = [(p["source"], p["target"]) for p in prediction_entries]
         expected_links: List[Tuple[str, str]] = eval_dataset.get_source_target_pairs()
         cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
 
@@ -67,22 +72,27 @@ class TestAssertions:
         :return: None
         """
         if isinstance(output, JobResult):
-            output = output[JobResult.BODY]
-        JsonUtil.require_properties(output, [TracePredictionOutput.METRICS])
+            output = output.body
+        if isinstance(output, TraceTrainOutput):
+            output = output.prediction_output
+        if not isinstance(output, TracePredictionOutput) and isinstance(output, dict):
+            output = TracePredictionOutput(**output)
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
-            if metric not in output[TracePredictionOutput.METRICS]:
+            if metric not in output.metrics:
                 test_case.fail(
-                    cls._KEY_ERROR_MESSAGE.format(metric, output[TracePredictionOutput.METRICS]))
+                    cls._KEY_ERROR_MESSAGE.format(metric, output.metrics))
 
     @staticmethod
-    def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict, expected_output=None):
+    def assert_training_output_matches_expected(test_case: TestCase, job_result: JobResult, expected_output=None):
         expected_output = expected_output if expected_output else TestDataManager.EXAMPLE_TRAINING_OUTPUT
-        if JobResult.STATUS in expected_output:
-            expected_output.pop(JobResult.STATUS)
-            test_case.assertIn(JobResult.STATUS, output_dict)
-        output_dict = output_dict[JobResult.BODY]
+        if "status" in expected_output:
+            expected_output.pop("status")
+            test_case.assertEquals(job_result.status, Status.SUCCESS)
+        output = job_result.body
+        if isinstance(output, AbstractTraceOutput):
+            output = output.output_to_dict()
         for key, value in expected_output.items():
-            test_case.assertIn(key, output_dict)
+            test_case.assertIsNotNone(output.get(key, None))
 
     @staticmethod
     def assert_lists_have_the_same_vals(test_case: TestCase, list1, list2) -> None:

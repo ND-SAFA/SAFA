@@ -4,9 +4,11 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.util.reflection_util import ReflectionUtil
+from tgen.util.uncased_dict import UncasedDict
 
 
 @dataclass
@@ -25,17 +27,6 @@ class TracePredictionOutput(AbstractTraceOutput):
     The output of predicting on the trace trainer.
     """
 
-    PREDICTIONS = "predictions"
-    PREDICTION_ENTRIES = "prediction_entries"
-    METRICS = "metrics"
-    SOURCE = "source"
-    TARGET = "target"
-    SCORE = "score"
-    VAL_METRICS = "val_metrics"
-    EVAL_METRICS = "eval_metrics"
-    PREDICTION_OUTPUT = "prediction_output"
-    LABEL_IDS = "label_ids"
-
     def __init__(self, predictions: TracePredictions = None, label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray], List]] = None,
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
                  prediction_entries: List[TracePredictionEntry] = None,
@@ -51,7 +42,8 @@ class TracePredictionOutput(AbstractTraceOutput):
         """
         self.predictions: TracePredictions = predictions
         self.label_ids = label_ids
-        self.metrics = metrics
+        metrics = {} if metrics is None else metrics
+        self.metrics = UncasedDict(metrics) if not isinstance(metrics, UncasedDict) else metrics
         self.source_target_pairs = source_target_pairs
         self.prediction_entries = prediction_entries
         super().__init__(hf_output=prediction_output)
@@ -69,7 +61,46 @@ class TracePredictionOutput(AbstractTraceOutput):
         self.prediction_entries = [TracePredictionEntry(source=pred_ids[0], target=pred_ids[1], score=float(pred_scores))
                                    for pred_ids, pred_scores in zip(self.source_target_pairs, self.predictions)]
 
-    def toJSON(self) -> Dict:
+    def is_better_than(self, other: "TracePredictionOutput", comparison_criterion: ComparisonCriterion = None) -> bool:
+        """
+        Evaluates whether this result is better than the other result
+        :param other: the other result
+        :param comparison_criterion: The criterion used to determine best job.
+        :return: True if this result is better than the other result else False
+        """
+        if comparison_criterion is None:
+            comparison_criterion = ComparisonCriterion(metrics=[])
+        assert len(comparison_criterion.metrics) <= 1, "Expected no more than 1 metric in comparison criterion."
+        comparison_metric = comparison_criterion.metrics[0] if len(comparison_criterion.metrics) > 0 else None
+        self_val, other_val = self._get_comparison_vals(other, comparison_metric)
+        if self_val is None or other_val is None:
+            return False
+        return comparison_criterion.comparison_function(self_val, other_val)
+
+    def _can_compare_with_metric(self, other: "TracePredictionOutput", comparison_metric_name: str) -> bool:
+        """
+         Returns True if can use comparison metric to compare the two results
+         :param other: other result
+         :return: True if can use comparison metric to compare the two results else false
+         """
+        if not comparison_metric_name:
+            return False
+        if self.metrics and other.metrics:
+            if comparison_metric_name in self.metrics and comparison_metric_name in other.metrics:
+                return True
+        return False
+
+    def _get_comparison_vals(self, other: "TracePredictionOutput", comparison_metric_name: str) -> Tuple:
+        """
+        Gets the values to use for comparison
+        :param other: the other result
+        :return: the values to use for comparison
+        """
+        if self._can_compare_with_metric(other, comparison_metric_name):
+            return self.metrics[comparison_metric_name], other.metrics[comparison_metric_name]
+        return None, None
+
+    def to_json(self) -> Dict:
         """
         Converts the output to json
         :return: The output as a dictionary

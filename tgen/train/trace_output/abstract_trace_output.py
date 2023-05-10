@@ -24,3 +24,14 @@ class AbstractTraceOutput(ABC):
         :return: The output represented as a dictionary.
         """
         return JsonUtil.to_dict(self)
+
+    def __eq__(self, other: "AbstractTraceOutput") -> bool:
+        """
+        Returns True if the two results are equal
+        :param other: The other job result to compare
+        :return: True if the two results are equal
+        """
+        for name, val in vars(self).items():
+            if getattr(self, name) != getattr(other, name):
+                return False
+        return True

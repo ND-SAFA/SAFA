@@ -42,15 +42,15 @@ class ArtifactGeneratorJob(HGenJob):
         super().__init__(hgen_args=hgen_args, llm_manager=llm_manager, job_args=job_args)
 
     @overrides(HGenJob)
-    def _run(self) -> JobResult:
+    def _run(self) -> List[str]:
         """
         Converts output of HGenJob to a list of the cluster content
         :return: The job result containing the list of cluster content
         """
-        generated_dataset: TraceDataset = super()._run()[JobResult.BODY]
+        generated_dataset: TraceDataset = super()._run()
         artifacts = [artifact[ArtifactKeys.CONTENT] for id_, artifact in generated_dataset.artifact_df.itertuples()
                      if artifact[ArtifactKeys.LAYER_ID] != self.SOURCE_LAYER_ID]
-        return JobResult(body= artifacts)
+        return artifacts
 
     @staticmethod
     def _create_trace_dataset_from_artifacts(artifacts: Dict[str, Dict]) -> TraceDataset:
@@ -78,4 +78,4 @@ class ArtifactGeneratorJob(HGenJob):
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args,
                                               summarizer=summarizer if summarizer is not None else
                                               Summarizer(code_or_exceeds_limit_only=True))
-        return summarize_job.run()[JobResult.BODY]
+        return summarize_job.run().body

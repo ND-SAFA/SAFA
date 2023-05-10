@@ -37,7 +37,7 @@ class CreateSourceSplitsJob(AbstractJob):
         self.exporter = exporter
         self.splits = splits
 
-    def _run(self) -> JobResult:
+    def _run(self) -> str:
         """
         Separates artifacts in type into different splits and saves projects accordingly.
         :return: JobResult containing empty message.
@@ -71,7 +71,7 @@ class CreateSourceSplitsJob(AbstractJob):
         export_path = os.path.join(self.exporter.export_path, "base")
         self.exporter.update_export_path(export_path)
         self.exporter.export()
-        return JobResult(body=export_path)
+        return export_path
 
     @staticmethod
     def create_split_links(trace_links: TraceDataFrame, artifact_ids: Set[Union[str, int]]) -> TraceDataFrame:

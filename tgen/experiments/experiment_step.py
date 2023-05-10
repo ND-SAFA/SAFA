@@ -9,6 +9,7 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.wandb.Wandb import Wandb
 from tgen.util.base_object import BaseObject
 from tgen.util.dict_util import ListUtil
@@ -109,7 +110,7 @@ class ExperimentStep(BaseObject):
         :param jobs: a list of jobs to check which failed
         :return: a list of a failed job ids
         """
-        return [job.id for job in jobs if job.result.get_job_status() == Status.FAILURE]
+        return [job.id for job in jobs if job.result.status == Status.FAILURE]
 
     def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
         """
@@ -135,10 +136,9 @@ class ExperimentStep(BaseObject):
         """
         if self.comparison_criterion is None:
             return None
-        best_job = best_job if best_job else jobs[0]
         for job in jobs:
-            if isinstance(job, AbstractTrainerJob):
-                if best_job is None or job.result.is_better_than(best_job.result, self.comparison_criterion):
+            if isinstance(job.result.body, TracePredictionOutput):
+                if best_job is None or job.result.body.is_better_than(best_job.result.body, self.comparison_criterion):
                     best_job = job
         return best_job
 
@@ -151,10 +151,10 @@ class ExperimentStep(BaseObject):
         :return: the update jobs
         """
         for i, job in enumerate(jobs):
-            if not job.result[JobResult.EXPERIMENTAL_VARS]:
-                job.result[JobResult.EXPERIMENTAL_VARS] = {}
+            if not job.result.experimental_vars:
+                job.result.experimental_vars = {}
             if experimental_vars:
-                job.result[JobResult.EXPERIMENTAL_VARS].update(experimental_vars[i])
+                job.result.experimental_vars.update(experimental_vars[i])
                 if isinstance(job, AbstractTrainerJob):
                     job.trainer_args.experimental_vars = experimental_vars[i]
         return jobs
@@ -180,7 +180,7 @@ class ExperimentStep(BaseObject):
         :return: the updated jobs
         """
         for job in self.jobs:
-            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS], str(job.id))
+            run_name = Wandb.get_run_name(job.result.experimental_vars, str(job.id))
             job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTrainerJob):
                 model_path = os.path.join(job_base_path, "models")

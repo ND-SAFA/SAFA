@@ -1,4 +1,6 @@
-{"body": {  "global_step": 7,
+{
+  "job_id": "6346158c-f9a6-4945-81a8-d73ed9be7452",
+  "body": {  "global_step": 7,
   "training_loss": 4.851851463317871,
   "metrics": {},
   "val_metrics": {

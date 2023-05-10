@@ -29,7 +29,7 @@ class ExportArtifactsJob(AbstractJob):
         self.file_name = file_name if file_name else trace_dataset_creator.get_name() + ".txt"
         self.delimiter = delimiter
 
-    def _run(self) -> JobResult:
+    def _run(self) -> str:
         """
         Exports artifact bodies as delimited file. Any delimiter found in artifact bodies is removed.
         :return: JobResult containing export path.
@@ -40,4 +40,4 @@ class ExportArtifactsJob(AbstractJob):
         content = self.delimiter.join(artifacts)
         file_path = os.path.join(self.job_args.output_dir, self.file_name)
         FileUtil.write(content, file_path)
-        return JobResult(body= file_path)
+        return file_path

@@ -31,12 +31,11 @@ class TestArtifactGenerationJob(BaseJobTest):
         mock_completion.side_effect = fake_open_ai_completion
         self._test_run_success()
 
-    def _assert_success(self, job: AbstractJob, output_dict: dict):
-        self.assertIn(JobResult.BODY, output_dict)
-        self.assertEqual(len(output_dict[JobResult.BODY]), len(self.ARTIFACTS_BY_CLUSTER))
+    def _assert_success(self, job: AbstractJob, job_result: JobResult):
+        self.assertEqual(len(job_result.body), len(self.ARTIFACTS_BY_CLUSTER))
         for i, artifact_ids in enumerate(self.ARTIFACTS_BY_CLUSTER):
             for a_id in artifact_ids:
-                self.assertIn(self.ARTIFACTS[a_id][ArtifactKeys.CONTENT.value], output_dict[JobResult.BODY][i])
+                self.assertIn(self.ARTIFACTS[a_id][ArtifactKeys.CONTENT.value], job_result.body[i])
 
     def _get_job(self) -> AbstractJob:
         llm_manager = OpenAIManager(OpenAIArgs())

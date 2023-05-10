@@ -45,7 +45,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(output["status"], Status.SUCCESS.value)
         best_job = self.get_job_by_id(experiment_step, output["best_job"])
         self.assertTrue(best_job is not None)
-        self.assertEquals(max(self.accuracies), best_job.result[JobResult.BODY][TracePredictionOutput.METRICS]["accuracy"])
+        self.assertEquals(max(self.accuracies), best_job.result.body.metrics["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
@@ -94,7 +94,7 @@ class TestExperimentStep(BaseExperimentTest):
 
     def test_get_failed_jobs(self):
         jobs = self.get_test_jobs()
-        jobs[0].result.set_job_status(Status.FAILURE)
+        jobs[0].result.status = Status.FAILURE
         failed_jobs = ExperimentStep._get_failed_jobs(jobs)
         self.assertEquals(1, len(failed_jobs))
 
@@ -112,9 +112,9 @@ class TestExperimentStep(BaseExperimentTest):
         definition_mock.return_value = StructureProjectDefinition()
         job1, job2 = self.get_test_jobs()
         step = self.get_experiment_step()
-        job1.result.update_body({TracePredictionOutput.METRICS: {"accuracy": 0.5}})
+        job1.result.body = TracePredictionOutput(metrics={"accuracy": 0.5})
 
-        job2.result.update_body({TracePredictionOutput.METRICS: {"accuracy": 0.8}})
+        job2.result.body = TracePredictionOutput(metrics={"accuracy": 0.8})
         best_job = step._get_best_job([job1, job2])
         self.assertEquals(best_job.id, job2.id)
 
@@ -161,8 +161,7 @@ class TestExperimentStep(BaseExperimentTest):
 
     def assert_experimental_vars(self, experiment_step):
         for job in experiment_step.jobs:
-            self.assertIn(JobResult.EXPERIMENTAL_VARS, job.result)
-            job_experiment_vars = job.result[JobResult.EXPERIMENTAL_VARS]
+            job_experiment_vars = job.result.experimental_vars
             for experiment_var_path in self.EXPERIMENT_VARS:
                 path_attrs = experiment_var_path.split(PERIOD)
                 attr = job

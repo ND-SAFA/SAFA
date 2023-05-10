@@ -70,5 +70,8 @@ export interface SearchQuerySchema {
  * Represents the artifacts that match a search request.
  */
 export interface SearchResultsSchema {
+  /**
+   * The ids of artifacts that match the search request.
+   */
   artifactIds: string[];
 }

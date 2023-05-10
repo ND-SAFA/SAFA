@@ -28,7 +28,12 @@
       style="min-width: 250px"
     />
     <flex-box full-width justify="end">
-      <text-button color="primary" label="Search" @click="emit('submit')" />
+      <text-button
+        v-close-popup
+        color="primary"
+        label="Search"
+        @click="emit('submit')"
+      />
     </flex-box>
   </flex-box>
 </template>

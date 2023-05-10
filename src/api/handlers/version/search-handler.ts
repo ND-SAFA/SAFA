@@ -1,7 +1,9 @@
+import { GraphMode } from "@/types";
 import { createDocument } from "@/util";
 import {
   appStore,
   documentStore,
+  layoutStore,
   logStore,
   projectStore,
   searchStore,
@@ -14,6 +16,7 @@ import { getProjectSearchQuery } from "@/api";
 export async function handleProjectSearch(): Promise<void> {
   try {
     appStore.onLoadStart();
+    layoutStore.mode = GraphMode.tree;
 
     const searchResults = await getProjectSearchQuery(
       projectStore.versionId,

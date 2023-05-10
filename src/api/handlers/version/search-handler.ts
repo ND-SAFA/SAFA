@@ -1,21 +1,35 @@
-import { SearchMode } from "@/types";
-import { layoutStore, searchStore, selectionStore } from "@/hooks";
+import { createDocument } from "@/util";
+import {
+  appStore,
+  documentStore,
+  logStore,
+  projectStore,
+  searchStore,
+} from "@/hooks";
+import { getProjectSearchQuery } from "@/api";
 
-export function handleProjectSearch(): void {
-  const searchQuery = searchStore.searchQuery;
+/**
+ * Handles searching a project, and updating the UI to display the search results.
+ */
+export async function handleProjectSearch(): Promise<void> {
+  try {
+    appStore.onLoadStart();
 
-  console.log("searchQuery", searchQuery);
+    const searchResults = await getProjectSearchQuery(
+      projectStore.versionId,
+      searchStore.searchQuery
+    );
 
-  if (
-    searchQuery.mode === SearchMode.artifactTypes &&
-    !!searchQuery.artifactTypes
-  ) {
-    selectionStore.selectArtifactLevel(searchQuery.artifactTypes[0]);
-    layoutStore.viewTreeTypes(searchQuery.artifactTypes);
-  } else if (
-    searchQuery.mode === SearchMode.artifacts &&
-    !!searchQuery.artifactIds
-  ) {
-    selectionStore.viewArtifactSubtree(searchQuery.artifactIds[0]);
+    const document = createDocument({
+      project: projectStore.projectIdentifier,
+      name: "Search Query",
+      artifactIds: searchResults.artifactIds,
+    });
+
+    await documentStore.addDocument(document);
+  } catch (e) {
+    logStore.onError("Unable to display search results.");
+  } finally {
+    appStore.onLoadEnd();
   }
 }

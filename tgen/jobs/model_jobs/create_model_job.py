@@ -13,4 +13,4 @@ class CreateModelJob(AbstractJob):
         model.save_pretrained(self.model_manager.model_output_path)
         tokenizer = self.model_manager.get_tokenizer()
         tokenizer.save_pretrained(self.model_manager.model_output_path)
-        return JobResult.from_dict({JobResult.MODEL_PATH: self.model_manager.model_output_path})
+        return JobResult(body=self.model_manager.model_output_path)

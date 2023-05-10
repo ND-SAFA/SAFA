@@ -43,4 +43,4 @@ class SummarizeArtifactsJob(AbstractJob):
         :return: The job result containing all artifacts mapped to their summarized content
         """
         summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.id2chunker)
-        return JobResult({JobResult.ARTIFACTS: summarized_df.to_dict(orient='index')})
+        return JobResult(body=summarized_df.to_dict(orient='index'))

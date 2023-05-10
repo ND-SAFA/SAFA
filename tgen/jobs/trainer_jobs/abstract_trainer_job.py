@@ -58,7 +58,7 @@ class AbstractTrainerJob(AbstractJob, ABC):
             output = self.get_trainer(**kwargs).perform_prediction()
         else:
             output = self._run_trainer_specific_task(**kwargs)
-        return JobResult.from_trace_output(output) if isinstance(output, AbstractTraceOutput) else JobResult.from_dict(output)
+        return JobResult.from_trace_output(output) if isinstance(output, AbstractTraceOutput) else JobResult(body=output)
 
     def get_trainer(self, **kwargs) -> HuggingFaceTrainer:
         """

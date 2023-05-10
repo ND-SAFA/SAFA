@@ -68,9 +68,10 @@ class CreateSourceSplitsJob(AbstractJob):
                 export_path = os.path.join(self.exporter.export_path, task_name, f"{stage.value}")
                 split_exporter = self.exporter.make_new(export_path=export_path, dataset=split_project_data)
                 split_exporter.export()
-        self.exporter.update_export_path(os.path.join(self.exporter.export_path, "base"))
+        export_path = os.path.join(self.exporter.export_path, "base")
+        self.exporter.update_export_path(export_path)
         self.exporter.export()
-        return JobResult.from_dict({"status": "ok"})
+        return JobResult(body=export_path)
 
     @staticmethod
     def create_split_links(trace_links: TraceDataFrame, artifact_ids: Set[Union[str, int]]) -> TraceDataFrame:

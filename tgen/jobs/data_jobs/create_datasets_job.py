@@ -27,4 +27,4 @@ class CreateDatasetsJob(AbstractJob):
         """
         saved_dataset_paths = self.trainer_dataset_manager.export_dataset_splits(self.export_path, self.format_type)
         assert len(saved_dataset_paths) > 0, "Either unable to save data or no data creators were provided"
-        return JobResult.from_dict({JobResult.SAVED_DATASET_PATHS: saved_dataset_paths})
+        return JobResult(body=saved_dataset_paths)

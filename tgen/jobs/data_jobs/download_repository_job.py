@@ -45,4 +45,4 @@ class DownloadRepositoryJob(AbstractJob):
         repo_path = os.path.join(self.artifact_store_path, self.repo_name)
         repository_extracter = RepositoryExporter(repo_path)
         repository_extracter.extract(self.output_path)
-        return JobResult.from_dict({"output_path": self.output_path})
+        return JobResult(body=self.output_path)

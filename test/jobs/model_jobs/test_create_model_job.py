@@ -21,5 +21,4 @@ class TestCreateModelJob(BaseJobTest):
         return CreateModelJob(job_args=job_args, model_manager=model_manager)
 
     def _assert_success(self, job: CreateModelJob, output_dict: dict):
-        self.assertIn(JobResult.MODEL_PATH, output_dict)
-        self.assertEqual(output_dict[JobResult.MODEL_PATH], TEST_OUTPUT_DIR)
+        self.assertEqual(output_dict[JobResult.BODY], TEST_OUTPUT_DIR)

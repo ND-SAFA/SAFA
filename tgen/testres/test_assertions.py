@@ -42,9 +42,7 @@ class TestAssertions:
         :return: None
         """
         if isinstance(output, JobResult):
-            output.require_properties([JobResult.PREDICTION_ENTRIES])
-        else:
-            JsonUtil.require_properties(output, [JobResult.PREDICTION_ENTRIES])
+            output = output[JobResult.BODY]
         prediction_entries = output[JobResult.PREDICTION_ENTRIES]
         test_case.assertEqual(len(eval_dataset), len(prediction_entries))
 
@@ -67,6 +65,8 @@ class TestAssertions:
         :param output: The result of a prediction job.
         :return: None
         """
+        if isinstance(output, JobResult):
+            output = output[JobResult.BODY]
         JsonUtil.require_properties(output, [JobResult.METRICS])
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
@@ -76,6 +76,10 @@ class TestAssertions:
     @staticmethod
     def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict, expected_output=None):
         expected_output = expected_output if expected_output else TestDataManager.EXAMPLE_TRAINING_OUTPUT
+        if JobResult.STATUS in expected_output:
+            expected_output.pop(JobResult.STATUS)
+            test_case.assertIn(JobResult.STATUS, output_dict)
+        output_dict = output_dict[JobResult.BODY]
         for key, value in expected_output.items():
             test_case.assertIn(key, output_dict)
 

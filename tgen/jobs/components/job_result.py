@@ -10,37 +10,32 @@ from tgen.util.uncased_dict import UncasedDict
 
 
 class JobResult(BaseObject):
+    BODY = "body"
     JOB_ID = "jobID"
     EXCEPTION = "exception"
     STATUS = "status"
-    MODEL_PATH = "modelPath"
     TRACEBACK = "traceback"
     PREDICTIONS = "predictions"
     PREDICTION_ENTRIES = "prediction_entries"
-    ARTIFACT_IDS = "ids"
     METRICS = "metrics"
-    TOTAL_EPOCHS = "total_epochs"  # distinguishes from epochs which does not describe global training loop
-    SAVED_DATASET_PATHS = "savedDatasetPaths"
-    IDS = "ids"
     SOURCE = "source"
     TARGET = "target"
     SCORE = "score"
-    SOURCE_TARGET_PAIRS = "source_target_pairs"
     VAL_METRICS = "val_metrics"
     EVAL_METRICS = "eval_metrics"
     EXPERIMENTAL_VARS = "experimental_vars"
-    EXPORT_PATH = "export_path"
     PREDICTION_OUTPUT = "prediction_output"
     LABEL_IDS = "label_ids"
-    ARTIFACTS = "artifacts"
     DATASET = "dataset"
 
-    def __init__(self, result_dict: Dict = None):
+    def __init__(self, result_dict: Dict = None, body: Any = None):
         """
         Represents the results of a job
         :param result_dict:
         """
         self.__result = UncasedDict(result_dict)
+        if body is not None:
+            self.__result[JobResult.BODY] = body
 
     def set_job_status(self, status: Status) -> None:
         """
@@ -77,7 +72,7 @@ class JobResult(BaseObject):
         :return: None
         """
         trace_output_dict = trace_output.output_to_dict()
-        self.update(trace_output_dict)
+        self.update_body(trace_output_dict)
 
     def to_json(self, keys: List[str] = None, as_dict: bool = False) -> str:
         """
@@ -113,8 +108,8 @@ class JobResult(BaseObject):
         Creates a JobResult from a dictionary
         :return: a new JobResult
         """
-        job_result = JobResult()
-        return job_result.update(results_dict)
+        job_result = JobResult(results_dict)
+        return job_result
 
     def get_printable_experiment_vars(self) -> str:
         """
@@ -151,8 +146,9 @@ class JobResult(BaseObject):
          """
         if not comparison_metric_name:
             return False
-        if JobResult.METRICS in self and JobResult.METRICS in other:
-            if comparison_metric_name in self[JobResult.METRICS] and comparison_metric_name in other[JobResult.METRICS]:
+        if JobResult.METRICS in self.get(JobResult.BODY, {}) and JobResult.METRICS in other[JobResult.BODY]:
+            if comparison_metric_name in self[JobResult.BODY][JobResult.METRICS] \
+                    and comparison_metric_name in other[JobResult.BODY][JobResult.METRICS]:
                 return True
         return False
 
@@ -163,7 +159,8 @@ class JobResult(BaseObject):
         :return: the values to use for comparison
         """
         if self._can_compare_with_metric(other, comparison_metric_name):
-            return self[JobResult.METRICS][comparison_metric_name], other[JobResult.METRICS][comparison_metric_name]
+            return self[JobResult.BODY][JobResult.METRICS][comparison_metric_name], \
+                   other[JobResult.BODY][JobResult.METRICS][comparison_metric_name]
         return self.get_job_status(), other.get_job_status()
 
     def require_properties(self, properties: List[str]) -> None:
@@ -173,6 +170,28 @@ class JobResult(BaseObject):
         :return: None
         """
         JsonUtil.require_properties(self.__result, properties)
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Gets an item in the JobResult and returns default if the item does not exist
+        :param key: The key to get
+        :param default: The default value if key not in self
+        :return: The item if it exists, else default
+        """
+        if key in self:
+            return self[key]
+        return default
+
+    def update_body(self, body: Any) -> None:
+        """
+        Updates the body of the job result
+        :param body: The body to update to
+        :return: None
+        """
+        if isinstance(body, dict) and isinstance(self.get(JobResult.BODY), dict):
+            self[JobResult.BODY].update(body)
+        else:
+            self[JobResult.BODY] = body
 
     def __getitem__(self, key: str) -> Any:
         """

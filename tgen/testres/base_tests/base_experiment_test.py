@@ -89,4 +89,4 @@ class BaseExperimentTest(BaseTest):
     def job_fake_run(self):
         accuracy = random.randint(1, 100) / 100
         self.accuracies.append(accuracy)
-        return JobResult({JobResult.METRICS: {"accuracy": accuracy}})
+        return JobResult({JobResult.BODY: {JobResult.METRICS: {"accuracy": accuracy}}})

@@ -31,8 +31,8 @@ class TestSummarizeJob(BaseJobTest):
         self._test_run_success()
 
     def _assert_success(self, job: AbstractJob, output_dict: dict):
-        self.assertIn(JobResult.ARTIFACTS, output_dict)
-        for artifact_id, artifact in output_dict[JobResult.ARTIFACTS].items():
+        self.assertIn(JobResult.BODY, output_dict)
+        for artifact_id, artifact in output_dict[JobResult.BODY].items():
             artifact = EnumDict(artifact)
             self.assertIn("Summary of ", artifact[ArtifactKeys.CONTENT])
             if self.ARTIFACTS[artifact_id][SummarizeArtifactsJob.TYPE_KEY] == "py":

@@ -40,4 +40,4 @@ class ExportArtifactsJob(AbstractJob):
         content = self.delimiter.join(artifacts)
         file_path = os.path.join(self.job_args.output_dir, self.file_name)
         FileUtil.write(content, file_path)
-        return JobResult.from_dict({JobResult.EXPORT_PATH: file_path})
+        return JobResult(body= file_path)

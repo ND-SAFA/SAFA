@@ -28,7 +28,7 @@ class TestExportArtifactsJob(BaseJobTest):
         Verifies that file containing same number of lines as artifacts and each artifact is
         present in exported file.
         """
-        export_path = job_result[JobResult.EXPORT_PATH]
+        export_path = job_result[JobResult.BODY]
         self.assertIsNotNone(export_path)
         file_lines = FileUtil.read_file(export_path).split(NEW_LINE)
         artifacts = TestDataManager.get_artifact_map()

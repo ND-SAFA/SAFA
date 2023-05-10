@@ -29,4 +29,4 @@ class HGenJob(AbstractJob):
         :return: The result of the job
         """
         generated_dataset = self.hgen.run(export_path=self.export_path)
-        return JobResult({JobResult.DATASET: generated_dataset})
+        return JobResult(body=generated_dataset)

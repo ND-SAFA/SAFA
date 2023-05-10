@@ -24,6 +24,7 @@ from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -187,8 +188,7 @@ class HierarchyGenerator(BaseObject):
                                                                layer_mapping_df=single_layer_dataset.layer_df)
         dataset = TraceDataset(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
                                layer_df=single_layer_dataset.layer_df)
-        if export_path:
-            dataset.trace_df.to_csv(os.path.join(export_path, "linked_source_layer_dataset.csv"))
+        self.save_dataset_checkpoint(dataset, export_path, "linked_source_layer_dataset")
         return dataset
 
     @staticmethod
@@ -223,6 +223,7 @@ class HierarchyGenerator(BaseObject):
         """
         if not export_path:
             return EMPTY_STRING
+        FileUtil.create_dir_safely(export_path)
         current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
         filename = current_time_string if not filename else filename
         full_export_path = os.path.join(export_path, filename)

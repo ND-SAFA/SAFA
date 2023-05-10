@@ -27,5 +27,5 @@ class TestVSMJob(BaseJobTest):
 
     def _assert_success(self, job: VSMJob, output_dict: dict):
         eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]
-        output_dict = output_dict[JobResult.PREDICTION_OUTPUT]
+        output_dict = output_dict[JobResult.BODY][JobResult.PREDICTION_OUTPUT]
         TestAssertions.verify_prediction_output(self, output_dict, eval_dataset, base_score=0.0)

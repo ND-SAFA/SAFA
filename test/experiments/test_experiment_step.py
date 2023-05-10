@@ -44,7 +44,7 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(output["status"], Status.SUCCESS.value)
         best_job = self.get_job_by_id(experiment_step, output["best_job"])
         self.assertTrue(best_job is not None)
-        self.assertEquals(max(self.accuracies), best_job.result[JobResult.METRICS]["accuracy"])
+        self.assertEquals(max(self.accuracies), best_job.result[JobResult.BODY][JobResult.METRICS]["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
@@ -111,9 +111,9 @@ class TestExperimentStep(BaseExperimentTest):
         definition_mock.return_value = StructureProjectDefinition()
         job1, job2 = self.get_test_jobs()
         step = self.get_experiment_step()
-        job1.result[JobResult.METRICS] = {"accuracy": 0.5}
+        job1.result.update_body({JobResult.METRICS: {"accuracy": 0.5}})
 
-        job2.result[JobResult.METRICS] = {"accuracy": 0.8}
+        job2.result.update_body({JobResult.METRICS: {"accuracy": 0.8}})
         best_job = step._get_best_job([job1, job2])
         self.assertEquals(best_job.id, job2.id)
 

@@ -90,7 +90,8 @@ class ScriptOutputReader:
                 continue
             job_result = JsonUtil.read_json_file(output_path)
             JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
-            base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}
+            base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if
+                          k not in self.experiment_vars_ignore}
             validation_metrics = self.read_validation_entries(job_result, self.metric_names, base_entry=base_entry)
             val_entries.extend(validation_metrics)
             eval_metric_entry = self.read_eval_entry(job_result, self.metric_names, base_entry=base_entry)
@@ -132,10 +133,11 @@ class ScriptOutputReader:
         if base_entry is None:
             base_entry = {}
         val_metric_entries = []
-        if JobResult.VAL_METRICS not in job_result or job_result[JobResult.VAL_METRICS] is None:
+        if JobResult.VAL_METRICS not in job_result.get(JobResult.BODY, {}) or \
+                job_result[JobResult.BODY][JobResult.VAL_METRICS] is None:
             return val_metric_entries
 
-        for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
+        for epoch_index, val_metric_entry in job_result[JobResult.BODY][JobResult.VAL_METRICS].items():
             metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
@@ -151,9 +153,8 @@ class ScriptOutputReader:
         """
         if base_entry is None:
             base_entry = {}
-        if JobResult.PREDICTION_OUTPUT not in job_result:
-            return None
-        job_result = job_result[JobResult.PREDICTION_OUTPUT]
+        job_result = job_result[JobResult.BODY]
+        job_result = job_result[JobResult.PREDICTION_OUTPUT] if JobResult.PREDICTION_OUTPUT in job_result else job_result
         metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
         if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}

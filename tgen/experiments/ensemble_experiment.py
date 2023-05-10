@@ -146,9 +146,9 @@ class EnsembleExperiment(Experiment):
         """
         for step in steps:
             for job in step.jobs:
-                job_experimental_vars = job.result[JobResult.EXPERIMENTAL_VARS]
+                job_experimental_vars = job.result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS]
                 if len(job_experimental_vars) == 0:
-                    job.result[JobResult.EXPERIMENTAL_VARS] = {"model_path": job.model_manager.model_path.lower()}
+                    job.result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS] = {"model_path": job.model_manager.model_path.lower()}
 
     def save_as_job_output(self, ensemble_predictions, ensemble_labels, agg_metrics, model_name: str) -> None:
         """
@@ -160,12 +160,12 @@ class EnsembleExperiment(Experiment):
         :return: None
         """
         job_result = JobResult()
-        job_result[JobResult.PREDICTION_OUTPUT] = {
+        job_result[JobResult.BODY] = {
             JobResult.PREDICTIONS: ensemble_predictions,
             JobResult.LABEL_IDS: ensemble_labels,
             JobResult.METRICS: agg_metrics,
         }
-        job_result[JobResult.EXPERIMENTAL_VARS] = {
+        job_result[JobResult.BODY][JobResult.EXPERIMENTAL_VARS] = {
             "model_path": model_name
         }
         step_output_dir = self.get_step_output_dir(self.experiment_index, 0)

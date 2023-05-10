@@ -47,6 +47,10 @@
 // Navigation - Inputs
 
 .nav-input {
+  & > .q-field__inner > .q-field__control:hover:after {
+    border-color: $color-accent !important;
+  }
+
   fieldset, div, label, i {
     color: $color-accent !important;
   }

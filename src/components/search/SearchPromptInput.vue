@@ -11,7 +11,7 @@
     :option-value="searchStore.artifactLikeMode ? 'id' : undefined"
     input-debounce="0"
     class="nav-search-prompt"
-    style="min-width: 600px"
+    style="width: 600px; max-width: 40vw"
     @update:model-value="clearOptions"
     @filter="filterOptions"
   >

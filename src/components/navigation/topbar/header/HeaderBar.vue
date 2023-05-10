@@ -1,13 +1,17 @@
 <template>
   <div class="full-width">
     <flex-box full-width :wrap="false" justify="between" align="center" y="2">
+      <flex-box align="center">
+        <project-selector />
+        <version-selector />
+      </flex-box>
+      <q-space />
       <project-searchbar v-if="graphVisible" />
+      <q-space />
       <q-space />
       <flex-box align="center">
         <update-button />
         <saving-icon />
-        <project-selector />
-        <version-selector />
       </flex-box>
     </flex-box>
     <separator v-if="graphVisible" nav />

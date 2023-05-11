@@ -70,9 +70,9 @@ class Summarizer(BaseObject):
                 continue
             indices2summarize.add(i)
             prompts_for_summaries.append(prompts)
-        summaries_iter = iter(self._summarize_chunks(self.llm_manager, prompts_for_summaries))
-        summaries = [next(summaries_iter) if index in indices2summarize else content for index, content in enumerate(contents)]
-        return summaries
+        summarized_contents = self._summarize_chunks(self.llm_manager, prompts_for_summaries)
+        summaries_iter = iter(summarized_contents)
+        return [next(summaries_iter) if index in indices2summarize else content for index, content in enumerate(contents)]
 
     def summarize_single(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
@@ -85,7 +85,7 @@ class Summarizer(BaseObject):
         prompts = self._create_summarization_prompts(content, chunker_type, id_)
         if len(prompts) < 1:
             return content
-        return self._summarize_chunks(self.llm_manager, prompts)
+        return self._summarize_chunks(self.llm_manager, prompts)[0]
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
                             index_to_chunker_to_use: Dict[str, SupportedChunker] = None):
@@ -111,7 +111,7 @@ class Summarizer(BaseObject):
         return TokenLimitCalculator.estimate_num_tokens(content, self.model_for_token_limit) > self.token_limit
 
     @staticmethod
-    def _summarize_chunks(llm_manager: AbstractLLMManager, prompts: Union[List[str], List[List[str]]]) -> Union[List[str], str]:
+    def _summarize_chunks(llm_manager: AbstractLLMManager, prompts: Union[List[str], List[List[str]]]) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model.
         :param llm_manager: The utility file containing API to AI library.
@@ -128,7 +128,7 @@ class Summarizer(BaseObject):
                                                                       prompt=all_prompts)
         summarizations_chunks = [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]
         summaries = [EMPTY_STRING.join(summarizations_chunks[i: i + n]) for i, n in enumerate(n_chunks_per_summary)]
-        return summaries if len(summaries) > 1 else summaries[0]
+        return summaries
 
     def _create_summarization_prompts(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) \
             -> List[str]:
@@ -145,5 +145,5 @@ class Summarizer(BaseObject):
         chunks = chunker.chunk(content=content, id_=id_)
         if self.code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return []  # skip summarizing content below token limit unless code
-        prompt_creator = self.code_prompt_creator if chunker_type else self.nl_prompt_creator
+        prompt_creator = self.nl_prompt_creator if chunker_type == SupportedChunker.NL else self.code_prompt_creator
         return [prompt_creator.create(target_content=chunk)[PromptKeys.PROMPT.value] for chunk in chunks]

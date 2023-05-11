@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -293,7 +292,7 @@ public class GithubProjectCreationJob extends CommitJob {
         ProjectCommit commit = getProjectCommit();
         Branch branch = getBranch(this.githubProject.getBranch());
         this.commitSha = branch.getTarget().getOid();
-        commit.addArtifacts(ModificationType.ADDED, getArtifacts());
+        commit.addArtifacts(ModificationType.ADDED, getArtifacts(logger));
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
 
@@ -314,7 +313,7 @@ public class GithubProjectCreationJob extends CommitJob {
             .orElse(this.githubRepository.getDefaultBranchRef());
     }
 
-    protected List<ArtifactAppEntity> getArtifacts() {
+    protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         GithubGraphQlService githubService = serviceProvider.getGithubGraphQlService();
         List<GithubRepositoryFileDTO> files = githubService.getFilesInRepo(this.user,
@@ -326,8 +325,10 @@ public class GithubProjectCreationJob extends CommitJob {
 
             String path = file.getPath();
             if (shouldSkipFile(path)) {
+                logger.log("%s will not be imported due to inclusion/exclusion criteria.", path);
                 continue;
             }
+            logger.log("Importing %s.", path);
 
             String type = githubProject.getArtifactType().getName();
             String summary = "";
@@ -380,21 +381,4 @@ public class GithubProjectCreationJob extends CommitJob {
         return !shouldImportPredicate.test(filename);
     }
 
-    /**
-     * Decodes GitHub's base64 encoded file bodies. Each line in the original file
-     * is base64 encoded in GitHub's storage, with newlines separating them.
-     *
-     * @param encodedBody The encoded file body
-     * @return The decoded file body
-     */
-    private String base64Decode(String encodedBody) {
-        StringBuilder output = new StringBuilder();
-
-        for (String line : encodedBody.split("\n")) {
-            byte[] decodedBytes = Base64.getDecoder().decode(line);
-            output.append(new String(decodedBytes));
-        }
-
-        return output.toString();
-    }
 }

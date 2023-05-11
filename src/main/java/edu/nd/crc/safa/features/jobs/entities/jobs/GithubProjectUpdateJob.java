@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -63,7 +64,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     }
 
     @Override
-    protected List<ArtifactAppEntity> getArtifacts() {
+    protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
@@ -78,8 +79,10 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
             String path = diff.getFilename();
             if (shouldSkipFile(path)) {
+                logger.log("%s will not be imported due to inclusion/exclusion criteria.", path);
                 continue;
             }
+            logger.log("Importing %s.", path);
 
             log.info(diff.toString());
             String type = diff.getStatus().name();

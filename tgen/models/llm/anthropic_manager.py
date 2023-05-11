@@ -1,14 +1,16 @@
-from typing import List, TypedDict
+import math
+from typing import List, TypedDict, Dict
 
 import anthropic
-from tqdm import tqdm
 
+from tgen.constants.anthropic_constants import ANTHROPIC_MAX_THREADS
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
+from tgen.util.thread_util import ThreadUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -67,19 +69,25 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `params`"
+        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params[AnthropicParams.PROMPT]
         response = []
         if isinstance(prompts, str):
             prompts = [prompts]
-        for p in tqdm(prompts):
-            prompt_params = {**params, AnthropicParams.PROMPT: p}
+
+        response = [None] * len(prompts)
+
+        def thread_work(payload):
+            index, prompt = payload
+            prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             prompt_response = AnthropicManager.Client.completion(**prompt_params)
-            response.append(prompt_response)
+            response[index] = prompt_response
+
+        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
+
         return response
 
-    @staticmethod
-    def translate_to_response(task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
         """
         Translates the LLM library response to task specific response.
         :param task: The task to translate to.
@@ -89,7 +97,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
-        raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
+        if task == LLMCompletionType.CLASSIFICATION:
+            results = [AnthropicManager._get_log_prob(r["completion"]) for r in res]
+            return ClassificationResponse(results)
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:
@@ -99,6 +109,24 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: None
         """
         raise NotImplementedError(NotImplementedError)
+
+    @staticmethod
+    def _get_log_prob(completion: str) -> Dict[str, float]:
+        """
+        Gets the log probabilities for a classification completion
+        :param completion: The completion
+        :return: The log probabilities for each class
+        """
+        completion = completion.lower()
+        log_probs = {"yes": 0, "no": 0}  # TODO get the neg and pos clas from the prompt creator
+        response_2_index = {ans: completion.find(ans) for ans in log_probs.keys()}
+        response_2_index = {k: v for k, v in response_2_index.items() if v == -1}  # remove if response not in completion
+        first_response = min(response_2_index, key=response_2_index.get) if len(response_2_index) > 0 else None
+        if first_response in log_probs:
+            log_probs[first_response] = 1
+        else:
+            log_probs = {k: 0.5 for k in log_probs.keys()}
+        return log_probs
 
 
 if not IS_TEST:

@@ -20,6 +20,7 @@ from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.logging.logger_manager import logger
+from tgen.util.uncased_dict import UncasedDict
 
 
 class LLMTrainer(AbstractTrainer):
@@ -155,6 +156,7 @@ class LLMTrainer(AbstractTrainer):
         if len(probs) == 0:
             return 0.5
 
+        probs = UncasedDict(probs)
         neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
         pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
 

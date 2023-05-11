@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.common;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -127,6 +128,37 @@ public abstract class BaseController {
      */
     protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request) {
         return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @return A deferred result that will perform the request.
+     */
+    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request) {
+        return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @param timeout The timeout for the request.
+     * @return A deferred result that will perform the request.
+     */
+    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request, long timeout) {
+        ExecutorDelegate executorDelegate = serviceProvider.getExecutorDelegate();
+        SafaUserService safaUserService = serviceProvider.getSafaUserService();
+
+        DeferredResult<Void> output = executorDelegate.createOutput(timeout);
+
+        SafaUser user = safaUserService.getCurrentUser();
+        executorDelegate.submit(output, () -> {
+            request.accept(user);
+        });
+
+        return output;
     }
 
     /**

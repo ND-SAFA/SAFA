@@ -16,10 +16,8 @@ import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
-import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,20 +32,14 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Controller
 public class GithubController extends BaseController {
 
-    private final SafaUserService safaUserService;
     private final GithubConnectionService githubConnectionService;
-    private final ExecutorDelegate executorDelegate;
     private final GithubControllerUtils githubControllerUtils;
 
     public GithubController(ResourceBuilder resourceBuilder,
-                            SafaUserService safaUserService,
-                            ExecutorDelegate executorDelegate,
                             ServiceProvider serviceProvider,
                             GithubConnectionService githubConnectionService,
                             GithubControllerUtils githubControllerUtils) {
         super(resourceBuilder, serviceProvider);
-        this.safaUserService = safaUserService;
-        this.executorDelegate = executorDelegate;
         this.githubConnectionService = githubConnectionService;
         this.githubControllerUtils = githubControllerUtils;
     }
@@ -65,19 +57,18 @@ public class GithubController extends BaseController {
                                                           @PathVariable("owner") String owner,
                                                           @RequestBody GithubImportDTO importSettings) {
 
-        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = this.checkCredentials();
-        executorDelegate.submit(output, () -> {
-
+        return makeDeferredRequest(user -> {
+            checkCredentials(user);
             GithubIdentifier identifier = new GithubIdentifier(null, owner, repositoryName);
             CreateProjectViaGithubBuilder builder
-                = new CreateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
+                = new CreateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
 
-            output.setResult(builder.perform());
+            try {
+                return builder.perform();
+            } catch (Exception e) {
+                throw new SafaError("Failed to start job", e);
+            }
         });
-
-        return output;
     }
 
     /**
@@ -96,20 +87,19 @@ public class GithubController extends BaseController {
                                                             @PathVariable("owner") String owner,
                                                             @RequestBody GithubImportDTO importSettings) {
 
-        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = this.checkCredentials();
-        executorDelegate.submit(output, () -> {
-
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
+        return makeDeferredRequest(user -> {
+            checkCredentials(user);
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(user);
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             UpdateProjectViaGithubBuilder builder
-                = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
+                = new UpdateProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
 
-            output.setResult(builder.perform());
+            try {
+                return builder.perform();
+            } catch (Exception e) {
+                throw new SafaError("Failed to start job", e);
+            }
         });
-
-        return output;
     }
 
     /**
@@ -128,25 +118,23 @@ public class GithubController extends BaseController {
                                                                   @PathVariable("owner") String owner,
                                                                   @RequestBody GithubImportDTO importSettings) {
 
-        DeferredResult<JobAppEntity> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = this.checkCredentials();
-        executorDelegate.submit(output, () -> {
-
-            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(principal);
+        return makeDeferredRequest(user -> {
+            checkCredentials(user);
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersionAs(user);
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, owner, repositoryName);
             ImportIntoProjectViaGithubBuilder builder
-                = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, importSettings, principal);
+                = new ImportIntoProjectViaGithubBuilder(serviceProvider, identifier, importSettings, user);
 
-            output.setResult(builder.perform());
+            try {
+                return builder.perform();
+            } catch (Exception e) {
+                throw new SafaError("Failed to start job", e);
+            }
         });
-
-        return output;
     }
 
-    private SafaUser checkCredentials() {
-        SafaUser principal = safaUserService.getCurrentUser();
-        GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(principal)
+    private void checkCredentials(SafaUser user) {
+        GithubAccessCredentials githubAccessCredentials = githubConnectionService.getGithubCredentials(user)
             .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
         boolean response = githubControllerUtils.checkCredentials(githubAccessCredentials);
@@ -154,8 +142,6 @@ public class GithubController extends BaseController {
         if (!response) {
             throw new SafaError("Invalid GitHub credentials");
         }
-
-        return principal;
     }
 
 }

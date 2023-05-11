@@ -14,7 +14,6 @@ import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
@@ -60,10 +59,7 @@ public class GithubCredentialsController extends BaseController {
     @PostMapping(AppRoutes.Github.Credentials.REGISTER)
     public DeferredResult<Void> createCredentials(
         @NotNull @NotEmpty @PathVariable("accessCode") String accessCode) {
-        DeferredResult<Void> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
+        return makeDeferredRequest(user -> {
             GithubAccessCredentialsDTO dto = githubConnectionService.useAccessCode(accessCode);
 
             if (dto.isError()) {
@@ -74,56 +70,31 @@ public class GithubCredentialsController extends BaseController {
             // If credentials are not valid it will throw
             GithubSelfResponseDTO selfResponseDTO = githubConnectionService.getSelf(credentials);
             Optional<GithubAccessCredentials> previousCredentials = githubAccessCredentialsRepository
-                .findByUser(principal);
+                .findByUser(user);
 
             if (previousCredentials.isPresent()) {
-                log.info("Deleting previous GitHub credentials for {}", principal.getEmail());
+                log.info("Deleting previous GitHub credentials for {}", user.getEmail());
                 githubAccessCredentialsRepository.delete(previousCredentials.get());
             }
 
             credentials.setGithubHandler(selfResponseDTO.getLogin());
-            credentials.setUser(principal);
+            credentials.setUser(user);
             githubAccessCredentialsRepository.save(credentials);
         });
-
-        return output;
     }
 
     @DeleteMapping(AppRoutes.Github.Credentials.DELETE)
-    public DeferredResult<Void> deleteCredentials() {
-        DeferredResult<Void> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
-            Optional<GithubAccessCredentials> credentials = githubAccessCredentialsRepository
-                .findByUser(principal);
-
-            if (credentials.isEmpty()) {
-                return;
-            }
-
-            githubAccessCredentialsRepository.delete(credentials.get());
-        });
-
-        return output;
+    public void deleteCredentials() {
+        Optional<GithubAccessCredentials> credentials = githubAccessCredentialsRepository
+            .findByUser(safaUserService.getCurrentUser());
+        credentials.ifPresent(githubAccessCredentialsRepository::delete);
     }
 
     @GetMapping(AppRoutes.Github.Credentials.VALID)
-    public DeferredResult<Boolean> validCredentials() {
-        DeferredResult<Boolean> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
-            Optional<GithubAccessCredentials> credentials = githubConnectionService.getGithubCredentials(principal);
-
-            if (credentials.isEmpty()) {
-                output.setResult(false);
-            } else {
-                output.setResult(githubControllerUtils.checkCredentials(credentials.get()));
-            }
-        });
-
-        return output;
+    public Boolean validCredentials() {
+        Optional<GithubAccessCredentials> credentials =
+            githubConnectionService.getGithubCredentials(safaUserService.getCurrentUser());
+        return credentials.filter(githubControllerUtils::checkCredentials).isPresent();
     }
 
 }

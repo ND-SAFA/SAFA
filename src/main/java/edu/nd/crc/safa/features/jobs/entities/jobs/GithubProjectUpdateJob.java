@@ -1,10 +1,8 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -90,13 +88,11 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
             String body = diff.getBlobUrl();
 
             Map<String, JsonNode> attributes = getAttributes(path);
-            String[] pathParts = path.split(Pattern.quote(File.separator));
-            String name = pathParts[pathParts.length - 1];
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
-                name,
+                path,
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,

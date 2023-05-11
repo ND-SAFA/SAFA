@@ -285,8 +285,7 @@ public class GithubProjectCreationJob extends CommitJob {
     private ArtifactType createArtifactType(Project project, String artifactTypeName) {
         ArtifactType artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeName);
         List<AttributePositionAppEntity> attributePositions = List.of(
-            new AttributePositionAppEntity(ReservedAttributes.Github.REPO_PATH.getKey(), 0, 0, 1, 1),
-            new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 1, 1, 1)
+            new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
         );
         AttributeLayoutAppEntity layoutEntity = new AttributeLayoutAppEntity(null, artifactTypeName + " Layout",
             List.of(artifactTypeName), attributePositions);
@@ -355,7 +354,7 @@ public class GithubProjectCreationJob extends CommitJob {
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
-                file.getName(),
+                path,
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,
@@ -370,7 +369,6 @@ public class GithubProjectCreationJob extends CommitJob {
 
     protected Map<String, JsonNode> getAttributes(String filePath) {
         Map<String, JsonNode> attributes = new HashMap<>();
-        attributes.put(ReservedAttributes.Github.REPO_PATH.getKey(), TextNode.valueOf(filePath));
         attributes.put(ReservedAttributes.Github.LINK.getKey(),
             TextNode.valueOf(buildGithubFileUrl(filePath)));
         return attributes;

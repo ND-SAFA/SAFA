@@ -9,12 +9,10 @@ public interface ReservedAttributes {
     interface Github {
         String PREFIX = ReservedAttributes.PREFIX + "gh:";
 
-        CustomAttributeAppEntity REPO_PATH =
-            new CustomAttributeAppEntity(PREFIX + "repo_path", "Full Path", CustomAttributeType.TEXT);
         CustomAttributeAppEntity LINK =
             new CustomAttributeAppEntity(PREFIX + "link", "Link", CustomAttributeType.TEXT);
 
-        List<CustomAttributeAppEntity> ALL_ATTRIBUTES = List.of(REPO_PATH, LINK);
+        List<CustomAttributeAppEntity> ALL_ATTRIBUTES = List.of(LINK);
     }
 
     static boolean isReservedAttribute(String attributeKey) {

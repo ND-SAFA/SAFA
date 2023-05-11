@@ -1,0 +1,22 @@
+{
+  "data": {
+    "repository": {
+      "refs": {
+        "edges": [
+          {
+            "node": {
+              "name": "branch3",
+              "target": {
+                "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+              }
+            }
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "Ng"
+        }
+      }
+    }
+  }
+}

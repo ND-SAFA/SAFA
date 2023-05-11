@@ -41,6 +41,12 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
         getMockWebServer().enqueue(new MockResponse()
             .setBody(loadGithubResponseFile("repositories_response.json"))
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        getMockWebServer().enqueue(new MockResponse()
+            .setBody(loadGithubResponseFile("repositories_continued.json"))
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        getMockWebServer().enqueue(new MockResponse()
+            .setBody(loadGithubResponseFile("branches_continued.json"))
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<GithubRepositoryDTO> response = SafaRequest
             .withRoute(AppRoutes.Integrations.Github.Repos.ROOT)
@@ -57,9 +63,10 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
         assertEquals("ND-SAFA", bend.getOwner());
         assertEquals("bend", bend.getName());
         List<String> bendBranches = bend.getBranches();
-        assertEquals(2, bendBranches.size());
+        assertEquals(3, bendBranches.size());
         assertEquals("development", bendBranches.get(0));
         assertEquals("production", bendBranches.get(1));
+        assertEquals("branch3", bendBranches.get(2));
 
         GithubRepositoryDTO fend = response.get(1);
         assertEquals("ND-SAFA", fend.getOwner());

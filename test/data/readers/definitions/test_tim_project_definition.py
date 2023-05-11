@@ -1,11 +1,11 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from tgen.testres.base_tests.base_test import BaseTest
 from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
+from tgen.testres.base_tests.base_test import BaseTest
 from tgen.util.json_util import JsonUtil
 
 
@@ -15,20 +15,21 @@ class TestTimProjectDefinition(BaseTest):
     """
     file_name = "file.csv"
     artifact_type = "reqs"
-    trace_matrix_name = "reqs2designs"
+    trace_matrix_name = "source_type2target_type"
     source = "source_type"
     target = "target_type"
     original = {
-        SafaKeys.DATAFILES_KEY: {
-            artifact_type: {
-                SafaKeys.FILE: file_name
+        SafaKeys.ARTIFACTS: [{
+            SafaKeys.TYPE: artifact_type,
+            SafaKeys.FILE: file_name
+        }],
+        SafaKeys.TRACES: [
+            {
+                SafaKeys.FILE: file_name,
+                SafaKeys.SOURCE_ID: source,
+                SafaKeys.TARGET_ID: target
             }
-        },
-        trace_matrix_name: {
-            SafaKeys.FILE: file_name,
-            SafaKeys.SOURCE_ID: source,
-            SafaKeys.TARGET_ID: target
-        }
+        ]
     }
     expected = {
         StructuredKeys.ARTIFACTS: {
@@ -40,6 +41,7 @@ class TestTimProjectDefinition(BaseTest):
         StructuredKeys.TRACES: {
             trace_matrix_name: {
                 StructuredKeys.PATH: file_name,
+
                 StructuredKeys.COLS: "csv-traces",
                 StructuredKeys.Trace.SOURCE.value: source,
                 StructuredKeys.Trace.TARGET.value: target
@@ -78,10 +80,11 @@ class TestTimProjectDefinition(BaseTest):
         Tests that trace definition converted to structure format.
         """
 
-        original_def = {self.trace_matrix_name: deepcopy(self.original[self.trace_matrix_name])}
-        expected_def = deepcopy(self.expected[StructuredKeys.TRACES])
-        artifact_definitions = TimProjectDefinition._create_trace_definitions(original_def)
-        self.assertDictEqual(expected_def, artifact_definitions)
+        original_def = {self.trace_matrix_name: deepcopy(self.original[SafaKeys.TRACES][0])}
+        expected_def = deepcopy(self.expected[StructuredKeys.TRACES][self.trace_matrix_name])
+        trace_definitions = TimProjectDefinition._create_trace_definitions(deepcopy(self.original))
+        t_definition = trace_definitions[self.trace_matrix_name]
+        self.assertDictEqual(expected_def, t_definition)
 
     def test_get_flattened_conversions(self):
         """

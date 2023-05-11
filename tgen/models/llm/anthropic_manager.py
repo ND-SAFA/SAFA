@@ -9,6 +9,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
+from tgen.util.thread_util import ThreadUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -72,6 +73,16 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         response = []
         if isinstance(prompts, str):
             prompts = [prompts]
+        results = [None * len(prompts)]
+
+        def thread_work(payload):
+            index, prompt = payload
+            prompt_params = {**params, AnthropicParams.PROMPT: prompt}
+            prompt_response = AnthropicManager.Client.completion(**prompt_params)
+            results[index] = prompt_response
+
+        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, 20)
+
         for p in tqdm(prompts):
             prompt_params = {**params, AnthropicParams.PROMPT: p}
             prompt_response = AnthropicManager.Client.completion(**prompt_params)

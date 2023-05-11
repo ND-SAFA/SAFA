@@ -55,7 +55,7 @@ class AbstractPromptCreator(BaseObject):
         return f"{self.args.completion_prefix}{base_completion}{self.args.completion_suffix}"
 
     @abstractmethod
-    def create(self, source_content: str, target_content: str, **kwargs) -> EnumDict[str, str]:
+    def create(self, target_content: str, source_content: str, **kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param source_content: The content of the source artifact

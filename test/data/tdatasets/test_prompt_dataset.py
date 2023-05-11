@@ -44,7 +44,7 @@ class TestPromptDataset(BaseTest):
         return True
 
     @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
-    @mock.patch.object(Summarizer, "summarize")
+    @mock.patch.object(Summarizer, "summarize_single")
     @mock.patch.object(AbstractChunker, "exceeds_token_limit")
     def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock,
                               summarize_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):

@@ -2,7 +2,8 @@
   <q-select
     v-model="model"
     filled
-    label="Custom Model"
+    label="Generation Model"
+    hint="The model used to generate trace links."
     :options="options"
     option-label="name"
     option-value="id"

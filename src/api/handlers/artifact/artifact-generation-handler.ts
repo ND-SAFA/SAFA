@@ -1,5 +1,10 @@
-import { ArtifactSchema, IOHandlerCallback } from "@/types";
-import { createSummary } from "@/api";
+import {
+  ArtifactSchema,
+  ArtifactSummaryConfirmation,
+  IOHandlerCallback,
+} from "@/types";
+import { logStore } from "@/hooks";
+import { createSummary, handleSaveArtifact } from "@/api";
 
 /**
  * Generates a summary for an artifact, and updates the app state.
@@ -11,18 +16,30 @@ import { createSummary } from "@/api";
  */
 export async function handleGenerateArtifactSummary(
   artifact: ArtifactSchema,
-  { onSuccess, onError, onComplete }: IOHandlerCallback<string>
+  {
+    onSuccess,
+    onError,
+    onComplete,
+  }: IOHandlerCallback<ArtifactSummaryConfirmation>
 ): Promise<void> {
-  // TODO:
-  //  1. Generate a summary for the artifact.
-  //  2. Save changes to the artifact.
-  //  3. Update the artifact in the app state.
   try {
     const summary = await createSummary(artifact);
 
-    onSuccess?.(summary);
+    const confirm = () =>
+      handleSaveArtifact(
+        {
+          ...artifact,
+          summary,
+        },
+        true,
+        undefined,
+        {}
+      );
+
+    onSuccess?.({ summary, confirm });
   } catch (e) {
     onError?.(e as Error);
+    logStore.onError(`Failed to generate summary: ${artifact.name}`);
   } finally {
     onComplete?.();
   }

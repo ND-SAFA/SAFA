@@ -2,13 +2,15 @@ class SafaKeys:
     """
     Keys used in the SAFA project format.
     """
+    TYPE = "type"
     TIM_FILE = "tim.json"
-    DATAFILES_KEY = "DataFiles"
+    ARTIFACTS = "artifacts"
+    TRACES = "traces"
     ARTIFACT_ID = "id"
     SAFA_CVS_ARTIFACT_TOKEN = "content"
     SAFA_JSON_ARTIFACT_TOKEN = "body"
-    SOURCE_ID = "Source"
-    TARGET_ID = "Target"
+    SOURCE_ID = "sourceType"
+    TARGET_ID = "targetType"
 
-    FILE = "File"
+    FILE = "fileName"
     SUPPORTED_EXTENSIONS = [".json", ".csv"]

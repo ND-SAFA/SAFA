@@ -1,5 +1,4 @@
 import os
-from copy import deepcopy
 from typing import Dict
 
 from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
@@ -66,15 +65,19 @@ class TimProjectDefinition(AbstractProjectDefinition):
         :param definition: The project definition
         :return: Mapping between artifact type to its definition.
         """
-        JsonUtil.require_properties(definition, [SafaKeys.DATAFILES_KEY])
-        artifact_definitions = definition[SafaKeys.DATAFILES_KEY]
-        for _, artifact_definition in artifact_definitions.items():
+        JsonUtil.require_properties(definition, [SafaKeys.ARTIFACTS])
+        artifact_definitions = definition[SafaKeys.ARTIFACTS]
+        artifact_definitions_map = {}
+        for artifact_definition in artifact_definitions:
+            JsonUtil.require_properties(artifact_definition, [SafaKeys.TYPE, SafaKeys.FILE])
+            artifact_type = artifact_definition.pop(SafaKeys.TYPE)
             artifact_data_path = artifact_definition.pop(SafaKeys.FILE)
             col_conversion_name = TimProjectDefinition.get_file_format(artifact_data_path)
             artifact_definition[StructuredKeys.PATH] = artifact_data_path
             artifact_definition[StructuredKeys.COLS] = TimProjectDefinition.get_conversion_id(col_conversion_name,
                                                                                               StructuredKeys.ARTIFACTS)
-        return artifact_definitions
+            artifact_definitions_map[artifact_type] = artifact_definition
+        return artifact_definitions_map
 
     @staticmethod
     def _create_trace_definitions(project_definition: Dict) -> Dict[str, Dict]:
@@ -83,20 +86,25 @@ class TimProjectDefinition(AbstractProjectDefinition):
         :param project_definition: The project definition.
         :return: Mapping of trace matrix name to its definition.
         """
-        definitions = deepcopy(project_definition)
-        definitions.pop(SafaKeys.DATAFILES_KEY, None)
+        JsonUtil.require_properties(project_definition, [SafaKeys.TRACES])
+        definitions = project_definition.pop(SafaKeys.TRACES)
 
-        return {
-            key: {
-                StructuredKeys.PATH: definition[SafaKeys.FILE],
-                StructuredKeys.Trace.SOURCE.value: definition[SafaKeys.SOURCE_ID],
-                StructuredKeys.Trace.TARGET.value: definition[SafaKeys.TARGET_ID],
+        trace_definitions_map = {}
+        for t_definition in definitions:
+            JsonUtil.require_properties(t_definition, [SafaKeys.FILE, SafaKeys.SOURCE_ID, SafaKeys.TARGET_ID])
+            source_type = t_definition[SafaKeys.SOURCE_ID]
+            target_type = t_definition[SafaKeys.TARGET_ID]
+            t_file = t_definition[SafaKeys.FILE]
+            trace_definition_key = f"{source_type}2{target_type}"
+            trace_definitions_map[trace_definition_key] = {
+                StructuredKeys.PATH: t_file,
+                StructuredKeys.Trace.SOURCE.value: source_type,
+                StructuredKeys.Trace.TARGET.value: target_type,
                 StructuredKeys.COLS: TimProjectDefinition.get_conversion_id(
-                    TimProjectDefinition.get_file_format(definition[SafaKeys.FILE]),
+                    TimProjectDefinition.get_file_format(t_definition[SafaKeys.FILE]),
                     StructuredKeys.TRACES)
             }
-            for key, definition in definitions.items()
-        }
+        return trace_definitions_map
 
     @staticmethod
     def get_flattened_conversions() -> Dict[str, Dict]:

@@ -28,8 +28,8 @@ class SafaExporter(AbstractDatasetExporter):
         :param dataset_creator: The creator in charge of making the dataset to export
         """
         super().__init__(export_path, dataset_creator, dataset)
-        self.artifact_definitions = {}
-        self.trace_definitions = {}
+        self.artifact_definitions = []
+        self.trace_definitions = []
         self.artifact_type_to_artifacts = None
 
     @staticmethod
@@ -73,9 +73,10 @@ class SafaExporter(AbstractDatasetExporter):
             file_name = artifact_type + ".csv"
             local_export_path = os.path.join(self.export_path, file_name)
             pd.DataFrame(entries).to_csv(local_export_path, index=False)
-            self.artifact_definitions[artifact_type] = {
+            self.artifact_definitions.append({
+                SafaKeys.TYPE: artifact_type,
                 SafaKeys.FILE: file_name
-            }
+            })
         return artifact_type_to_artifacts
 
     def create_trace_definitions(self) -> None:
@@ -90,11 +91,11 @@ class SafaExporter(AbstractDatasetExporter):
             file_name = matrix_name + ".csv"
             export_file_path = os.path.join(self.export_path, file_name)
             trace_df = self.create_trace_df_for_layer(source_type, target_type)
-            self.trace_definitions[matrix_name] = {
-                "File": file_name,
-                "Source": source_type,
-                "Target": target_type
-            }
+            self.trace_definitions.append({
+                SafaKeys.FILE: file_name,
+                SafaKeys.SOURCE_ID: source_type,
+                SafaKeys.TARGET_ID: target_type
+            })
             trace_df.to_csv(export_file_path, index=False, encoding="utf-8")
 
     def create_trace_df_for_layer(self, source_type, target_type) -> pd.DataFrame:
@@ -127,10 +128,8 @@ class SafaExporter(AbstractDatasetExporter):
         :return: None
         """
         tim_definition = {
-            "DataFiles": {
-                **self.artifact_definitions
-            },
-            **self.trace_definitions
+            SafaKeys.ARTIFACTS: self.artifact_definitions,
+            SafaKeys.TRACES: self.trace_definitions
         }
         tim_export_path = os.path.join(self.export_path, "tim.json")
         FileUtil.write(tim_definition, tim_export_path)

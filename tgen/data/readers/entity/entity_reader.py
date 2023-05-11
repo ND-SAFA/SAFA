@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Generic, Optional, TypeVar, Tuple
+from typing import Dict, Generic, Optional, Tuple, TypeVar
 
 import pandas as pd
 
@@ -27,8 +27,7 @@ class EntityReader(Generic[EntityType]):
         :param definition: Defines how to parse the data.
         :param conversions: The definitions to the data to standardize it.
         """
-        required_properties = [StructuredKeys.PATH]
-        JsonUtil.require_properties(definition, required_properties)
+        JsonUtil.require_properties(definition, [StructuredKeys.PATH])
         self.definition: Dict = definition
         self.path = os.path.join(base_path, JsonUtil.get_property(definition, StructuredKeys.PATH))
         self.conversions: Dict[str, Dict] = conversions

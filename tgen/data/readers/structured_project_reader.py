@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Tuple, Generic
+from typing import Dict
 
 import pandas as pd
 
@@ -82,8 +82,8 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :return:  Mapping between artifacts' name and its reader.
         """
         artifacts_df = ArtifactDataFrame()
-        type2definition = self._get_artifact_definitions()
-        for artifact_type, artifact_definition in type2definition.items():
+        artifact_definitions = self._get_artifact_definitions()
+        for artifact_type, artifact_definition in artifact_definitions.items():
             artifact_reader = EntityReader(self.project_path,
                                            artifact_definition,
                                            conversions=self.get_project_conversions())

@@ -128,17 +128,19 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     /**
      * Deletes a layout by its ID.
      *
+     * @param user The user making the request.
      * @param id The ID of the layout to delete.
      */
     @Transactional
-    public void deleteLayoutById(UUID id) {
+    public void deleteLayoutById(SafaUser user, UUID id) {
         Optional<AttributeLayout> layout = getLayoutById(id);
         layoutRepo.deleteById(id);
 
         if (layout.isPresent()) {
             Project project = layout.get().getProject();
-            notificationService.broadcastChange(
-                    EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId())
+            notificationService.broadcastChangeToUser(
+                EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId()),
+                user
             );
         }
     }
@@ -146,6 +148,7 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
     /**
      * Save a front-end layout entity to the database.
      *
+     * @param user The user making the request.
      * @param appEntity The entity to save.
      * @param project The project the layout is associated with.
      * @param isNew True if this layout is being newly created, false otherwise. If this is set to false and
@@ -154,7 +157,8 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
      * @return The database entity that was created/updated.
      */
     @Transactional
-    public AttributeLayout saveLayoutEntity(AttributeLayoutAppEntity appEntity, Project project, boolean isNew) {
+    public AttributeLayout saveLayoutEntity(SafaUser user, AttributeLayoutAppEntity appEntity,
+                                            Project project, boolean isNew) {
         AttributeLayout layout = attributeLayoutFromAppEntity(project, appEntity);
 
         if (!isNew && (appEntity.getId() == null || layoutRepo.findById(appEntity.getId()).isEmpty())) {
@@ -165,8 +169,9 @@ public class AttributeLayoutService implements IAppEntityService<AttributeLayout
         saveArtifactTypes(layout, appEntity.getArtifactTypes());
         savePositions(layout, appEntity.getPositions());
 
-        notificationService.broadcastChange(
-                EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId())
+        notificationService.broadcastChangeToUser(
+            EntityChangeBuilder.create(project.getProjectId()).withProjectUpdate(project.getProjectId()),
+            user
         );
 
         return layout;

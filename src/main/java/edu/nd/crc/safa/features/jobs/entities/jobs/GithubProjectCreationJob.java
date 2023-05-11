@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
@@ -32,6 +34,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
@@ -265,16 +268,29 @@ public class GithubProjectCreationJob extends CommitJob {
      * @return The artifact type we should use for importing.
      */
     protected ArtifactType getArtifactTypeMapping(Project project) {
-        String artifactTypeId = this.importSettings.getArtifactType();
-        artifactTypeId = artifactTypeId != null ? artifactTypeId : getDefaultTypeName();
+        TypeService typeService = serviceProvider.getTypeService();
+        String artifactTypeName = this.importSettings.getArtifactType();
+        artifactTypeName = artifactTypeName != null ? artifactTypeName : getDefaultTypeName();
 
-        ArtifactType artifactType = serviceProvider.getTypeService().getArtifactType(project, artifactTypeId);
+        ArtifactType artifactType = typeService.getArtifactType(project, artifactTypeName);
 
         if (artifactType == null) {
-            artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeId);
+            artifactType = createArtifactType(project, artifactTypeName);
 
         }
 
+        return artifactType;
+    }
+
+    private ArtifactType createArtifactType(Project project, String artifactTypeName) {
+        ArtifactType artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeName);
+        List<AttributePositionAppEntity> attributePositions = List.of(
+            new AttributePositionAppEntity(ReservedAttributes.Github.REPO_PATH.getKey(), 0, 0, 1, 1),
+            new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 1, 1, 1)
+        );
+        AttributeLayoutAppEntity layoutEntity = new AttributeLayoutAppEntity(null, artifactTypeName + " Layout",
+            List.of(artifactTypeName), attributePositions);
+        serviceProvider.getAttributeLayoutService().saveLayoutEntity(user, layoutEntity, project, true);
         return artifactType;
     }
 

@@ -1,4 +1,5 @@
 import { ArtifactSchema, IOHandlerCallback } from "@/types";
+import { createSummary } from "@/api";
 
 /**
  * Generates a summary for an artifact, and updates the app state.
@@ -8,17 +9,21 @@ import { ArtifactSchema, IOHandlerCallback } from "@/types";
  * @param onError - Called if the summary generation fails.
  * @param onComplete - Called after the action completes.
  */
-export function handleGenerateArtifactSummary(
+export async function handleGenerateArtifactSummary(
   artifact: ArtifactSchema,
-  { onSuccess, onError, onComplete }: IOHandlerCallback
-): void {
+  { onSuccess, onError, onComplete }: IOHandlerCallback<string>
+): Promise<void> {
   // TODO:
   //  1. Generate a summary for the artifact.
-  //  2. Save changes to thee artifact.
+  //  2. Save changes to the artifact.
   //  3. Update the artifact in the app state.
-  setTimeout(() => {
-    artifact.summary = "Some generated summary.";
-    onSuccess?.();
+  try {
+    const summary = await createSummary(artifact);
+
+    onSuccess?.(summary);
+  } catch (e) {
+    onError?.(e as Error);
+  } finally {
     onComplete?.();
-  }, 1000);
+  }
 }

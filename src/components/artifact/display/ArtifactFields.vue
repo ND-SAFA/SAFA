@@ -97,6 +97,11 @@ function handleGenerateSummary(): void {
 
   handleGenerateArtifactSummary(artifact.value, {
     onComplete: () => (generateLoading.value = false),
+    onSuccess: (summary) => {
+      //TODO: remove test code
+      if (!artifact.value) return;
+      artifact.value.summary = summary;
+    },
   });
 }
 </script>

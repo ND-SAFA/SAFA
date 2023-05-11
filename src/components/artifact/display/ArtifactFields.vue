@@ -35,7 +35,7 @@
         color="primary"
         :loading="generateLoading"
         :icon="hasSummary ? 'graph-refresh' : 'add'"
-        :label="hasSummary ? 'Regenerate' : 'Generate'"
+        :label="hasSummary ? 'Resummarize' : 'Summarize'"
         @click="handleGenerateSummary"
       />
     </flex-box>

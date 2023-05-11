@@ -11,17 +11,15 @@
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre
-      v-if="isExpanded"
-      v-highlightjs
-      :class="className"
-      style="overflow-x: scroll"
-    >
+    <pre v-if="isExpanded" v-highlightjs :class="className">
       <code>{{value}}</code>
     </pre>
-    <div v-else :class="className + ' text-ellipsis text-expanded'">
-      {{ value }}
+    <div v-else :class="className + ' text-grey-8'">
+      Code is hidden to save space.
     </div>
+    <!--    <div v-else :class="className + ' text-ellipsis text-expanded'">-->
+    <!--      {{ value }}-->
+    <!--    </div>-->
     <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
@@ -123,6 +121,11 @@ const props = withDefaults(
      * For expandable variants, whether the content defaults to expanded.
      */
     defaultExpanded?: boolean;
+    /**
+     * The length at which to automatically collapse a default expanded component.
+     * If set to 0, the component will never collapse by default.
+     */
+    collapseLength?: number;
 
     /**
      * Renders a smaller component.
@@ -177,6 +180,7 @@ const props = withDefaults(
     t: "",
     b: "",
     class: "",
+    collapseLength: 500,
   }
 );
 
@@ -204,7 +208,9 @@ const className = useMargins(props, () => [
 ]);
 
 const isExpanded = ref(
-  props.defaultExpanded && String(props.value).length < 500
+  props.defaultExpanded &&
+    (props.collapseLength === 0 ||
+      String(props.value).length < props.collapseLength)
 );
 
 const isExpandable = computed(() => props.variant === "expandable");

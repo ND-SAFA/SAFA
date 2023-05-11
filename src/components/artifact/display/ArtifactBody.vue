@@ -8,7 +8,13 @@
       @click="handleViewArtifact"
     />
     <panel-card>
-      <typography default-expanded :variant="variant" el="p" :value="body" />
+      <typography
+        default-expanded
+        :collapse-length="0"
+        :variant="variant"
+        el="p"
+        :value="body"
+      />
     </panel-card>
   </div>
 </template>

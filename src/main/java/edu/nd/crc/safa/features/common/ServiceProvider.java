@@ -27,6 +27,7 @@ import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepos
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
+import edu.nd.crc.safa.features.hgen.HGenService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -174,6 +175,8 @@ public class ServiceProvider {
     private SearchService searchService;
     // Summarize
     private SummaryService summaryService;
+    // HGen
+    private HGenService hGenService;
 
     @PostConstruct
     public void postInit() {

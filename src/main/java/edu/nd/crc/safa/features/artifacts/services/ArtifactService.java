@@ -19,13 +19,17 @@ import org.springframework.stereotype.Service;
 public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     ArtifactVersionRepository artifactVersionRepository;
 
+    public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion) {
+        return getAppEntities(projectVersion, null);
+    }
+
     @Override
     public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         return versionToAppEntity(artifactVersions);
     }
-
+    
     public List<ArtifactAppEntity> getAppEntities(Project project) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository.findByProjectVersionProject(project);
         return versionToAppEntity(artifactVersions);

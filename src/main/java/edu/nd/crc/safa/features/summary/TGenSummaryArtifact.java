@@ -1,12 +1,16 @@
 package edu.nd.crc.safa.features.summary;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The artifact representation for summarization.
  */
 @Data
-class TGenSummaryArtifact {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TGenSummaryArtifact {
     /**
      * The content to summarize.
      */

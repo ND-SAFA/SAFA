@@ -8,6 +8,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -35,13 +36,20 @@ public class SearchController extends BaseController {
         throws InvalidAttributeValueException {
         ProjectVersion projectVersion =
             this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        ProjectAppEntity projectAppEntity = this.serviceProvider
+            .getProjectRetrievalService()
+            .getProjectAppEntity(projectVersion);
+        SearchResponse response = null;
         switch (request.mode) {
             case PROMPT:
                 if (request.prompt == null || request.prompt.equals("")) {
                     throw new InvalidAttributeValueException("Expected prompt to contain non-empty string.");
                 }
-                return this.serviceProvider.getSearchService().performPromptSearch(projectVersion,
+                response = this.serviceProvider.getSearchService().performPromptSearch(projectAppEntity,
                     request.getPrompt(), request.getSearchTypes(), request.getTracingPrompt());
+                this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
+                    request.getRelatedTypes());
+                return response;
 
             case ARTIFACTS:
                 if (request.artifactIds == null) {
@@ -50,8 +58,12 @@ public class SearchController extends BaseController {
                 if (request.artifactIds.isEmpty()) {
                     return new SearchResponse();
                 }
-                return this.serviceProvider.getSearchService().performArtifactSearch(projectVersion,
+                response = this.serviceProvider.getSearchService().performArtifactSearch(projectAppEntity,
                     request.getArtifactIds(), request.getSearchTypes(), request.getTracingPrompt());
+                this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
+                    request.getRelatedTypes());
+                return response;
+
             case ARTIFACTTYPES:
                 if (request.artifactTypes == null) {
                     throw new InvalidAttributeValueException("Expected artifactTypes to be non-null.");

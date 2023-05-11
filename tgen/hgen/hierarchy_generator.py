@@ -49,15 +49,15 @@ class HierarchyGenerator(BaseObject):
         export_path = os.path.join(export_path, str(uuid.uuid4())) if export_path else None
 
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
-        if self.args.dataset_creator_for_clusters:
+        if self.args.dataset_creator_for_clusters:  # clusters are already created
             trace_dataset_with_sources = self.args.dataset_creator_for_clusters.trace_dataset
             cluster_dataset_creator = self.args.dataset_creator_for_clusters
         else:
-            if self.args.tgen_trainer:
+            if self.args.tgen_trainer:  # links need generated
                 trace_dataset_with_sources = self._get_trace_dataset_with_sources_from_trainer(export_path)
                 source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(
                     trace_dataset_with_sources.artifact_df, export_path)
-            else:
+            else:  # links pre-generated
                 trace_dataset_with_sources = self.args.dataset_creator_for_sources.create()
                 source_layer_only_dataset = self._create_trace_dataset_with_single_layer(trace_dataset_with_sources.artifact_df,
                                                                                          self.args.source_layer_id,

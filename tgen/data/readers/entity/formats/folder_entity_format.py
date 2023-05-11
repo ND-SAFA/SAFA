@@ -1,5 +1,6 @@
 import os
-from typing import List
+from copy import deepcopy
+from typing import List, Tuple
 
 import pandas as pd
 from tqdm import tqdm
@@ -66,21 +67,23 @@ class FolderEntityFormat(AbstractEntityFormat):
         """
         entries = []
         summarize_desc = "and summarizing" if summarizer is not None else EMPTY_STRING
+        artifact_names = []
+        chunker_types = []
+        contents = []
         for file_path in tqdm(file_paths, f"Adding files as artifacts {summarize_desc}"):
             artifact_name = os.path.basename(file_path) if use_file_name else os.path.sep + os.path.relpath(file_path, base_path)
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]
-            entry = EnumDict({
-                ArtifactKeys.ID: artifact_name,
-                ArtifactKeys.CONTENT: FileUtil.read_file(file_path)
-            })
-            if summarizer is not None:
-                chunker_type = SupportedChunker.determine_from_path(file_path)
-                entry[ArtifactKeys.CONTENT] = summarizer.summarize_single(entry[ArtifactKeys.CONTENT], chunker_type, id_=file_path)
-            if not entry[ArtifactKeys.CONTENT]:
-                logger.warning(f"{artifact_name} does not contain any content. Skipping...")
-                continue
-            entries.append(entry)
+            artifact_names.append(artifact_name)
+            chunker_types.append(SupportedChunker.determine_from_path(file_path))
+            contents.append(FileUtil.read_file(file_path))
+        if summarizer is not None:
+            contents = summarizer.summarize_bulk(contents=contents, chunker_types=chunker_types, ids=artifact_names)
+        artifact_names, contents = FolderEntityFormat._remove_empty_contents(artifact_names, contents)
+        entries = EnumDict({
+            ArtifactKeys.ID: artifact_names,
+            ArtifactKeys.CONTENT: contents
+        })
         return pd.DataFrame(entries).sort_values([ArtifactKeys.ID.value], ignore_index=True)
 
     @staticmethod
@@ -90,3 +93,21 @@ class FolderEntityFormat(AbstractEntityFormat):
         :return: True
         """
         return True
+
+
+    @staticmethod
+    def _remove_empty_contents(artifact_names: List[str], contents: List[str]) -> Tuple[List[str], List[str]]:
+        """
+        Removes artifact names and content if the content is empty
+        :param artifact_names: Names of the artifacts
+        :param contents: Contents of the artifacts
+        :return: The names and contents with all artifacts with empty content removed
+        """
+        missing_content = {i for i, content in enumerate(contents) if not content}
+        artifact_names = [name for i, name in enumerate(artifact_names) if i not in missing_content]
+        contents = [content for i, content in enumerate(contents) if i not in missing_content]
+        for i in missing_content:
+            logger.warning(f"{artifact_names[i]} does not contain any content. Skipping...")
+            continue
+        return artifact_names, contents
+

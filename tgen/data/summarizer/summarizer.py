@@ -62,9 +62,17 @@ class Summarizer(BaseObject):
         ids = [ids for i in range(len(contents))] if not isinstance(ids, List) else ids
         assert len(chunker_types) == len(contents) and len(ids) == len(contents), "If supplying a chunker type and id, " \
                                                                                   "must provide one for all content"
-        prompts = [self._create_summarization_prompts(content, chunker_type, id_)
-                   for content, chunker_type, id_ in zip(contents, chunker_types, ids)]
-        return self._summarize_chunks(self.llm_manager, prompts)
+        indices2summarize = set()
+        prompts_for_summaries = []
+        for i, content, chunker_type, id_ in zip(range(len(contents)), contents, chunker_types, ids):
+            prompts = self._create_summarization_prompts(content, chunker_type, id_)
+            if len(prompts) < 1:
+                continue
+            indices2summarize.add(i)
+            prompts_for_summaries.append(prompts)
+        summaries_iter = iter(self._summarize_chunks(self.llm_manager, prompts_for_summaries))
+        summaries = [next(summaries_iter) if index in indices2summarize else content for index, content in enumerate(contents)]
+        return summaries
 
     def summarize_single(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
@@ -110,6 +118,8 @@ class Summarizer(BaseObject):
         :param prompts: The prompts used to summarize each chunk
         :return: The combined summaries of all chunks
         """
+        if len(prompts) < 1:
+            return prompts
         if not isinstance(prompts[0], List):
             prompts = [prompts]
         n_chunks_per_summary = [len(chunks) for chunks in prompts]

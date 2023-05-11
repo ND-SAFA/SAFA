@@ -32,15 +32,15 @@ class PreTrainProjectReader(AbstractProjectReader[List]):
             StructuredKeys.PARSER: "FOLDER"
         })
         entity_df = entity_reader.read_entities()
-        examples = []
+        all_examples = []
         for _, entity_row in entity_df.iterrows():
             col_name = StructuredKeys.Artifact.CONTENT.value
             file_content = entity_row[col_name]
-            for example in file_content.split(self.DELIMINATOR):
-                if self.summarizer is not None:
-                    example = self.summarizer.summarize(content=example)
-                examples.append(example)
-        return examples
+            examples = file_content.split(self.DELIMINATOR)
+            if self.summarizer is not None:
+                examples = self.summarizer.summarize_bulk(contents=examples)
+            all_examples.extend(examples)
+        return all_examples
 
     def get_project_name(self) -> str:
         """

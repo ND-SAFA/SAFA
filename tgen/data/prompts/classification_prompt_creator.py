@@ -1,5 +1,6 @@
 from typing import Union
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
@@ -31,7 +32,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         self.neg_class = neg_class
         self.artifact_prompt_format = artifact_prompt_format
 
-    def create(self, source_content: str, target_content: str, label: int = None) -> EnumDict[str, str]:
+    def create(self, target_content: str, source_content: str = EMPTY_STRING, label: int = None) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param source_content: The content of the source artifact

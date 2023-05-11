@@ -8,7 +8,6 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -30,7 +29,6 @@ class LLMJob(AbstractTrainerJob):
         """
         if llm_manager is None:
             llm_manager = DEFAULT_LLM_MANAGER_CLS(trainer_args)
-            assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
         if trainer_args is None:
             trainer_args = llm_manager.llm_args
         if prompt_creator is None:

@@ -133,6 +133,6 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
             .newType(projectName, artifactTypeName);
 
         IntStream.range(0, initialArtifactCount).mapToObj(String::valueOf).forEach(name ->
-            dbEntityBuilder.newArtifact(projectName, artifactTypeName, name));
+            dbEntityBuilder.newArtifactAndBody(projectName, artifactTypeName, name, "", ""));
     }
 }

@@ -7,7 +7,11 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
+import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
@@ -65,6 +69,35 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         Assertions.assertTrue(importedFiles.stream().anyMatch(artifact -> artifact.getName().startsWith("include/")));
         Assertions.assertTrue(importedFiles.stream().allMatch(artifact ->
             artifact.getType().equals("GitHub File")));
+
+        for (ArtifactAppEntity artifact : importedFiles) {
+            if (artifact.getType().equals("GitHub File")) {
+                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                    .map(CustomAttributeAppEntity::getKey)
+                    .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
+            }
+        }
+
+        assertLayout(githubProject.getProject(), "GitHub File");
+    }
+
+    private void assertLayout(Project project, String typeName) {
+        AttributeLayoutService layoutService = serviceProvider.getAttributeLayoutService();
+        ProjectVersion version = serviceProvider.getVersionService().getProjectVersions(project).get(0);
+        List<AttributeLayoutAppEntity> layouts = layoutService.getAppEntities(version, currentUser);
+        Assertions.assertEquals(1, layouts.size());
+
+        AttributeLayoutAppEntity layout = layouts.get(0);
+        Assertions.assertEquals(typeName + " Layout", layout.getName());
+        Assertions.assertEquals(List.of(typeName), layout.getArtifactTypes());
+        Assertions.assertEquals(1, layout.getPositions().size());
+
+        AttributePositionAppEntity position = layout.getPositions().get(0);
+        Assertions.assertEquals(0, position.getX());
+        Assertions.assertEquals(0, position.getY());
+        Assertions.assertEquals(1, position.getWidth());
+        Assertions.assertEquals(1, position.getHeight());
+        Assertions.assertEquals(ReservedAttributes.Github.LINK.getKey(), position.getKey());
     }
 
     @Test
@@ -97,7 +130,13 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
             Assertions.assertEquals(typeName, artifact.getType());
             Assertions.assertTrue(artifact.getName().endsWith(".cpp"));
             Assertions.assertFalse(artifact.getName().startsWith("include/"));
+
+            ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                .map(CustomAttributeAppEntity::getKey)
+                .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
         }
+
+        assertLayout(githubProject.getProject(), typeName);
     }
 
     @Test
@@ -129,14 +168,23 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
         int importedArtifactsCount = 23;
 
         // We should have the correct number of artifacts and links
-        List<Artifact> artifacts = serviceProvider.getArtifactRepository()
-            .findByProject(project);
+        List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
         Assertions.assertEquals(
             importedArtifactsCount + initialArtifactCount,
             artifacts.size());
 
+        for (ArtifactAppEntity artifact : artifacts) {
+            if (artifact.getType().equals("GitHub File")) {
+                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                    .map(CustomAttributeAppEntity::getKey)
+                    .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
+            }
+        }
+
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());
+
+        assertLayout(project, "GitHub File");
     }
 
     @Test
@@ -182,11 +230,17 @@ public class TestGithubImport extends AbstractGithubGraphqlTest {
                 importedArtifactsCount--;
                 Assertions.assertTrue(artifact.getName().endsWith(".cpp"));
                 Assertions.assertFalse(artifact.getName().startsWith("include/"));
+
+                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                    .map(CustomAttributeAppEntity::getKey)
+                    .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
             }
         }
         Assertions.assertEquals(0, importedArtifactsCount);
 
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());
+
+        assertLayout(project, typeName);
     }
 }

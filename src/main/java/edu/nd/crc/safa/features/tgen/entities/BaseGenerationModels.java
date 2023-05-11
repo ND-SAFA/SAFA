@@ -33,6 +33,10 @@ public enum BaseGenerationModels {
      */
     GPT("gpt"),
     /**
+     * Anthropic claude 1.3 model.
+     */
+    ANTHROPIC("anthropic"),
+    /**
      * The VSM method. Used primarily for testing.
      */
     VSM("vsm");

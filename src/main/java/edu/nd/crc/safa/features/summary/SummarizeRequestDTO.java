@@ -1,7 +1,8 @@
 package edu.nd.crc.safa.features.summary;
 
 import java.util.List;
-import javax.annotation.Nullable;
+
+import edu.nd.crc.safa.features.tgen.entities.api.AbstractGenerationRequest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,14 +12,9 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class SummarizeRequestDTO {
+public class SummarizeRequestDTO extends AbstractGenerationRequest {
     /**
-     *
+     * The artifacts to summarize and their type.
      */
     List<TGenSummaryArtifact> artifacts;
-    /**
-     * The model to use for summaries.
-     */
-    @Nullable
-    String model;
 }

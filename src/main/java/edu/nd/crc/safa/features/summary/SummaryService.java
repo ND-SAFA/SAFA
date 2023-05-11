@@ -23,9 +23,7 @@ public class SummaryService {
      * @return List of summaries.
      */
     public List<String> generateSummaries(SummarizeRequestDTO request) {
-        String model = request.getModel().toUpperCase();
-        BaseGenerationModels baseModel = model == null ? BaseGenerationModels.getDefault() :
-            BaseGenerationModels.valueOf(model);
+        BaseGenerationModels baseModel = request.getModel();
         TGen controller = baseModel.createTGenController();
         Map<String, TGenSummaryArtifact> artifacts = new HashMap<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {

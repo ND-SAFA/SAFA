@@ -12,6 +12,8 @@ import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
+import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
@@ -47,6 +49,17 @@ public class TGen implements ITraceGenerationController {
     }
 
     /**
+     * Creates hierarchy of artifacts for artifacts.
+     *
+     * @param request The request detailing clusters of artifacts.
+     * @return The generated artifacts per cluster.
+     */
+    public TGenHGenResponse generateHierarchy(TGenHGenRequest request) {
+        String summarizeEndpoint = TGenConfig.get().getHGenEndpoint();
+        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenHGenResponse.class);
+    }
+
+    /**
      * Generates summaries for given content.
      *
      * @param request Contains content to summarize and assocatied parameteres.
@@ -54,9 +67,7 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
         String summarizeEndpoint = TGenConfig.get().getSummarizeEndpoint();
-        TGenSummaryResponse output = this.safaRequestBuilder
-            .sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
-        return output;
+        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
     }
 
     /**
@@ -67,9 +78,7 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
         String generatePromptEndpoint = TGenConfig.get().getPromptCompletionEndpoint();
-        TGenPromptResponse output = this.safaRequestBuilder
-            .sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
-        return output;
+        return this.safaRequestBuilder.sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
     /**

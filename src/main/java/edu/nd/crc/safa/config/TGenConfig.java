@@ -23,6 +23,13 @@ public class TGenConfig {
     }
 
     /**
+     * @return Returns the endpoint for generating hierarchies
+     */
+    public String getHGenEndpoint() {
+        return createTGenEndpoint(baseEndpoint, "hgen");
+    }
+
+    /**
      * @return Returns summarize endpoint.
      */
     public String getSummarizeEndpoint() {

@@ -330,13 +330,10 @@ public class GithubProjectCreationJob extends CommitJob {
             }
 
             String type = githubProject.getArtifactType().getName();
-            String summary = "";  // TODO I don't think this field is shown to the user at all
+            String summary = "";
             String body = file.isBinary() ? "<binary file>" : file.getContents();
 
-            Map<String, JsonNode> attributes = new HashMap<>();
-            attributes.put(ReservedAttributes.Github.REPO_PATH.getKey(), TextNode.valueOf(file.getPath()));
-            attributes.put(ReservedAttributes.Github.LINK.getKey(),
-                TextNode.valueOf(buildGithubFileUrl(file.getPath())));
+            Map<String, JsonNode> attributes = getAttributes(file.getPath());
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
@@ -352,6 +349,14 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         return artifacts;
+    }
+
+    protected Map<String, JsonNode> getAttributes(String filePath) {
+        Map<String, JsonNode> attributes = new HashMap<>();
+        attributes.put(ReservedAttributes.Github.REPO_PATH.getKey(), TextNode.valueOf(filePath));
+        attributes.put(ReservedAttributes.Github.LINK.getKey(),
+            TextNode.valueOf(buildGithubFileUrl(filePath)));
+        return attributes;
     }
 
     private String buildGithubFileUrl(String filePath) {

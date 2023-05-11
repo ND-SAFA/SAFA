@@ -1,8 +1,10 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -19,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +64,6 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
 
     @Override
     protected List<ArtifactAppEntity> getArtifacts() {
-        // TODO graphql
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
@@ -74,8 +76,8 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
         log.info("Retrieving diff");
         for (GithubCommitDiffResponseDTO.GithubFileDiffDTO diff : diffResponseDTO.getFiles()) {
 
-            String name = diff.getFilename();
-            if (shouldSkipFile(name)) {
+            String path = diff.getFilename();
+            if (shouldSkipFile(path)) {
                 continue;
             }
 
@@ -84,6 +86,10 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
             String summary = diff.getSha();
             String body = diff.getBlobUrl();
 
+            Map<String, JsonNode> attributes = getAttributes(path);
+            String[] pathParts = path.split(Pattern.quote(File.separator));
+            String name = pathParts[pathParts.length - 1];
+
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
@@ -91,7 +97,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                attributes
             );
 
             artifacts.add(artifact);

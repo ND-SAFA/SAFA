@@ -4,20 +4,17 @@ from copy import deepcopy
 from unittest import mock
 
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -26,7 +23,6 @@ from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.supported_trainer import SupportedTrainer
 from tgen.util.enum_util import EnumDict
 
 
@@ -137,17 +133,17 @@ class TestHierarchyGeneration(BaseTest):
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
         hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()),
                                             layer_id=layer_id)
-        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df)
+        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, export_path=TEST_OUTPUT_DIR)
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
             self.assertLess(label - 0.4012, 0.1)
 
     def test_save_dataset_checkpoint(self):
         dataset = PromptDatasetCreator(project_reader=PromptTestProject.get_project_reader()).create()
-        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, True)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR)
         self.assertTrue(os.path.exists(export_path))
 
-        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, TEST_OUTPUT_DIR, False)
+        export_path = HierarchyGenerator.save_dataset_checkpoint(dataset, None)
         self.assertFalse(export_path)
 
     def test_create_trace_dataset_for_single_layer(self):

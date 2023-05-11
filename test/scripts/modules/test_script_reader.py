@@ -5,6 +5,7 @@ from tgen.scripts.modules.script_reader import ScriptOutputReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_RESULT_READER
 from tgen.testres.test_assertions import TestAssertions
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 
 
 class TestResultReader(BaseTest):
@@ -15,13 +16,11 @@ class TestResultReader(BaseTest):
     EXPERIMENT_ID = "e9fb497b-390a-4a5e-b1c9-92177d3dc761"
     STEP_ID = "050139d9-3f4e-4c3e-af5a-abefae5e79dd"
     TEST_ENTRY = {
-        JobResult.PREDICTION_OUTPUT: {
-            JobResult.METRICS: {"a": 1, "b": 2, "c": 3}
-        },
-        JobResult.VAL_METRICS: {
-            0: {"a": 1, "b": 2, "c": 3},
-            1: {"a": 3, "b": 6, "c": 9}
-        }
+            ScriptOutputReader.METRICS: {"a": 1, "b": 2, "c": 3},
+            ScriptOutputReader.VAL_METRICS: {
+                0: {"a": 1, "b": 2, "c": 3},
+                1: {"a": 3, "b": 6, "c": 9}
+            }
     }
     EXPECTED_VAL_METRICS = {"map": 0.242, "ap": 0.0819, "f1": 0.177, "f2": 0.3497,
                             "precision@1": 0.105, "precision@2": 0.053, "precision@3": 0.053, "avg_true_links": 1.2, "lag": 5,

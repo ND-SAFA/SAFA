@@ -24,6 +24,7 @@ from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -46,24 +47,17 @@ class HierarchyGenerator(BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
         export_path = os.path.join(export_path, str(uuid.uuid4())) if export_path else None
-        save_dataset_checkpoints = export_path is not None
+
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
-        if self.args.dataset_creator_for_clusters:
+        if self.args.dataset_creator_for_clusters:  # clusters are already created
             trace_dataset_with_sources = self.args.dataset_creator_for_clusters.trace_dataset
             cluster_dataset_creator = self.args.dataset_creator_for_clusters
         else:
-            if self.args.tgen_trainer:
-                self._update_trainer_args(self.args.tgen_trainer, export_path)
-                trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
-                self.save_dataset_checkpoint(trace_dataset_with_sources, export_path, save_dataset_checkpoints,
-                                             filename="initial_dataset_with_sources")
-                assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
-                logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
+            if self.args.tgen_trainer:  # links need generated
+                trace_dataset_with_sources = self._get_trace_dataset_with_sources_from_trainer(export_path)
                 source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(
-                    trace_dataset_with_sources.artifact_df)
-                if save_dataset_checkpoints:
-                    source_layer_only_dataset.trace_df.to_csv(os.path.join(export_path, "linked_source_layer_dataset.csv"))
-            else:
+                    trace_dataset_with_sources.artifact_df, export_path)
+            else:  # links pre-generated
                 trace_dataset_with_sources = self.args.dataset_creator_for_sources.create()
                 source_layer_only_dataset = self._create_trace_dataset_with_single_layer(trace_dataset_with_sources.artifact_df,
                                                                                          self.args.source_layer_id,
@@ -71,20 +65,28 @@ class HierarchyGenerator(BaseObject):
             # Step 2: Create clusters of related artifacts
             cluster_dataset_creator = ClusterDatasetCreator(source_layer_only_dataset, self.args.cluster_method)
 
-        hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
-
         # Step 3: Create higher-level artifacts from Clusters
-        artifact_generations = self._generate_artifact_content(hgen_dataset_manager, export_path)
+        hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
+        artifact_generations = self._generate_artifact_content(hgen_dataset_manager, export_path=export_path)
 
         # Step 4: Create new dataset with created artifacts
-        generated_dataset = self._create_trace_dataset_with_generated_artifacts(artifact_generations,
-                                                                                hgen_dataset_manager[DatasetRole.EVAL],
-                                                                                trace_dataset_with_sources)
-        self.save_dataset_checkpoint(generated_dataset, export_path, save_dataset_checkpoints=save_dataset_checkpoints,
-                                     filename="final_generated_dataset")
-        return generated_dataset
+        return self._create_trace_dataset_with_generated_artifacts(artifact_generations,
+                                                                   hgen_dataset_manager[DatasetRole.EVAL],
+                                                                   trace_dataset_with_sources, export_path=export_path)
 
-    def _generate_artifact_content(self, hgen_dataset_manager: TrainerDatasetManager, export_path: str = None) -> List[str]:
+    def _get_trace_dataset_with_sources_from_trainer(self, export_path: str) -> TraceDataset:
+        """
+        Gets the trace dataset containing the source artifacts from the tgen trainer
+        :param export_path: The path to export the dataset to
+        :return: The dataset
+        """
+        self._update_trainer_args(self.args.tgen_trainer, export_path)
+        trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
+        self.save_dataset_checkpoint(trace_dataset_with_sources, export_path, filename="initial_dataset_with_sources")
+        assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
+        return trace_dataset_with_sources
+
+    def _generate_artifact_content(self, hgen_dataset_manager: TrainerDatasetManager, export_path: str) -> List[str]:
         """
         Generates the content for the new artifacts using the given dataset
         :param hgen_dataset_manager: Contains the dataset used to create
@@ -104,12 +106,14 @@ class HierarchyGenerator(BaseObject):
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        hgen_dataset: TraceDataset,
-                                                       original_sources_dataset: Union[PromptDataset, TraceDataset]) -> TraceDataset:
+                                                       original_sources_dataset: Union[PromptDataset, TraceDataset],
+                                                       export_path: str) -> TraceDataset:
         """
         Creates a dataset with traces between the original lower-level artifacts and the newly generated upper-level artifacts
         :param artifact_generations: A list of generated artifact content
         :param hgen_dataset: The dataset created from the clusters
         :param original_sources_dataset: The original dataset used for trace generation
+        :param export_path: The path to export the dataset to
         :return: The dataset using the new generated artifacts
         """
         original_artifact_df = original_sources_dataset.artifact_df
@@ -124,7 +128,9 @@ class HierarchyGenerator(BaseObject):
                                                                         original_artifact_df)
         layer_df = self._create_layer_df_with_generated_artifacts(hgen_dataset.layer_df, original_layer_df)
         trace_df = self._create_trace_df_with_generated_artifacts(hgen_dataset.trace_df, artifact_df, original_trace_df)
-        return TraceDataset(artifact_df, trace_df, layer_df)
+        dataset = TraceDataset(artifact_df, trace_df, layer_df)
+        self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
+        return dataset
 
     @staticmethod
     def _create_artifact_df_with_generated_artifacts(artifact_generations: List[str], hgen_artifacts_df: ArtifactDataFrame,
@@ -165,12 +171,14 @@ class HierarchyGenerator(BaseObject):
         layer_df = LayerDataFrame.concat(hgen_layer_df, original_layer_df) if original_layer_df is not None else hgen_layer_df
         return layer_df.filter_by_row(lambda row: row[LayerKeys.SOURCE_TYPE.value] != row[LayerKeys.TARGET_TYPE.value])
 
-    def _create_linked_dataset_for_intra_level_artifacts(self, artifacts_df: ArtifactDataFrame) -> TraceDataset:
+    def _create_linked_dataset_for_intra_level_artifacts(self, artifacts_df: ArtifactDataFrame, export_path: str) -> TraceDataset:
         """
         Creates a trace dataset from predictions for trace links within the same layer
         :param artifacts_df: Dataframe containing all source artifacts
+        :param export_path: The path to export the dataset to
         :return: The dataset containing the trace link predictions
         """
+        logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
         single_layer_dataset = self._create_trace_dataset_with_single_layer(artifacts_df, self.args.source_layer_id)
         prediction_entries = self.args.tgen_trainer.perform_prediction(dataset=single_layer_dataset).prediction_entries
         for entry in prediction_entries:
@@ -178,8 +186,10 @@ class HierarchyGenerator(BaseObject):
         trace_df = TraceDataFrame(prediction_entries)
         trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
                                                                layer_mapping_df=single_layer_dataset.layer_df)
-        return TraceDataset(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
-                            layer_df=single_layer_dataset.layer_df)
+        dataset = TraceDataset(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
+                               layer_df=single_layer_dataset.layer_df)
+        self.save_dataset_checkpoint(dataset, export_path, "linked_source_layer_dataset")
+        return dataset
 
     @staticmethod
     def _create_trace_dataset_with_single_layer(original_artifact_df: ArtifactDataFrame, layer_id: Any,
@@ -203,8 +213,7 @@ class HierarchyGenerator(BaseObject):
         return TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df)
 
     @staticmethod
-    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str, save_dataset_checkpoints: bool,
-                                filename: str = None) -> str:
+    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None, filename: str = None) -> str:
         """
         Exports the dataset to csv
         :param dataset: The dataset to export
@@ -212,8 +221,9 @@ class HierarchyGenerator(BaseObject):
         :param filename: Name of the file to use when saving the dataset
         :return: The full export path
         """
-        if not save_dataset_checkpoints:
+        if not export_path:
             return EMPTY_STRING
+        FileUtil.create_dir_safely(export_path)
         current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
         filename = current_time_string if not filename else filename
         full_export_path = os.path.join(export_path, filename)

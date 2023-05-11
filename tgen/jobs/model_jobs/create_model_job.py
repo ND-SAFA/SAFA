@@ -4,7 +4,7 @@ from tgen.jobs.components.job_result import JobResult
 
 class CreateModelJob(AbstractJob):
 
-    def _run(self) -> JobResult:
+    def _run(self) -> str:
         """
         Creates a new model
         :return: the model path
@@ -13,4 +13,4 @@ class CreateModelJob(AbstractJob):
         model.save_pretrained(self.model_manager.model_output_path)
         tokenizer = self.model_manager.get_tokenizer()
         tokenizer.save_pretrained(self.model_manager.model_output_path)
-        return JobResult.from_dict({JobResult.MODEL_PATH: self.model_manager.model_output_path})
+        return self.model_manager.model_output_path

@@ -1,4 +1,5 @@
 import json
+import uuid
 from enum import Enum
 from typing import Any, Dict, List, Union
 
@@ -14,6 +15,8 @@ class NpEncoder(json.JSONEncoder):
     """
 
     def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):

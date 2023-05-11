@@ -7,7 +7,6 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput

@@ -5,7 +5,7 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
-from typing import Dict, Type
+from typing import Dict, Type, Any
 
 import torch
 import wandb
@@ -33,8 +33,8 @@ class AbstractJob(threading.Thread, BaseObject):
         super().__init__()
         self.job_args = job_args if job_args else JobArgs()
         self.model_manager = model_manager
-        self.result = JobResult()
         self.id = uuid.uuid4()
+        self.result = JobResult(job_id=self.id)
         self.save_job_output = self.job_args.save_job_output
 
     def run(self) -> JobResult:
@@ -43,18 +43,17 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         logger.log_with_title(f"Starting New {self.get_job_name()} Job with Following Experiment Vars",
                               self.result.get_printable_experiment_vars())
-        self.result.set_job_status(Status.IN_PROGRESS)
+        self.result.status = Status.IN_PROGRESS
         try:
             if self.job_args.random_seed is not None:
                 RandomUtil.set_seed(self.job_args.random_seed)
             run_result = self._run()
-            self.result = run_result.update(self.result)
-            self.result.set_job_status(Status.SUCCESS)
+            self.result.body = run_result
+            self.result.status = Status.SUCCESS
         except Exception as e:
             logger.exception("Job failed during run")
-            self.result[JobResult.TRACEBACK] = traceback.format_exc()
-            self.result[JobResult.EXCEPTION] = str(e)
-            self.result.set_job_status(Status.FAILURE)
+            self.result.body = traceback.format_exc()
+            self.result.status = Status.FAILURE
         if self.save_job_output and self.job_args.output_dir:
             self.save(self.job_args.output_dir)
             wandb.finish()
@@ -82,7 +81,7 @@ class AbstractJob(threading.Thread, BaseObject):
         return os.path.join(output_dir, OUTPUT_FILENAME)
 
     @abstractmethod
-    def _run(self) -> JobResult:
+    def _run(self) -> Any:
         """
         Runs job specific logic
         :return: output of job as a dictionary
@@ -100,6 +99,7 @@ class AbstractJob(threading.Thread, BaseObject):
             FileUtil.write(json_output, job_output_filepath)
             return True
         except Exception:
+            traceback.print_exc()
             logger.exception("Unable to save job output")  # to save in logs
             return False
 

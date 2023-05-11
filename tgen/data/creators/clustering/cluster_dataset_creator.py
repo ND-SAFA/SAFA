@@ -1,6 +1,6 @@
 import uuid
 from collections import Set
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Tuple
 
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
@@ -22,6 +22,8 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
     """
     Responsible for clustering dataset artifacts
     """
+
+    CLUSTER_CONTENT_FORMAT = "{}"
 
     def __init__(self, trace_dataset: TraceDataset,
                  cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
@@ -91,19 +93,8 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         :param cluster_layer_id: The id of the new layer
         :return: The new dataset where each cluster is a single artifact linked to the artifacts in the cluster
         """
-        cluster_id_to_content = {}
-        traces = {}
-        source_layers = set()
-        for clusters in method_to_clusters.values():
-            for cluster_id, artifacts in clusters.items():
-                artifact_content = []
-                for artifact_id in artifacts:
-                    artifact = orig_dataset.artifact_df.get_artifact(artifact_id)
-                    artifact_content.append(artifact[ArtifactKeys.CONTENT])
-                    traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
-                                                                    TraceKeys.LABEL: 1}))  # add link between artifact and cluster
-                    source_layers.add(artifact[ArtifactKeys.LAYER_ID])
-                cluster_id_to_content[cluster_id] = NEW_LINE.join(artifact_content)  # combines the content of all artifacts in cluster
+        cluster_id_to_content, source_layers, traces = ClusterDatasetCreator._extract_dataset_input_from_clusters(method_to_clusters,
+                                                                                                                  orig_dataset)
         new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: list(cluster_id_to_content.keys()),
                                              ArtifactKeys.CONTENT: list(cluster_id_to_content.values()),
                                              ArtifactKeys.LAYER_ID: [cluster_layer_id for _ in cluster_id_to_content]})
@@ -115,3 +106,27 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         trace_df = TraceDataFrame.concat(trace_df, orig_dataset.trace_df)
         layer_df = LayerDataFrame.concat(layer_df, orig_dataset.layer_df)
         return PromptDataset(artifact_df=new_artifact_df, trace_dataset=TraceDataset(artifact_df, trace_df, layer_df))
+
+    @staticmethod
+    def _extract_dataset_input_from_clusters(method_to_clusters: Dict[str, Clusters], orig_dataset: TraceDataset) \
+            -> Tuple[Dict[str, str], Set[str], Dict[str, Dict]]:
+        """
+        Gets the mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
+        :param method_to_clusters: A dictionary mapping method name to the clusters it produced
+        :param orig_dataset: The original trace dataset
+        :return:  mapping of cluster to content, all new positive trace links, and source layer ids to create the project dataframes
+        """
+        cluster_id_to_content = {}
+        traces = {}
+        source_layers = set()
+        for clusters in method_to_clusters.values():
+            for cluster_id, artifacts in clusters.items():
+                artifact_content = []
+                for i, artifact_id in enumerate(artifacts):
+                    artifact = orig_dataset.artifact_df.get_artifact(artifact_id)
+                    artifact_content.append(ClusterDatasetCreator.CLUSTER_CONTENT_FORMAT.format(artifact[ArtifactKeys.CONTENT]))
+                    traces = DataFrameUtil.append(traces, EnumDict({TraceKeys.SOURCE: artifact_id, TraceKeys.TARGET: cluster_id,
+                                                                    TraceKeys.LABEL: 1}))  # add link between artifact and cluster
+                    source_layers.add(artifact[ArtifactKeys.LAYER_ID])
+                cluster_id_to_content[cluster_id] = NEW_LINE.join(artifact_content)  # combines the content of all artifacts in cluster
+        return cluster_id_to_content, source_layers, traces

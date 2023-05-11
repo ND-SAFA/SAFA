@@ -25,8 +25,7 @@ class TestCreateDatasetJobSAFA(BaseJobTest):
         """
         Tests that output contains dataset output path.
         """
-        self.assertIn(JobResult.SAVED_DATASET_PATHS, job_result)
-        self.assertGreater(len(job_result[JobResult.SAVED_DATASET_PATHS]), 0)
+        self.assertGreater(len(job_result.body), 0)
 
     def _get_job(self, include_dataset=True) -> AbstractJob:
         """

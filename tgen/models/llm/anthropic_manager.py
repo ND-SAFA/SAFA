@@ -1,12 +1,13 @@
+import math
 from typing import List, TypedDict
 
 import anthropic
-from tqdm import tqdm
 
+from tgen.constants.anthropic_constants import ANTHROPIC_MAX_THREADS
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.util.thread_util import ThreadUtil
@@ -73,24 +74,20 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         response = []
         if isinstance(prompts, str):
             prompts = [prompts]
-        results = [None * len(prompts)]
+
+        response = [None] * len(prompts)
 
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             prompt_response = AnthropicManager.Client.completion(**prompt_params)
-            results[index] = prompt_response
+            response[index] = prompt_response
 
-        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, 20)
+        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
 
-        for p in tqdm(prompts):
-            prompt_params = {**params, AnthropicParams.PROMPT: p}
-            prompt_response = AnthropicManager.Client.completion(**prompt_params)
-            response.append(prompt_response)
         return response
 
-    @staticmethod
-    def translate_to_response(task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
         """
         Translates the LLM library response to task specific response.
         :param task: The task to translate to.
@@ -100,6 +97,29 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
+        if task == LLMCompletionType.CLASSIFICATION:
+            results = []
+            for r in res:
+                r_completion = r["completion"].lower()
+                yes_index = r_completion.find("yes")
+                no_index = r_completion.find("no")
+                log_probs = {}
+                if yes_index == -1:
+                    log_probs["yes"] = 0
+                    yes_index = math.inf
+                if no_index == -1:
+                    log_probs["no"] = 0
+                    no_index = math.inf
+                if yes_index < no_index:
+                    log_probs = {"yes": 1, "no": 0}
+                else:
+                    log_probs = {"yes": 0, "no": 1}
+                if sum(log_probs.values()) == 0:
+                    log_probs = {"yes": 0.5, "no": 0.5}
+
+                results.append(log_probs)
+            return ClassificationResponse(results)
+
         raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod

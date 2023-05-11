@@ -1,5 +1,5 @@
 import math
-from typing import List, TypedDict
+from typing import List, TypedDict, Dict
 
 import anthropic
 
@@ -69,7 +69,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
-        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `params`"
+        assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params[AnthropicParams.PROMPT]
         response = []
         if isinstance(prompts, str):
@@ -98,29 +98,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         if task == LLMCompletionType.CLASSIFICATION:
-            results = []
-            for r in res:
-                r_completion = r["completion"].lower()
-                yes_index = r_completion.find("yes")
-                no_index = r_completion.find("no")
-                log_probs = {}
-                if yes_index == -1:
-                    log_probs["yes"] = 0
-                    yes_index = math.inf
-                if no_index == -1:
-                    log_probs["no"] = 0
-                    no_index = math.inf
-                if yes_index < no_index:
-                    log_probs = {"yes": 1, "no": 0}
-                else:
-                    log_probs = {"yes": 0, "no": 1}
-                if sum(log_probs.values()) == 0:
-                    log_probs = {"yes": 0.5, "no": 0.5}
-
-                results.append(log_probs)
+            results = [AnthropicManager._get_log_prob(r["completion"]) for r in res]
             return ClassificationResponse(results)
-
-        raise NotImplementedError("Reading anthropic responses is under construction. Please use OpenAI for now.")
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:
@@ -130,6 +109,24 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: None
         """
         raise NotImplementedError(NotImplementedError)
+
+    @staticmethod
+    def _get_log_prob(completion: str) -> Dict[str, float]:
+        """
+        Gets the log probabilities for a classification completion
+        :param completion: The completion
+        :return: The log probabilities for each class
+        """
+        completion = completion.lower()
+        log_probs = {"yes": 0, "no": 0}  # TODO get the neg and pos clas from the prompt creator
+        response_2_index = {ans: completion.find(ans) for ans in log_probs.keys()}
+        response_2_index = {k: v for k, v in response_2_index.items() if v == -1}  # remove if response not in completion
+        first_response = min(response_2_index, key=response_2_index.get) if len(response_2_index) > 0 else None
+        if first_response in log_probs:
+            log_probs[first_response] = 1
+        else:
+            log_probs = {k: 0.5 for k in log_probs.keys()}
+        return log_probs
 
 
 if not IS_TEST:

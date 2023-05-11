@@ -43,7 +43,7 @@ class MetricsManager:
         :param metric_names: name of metrics desired for evaluation
         :return: a dictionary of metric_name to result
         """
-        if len(metric_names) < 1:
+        if metric_names is None or len(metric_names) < 1:
             return {}
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}

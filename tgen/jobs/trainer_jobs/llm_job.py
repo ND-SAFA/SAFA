@@ -34,7 +34,7 @@ class LLMJob(AbstractTrainerJob):
             llm_manager = DEFAULT_LLM_MANAGER_CLS(trainer_args)
             assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
         if prompt_creator is None:
-            prompt_creator = ClassificationPromptCreator(prompt_args=trainer_args.prompt_args)
+            prompt_creator = ClassificationPromptCreator(prompt_args=llm_manager.prompt_args)
         super().__init__(model_manager=None, trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task, job_args=job_args)
         self.trainer_args = trainer_args

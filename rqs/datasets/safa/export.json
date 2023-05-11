@@ -12,7 +12,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/safa/source"
+                "project_path": "~/desktop/playground/safa/safa"
               }
             },
             "val_dataset_creator": {

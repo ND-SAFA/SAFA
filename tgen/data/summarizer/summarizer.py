@@ -1,5 +1,6 @@
+import itertools
 import os
-from typing import List, Dict
+from typing import List, Dict, Union
 
 import pandas as pd
 from tqdm import tqdm
@@ -49,7 +50,23 @@ class Summarizer(BaseObject):
             prompt_args=self.prompt_args,
             base_prompt=nl_base_prompt)
 
-    def summarize(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
+    def summarize_bulk(self, contents: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None) -> List[str]:
+        """
+        Summarizes a file or body of text  to create shorter, more succinct input for model
+        :param contents: List of content to summarize
+        :param chunker_types: The list of supported chunkers to use
+        :param ids: The ids associated with each content
+        :return: The summarization
+        """
+        chunker_types = [SupportedChunker.NL for i in range(len(contents))] if not chunker_types else chunker_types
+        ids = [ids for i in range(len(contents))] if not isinstance(ids, List) else ids
+        assert len(chunker_types) == len(contents) and len(ids) == len(contents), "If supplying a chunker type and id, " \
+                                                                                  "must provide one for all content"
+        prompts = [self._create_summarization_prompts(content, chunker_type, id_)
+                   for content, chunker_type, id_ in zip(contents, chunker_types, ids)]
+        return self._summarize_chunks(self.llm_manager, prompts)
+
+    def summarize_single(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
         Summarizes a file or body of text  to create shorter, more succinct input for model
         :param content: Content to summarize
@@ -57,15 +74,10 @@ class Summarizer(BaseObject):
         :param id_: The id associated with the content
         :return: The summarization
         """
-        id_ = '' if not id_ else id_
-        chunker = chunker_type.value(self.model_for_token_limit, token_limit=self.token_limit)
-        assert content is not None, "No content to summarize."
-        chunks = chunker.chunk(content=content, id_=id_)
-        if self.code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
-            return content  # skip summarizing content below token limit unless code
-        prompt_creator = self.code_prompt_creator if chunker_type else self.nl_prompt_creator
-        summarizations = self._summarize_chunks(self.llm_manager, prompt_creator, chunks)
-        return EMPTY_STRING.join(summarizations)
+        prompts = self._create_summarization_prompts(content, chunker_type, id_)
+        if len(prompts) < 1:
+            return content
+        return self._summarize_chunks(self.llm_manager, prompts)
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
                             index_to_chunker_to_use: Dict[str, SupportedChunker] = None):
@@ -76,16 +88,10 @@ class Summarizer(BaseObject):
         :param index_to_chunker_to_use: Dictionary mapping index to the chunker to use for that row
         :return: The dataframe with the contents in the given column summarized
         """
-        index_to_chunker_to_use = {} if index_to_chunker_to_use is None else index_to_chunker_to_use
-        loading_bar = tqdm(total=len(df), desc="Summarizing dataframe.")
-
-        def summarize_item(row):
-            summary = self.summarize(content=row[col2summarize], id_=row.name,
-                                     chunker_type=index_to_chunker_to_use.get(row.name, SupportedChunker.NL))
-            loading_bar.update()
-            return summary
-
-        df[col2summarize] = df.apply(summarize_item, axis=1)
+        ids = list(df.index)
+        chunker_types = None if index_to_chunker_to_use is None else [index_to_chunker_to_use[index] for index in ids]
+        summaries = self.summarize_bulk(list(df[col2summarize]), chunker_types, ids)
+        df[col2summarize] = summaries
         return df
 
     def exceeds_token_limit(self, content: str) -> bool:
@@ -97,18 +103,37 @@ class Summarizer(BaseObject):
         return TokenLimitCalculator.estimate_num_tokens(content, self.model_for_token_limit) > self.token_limit
 
     @staticmethod
-    def _summarize_chunks(llm_manager: AbstractLLMManager, prompt_creator: AbstractPromptCreator, chunks: List[str]) -> \
-            List[str]:
+    def _summarize_chunks(llm_manager: AbstractLLMManager, prompts: Union[List[str], List[List[str]]]) -> Union[List[str], str]:
         """
         Summarizes all chunks using a given OpenAI model.
         :param llm_manager: The utility file containing API to AI library.
-        :param prompt_creator: The creator responsible for creating summarization prompts.
-        :param model_path: The model to use for summarizations
-        :param chunks: The chunks of text to summarize
-        :return: The summaries of all chunks
+        :param prompts: The prompts used to summarize each chunk
+        :return: The combined summaries of all chunks
         """
-        prompts = [prompt_creator.create(target_content=chunk, source_content=EMPTY_STRING)[PromptKeys.PROMPT.value] for chunk in
-                   chunks]
+        if not isinstance(prompts[0], List):
+            prompts = [prompts]
+        n_chunks_per_summary = [len(chunks) for chunks in prompts]
+        all_prompts = list(itertools.chain.from_iterable(prompts))
         res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
-                                                                      prompt=prompts)
-        return [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]
+                                                                      prompt=all_prompts)
+        summarizations_chunks = [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]
+        summaries = [EMPTY_STRING.join(summarizations_chunks[i: i + n]) for i, n in enumerate(n_chunks_per_summary)]
+        return summaries if len(summaries) > 1 else summaries[0]
+
+    def _create_summarization_prompts(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) \
+            -> List[str]:
+        """
+        Prepares for summarization by creating the necessary prompts for each chunk
+        :param content: Content to summarize
+        :param chunker_type: The supported chunker to use
+        :param id_: The id associated with the content
+        :return: The list of prompts to use for summarization
+        """
+        id_ = '' if not id_ else id_
+        chunker = chunker_type.value(self.model_for_token_limit, token_limit=self.token_limit)
+        assert content is not None, "No content to summarize."
+        chunks = chunker.chunk(content=content, id_=id_)
+        if self.code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
+            return []  # skip summarizing content below token limit unless code
+        prompt_creator = self.code_prompt_creator if chunker_type else self.nl_prompt_creator
+        return [prompt_creator.create(target_content=chunk)[PromptKeys.PROMPT.value] for chunk in chunks]

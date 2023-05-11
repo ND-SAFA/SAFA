@@ -12,14 +12,14 @@ class TestClassificationPromptGenerater(BasePromptTest):
         prompt_creator = ClassificationPromptCreator(pos_class="yass", neg_class="nope")
 
         # No Label
-        generated_prompt = prompt_creator.create("source1", "target1")
+        generated_prompt = prompt_creator.create("target1", "source1")
         self.verify_prompt(generated_prompt)
 
-        generated_prompt = prompt_creator.create("source1", "target1", label=0)
+        generated_prompt = prompt_creator.create("target1", "source1", label=0)
         self.verify_prompt(generated_prompt)
         self.assertIn("nope", generated_prompt[PromptKeys.COMPLETION])
 
-        generated_prompt = prompt_creator.create("source1", "target1", label=1)
+        generated_prompt = prompt_creator.create("target1", "source1", label=1)
         self.verify_prompt(generated_prompt)
         self.assertIn("yass", generated_prompt[PromptKeys.COMPLETION])
 

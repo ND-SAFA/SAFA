@@ -12,7 +12,7 @@ class TestClassificationPromptGenerater(BasePromptTest):
         prompt_creator = GenerationPromptCreator(base_prompt=SupportedPrompts.SYSTEM_REQUIREMENT_CREATION)
 
         # No Label
-        generated_prompt = prompt_creator.create("source1", "target1")
+        generated_prompt = prompt_creator.create("target1", "source1")
         self.verify_prompt(generated_prompt)
 
     @overrides(BasePromptTest)

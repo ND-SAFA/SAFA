@@ -181,8 +181,8 @@ class PromptDataset(iDataset):
         :return: The prompt entry
         """
         source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else EMPTY_STRING
-        entry = prompt_creator.create(source_content=source_content,
-                                      target_content=target_artifact[ArtifactKeys.CONTENT], **prompt_creator_params)
+        entry = prompt_creator.create(target_content=target_artifact[ArtifactKeys.CONTENT], source_content=source_content,
+                                      **prompt_creator_params)
         if not summarizer:
             return entry
 
@@ -194,7 +194,7 @@ class PromptDataset(iDataset):
             if source_artifact:
                 source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
             target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
-            entry = prompt_creator.create(source_content, target_content, **prompt_creator_params)
+            entry = prompt_creator.create(target_content, source_content, **prompt_creator_params)
         if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
             # Since summarization failed, just cut off anything that exceeds the limit
             chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit, token_limit=summarizer.token_limit)
@@ -210,11 +210,11 @@ class PromptDataset(iDataset):
         """
         artifact_id = artifact[ArtifactKeys.ID]
         if artifact_id not in self.__summarized_artifacts:
-            summary = summarizer.summarize(content=artifact[ArtifactKeys.CONTENT], id_=artifact_id)
+            summary = summarizer.summarize_single(content=artifact[ArtifactKeys.CONTENT], id_=artifact_id)
             self.__summarized_artifacts[artifact_id] = summary
             return summary
         if force_create_new:
-            summary = summarizer.summarize(content=self.__summarized_artifacts[artifact_id], id_=artifact_id)
+            summary = summarizer.summarize_single(content=self.__summarized_artifacts[artifact_id], id_=artifact_id)
             return summary
         return self.__summarized_artifacts[artifact_id]
 

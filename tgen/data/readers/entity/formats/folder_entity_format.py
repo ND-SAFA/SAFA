@@ -76,7 +76,7 @@ class FolderEntityFormat(AbstractEntityFormat):
             })
             if summarizer is not None:
                 chunker_type = SupportedChunker.determine_from_path(file_path)
-                entry[ArtifactKeys.CONTENT] = summarizer.summarize(entry[ArtifactKeys.CONTENT], chunker_type, id_=file_path)
+                entry[ArtifactKeys.CONTENT] = summarizer.summarize_single(entry[ArtifactKeys.CONTENT], chunker_type, id_=file_path)
             if not entry[ArtifactKeys.CONTENT]:
                 logger.warning(f"{artifact_name} does not contain any content. Skipping...")
                 continue

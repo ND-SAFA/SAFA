@@ -31,7 +31,6 @@ public class SearchService {
     private static final double THRESHOLD = 0.5;
     ProjectRetrievalService projectRetrievalService;
 
-
     /**
      * Searches for artifacts in search types that match the given prompt.
      *
@@ -41,8 +40,8 @@ public class SearchService {
      * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
      * @return Ids of matched artifacts.
      */
-    public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt, List<String> searchTypes,
-                                              String tracingPrompt) {
+    public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
+                                              List<String> searchTypes, String tracingPrompt) {
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
@@ -128,7 +127,6 @@ public class SearchService {
         }
         return targetLayer;
     }
-
 
     /**
      * Adds related types to search response.

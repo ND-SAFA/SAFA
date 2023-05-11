@@ -36,7 +36,9 @@ public class SearchController extends BaseController {
         throws InvalidAttributeValueException {
         ProjectVersion projectVersion =
             this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        ProjectAppEntity projectAppEntity = this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(projectVersion);
+        ProjectAppEntity projectAppEntity = this.serviceProvider
+            .getProjectRetrievalService()
+            .getProjectAppEntity(projectVersion);
         SearchResponse response = null;
         switch (request.mode) {
             case PROMPT:

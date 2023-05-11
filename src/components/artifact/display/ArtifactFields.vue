@@ -28,6 +28,25 @@
       data-cy="text-selected-body"
     />
 
+    <flex-box justify="between" align="center">
+      <typography variant="caption" value="Summary" />
+      <text-button
+        text
+        color="primary"
+        :loading="generateLoading"
+        :icon="hasSummary ? 'graph-refresh' : 'add'"
+        :label="hasSummary ? 'Regenerate' : 'Generate'"
+        @click="handleGenerateSummary"
+      />
+    </flex-box>
+    <typography
+      v-if="hasSummary"
+      default-expanded
+      variant="expandable"
+      :value="summary"
+      data-cy="text-selected-body"
+    />
+
     <attribute-list-display :artifact="artifact" />
   </panel-card>
 </template>
@@ -42,9 +61,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ReservedArtifactType } from "@/types";
 import { selectionStore } from "@/hooks";
+import { handleGenerateArtifactSummary } from "@/api";
 import {
   Typography,
   FlexBox,
@@ -53,6 +73,9 @@ import {
   AttributeListDisplay,
   Separator,
 } from "@/components/common";
+import TextButton from "@/components/common/button/TextButton.vue";
+
+const generateLoading = ref(false);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 const name = computed(() => artifact.value?.name || "");
@@ -61,4 +84,19 @@ const body = computed(() => artifact.value?.body.trim() || "");
 const variant = computed(() =>
   type?.value === ReservedArtifactType.github ? "code" : "expandable"
 );
+const summary = computed(() => artifact.value?.summary || "");
+const hasSummary = computed(() => !!summary.value);
+
+/**
+ * Generates a summary for the artifact.
+ */
+function handleGenerateSummary(): void {
+  if (!artifact.value) return;
+
+  generateLoading.value = true;
+
+  handleGenerateArtifactSummary(artifact.value, {
+    onComplete: () => (generateLoading.value = false),
+  });
+}
 </script>

@@ -84,10 +84,14 @@ public enum BaseGenerationModels {
     public static List<ModelAppEntity> getDefaultModels() {
         return List.of(
             getDefaultModel(),
-            new ModelAppEntity(UUID.fromString("d3e7023e-a1b4-4636-847a-39e006b80d00"), "AutomotiveBert", BaseGenerationModels.AutomotiveBert),
-            new ModelAppEntity(UUID.fromString("610e386a-5d58-49a8-85b4-322d683a8147"), "Natural Language Bert", BaseGenerationModels.NLBert),
-            new ModelAppEntity(UUID.fromString("4d589342-18a0-4bc4-b530-c186dc2b0de9"), "Programming Language Bert", BaseGenerationModels.NLBert),
-            new ModelAppEntity(UUID.fromString("6f94c777-04e8-406c-9dc3-3a19e417043b"), "TraceGPT", BaseGenerationModels.GPT)
+            new ModelAppEntity(UUID.fromString("d3e7023e-a1b4-4636-847a-39e006b80d00"),
+                "AutomotiveBert", BaseGenerationModels.AutomotiveBert),
+            new ModelAppEntity(UUID.fromString("610e386a-5d58-49a8-85b4-322d683a8147"),
+                "Natural Language Bert", BaseGenerationModels.NLBert),
+            new ModelAppEntity(UUID.fromString("4d589342-18a0-4bc4-b530-c186dc2b0de9"),
+                "Programming Language Bert", BaseGenerationModels.NLBert),
+            new ModelAppEntity(UUID.fromString("6f94c777-04e8-406c-9dc3-3a19e417043b"),
+                "TraceGPT", BaseGenerationModels.GPT)
         );
     }
 
@@ -95,7 +99,8 @@ public enum BaseGenerationModels {
      * @return Returns the default model.
      */
     public static ModelAppEntity getDefaultModel() {
-        return new ModelAppEntity(UUID.fromString("2dfe434c-5449-4b33-8627-f5ac20667aca"), "Anthropic", BaseGenerationModels.ANTHROPIC);
+        return new ModelAppEntity(UUID.fromString("2dfe434c-5449-4b33-8627-f5ac20667aca"),
+            "Anthropic", BaseGenerationModels.ANTHROPIC);
     }
 
     /**

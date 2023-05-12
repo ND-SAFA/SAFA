@@ -4,36 +4,20 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.tgen.entities.api.SafaResponse;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-/**
- * The generic response from TGEN.
- */
-@Data
-@NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-class SafaResponse<T> {
-    @JsonProperty("job_id")
-    UUID jobId;
-    int status;
-    T body;
-}
 
 @AllArgsConstructor
 @Service
@@ -41,7 +25,6 @@ public class SafaRequestBuilder {
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 30;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
 
     public <T> T sendPost(String endpoint,
                           Object object,

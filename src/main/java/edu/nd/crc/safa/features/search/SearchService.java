@@ -38,6 +38,7 @@ public class SearchService {
      * @param prompt           The prompt to match artifacts against.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
+     * @param model            The base model to use for searching.
      * @return Ids of matched artifacts.
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
@@ -56,6 +57,7 @@ public class SearchService {
      * @param artifactIds      The ids of the artifacts to use as queries.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if two artifacts are linked.
+     * @param model            The base model to use for searching.
      * @return List of matched artifacts.
      */
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
@@ -77,6 +79,7 @@ public class SearchService {
      * @param sourceLayer   Source artifacts mapping id to body.
      * @param targetLayer   Target artifacts mapping id to body.
      * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
+     * @param model         The model to use for searching.
      * @return Target Artifact IDs that matched source artifacts.
      */
     public SearchResponse searchSourceLayer(Map<String, String> sourceLayer,

@@ -23,6 +23,7 @@ export type IconVariant =
   | "back"
   | "account"
   | "search"
+  | "generate"
   | "notification"
   | "share"
   | "logs"

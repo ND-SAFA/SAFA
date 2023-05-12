@@ -12,7 +12,11 @@
     :type="props.type"
     :disable="props.disabled"
     @keydown="handleKeydown"
-  />
+  >
+    <template #append>
+      <slot name="append" />
+    </template>
+  </q-input>
 </template>
 
 <script lang="ts">

@@ -3,8 +3,8 @@ import {
   ArtifactSummaryConfirmation,
   IOHandlerCallback,
 } from "@/types";
-import { logStore } from "@/hooks";
-import { createSummary, handleSaveArtifact } from "@/api";
+import { artifactSaveStore, logStore } from "@/hooks";
+import { createPrompt, createSummary, handleSaveArtifact } from "@/api";
 
 /**
  * Generates a summary for an artifact, and updates the app state.
@@ -41,6 +41,35 @@ export async function handleGenerateArtifactSummary(
   } catch (e) {
     onError?.(e as Error);
     logStore.onError(`Failed to generate summary: ${artifact.name}`);
+  } finally {
+    onComplete?.();
+  }
+}
+
+/**
+ * Generates the body of an artifact based on an artifact prompt.
+ * Uses the artifact currently being edited, and updates the edited artifact body to the response.
+ *
+ * @param onSuccess - Called if the body is generated successfully.
+ * @param onError - Called if the body generation fails.
+ * @param onComplete - Called after the action completes.
+ */
+export async function handleGenerateArtifactBody({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): Promise<void> {
+  const artifact = artifactSaveStore.editedArtifact;
+
+  try {
+    artifact.body = await createPrompt(artifact.body);
+
+    onSuccess?.();
+  } catch (e) {
+    onError?.(e as Error);
+    logStore.onError(
+      `Failed to generate body based on prompt: ${artifact.name}`
+    );
   } finally {
     onComplete?.();
   }

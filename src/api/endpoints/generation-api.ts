@@ -25,3 +25,21 @@ export async function createSummary(artifact: ArtifactSchema): Promise<string> {
 
   return summaries[0] || "";
 }
+
+/**
+ * Generates a response based on a prompt.
+ *
+ * @param prompt - The prompt to generate with.
+ * @return The response based on the prompt.
+ */
+export async function createPrompt(prompt: string): Promise<string> {
+  const { completion } = await authHttpClient<{ completion: string }>(
+    fillEndpoint(Endpoint.prompt),
+    {
+      method: "POST",
+      body: JSON.stringify({ prompt }),
+    }
+  );
+
+  return completion;
+}

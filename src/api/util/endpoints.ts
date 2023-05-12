@@ -134,6 +134,7 @@ export enum Endpoint {
   // Generation
 
   summarize = "summarize",
+  prompt = "prompt",
 }
 
 /**

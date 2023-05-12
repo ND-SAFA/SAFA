@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -80,14 +79,6 @@ public class SafaRequestBuilder {
             .uri(requestMeta.endpoint);
 
         if (requestMeta.payload != null) {
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String json = null;
-            try {
-                json = ow.writeValueAsString(requestMeta.payload);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            System.out.println("PAYLOAD:" + json);
             request.bodyValue(requestMeta.payload);
         }
 
@@ -110,7 +101,6 @@ public class SafaRequestBuilder {
         });
 
         String responseStr = responseMono.block();
-        System.out.println("Response String:" + responseStr);
         return parseTGenResponse(responseStr, requestMeta.responseClass).getBody();
     }
 
@@ -119,7 +109,6 @@ public class SafaRequestBuilder {
             if (safaResponse.getStatus() == -1) {
                 throw new SafaError("TGen returned with an error.", safaResponse.getBody());
             }
-            System.out.println("BODY:" + safaResponse.getBody());
             return objectMapper.readValue(safaResponse.getBody().toString(), targetClass);
         } catch (JsonProcessingException e) {
             throw new SafaError("TGen response not recognized.", e);

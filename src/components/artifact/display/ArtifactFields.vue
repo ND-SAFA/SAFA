@@ -31,7 +31,7 @@
     <flex-box justify="between" align="center">
       <typography variant="caption" value="Summary" />
       <text-button
-        v-if="!generateConfirmation"
+        v-if="!generateApproval"
         text
         color="primary"
         :loading="generateLoading"
@@ -43,19 +43,34 @@
         <text-button text icon="save" label="Save" @click="handleSaveSummary" />
         <text-button
           text
+          :loading="generateLoading"
+          icon="graph-refresh"
+          label="Retry"
+          @click="handleGenerateSummary"
+        />
+        <text-button
+          text
           icon="delete"
           label="Delete"
           @click="handleDeleteSummary"
         />
       </q-card>
     </flex-box>
-    <typography
-      v-if="hasSummary"
-      default-expanded
-      variant="expandable"
-      :value="summary"
-      data-cy="text-selected-body"
-    />
+    <flex-box full-width>
+      <q-card
+        :bordered="generateApproval"
+        :flat="!generateApproval"
+        :class="generateApproval ? 'full-width q-pa-sm' : ''"
+      >
+        <typography
+          v-if="hasSummary"
+          default-expanded
+          variant="expandable"
+          :value="summary"
+          data-cy="text-selected-body"
+        />
+      </q-card>
+    </flex-box>
 
     <attribute-list-display :artifact="artifact" />
   </panel-card>
@@ -102,6 +117,7 @@ const summary = computed(
   () => generateConfirmation.value?.summary || artifact.value?.summary || ""
 );
 const hasSummary = computed(() => !!summary.value);
+const generateApproval = computed(() => !!generateConfirmation.value);
 
 /**
  * Generates a summary for the artifact.

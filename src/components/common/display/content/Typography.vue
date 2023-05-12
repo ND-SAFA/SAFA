@@ -6,7 +6,7 @@
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
+    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
@@ -17,10 +17,7 @@
     <div v-else :class="className + ' text-grey-8'">
       Code is hidden to save space.
     </div>
-    <!--    <div v-else :class="className + ' text-ellipsis text-expanded'">-->
-    <!--      {{ value }}-->
-    <!--    </div>-->
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
+    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
   </div>

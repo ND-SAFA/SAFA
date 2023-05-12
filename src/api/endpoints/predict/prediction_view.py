@@ -9,12 +9,15 @@ from rest_framework.views import APIView
 
 from api.endpoints.predict.prediction_serializer import PredictionSerializer
 from api.experiment_creator import JobCreator, PredictionJobTypes
+from api.utils.model_util import ModelUtil
 from api.utils.view_util import ViewUtil
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.testres.definition_creator import DefinitionCreator
+from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.json_util import NpEncoder
+from tgen.util.status import Status
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -29,7 +32,7 @@ def create_predict_definition(task_id: str, dataset: ApiDefinition, model: str, 
     """
     prediction_job_args = {
         "output_dir": os.path.join(JOB_DIR, task_id),
-        "prediction_job_type": PredictionJobTypes.OPENAI if model.lower().strip() == "gpt" else PredictionJobTypes.BASE,
+        "prediction_job_type": PredictionJobTypes.LLM if ModelUtil.is_llm(model) else PredictionJobTypes.BASE,
         "model_path": model
     }
     if prompt:
@@ -54,5 +57,10 @@ class PredictView(APIView):
         api_id = uuid.uuid4()
         prediction_job = create_predict_definition(str(api_id), dataset, model, prompt)
         prediction_job.run()
-        output = prediction_job.result.to_json(as_dict=True)
-        return JsonResponse({"predictions": output["prediction_entries"]}, encoder=NpEncoder)
+        job_result = prediction_job.result
+        job_body = job_result.to_json(as_dict=True)
+
+        if job_result.status == Status.FAILURE:
+            return JsonResponse(job_body, status=400)
+        traceOutput: TracePredictionOutput = job_body["body"]
+        return JsonResponse({"body": {"predictions": traceOutput.prediction_entries}}, encoder=NpEncoder)

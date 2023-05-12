@@ -1,3 +1,4 @@
+from api.utils.model_util import ModelUtil
 from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -10,13 +11,12 @@ from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.model_manager import ModelManager
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.supported_enum import SupportedEnum
 
 
 class PredictionJobTypes(SupportedEnum):
-    OPENAI = "openai"
+    LLM = "openai"
     BASE = "base"
 
 
@@ -41,13 +41,13 @@ class JobCreator:
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=eval_dataset_creator)
         job_args = JobArgs(random_seed=42)
 
-        if prediction_job_type == PredictionJobTypes.OPENAI:
-            trainer_args = OpenAIArgs(metrics=None)
+        if prediction_job_type == PredictionJobTypes.LLM:
+            model, llm_manager = ModelUtil.get_model_manager(model_path)
             job = LLMJob(task=TrainerTask.PREDICT,
                          trainer_dataset_manager=trainer_dataset_manager,
-                         trainer_args=trainer_args,
                          job_args=job_args,
-                         prompt_creator=prompt_creator)
+                         prompt_creator=prompt_creator,
+                         llm_manager=llm_manager)
             return job
         elif prediction_job_type == PredictionJobTypes.BASE:
             assert model_path is not None, "Expected model_path to be defined for prediction job."

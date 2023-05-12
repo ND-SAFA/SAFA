@@ -19,6 +19,15 @@ class ModelUtil:
     }
 
     @staticmethod
+    def is_llm(model: str) -> bool:
+        """
+        Returns true if model is LLM, false otherwise.
+        :param model: The model identifier.
+        :return: Whether model is LLM.
+        """
+        return model.lower().strip() in ModelUtil.model_map
+
+    @staticmethod
     def get_default_model() -> str:
         """
         :return: Returns the default library key.

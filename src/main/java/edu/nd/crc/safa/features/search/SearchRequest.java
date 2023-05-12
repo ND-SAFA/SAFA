@@ -61,7 +61,13 @@ public class SearchRequest {
     @Nullable
     String tracingPrompt;
 
+    /**
+     * @return Returns the base model associated with request.
+     */
     public BaseGenerationModels getModel() {
+        if (this.model == null) {
+            return BaseGenerationModels.getDefault();
+        }
         UUID modelId = UUID.fromString(this.model);
         return BaseGenerationModels.getModelById(modelId);
     }

@@ -71,8 +71,11 @@ public enum BaseGenerationModels {
         return model.getBaseModel();
     }
 
+    /**
+     * @return Returns the default model for search, tracing, and generation.
+     */
     public static BaseGenerationModels getDefault() {
-        return BaseGenerationModels.GPT;
+        return BaseGenerationModels.ANTHROPIC;
     }
 
     /**

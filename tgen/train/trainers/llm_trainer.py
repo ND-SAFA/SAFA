@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
@@ -19,6 +20,8 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.file_util import FileUtil
+from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.uncased_dict import UncasedDict
 
@@ -134,15 +137,16 @@ class LLMTrainer(AbstractTrainer):
         scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores)
+
         if trace_dataset is not None:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
-                                             link_ids=trace_dataset.get_ordered_link_ids(),
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
                 logger.log_with_title(f"Metrics", repr(output.metrics))
             output.label_ids = metrics_manager.trace_matrix.labels
             output.prediction_entries = metrics_manager.get_trace_predictions()
+
         return output
 
     def _get_score(self, probs: Dict) -> float:
@@ -159,6 +163,9 @@ class LLMTrainer(AbstractTrainer):
         probs = UncasedDict(probs)
         neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
         pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
+
+        neg_str = neg_str.strip()
+        pos_str = pos_str.strip()
 
         if pos_str in probs and neg_str in probs:
             v0 = probs.get(neg_str, 0)

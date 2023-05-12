@@ -62,13 +62,25 @@ class UncasedDict(dict):
             return processed_value
         return value
 
+    def get(self, key, *args, **kwargs) -> Any:
+        """
+        Gets item in dictionary.
+        :param key: The key to get item at.
+        :param args: Positional arguments passed to get.
+        :param kwargs: Keyword arguments passed to get.
+        :return: Item with given key.
+        """
+        processed_key = self._process_key(key)
+        return super().get(processed_key, *args, **kwargs)
+
     def __getitem__(self, key: str) -> Any:
         """
         Returns value matching the given key in the dictionary
         :param key: the key to the results dictionary
         :return: the value from the results dictionary
         """
-        return super().get(self._process_key(key))
+        processed_key = self._process_key(key)
+        return super().get(processed_key)
 
     def __setitem__(self, key: str, value: Any) -> None:
         """

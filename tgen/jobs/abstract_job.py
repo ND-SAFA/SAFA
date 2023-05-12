@@ -5,7 +5,7 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
-from typing import Dict, Type, Any
+from typing import Any, Dict, Type
 
 import torch
 import wandb

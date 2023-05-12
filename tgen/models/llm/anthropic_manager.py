@@ -1,5 +1,4 @@
-import math
-from typing import List, TypedDict, Dict
+from typing import Dict, List, TypedDict
 
 import anthropic
 
@@ -100,6 +99,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         if task == LLMCompletionType.CLASSIFICATION:
             results = [AnthropicManager._get_log_prob(r["completion"]) for r in res]
             return ClassificationResponse(results)
+        else:
+            raise ValueError(f"Response is not supported by anthropic manager: {task}")
 
     @staticmethod
     def upload_file(**params) -> AnthropicResponse:
@@ -120,7 +121,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         completion = completion.lower()
         log_probs = {"yes": 0, "no": 0}  # TODO get the neg and pos clas from the prompt creator
         response_2_index = {ans: completion.find(ans) for ans in log_probs.keys()}
-        response_2_index = {k: v for k, v in response_2_index.items() if v == -1}  # remove if response not in completion
+        response_2_index = {k: v for k, v in response_2_index.items() if v != -1}  # remove if response not in completion
         first_response = min(response_2_index, key=response_2_index.get) if len(response_2_index) > 0 else None
         if first_response in log_probs:
             log_probs[first_response] = 1

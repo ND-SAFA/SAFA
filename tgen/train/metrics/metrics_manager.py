@@ -21,7 +21,7 @@ class MetricsManager:
     Calculates metrics for trace trainer.
     """
 
-    def __init__(self, trace_df: TraceDataFrame, link_ids: List[int], trace_predictions: TracePredictions = None,
+    def __init__(self, trace_df: TraceDataFrame, link_ids: List[int] = None, trace_predictions: TracePredictions = None,
                  predicted_similarities: List[float] = None):
         """
         Constructs metrics manager with labels from trace links and scores from prediction output.
@@ -30,6 +30,8 @@ class MetricsManager:
         :param trace_predictions: The output of a model.
         :param predicted_similarities: The similarity scores predicted
         """
+        if link_ids is None:
+            link_ids = trace_df.index
         n_predictions = len(predicted_similarities) if trace_predictions is None else len(trace_predictions)
         n_expected = len(trace_df)
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."

@@ -27,6 +27,8 @@ public class SummaryService {
         TGen controller = baseModel.createTGenController();
         Map<String, TGenSummaryArtifact> artifacts = new HashMap<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
+            TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifact.getName());
+            artifact.setType(artifactType);
             artifacts.put(UUID.randomUUID().toString(), artifact);
         }
         TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts, request.getModel());

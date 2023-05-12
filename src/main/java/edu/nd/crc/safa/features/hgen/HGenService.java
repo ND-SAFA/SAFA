@@ -48,12 +48,11 @@ public class HGenService {
         List<ArtifactAppEntity> artifacts = artifactService.getAppEntities(projectVersion);
         Map<String, TGenSummaryArtifact> artifactMap = new HashMap<>();
         Set<UUID> artifactIdSet = new HashSet<>(artifactIds);
-
         artifacts.stream()
             .filter(a -> artifactIdSet.contains(a.getId()))
             .forEach(a -> {
-                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getBody(),
-                    TGenSummaryArtifactType.getArtifactType(a.getName())));
+                TGenSummaryArtifactType chunkerType = TGenSummaryArtifactType.getArtifactType(a.getName());
+                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getName(), a.getBody(), chunkerType));
             });
         return artifactMap;
     }

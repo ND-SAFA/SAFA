@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
+import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.method.TGen;
 
 import lombok.AllArgsConstructor;

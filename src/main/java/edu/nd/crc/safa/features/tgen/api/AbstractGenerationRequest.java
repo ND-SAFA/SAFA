@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.entities.api;
+package edu.nd.crc.safa.features.tgen.api;
 
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 

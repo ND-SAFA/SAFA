@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.api.SafaResponse;
+import edu.nd.crc.safa.features.tgen.api.SafaResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -85,17 +85,6 @@ public class SafaRequestBuilder {
 
         String responseStr = responseMono.block();
         return parseTGenResponse(responseStr, requestMeta.responseClass).getBody();
-    }
-
-    private <T> T parseResponse(SafaResponse safaResponse, Class<T> targetClass) {
-        try {
-            if (safaResponse.getStatus() == -1) {
-                throw new SafaError("TGen returned with an error.", safaResponse.getBody());
-            }
-            return objectMapper.readValue(safaResponse.getBody().toString(), targetClass);
-        } catch (JsonProcessingException e) {
-            throw new SafaError("TGen response not recognized.", e);
-        }
     }
 
     private <T> SafaResponse<T> parseTGenResponse(String body, Class<T> contentClass) {

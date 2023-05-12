@@ -24,6 +24,6 @@ public class TGenPredictionOutput extends AbstractTGenResponse {
         String source;
         String target;
         double score;
-        double label;
+        double label = -1;
     }
 }

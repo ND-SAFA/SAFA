@@ -63,7 +63,8 @@ class HierarchyGenerator(BaseObject):
                                                                                          self.args.source_layer_id,
                                                                                          trace_dataset_with_sources.trace_df)
             # Step 2: Create clusters of related artifacts
-            cluster_dataset_creator = ClusterDatasetCreator(source_layer_only_dataset, self.args.cluster_method)
+            cluster_dataset_creator = ClusterDatasetCreator(trace_dataset=source_layer_only_dataset,
+                                                            cluster_methods=self.args.cluster_method)
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)

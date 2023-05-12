@@ -8,6 +8,7 @@
     :error="showError"
     :class="className"
     :hint="props.hint"
+    :hide-hint="props.hideHint"
     :type="props.type"
     :disable="props.disabled"
     @keydown="handleKeydown"
@@ -54,6 +55,10 @@ const props = withDefaults(
      * A hint to display below the input.
      */
     hint?: string;
+    /**
+     * Whether to hide the hint.
+     */
+    hideHint?: boolean;
     type?:
       | "text"
       | "password"
@@ -102,8 +107,12 @@ const model = useVModel(props, "modelValue");
 
 const className = useMargins(props, () => [[!!props.class, props.class]]);
 
-const showError = computed(
-  () => !!props.errorMessage && props.errorMessage.length > 0
+const showError = computed(() =>
+  props.hideHint
+    ? // If the hint is hidden, don't show the error. Undefined will remove the bottom margin for the message.
+      undefined
+    : // If there is an error message, show it. Either way, the input will have a bottom margin.
+      !!props.errorMessage && props.errorMessage.length > 0
 );
 
 /**

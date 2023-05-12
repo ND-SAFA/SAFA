@@ -29,6 +29,15 @@
       data-cy="input-artifact-body"
     />
 
+    <text-input
+      v-if="!store.isFTA && !!store.hasSummary"
+      v-model="store.editedArtifact.summary"
+      label="Artifact Summary"
+      type="textarea"
+      class="q-mb-md"
+      data-cy="input-artifact-summary"
+    />
+
     <select-input
       v-if="showDocumentType"
       v-model="store.editedArtifact.documentType"

@@ -72,9 +72,9 @@ import {
   ArtifactTypeInput,
   TextInput,
   TextButton,
+  CustomModelInput,
+  ExpansionItem,
 } from "@/components/common";
-import CustomModelInput from "@/components/common/input/CustomModelInput.vue";
-import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
 
 const emit = defineEmits<{
   (e: "submit"): void;

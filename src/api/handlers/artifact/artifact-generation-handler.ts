@@ -29,14 +29,15 @@ export async function handleGenerateArtifactSummary(
       handleSaveArtifact(
         {
           ...artifact,
-          summary,
+          summary: generateConfirmation.summary,
         },
         true,
         undefined,
         {}
       );
+    const generateConfirmation = { summary, confirm };
 
-    onSuccess?.({ summary, confirm });
+    onSuccess?.(generateConfirmation);
   } catch (e) {
     onError?.(e as Error);
     logStore.onError(`Failed to generate summary: ${artifact.name}`);

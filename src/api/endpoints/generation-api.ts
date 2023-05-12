@@ -12,12 +12,14 @@ export async function createSummary(artifact: ArtifactSchema): Promise<string> {
     fillEndpoint(Endpoint.summarize),
     {
       method: "POST",
-      body: JSON.stringify([
-        {
-          content: artifact.body,
-          type: "NL",
-        },
-      ]),
+      body: JSON.stringify({
+        artifacts: [
+          {
+            name: artifact.name,
+            content: artifact.body,
+          },
+        ],
+      }),
     }
   );
 

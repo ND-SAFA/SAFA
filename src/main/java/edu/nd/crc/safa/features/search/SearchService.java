@@ -41,11 +41,12 @@ public class SearchService {
      * @return Ids of matched artifacts.
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
-                                              List<String> searchTypes, String tracingPrompt) {
+                                              List<String> searchTypes, String tracingPrompt,
+                                              BaseGenerationModels model) {
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt);
+        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
     }
 
     /**
@@ -60,13 +61,14 @@ public class SearchService {
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
                                                 List<UUID> artifactIds,
                                                 List<String> searchTypes,
-                                                String tracingPrompt) {
+                                                String tracingPrompt,
+                                                BaseGenerationModels model) {
         Map<UUID, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(
             convertArtifactMapToLayer(sourceLayer),
-            convertArtifactMapToLayer(targetLayer), tracingPrompt);
+            convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
     }
 
     /**
@@ -77,11 +79,12 @@ public class SearchService {
      * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
      * @return Target Artifact IDs that matched source artifacts.
      */
-    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,
-                                            String tracingPrompt) {
+    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer,
+                                            Map<String, String> targetLayer,
+                                            String tracingPrompt,
+                                            BaseGenerationModels model) {
 
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
-        BaseGenerationModels model = BaseGenerationModels.GPT;
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
         TGen controller = model.createTGenController();
         TGenPredictionOutput response = controller.performPrediction(payload);

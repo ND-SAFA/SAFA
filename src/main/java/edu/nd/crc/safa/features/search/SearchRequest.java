@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+
 import lombok.Data;
 
 @Data
@@ -58,4 +60,9 @@ public class SearchRequest {
      */
     @Nullable
     String tracingPrompt;
+
+    public BaseGenerationModels getModel() {
+        UUID modelId = UUID.fromString(this.model);
+        return BaseGenerationModels.getModelById(modelId);
+    }
 }

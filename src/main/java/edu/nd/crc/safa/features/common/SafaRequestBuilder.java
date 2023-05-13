@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.api.SafaResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -19,22 +19,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+/**
+ * Builds and performs HTTP/HTTPS requests.
+ */
 @AllArgsConstructor
 @Service
 public class SafaRequestBuilder {
+    protected final ObjectMapper objectMapper = new ObjectMapper();
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 30;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Performs a POST request.
+     *
+     * @param endpoint      Where to send request to.
+     * @param payload       The payload to send in body of request.
+     * @param responseClass The expected class response should be in.
+     * @param <T>           The type associated with response to parse.
+     * @return The parsed of generic type.
+     */
     public <T> T sendPost(String endpoint,
-                          Object object,
+                          Object payload,
                           Class<T> responseClass) {
         // Step - Send request
-        return sendJsonRequest(endpoint, object, responseClass, HttpMethod.POST);
+        return sendJsonRequest(endpoint, payload, responseClass, HttpMethod.POST);
     }
 
+    /**
+     * Performs request with JSON headers.
+     *
+     * @param endpoint      The endpoint to send request to.
+     * @param payload       The payload to send in request.
+     * @param responseClass The expected class to parse response to.
+     * @param method        The type of HTTP method to make request with.
+     * @param <T>           The generic type to parse response to.
+     * @return The parsed response.
+     */
     public <T> T sendJsonRequest(String endpoint,
-                                 Object object,
+                                 Object payload,
                                  Class<T> responseClass,
                                  HttpMethod method) {
         // Step - Create headers
@@ -48,7 +70,7 @@ public class SafaRequestBuilder {
             endpoint,
             method,
             headerMap,
-            object,
+            payload,
             responseClass,
             Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS));
 
@@ -56,6 +78,13 @@ public class SafaRequestBuilder {
         return sendRequest(requestMeta);
     }
 
+    /**
+     * Performs generic request.
+     *
+     * @param requestMeta Request meta details including endpoint, method, payload, and more.
+     * @param <T>         The expected response type.
+     * @return The parsed response.
+     */
     public <T> T sendRequest(RequestMeta<T> requestMeta) {
         WebClient.RequestBodySpec request = webClient
             .method(requestMeta.httpMethod)
@@ -74,8 +103,7 @@ public class SafaRequestBuilder {
                 return response.bodyToMono(String.class);
             } else if (response.statusCode().is4xxClientError()) {
                 return response.bodyToMono(String.class).flatMap(body -> {
-                    SafaResponse<String> safaResponse = parseTGenResponse(body, String.class);
-                    String error = safaResponse.getBody();
+                    String error = parseResponse(body, String.class);
                     return Mono.error(new RuntimeException(error));
                 });
             } else {
@@ -84,26 +112,41 @@ public class SafaRequestBuilder {
         });
 
         String responseStr = responseMono.block();
-        return parseTGenResponse(responseStr, requestMeta.responseClass).getBody();
+        return parseResponse(responseStr, requestMeta.responseClass);
     }
 
-    private <T> SafaResponse<T> parseTGenResponse(String body, Class<T> contentClass) {
+    /**
+     * Parses JSON string into target type.
+     *
+     * @param jsonString The JSON string.
+     * @param targetType The target type being one of JavaType, TypeReference, or Class
+     * @param <T>        The generic type to parse into
+     * @return The target class referenced by type or class.
+     */
+    public <T> T parseResponse(String jsonString, Object targetType) {
         try {
-            JavaType type = objectMapper.getTypeFactory().constructParametricType(SafaResponse.class, contentClass);
-            return objectMapper.readValue(body, type);
+            if (targetType instanceof JavaType) {
+                return objectMapper.readValue(jsonString, (JavaType) targetType);
+            } else if (targetType instanceof Class) {
+                return objectMapper.readValue(jsonString, (Class<T>) targetType);
+            } else if (targetType instanceof TypeReference) {
+                return objectMapper.readValue(jsonString, (TypeReference<T>) targetType);
+            } else {
+                throw new IllegalArgumentException("Unsupported target type: " + targetType.getClass());
+            }
         } catch (JsonProcessingException e) {
-            throw new SafaError("TGen response not recognized.", e);
+            throw new SafaError("Response not recognized.", e);
         }
     }
 
     @AllArgsConstructor
     @Data
-    class RequestMeta<T> {
+    protected class RequestMeta<T> {
         String endpoint;
         HttpMethod httpMethod;
         Map<String, Object> headers;
-        Object payload;
-        Class<T> responseClass;
+        Object payload; // can be JavaType, TypeReference, or Class<T>
+        Object responseClass;
         Duration timeout = Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS);
     }
 }

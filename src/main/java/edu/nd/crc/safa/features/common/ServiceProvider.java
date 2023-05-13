@@ -50,7 +50,6 @@ import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.search.SearchService;
 import edu.nd.crc.safa.features.summary.SummaryService;
-import edu.nd.crc.safa.features.tgen.api.TGenRequestBuilder;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
@@ -163,7 +162,6 @@ public class ServiceProvider {
     private final DefaultProjectCreatorService defaultProjectCreatorService;
     // HTTP
     private final SafaRequestBuilder safaRequestBuilder;
-    private final TGenRequestBuilder tGenRequestBuilder;
     private final GraphQlService graphQlService;
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;

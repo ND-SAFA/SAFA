@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
 import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
@@ -21,7 +22,6 @@ import edu.nd.crc.safa.features.summary.TGenSummaryResponse;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.tgen.api.TGenRequestBuilder;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -40,11 +40,11 @@ public class TGen implements ITraceGenerationController {
 
     private static final Logger log = LoggerFactory.getLogger(TGen.class);
 
-    private final TGenRequestBuilder safaRequestBuilder;
+    private final SafaRequestBuilder safaRequestBuilder;
     private final BertMethodIdentifier methodId;
 
     public TGen(BertMethodIdentifier methodId) {
-        this.safaRequestBuilder = ServiceProvider.instance.getTGenRequestBuilder();
+        this.safaRequestBuilder = ServiceProvider.instance.getSafaRequestBuilder();
         this.methodId = methodId;
     }
 

@@ -9,16 +9,38 @@ from tgen.util.status import Status
 
 
 def endpoint(serializer):
-    def method_handler(method, **kwargs):
+    """
+    Decorator for creating automatic documentation, serialization, and job handling.
+    :param serializer: The serializer to use for parsing payload.
+    :return: Handler function accepting `POST` method.
+    """
+
+    def method_handler(endpoint_method):
+        """
+        Decorator for performing endpoint method alongside auto documenting it and job handling.
+        :param endpoint_method: The method performing endpoint logic.
+        :return: Request handler
+        """
+
         @autodoc(serializer)
         @csrf_exempt
-        def request_handler(self, request, **kwargs):
+        def request_handler(method_class_instance, request):
+            """
+            Decorator serializing request and performing job handling.
+            :param method_class_instance: The instance of the class encapsulating method (`self`).
+            :param request: The request containing payload.
+            :return: Endpoint response containing error if occurred or job result if successful.
+            """
             prediction_payload = ViewUtil.read_request(request, serializer)
-            job_tuple = method(self, prediction_payload)
+            job_tuple = endpoint_method(method_class_instance, prediction_payload)
             job: AbstractJob = job_tuple[0]
             post_processor = job_tuple[1]
 
             def job_handler():
+                """
+                Runs jobs and returns body if successful.y
+                :return: Error if failure occurs, job result otherwise.
+                """
                 job_result = job.run()
                 job_dict = job_result.to_json(as_dict=True)
                 if job_result.status == Status.FAILURE:

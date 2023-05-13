@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_BUFFER
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker
@@ -76,19 +76,19 @@ class TestSummarizer(BaseTest):
 
         # set code_or_exceeds_limit_only to TRUE this time
         llm_manager = OpenAIManager(OpenAIArgs())
-        token_limit = ModelTokenLimits.get_token_limit_for_model(GENERATION_MODEL_DEFAULT)
+        token_limit = ModelTokenLimits.get_token_limit_for_model(OPEN_AI_MODEL_DEFAULT)
         summarizer = Summarizer(llm_manager, max_tokens_for_token_limit=token_limit - MAX_TOKENS_BUFFER - 5,
                                 code_or_exceeds_limit_only=True)
         long_text = "This is a text is over the token limit"
         short_text = "short text"
         summaries = summarizer.summarize_bulk(contents=[long_text, short_text])
         expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
-                                    for chunk in NaturalLanguageChunker(GENERATION_MODEL_DEFAULT, token_limit=5).chunk(long_text)])
+                                    for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)])
         self.assertEqual(summaries[0], expected_summary)
         self.assertEqual(summaries[1], short_text)  # shouldn't have summarized
 
     def test_create_summarization_prompts(self):
-        token_limit = ModelTokenLimits.get_token_limit_for_model(GENERATION_MODEL_DEFAULT)
+        token_limit = ModelTokenLimits.get_token_limit_for_model(OPEN_AI_MODEL_DEFAULT)
         summarizer = Summarizer(OpenAIManager(OpenAIArgs()), max_tokens_for_token_limit=token_limit - MAX_TOKENS_BUFFER - 5,
                                 code_or_exceeds_limit_only=True)
         short_text = "short text"
@@ -98,7 +98,7 @@ class TestSummarizer(BaseTest):
         long_text = "This is a text is over the token limit"
         prompts = summarizer._create_summarization_prompts(long_text)
         expected_prompts = [summarizer.nl_prompt_creator.create(chunk)[PromptKeys.PROMPT]
-                            for chunk in NaturalLanguageChunker(GENERATION_MODEL_DEFAULT, token_limit=5).chunk(long_text)]
+                            for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)]
         self.assertListEqual(prompts, expected_prompts)
 
         python_code = "x = 1"

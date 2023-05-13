@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_default_llm_manager
-from tgen.constants.open_ai_constants import GENERATION_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
@@ -25,7 +25,7 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
+    def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = OPEN_AI_MODEL_DEFAULT,
                  max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
                  nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):

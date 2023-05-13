@@ -33,8 +33,8 @@ class SummaryView(APIView):
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args, summarizer=summarizer)
         job_result = summarize_job.run()
+        
         job_body = job_result.to_json(as_dict=True)["body"]
         if job_result.status == Status.FAILURE:
             return JsonResponse(job_body, status=400)
-        summarized_artifacts = job_body
-        return JsonResponse({"body": {"artifacts": summarized_artifacts}}, encoder=NpEncoder)
+        return JsonResponse({"body": {"artifacts": job_body}}, encoder=NpEncoder)

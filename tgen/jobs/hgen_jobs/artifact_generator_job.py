@@ -10,12 +10,12 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.jobs.hgen_jobs.hgen_job import HGenJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
+from tgen.util.status import Status
 
 
 class ArtifactGeneratorJob(HGenJob):
@@ -34,7 +34,8 @@ class ArtifactGeneratorJob(HGenJob):
         """
         self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
         self.artifacts_by_cluster = artifact_ids_by_cluster
-        dataset_creator = ClusterDatasetCreator(trace_dataset=self._create_trace_dataset_from_artifacts(self.artifacts),
+        trace_dataset = self._create_trace_dataset_from_artifacts(self.artifacts)
+        dataset_creator = ClusterDatasetCreator(trace_dataset=trace_dataset,
                                                 manual_clusters={i: artifacts_in_cluster
                                                                  for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)})
         hgen_args = HGenArgs(source_layer_id=self.SOURCE_LAYER_ID, hgen_base_prompt=hgen_base_prompt,
@@ -78,4 +79,7 @@ class ArtifactGeneratorJob(HGenJob):
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args,
                                               summarizer=summarizer if summarizer is not None else
                                               Summarizer(code_or_exceeds_limit_only=True))
-        return summarize_job.run().body
+        job_result = summarize_job.run()
+        if job_result.status == Status.FAILURE:
+            raise Exception(job_result.body)
+        return job_result.body

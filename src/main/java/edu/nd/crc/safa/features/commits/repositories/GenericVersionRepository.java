@@ -242,6 +242,7 @@ public abstract class GenericVersionRepository<
                     versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
             this.save(versionEntity);
         } catch (Exception e) {
+            e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();
             String error = String.format("An error occurred while saving version entity with base id: %s",
                 baseEntityId);

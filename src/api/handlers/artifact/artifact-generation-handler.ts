@@ -47,6 +47,37 @@ export async function handleGenerateArtifactSummary(
 }
 
 /**
+ * Generates the name of an artifact based on the body.
+ * Uses the artifact currently being edited, and updates the edited artifact name to the response.
+ *
+ * @param onSuccess - Called if the body is generated successfully.
+ * @param onError - Called if the body generation fails.
+ * @param onComplete - Called after the action completes.
+ */
+export async function handleGenerateArtifactName({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): Promise<void> {
+  const artifact = artifactSaveStore.editedArtifact;
+
+  try {
+    artifact.name = await createPrompt(
+      `Generate a 3 word name for:\n\`\`\`\n${artifact.body}\n\`\`\``
+    );
+
+    onSuccess?.();
+  } catch (e) {
+    onError?.(e as Error);
+    logStore.onError(
+      `Failed to generate name based on the body: ${artifact.name}`
+    );
+  } finally {
+    onComplete?.();
+  }
+}
+
+/**
  * Generates the body of an artifact based on an artifact prompt.
  * Uses the artifact currently being edited, and updates the edited artifact body to the response.
  *

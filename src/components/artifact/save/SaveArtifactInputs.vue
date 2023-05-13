@@ -9,7 +9,16 @@
       :loading="nameCheckLoading"
       class="q-mb-md"
       data-cy="input-artifact-name"
-    />
+    >
+      <template #append>
+        <icon-button
+          :loading="genBodyLoading"
+          tooltip="Generate the name based on the body"
+          icon="generate"
+          @click="handleGenerateName"
+        />
+      </template>
+    </text-input>
     <artifact-type-input
       v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
       v-model="store.editedArtifact.type"
@@ -30,7 +39,7 @@
     >
       <template #append>
         <icon-button
-          :loading="promptLoading"
+          :loading="genBodyLoading"
           tooltip="Generate the body based on a prompt"
           icon="generate"
           @click="handleGenerateBody"
@@ -108,9 +117,9 @@ import { computed, ref, watch } from "vue";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
 import {
-  createPrompt,
   getDoesArtifactExist,
   handleGenerateArtifactBody,
+  handleGenerateArtifactName,
 } from "@/api";
 import {
   ArtifactInput,
@@ -126,7 +135,8 @@ const logicTypes = logicTypeOptions();
 
 const nameCheckTimer = ref<ReturnType<typeof setTimeout> | undefined>();
 const nameCheckLoading = ref(false);
-const promptLoading = ref(false);
+const genNameLoading = ref(false);
+const genBodyLoading = ref(false);
 
 const store = computed(() => artifactSaveStore);
 
@@ -141,13 +151,24 @@ const nameError = computed(() =>
 );
 
 /**
+ * Generates the name of the artifact based on the body.
+ */
+function handleGenerateName() {
+  genNameLoading.value = true;
+
+  handleGenerateArtifactName({
+    onComplete: () => (genNameLoading.value = false),
+  });
+}
+
+/**
  * Generates the body of the artifact based on a prompt.
  */
 function handleGenerateBody() {
-  promptLoading.value = true;
+  genBodyLoading.value = true;
 
   handleGenerateArtifactBody({
-    onComplete: () => (promptLoading.value = false),
+    onComplete: () => (genBodyLoading.value = false),
   });
 }
 

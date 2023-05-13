@@ -4,6 +4,8 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from api.endpoints.base.docs.doc_generator import autodoc
+from api.endpoints.summary.summary_serializer import SummarySerializer
 from api.utils.model_util import ModelUtil
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.components.args.job_args import JobArgs
@@ -17,6 +19,7 @@ class SummaryView(APIView):
     Provides endpoint for summarizing artifacts.
     """
 
+    @autodoc(SummarySerializer)
     @csrf_exempt
     def post(self, request: HttpRequest):
         """
@@ -33,7 +36,7 @@ class SummaryView(APIView):
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args, summarizer=summarizer)
         job_result = summarize_job.run()
-        
+
         job_body = job_result.to_json(as_dict=True)["body"]
         if job_result.status == Status.FAILURE:
             return JsonResponse(job_body, status=400)

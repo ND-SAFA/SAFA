@@ -1,6 +1,8 @@
 from django.http import HttpRequest, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from api.endpoints.base.docs.doc_generator import autodoc
 from api.endpoints.hgen.hgen_serializer import HGenSerializer
 from api.utils.model_util import ModelUtil
 from api.utils.view_util import ViewUtil
@@ -15,6 +17,8 @@ class HGenView(APIView):
     Provides endpoint for generating artifacts.
     """
 
+    @autodoc(HGenSerializer)
+    @csrf_exempt
     def post(self, request: HttpRequest):
         """
         Performs generation of single artifacts from cluster.

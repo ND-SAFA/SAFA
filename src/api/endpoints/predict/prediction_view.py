@@ -7,6 +7,7 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from api.endpoints.base.docs.doc_generator import autodoc
 from api.endpoints.predict.prediction_serializer import PredictionSerializer
 from api.experiment_creator import JobCreator, PredictionJobTypes
 from api.utils.model_util import ModelUtil
@@ -45,6 +46,7 @@ class PredictView(APIView):
     Allows users to run experiments.
     """
 
+    @autodoc(PredictionSerializer)
     @csrf_exempt
     def post(self, request: HttpRequest):
         prediction_payload = ViewUtil.read_request(request, PredictionSerializer)

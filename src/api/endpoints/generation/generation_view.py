@@ -4,6 +4,7 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from api.endpoints.base.docs.doc_generator import autodoc
 from api.endpoints.generation.generation_serializer import GenerationSerializer
 from api.utils.model_util import ModelUtil
 from api.utils.view_util import ViewUtil
@@ -24,6 +25,7 @@ class GenerationView(APIView):
     Provides endpoints for accessing completion API of LLM libraries.
     """
 
+    @autodoc(GenerationSerializer)
     @csrf_exempt
     def post(self, request: HttpRequest):
         prediction_payload = ViewUtil.read_request(request, GenerationSerializer)

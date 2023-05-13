@@ -11,8 +11,9 @@ class SummaryArtifactSerializer(serializers.Serializer):
     """
     Serializes a summary artifact request.
     """
-    content = serializers.CharField(max_length=2056)
-    type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker])
+    content = serializers.CharField(max_length=2056, help_text="The content to summarize.")
+    type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker],
+                                   help_text="The type of chunker to use for segmenting document.")
 
 
 class SummarySerializer(AbstractSerializer):
@@ -20,9 +21,10 @@ class SummarySerializer(AbstractSerializer):
     Serializes the request for artifact summaries.
     """
 
-    artifacts = serializers.DictField(child=SummaryArtifactSerializer())
-    model = serializers.CharField(max_length=512, required=False)
-    prompt = serializers.CharField(max_length=512, required=False)
+    artifacts = serializers.DictField(child=SummaryArtifactSerializer(help_text="Artifact information for summarization."),
+                                      help_text="Map of artifact IDs to bodies.")
+    model = serializers.CharField(max_length=512, required=False, help_text="The LLM used for summarization.")
+    prompt = serializers.CharField(max_length=512, required=False, help_text="The prompt to use for summarizing artifact.")
 
     def create(self, validated_data: Dict):
         """

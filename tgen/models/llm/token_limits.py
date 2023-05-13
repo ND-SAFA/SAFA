@@ -55,12 +55,12 @@ class ModelTokenLimits(Enum):
         :return: The token limit
         """
         token_limit = ModelTokenLimits.DEFAULT
-        model_name = RemoveUnwantedCharsStep(string.punctuation).run([model_name]).pop()
+        model_name = RemoveUnwantedCharsStep(string.punctuation).run([model_name]).pop().upper()
         try:
             token_limit = ModelTokenLimits[model_name.upper()]
         except KeyError:
             for mtl in ModelTokenLimits:
-                if model_name in mtl.name:
+                if model_name in mtl.name or mtl.name in model_name:
                     token_limit = mtl
                     break
         return token_limit

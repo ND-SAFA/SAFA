@@ -1,5 +1,5 @@
 import math
-from typing import List, TypedDict, Dict
+from typing import List, TypedDict, Dict, Optional
 
 import anthropic
 
@@ -87,7 +87,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
         return response
 
-    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> SupportedLLMResponses:
+    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[SupportedLLMResponses]:
         """
         Translates the LLM library response to task specific response.
         :param task: The task to translate to.
@@ -95,6 +95,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Any additional parameters to customize translation.
         :return: A task-specific response.
         """
+        if res is None:
+            return
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         if task == LLMCompletionType.CLASSIFICATION:

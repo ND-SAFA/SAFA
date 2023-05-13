@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
@@ -16,35 +18,49 @@ import lombok.Getter;
  */
 @Getter
 public enum BaseGenerationModels {
+
     /**
      * The Bert model trained on automotive data.
      */
-    AutomotiveBert("thearod5/automotive-bert"),
+    AutomotiveBert("b0c13c32-03d6-43bc-90df-2679c6affae3", "thearod5/automotive-bert", "Automotive BERT"),
     /**
      * Bert model trained on NL-NL trace links.
      */
-    NLBert("thearod5/nl-bert"),
+    NLBert("610e386a-5d58-49a8-85b4-322d683a8147", "thearod5/nl-bert", "Natural Language BERT"),
     /**
      * TBert as described in Traceability Transformed: Generating more Accurate Links with Pre-Trained BERT Models.
      */
-    PLBert("thearod5/pl-bert"),
+    PLBert("4d589342-18a0-4bc4-b530-c186dc2b0de9", "thearod5/pl-bert", "Programming Language BERT"),
     /**
      * OpenAI's GPT3.5 ada model trained on traceability links
      */
-    GPT("gpt"),
+    GPT("6f94c777-04e8-406c-9dc3-3a19e417043b", "gpt", "GPT3"),
     /**
      * Anthropic claude 1.3 model.
      */
-    ANTHROPIC("anthropic"),
+    ANTHROPIC("d3e7023e-a1b4-4636-847a-39e006b80d00", "anthropic", "Claude"),
     /**
      * The VSM method. Used primarily for testing.
      */
-    VSM("vsm");
+    VSM("00efc62f-afcc-4345-a843-b59dfa28ef5d", "vsm", "Vector Space Model");
 
+    /**
+     * Unique identifier for each model.
+     */
+    UUID id;
+    /**
+     * The path to load state from.
+     */
     String statePath;
+    /**
+     * The display name of the model.
+     */
+    String name;
 
-    BaseGenerationModels(String statePath) {
+    BaseGenerationModels(String id, String statePath, String name) {
+        this.id = UUID.fromString(id);
         this.statePath = statePath;
+        this.name = name;
     }
 
     /**
@@ -82,25 +98,14 @@ public enum BaseGenerationModels {
      * @return Returns list of models available to user.
      */
     public static List<ModelAppEntity> getDefaultModels() {
-        return List.of(
-            getDefaultModel(),
-            new ModelAppEntity(UUID.fromString("d3e7023e-a1b4-4636-847a-39e006b80d00"),
-                "AutomotiveBert", BaseGenerationModels.AutomotiveBert),
-            new ModelAppEntity(UUID.fromString("610e386a-5d58-49a8-85b4-322d683a8147"),
-                "Natural Language Bert", BaseGenerationModels.NLBert),
-            new ModelAppEntity(UUID.fromString("4d589342-18a0-4bc4-b530-c186dc2b0de9"),
-                "Programming Language Bert", BaseGenerationModels.NLBert),
-            new ModelAppEntity(UUID.fromString("6f94c777-04e8-406c-9dc3-3a19e417043b"),
-                "TraceGPT", BaseGenerationModels.GPT)
-        );
+        return Arrays.stream(BaseGenerationModels.values()).map(ModelAppEntity::new).collect(Collectors.toList());
     }
 
     /**
      * @return Returns the default model.
      */
     public static ModelAppEntity getDefaultModel() {
-        return new ModelAppEntity(UUID.fromString("2dfe434c-5449-4b33-8627-f5ac20667aca"),
-            "Anthropic", BaseGenerationModels.ANTHROPIC);
+        return new ModelAppEntity(BaseGenerationModels.ANTHROPIC);
     }
 
     /**

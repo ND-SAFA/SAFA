@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
-from api.endpoints.summary.summary_serializer import SummaryArtifactSerializer
+from api.endpoints.summarize.summarize_serializer import SummaryArtifactSerializer
 
 
 class HGenSerializer(AbstractSerializer):

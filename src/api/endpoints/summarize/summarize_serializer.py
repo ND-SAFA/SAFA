@@ -16,7 +16,7 @@ class SummaryArtifactSerializer(serializers.Serializer):
                                    help_text="The type of chunker to use for segmenting document.")
 
 
-class SummarySerializer(AbstractSerializer):
+class SummarizeSerializer(AbstractSerializer):
     """
     Serializes the request for artifact summaries.
     """

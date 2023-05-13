@@ -7,7 +7,7 @@ from api.utils.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
 
 
-class GenerationSerializer(AbstractSerializer):
+class CompletionSerializer(AbstractSerializer):
     """
     Serialized the generation payload
     """

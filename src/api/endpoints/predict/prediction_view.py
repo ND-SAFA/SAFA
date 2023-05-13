@@ -3,22 +3,17 @@ import os.path
 import uuid
 from typing import Dict, Optional
 
-from django.http import HttpRequest, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
-from api.endpoints.base.docs.doc_generator import autodoc
+from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.predict.prediction_serializer import PredictionSerializer
 from api.experiment_creator import JobCreator, PredictionJobTypes
 from api.utils.model_util import ModelUtil
-from api.utils.view_util import ViewUtil
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.util.json_util import NpEncoder
-from tgen.util.status import Status
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -46,10 +41,8 @@ class PredictView(APIView):
     Allows users to run experiments.
     """
 
-    @autodoc(PredictionSerializer)
-    @csrf_exempt
-    def post(self, request: HttpRequest):
-        prediction_payload = ViewUtil.read_request(request, PredictionSerializer)
+    @endpoint(serializer=PredictionSerializer)
+    def post(self, prediction_payload):
         model = prediction_payload["model"]
         dataset_definition: Dict = prediction_payload["dataset"]
         prompt: Optional[str] = prediction_payload.get("prompt", None)
@@ -58,11 +51,8 @@ class PredictView(APIView):
 
         api_id = uuid.uuid4()
         prediction_job = create_predict_definition(str(api_id), dataset, model, prompt)
-        prediction_job.run()
-        job_result = prediction_job.result
-        job_body = job_result.to_json(as_dict=True)
 
-        if job_result.status == Status.FAILURE:
-            return JsonResponse(job_body, status=400)
-        traceOutput: TracePredictionOutput = job_body["body"]
-        return JsonResponse({"body": {"predictions": traceOutput.prediction_entries}}, encoder=NpEncoder)
+        def post_process(trace_output: TracePredictionOutput):
+            return {"predictions": trace_output.prediction_entries}
+
+        return prediction_job, post_process

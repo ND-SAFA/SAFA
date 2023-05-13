@@ -1,39 +1,37 @@
 import os.path
 
-from django.http import HttpRequest, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
-from api.endpoints.base.docs.doc_generator import autodoc
-from api.endpoints.generation.generation_serializer import GenerationSerializer
+from api.endpoints.base.views.endpoint import endpoint
+from api.endpoints.completion.completion_serializer import CompletionSerializer
 from api.utils.model_util import ModelUtil
-from api.utils.view_util import ViewUtil
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.json_util import NpEncoder
 from tgen.util.reflection_util import ReflectionUtil
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
 
-class GenerationView(APIView):
+class CompletionView(APIView):
     """
     Provides endpoints for accessing completion API of LLM libraries.
     """
 
-    @autodoc(GenerationSerializer)
-    @csrf_exempt
-    def post(self, request: HttpRequest):
-        prediction_payload = ViewUtil.read_request(request, GenerationSerializer)
+    @endpoint(CompletionSerializer)
+    def post(self, prediction_payload):
         llm_name = prediction_payload["model"].lower()
         prompt: str = prediction_payload["prompt"]
         model, llm_manager = ModelUtil.get_model_manager(llm_name)
-        completion = self.perform_completion(model, prompt, llm_manager)
-        return JsonResponse({"completion": completion}, encoder=NpEncoder)
+        completion_runner = lambda: self.perform_completion(model, prompt, llm_manager)
+
+        def post_process(completion):
+            return {"completion": completion}
+
+        return completion_runner, post_process
 
     @staticmethod
     def perform_completion(model: str, prompt: str, llm_manager: AbstractLLMManager, **params) -> str:

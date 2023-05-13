@@ -9,8 +9,7 @@
             "object_type": "CLASSIFICATION",
             "pos_class": "Yes",
             "neg_class": "No",
-            "base_prompt": "Is (1) related to (2)?\n\n",
-            "artifact_prompt_format": "1. {}\n2. {}\n\n>"
+            "base_prompt": "Is (1) related to (2)?\n\n"
           },
           "trainer_args": {
             "object_type": "OPENAI",

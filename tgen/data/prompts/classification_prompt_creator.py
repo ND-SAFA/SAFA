@@ -13,7 +13,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     """
 
     def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "Yes", neg_class: str = "No",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}",
+                 artifact_prompt_format: str = "\n1. {}\n\n2. {}",
                  base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.CLASSIFICATION):
         """
         Constructs classification prompt creator

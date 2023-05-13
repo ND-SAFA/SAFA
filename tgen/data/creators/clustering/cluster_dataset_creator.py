@@ -25,15 +25,17 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
 
     CLUSTER_CONTENT_FORMAT = "{}"
 
-    def __init__(self, trace_dataset: TraceDataset,
+    def __init__(self, trace_dataset: TraceDataset = None, trace_dataset_creator: TraceDatasetCreator = None,
                  cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
-                 manual_clusters: Dict = None):
+                 manual_clusters: dict = None):
         """
         Initializes with a dataset with artifacts to be clustered
+        :param trace_dataset_creator:
         :param trace_dataset: The dataset to perform clustering on
         """
         super().__init__()
-        self.trace_dataset = trace_dataset
+        assert not (trace_dataset is None and trace_dataset_creator is None), "Provide either a trace dataset or a creator to make one"
+        self.trace_dataset = trace_dataset if trace_dataset is not None else trace_dataset_creator.create()
         self.cluster_methods = cluster_methods if isinstance(cluster_methods, Set) else {cluster_methods}
         assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters is not None, \
             "Must supply clusters for manual clustering"

@@ -29,8 +29,7 @@ class GenerationPromptCreator(AbstractPromptCreator):
         Generates the prompt and response
         :param source_content: The content of the source artifact
         :param target_content: The content of the target artifact
-        :param artifact_id: The id of the artifact
         :return: Dictionary containing the prompt and completion
         """
 
-        return self.generate_base(self.base_prompt.format(target_content, **kwargs), source_content)
+        return self.generate_base(self.base_prompt.format(target_content=target_content, **kwargs), source_content)

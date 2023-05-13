@@ -148,7 +148,8 @@ class PromptDataset(iDataset):
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
             entry = self._get_prompt_entry(source_artifact=source, target_artifact=target,
-                                           label=row[TraceKeys.LABEL], prompt_creator=prompt_creator, summarizer=summarizer)
+                                           label=row[TraceKeys.LABEL], prompt_creator=prompt_creator,
+                                           summarizer=summarizer, artifact_id=target[ArtifactKeys.ID])
             entries.append(entry)
         FileUtil.delete_file_safely(save_path)
         return PromptDataFrame(entries)
@@ -162,10 +163,10 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for i, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
-                                desc="Generating prompts dataframe from artifacts"):
+        for id_, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
+                                  desc="Generating prompts dataframe from artifacts"):
             entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
-                                           summarizer=summarizer)
+                                           summarizer=summarizer, artifact_id=id_)
             entries.append(entry)
         return PromptDataFrame(entries)
 

@@ -36,7 +36,7 @@ class TestSummarizer(BaseTest):
 
         # use file content
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False, model_for_token_limit=model_name)
+        summarizer = Summarizer(llm_manager, model_for_token_limit=model_name, code_or_exceeds_limit_only=False)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize_single(content=content)
         self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
@@ -64,7 +64,7 @@ class TestSummarizer(BaseTest):
 
         # use file content
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False, model_for_token_limit=model_name)
+        summarizer = Summarizer(llm_manager, model_for_token_limit=model_name, code_or_exceeds_limit_only=False)
         python_file_contents = FileUtil.read_file(os.path.join(TEST_DATA_DIR, "chunker/test_python.py"))
         contents = [" ".join(self.CHUNKS), python_file_contents]
         summaries = summarizer.summarize_bulk(contents=contents, chunker_types=[SupportedChunker.NL, SupportedChunker.PY])

@@ -13,6 +13,7 @@ class ModelTokenLimits(Enum):
     TEXTDAVINCI003 = 4096
     CODEDAVINCI = 8001
     CODECUSHMAN = 2048
+    CLAUDE = 100000
     DEFAULT = 2049
 
     @staticmethod

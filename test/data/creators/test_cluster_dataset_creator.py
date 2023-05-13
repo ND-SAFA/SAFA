@@ -97,4 +97,4 @@ class TestClusterDatasetCreator(BaseTest):
 
     def get_artifact_clusterer(self) -> ClusterDatasetCreator:
         dataset = self.get_trace_dataset()
-        return ClusterDatasetCreator(dataset, set(self.METHOD2CLUSTER.keys()))
+        return ClusterDatasetCreator(dataset, cluster_methods=set(self.METHOD2CLUSTER.keys()))

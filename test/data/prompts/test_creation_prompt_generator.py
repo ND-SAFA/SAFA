@@ -19,5 +19,5 @@ class TestClassificationPromptGenerater(BasePromptTest):
     def verify_prompt(self, generated_prompt):
         self.assertIn("source1", generated_prompt[PromptKeys.COMPLETION])
         self.assertTrue(
-            generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.SYSTEM_REQUIREMENT_CREATION.value.split("{}")[0]))
+            generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.SYSTEM_REQUIREMENT_CREATION.value.split("{")[0]))
         super().verify_prompt(generated_prompt, OpenAIManager.prompt_args)  # assumed using openai

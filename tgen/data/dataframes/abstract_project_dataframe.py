@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union, Callable
+from typing import Any, Dict, List, Union, Callable, Type
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
@@ -192,6 +192,18 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if len(duplicated_indices) > 0:
             logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
         return self[~is_duplicated]
+
+    @overrides(pd.DataFrame)
+    def to_dict(self, orient: str = 'dict', into: Type = dict, index: bool = True) -> Dict:
+        """
+        Converts the dataframe to dictionary after removing any duplicate indices (panda's to_dict does not allow duplicates)
+        :param orient: Determines the type of the values of the dictionary.
+        :param into: The collections.abc.Mapping subclass used for all Mappings in the return value.
+        :param index: Whether to include the index item
+        :return: The dataframe as a dictionary
+        """
+        self.remove_duplicate_indices()
+        return super().to_dict(orient, into, index)
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

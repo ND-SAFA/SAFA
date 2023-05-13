@@ -25,9 +25,9 @@ class Summarizer(BaseObject):
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
 
-    def __init__(self, llm_manager: AbstractLLMManager = None,
-                 model_for_token_limit: str = GENERATION_MODEL_DEFAULT, max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT,
-                 code_or_exceeds_limit_only: bool = True, nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
+    def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = GENERATION_MODEL_DEFAULT,
+                 max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
+                 nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
         """
         Initializes a summarizer for a specific model

@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 public class SafaRequestBuilder {
     protected final ObjectMapper objectMapper = new ObjectMapper();
     private final WebClient webClient;
-    private final int DEFAULT_TIMEOUT = 30;
+    private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
 
     /**
      * Performs a POST request.

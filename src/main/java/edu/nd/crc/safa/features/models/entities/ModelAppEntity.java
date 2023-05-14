@@ -31,6 +31,12 @@ public class ModelAppEntity implements IAppEntity {
      */
     BaseGenerationModels baseModel;
 
+    public ModelAppEntity(BaseGenerationModels model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.baseModel = model;
+    }
+
     /**
      * @param baseGenerationModel The base model whose state is returned.
      * @return Returns the state of the associated model

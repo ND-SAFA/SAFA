@@ -46,7 +46,7 @@ public class SearchController extends BaseController {
                     throw new InvalidAttributeValueException("Expected prompt to contain non-empty string.");
                 }
                 response = this.serviceProvider.getSearchService().performPromptSearch(projectAppEntity,
-                    request.getPrompt(), request.getSearchTypes(), request.getTracingPrompt());
+                    request.getPrompt(), request.getSearchTypes(), request.getTracingPrompt(), request.getModel());
                 this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;
@@ -59,7 +59,7 @@ public class SearchController extends BaseController {
                     return new SearchResponse();
                 }
                 response = this.serviceProvider.getSearchService().performArtifactSearch(projectAppEntity,
-                    request.getArtifactIds(), request.getSearchTypes(), request.getTracingPrompt());
+                    request.getArtifactIds(), request.getSearchTypes(), request.getTracingPrompt(), request.getModel());
                 this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;

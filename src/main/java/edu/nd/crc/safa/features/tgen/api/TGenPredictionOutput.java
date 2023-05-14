@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.entities.api;
+package edu.nd.crc.safa.features.tgen.api;
 
 import java.util.List;
 
@@ -24,6 +24,6 @@ public class TGenPredictionOutput extends AbstractTGenResponse {
         String source;
         String target;
         double score;
-        double label;
+        double label = -1;
     }
 }

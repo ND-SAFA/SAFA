@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
+import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.method.TGen;
 
 import lombok.AllArgsConstructor;
@@ -38,14 +38,16 @@ public class SearchService {
      * @param prompt           The prompt to match artifacts against.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
+     * @param model            The base model to use for searching.
      * @return Ids of matched artifacts.
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
-                                              List<String> searchTypes, String tracingPrompt) {
+                                              List<String> searchTypes, String tracingPrompt,
+                                              BaseGenerationModels model) {
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt);
+        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
     }
 
     /**
@@ -55,18 +57,20 @@ public class SearchService {
      * @param artifactIds      The ids of the artifacts to use as queries.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if two artifacts are linked.
+     * @param model            The base model to use for searching.
      * @return List of matched artifacts.
      */
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
                                                 List<UUID> artifactIds,
                                                 List<String> searchTypes,
-                                                String tracingPrompt) {
+                                                String tracingPrompt,
+                                                BaseGenerationModels model) {
         Map<UUID, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(
             convertArtifactMapToLayer(sourceLayer),
-            convertArtifactMapToLayer(targetLayer), tracingPrompt);
+            convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
     }
 
     /**
@@ -75,13 +79,15 @@ public class SearchService {
      * @param sourceLayer   Source artifacts mapping id to body.
      * @param targetLayer   Target artifacts mapping id to body.
      * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
+     * @param model         The model to use for searching.
      * @return Target Artifact IDs that matched source artifacts.
      */
-    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer, Map<String, String> targetLayer,
-                                            String tracingPrompt) {
+    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer,
+                                            Map<String, String> targetLayer,
+                                            String tracingPrompt,
+                                            BaseGenerationModels model) {
 
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
-        BaseGenerationModels model = BaseGenerationModels.GPT;
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
         TGen controller = model.createTGenController();
         TGenPredictionOutput response = controller.performPrediction(payload);

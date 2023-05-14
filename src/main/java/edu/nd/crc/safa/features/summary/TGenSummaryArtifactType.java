@@ -34,6 +34,9 @@ public enum TGenSummaryArtifactType {
      * @return The artifact type of artifact name.
      */
     public static TGenSummaryArtifactType getArtifactType(String artifactName) {
+        if (artifactName == null) {
+            return NL;
+        }
         List<TGenSummaryArtifactType> artifactTypes = List.of(PY, JAVA);
         for (TGenSummaryArtifactType artifactType : artifactTypes) {
             if (artifactName.endsWith(artifactType.fileExtension)) {

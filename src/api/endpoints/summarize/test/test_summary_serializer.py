@@ -1,4 +1,4 @@
-from api.endpoints.summary.summary_serializer import SummarySerializer
+from api.endpoints.summary.summary_serializer import SummarizeSerializer
 from api.tests.api_base_test import APIBaseTest
 
 
@@ -23,7 +23,7 @@ class TestSummarySerializer(APIBaseTest):
             }
         }
 
-        serializer = SummarySerializer(data=data)
+        serializer = SummarizeSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         validated_payload = serializer.save()
         validated_artifacts = validated_payload["artifacts"]

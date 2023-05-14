@@ -1,30 +1,25 @@
-import json
-
-from django.http import HttpRequest, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from api.endpoints.base.views.endpoint import endpoint
+from api.endpoints.summarize.summarize_serializer import SummarizeSerializer
 from api.utils.model_util import ModelUtil
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.util.json_util import NpEncoder
-from tgen.util.status import Status
 
 
-class SummaryView(APIView):
+class SummarizeView(APIView):
     """
     Provides endpoint for summarizing artifacts.
     """
 
-    @csrf_exempt
-    def post(self, request: HttpRequest):
+    @endpoint(SummarizeSerializer)
+    def post(self, request_data):
         """
         Performs artifact summarization.
-        :param request: Request containing artifacts to summarize.
+        :param request_data: Serialized data.
         :return: The same artifacts with content as summary.
         """
-        request_data = json.loads(request.body)
         artifacts = request_data["artifacts"]
         llm_name = request_data.get("model", ModelUtil.get_default_model())
         job_args = JobArgs()
@@ -32,9 +27,8 @@ class SummaryView(APIView):
 
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
         summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args, summarizer=summarizer)
-        job_result = summarize_job.run()
-        
-        job_body = job_result.to_json(as_dict=True)["body"]
-        if job_result.status == Status.FAILURE:
-            return JsonResponse(job_body, status=400)
-        return JsonResponse({"body": {"artifacts": job_body}}, encoder=NpEncoder)
+
+        def post_process(job_body):
+            return {"artifacts": job_body}
+
+        return summarize_job, post_process

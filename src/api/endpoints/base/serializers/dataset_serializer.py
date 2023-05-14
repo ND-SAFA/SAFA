@@ -8,12 +8,19 @@ class DatasetSerializer(serializers.Serializer):
     """
     Serializes datasets for trace link prediction.
     """
-    source_layers = serializers.ListField(child=serializers.DictField(),
-                                          help_text="List of source artifacts layers.",
-                                          required=True)
-    target_layers = serializers.ListField(child=serializers.DictField(),
-                                          help_text="List of target artifacts layers.",
-                                          required=True)
+    source_layers = serializers.ListSerializer(
+        child=serializers.DictField(
+            child=serializers.CharField(help_text="The artifact body."),
+            help_text="Map of artifact IDs to bodies."
+        ),
+        help_text="List of source artifacts layers.",
+        required=True)
+    target_layers = serializers.ListSerializer(
+        child=serializers.DictField(
+            child=serializers.CharField(help_text="The artifact Body"),
+            help_text="Map of artifact IDs to bodies."),
+        help_text="List of target artifacts layers.",
+        required=True)
 
     def update(self, **kwargs):
         """

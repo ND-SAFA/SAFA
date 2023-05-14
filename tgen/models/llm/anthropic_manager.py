@@ -4,6 +4,7 @@ from typing import List, TypedDict, Dict, Optional
 import anthropic
 
 from tgen.constants.anthropic_constants import ANTHROPIC_MAX_THREADS
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -26,6 +27,18 @@ class AnthropicResponse(TypedDict):
     exception: str
 
 
+def response_with_defaults(**params) -> AnthropicResponse:
+    """
+    Creates an Anthropic response using default values unless provided
+    :param params: Params to use in place of defaults
+    :return: The Anthropic response with defaults filled in
+    """
+    defaults = {str: EMPTY_STRING, bool: False}
+    all_params = {attr: params[attr] if attr in params else defaults[type_]
+                  for attr, type_ in AnthropicResponse.__annotations__.values()}
+    return AnthropicResponse(**all_params)
+
+
 class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     """
     Defines AI interface for anthropic API.
@@ -33,7 +46,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
     Client = None
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
-    prompt_args = PromptArgs(prompt_prefix="\n\nHuman:", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
+    prompt_args = PromptArgs(prompt_prefix="\n\nHuman: ", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
                              completion_suffix="###")
 
     def __init__(self, llm_args: AnthropicArgs = None):
@@ -80,14 +93,20 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            prompt_response = AnthropicManager.Client.completion(**prompt_params)
+            try:
+                prompt_response = AnthropicManager.Client.completion(**prompt_params)
+            except Exception as e:
+                prompt_response = response_with_defaults(exception=str(e))
+            if prompt_response.get("exception", EMPTY_STRING):
+                raise Exception(prompt_response["exception"])
             response[index] = prompt_response
 
         ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
 
-        return response
+        return [res for res in response if res is not None]
 
-    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[SupportedLLMResponses]:
+    def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
+        SupportedLLMResponses]:
         """
         Translates the LLM library response to task specific response.
         :param task: The task to translate to.
@@ -95,8 +114,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Any additional parameters to customize translation.
         :return: A task-specific response.
         """
-        if res is None:
-            return
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         if task == LLMCompletionType.CLASSIFICATION:

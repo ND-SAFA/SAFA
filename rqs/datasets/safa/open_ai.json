@@ -6,10 +6,7 @@
           "object_type": "LLM",
           "task": "PREDICT",
           "prompt_creator": {
-            "object_type": "CLASSIFICATION",
-            "pos_class": "Yes",
-            "neg_class": "No",
-            "base_prompt": "Is (1) related to (2)?\n\n"
+            "object_type": "CLASSIFICATION"
           },
           "trainer_args": {
             "object_type": "OPENAI",

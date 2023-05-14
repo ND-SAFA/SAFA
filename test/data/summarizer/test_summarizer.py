@@ -45,9 +45,12 @@ class TestSummarizer(BaseTest):
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
         content = FileUtil.read_file(path_to_file)
         summaries = summarizer.summarize_single(content, chunker_type=SupportedChunker.PY)
-        summaries = summaries.replace("\n", "")
+        summaries = self._remove_irrelevant_chars(summaries)
         expected_chunks = PythonChunker(model_name, summarizer.token_limit).chunk(FileUtil.read_file(path_to_file))
-        summarized_chunks = [SUMMARY_FORMAT.format(chunk.replace("\n", "")) for chunk in expected_chunks]
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
+                             NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
+        summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
         self.assertEqual("".join(summarized_chunks), summaries)
 
         # set code_or_exceeds_limit_only to TRUE this time
@@ -56,6 +59,12 @@ class TestSummarizer(BaseTest):
         short_text = "This is a short text under the token limit"
         summaries = summarizer.summarize_single(content=short_text)
         self.assertEqual(summaries, short_text)  # shouldn't have summarized
+
+    def _remove_irrelevant_chars(self, orig_content):
+        orig_content = orig_content.replace("\n", "")
+        orig_content = orig_content.replace(" ", "")
+        orig_content = orig_content.replace("\t", "")
+        return orig_content
 
     @mock.patch("openai.Completion.create")
     def test_summarize_bulk(self, mock_completion: mock.MagicMock):
@@ -69,10 +78,12 @@ class TestSummarizer(BaseTest):
         contents = [" ".join(self.CHUNKS), python_file_contents]
         summaries = summarizer.summarize_bulk(contents=contents, chunker_types=[SupportedChunker.NL, SupportedChunker.PY])
         self.assertEqual(summaries[0], SUMMARY_FORMAT.format(contents[0]))
-        summaries[1] = summaries[1].replace("\n", "")
         expected_chunks = PythonChunker(model_name, summarizer.token_limit).chunk(python_file_contents)
-        summarized_chunks = [SUMMARY_FORMAT.format(chunk.replace("\n", "")) for chunk in expected_chunks]
-        self.assertEqual("".join(summarized_chunks), summaries[1])
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
+                             NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
+        summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
+        self.assertEqual( "".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
 
         # set code_or_exceeds_limit_only to TRUE this time
         llm_manager = OpenAIManager(OpenAIArgs())
@@ -84,6 +95,8 @@ class TestSummarizer(BaseTest):
         summaries = summarizer.summarize_bulk(contents=[long_text, short_text])
         expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
                                     for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)])
+        expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
+                                    for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(expected_summary)])
         self.assertEqual(summaries[0], expected_summary)
         self.assertEqual(summaries[1], short_text)  # shouldn't have summarized
 
@@ -93,7 +106,7 @@ class TestSummarizer(BaseTest):
                                 code_or_exceeds_limit_only=True)
         short_text = "short text"
         prompts = summarizer._create_summarization_prompts(short_text)
-        self.assertSize(0, prompts) # should not be summarized because it is under token limit
+        self.assertSize(0, prompts)  # should not be summarized because it is under token limit
 
         long_text = "This is a text is over the token limit"
         prompts = summarizer._create_summarization_prompts(long_text)
@@ -109,6 +122,3 @@ class TestSummarizer(BaseTest):
         summarizer.code_or_above_limit_only = False
         prompts = summarizer._create_summarization_prompts(short_text)
         self.assertSize(1, prompts)  # should be summarized even though it is under token limit
-
-
-

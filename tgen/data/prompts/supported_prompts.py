@@ -14,4 +14,7 @@ class SupportedPrompts(SupportedEnum):
     SYSTEM_REQUIREMENT_CREATION = "Given a summary of python code, write a system-level requirement\n The requirements should " \
                                   "reference physical world entities related to the UAV systems, be numbered system level " \
                                   "requirements and use the 'shall' format:\n '{target_content}'"
-    CLUSTERING = "Group the following code descriptions by functionality: {target_content}"
+    CLUSTERING = "I am giving you a numbered list of software artifact descriptions. Group the artifacts by functionality. " \
+                 "Enclose each group in tags <group></group> and inside each group provide a brief summary of the group's " \
+                 "functionality in <summary></summary> and the numbers corresponding to the artifacts in the group inside of " \
+                 "<artifacts></artifacts>:\n {target_content}"

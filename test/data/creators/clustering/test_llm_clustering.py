@@ -1,5 +1,7 @@
 from unittest import mock
 
+from bs4 import BeautifulSoup
+
 from tgen.data.creators.clustering.llm_clustering import LLMClustering
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -11,9 +13,6 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.train.args.anthropic_args import AnthropicArgs
-
-from bs4 import BeautifulSoup
-
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 
@@ -37,15 +36,6 @@ class TestLLMClustering(BaseTest):
         clusters = LLMClustering.cluster(trace_dataset,
                                          AnthropicManager(AnthropicArgs()))
         self.assertDictEqual(clusters, self.expected_clusters)
-
-        def verify_over_tokens(manager):
-            try:
-                clusters_over_token_limit = LLMClustering.cluster(trace_dataset, manager)
-            except AssertionError as e:
-                return
-            self.fail("Should throw exception if tokens over limit")
-
-        verify_over_tokens(AnthropicManager(AnthropicArgs(max_tokens_to_sample=100000)))
 
     def test_get_clusters_from_response(self):
         clusters = LLMClustering._get_clusters_from_response(self.res, self.artifact_df)
@@ -89,3 +79,12 @@ class TestLLMClustering(BaseTest):
 
         bad_artifact_id_oor = LLMClustering._get_artifact_id_by_num("100", list(self.artifact_df.index))
         self.assertIsNone(bad_artifact_id_oor)
+
+    def test_set_max_tokens(self):
+        prompt = "This is a prompt"
+        max_tokens = LLMClustering._set_max_tokens(AnthropicManager(), prompt=prompt)
+        self.assertEqual(max_tokens, LLMClustering.PERC_TOKENS_FOR_RES*100000)
+
+        prompt = "This is a prompt"
+        max_tokens = LLMClustering._set_max_tokens(OpenAIManager(OpenAIArgs(model="davincci")), prompt=prompt)
+        self.assertEqual(max_tokens, LLMClustering.RES_TOKENS_MIN)

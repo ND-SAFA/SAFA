@@ -1,10 +1,10 @@
-import random
+from typing import List, Tuple, Optional
 
 import bs4
 from bs4 import BeautifulSoup
-from typing import List, Tuple, Optional
 
 from tgen.constants.deliminator_constants import NEW_LINE, COMMA, EMPTY_STRING
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER
 from tgen.data.creators.clustering.iclustering import Clusters, iClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -25,6 +25,8 @@ class LLMClustering(iClustering):
     CLUSTER_ARTIFACTS_TAG = 'artifacts'
     ARTIFACT_CONTENT_FORMAT = "{}) {}" + NEW_LINE
     DEFAULT_LLM_MANAGER = AnthropicManager
+    RES_TOKENS_MIN = 500
+    PERC_TOKENS_FOR_RES = 0.1
 
     @staticmethod
     def cluster(trace_dataset: TraceDataset, llm_manager: AbstractLLMManager = None, **kwargs) -> Clusters:
@@ -41,16 +43,31 @@ class LLMClustering(iClustering):
         prompt_creator = GenerationPromptCreator(llm_manager.prompt_args, SupportedPrompts.CLUSTERING)
         prompt = prompt_creator.create(NEW_LINE.join(contents))[PromptKeys.PROMPT]
 
-        # TODO handle this case in the future
-        error_msg = "LLM Clustering is currently only supported for models with token limits greater than the combined " \
-                    "artifact content and max tokens length."
-        n_tokens = TokenLimitCalculator.estimate_num_tokens(prompt, llm_manager.llm_args.model) + llm_manager.llm_args.get_max_tokens()
-        assert n_tokens <= ModelTokenLimits.get_token_limit_for_model(llm_manager.llm_args.model), error_msg
+        LLMClustering._set_max_tokens(llm_manager, prompt)
 
         params = llm_manager.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
         res = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION, prompt=prompt, **params)
 
         return LLMClustering._get_clusters_from_response(res, artifact_df)
+
+    @staticmethod
+    def _set_max_tokens(llm_manager: AbstractLLMManager, prompt: str) -> int:
+        """
+        Tries to find the optimal number of tokens to set for the model's response
+        :param llm_manager: The LLM Manager being used for the clustering
+        :param prompt: The prompt being used for the clustering
+        :return: The max tokens that the model was set to
+        """
+        n_tokens = TokenLimitCalculator.estimate_num_tokens(prompt, llm_manager.llm_args.model)
+        model_token_limit = ModelTokenLimits.get_token_limit_for_model(llm_manager.llm_args.model)
+        tokens_available = model_token_limit - n_tokens - MAX_TOKENS_BUFFER
+        max_tokens = max(LLMClustering.RES_TOKENS_MIN, min(tokens_available, model_token_limit * LLMClustering.PERC_TOKENS_FOR_RES))
+        # TODO handle this case in the future
+        error_msg = "LLM Clustering is currently only supported for models with token limits greater than the combined " \
+                    "artifact content and max tokens length."
+        assert tokens_available >= max_tokens, error_msg
+        llm_manager.llm_args.set_max_tokens(max_tokens)
+        return max_tokens
 
     @staticmethod
     def _get_clusters_from_response(res: GenerationResponse, artifact_df: ArtifactDataFrame) -> Clusters:

@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema, SearchMode, SearchQuerySchema } from "@/types";
+import {
+  ArtifactSchema,
+  GenerationModelSchema,
+  SearchMode,
+  SearchQuerySchema,
+} from "@/types";
 import { searchModeOptions } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -25,6 +30,10 @@ export const useSearch = defineStore("search", {
      * What type(s) of artifacts to predict links from the search artifacts to.
      */
     searchTypes: [] as string[],
+    /**
+     * The generation model to use for the search.
+     */
+    searchModel: undefined as GenerationModelSchema | undefined,
     /**
      * How many of the top predictions to include.
      */
@@ -78,6 +87,7 @@ export const useSearch = defineStore("search", {
         searchTypes: this.searchTypes,
         maxResults: this.maxResults,
         relatedTypes: this.relatedTypes,
+        model: this.searchModel?.id,
       };
 
       if (this.mode.id === SearchMode.prompt) {

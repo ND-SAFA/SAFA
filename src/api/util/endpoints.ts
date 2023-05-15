@@ -130,6 +130,11 @@ export enum Endpoint {
 
   // Search
   search = "search/:versionId",
+
+  // Generation
+
+  summarize = "summarize",
+  prompt = "prompt",
 }
 
 /**

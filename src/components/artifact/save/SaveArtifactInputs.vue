@@ -9,7 +9,16 @@
       :loading="nameCheckLoading"
       class="q-mb-md"
       data-cy="input-artifact-name"
-    />
+    >
+      <template #append>
+        <icon-button
+          :loading="genBodyLoading"
+          tooltip="Generate the name based on the body"
+          icon="generate"
+          @click="handleGenerateName"
+        />
+      </template>
+    </text-input>
     <artifact-type-input
       v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
       v-model="store.editedArtifact.type"
@@ -27,6 +36,24 @@
       hint="Required"
       class="q-mb-md"
       data-cy="input-artifact-body"
+    >
+      <template #append>
+        <icon-button
+          :loading="genBodyLoading"
+          tooltip="Generate the body based on a prompt"
+          icon="generate"
+          @click="handleGenerateBody"
+        />
+      </template>
+    </text-input>
+
+    <text-input
+      v-if="!store.isFTA && !!store.hasSummary"
+      v-model="store.editedArtifact.summary"
+      label="Artifact Summary"
+      type="textarea"
+      class="q-mb-md"
+      data-cy="input-artifact-summary"
     />
 
     <select-input
@@ -89,7 +116,11 @@ export default {
 import { computed, ref, watch } from "vue";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
-import { getDoesArtifactExist } from "@/api";
+import {
+  getDoesArtifactExist,
+  handleGenerateArtifactBody,
+  handleGenerateArtifactName,
+} from "@/api";
 import {
   ArtifactInput,
   ArtifactTypeInput,
@@ -97,12 +128,15 @@ import {
   TextInput,
   SelectInput,
 } from "@/components/common";
+import IconButton from "@/components/common/button/IconButton.vue";
 
 const safetyCaseTypes = safetyCaseOptions();
 const logicTypes = logicTypeOptions();
 
 const nameCheckTimer = ref<ReturnType<typeof setTimeout> | undefined>();
 const nameCheckLoading = ref(false);
+const genNameLoading = ref(false);
+const genBodyLoading = ref(false);
 
 const store = computed(() => artifactSaveStore);
 
@@ -115,6 +149,28 @@ const showDocumentType = computed(() => documentTypes.value.length > 1);
 const nameError = computed(() =>
   nameCheckLoading.value ? false : artifactSaveStore.nameError
 );
+
+/**
+ * Generates the name of the artifact based on the body.
+ */
+function handleGenerateName() {
+  genNameLoading.value = true;
+
+  handleGenerateArtifactName({
+    onComplete: () => (genNameLoading.value = false),
+  });
+}
+
+/**
+ * Generates the body of the artifact based on a prompt.
+ */
+function handleGenerateBody() {
+  genBodyLoading.value = true;
+
+  handleGenerateArtifactBody({
+    onComplete: () => (genBodyLoading.value = false),
+  });
+}
 
 /**
  * Checks whether the set name has already been taken in this project.

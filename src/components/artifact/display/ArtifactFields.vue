@@ -28,6 +28,8 @@
       data-cy="text-selected-body"
     />
 
+    <artifact-summary />
+
     <attribute-list-display :artifact="artifact" />
   </panel-card>
 </template>
@@ -53,6 +55,7 @@ import {
   AttributeListDisplay,
   Separator,
 } from "@/components/common";
+import ArtifactSummary from "./ArtifactSummary.vue";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 const name = computed(() => artifact.value?.name || "");

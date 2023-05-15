@@ -35,7 +35,7 @@ class HGenArgs(BaseObject):
     """
     The method to use to cluster source artifacts. Hierarchy will be built from these clusters
     """
-    cluster_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.LOUVAIN
+    cluster_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.GRAPH
 
     def __post_init__(self) -> None:
         """

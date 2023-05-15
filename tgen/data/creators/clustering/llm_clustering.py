@@ -5,32 +5,37 @@ from bs4 import BeautifulSoup
 from typing import List, Tuple, Optional
 
 from tgen.constants.deliminator_constants import NEW_LINE, COMMA, EMPTY_STRING
-from tgen.data.creators.clustering.cluster_dataset_creator import Clusters
+from tgen.data.creators.clustering.iclustering import Clusters, iClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator, ModelTokenLimits
 from tgen.train.trainers.trainer_task import TrainerTask
 
 
-class LLMClustering:
+class LLMClustering(iClustering):
     CLUSTER_TAG = 'group'
     CLUSTER_id_TAG = 'summary'
     CLUSTER_ARTIFACTS_TAG = 'artifacts'
     ARTIFACT_CONTENT_FORMAT = "{}) {}" + NEW_LINE
+    DEFAULT_LLM_MANAGER = AnthropicManager
 
     @staticmethod
-    def cluster(llm_manager: AbstractLLMManager, artifact_df: ArtifactDataFrame) -> Clusters:
+    def cluster(trace_dataset: TraceDataset, llm_manager: AbstractLLMManager = None, **kwargs) -> Clusters:
         """
-        Performs clusters by using the model to predict artifact groups
+        Performs clustering by using the model to predict artifact groups
         :param llm_manager: The LLM manager to use for the prediction
-        :param artifact_df: The dataframe of artifacts to group
+        :param trace_dataset: The dataset containing artifacts to cluster
         :return: The mapping of cluster names to list of artifacts in the cluster
         """
+        artifact_df = trace_dataset.artifact_df
+        llm_manager = LLMClustering.DEFAULT_LLM_MANAGER() if llm_manager is None else llm_manager
         contents = [LLMClustering.format_artifact_content(i, content) for i, content in enumerate(artifact_df[ArtifactKeys.CONTENT])]
 
         prompt_creator = GenerationPromptCreator(llm_manager.prompt_args, SupportedPrompts.CLUSTERING)

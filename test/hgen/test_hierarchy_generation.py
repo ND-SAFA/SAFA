@@ -3,6 +3,10 @@ import uuid
 from copy import deepcopy
 from unittest import mock
 
+from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.data.creators.clustering.graph_clustering import GraphClustering
+from tgen.data.creators.clustering.iclustering import iClustering
+from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -26,14 +30,14 @@ from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.enum_util import EnumDict
 
 
-def fake_clustering(trace_dataset: TraceDataset, cluster_method):
-    artifact_to_cluster = {node: str(i % 4) for i, node in enumerate(list(trace_dataset.artifact_df.index))}
+def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):
+    artifact_to_cluster = {node: str(i % 4) for i, node in enumerate(list(artifact_df.index))}
     clusters = {}
     for artifact_id, cluster_num in artifact_to_cluster.items():
         if cluster_num not in clusters:
             clusters[cluster_num] = []
         clusters[cluster_num].append(artifact_id)
-    return {str(uuid.uuid4()): artifacts for cluster_num, artifacts in clusters.items()}
+    return {cluster_method: {str(uuid.uuid4()): artifacts for cluster_num, artifacts in clusters.items()}}
 
 
 class TestHierarchyGeneration(BaseTest):
@@ -46,21 +50,21 @@ class TestHierarchyGeneration(BaseTest):
             trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
             return trainer_dataset_manager[DatasetRole.EVAL]
 
-    @mock.patch("tgen.data.creators.clustering.cluster_dataset_creator.ClusterDatasetCreator._cluster")
+    @mock.patch.object(ClusterDatasetCreator, "get_clusters")
     @mock.patch("openai.Completion.create")
     def test_run(self, mock_completion_api: mock.MagicMock, mock_cluster: mock.MagicMock):
         mock_completion_api.side_effect = fake_open_ai_completion
-        mock_cluster.side_effect = fake_clustering
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
                             self.get_dataset_creator_with_trace_dataset_creator(),
                             self.FakeDatasetCreator()]
         for i, dataset_creator in enumerate(dataset_creators):
             tgen_trainer = self.get_tgen_trainer(dataset_creator) if not isinstance(dataset_creator, self.FakeDatasetCreator) else None
             hgen = self.get_hierarchy_generator(tgen_trainer=tgen_trainer, dataset_creator_for_sources=dataset_creator)
-            generated_dataset = hgen.run(TEST_OUTPUT_DIR)
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
-
+            mock_cluster.side_effect = lambda: fake_clustering(artifact_df=orig_dataset.artifact_df,
+                                                               cluster_method=hgen.args.cluster_method)
+            generated_dataset = hgen.run(TEST_OUTPUT_DIR)
             self.assertEqual(len(orig_dataset.artifact_df) + 4, len(generated_dataset.artifact_df))
             expected_n_traces = len(orig_dataset.artifact_df) * 4
             self.assertEqual(expected_n_traces, len(generated_dataset))

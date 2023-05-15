@@ -34,7 +34,7 @@ class ArtifactGeneratorJob(HGenJob):
         """
         self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
         self.artifacts_by_cluster = artifact_ids_by_cluster
-        dataset_creator = ClusterDatasetCreator(trace_dataset=self._create_trace_dataset_from_artifacts(self.artifacts),
+        dataset_creator = ClusterDatasetCreator(artifact_df=self._create_artifact_df_from_artifacts(artifacts),
                                                 manual_clusters={i: artifacts_in_cluster
                                                                  for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)})
         hgen_args = HGenArgs(source_layer_id=self.SOURCE_LAYER_ID, hgen_base_prompt=hgen_base_prompt,
@@ -53,7 +53,7 @@ class ArtifactGeneratorJob(HGenJob):
         return artifacts
 
     @staticmethod
-    def _create_trace_dataset_from_artifacts(artifacts: Dict[str, Dict]) -> TraceDataset:
+    def _create_artifact_df_from_artifacts(artifacts: Dict[str, Dict]) -> ArtifactDataFrame:
         """
         Creates a trace dataset containing the given artifacts
         :param artifacts: The artifacts used for the generation
@@ -62,9 +62,7 @@ class ArtifactGeneratorJob(HGenJob):
         artifacts = [EnumDict({ArtifactKeys.ID: id_,
                                ArtifactKeys.CONTENT: artifact[ArtifactKeys.CONTENT.value],
                                ArtifactKeys.LAYER_ID: ArtifactGeneratorJob.SOURCE_LAYER_ID}) for id_, artifact in artifacts.items()]
-        artifact_df = ArtifactDataFrame(artifacts)
-        trace_dataset = TraceDataset(artifact_df, TraceDataFrame(), LayerDataFrame())
-        return trace_dataset
+        return  ArtifactDataFrame(artifacts)
 
     @staticmethod
     def _summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:

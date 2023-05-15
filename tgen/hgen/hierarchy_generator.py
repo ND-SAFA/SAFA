@@ -118,10 +118,11 @@ class HierarchyGenerator(BaseObject):
         :return: The dataset using the new generated artifacts
         """
         original_artifact_df = original_sources_dataset.artifact_df
+
         original_trace_dataset = original_sources_dataset.trace_dataset if isinstance(original_sources_dataset,
                                                                                       PromptDataset) else original_sources_dataset
         original_trace_df, original_layer_df = None, None
-        if original_trace_dataset is not None:
+        if original_trace_dataset:
             original_trace_df = original_trace_dataset.trace_df
             original_layer_df = original_trace_dataset.layer_df
 

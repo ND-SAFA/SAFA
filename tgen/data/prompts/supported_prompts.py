@@ -10,7 +10,7 @@ class SupportedPrompts(SupportedEnum):
                    "details and assume your audience works on this system. '{target_content}'"
     NL_SUMMARY = "Summarize the following '{target_content}'"
     USER_STORY_CREATION = "Write a single user story that focuses on the {artifact_id} functionality of the " \
-                          "following code descriptions. Make the user story start with 'As a'\n '{target_content}'"
+                          "following code descriptions. Enclose the user story in the tags <doc></doc>: {target_content}'"
     SYSTEM_REQUIREMENT_CREATION = "Given a summary of python code, write a system-level requirement\n The requirements should " \
                                   "reference physical world entities related to the UAV systems, be numbered system level " \
                                   "requirements and use the 'shall' format:\n '{target_content}'"

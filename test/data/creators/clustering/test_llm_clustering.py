@@ -1,6 +1,9 @@
 from unittest import mock
 
 from tgen.data.creators.clustering.llm_clustering import LLMClustering
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
@@ -30,12 +33,14 @@ class TestLLMClustering(BaseTest):
     @mock.patch.object(AbstractLLMManager, "make_completion_request")
     def test_cluster(self, mock_completion_request: mock.MagicMock):
         mock_completion_request.return_value = self.res
-        clusters = LLMClustering.cluster(AnthropicManager(AnthropicArgs()), self.artifact_df)
+        trace_dataset = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame())
+        clusters = LLMClustering.cluster(trace_dataset,
+                                         AnthropicManager(AnthropicArgs()))
         self.assertDictEqual(clusters, self.expected_clusters)
 
         def verify_over_tokens(manager):
             try:
-                clusters_over_token_limit = LLMClustering.cluster(manager, self.artifact_df)
+                clusters_over_token_limit = LLMClustering.cluster(trace_dataset, manager)
             except AssertionError as e:
                 return
             self.fail("Should throw exception if tokens over limit")

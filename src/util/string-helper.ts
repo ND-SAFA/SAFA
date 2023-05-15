@@ -121,3 +121,12 @@ export function versionToString(currentVersion?: VersionSchema): string {
   }
   return `${currentVersion.majorVersion}.${currentVersion.minorVersion}.${currentVersion.revision}`;
 }
+
+/**
+ * Determines if the given artifact name is a code artifact.
+ * @param name - The artifact name to check.
+ * @return True if the artifact is a code artifact.
+ */
+export function isCodeArtifact(name: string): boolean {
+  return name.includes(".");
+}

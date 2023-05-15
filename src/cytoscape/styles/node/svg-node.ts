@@ -1,10 +1,5 @@
-import {
-  ArtifactCytoElementData,
-  ReservedArtifactType,
-  SvgNodeStyle,
-  SvgStyle,
-} from "@/types";
-import { capitalize, getBorderColor } from "@/util";
+import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
+import { capitalize, getBorderColor, isCodeArtifact } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
@@ -133,7 +128,7 @@ function svgBody(
   truncateLength: number,
   style: SvgStyle
 ): string {
-  const code = data.artifactType === ReservedArtifactType.github;
+  const code = isCodeArtifact(data.artifactName);
 
   return svgText(
     getBody(data.body, truncateLength),

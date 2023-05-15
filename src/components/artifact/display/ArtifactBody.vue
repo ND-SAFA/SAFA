@@ -30,7 +30,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ReservedArtifactType } from "@/types";
+import { isCodeArtifact } from "@/util";
 import { appStore, selectionStore } from "@/hooks";
 import { Typography, TextButton, PanelCard } from "@/components/common";
 
@@ -39,7 +39,7 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 const body = computed(() => artifact.value?.body.trim() || "");
 
 const variant = computed(() =>
-  artifact.value?.type === ReservedArtifactType.github ? "code" : "expandable"
+  isCodeArtifact(artifact.value?.name || "") ? "code" : "expandable"
 );
 
 /**

@@ -11,7 +11,7 @@ class SummaryArtifactSerializer(serializers.Serializer):
     """
     Serializes a summary artifact request.
     """
-    content = serializers.CharField(max_length=8192, help_text="The content to summarize.")
+    content = serializers.CharField(max_length=4112, help_text="The content to summarize.")
     type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker],
                                    help_text="The type of chunker to use for segmenting document.")
 

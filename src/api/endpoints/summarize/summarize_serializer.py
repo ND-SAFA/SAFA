@@ -16,14 +16,15 @@ class SummaryArtifactSerializer(serializers.Serializer):
                                    help_text="The type of chunker to use for segmenting document.")
 
 
-class SummarySerializer(AbstractSerializer):
+class SummarizeSerializer(AbstractSerializer):
     """
     Serializes the request for artifact summaries.
     """
 
-    artifacts = serializers.DictField(child=SummaryArtifactSerializer())
-    model = serializers.CharField(max_length=512, required=False)
-    prompt = serializers.CharField(max_length=512, required=False)
+    artifacts = serializers.DictField(child=SummaryArtifactSerializer(help_text="Artifact information for summarization."),
+                                      help_text="Map of artifact IDs to bodies.")
+    model = serializers.CharField(max_length=512, required=False, help_text="The LLM used for summarization.")
+    prompt = serializers.CharField(max_length=512, required=False, help_text="The prompt to use for summarizing artifact.")
 
     def create(self, validated_data: Dict):
         """

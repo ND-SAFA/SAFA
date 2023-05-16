@@ -19,10 +19,10 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from api.endpoints.generation.generation_view import GenerationView
+from api.endpoints.completion.completion_view import CompletionView
 from api.endpoints.hgen.hgen_view import HGenView
 from api.endpoints.predict.prediction_view import PredictView
-from api.endpoints.summary.summary_view import SummaryView
+from api.endpoints.summarize.summarize_view import SummarizeView
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
@@ -48,7 +48,7 @@ urlpatterns = [
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
     path('predict/', PredictView.as_view()),
-    path('complete/', GenerationView.as_view()),
-    path('summarize/', SummaryView.as_view()),
+    path('complete/', CompletionView.as_view()),
+    path('summarize/', SummarizeView.as_view()),
     path('hgen/', HGenView.as_view())
 ]

@@ -2,13 +2,16 @@ package edu.nd.crc.safa.features.github.entities.api.graphql;
 
 import java.util.Date;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.graphql.entities.Edges;
+import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Repository {
+public class Repository implements Paginatable {
     private String id;
     private String name;
     private Owner owner;
@@ -22,24 +25,10 @@ public class Repository {
     private Branch defaultBranchRef;
     private Edges<Branch> refs;
 
-    @Data
-    public static class Owner {
-        private String login;
-    }
-
-    @Data
-    public static class Language {
-        private String name;
-    }
-
-    @Data
-    public static class Branch {
-        private String name;
-        private Commit target;
-    }
-
-    @Data
-    public static class Commit {
-        private String oid;
+    @Override
+    public void paginate(SafaUser user) {
+        if (refs != null) {
+            ServiceProvider.instance.getGithubGraphQlService().paginateBranches(user, refs, name, owner.getLogin());
+        }
     }
 }

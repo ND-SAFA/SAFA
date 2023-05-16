@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoriesResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
@@ -30,17 +31,14 @@ public class GithubRepositoryDTO {
     @JsonProperty("private")
     private Boolean isPrivate;
 
-    @JsonProperty("html_url")
     private String url;
 
     private String description;
 
     private String visibility;
 
-    @JsonProperty("default_branch")
     private String defaultBranch;
 
-    @JsonProperty("created_at")
     private Date creationDate;
 
     private String language;
@@ -107,7 +105,7 @@ public class GithubRepositoryDTO {
 
         List<String> branches = repo.getRefs().getEdges().stream()
             .map(EdgeNode::getNode)
-            .map(Repository.Branch::getName)
+            .map(Branch::getName)
             .collect(Collectors.toList());
         ghDto.setBranches(branches);
 

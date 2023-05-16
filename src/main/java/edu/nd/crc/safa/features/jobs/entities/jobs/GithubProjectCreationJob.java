@@ -3,26 +3,29 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
+import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
+import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Repository;
-import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
@@ -31,11 +34,13 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
 
-import org.springframework.util.StringUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Responsible for providing step implementations for importing a GitHub project:
@@ -187,11 +192,28 @@ public class GithubProjectCreationJob extends CommitJob {
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
+        createCustomAttributes(project);
+
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
         createImportPredicate();
 
         logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
+    }
+
+    /**
+     * Creates custom attributes that are used for the github import.
+     *
+     * @param project The project we're importing into
+     */
+    private void createCustomAttributes(Project project) {
+        for (CustomAttributeAppEntity attribute : ReservedAttributes.Github.ALL_ATTRIBUTES) {
+            AttributeService attributeService = serviceProvider.getAttributeService();
+
+            if (attributeService.getByProjectAndKeyname(project, attribute.getKey()).isEmpty()) {
+                serviceProvider.getAttributeService().saveEntity(attribute, project, true);
+            }
+        }
     }
 
     /**
@@ -246,15 +268,28 @@ public class GithubProjectCreationJob extends CommitJob {
      * @return The artifact type we should use for importing.
      */
     protected ArtifactType getArtifactTypeMapping(Project project) {
-        String artifactTypeId = this.importSettings.getArtifactTypeId();
-        artifactTypeId = artifactTypeId != null ? artifactTypeId : getDefaultTypeName();
+        TypeService typeService = serviceProvider.getTypeService();
+        String artifactTypeName = this.importSettings.getArtifactType();
+        artifactTypeName = artifactTypeName != null ? artifactTypeName : getDefaultTypeName();
 
-        ArtifactType artifactType = serviceProvider.getTypeService().getArtifactType(project, artifactTypeId);
+        ArtifactType artifactType = typeService.getArtifactType(project, artifactTypeName);
 
         if (artifactType == null) {
-            artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeId);
+            artifactType = createArtifactType(project, artifactTypeName);
+
         }
 
+        return artifactType;
+    }
+
+    private ArtifactType createArtifactType(Project project, String artifactTypeName) {
+        ArtifactType artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeName);
+        List<AttributePositionAppEntity> attributePositions = List.of(
+            new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
+        );
+        AttributeLayoutAppEntity layoutEntity = new AttributeLayoutAppEntity(null, artifactTypeName + " Layout",
+            List.of(artifactTypeName), attributePositions);
+        serviceProvider.getAttributeLayoutService().saveLayoutEntity(user, layoutEntity, project, true);
         return artifactType;
     }
 
@@ -270,9 +305,9 @@ public class GithubProjectCreationJob extends CommitJob {
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 5)
     public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         ProjectCommit commit = getProjectCommit();
-        Repository.Branch branch = getBranch(this.githubProject.getBranch());
+        Branch branch = getBranch(this.githubProject.getBranch());
         this.commitSha = branch.getTarget().getOid();
-        commit.addArtifacts(ModificationType.ADDED, getArtifacts());
+        commit.addArtifacts(ModificationType.ADDED, getArtifacts(logger));
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
 
@@ -285,7 +320,7 @@ public class GithubProjectCreationJob extends CommitJob {
      * @param targetBranch The name of the branch.
      * @return The branch if it exists, otherwise the default branch.
      */
-    protected Repository.Branch getBranch(String targetBranch) {
+    protected Branch getBranch(String targetBranch) {
         return this.githubRepository.getRefs().getEdges().stream()
             .map(EdgeNode::getNode)
             .filter(branch -> branch.getName().equals(targetBranch))
@@ -293,47 +328,60 @@ public class GithubProjectCreationJob extends CommitJob {
             .orElse(this.githubRepository.getDefaultBranchRef());
     }
 
-    protected List<ArtifactAppEntity> getArtifacts() {
+    protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
-        GithubRepositoryFiletreeResponseDTO filetreeResponseDTO =
-            connectionService.getRepositoryFiles(
-                this.credentials,
-                this.githubIdentifier.getRepositoryName(),
-                this.commitSha);
+        GithubGraphQlService githubService = serviceProvider.getGithubGraphQlService();
+        List<GithubRepositoryFileDTO> files = githubService.getFilesInRepo(this.user,
+            this.githubIdentifier.getRepositoryOwner(),
+            this.githubIdentifier.getRepositoryName(),
+            this.githubProject.getBranch());
 
-        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
+        for (GithubRepositoryFileDTO file : files) {
 
-            String name = file.getPath();
-            if (shouldSkipFile(name)) {
+            String path = file.getPath();
+            if (shouldSkipFile(path)) {
+                logger.log("%s will not be imported due to inclusion/exclusion criteria.", path);
                 continue;
             }
+            logger.log("Importing %s.", path);
 
             String type = githubProject.getArtifactType().getName();
-            String summary = file.getSha();
-            String body = "";
+            String summary = "";
+            String body = file.isBinary() ? "<binary file>" : file.getContents();
 
-            GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
-                .getBlobInformation(this.credentials, file.getBlobApiUrl());
-
-            if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
-                body = base64Decode(blobDTO.getContent());
-            }
+            Map<String, JsonNode> attributes = getAttributes(file.getPath());
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
-                name,
+                path,
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                attributes
             );
 
             artifacts.add(artifact);
         }
 
         return artifacts;
+    }
+
+    protected Map<String, JsonNode> getAttributes(String filePath) {
+        Map<String, JsonNode> attributes = new HashMap<>();
+        attributes.put(ReservedAttributes.Github.LINK.getKey(),
+            TextNode.valueOf(buildGithubFileUrl(filePath)));
+        return attributes;
+    }
+
+    private String buildGithubFileUrl(String filePath) {
+        return String.join("/",
+            "https://github.com",
+            githubProject.getOwner(),
+            githubProject.getRepositoryName(),
+            "blob",
+            githubProject.getBranch(),
+            filePath);
     }
 
     /**
@@ -347,21 +395,4 @@ public class GithubProjectCreationJob extends CommitJob {
         return !shouldImportPredicate.test(filename);
     }
 
-    /**
-     * Decodes GitHub's base64 encoded file bodies. Each line in the original file
-     * is base64 encoded in GitHub's storage, with newlines separating them.
-     *
-     * @param encodedBody The encoded file body
-     * @return The decoded file body
-     */
-    private String base64Decode(String encodedBody) {
-        StringBuilder output = new StringBuilder();
-
-        for (String line : encodedBody.split("\n")) {
-            byte[] decodedBytes = Base64.getDecoder().decode(line);
-            output.append(new String(decodedBytes));
-        }
-
-        return output.toString();
-    }
 }

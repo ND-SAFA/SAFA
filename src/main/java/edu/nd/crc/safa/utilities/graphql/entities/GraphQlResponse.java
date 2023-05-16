@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class GraphQlResponse<T> {
+public class GraphQlResponse<T> implements DefaultPaginatable {
     private T data;
     private List<ResponseError> errors;
 

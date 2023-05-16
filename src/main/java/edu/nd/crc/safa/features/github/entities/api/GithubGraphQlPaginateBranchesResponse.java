@@ -6,10 +6,8 @@ import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
 
 import lombok.Data;
 
-/**
- * Response for {@code github/GetRepositoryByName.graphql}.
- */
-public class GithubGraphQlRepositoryResponse extends GraphQlResponse<GithubGraphQlRepositoryResponse.Payload> {
+public class GithubGraphQlPaginateBranchesResponse
+    extends GraphQlResponse<GithubGraphQlPaginateBranchesResponse.Payload> {
 
     @Data
     public static class Payload implements DefaultPaginatable {

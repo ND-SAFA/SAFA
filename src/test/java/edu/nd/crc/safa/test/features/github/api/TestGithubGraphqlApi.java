@@ -11,13 +11,11 @@ import edu.nd.crc.safa.test.features.github.base.AbstractGithubGraphqlTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
 
@@ -38,9 +36,9 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
 
     @Test
     public void testGetRepositories() throws Exception {
-        getMockWebServer().enqueue(new MockResponse()
-            .setBody(loadGithubResponseFile("repositories_response.json"))
-            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        enqueueResponse("repositories_response.json");
+        enqueueResponse("repositories_continued.json");
+        enqueueResponse("branches_continued.json");
 
         List<GithubRepositoryDTO> response = SafaRequest
             .withRoute(AppRoutes.Integrations.Github.Repos.ROOT)
@@ -57,9 +55,10 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
         assertEquals("ND-SAFA", bend.getOwner());
         assertEquals("bend", bend.getName());
         List<String> bendBranches = bend.getBranches();
-        assertEquals(2, bendBranches.size());
+        assertEquals(3, bendBranches.size());
         assertEquals("development", bendBranches.get(0));
         assertEquals("production", bendBranches.get(1));
+        assertEquals("branch3", bendBranches.get(2));
 
         GithubRepositoryDTO fend = response.get(1);
         assertEquals("ND-SAFA", fend.getOwner());
@@ -73,9 +72,7 @@ public class TestGithubGraphqlApi extends AbstractGithubGraphqlTest {
 
     @Test
     public void testGetRepository() throws Exception {
-        getMockWebServer().enqueue(new MockResponse()
-            .setBody(loadGithubResponseFile("repository_response.json"))
-            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        enqueueResponse("repository_response.json");
 
         GithubRepositoryDTO response = SafaRequest
             .withRoute(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)

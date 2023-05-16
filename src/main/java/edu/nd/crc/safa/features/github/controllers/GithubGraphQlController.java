@@ -30,8 +30,9 @@ public class GithubGraphQlController extends BaseController {
      */
     @GetMapping(AppRoutes.Integrations.Github.Repos.ROOT)
     public DeferredResult<List<GithubRepositoryDTO>> retrieveGithubRepositories() {
-        return makeDeferredRequest(user ->
-            GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepositories(user)));
+        return makeDeferredRequest(user -> {
+            return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepositories(user));
+        });
     }
 
     /**
@@ -44,8 +45,9 @@ public class GithubGraphQlController extends BaseController {
     @GetMapping(AppRoutes.Integrations.Github.Repos.BY_OWNER_AND_NAME)
     public DeferredResult<GithubRepositoryDTO> retrieveGithubRepository(@PathVariable("owner") String owner,
                                                                         @PathVariable("repositoryName") String repo) {
-        return makeDeferredRequest(user ->
-            GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepository(user, owner, repo)));
+        return makeDeferredRequest(user -> {
+            return GithubRepositoryDTO.fromGraphQlResponse(graphQlService.getGithubRepository(user, owner, repo));
+        });
     }
 
 }

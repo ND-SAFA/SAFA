@@ -1,286 +1,91 @@
 {
-  "sha": "00cb43782b9a46f7362ce16f24f3d03c9285b409",
-  "tree": [
-    {
-      "mode": "100644",
-      "path": ".gitignore",
-      "sha": "84ccac49f63d3c70a39ff57697f792dbedb0ae68",
-      "size": 2079,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/84ccac49f63d3c70a39ff57697f792dbedb0ae68"
-    },
-    {
-      "mode": "100644",
-      "path": "LICENSE",
-      "sha": "fe04d34afdd9a18fe3acbc894ebfe4ad33dddc48",
-      "size": 1067,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/fe04d34afdd9a18fe3acbc894ebfe4ad33dddc48"
-    },
-    {
-      "mode": "100644",
-      "path": "README.md",
-      "sha": "bac154fb7c29981584fd6cfebee2209daa83e900",
-      "size": 11667,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/bac154fb7c29981584fd6cfebee2209daa83e900"
-    },
-    {
-      "mode": "040000",
-      "path": "diagrams",
-      "sha": "178640dc39ef24ffb2ae30700fd48c9d0d35a097",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/178640dc39ef24ffb2ae30700fd48c9d0d35a097"
-    },
-    {
-      "mode": "100644",
-      "path": "diagrams/fsm_home_assis.drawio",
-      "sha": "d9dccd6429d487f2c20ae632f035f3e23f1af0ff",
-      "size": 3751,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d9dccd6429d487f2c20ae632f035f3e23f1af0ff"
-    },
-    {
-      "mode": "100644",
-      "path": "diagrams/system diagram.drawio",
-      "sha": "1c5f9dc244bb61474c85d15d0c804e7cf9112b2e",
-      "size": 1434,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/1c5f9dc244bb61474c85d15d0c804e7cf9112b2e"
-    },
-    {
-      "mode": "100644",
-      "path": "home assistant.postman_collection.json",
-      "sha": "30e31020fa332116a19d24317abf19e17f7d536d",
-      "size": 10537,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/30e31020fa332116a19d24317abf19e17f7d536d"
-    },
-    {
-      "mode": "040000",
-      "path": "images",
-      "sha": "9cccc12a697f054e291db86d0bcdd02d875a3587",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/9cccc12a697f054e291db86d0bcdd02d875a3587"
-    },
-    {
-      "mode": "100644",
-      "path": "images/entity_replacement.jpg",
-      "sha": "d28edb19e32a8734f6b78d83997bdf5c10655e2a",
-      "size": 20658,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d28edb19e32a8734f6b78d83997bdf5c10655e2a"
-    },
-    {
-      "mode": "100644",
-      "path": "images/fsm.PNG",
-      "sha": "cc693df4d12d36c8fbc3f2ca408bffa4fc8301f1",
-      "size": 89687,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/cc693df4d12d36c8fbc3f2ca408bffa4fc8301f1"
-    },
-    {
-      "mode": "100644",
-      "path": "images/system diagram.png",
-      "sha": "277c675851ec91b4c555b8128066df7ea8c76872",
-      "size": 35928,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/277c675851ec91b4c555b8128066df7ea8c76872"
-    },
-    {
-      "mode": "040000",
-      "path": "modules",
-      "sha": "dc723422859f309e3778d1ebb794c5f91b5411d3",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/dc723422859f309e3778d1ebb794c5f91b5411d3"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/calendar",
-      "sha": "6391e9f55a34d05cd04995c2ed33396f0b1b3b69",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/6391e9f55a34d05cd04995c2ed33396f0b1b3b69"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/calendar/api_delegate.py",
-      "sha": "4b7adf2b0a1630cd8350e25f275a6d1aa975fbe6",
-      "size": 7702,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/4b7adf2b0a1630cd8350e25f275a6d1aa975fbe6"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/calendar/calendar.pl",
-      "sha": "9c930d9b4c8ce4ad220cb70c226ed672ca8fb1c4",
-      "size": 4917,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/9c930d9b4c8ce4ad220cb70c226ed672ca8fb1c4"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/calendar/install.pl",
-      "sha": "ec1d8d80361ae3b010e0e2cd432fe45593063263",
-      "size": 28,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/ec1d8d80361ae3b010e0e2cd432fe45593063263"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/calendar/requirements.txt",
-      "sha": "122195cbf3abfcb5fc326f55faa498c6cf3a53b5",
-      "size": 113,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/122195cbf3abfcb5fc326f55faa498c6cf3a53b5"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/intents",
-      "sha": "5b8c1109c29dd0e12d8d3042687c0f5e252e1f0e",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/5b8c1109c29dd0e12d8d3042687c0f5e252e1f0e"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/calendar_kb.pl",
-      "sha": "e753e31441d3767e430a793ccbd972ae306f1ef8",
-      "size": 3959,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/e753e31441d3767e430a793ccbd972ae306f1ef8"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/intents/chatito",
-      "sha": "f6ad3f5fdf93f3722a4a99a03c04baac25f0f9a5",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/f6ad3f5fdf93f3722a4a99a03c04baac25f0f9a5"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/chatito/answer.chatito",
-      "sha": "d31363b94fd6915a293a420811df198aa8f4215b",
-      "size": 347,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d31363b94fd6915a293a420811df198aa8f4215b"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/chatito/calendarAdd.chatito",
-      "sha": "1ee0bae01eb0d17d9cffe45c6cd6c8b79b9243c9",
-      "size": 1524,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/1ee0bae01eb0d17d9cffe45c6cd6c8b79b9243c9"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/chatito/calendarAsk.chatito",
-      "sha": "97efcbe09778a50766e5f78114e71c2370f8b4e1",
-      "size": 1801,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/97efcbe09778a50766e5f78114e71c2370f8b4e1"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/chatito/calendarUpdate.chatito",
-      "sha": "32d218385eca49c30ae1ed22f2a6b3c8df6348be",
-      "size": 698,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/32d218385eca49c30ae1ed22f2a6b3c8df6348be"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/chatito/weather.chatito",
-      "sha": "315f5e488846b1880c51d9a76b9bd634de745a5a",
-      "size": 1769,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/315f5e488846b1880c51d9a76b9bd634de745a5a"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/fsm.pl",
-      "sha": "a6ec308d5e0083528c49a348578c8d1406220bd0",
-      "size": 14118,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/a6ec308d5e0083528c49a348578c8d1406220bd0"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/kb.pl",
-      "sha": "f15eb6920603ba4e2149b2e59df4039b1bbc1f28",
-      "size": 3575,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/f15eb6920603ba4e2149b2e59df4039b1bbc1f28"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/weather_kb.pl",
-      "sha": "134eac06523dff0070d4136e05d71b46a6d878eb",
-      "size": 6041,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/134eac06523dff0070d4136e05d71b46a6d878eb"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/intents/weekdays_kb.pl",
-      "sha": "4809de64fe719cb48d8d2417f41de540f8d7d996",
-      "size": 1104,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/4809de64fe719cb48d8d2417f41de540f8d7d996"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/text2Speech",
-      "sha": "8483b029d0102424e0f0d5786aee50d021b91877",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/8483b029d0102424e0f0d5786aee50d021b91877"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/text2Speech/audio",
-      "sha": "0bda1460fc252d0550bce8003e9c66742f4765ef",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/0bda1460fc252d0550bce8003e9c66742f4765ef"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/text2Speech/audio/trial.mp3",
-      "sha": "3ad5ad9e579444929fce148e2256c6d72bb26be3",
-      "size": 11232,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/3ad5ad9e579444929fce148e2256c6d72bb26be3"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/text2Speech/notes.md",
-      "sha": "bbe7510d636a50cf6e5e92cc561d3615bc3d254c",
-      "size": 110,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/bbe7510d636a50cf6e5e92cc561d3615bc3d254c"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/text2Speech/text2SpeechWrapper.py",
-      "sha": "cebcfaef4c04455325b7018f2f40288f1d237c0f",
-      "size": 2255,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/cebcfaef4c04455325b7018f2f40288f1d237c0f"
-    },
-    {
-      "mode": "040000",
-      "path": "modules/weather",
-      "sha": "54bbc5b5594a5aa92c5f619fbf688eeee3bf1b7f",
-      "type": "tree",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/54bbc5b5594a5aa92c5f619fbf688eeee3bf1b7f"
-    },
-    {
-      "mode": "100644",
-      "path": "modules/weather/weather.pl",
-      "sha": "50df3de868b0fc71611a3df4a39a4cf2511ab644",
-      "size": 941,
-      "type": "blob",
-      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/50df3de868b0fc71611a3df4a39a4cf2511ab644"
+  "data": {
+    "repository": {
+      "object": {
+        "entries": [
+          {
+            "name": ".clang",
+            "type": "blob",
+            "object": {
+              "text": "compilation_database = \"build\"\n",
+              "isBinary": false
+            },
+            "path": ".clang"
+          },
+          {
+            "name": ".clang-tidy",
+            "type": "blob",
+            "object": {
+              "text": "Checks: '-*,bugprone-*,cert-dcl21-cpp,cert-dcl50-cpp,cert-env33-c,cert-err34-c,cert-err52-cpp,cert-err60-cpp,cert-flp30-c,cert-msc50-cpp,cert-msc51-cpp,cppcoreguidelines-*,google-build-using-namespace,google-explicit-constructor,google-global-names-in-headers,google-readability-casting,google-runtime-int,google-runtime-operator,hicpp-*,misc-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-readability-avoid-const-params-in-decls,-hicpp-special-member-functions,-hicpp-use-override,-readability-identifier-length,-bugprone-easily-swappable-parameters'\nCheckOptions:\n    - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic\n      value: 1\n    - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor\n      value: 1\nFormatStyle: 'file'\nHeaderFilterRegex: '^(?!/lib.*)/include/.*\\.hpp$'\n",
+              "isBinary": false
+            },
+            "path": ".clang-tidy"
+          },
+          {
+            "name": ".gitignore",
+            "type": "blob",
+            "object": {
+              "text": "build/\n*.swp\n.ycm_extra_conf.py\n",
+              "isBinary": false
+            },
+            "path": ".gitignore"
+          },
+          {
+            "name": ".gitmodules",
+            "type": "blob",
+            "object": {
+              "text": "[submodule \"cmake-modules\"]\n\tpath = cmake-modules\n\turl = https://github.com/bilke/cmake-modules.git\n\tbranch = master\n[submodule \"lib/blink1-tool\"]\n\tpath = lib/blink1-tool\n\turl = https://github.com/todbot/blink1-tool.git\n\tbranch = main\n[submodule \"lib/googletest\"]\n\tpath = lib/googletest\n\turl = https://github.com/google/googletest.git\n\tbranch = main\n[submodule \"lib/doxygen-awesome-css\"]\n\tpath = lib/doxygen-awesome-css\n\turl = https://github.com/jothepro/doxygen-awesome-css.git\n\tbranch = main\n",
+              "isBinary": false
+            },
+            "path": ".gitmodules"
+          },
+          {
+            "name": "CMakeLists.txt",
+            "type": "blob",
+            "object": {
+              "text": "cmake_minimum_required(VERSION 3.10)\n\nproject(blink1-lib VERSION 1.0.0)\n\nset(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)\n\nif(NOT CMAKE_BUILD_TYPE)\n  set(CMAKE_BUILD_TYPE Release)\nendif()\n\nif (CMAKE_BUILD_TYPE MATCHES Debug)\n    add_definitions(-DDEBUG_PRINTF)\nendif (CMAKE_BUILD_TYPE MATCHES Debug)\n\nset(CMAKE_EXPORT_COMPILE_COMMANDS yes)\n\nget_directory_property(HAS_PARENT PARENT_DIRECTORY)\noption(BLINK1_LIB_BUILD_STATIC no)\noption(BLINK1_LIB_BUILD_SHARED no)\n\nif ((HAS_PARENT OR BLINK1_LIB_BUILD_STATIC) AND NOT BLINK1_LIB_BUILD_SHARED)\n    set(LIBRARY_TYPE STATIC)\nelseif ((NOT HAS_PARENT OR BLINK1_LIB_BUILD_SHARED) AND NOT BLINK1_LIB_BUILD_STATIC)\n    set(LIBRARY_TYPE SHARED)\nelse()\n    message(FATAL_ERROR \"Must set exactly 1 of BLINK1_LIB_BUILD_SHARED or BLINK1_LIB_BUILD_STATIC, or neither of them.\")\nendif()\n\nmessage(\"-- blink1-lib library type: ${LIBRARY_TYPE}\")\n\nif (HAS_PARENT)\n    set(INCLUDE_DIR_SYSTEM SYSTEM)\nelse(HAS_PARENT)\n    set(INCLUDE_DIR_SYSTEM \"\")\nendif(HAS_PARENT)\n\n##############\n# BLINK1-LIB #\n##############\nset(CMAKE_CXX_FLAGS_RELEASE \"${CMAKE_CXX_FLAG_RELEASE} -O3\")\nset(CMAKE_CXX_FLAGS_DEBUG \"${CMAKE_CXX_FLAGS_DEBUG} -O0 -DDEBUG -g\")\nset(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)\nset(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)\n\nset(INCLUDES ${INCLUDE_DIR})\n\nset(SOURCES\n    ${SOURCE_DIR}/Blink1Device.cpp\n    ${SOURCE_DIR}/PatternLine.cpp\n    ${SOURCE_DIR}/PatternLineN.cpp\n    ${SOURCE_DIR}/PlayState.cpp\n    ${SOURCE_DIR}/RGB.cpp\n    ${SOURCE_DIR}/RGBN.cpp\n)\n\nset(CXX_STANDARD_REQUIRED yes)\n\nadd_library(blink1 ${LIBRARY_TYPE} ${SOURCES})\nadd_library(blink1-testing ${LIBRARY_TYPE} ${SOURCES} ${SOURCE_DIR}/Blink1TestingLibrary.cpp)\n\nset_property(TARGET blink1 PROPERTY CXX_STANDARD 20)\nset_property(TARGET blink1-testing PROPERTY CXX_STANDARD 20)\n\n###############\n# BLINK1-TOOL #\n###############\nset(BLINK1_DIR ${LIB_DIR}/blink1-tool)\nset(LIB_BLINK1_LOC ${BLINK1_DIR}/libblink1.so)\nset(INCLUDES ${INCLUDES} ${BLINK1_DIR} ${BLINK1_DIR}/hidapi/hidapi)\n\nadd_definitions(-DUSE_HIDAPI)\n\nadd_custom_command(OUTPUT ${LIB_BLINK1_LOC}\n                   COMMAND $(MAKE) lib\n                   WORKING_DIRECTORY ${BLINK1_DIR})\nadd_custom_target(libblink1_target DEPENDS ${LIB_BLINK1_LOC})\nadd_library(libblink1 STATIC IMPORTED GLOBAL)\nset_target_properties(libblink1 PROPERTIES IMPORTED_LOCATION ${LIB_BLINK1_LOC})\nadd_dependencies(libblink1 libblink1_target)\n\ntarget_link_libraries(blink1 libblink1)\n\ntarget_include_directories(blink1 ${INCLUDE_DIR_SYSTEM} PUBLIC ${INCLUDES})\ntarget_include_directories(blink1-testing ${INCLUDE_DIR_SYSTEM} PUBLIC ${INCLUDES})\n\nif(NOT HAS_PARENT)\n\n    ###########\n    # DOXYGEN #\n    ###########\n    set(DOXYGEN_GENERATE_HTML YES)\n    set(DOXYGEN_GENERATE_MAN YES)\n    set(DOXYGEN_GENERATE_TREEVIEW YES)\n    set(DOXYGEN_HTML_EXTRA_STYLESHEET \"${LIB_DIR}/doxygen-awesome-css/doxygen-awesome.css\")\n    find_package(Doxygen)\n    if (DOXYGEN_FOUND)\n        doxygen_add_docs(\n            doxygen\n            ${INCLUDE_DIR}\n            COMMENT \"Generate documentation\"\n        )\n    endif(DOXYGEN_FOUND)\n\n    ###########\n    # Testing #\n    ###########\n    add_subdirectory(${LIB_DIR}/googletest)\n    include(GoogleTest)\n    set(TEST_EXECUTABLE_NAME blink1_lib_test)\n    set(TEST_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)\n\n    set(TEST_SOURCES\n        ${TEST_SOURCE_DIR}/Blink1Device_BadInit_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_Blocking_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_GoodInit_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_GoodInitBadFunction_test.cpp\n        ${TEST_SOURCE_DIR}/PatternLineN_test.cpp\n        ${TEST_SOURCE_DIR}/PatternLine_test.cpp\n        ${TEST_SOURCE_DIR}/PlayState_test.cpp\n        ${TEST_SOURCE_DIR}/RGBN_test.cpp\n        ${TEST_SOURCE_DIR}/RGB_test.cpp\n    )\n\n    enable_testing()\n    add_executable(${TEST_EXECUTABLE_NAME} ${TEST_SOURCES})\n    target_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing gtest gtest_main gmock gmock_main)\n    gtest_discover_tests(${TEST_EXECUTABLE_NAME})\n    set_property(TARGET ${TEST_EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)\n\n    set(WARNINGS \"-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion\")\n    if (CMAKE_CXX_COMPILER_ID STREQUAL \"Clang\")\n        # Set specific warnings if they ever exist\n    elseif (CMAKE_CXX_COMPILER_ID STREQUAL \"GNU\")\n        set(WARNINGS \"${WARNINGS} -Wmisleading-indentation\")\n    endif()\n    set_target_properties(${TEST_EXECUTABLE_NAME} PROPERTIES COMPILE_FLAGS \"${WARNINGS}\")\n\n    ############\n    # COVERAGE #\n    ############\n    if (CMAKE_BUILD_TYPE MATCHES Debug)\n        list(APPEND CMAKE_MODULE_PATH \"${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules\")\n        include(CodeCoverage)\n\n        set(COVERAGE_EXCLUDES \"/usr/*\" \"${LIB_DIR}/*\" \"${TEST_SOURCE_DIR}/*\")\n        APPEND_COVERAGE_COMPILER_FLAGS()\n\n        if (CMAKE_CXX_COMPILER_ID STREQUAL \"Clang\")\n            set(GCOV_PATH \"${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-cov.sh\")\n            SETUP_TARGET_FOR_COVERAGE_LCOV(NAME coverage\n                                           EXECUTABLE ${TEST_EXECUTABLE_NAME}\n                                           DEPENDENCIES ${TEST_EXECUTABLE_NAME})\n        else()\n            SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME coverage\n                                                 EXECUTABLE ${TEST_EXECUTABLE_NAME}\n                                                 DEPENDENCIES ${TEST_EXECUTABLE_NAME})\n        endif()\n\n        add_definitions(-DDEBUG_PRINTF)\n\n        set_target_properties(\n            blink1\n            PROPERTIES\n                CXX_CLANG_TIDY \"clang-tidy\"\n        )\n\n    endif (CMAKE_BUILD_TYPE MATCHES Debug)\n\n    ################\n    # OPTIMIZATION #\n    ################\n    include(CheckIPOSupported)\n    check_ipo_supported(RESULT ipo_supported OUTPUT error)\n    if (ipo_supported)\n        message(STATUS \"IPO/LTO enabled\")\n        set_property(TARGET ${TEST_EXECUTABLE_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)\n    else()\n        message(STATUS \"IPO/LTO not supported\")\n    endif()\n\nendif(NOT HAS_PARENT)\n",
+              "isBinary": false
+            },
+            "path": "CMakeLists.txt"
+          },
+          {
+            "name": "LICENSE",
+            "type": "blob",
+            "object": {
+              "text": "MIT License\n\nCopyright (c) 2022 Evan Allan\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+              "isBinary": false
+            },
+            "path": "LICENSE"
+          },
+          {
+            "name": "README.md",
+            "type": "blob",
+            "object": {
+              "text": "blink1-lib\n==========\n[![Build](https://github.com/evan1026/blink1-lib/actions/workflows/build.yml/badge.svg)](https://github.com/evan1026/blink1-lib/actions/workflows/build.yml)\n\nThis project is a C++ wrapper that uses classes and RAII principles to simplify\ndevelopment of C++ code that interfaces with the [blink(1)](https://blink1.thingm.com/)\nas compared to [the official blink1-tool C library](https://github.com/todbot/blink1-tool).\n\n## Usage\nCurrently, this library supports being a CMake subdirectory, as well as building against shared or static\nlibrary files which can be found in the releases tab. I may also create a header-only version in the future for\nthose who prefer that.\n\n### Shared or Static Library\nEach release contains tar files with headers and library files which can be linked to your project.\n\n### CMake Subdirectory\nThere are two main targets created:\n* `blink1` - The main library\n* `blink1-testing` - The testing library (see below)\n\nExample usage:\n```cmake\nadd_definitions(-DUSE_HIDAPI)  # blink1-tool requires either USE_HIDAPI or USE_HIDDATA to be set\n                               # USE_HIDAPI is the default - see todbot/blink1-tool for more info\nadd_subdirectory(path/to/blink1-lib)\n\ntarget_link_libraries(${EXECUTABLE_NAME} blink1)\ntarget_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing)\n```\n\nBy default, when this library is built as a subdirectory, it will build static libraries.\nThis behavior can be changed by setting the `BLINK1_LIB_BUILD_SHARED` option.\n\n### CPM\nIncluding with CPM is much the same as adding the library as a subdirectory, but CPM manages downloading it:\n```cmake\nadd_definitions(-DUSE_HIDAPI)\n\nCPMAddPackage(\n  NAME blink1-lib\n  GITHUB_REPOSITORY evan1026/blink1-lib\n  VERSION 1.1.0\n)\n\ntarget_link_libraries(${EXECUTABLE_NAME} blink1)\ntarget_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing)\n```\n\nTo use the latest development version:\n```cmake\nCPMAddPackage(\n  NAME blink1-lib\n  GITHUB_REPOSITORY evan1026/blink1-lib\n  VERSION latest\n  GIT_TAG latest\n)\n```\n\n## Testing Library\nIn addition to providing a wrapper around the blink1-tool library, this project\nalso provides a testing library to simplify unit-testing and development for blink(1)\ndevices. This library is specifically designed to work with gtest, but I could update\nit to be more generic if there's any desire for that. It can also be used for\ndevelopment so that blink(1) code can be run without a device needing to be present,\nor to test your program's behavior under special cases that are hard to recreate\nwith a real device.\n\nIn order to use this library, include `Blink1TestingLibrary.hpp` in your test case\nand make sure you link against `blink1-testing`.\n\nFurther information about the library's features can be found [here](https://evan1026.github.io/blink1-lib/docs/namespacefake__blink1__lib.html).\n\n## Docs\nClass documentation can be found [here](https://evan1026.github.io/blink1-lib/docs/index.html)\n",
+              "isBinary": false
+            },
+            "path": "README.md"
+          },
+          {
+            "name": "cmake-modules",
+            "type": "commit",
+            "object": null,
+            "path": "cmake-modules"
+          },
+          {
+            "name": "src",
+            "type": "tree",
+            "object": {},
+            "path": "src"
+          },
+          {
+            "name": "include",
+            "type": "tree",
+            "object": {},
+            "path": "include"
+          }
+        ]
+      }
     }
-  ],
-  "truncated": false,
-  "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/00cb43782b9a46f7362ce16f24f3d03c9285b409"
+  }
 }

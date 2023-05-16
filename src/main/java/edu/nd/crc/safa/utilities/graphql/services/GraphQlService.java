@@ -1,10 +1,19 @@
 package edu.nd.crc.safa.utilities.graphql.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
+import edu.nd.crc.safa.utilities.graphql.entities.Edges;
+import edu.nd.crc.safa.utilities.graphql.entities.GraphQlResponse;
+import edu.nd.crc.safa.utilities.graphql.entities.PageInfo;
+import edu.nd.crc.safa.utilities.graphql.entities.Paginatable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +30,60 @@ public class GraphQlService {
     private final WebClient webClient;
 
     /**
-     * Performs a request against the GitHub GraphQL endpoint.
+     * Perform pagination on a list of edges from a previous request. This method is provided to cut down
+     * on repeated code, but it requires many parameters to make it work. Many of the items are the same or
+     * similar to {@link #makeGraphQlRequest(String, String, String, Class, String...)}.
+     *
+     * @param url The url for the GraphQL request that will get more items.
+     * @param queryLocation Location relative to {@code src/main/resources/graphql} of the pagination query definition.
+     *                      The pagination query must have a variable named {@code "after"} which specifies where
+     *                      the end cursor from the previous request goes.
+     * @param authorization The authorization header to send with the request.
+     *                      Can be null if no authorization is needed.
+     * @param responseClass The class that represents the schema that will be returned by the pagination query.
+     * @param edges The {@link Edges} object that we are performing pagination on.
+     * @param edgesRetriever Given the response from a pagination query, this function retrieves the {@link Edges}
+     *                       object which represents the new edges we have just retrieved.
+     * @param variables Addition variables that will be passed to the query.
+     * @param <T> The type the {@link Edges} object contains.
+     * @param <U> The type of the response of the pagination query.
+     */
+    public <T, U extends GraphQlResponse<?>> void paginate(String url, String queryLocation, String authorization,
+                                                           Class<U> responseClass, Edges<T> edges,
+                                                           Function<U, Edges<T>> edgesRetriever,
+                                                           String... variables) {
+
+        // It would almost be possible to put this code in Edges
+        // as it provides most of the information we need, but some queries
+        // need extra parameters, so we need to have different instantiations
+        // for everything we want to paginate. This function pulls together all
+        // the common parts.
+
+        PageInfo pageInfo = edges.getPageInfo();
+        List<EdgeNode<T>> currentList = edges.getEdges();
+
+        while (pageInfo.hasNextPage()) {
+            List<String> variablesList = new ArrayList<>(List.of(variables));
+            variablesList.add("after");
+            variablesList.add(pageInfo.getEndCursor());
+
+            U response = makeGraphQlRequest(url,
+                queryLocation,
+                authorization,
+                responseClass,
+                variablesList.toArray(new String[0]));
+
+            Edges<T> newEdges = edgesRetriever.apply(response);
+            currentList.addAll(newEdges.getEdges());
+            pageInfo = newEdges.getPageInfo();
+        }
+    }
+
+    /**
+     * Performs a request against the GitHub GraphQL endpoint. Users should be aware of if their query
+     * will require pagination or not, and if so, they should call {@link Paginatable#paginate(SafaUser)}
+     * to make sure pagination is handled. When in doubt, perform the pagination, unless you are already
+     * within a pagination loop.
      *
      * @param url The url to send the request to.
      * @param queryLocation Location relative to {@code src/main/resources/graphql} of the query definition.
@@ -31,40 +94,72 @@ public class GraphQlService {
      * @param <T> The query return type.
      * @return The result of the query.
      */
-    public <T> T makeGraphQlRequest(String url, String queryLocation, String authorization,
-                                    Class<T> responseClass, String... variables)  {
-
+    public <T extends GraphQlResponse<?>> T makeGraphQlRequest(String url, String queryLocation,
+                                                               String authorization, Class<T> responseClass,
+                                                               String... variables)  {
 
         GraphqlRequestBody graphQLRequestBody = new GraphqlRequestBody();
+        graphQLRequestBody.setQuery(loadQueryFromFile(queryLocation));
+        addVariables(graphQLRequestBody, variables);
 
-        String query;
+        return createRequest(url, authorization, graphQLRequestBody, responseClass).block();
+    }
+
+    /**
+     * Loads a query schema from a file.
+     *
+     * @param queryLocation Location relative to {@code src/main/resources/graphql} of the query definition.
+     * @return The query schema.
+     */
+    private String loadQueryFromFile(String queryLocation) {
         try {
             String resourcePath = "graphql/" + queryLocation + ".graphql";
-            query = FileUtilities.readClasspathFile(resourcePath);
+            return FileUtilities.readClasspathFile(resourcePath);
         }  catch (Exception e) {
             throw new SafaError("Could not load query schema", e);
         }
-        graphQLRequestBody.setQuery(query);
+    }
 
+    /**
+     * Adds variables to the GraphQL request body.
+     *
+     * @param graphQLRequestBody The GraphQL request body.
+     * @param variables The variables to add.
+     */
+    private void addVariables(GraphqlRequestBody graphQLRequestBody, String... variables) {
         assert variables.length % 2 == 0;
         for (int i = 0; i < variables.length; i += 2) {
             String variableName = variables[i];
             String variableValue = variables[i + 1];
             graphQLRequestBody.getVariables().put(variableName, variableValue);
         }
+    }
 
-        WebClient.RequestBodySpec responseBodySpec = webClient.post().uri(url);
+    /**
+     * Creates a request to the GitHub GraphQL endpoint.
+     *
+     * @param url The url to send the request to.
+     * @param authorization The authorization header to send with the request.
+     * @param graphQLRequestBody The GraphQL request body.
+     * @param responseClass The class that represents the schema that will be returned by the query.
+     * @param <T> The query return type.
+     * @return The response from the request.
+     */
+    private <T extends GraphQlResponse<?>> Mono<T> createRequest(String url, String authorization,
+                                                                 GraphqlRequestBody graphQLRequestBody,
+                                                                 Class<T> responseClass) {
+
+        WebClient.RequestBodySpec requestBodySpec = webClient.post().uri(url);
 
         if (authorization != null) {
-            responseBodySpec = responseBodySpec.header(HttpHeaders.AUTHORIZATION, authorization);
+            requestBodySpec = requestBodySpec.header(HttpHeaders.AUTHORIZATION, authorization);
         }
 
-        return responseBodySpec
+        return requestBodySpec
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .bodyValue(graphQLRequestBody)
             .retrieve()
-            .bodyToMono(responseClass)
-            .block();
+            .bodyToMono(responseClass);
     }
 
     @Data

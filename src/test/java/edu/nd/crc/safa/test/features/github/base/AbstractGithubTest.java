@@ -33,13 +33,6 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     private static final String FILETREE_RESPONSE_FILE = "mock/github/filetree_response.json";
     private static final String DIFF_RESPONSE_FILE = "mock/github/diff_response.json";
 
-    public static final String ENCODED_FILE_CONTENT =
-        "VGhpcyBpcyBzb21lIHRlc3QgY29udGVudCB0aGF0IHdpbGwgYmUgcGFyc2VkIGZyb20gYmFzZTY0\n"
-            + "IGludG8gYSByYXcgc3RyaW5n";
-
-    public static final String DECODED_FILE_CONTENT =
-        "This is some test content that will be parsed from base64 into a raw string";
-
     protected String repositoryName = "home_assistant_ro";
     protected String githubLogin = "safaGithub";
     protected GithubAccessCredentials credentials = new GithubAccessCredentials();
@@ -100,7 +93,6 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         );
 
         GithubFileBlobDTO file = new GithubFileBlobDTO();
-        file.setContent(ENCODED_FILE_CONTENT);
         Mockito.when(serviceMock.getBlobInformation(Mockito.any(), Mockito.any()))
                 .thenReturn(file);
     }
@@ -141,6 +133,6 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
             .newType(projectName, artifactTypeName);
 
         IntStream.range(0, initialArtifactCount).mapToObj(String::valueOf).forEach(name ->
-            dbEntityBuilder.newArtifact(projectName, artifactTypeName, name));
+            dbEntityBuilder.newArtifactAndBody(projectName, artifactTypeName, name, "", ""));
     }
 }

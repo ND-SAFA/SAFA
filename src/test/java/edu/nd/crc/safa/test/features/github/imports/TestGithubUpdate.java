@@ -1,6 +1,11 @@
 package edu.nd.crc.safa.test.features.github.imports;
 
+import java.util.List;
+
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -51,10 +56,18 @@ public class TestGithubUpdate extends AbstractGithubTest {
 
         int diffArtifactsCount = 3;
 
+        List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
+
         // We should have the correct number of artifacts and links
-        Assertions.assertEquals(
-            initialArtifactCount + diffArtifactsCount,
-            serviceProvider.getArtifactRepository().findByProject(project).size());
+        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount,artifacts.size());
+
+        for (ArtifactAppEntity artifact : artifacts) {
+            if (artifact.getType().equals(type.getName())) {
+                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                    .map(CustomAttributeAppEntity::getKey)
+                    .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
+            }
+        }
 
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());
@@ -97,10 +110,18 @@ public class TestGithubUpdate extends AbstractGithubTest {
 
         int diffArtifactsCount = 1;
 
+        List<ArtifactAppEntity> artifacts = serviceProvider.getArtifactService().getAppEntities(project);
+
         // We should have the correct number of artifacts and links
-        Assertions.assertEquals(
-            initialArtifactCount + diffArtifactsCount,
-            serviceProvider.getArtifactRepository().findByProject(project).size());
+        Assertions.assertEquals(initialArtifactCount + diffArtifactsCount, artifacts.size());
+
+        for (ArtifactAppEntity artifact : artifacts) {
+            if (artifact.getType().equals(type.getName())) {
+                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
+                    .map(CustomAttributeAppEntity::getKey)
+                    .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
+            }
+        }
 
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());

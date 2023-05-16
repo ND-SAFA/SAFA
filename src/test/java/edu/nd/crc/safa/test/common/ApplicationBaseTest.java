@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.test.builders.DbEntityBuilder;
@@ -69,6 +70,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     public void testSetup() throws Exception {
         clearData();
         setAuthorization();
+        ReflectionTestUtils.setField(ServiceProvider.class, "instance", this.serviceProvider);
     }
 
     /**

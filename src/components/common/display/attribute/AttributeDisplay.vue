@@ -5,7 +5,10 @@
       variant="caption"
       :value="attribute.label"
     />
-    <div v-if="arrayValue.length > 0">
+    <p v-if="isLink">
+      <typography el="a" :value="displayValue" />
+    </p>
+    <div v-else-if="arrayValue.length > 0">
       <attribute-chip v-for="value in arrayValue" :key="value" :value="value" />
     </div>
     <typography v-else el="p" :value="displayValue" />
@@ -45,6 +48,9 @@ const props = defineProps<{
 }>();
 
 const dataCy = computed(() => `text-attribute-${props.attribute.key}`);
+const isLink = computed(() =>
+  String(props.values[props.attribute.key]).includes("://")
+);
 
 /**
  * The display values for an array attribute.

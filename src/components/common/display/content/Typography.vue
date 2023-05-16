@@ -39,6 +39,9 @@
   <h3 v-else-if="el === 'h3'" :class="className">
     {{ value }}
   </h3>
+  <a v-else-if="el === 'a'" :class="className" :href="value">
+    {{ value }}
+  </a>
 </template>
 
 <script lang="ts">

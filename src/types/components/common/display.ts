@@ -16,7 +16,7 @@ export type TextType =
 /**
  * The types of text elements.
  */
-export type ElementType = "span" | "p" | "div" | "h1" | "h2" | "h3";
+export type ElementType = "span" | "p" | "div" | "h1" | "h2" | "h3" | "a";
 
 /**
  * The methods of text alignment.

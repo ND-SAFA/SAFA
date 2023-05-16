@@ -30,7 +30,10 @@ SECRET_KEY = 'django-insecure-*@=lz%&bco*9i4sjo_2kp5eb$yp%j#xdn@5!a6*v2v1b(-rahg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['localhost',
+                 '127.0.0.1',
+                 "dev-api.safa.ai",
+                 "api.safa.ai"]
 
 # Application definition
 

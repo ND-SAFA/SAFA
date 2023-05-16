@@ -8,7 +8,7 @@ class SupportedPrompts(SupportedEnum):
     CLASSIFICATION = "Is (1) related to (2)? Answer \"yes\" or \"no\".\n\n"
     CODE_SUMMARY = "Provide 5 sentence paragraph describing the high-level usage of the code below. Do not focus on implementation " \
                    "details and assume your audience works on this system. '{}'"
-    NL_SUMMARY = "Summarize the following '{}'"
+    NL_SUMMARY = "Provide a short paragraph summarizing the content below.\n\n'{}'"
     USER_STORY_CREATION = "Write a single user story that captures the main functionality of the following code descriptions. " \
                           "Make the user story start with 'As a'\n '{}'"
     SYSTEM_REQUIREMENT_CREATION = "Given a summary of python code, write a system-level requirement\n The requirements should " \

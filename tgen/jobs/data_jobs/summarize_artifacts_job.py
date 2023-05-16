@@ -1,20 +1,12 @@
-from typing import Dict, Literal, TypedDict, Any
+from typing import Any, Dict
 
 import pandas as pd
+
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
-
-
-class SummaryArtifact(TypedDict):
-    """
-    The artifact properties needed for summarization.
-    """
-    content: str
-    type: Literal["java", "py"]
 
 
 class SummarizeArtifactsJob(AbstractJob):

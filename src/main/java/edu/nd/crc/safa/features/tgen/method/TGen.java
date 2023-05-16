@@ -141,7 +141,14 @@ public class TGen implements ITraceGenerationController {
 
         tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
             Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
-            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getBody()));
+            artifacts.forEach(a -> {
+                String summary = a.getSummary();
+                if (summary != null && summary.length() > 0) {
+                    artifactLevelsArtifactMap.put(a.getName(), summary);
+                } else {
+                    artifactLevelsArtifactMap.put(a.getName(), a.getBody());
+                }
+            });
             artifactLevelsMap.add(artifactLevelsArtifactMap);
         });
         return artifactLevelsMap;

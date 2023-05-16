@@ -41,7 +41,6 @@ class PromptDataset(iDataset):
         :param trace_dataset: The dataset containing trace links and artifacts
         :param project_file_id: The file id used by open AI
         :param data_export_path: The path to where data files will be saved if specified. May be to a directory or specific file
-        :param llm_manager: The utility class for access LLM API
         """
         self.prompt_df = prompt_df
         self.artifact_df = trace_dataset.artifact_df if artifact_df is None and trace_dataset is not None else artifact_df

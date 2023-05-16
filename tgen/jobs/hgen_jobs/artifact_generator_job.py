@@ -7,6 +7,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
@@ -34,11 +35,11 @@ class ArtifactGeneratorJob(HGenJob):
         """
         self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
         self.artifacts_by_cluster = artifact_ids_by_cluster
-        dataset_creator = ClusterDatasetCreator(artifact_df=self._create_artifact_df_from_artifacts(artifacts),
-                                                manual_clusters={i: artifacts_in_cluster
-                                                                 for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)})
-        hgen_args = HGenArgs(source_layer_id=self.SOURCE_LAYER_ID, hgen_base_prompt=hgen_base_prompt,
-                             dataset_creator_for_clusters=dataset_creator, cluster_method=SupportedClusteringMethod.MANUAL)
+        dataset = PromptDataset(artifact_df=self._create_artifact_df_from_artifacts(artifacts))
+        manual_clusters={i: artifacts_in_cluster
+                         for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)}
+        hgen_args = HGenArgs(dataset_for_sources=dataset, source_layer_id=self.SOURCE_LAYER_ID, hgen_base_prompt=hgen_base_prompt,
+                             manual_clusters=manual_clusters, clustering_method=SupportedClusteringMethod.MANUAL)
         super().__init__(hgen_args=hgen_args, llm_manager=llm_manager, job_args=job_args)
 
     @overrides(HGenJob)

@@ -122,5 +122,5 @@ class TestClusterDatasetCreator(BaseTest):
         return dataset_manager[DatasetRole.TRAIN]
 
     def get_artifact_clusterer(self) -> ClusterDatasetCreator:
-        dataset = self.get_trace_dataset()
+        dataset = PromptDataset(trace_dataset=self.get_trace_dataset())
         return ClusterDatasetCreator(dataset, cluster_methods={SupportedClusteringMethod.GRAPH, SupportedClusteringMethod.LLM})

@@ -63,7 +63,7 @@ class TestHierarchyGeneration(BaseTest):
             orig_dataset = tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL] if tgen_trainer is not None \
                 else PromptDataset(trace_dataset=dataset_creator.create())
             mock_cluster.side_effect = lambda: fake_clustering(artifact_df=orig_dataset.artifact_df,
-                                                               cluster_method=hgen.args.cluster_method)
+                                                               cluster_method=hgen.args.clustering_method)
             generated_dataset = hgen.run(TEST_OUTPUT_DIR)
             self.assertEqual(len(orig_dataset.artifact_df) + 4, len(generated_dataset.artifact_df))
             expected_n_traces = len(orig_dataset.artifact_df) * 4
@@ -137,7 +137,7 @@ class TestHierarchyGeneration(BaseTest):
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
         hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()),
                                             layer_id=layer_id)
-        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, export_path=TEST_OUTPUT_DIR)
+        linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, export_path=TEST_OUTPUT_DIR).trace_dataset
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
             self.assertLess(label - 0.4012, 0.1)
@@ -155,14 +155,15 @@ class TestHierarchyGeneration(BaseTest):
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
 
         # Dont supply trace dataframe
-        single_layer_trace_dataset = HierarchyGenerator._create_trace_dataset_with_single_layer(artifact_df, layer_id)
+        single_layer_trace_dataset = HierarchyGenerator._create_dataset_with_single_layer(artifact_df, layer_id).trace_dataset
         self.verify_single_layer_dataset(single_layer_trace_dataset, artifact_df, layer_id)
 
         # Do supply trace dataframe
         layer_artifact_ids = list(single_layer_trace_dataset.artifact_df.index)
         source, target = layer_artifact_ids[0], layer_artifact_ids[1]
         trace_df = TraceDataFrame({TraceKeys.SOURCE: [source], TraceKeys.TARGET: [target], TraceKeys.LABEL: [1]})
-        single_layer_trace_dataset = HierarchyGenerator._create_trace_dataset_with_single_layer(artifact_df, layer_id, trace_df)
+        single_layer_trace_dataset = HierarchyGenerator._create_dataset_with_single_layer(artifact_df, layer_id, trace_df)\
+            .trace_dataset
         self.verify_single_layer_dataset(single_layer_trace_dataset, artifact_df, layer_id)
         self.assertEqual(single_layer_trace_dataset.trace_df.get_link(source_id=source, target_id=target)[TraceKeys.LABEL], 1)
 

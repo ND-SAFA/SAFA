@@ -24,7 +24,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
 
     CLUSTER_CONTENT_FORMAT = "{}"
 
-    def __init__(self, trace_dataset: TraceDataset = None, artifact_df: ArtifactDataFrame = None,
+    def __init__(self, prompt_dataset: PromptDataset,
                  cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
                  manual_clusters: dict = None, **clustering_params):
         """
@@ -36,13 +36,10 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
         :param clustering_params: Any additional parameters necessary to create clusters
         """
         super().__init__()
-        assert not (trace_dataset is None and artifact_df is None), "Provide either a trace dataset " \
-                                                                    "or an artifact df to create clusters from"
-        assert trace_dataset is None or artifact_df is None, "Please provide only one data source."
-
-        self.trace_dataset = trace_dataset if trace_dataset is not None else TraceDataset(artifact_df, TraceDataFrame(),
-                                                                                          LayerDataFrame())
-        self.artifact_df = artifact_df
+        assert prompt_dataset.artifact_df is not None, "Creator requires artifacts to be provided"
+        self.trace_dataset = prompt_dataset.trace_dataset if prompt_dataset.trace_dataset is not None \
+            else TraceDataset(prompt_dataset.artifact_df, TraceDataFrame(), LayerDataFrame())
+        self.artifact_df = prompt_dataset.artifact_df
         self.cluster_methods = cluster_methods if isinstance(cluster_methods, Set) else {cluster_methods}
         assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters is not None, \
             "Must supply clusters for manual clustering"

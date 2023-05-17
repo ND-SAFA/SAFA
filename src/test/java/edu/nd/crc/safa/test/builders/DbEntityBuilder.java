@@ -338,7 +338,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         TraceLinkVersion traceLinkVersion = (new TraceLinkVersion())
             .withProjectVersion(projectVersion)
             .withTraceLink(traceLink)
-            .withModificationType(ModificationType.REMOVED)
+            .withModificationType(ModificationType.ADDED)
             .withManualTraceType();
         traceLinkVersion.setApprovalStatus(ApprovalStatus.APPROVED);
         this.traceLinkVersionRepository.save(traceLinkVersion);

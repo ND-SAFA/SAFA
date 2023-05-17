@@ -41,9 +41,9 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
             else TraceDataset(prompt_dataset.artifact_df, TraceDataFrame(), LayerDataFrame())
         self.artifact_df = prompt_dataset.artifact_df
         self.cluster_methods = cluster_methods if isinstance(cluster_methods, Set) else {cluster_methods}
-        assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters is not None, \
+        assert SupportedClusteringMethod.MANUAL not in self.cluster_methods or manual_clusters, \
             "Must supply clusters for manual clustering"
-        if manual_clusters is not None:
+        if manual_clusters:
             self.cluster_methods.add(SupportedClusteringMethod.MANUAL)
         self.manual_clusters = manual_clusters
         self.clustering_params = clustering_params

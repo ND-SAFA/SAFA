@@ -14,6 +14,7 @@ from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -31,6 +32,7 @@ class HierarchyGenerator(BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
+    BASE_PROMPT = SupportedPrompts.USER_STORY_CREATION
 
     def __init__(self, args: HGenArgs, llm_manager: AbstractLLMManager):
         """
@@ -40,12 +42,12 @@ class HierarchyGenerator(BaseObject):
         self.args = args
         self.llm_manager = llm_manager
 
-    def run(self, export_path: str = None) -> TraceDataset:
+    def run(self) -> TraceDataset:
         """
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        export_path = os.path.join(export_path, str(uuid.uuid4())) if export_path else None
+        export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
 
         # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
         if self.args.tgen_trainer:  # links need generated
@@ -94,7 +96,7 @@ class HierarchyGenerator(BaseObject):
         :return: The content for the generated artifacts
         """
         prompt_creator = GenerationPromptCreator(prompt_args=self.llm_manager.prompt_args,
-                                                 base_prompt=self.args.hgen_base_prompt)
+                                                 base_prompt=self.BASE_PROMPT)
         hgen_trainer = LLMTrainer(llm_manager=self.llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
                                   prompt_creator=prompt_creator)

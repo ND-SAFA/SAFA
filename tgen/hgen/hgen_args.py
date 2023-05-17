@@ -20,6 +20,10 @@ class HGenArgs(BaseObject):
     """
     source_layer_id: str
     """
+    The type of higher-level artifact that will be generated
+    """
+    target_type: str
+    """
     The trainer used to generate intra layer trace links between source artifacts
     """
     tgen_trainer: AbstractTrainer = None
@@ -32,10 +36,6 @@ class HGenArgs(BaseObject):
     """
     dataset_for_sources: PromptDataset = None
     """
-    The base prompt to use for generation.
-    """
-    hgen_base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.USER_STORY_CREATION
-    """
     The method to use to cluster source artifacts. Hierarchy will be built from these clusters
     """
     clustering_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.GRAPH
@@ -47,6 +47,10 @@ class HGenArgs(BaseObject):
     The method to use to cluster source artifacts. Hierarchy will be built from these clusters
     """
     clustering_params: dict = field(default_factory=dict)
+    """
+    The path to save checkpoints to if desired
+    """
+    export_path: str = None
 
     def __post_init__(self) -> None:
         """

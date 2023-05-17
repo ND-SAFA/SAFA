@@ -1,48 +1,43 @@
 from typing import Dict, List, Union
 
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.jobs.hgen_jobs.hgen_job import HGenJob
+from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
+from tgen.util.status import Status
 
 
-class ArtifactGeneratorJob(HGenJob):
+class GenerateArtifactsJob(BaseHGenJob):
     SOURCE_LAYER_ID = "source_layer"
 
-    def __init__(self, artifacts: Dict[str, Dict], artifact_ids_by_cluster: List[List[Union[str, int]]],
-                 llm_manager: AbstractLLMManager, hgen_base_prompt: Union[str, SupportedPrompts],
-                 summarizer: Summarizer = None, job_args: JobArgs = None):
+    def __init__(self, artifacts: Dict[str, Dict], target_type: str, llm_manager: AbstractLLMManager,
+                 artifact_ids_by_cluster: List[List[Union[str, int]]] = None, summarizer: Summarizer = None, job_args: JobArgs = None,
+                 **hgen_params):
         """
         Initializes the job with args needed for hierarchy generator
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
         :param artifact_ids_by_cluster: A list of lists of artifact ids representing each cluster
-        :param hgen_base_prompt: The base prompt used to create the artifacts
+        :param target_type: The type of higher-level artifact that will be generated
         :param llm_manager: Model Manager in charge of generating artifacts
-        :pram job_args: The arguments need for the job
+        :param summarizer: Used to summarize the source artifacts
+        :param job_args: The arguments need for the job
+        :param hgen_params: Any additional parameters for the hgen args
         """
-        self.artifacts = self._summarize_artifacts(artifacts, summarizer, job_args)
-        self.artifacts_by_cluster = artifact_ids_by_cluster
-        dataset = PromptDataset(artifact_df=self._create_artifact_df_from_artifacts(artifacts))
-        manual_clusters={i: artifacts_in_cluster
-                         for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)}
-        hgen_args = HGenArgs(dataset_for_sources=dataset, source_layer_id=self.SOURCE_LAYER_ID, hgen_base_prompt=hgen_base_prompt,
-                             manual_clusters=manual_clusters, clustering_method=SupportedClusteringMethod.MANUAL)
-        super().__init__(hgen_args=hgen_args, llm_manager=llm_manager, job_args=job_args)
+        self.artifacts = artifacts
+        self.target_type = target_type
+        self.summarizer = summarizer if summarizer is not None else Summarizer(code_or_exceeds_limit_only=True)
+        self.artifacts_by_cluster = artifact_ids_by_cluster if artifact_ids_by_cluster is not None else {}
+        super().__init__(llm_manager=llm_manager, job_args=job_args, **hgen_params)
 
-    @overrides(HGenJob)
+    @overrides(BaseHGenJob)
     def _run(self) -> List[str]:
         """
         Converts output of HGenJob to a list of the cluster content
@@ -51,30 +46,40 @@ class ArtifactGeneratorJob(HGenJob):
         generated_dataset: TraceDataset = super()._run()
         artifacts = [artifact[ArtifactKeys.CONTENT] for id_, artifact in generated_dataset.artifact_df.itertuples()
                      if artifact[ArtifactKeys.LAYER_ID] != self.SOURCE_LAYER_ID]
-        return artifacts
+        return artifacts if self.artifacts_by_cluster else generated_dataset  # TODO unify this??
 
-    @staticmethod
-    def _create_artifact_df_from_artifacts(artifacts: Dict[str, Dict]) -> ArtifactDataFrame:
+    def get_hgen_args(self) -> HGenArgs:
+        """
+        Gets the arguments used for the hierarchy generation
+        :return: The arguments used for the hierarchy generation
+        """
+        manual_clusters = {i: artifacts_in_cluster
+                           for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)}
+        clustering_method = SupportedClusteringMethod.MANUAL if len(manual_clusters) > 0 else SupportedClusteringMethod.LLM
+        return HGenArgs(dataset_for_sources=self._create_dataset(), manual_clusters=manual_clusters,
+                        source_layer_id=self.SOURCE_LAYER_ID, target_type=self.target_type,
+                        clustering_method=clustering_method, **self.hgen_params)
+
+    def _create_dataset(self) -> PromptDataset:
         """
         Creates a trace dataset containing the given artifacts
-        :param artifacts: The artifacts used for the generation
         :return: The trace dataset containing the artifacts
         """
-        artifacts = [EnumDict({ArtifactKeys.ID: id_,
-                               ArtifactKeys.CONTENT: artifact[ArtifactKeys.CONTENT.value],
-                               ArtifactKeys.LAYER_ID: ArtifactGeneratorJob.SOURCE_LAYER_ID}) for id_, artifact in artifacts.items()]
-        return  ArtifactDataFrame(artifacts)
+        artifacts = self._summarize_artifacts()
+        artifacts_dict = [EnumDict({ArtifactKeys.ID: id_,
+                                    ArtifactKeys.CONTENT: artifact[ArtifactKeys.CONTENT.value],
+                                    ArtifactKeys.LAYER_ID: GenerateArtifactsJob.SOURCE_LAYER_ID})
+                          for id_, artifact in artifacts.items()]
+        return PromptDataset(artifact_df=ArtifactDataFrame(artifacts_dict))
 
-    @staticmethod
-    def _summarize_artifacts(artifacts: Dict[str, Dict], summarizer: Summarizer, job_args: JobArgs) -> Dict[str, Dict]:
+    def _summarize_artifacts(self) -> Dict[str, Dict]:
         """
         Runs summarize job on artifacts
-        :param artifacts: The artifacts to summarize
-        :param summarizer: The summarizer to use
-        :param job_args: Any job args for the job
         :return: The summarized artifacts
         """
-        summarize_job = SummarizeArtifactsJob(artifacts, job_args=job_args,
-                                              summarizer=summarizer if summarizer is not None else
-                                              Summarizer(code_or_exceeds_limit_only=True))
-        return summarize_job.run().body
+        summarize_job = SummarizeArtifactsJob(self.artifacts, job_args=self.job_args,
+                                              summarizer=self.summarizer)
+        result =  summarize_job.run()
+        if result.status != Status.SUCCESS:
+            raise Exception(result.body)
+        return result.body

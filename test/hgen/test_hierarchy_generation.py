@@ -64,7 +64,7 @@ class TestHierarchyGeneration(BaseTest):
                 else PromptDataset(trace_dataset=dataset_creator.create())
             mock_cluster.side_effect = lambda: fake_clustering(artifact_df=orig_dataset.artifact_df,
                                                                cluster_method=hgen.args.clustering_method)
-            generated_dataset = hgen.run(TEST_OUTPUT_DIR)
+            generated_dataset = hgen.run()
             self.assertEqual(len(orig_dataset.artifact_df) + 4, len(generated_dataset.artifact_df))
             expected_n_traces = len(orig_dataset.artifact_df) * 4
             self.assertEqual(expected_n_traces, len(generated_dataset))
@@ -228,7 +228,7 @@ class TestHierarchyGeneration(BaseTest):
 
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
         llm_manager = OpenAIManager(OpenAIArgs())
-        args = HGenArgs(tgen_trainer=tgen_trainer,
-                        source_layer_id=self.LAYER_ID if not layer_id else layer_id,
+        args = HGenArgs(tgen_trainer=tgen_trainer, target_type="user_story",
+                        source_layer_id=self.LAYER_ID if not layer_id else layer_id, export_path=TEST_OUTPUT_DIR,
                         **params)
         return HierarchyGenerator(args, llm_manager)

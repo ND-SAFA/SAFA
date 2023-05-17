@@ -23,8 +23,26 @@ public enum TGenSummaryArtifactType {
     /**
      * Identifies java files.
      */
-    JAVA(".java");
+    JAVA(".java"),
+    /**
+     * Generic parser for code.
+     */
+    CODE(".*");
 
+    private static final String[] codeExtensions = new String[]{
+        ".c",
+        ".php",
+        ".vue",
+        ".rb",
+        ".js",
+        ".ts",
+        ".tsx",
+        ".html",
+        ".htm",
+        ".xml",
+        ".json",
+        ".sql"
+    };
     String fileExtension;
 
     /**
@@ -43,6 +61,22 @@ public enum TGenSummaryArtifactType {
                 return artifactType;
             }
         }
+        for (String codeExtension : codeExtensions) {
+            if (artifactName.endsWith(codeExtension)) {
+                return CODE;
+            }
+        }
         return NL;
+    }
+
+    /**
+     * Returns whether artifact type is a code.
+     *
+     * @param artifactName The name of the artifact to extract type from.
+     * @return True if code, false otherwise.
+     */
+    public static boolean isCode(String artifactName) {
+        TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifactName);
+        return List.of(CODE, PY, JAVA).contains(artifactType);
     }
 }

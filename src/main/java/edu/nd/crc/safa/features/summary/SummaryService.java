@@ -53,6 +53,9 @@ public class SummaryService {
         List<ArtifactAppEntity> codeArtifacts = projectArtifacts
             .stream()
             .filter(a -> TGenSummaryArtifactType.isCode(a.getName())).collect(Collectors.toList());
+        if (codeArtifacts.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
             a.getName(),
             a.getBody(),

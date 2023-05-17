@@ -4,14 +4,12 @@ from tgen.data.creators.clustering.supported_clustering_method import SupportedC
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.util.enum_util import EnumDict
-from tgen.util.override import overrides
 from tgen.util.status import Status
 
 
@@ -36,17 +34,6 @@ class GenerateArtifactsJob(BaseHGenJob):
         self.summarizer = summarizer if summarizer is not None else Summarizer(code_or_exceeds_limit_only=True)
         self.artifacts_by_cluster = artifact_ids_by_cluster if artifact_ids_by_cluster is not None else {}
         super().__init__(llm_manager=llm_manager, job_args=job_args, **hgen_params)
-
-    @overrides(BaseHGenJob)
-    def _run(self) -> List[str]:
-        """
-        Converts output of HGenJob to a list of the cluster content
-        :return: The job result containing the list of cluster content
-        """
-        generated_dataset: TraceDataset = super()._run()
-        artifacts = [artifact[ArtifactKeys.CONTENT] for id_, artifact in generated_dataset.artifact_df.itertuples()
-                     if artifact[ArtifactKeys.LAYER_ID] != self.SOURCE_LAYER_ID]
-        return artifacts if self.artifacts_by_cluster else generated_dataset  # TODO unify this??
 
     def get_hgen_args(self) -> HGenArgs:
         """

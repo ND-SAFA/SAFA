@@ -6,7 +6,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
-from tgen.jobs.hgen_jobs.artifact_generator_job import GenerateArtifactsJob
+from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest

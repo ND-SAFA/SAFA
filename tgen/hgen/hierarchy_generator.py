@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Union
 
+from bs4 import BeautifulSoup
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -33,6 +34,7 @@ class HierarchyGenerator(BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     BASE_PROMPT = SupportedPrompts.USER_STORY_CREATION
+    GENERATION_TAG = "doc"
 
     def __init__(self, args: HGenArgs, llm_manager: AbstractLLMManager):
         """
@@ -145,8 +147,23 @@ class HierarchyGenerator(BaseObject):
         :param hgen_artifacts_df: The dataframe containing artifacts created from the clusters
         :return: The dataframe of generated artifacts
         """
-        hgen_artifacts_df[ArtifactKeys.CONTENT] = artifact_generations
+        artifact_content = [HierarchyGenerator._extract_generated_content(gen) for gen in artifact_generations]
+        hgen_artifacts_df[ArtifactKeys.CONTENT] = artifact_content
         return ArtifactDataFrame.concat(orig_artifact_df, hgen_artifacts_df)
+
+    @staticmethod
+    def _extract_generated_content(generation: str) -> str:
+        """
+        Extracts the new artifact content from the LLM generation
+        :param generation: The response from the LLM for the artifact content
+        :return: The new artifact content
+        """
+        try:
+            content = BeautifulSoup(generation).find(HierarchyGenerator.GENERATION_TAG).contents[0]
+            assert isinstance(content, str)
+            return content
+        except Exception:
+            return ''
 
     @staticmethod
     def _create_trace_df_with_generated_artifacts(hgen_trace_df: TraceDataFrame, artifact_df: ArtifactDataFrame,

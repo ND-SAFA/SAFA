@@ -19,6 +19,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -74,7 +75,8 @@ class TestHierarchyGeneration(BaseTest):
     def test_create_artifacts_df_with_generated_artifacts(self):
         hgen_dataset = PromptTestProject.get_trace_dataset_creator().create()
         generated_content = "generated content"
-        artifact_generations = [generated_content for _ in hgen_dataset.artifact_df.index]
+        tag = HierarchyGenerator.GENERATION_TAG
+        artifact_generations = [f"<{tag}>{generated_content}</{tag}>"  for _ in hgen_dataset.artifact_df.index]
         orig_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ["original_id"], ArtifactKeys.CONTENT: ["original_content"],
                                               ArtifactKeys.LAYER_ID: ["original_layer"]})
         artifact_df = HierarchyGenerator._create_artifact_df_with_generated_artifacts(artifact_generations, hgen_dataset.artifact_df,
@@ -162,7 +164,7 @@ class TestHierarchyGeneration(BaseTest):
         layer_artifact_ids = list(single_layer_trace_dataset.artifact_df.index)
         source, target = layer_artifact_ids[0], layer_artifact_ids[1]
         trace_df = TraceDataFrame({TraceKeys.SOURCE: [source], TraceKeys.TARGET: [target], TraceKeys.LABEL: [1]})
-        single_layer_trace_dataset = HierarchyGenerator._create_dataset_with_single_layer(artifact_df, layer_id, trace_df)\
+        single_layer_trace_dataset = HierarchyGenerator._create_dataset_with_single_layer(artifact_df, layer_id, trace_df) \
             .trace_dataset
         self.verify_single_layer_dataset(single_layer_trace_dataset, artifact_df, layer_id)
         self.assertEqual(single_layer_trace_dataset.trace_df.get_link(source_id=source, target_id=target)[TraceKeys.LABEL], 1)

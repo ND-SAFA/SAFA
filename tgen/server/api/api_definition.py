@@ -18,3 +18,10 @@ class ApiDefinition(BaseObject):
         :return: Returns the trace links defined in API dataset.
         """
         return [] if self.true_links is None else self.true_links
+
+    def as_dict(self) -> Dict:
+        """
+        Returns the definition as a dictionary
+        :return: The definition as a dictionary
+        """
+        return vars(self)

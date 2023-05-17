@@ -47,7 +47,7 @@ public class ProjectGraph {
      * The artifact node by ID.
      *
      * @param artifactId The artifact ID of the node to retrieve.
-     * @return
+     * @return The artifact node with ID.
      */
     public ArtifactNode getArtifactNode(UUID artifactId) {
         return artifacts.get(artifactId);

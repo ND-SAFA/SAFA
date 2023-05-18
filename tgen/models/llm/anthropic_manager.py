@@ -1,3 +1,4 @@
+import time
 from typing import Dict, List, TypedDict
 
 import anthropic
@@ -80,6 +81,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
             prompt_response = AnthropicManager.Client.completion(**prompt_params)
+            if prompt_response is None:  # retry once more
+                time.sleep(0.5)
+                prompt_response = AnthropicManager.Client.completion(**prompt_params)
             response[index] = prompt_response
 
         ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)

@@ -39,7 +39,10 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param kwargs: Params necessary for request
         :return: The response from open  ai
         """
-        return openai.FineTune.create(**kwargs)
+        result = openai.FineTune.create(**kwargs)
+        if result is None:  # retry if failed.
+            result = openai.FineTune.create(**kwargs)
+        return result
 
     def retrieve_fine_tune_request(self, **params) -> OpenAIObject:
         """

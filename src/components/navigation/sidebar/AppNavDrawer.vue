@@ -16,7 +16,7 @@
       y="3"
       class="nav-sidebar-header-open"
     >
-      <safa-icon />
+      <safa-icon clickable @click="handleLogoClick" />
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"
@@ -61,6 +61,7 @@ export default {
 import { computed, onMounted } from "vue";
 import { ThemeColors } from "@/util";
 import { appStore, useScreen, useTheme } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
@@ -80,6 +81,13 @@ const sidebarOpen = computed({
     appStore.toggleAppPanel();
   },
 });
+
+/**
+ * Navigates to the home page when the logo is clicked.
+ */
+function handleLogoClick(): void {
+  navigateTo(Routes.HOME);
+}
 
 onMounted(() => {
   if (!smallWindow) return;

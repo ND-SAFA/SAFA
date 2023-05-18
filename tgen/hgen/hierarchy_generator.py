@@ -98,7 +98,7 @@ class HierarchyGenerator(BaseObject):
         :return: The content for the generated artifacts
         """
         prompt_creator = GenerationPromptCreator(prompt_args=self.llm_manager.prompt_args,
-                                                 base_prompt=self.BASE_PROMPT)
+                                                 base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type))
         hgen_trainer = LLMTrainer(llm_manager=self.llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
                                   prompt_creator=prompt_creator)

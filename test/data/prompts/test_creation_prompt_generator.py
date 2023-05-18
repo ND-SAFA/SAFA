@@ -9,7 +9,7 @@ from tgen.util.override import overrides
 class TestClassificationPromptGenerater(BasePromptTest):
 
     def test_generate(self):
-        prompt_creator = GenerationPromptCreator(base_prompt=SupportedPrompts.SYSTEM_REQUIREMENT_CREATION)
+        prompt_creator = GenerationPromptCreator(base_prompt=SupportedPrompts.UAV_SYSTEM_REQUIREMENT)
 
         # No Label
         generated_prompt = prompt_creator.create("target1", "source1")
@@ -19,5 +19,5 @@ class TestClassificationPromptGenerater(BasePromptTest):
     def verify_prompt(self, generated_prompt):
         self.assertIn("source1", generated_prompt[PromptKeys.COMPLETION])
         self.assertTrue(
-            generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.SYSTEM_REQUIREMENT_CREATION.value.split("{")[0]))
+            generated_prompt[PromptKeys.PROMPT].startswith(SupportedPrompts.UAV_SYSTEM_REQUIREMENT.value.split("{")[0]))
         super().verify_prompt(generated_prompt, OpenAIManager.prompt_args)  # assumed using openai

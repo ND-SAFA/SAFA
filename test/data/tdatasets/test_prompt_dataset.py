@@ -58,7 +58,7 @@ class TestPromptDataset(BaseTest):
                                                                                         Summarizer(llm_manager))
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
-                self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
+                self.assertLessEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()

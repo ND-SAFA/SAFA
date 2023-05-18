@@ -35,7 +35,7 @@ def response_with_defaults(**params) -> AnthropicResponse:
     """
     defaults = {str: EMPTY_STRING, bool: False}
     all_params = {attr: params[attr] if attr in params else defaults[type_]
-                  for attr, type_ in AnthropicResponse.__annotations__.values()}
+                  for attr, type_ in AnthropicResponse.__annotations__.items()}
     return AnthropicResponse(**all_params)
 
 
@@ -97,12 +97,13 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                 prompt_response = AnthropicManager.Client.completion(**prompt_params)
             except Exception as e:
                 prompt_response = response_with_defaults(exception=str(e))
-            if prompt_response.get("exception", EMPTY_STRING):
-                raise Exception(prompt_response["exception"])
             response[index] = prompt_response
 
         ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
 
+        for res in response:
+            if res and res.get("exception", EMPTY_STRING):
+                raise Exception(res["exception"])
         return [res for res in response if res is not None]
 
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[

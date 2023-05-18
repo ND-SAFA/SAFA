@@ -10,6 +10,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.train.args.anthropic_args import AnthropicArgs
@@ -83,7 +84,7 @@ class TestLLMClustering(BaseTest):
     def test_set_max_tokens(self):
         prompt = "This is a prompt"
         max_tokens = LLMClustering._set_max_tokens(AnthropicManager(), prompt=prompt)
-        self.assertEqual(max_tokens, LLMClustering.PERC_TOKENS_FOR_RES*100000)
+        self.assertEqual(max_tokens, LLMClustering.PERC_TOKENS_FOR_RES*ModelTokenLimits.get_token_limit_for_model("claude"))
 
         prompt = "This is a prompt"
         max_tokens = LLMClustering._set_max_tokens(OpenAIManager(OpenAIArgs(model="davincci")), prompt=prompt)

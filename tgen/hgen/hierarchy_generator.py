@@ -59,6 +59,7 @@ class HierarchyGenerator(BaseObject):
         else:  # links pre-generated or not needed
             dataset_with_sources = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
                 else self.args.dataset_for_sources
+            self.save_dataset_checkpoint(dataset_with_sources, export_path, filename="initial_dataset_with_sources")
             source_layer_only_dataset = self._create_dataset_with_single_layer(dataset_with_sources.artifact_df,
                                                                                self.args.source_layer_id,
                                                                                dataset_with_sources.trace_dataset.trace_df

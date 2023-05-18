@@ -38,7 +38,7 @@ class HGenArgs(BaseObject):
     """
     The method to use to cluster source artifacts. Hierarchy will be built from these clusters
     """
-    clustering_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.GRAPH
+    clustering_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.LLM
     """
     Pre-created clusters to use
     """

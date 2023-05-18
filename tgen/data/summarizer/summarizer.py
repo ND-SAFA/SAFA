@@ -18,6 +18,7 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.util.base_object import BaseObject
+from tgen.util.logging.logger_manager import logger
 
 
 class Summarizer(BaseObject):
@@ -75,6 +76,7 @@ class Summarizer(BaseObject):
             indices2summarize.add(i)
             prompts_for_summaries.append(prompts)
 
+        logger.info(f"Summarizing {len(indices2summarize)} artifacts")
         summarized_content = self._summarize_selective(contents, indices2summarize, prompts_for_summaries)
 
         prompts_for_resummarization = [self._create_summarization_prompts(content, code_or_above_limit_only=False)
@@ -150,7 +152,7 @@ class Summarizer(BaseObject):
         :param code_or_above_limit_only: Needed only if different from self.code_or_above_limit_only
         :return: The list of prompts to use for summarization
         """
-        code_or_above_limit_only = self.code_or_above_limit_only if code_or_above_limit_only is None else content
+        code_or_above_limit_only = self.code_or_above_limit_only if code_or_above_limit_only is None else code_or_above_limit_only
         id_ = '' if not id_ else id_
         chunker = chunker_type.value(self.model_for_token_limit, token_limit=self.token_limit)
         assert content is not None, "No content to summarize."

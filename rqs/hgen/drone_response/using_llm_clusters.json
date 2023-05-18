@@ -1,0 +1,26 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HGen",
+          "hgen_args": {
+          "export_path": "[OUTPUT_PATH]/hgen/dr_onboard_autonomy",
+          "source_layer_id": "Code",
+          "target_type": "User Story",
+          "dataset_creator_for_sources": {
+            "object_type": "PROMPT",
+            "project_reader": {
+              "object_type": "Artifact",
+              "project_path": "[DATA_PATH]/dr_onboard_autonomy_small"
+            },
+            "summarizer": {}
+          }},
+          "llm_manager": {
+            "object_type": "OPENAI"
+          }
+        }
+      ]
+    }
+  ]
+}

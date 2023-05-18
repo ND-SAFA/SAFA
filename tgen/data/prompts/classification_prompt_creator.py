@@ -4,7 +4,6 @@ from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
-
 from tgen.util.enum_util import EnumDict
 
 
@@ -14,7 +13,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
     """
 
     def __init__(self, prompt_args: PromptArgs = None, pos_class: str = "Yes", neg_class: str = "No",
-                 artifact_prompt_format: str = "\n1. {}\n2. {}\n>",
+                 artifact_prompt_format: str = "\n1. {}\n\n2. {}",
                  base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.CLASSIFICATION):
         """
         Constructs classification prompt creator

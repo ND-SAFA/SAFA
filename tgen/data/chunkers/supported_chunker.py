@@ -1,5 +1,4 @@
-from enum import Enum
-
+from tgen.data.chunkers.dummy_code_chunker import DummyCodeChunker
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
@@ -11,6 +10,7 @@ class SupportedChunker(SupportedEnum):
     PY = PythonChunker
     JAVA = JavaChunker
     NL = NaturalLanguageChunker
+    CODE = DummyCodeChunker
 
     @staticmethod
     def determine_from_path(path_to_file: str = None) -> "SupportedChunker":

@@ -478,7 +478,7 @@ declare namespace Cypress {
     /**
      * Switches to table view.
      */
-    switchToTableView(tab?: "artifact" | "trace"): Chainable<void>;
+    switchToTableView(tab?: "artifact" | "trace" | "approval"): Chainable<void>;
 
     /**
      * Sorts the artifact and trace matrix tables.
@@ -547,11 +547,6 @@ declare namespace Cypress {
     createDocument(props: DocumentFields, save?: boolean): Chainable<void>;
 
     // Trace Approval
-
-    /**
-     * Navigates to the trace approval page.
-     */
-    openTraceApproval(): Chainable<void>;
 
     /**
      * Sorts the trace approval table.

@@ -6,7 +6,7 @@ describe("Trace Link Approval Display", () => {
   });
 
   beforeEach(() => {
-    cy.initProjectVersion().openTraceApproval();
+    cy.initProjectVersion().switchToTableView("approval");
   });
 
   describe("I can see approved, declined, and un-reviewed trace links", () => {

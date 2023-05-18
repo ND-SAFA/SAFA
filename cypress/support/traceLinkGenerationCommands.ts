@@ -1,11 +1,5 @@
 import { DataCy } from "@/fixtures";
 
-Cypress.Commands.add("openTraceApproval", () => {
-  cy.expandViewport()
-    .clickButtonWithName("Trace Prediction")
-    .switchTab("Trace Approval");
-});
-
 Cypress.Commands.add("sortTraceApproval", (sort) => {
   if (sort === "name") {
     cy.clickButton(DataCy.traceLinkTableSortByInput).clickMenuOption("name");

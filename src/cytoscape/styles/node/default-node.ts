@@ -23,9 +23,10 @@ export function svgDefault(data: ArtifactCytoElementData): string {
     },
     svgRect(
       outer,
-      getBorderColor(data.artifactDeltaState),
+      getBorderColor(data.artifactType),
       getBackgroundColor(data.artifactDeltaState, data.dark),
       8
+      // getTypeColor(data.artifactType)
     )
   );
 }

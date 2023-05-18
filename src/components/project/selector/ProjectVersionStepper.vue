@@ -42,8 +42,7 @@ import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
-import ProjectSelectorTable from "./ProjectSelectorTable.vue";
-import VersionSelectorTable from "./VersionSelectorTable.vue";
+import { ProjectSelectorTable, VersionSelectorTable } from "./table";
 
 const props = defineProps<{
   /**

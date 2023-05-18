@@ -41,7 +41,7 @@ import { actionsColumn, versionColumns } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { SelectorTable } from "@/components/common";
-import VersionCreator from "./VersionCreator.vue";
+import { VersionCreator } from "@/components/project/creator";
 
 const props = defineProps<{
   /**

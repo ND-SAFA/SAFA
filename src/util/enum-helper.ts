@@ -5,9 +5,11 @@ import {
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
+  LoaderTabTypes,
   ModelShareType,
   ModelType,
   ProjectRole,
+  ProjectTableTabTypes,
   SafetyCaseType,
   SearchMode,
   SearchSelectOption,
@@ -44,35 +46,6 @@ export function documentTypeOptions(): SelectOption[] {
     createEnumOption(DocumentType.FMEA, "FMEA"),
     createEnumOption(DocumentType.FMECA, "FMECA"),
   ];
-}
-
-/**
- * Returns the document types of artifacts that can be created on a given document.
- *
- * @return The select option names and ids.
- */
-export function documentTypeMap(): { [type in DocumentType]: SelectOption[] } {
-  const options = documentTypeOptions();
-
-  return {
-    [DocumentType.ARTIFACT_TREE]: [options[0]],
-    [DocumentType.FTA]: [options[0], options[1]],
-    [DocumentType.SAFETY_CASE]: [options[0], options[2]],
-    [DocumentType.FMEA]: [options[0], options[3]],
-    [DocumentType.FMECA]: [options[0], options[4]],
-  };
-}
-
-/**
- * Returns whether the given document represents a table.
- *
- * @param type - The current document type.
- * @return Whether the type is for a table.
- */
-export function isTableDocument(type: DocumentType): boolean {
-  const tableDocuments = [DocumentType.FMEA, DocumentType.FMECA];
-
-  return tableDocuments.includes(type);
 }
 
 /**
@@ -188,6 +161,18 @@ export function creatorTabOptions(): SelectOption[] {
 }
 
 /**
+ * Returns display names for project loader tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function loaderTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(LoaderTabTypes.load, "Open Project"),
+    createEnumOption(LoaderTabTypes.uploads, "Project Uploads"),
+  ];
+}
+
+/**
  * Returns display names for trace prediction tabs.
  *
  * @return The select option names and ids.
@@ -235,8 +220,9 @@ export function trainingTabOptions(): SelectOption[] {
  */
 export function tableViewTabOptions(): SelectOption[] {
   return [
-    createEnumOption("artifacts", "Artifacts"),
-    createEnumOption("traces", "Trace Links"),
+    createEnumOption(ProjectTableTabTypes.artifact, "Artifacts"),
+    createEnumOption(ProjectTableTabTypes.trace, "Trace Links"),
+    createEnumOption(ProjectTableTabTypes.approve, "Trace Approval"),
   ];
 }
 

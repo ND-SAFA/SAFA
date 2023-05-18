@@ -21,12 +21,9 @@ export enum DataCy {
   navLoadUpdatesButton = "button-nav-load-update",
 
   // Navigation - Webpage
-  navHomeButton = "nav-Home-button",
   navCreateProjectButton = "button-nav-Create Project",
   navOpenProjectButton = "button-nav-Open Project",
-  navProjectUploadButton = "button-nav-Project Upload",
-  navArtifactViewButton = "button-nav-Artifact View",
-  navTraceLinkApprovalButton = "button-nav-Trace Prediction",
+  navArtifactViewButton = "button-nav-Project View",
   navSettingsButton = "button-nav-Settings",
 
   // Steppers

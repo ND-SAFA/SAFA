@@ -63,7 +63,7 @@ describe("Change Commits", () => {
     });
 
     it.skip("Undoes changes to a trace link", () => {
-      cy.openTraceApproval();
+      cy.switchToTableView("approval");
 
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.filter(":visible").should("have.length", 10);

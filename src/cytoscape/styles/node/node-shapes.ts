@@ -13,8 +13,27 @@ export function svgRect(
   style: Pick<SvgStyle, "width" | "height">,
   borderColor: string,
   bgColor: string,
-  rx = 0
+  rx = 0,
+  barColor?: string
 ): string {
+  const bar = barColor
+    ? `
+   <clipPath id="node-click-path">
+      <rect
+        rx="${rx}"
+        width="${style.width}" 
+        height="${style.height}"
+      />
+    </clipPath>
+    <rect 
+      style="clip-path: url(#node-click-path);"
+      width="9" 
+      height="100%"
+      fill="${barColor}"
+    />
+  `
+    : "";
+
   return `
     <rect 
       rx="${rx}" 
@@ -32,6 +51,7 @@ export function svgRect(
       fill="${bgColor}"
       class="artifact-svg"
     />
+    ${bar}
   `;
 }
 

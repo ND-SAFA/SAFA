@@ -11,6 +11,11 @@ export enum CreatorTabTypes {
   import = "import",
 }
 
+export enum LoaderTabTypes {
+  load = "load",
+  uploads = "uploads",
+}
+
 /**
  * Represents a panel for uploading files in the project creator.
  */

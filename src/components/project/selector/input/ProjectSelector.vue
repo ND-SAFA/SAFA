@@ -52,7 +52,7 @@ import {
   handleGetProjects,
 } from "@/api";
 import { TextButton, Typography } from "@/components/common";
-import { ProjectIdentifierModal } from "../base";
+import { ProjectIdentifierModal } from "../../base";
 
 const openCreateProject = ref(false);
 

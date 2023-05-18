@@ -25,7 +25,7 @@ export function svgNode(
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : data.artifactType;
-  const color = getBorderColor(data.artifactDeltaState);
+  const color = getBorderColor(data.artifactType);
   const footer = svgFooter(data, outer);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
   const outerHeight = outer.height + heightOffset;
@@ -84,7 +84,7 @@ export function svgTitle(
     {
       class: icon
         ? "q-mx-lg text-ellipsis artifact-text"
-        : "q-mx-sm text-ellipsis artifact-text",
+        : "q-mx-md text-ellipsis artifact-text",
       x: 0,
       y,
       width: "100%",

@@ -26,7 +26,7 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrecisionAtRecallMetric(AbstractTraceMetric):
-    name = "precision_at_recall"
+    name = "precision_at_recall_95"
 
     # TODO
     def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> Dict:

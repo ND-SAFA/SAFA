@@ -5,19 +5,6 @@
         {
           "object_type": "LLM",
           "task": "PREDICT",
-          "prompt_creator": {
-            "object_type": "CLASSIFICATION",
-            "pos_class": "Yes",
-            "neg_class": "No",
-            "base_prompt": "Is (1) related to (2)? Answer \"yes\" or \"no\".\n\n",
-            "artifact_prompt_format": "\n1. {}\n2. {}\n>",
-            "prompt_args": {
-              "prompt_prefix": "\n\nHuman:",
-              "prompt_suffix": "\n\nAssistant:",
-              "completion_prefix": "",
-              "completion_suffix": ""
-            }
-          },
           "trainer_args": {
             "object_type": "ANTHROPIC",
             "model": "claude-v1.3"

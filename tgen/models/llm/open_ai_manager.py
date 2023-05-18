@@ -21,7 +21,7 @@ if not IS_TEST:
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
     MAX_COMPLETION_PROMPTS: int = 20
-    prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="", completion_prefix="", completion_suffix="")
+    prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="")
 
     def __init__(self, llm_args: OpenAIArgs = None):
         """
@@ -39,7 +39,10 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param kwargs: Params necessary for request
         :return: The response from open  ai
         """
-        return openai.FineTune.create(**kwargs)
+        result = openai.FineTune.create(**kwargs)
+        if result is None:  # retry if failed.
+            result = openai.FineTune.create(**kwargs)
+        return result
 
     def retrieve_fine_tune_request(self, **params) -> OpenAIObject:
         """
@@ -64,7 +67,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(.1)  # trying to avoid rate limit
+            time.sleep(1)  # trying to avoid rate limit
         return res
 
     @staticmethod

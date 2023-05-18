@@ -1,6 +1,6 @@
 from typing import Union
 
-from tgen.constants.model_constants import DEFAULT_LLM_MANAGER_CLS, DEFAULT_LLM_ARGS_CLS
+from tgen.constants.model_constants import DEFAULT_LLM_MANAGER_CLS
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
@@ -8,7 +8,6 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -28,11 +27,10 @@ class LLMJob(AbstractTrainerJob):
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
-        if trainer_args is None:
-            trainer_args = DEFAULT_LLM_ARGS_CLS()
         if llm_manager is None:
             llm_manager = DEFAULT_LLM_MANAGER_CLS(trainer_args)
-            assert isinstance(trainer_args, OpenAIArgs), "Using default OpenAI args and expected trainer args to match."
+        if trainer_args is None:
+            trainer_args = llm_manager.llm_args
         if prompt_creator is None:
             prompt_creator = ClassificationPromptCreator(prompt_args=llm_manager.prompt_args)
         super().__init__(model_manager=None, trainer_dataset_manager=trainer_dataset_manager,

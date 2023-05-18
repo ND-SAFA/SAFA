@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.projects.graph;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -16,9 +17,9 @@ import lombok.Getter;
 public class ArtifactNode {
 
     ArtifactAppEntity artifact;
-    List<ArtifactNode> neighbors = new ArrayList<>();
-    List<ArtifactNode> parents = new ArrayList<>();
-    List<ArtifactNode> children = new ArrayList<>();
+    Set<ArtifactNode> neighbors = new HashSet<>();
+    Set<ArtifactNode> parents = new HashSet<>();
+    Set<ArtifactNode> children = new HashSet<>();
 
     public ArtifactNode(ArtifactAppEntity artifact) {
         this.artifact = artifact;

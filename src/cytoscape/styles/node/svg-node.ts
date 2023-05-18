@@ -87,7 +87,7 @@ export function svgTitle(
     {
       class: icon
         ? "q-mx-lg text-ellipsis artifact-text"
-        : "q-mx-sm text-ellipsis artifact-text",
+        : "q-mx-md text-ellipsis artifact-text",
       x: 0,
       y,
       width: "100%",

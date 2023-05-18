@@ -38,11 +38,6 @@ const options = computed(() => {
 
   const items: NavOption[] = [
     {
-      label: "Home",
-      icon: "nav-home",
-      path: Routes.HOME,
-    },
-    {
       label: "Create Project",
       icon: "nav-create",
       path: Routes.PROJECT_CREATOR,
@@ -51,11 +46,6 @@ const options = computed(() => {
       label: "Open Project",
       icon: "nav-open",
       path: Routes.MY_PROJECTS,
-    },
-    {
-      label: "Project Uploads",
-      icon: "nav-uploads",
-      path: Routes.UPLOAD_STATUS,
     },
     {
       label: "Artifact View",

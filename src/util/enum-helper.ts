@@ -5,6 +5,7 @@ import {
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
+  LoaderTabTypes,
   ModelShareType,
   ModelType,
   ProjectRole,
@@ -184,6 +185,18 @@ export function creatorTabOptions(): SelectOption[] {
     createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
     createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
     createEnumOption(CreatorTabTypes.import, "Integrations Import"),
+  ];
+}
+
+/**
+ * Returns display names for project loader tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function loaderTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(LoaderTabTypes.load, "Open Project"),
+    createEnumOption(LoaderTabTypes.uploads, "Project Uploads"),
   ];
 }
 

@@ -53,7 +53,7 @@ import { versionToString } from "@/util";
 import { projectStore, useTheme } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
 import { TextButton, ListItem } from "@/components/common";
-import VersionCreator from "./VersionCreator.vue";
+import { VersionCreator } from "@/components/project/creator";
 
 const versions = ref<VersionSchema[]>([]);
 const openCreateVersion = ref(false);

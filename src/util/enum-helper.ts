@@ -9,6 +9,7 @@ import {
   ModelShareType,
   ModelType,
   ProjectRole,
+  ProjectTableTabTypes,
   SafetyCaseType,
   SearchMode,
   SearchSelectOption,
@@ -248,8 +249,9 @@ export function trainingTabOptions(): SelectOption[] {
  */
 export function tableViewTabOptions(): SelectOption[] {
   return [
-    createEnumOption("artifacts", "Artifacts"),
-    createEnumOption("traces", "Trace Links"),
+    createEnumOption(ProjectTableTabTypes.artifact, "Artifacts"),
+    createEnumOption(ProjectTableTabTypes.trace, "Trace Links"),
+    createEnumOption(ProjectTableTabTypes.approve, "Trace Approval"),
   ];
 }
 

@@ -6,3 +6,4 @@ export * from "./graph";
 export * from "./models";
 export * from "./settings";
 export * from "./icons";
+export * from "./project-view";

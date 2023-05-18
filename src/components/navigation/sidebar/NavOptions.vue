@@ -48,19 +48,11 @@ const options = computed(() => {
       path: Routes.MY_PROJECTS,
     },
     {
-      label: "Artifact View",
+      label: "Project View",
       icon: "nav-artifact",
       disabled: hideProjectOptions.value,
       divider: true,
       path: { path: Routes.ARTIFACT, query },
-    },
-    {
-      label: "Trace Prediction",
-      icon: "nav-trace",
-      disabled:
-        hideProjectOptions.value ||
-        !sessionStore.isEditor(projectStore.project),
-      path: { path: Routes.TRACE_LINK, query },
     },
     {
       label: "Settings",

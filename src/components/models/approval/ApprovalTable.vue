@@ -1,8 +1,5 @@
 <template>
-  <panel-card
-    title="Approve Generated Links"
-    subtitle="Review, approve, and decline generated trace links."
-  >
+  <panel-card>
     <groupable-table
       v-model:group-by="groupBy"
       v-model:expanded="expanded"
@@ -40,6 +37,7 @@
           label="Clear Unreviewed"
           icon="trace-decline-all"
           color="negative"
+          class="q-ml-sm"
           @click="handleDeclineAll"
         />
       </template>
@@ -61,7 +59,7 @@
       </template>
 
       <template #body-cell-actions="{ row }">
-        <trace-link-approval :trace="row" />
+        <trace-link-approval v-if="displayActions" :trace="row" />
       </template>
 
       <template #body-expanded="{ row }">
@@ -85,7 +83,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { ApprovalType, FlatTraceLink } from "@/types";
 import { approvalTypeOptions, approvalColumns } from "@/util";
-import { approvalStore, appStore, projectStore } from "@/hooks";
+import { approvalStore, appStore, projectStore, sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { handleDeclineAll, handleGetGeneratedLinks } from "@/api";
 import {
@@ -111,6 +109,10 @@ const currentRoute = useRoute();
 
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
 const groupBy = ref<string | undefined>("targetName");
+
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const rows = computed(() => approvalStore.traceLinks);
 

@@ -38,7 +38,7 @@ def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteri
         if cluster_num not in clusters:
             clusters[cluster_num] = []
         clusters[cluster_num].append(artifact_id)
-    return {cluster_method: {str(uuid.uuid4()): artifacts for cluster_num, artifacts in clusters.items()}}
+    return {cluster_method: {uuid.uuid4(): artifacts for cluster_num, artifacts in clusters.items()}}
 
 
 class TestHierarchyGeneration(BaseTest):

@@ -33,7 +33,7 @@ class HierarchyGenerator(BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
-    BASE_PROMPT = SupportedPrompts.USER_STORY_CREATION
+    BASE_PROMPT = SupportedPrompts.ARTIFACT_GENERATION
     GENERATION_TAG = "doc"
 
     def __init__(self, args: HGenArgs, llm_manager: AbstractLLMManager):

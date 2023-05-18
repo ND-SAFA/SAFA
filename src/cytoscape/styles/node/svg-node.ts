@@ -1,9 +1,6 @@
 import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
 import { capitalize, getBorderColor, isCodeArtifact } from "@/util";
-import {
-  ARTIFACT_BORDER_WIDTH,
-  ARTIFACT_CHILDREN_HEIGHT,
-} from "@/cytoscape/styles/config";
+import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
 import { getBody, sanitizeText } from "./node-helper";

@@ -25,7 +25,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { NavOption } from "@/types";
-import { projectStore, sessionStore } from "@/hooks";
+import { projectStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
 import { List, ListItem, Separator } from "@/components/common";
 

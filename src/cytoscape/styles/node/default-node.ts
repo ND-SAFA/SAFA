@@ -1,5 +1,5 @@
 import { ArtifactCytoElementData } from "@/types";
-import { getBackgroundColor, getBorderColor, getTypeColor } from "@/util";
+import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 

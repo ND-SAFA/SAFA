@@ -1,5 +1,5 @@
 import { TimNodeCytoElementData } from "@/types";
-import { getBackgroundColor, getBorderColor, getTypeColor } from "@/util";
+import { getBackgroundColor, getBorderColor } from "@/util";
 import { TIM_NODE_HEIGHT, TIM_NODE_WIDTH } from "@/cytoscape/styles/config";
 import { svgRect } from "./node-shapes";
 import { svgDiv, svgTitle } from "./svg-node";

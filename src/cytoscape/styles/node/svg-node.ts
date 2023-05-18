@@ -1,6 +1,9 @@
 import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
 import { capitalize, getBorderColor, isCodeArtifact } from "@/util";
-import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import {
+  ARTIFACT_BORDER_WIDTH,
+  ARTIFACT_CHILDREN_HEIGHT,
+} from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
 import { getBody, sanitizeText } from "./node-helper";
@@ -25,7 +28,7 @@ export function svgNode(
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : data.artifactType;
-  const color = getBorderColor(data.artifactDeltaState);
+  const color = getBorderColor(data.artifactType);
   const footer = svgFooter(data, outer);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
   const outerHeight = outer.height + heightOffset;

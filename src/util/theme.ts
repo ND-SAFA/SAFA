@@ -89,6 +89,34 @@ export const darkPalette: Record<string, string> = {
   removedLight: ThemeColors.removedLight,
 };
 
+const typeColorMap: Record<string, string> = {
+  "": ThemeColors.modifiedLight,
+};
+
+/**
+ * Returns the color for the given type.
+ * @param type - The type to get the color for.
+ * @return The color.
+ */
+export function getTypeColor(type = ""): string {
+  if (!typeColorMap[type]) {
+    const remainingColors = [
+      ThemeColors.addedLight,
+      ThemeColors.removedLight,
+      ThemeColors.secondary,
+      ThemeColors.accent,
+      ThemeColors.modified,
+    ].filter((color) => !Object.values(typeColorMap).includes(color));
+
+    typeColorMap[type] =
+      remainingColors.length === 0
+        ? ThemeColors.modifiedLight
+        : remainingColors[Math.floor(Math.random() * remainingColors.length)];
+  }
+
+  return typeColorMap[type];
+}
+
 /**
  * Returns the background color for the given state.
  * @param state - The state to get the color for.
@@ -122,7 +150,9 @@ export function getBackgroundColor(
  * @param state - The state to get the color for.
  * @return The color.
  */
-export function getBorderColor(state?: ArtifactDeltaState | string): string {
+export function getBorderColor(
+  state: ArtifactDeltaState | string = ""
+): string {
   switch (state) {
     case ArtifactDeltaState.ADDED:
       return ThemeColors.addedDark;

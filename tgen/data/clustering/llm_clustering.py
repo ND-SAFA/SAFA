@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from tgen.constants.deliminator_constants import NEW_LINE, COMMA, EMPTY_STRING
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER
-from tgen.data.creators.clustering.iclustering import Clusters, iClustering
+from tgen.data.clustering.iclustering import Clusters, iClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -17,6 +17,7 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator, ModelTokenLimits
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.llm_response_util import LLMResponseUtil
 
 
 class LLMClustering(iClustering):
@@ -77,7 +78,7 @@ class LLMClustering(iClustering):
         :param artifact_df: The dataframe of all artifacts
         :return: Mapping of cluster name to the list of artifacts in the cluster
         """
-        groups = BeautifulSoup(res.batch_responses[0], features="lxml").findAll(LLMClustering.CLUSTER_TAG)
+        groups = LLMResponseUtil.parse(res.batch_responses[0], LLMClustering.CLUSTER_TAG, is_nested=True)
         artifact_ids = list(artifact_df.index)
         clusters = {}
         for group in groups:

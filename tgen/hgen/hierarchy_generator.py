@@ -1,17 +1,18 @@
 import os
 import uuid
 from datetime import datetime
-from typing import Any, List, Union
+from typing import Any, List, Union, Type
 
-from bs4 import BeautifulSoup
 from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -26,6 +27,7 @@ from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.file_util import FileUtil
+from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -65,10 +67,11 @@ class HierarchyGenerator(BaseObject):
                                                                                dataset_with_sources.trace_dataset.trace_df
                                                                                if dataset_with_sources.trace_dataset else None)
         # Step 2: Create clusters of related artifacts
+        target_layer_id = self._get_target_layer_id(dataset_with_sources)
         cluster_dataset_creator = ClusterDatasetCreator(prompt_dataset=source_layer_only_dataset,
+                                                        layer_id=target_layer_id,
                                                         cluster_methods=self.args.clustering_method,
-                                                        manual_clusters=self.args.manual_clusters,
-                                                        **self.args.clustering_params)
+                                                        manual_clusters=self.args.manual_clusters, **self.args.clustering_params)
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
@@ -135,7 +138,8 @@ class HierarchyGenerator(BaseObject):
         layer_df = self._create_layer_df_with_generated_artifacts(hgen_dataset.layer_df, original_layer_df)
         trace_df = self._create_trace_df_with_generated_artifacts(hgen_dataset.trace_df, artifact_df, original_trace_df)
         dataset = TraceDataset(artifact_df, trace_df, layer_df)
-        self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
+        save_path = self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
+        self.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         return dataset
 
     @staticmethod
@@ -159,12 +163,7 @@ class HierarchyGenerator(BaseObject):
         :param generation: The response from the LLM for the artifact content
         :return: The new artifact content
         """
-        try:
-            content = BeautifulSoup(generation).find(HierarchyGenerator.GENERATION_TAG).contents[0]
-            assert isinstance(content, str)
-            return content
-        except Exception:
-            return ''
+        return LLMResponseUtil.parse(generation, HierarchyGenerator.GENERATION_TAG)
 
     @staticmethod
     def _create_trace_df_with_generated_artifacts(hgen_trace_df: TraceDataFrame, artifact_df: ArtifactDataFrame,
@@ -234,12 +233,14 @@ class HierarchyGenerator(BaseObject):
         return PromptDataset(trace_dataset=TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df))
 
     @staticmethod
-    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None, filename: str = None) -> str:
+    def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None,
+                                filename: str = None, exporter_class: Type[AbstractDatasetExporter] = None) -> str:
         """
         Exports the dataset to csv
         :param dataset: The dataset to export
         :param export_path: The base path to export to
         :param filename: Name of the file to use when saving the dataset
+        :param exporter_class: Exporter class to specify if not using defaults
         :return: The full export path
         """
         if not export_path:
@@ -250,13 +251,25 @@ class HierarchyGenerator(BaseObject):
         full_export_path = os.path.join(export_path, filename)
         if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
             dataset = dataset.trace_dataset
-        exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
+        if exporter_class is None:
+            exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
         if issubclass(exporter_class, CSVExporter):
             full_export_path += CSVKeys.EXT
         exporter = exporter_class(export_path=full_export_path, dataset=dataset)
         exporter.export()
         logger.info(f"Dataset checkpoint saved to {full_export_path} ")
         return full_export_path
+
+    def _get_target_layer_id(self, dataset_with_sources: PromptDataset) -> str:
+        """
+        Gets the id of the new target layer
+        :param dataset_with_sources: The dataset containing source artifacts
+        :return: The id of the new target layer
+        """
+        layer_id = self.args.target_type
+        if self.args.target_type in dataset_with_sources.artifact_df[ArtifactKeys.LAYER_ID].values:
+            layer_id = f"{layer_id}_{uuid.uuid4()}"
+        return layer_id
 
     @staticmethod
     def _update_trainer_args(trainer: AbstractTrainer, export_path: str) -> None:

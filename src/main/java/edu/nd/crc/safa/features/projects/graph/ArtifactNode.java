@@ -33,9 +33,6 @@ public class ArtifactNode {
     public void addParent(ArtifactNode parentNode) {
         this.neighbors.add(parentNode);
         this.parents.add(parentNode);
-
-        parentNode.neighbors.add(this);
-        parentNode.children.add(this);
     }
 
     /**
@@ -46,9 +43,6 @@ public class ArtifactNode {
     public void addChild(ArtifactNode childNode) {
         this.neighbors.add(childNode);
         this.children.add(childNode);
-
-        childNode.neighbors.add(this);
-        childNode.parents.add(this);
     }
 
     /**

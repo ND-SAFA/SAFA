@@ -1,12 +1,11 @@
-from cdlib import algorithms
-
+from tgen.data.creators.clustering.graph_clustering import GraphClustering
+from tgen.data.creators.clustering.llm_clustering import LLMClustering
 from tgen.util.enum_util import FunctionalWrapper
 from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedClusteringMethod(SupportedEnum):
     MANUAL = None
-    LOUVAIN = FunctionalWrapper(lambda dataset_graph: algorithms.louvain(dataset_graph, resolution=1.2))
-    WCOMMUNITY = FunctionalWrapper(lambda dataset_graph: algorithms.wCommunity(dataset_graph,
-                                                                               min_bel_degree=0.6, threshold_bel_degree=0.6))
-    THRESHOLD = FunctionalWrapper(algorithms.threshold_clustering)
+    GRAPH = FunctionalWrapper(GraphClustering.cluster)
+    LLM = FunctionalWrapper(LLMClustering.cluster)
+

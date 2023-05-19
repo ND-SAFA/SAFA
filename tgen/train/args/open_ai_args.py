@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, GENERATION_MODEL_DEFAULT, \
+from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
     LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -46,7 +46,7 @@ class OpenAIArgs(AbstractLLMArgs):
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
         if "model" not in super_args:
-            super_args["model"] = GENERATION_MODEL_DEFAULT
+            super_args["model"] = OPEN_AI_MODEL_DEFAULT
         super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
 
     @overrides(AbstractLLMArgs)

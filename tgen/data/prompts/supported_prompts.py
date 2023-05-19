@@ -1,3 +1,4 @@
+from tgen.data.prompts.prompt import Prompt, ArtGenPrompt
 from tgen.util.supported_enum import SupportedEnum
 
 
@@ -5,12 +6,18 @@ class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = "Is (1) related to (2)? Answer \"yes\" or \"no\".\n\n"
-    CODE_SUMMARY = "Provide 5 sentence paragraph describing the high-level usage of the code below. Do not focus on implementation " \
-                   "details and assume your audience works on this system. '{}'"
-    NL_SUMMARY = "Provide a short paragraph summarizing the content below.\n\n'{}'"
-    USER_STORY_CREATION = "Write a single user story that captures the main functionality of the following code descriptions. " \
-                          "Make the user story start with 'As a'\n '{}'"
-    SYSTEM_REQUIREMENT_CREATION = "Given a summary of python code, write a system-level requirement\n The requirements should " \
-                                  "reference physical world entities related to the UAV systems, be numbered system level " \
-                                  "requirements and use the 'shall' format:\n '{}'"
+    CLASSIFICATION = Prompt("Is (1) related to (2)?\n.")
+    CODE_SUMMARY = Prompt("Provide 5 sentence paragraph describing the high-level usage of the code below. "
+                          "Do not focus on implementation details and assume your audience works on this system.\n '{target_content}'")
+    NL_SUMMARY = Prompt("Summarize the following '{target_content}'")
+    ARTIFACT_GENERATION = ArtGenPrompt("Write a single {artifact_type} that focuses on the {artifact_id} functionality of the "
+                                           "following code descriptions. Enclose the user story in the tags <doc></doc>:\n "
+                                           "'{target_content}'")
+    UAV_SYSTEM_REQUIREMENT = Prompt("Given a summary of python code, write a system-level requirement\n "
+                                    "The requirements should reference physical world entities related to the UAV systems, "
+                                    "be numbered system level requirements and use the 'shall' format:\n '{target_content}'")
+    CLUSTERING = Prompt("I am giving you a numbered list of software artifact descriptions. "
+                        "Group the artifacts by functionality. Enclose each group in tags <group></group> and "
+                        "inside each group provide a brief summary of the group's functionality in "
+                        "<summary></summary> and the numbers corresponding to the artifacts in the group inside of "
+                        "<artifacts></artifacts>:\n '{target_content}'")

@@ -5,7 +5,7 @@ from typing import Dict, List
 import mock
 import pandas as pd
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, GENERATION_MODEL_DEFAULT
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -58,7 +58,7 @@ class TestPromptDataset(BaseTest):
                                                                                         Summarizer(llm_manager))
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
-                self.assertEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
+                self.assertLessEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()

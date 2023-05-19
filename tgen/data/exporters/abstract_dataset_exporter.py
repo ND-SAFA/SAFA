@@ -20,7 +20,7 @@ class AbstractDatasetExporter(BaseObject):
         assert dataset_creator is not None or dataset is not None, "Must supply either a dataset creator or a dataset"
         self.dataset_creator = dataset_creator
         self._dataset = dataset
-        self.export_path = self.update_export_path(export_path)
+        self.export_path = self.update_export_path(export_path) if export_path else export_path
 
     def update_export_path(self, export_path: str) -> str:
         """

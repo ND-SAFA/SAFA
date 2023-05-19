@@ -15,6 +15,10 @@ class NpEncoder(json.JSONEncoder):
     """
 
     def default(self, obj):
+        from tgen.data.tdatasets.trace_dataset import TraceDataset
+        if isinstance(obj, TraceDataset):
+            from tgen.data.exporters.api_exporter import ApiExporter
+            return ApiExporter(dataset=obj).export().as_dict()
         if isinstance(obj, uuid.UUID):
             return str(obj)
         if isinstance(obj, np.integer):
@@ -85,6 +89,17 @@ class JsonUtil:
         :return: the dictionary as json
         """
         return json.dumps(dict_, indent=4, cls=NpEncoder)
+
+    @staticmethod
+    def save_to_json_file(dict_: Dict, filepath: str) -> None:
+        """
+        Converts the dictionary to json
+        :param dict_: the dictionary to save as json
+        :param filepath: The path to save the json to
+        :return: None
+        """
+        with open(filepath, 'w') as f:
+            json.dump(dict_, f, indent=4, cls=NpEncoder)
 
     @staticmethod
     def require_properties(json_obj: Dict, required_properties: List[str]) -> None:

@@ -95,4 +95,20 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds.add(documentId);
     }
 
+    public boolean hasSummary() {
+        return this.summary != null && this.summary.length() > 0;
+    }
+
+    /**
+     * Returns the tracing string that best represents this artifact.
+     *
+     * @return String representing artifact content.
+     */
+    public String getTraceString() {
+        if (this.hasSummary()) {
+            return this.summary;
+        } else {
+            return this.body;
+        }
+    }
 }

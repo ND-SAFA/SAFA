@@ -129,7 +129,7 @@ public class SearchService {
         Map<UUID, String> targetLayer = new HashMap<>();
         for (String artifactTypeName : artifactTypes) {
             List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(artifactTypeName);
-            artifacts.forEach(a -> targetLayer.put(a.getId(), a.getBody()));
+            artifacts.forEach(a -> targetLayer.put(a.getId(), a.getTraceString()));
         }
         return targetLayer;
     }

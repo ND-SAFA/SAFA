@@ -52,7 +52,7 @@ public class SummaryService {
     public List<ArtifactAppEntity> summarizeCodeArtifacts(List<ArtifactAppEntity> projectArtifacts) {
         List<ArtifactAppEntity> codeArtifacts = projectArtifacts
             .stream()
-            .filter(a -> TGenSummaryArtifactType.isCode(a.getName())).collect(Collectors.toList());
+            .filter(a -> TGenSummaryArtifactType.isCode(a.getName()) && !a.hasSummary()).collect(Collectors.toList());
         if (codeArtifacts.isEmpty()) {
             return new ArrayList<>();
         }

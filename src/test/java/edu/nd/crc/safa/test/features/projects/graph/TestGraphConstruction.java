@@ -57,6 +57,8 @@ public class TestGraphConstruction extends ApplicationBaseTest {
         ArtifactNode nodeThree = getArtifactNode(project, graph, typeThreeName);
 
         assertThat(nodeOne.getNeighbors()).hasSize(2);
+        assertThat(nodeOne.getParents()).isEmpty();
+        assertThat(nodeOne.getChildren()).hasSize(2);
 
         assertThat(nodeTwo.getNeighbors()).hasSize(1);
         assertThat(nodeTwo.getParents()).hasSize(1);

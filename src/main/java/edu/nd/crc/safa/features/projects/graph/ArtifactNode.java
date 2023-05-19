@@ -33,6 +33,9 @@ public class ArtifactNode {
     public void addParent(ArtifactNode parentNode) {
         this.neighbors.add(parentNode);
         this.parents.add(parentNode);
+
+        parentNode.neighbors.add(this);
+        parentNode.children.add(this);
     }
 
     /**
@@ -42,7 +45,10 @@ public class ArtifactNode {
      */
     public void addChild(ArtifactNode childNode) {
         this.neighbors.add(childNode);
-        this.parents.add(childNode);
+        this.children.add(childNode);
+
+        childNode.neighbors.add(this);
+        childNode.parents.add(this);
     }
 
     /**
@@ -52,14 +58,14 @@ public class ArtifactNode {
      * @return Artifact IDs in neighborhoods.
      */
     public List<UUID> getNeighborhoodWithTypes(Set<String> artifactTypes) {
-        List<UUID> neighborhoodWithTypes = new ArrayList<>();
+        Set<UUID> neighborhoodWithTypes = new HashSet<>();
         neighborhoodWithTypes.add(artifact.getId());
         this.addNeighborhoodNodesWithTypes(artifactTypes, neighborhoodWithTypes);
         neighborhoodWithTypes.remove(artifact.getId());
-        return neighborhoodWithTypes;
+        return new ArrayList<>(neighborhoodWithTypes);
     }
 
-    private void addNeighborhoodNodesWithTypes(Set<String> artifactTypes, List<UUID> artifactsSeen) {
+    private void addNeighborhoodNodesWithTypes(Set<String> artifactTypes, Set<UUID> artifactsSeen) {
         for (ArtifactNode artifactNode : neighbors) {
             UUID artifactId = artifactNode.artifact.getId();
             String artifactNodeType = artifactNode.artifact.getType();

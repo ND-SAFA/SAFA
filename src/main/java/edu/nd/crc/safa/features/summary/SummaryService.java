@@ -1,10 +1,7 @@
 package edu.nd.crc.safa.features.summary;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -27,11 +24,11 @@ public class SummaryService {
     public List<String> generateSummaries(SummarizeRequestDTO request) {
         BaseGenerationModels baseModel = request.getModel();
         TGen controller = baseModel.createTGenController();
-        Map<String, TGenSummaryArtifact> artifacts = new HashMap<>();
+        List<TGenSummaryArtifact> artifacts = new ArrayList<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
             TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifact.getName());
             artifact.setType(artifactType);
-            artifacts.put(UUID.randomUUID().toString(), artifact);
+            artifacts.add(artifact);
         }
         TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts, request.getModel());
         TGenSummaryResponse response = controller.generateSummaries(tgenRequest);
@@ -57,6 +54,7 @@ public class SummaryService {
             return new ArrayList<>();
         }
         List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
+            a.getName(),
             a.getName(),
             a.getBody(),
             TGenSummaryArtifactType.getArtifactType(a.getName()))

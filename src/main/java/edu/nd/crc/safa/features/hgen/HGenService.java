@@ -52,7 +52,8 @@ public class HGenService {
             .filter(a -> artifactIdSet.contains(a.getId()))
             .forEach(a -> {
                 TGenSummaryArtifactType chunkerType = TGenSummaryArtifactType.getArtifactType(a.getName());
-                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getName(), a.getBody(), chunkerType));
+                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getName(), a.getName(), a.getBody(),
+                    chunkerType));
             });
         return artifactMap;
     }

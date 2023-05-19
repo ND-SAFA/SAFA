@@ -3,8 +3,8 @@ from collections import Set
 from typing import Dict, Union, Tuple
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.creators.clustering.iclustering import Clusters
-from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.clustering.iclustering import Clusters
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
@@ -24,12 +24,13 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
 
     CLUSTER_CONTENT_FORMAT = "{}"
 
-    def __init__(self, prompt_dataset: PromptDataset,
+    def __init__(self, prompt_dataset: PromptDataset, layer_id: str = None,
                  cluster_methods: Union[Set[SupportedClusteringMethod], SupportedClusteringMethod] = SupportedClusteringMethod.MANUAL,
                  manual_clusters: dict = None, **clustering_params):
         """
         Initializes with a dataset with artifacts to be clustered
         :param trace_dataset: The dataset to perform clustering on
+        :param layer_id: ID to use for the new layer created from the clusters
         :param artifact_df: The dataframe containing all artifacts to cluster from
         :param cluster_methods: The methods to use to create clusters
         :param manual_clusters: Manually created clusters to use to create dataset
@@ -46,7 +47,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
             self.cluster_methods.add(SupportedClusteringMethod.MANUAL)
         self.manual_clusters = {uuid.uuid4(): cluster for cluster in manual_clusters.values()} if manual_clusters else {}
         self.clustering_params = clustering_params
-        self.layer_id = str(uuid.uuid4())
+        self.layer_id = str(uuid.uuid4()) if layer_id is None else layer_id
         self.__method_to_clusters: Dict[SupportedClusteringMethod, Clusters] = {}
 
     def get_clusters(self) -> Dict[SupportedClusteringMethod, Clusters]:

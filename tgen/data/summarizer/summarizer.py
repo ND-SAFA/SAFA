@@ -1,16 +1,13 @@
 import itertools
-import os
 from typing import List, Dict, Union
 
 import pandas as pd
-from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_default_llm_manager
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -18,6 +15,7 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.util.base_object import BaseObject
+from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -25,6 +23,7 @@ class Summarizer(BaseObject):
     """
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
+    SUMMARY_TAG = "summary"
 
     def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = OPEN_AI_MODEL_DEFAULT,
                  max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
@@ -96,7 +95,7 @@ class Summarizer(BaseObject):
         if len(prompts) < 1:
             return content
         summary = self._summarize_chunks(self.llm_manager, prompts)[0]
-        if len(prompts) > 1:   # Summarize the summarized chunks to have one congruent summary at the end
+        if len(prompts) > 1:  # Summarize the summarized chunks to have one congruent summary at the end
             summary = self._summarize_chunks(self.llm_manager, self._create_summarization_prompts(summary,
                                                                                                   code_or_above_limit_only=False))[0]
         return summary
@@ -139,7 +138,8 @@ class Summarizer(BaseObject):
         all_prompts = list(itertools.chain.from_iterable(prompts))
         res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
                                                                       prompt=all_prompts)
-        batch_responses = [r.strip() for r in res.batch_responses] if res else [EMPTY_STRING]
+        batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG).strip() for r in res.batch_responses] \
+            if res else [EMPTY_STRING]
         return [EMPTY_STRING.join(batch_responses[i: i + n]) for i, n in enumerate(n_chunks_per_summary)]
 
     def _create_summarization_prompts(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None,

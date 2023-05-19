@@ -2,12 +2,9 @@ from collections import Set
 from dataclasses import dataclass, field
 from typing import Union
 
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
-from tgen.data.creators.clustering.iclustering import Clusters
-from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.clustering.iclustering import Clusters
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject

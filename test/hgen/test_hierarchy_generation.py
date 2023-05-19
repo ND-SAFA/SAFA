@@ -3,10 +3,8 @@ import uuid
 from copy import deepcopy
 from unittest import mock
 
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
-from tgen.data.creators.clustering.graph_clustering import GraphClustering
-from tgen.data.creators.clustering.iclustering import iClustering
-from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -19,7 +17,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -43,6 +40,7 @@ def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteri
 
 class TestHierarchyGeneration(BaseTest):
     LAYER_ID = str(uuid.uuid4())
+    TARGET_TYPE = "user_story"
 
     class FakeDatasetCreator:
 
@@ -76,7 +74,7 @@ class TestHierarchyGeneration(BaseTest):
         hgen_dataset = PromptTestProject.get_trace_dataset_creator().create()
         generated_content = "generated content"
         tag = HierarchyGenerator.GENERATION_TAG
-        artifact_generations = [f"<{tag}>{generated_content}</{tag}>"  for _ in hgen_dataset.artifact_df.index]
+        artifact_generations = [f"<{tag}>{generated_content}</{tag}>" for _ in hgen_dataset.artifact_df.index]
         orig_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ["original_id"], ArtifactKeys.CONTENT: ["original_content"],
                                               ArtifactKeys.LAYER_ID: ["original_layer"]})
         artifact_df = HierarchyGenerator._create_artifact_df_with_generated_artifacts(artifact_generations, hgen_dataset.artifact_df,
@@ -180,6 +178,19 @@ class TestHierarchyGeneration(BaseTest):
             self.assertIn(link[TraceKeys.TARGET], layer_artifacts)
         self.assertEqual(1, len(dataset.layer_df))
 
+    def test_get_target_layer_id(self):
+        dataset = self.get_dataset_creator_with_trace_dataset_creator(include_summarizer=False).create()
+        hgen = self.get_hierarchy_generator(tgen_trainer=None, dataset_for_sources=dataset)
+        layer_id = hgen._get_target_layer_id(dataset)
+        self.assertEqual(layer_id, self.TARGET_TYPE)
+
+        # target type is already in artifact layer ids
+        dataset = self.get_dataset_creator_with_trace_dataset_creator(include_summarizer=False).create()
+        dataset.trace_dataset.artifact_df.add_artifact("new_artifact", "content", self.TARGET_TYPE)
+        hgen = self.get_hierarchy_generator(tgen_trainer=None, dataset_for_sources=dataset)
+        layer_id = hgen._get_target_layer_id(dataset)
+        self.assertNotEqual(layer_id, self.TARGET_TYPE)
+
     @staticmethod
     def get_tgen_trainer(dataset_creator):
         prompt_creator = ClassificationPromptCreator()
@@ -214,23 +225,24 @@ class TestHierarchyGeneration(BaseTest):
         return TestHierarchyGeneration.get_dataset_creator(project_reader=artifact_project_reader)
 
     @staticmethod
-    def get_dataset_creator_with_prompt_project_reader():
+    def get_dataset_creator_with_prompt_project_reader(include_summarizer: bool = True):
         prompt_project_reader = PromptTestProject.get_project_reader()
-        return TestHierarchyGeneration.get_dataset_creator(project_reader=prompt_project_reader)
+        return TestHierarchyGeneration.get_dataset_creator(project_reader=prompt_project_reader, include_summarizer=include_summarizer)
 
     @staticmethod
-    def get_dataset_creator_with_trace_dataset_creator():
+    def get_dataset_creator_with_trace_dataset_creator(include_summarizer: bool = True):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
-        return TestHierarchyGeneration.get_dataset_creator(trace_dataset_creator=trace_dataset_creator)
+        return TestHierarchyGeneration.get_dataset_creator(trace_dataset_creator=trace_dataset_creator,
+                                                           include_summarizer=include_summarizer)
 
     @staticmethod
-    def get_dataset_creator(**params):
+    def get_dataset_creator(include_summarizer: bool = True, **params):
         llm_manager = OpenAIManager(OpenAIArgs())
-        return PromptDatasetCreator(summarizer=Summarizer(llm_manager), **params)
+        return PromptDatasetCreator(summarizer=Summarizer(llm_manager) if include_summarizer else None, **params)
 
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
         llm_manager = OpenAIManager(OpenAIArgs())
-        args = HGenArgs(tgen_trainer=tgen_trainer, target_type="user_story",
+        args = HGenArgs(tgen_trainer=tgen_trainer, target_type=self.TARGET_TYPE,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id, export_path=TEST_OUTPUT_DIR,
                         **params)
         return HierarchyGenerator(args, llm_manager)

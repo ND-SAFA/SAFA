@@ -1,5 +1,5 @@
-from tgen.data.creators.clustering.graph_clustering import GraphClustering
-from tgen.data.creators.clustering.llm_clustering import LLMClustering
+from tgen.data.clustering.graph_clustering import GraphClustering
+from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.util.enum_util import FunctionalWrapper
 from tgen.util.supported_enum import SupportedEnum
 

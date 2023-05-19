@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.util.attr_dict import AttrDict
 
@@ -97,12 +98,17 @@ SUMMARY_FORMAT = "Summary of {}"
 def fake_open_ai_completion(prompt, **args):
     choice = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0])
     choice["text"] = SUMMARY_FORMAT
+    tags = [HierarchyGenerator.GENERATION_TAG, Summarizer.SUMMARY_TAG]
+    tag = None
+    for t in tags:
+        if f"<{t}>" in prompt[0]:
+            tag = t
+            break
     tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]
     choices = [deepcopy(choice) for _ in tokens]
     for i, c in enumerate(choices):
         c['text'] = c['text'].format(tokens[i])
+        if tag:
+            c['text'] = f"<{tag}>{c['text']}</{tag}>"
     res = AttrDict({"choices": choices, "id": "id"})
-    if f"<{HierarchyGenerator.GENERATION_TAG}>" in prompt[0]:
-        for c in res["choices"]:
-            c['text'] = f"<doc>{c['text']}</doc>"
     return res

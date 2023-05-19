@@ -1,6 +1,6 @@
 from typing import Dict, List, Union
 
-from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset

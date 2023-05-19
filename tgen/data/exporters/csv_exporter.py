@@ -6,8 +6,8 @@ class CSVExporter(AbstractDatasetExporter):
     @staticmethod
     def include_filename() -> bool:
         """
-        Returns True if the dataset exporter expects the export path to include the filename, else False
-        :return: True if the dataset exporter expects the export path to include the filename, else False
+        Returns True bc the dataset exporter expects the export path to include the filename
+        :return: True
         """
         return True
 

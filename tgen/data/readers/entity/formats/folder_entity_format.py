@@ -65,12 +65,11 @@ class FolderEntityFormat(AbstractEntityFormat):
         :param summarizer: If provided, will summarize the artifact content
         :return: DataFrame containing artifact properties id and body.
         """
-        entries = []
         summarize_desc = "and summarizing" if summarizer is not None else EMPTY_STRING
         artifact_names = []
         chunker_types = []
         contents = []
-        for file_path in tqdm(file_paths, f"Adding files as artifacts {summarize_desc}"):
+        for file_path in file_paths:
             artifact_name = os.path.basename(file_path) if use_file_name else os.path.sep + os.path.relpath(file_path, base_path)
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]

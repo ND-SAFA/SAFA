@@ -14,7 +14,7 @@ class GenerationPromptCreator(AbstractPromptCreator):
     """
 
     def __init__(self, prompt_args: PromptArgs = None,
-                 base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.SYSTEM_REQUIREMENT_CREATION):
+                 base_prompt: Union[str, SupportedPrompts] = SupportedPrompts.ARTIFACT_GENERATION):
         """
         Constructs generation prompt dataset creator for specified library.
         :param prompt_args: The arguments used for creating prompts. Defaults to OpenAI format.
@@ -31,4 +31,5 @@ class GenerationPromptCreator(AbstractPromptCreator):
         :param target_content: The content of the target artifact
         :return: Dictionary containing the prompt and completion
         """
-        return self.generate_base(self.base_prompt.format(target_content), source_content)
+
+        return self.generate_base(self.base_prompt.format(target_content=target_content, **kwargs), source_content)

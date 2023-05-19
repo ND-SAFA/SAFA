@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.util.attr_dict import AttrDict
 
 FINE_TUNE_REQUEST = AttrDict({
@@ -100,4 +101,8 @@ def fake_open_ai_completion(prompt, **args):
     choices = [deepcopy(choice) for _ in tokens]
     for i, c in enumerate(choices):
         c['text'] = c['text'].format(tokens[i])
-    return AttrDict({"choices": choices, "id": "id"})
+    res = AttrDict({"choices": choices, "id": "id"})
+    if f"<{HierarchyGenerator.GENERATION_TAG}>" in prompt[0]:
+        for c in res["choices"]:
+            c['text'] = f"<doc>{c['text']}</doc>"
+    return res

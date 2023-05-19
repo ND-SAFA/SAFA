@@ -13,6 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+import sys
+
 from django.http import HttpResponse
 from django.urls import path, re_path
 from drf_yasg import openapi
@@ -21,6 +24,8 @@ from rest_framework import permissions
 
 from api.endpoints.completion.completion_view import CompletionView
 from api.endpoints.hgen.hgen_view import HGenView
+from api.endpoints.jobs.job_view import JobView
+from api.endpoints.jobs.result_view import ResultView
 from api.endpoints.predict.prediction_view import PredictView
 from api.endpoints.summarize.summarize_view import SummarizeView
 
@@ -50,5 +55,7 @@ urlpatterns = [
     path('predict/', PredictView.as_view()),
     path('complete/', CompletionView.as_view()),
     path('summarize/', SummarizeView.as_view()),
-    path('hgen/', HGenView.as_view())
+    path('hgen/', HGenView.as_view()),
+    path('jobs/', JobView.as_view()),
+    path('results/', ResultView.as_view())
 ]

@@ -12,12 +12,16 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os.path
 import sys
 
-TGEN_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..", "tgen")
+REPO_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..")
+API_PATH = os.path.join(REPO_PATH, "src")
+TGEN_PATH = os.path.join(REPO_PATH, "tgen")
 sys.path.append(TGEN_PATH)
+sys.path.append(API_PATH)
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -135,4 +139,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
-load_dotenv()
+
+# Celery Configuration Options
+CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
+CELERY_TIMEZONE = "America/New_York"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30m
+
+CELERY_S3_BACKEND_SETTINGS = {
+    'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
+    'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
+    'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}'
+}

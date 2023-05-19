@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
@@ -95,6 +96,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds.add(documentId);
     }
 
+    @JsonIgnore
     public boolean hasSummary() {
         return this.summary != null && this.summary.length() > 0;
     }
@@ -104,6 +106,7 @@ public class ArtifactAppEntity implements IAppEntity {
      *
      * @return String representing artifact content.
      */
+    @JsonIgnore
     public String getTraceString() {
         if (this.hasSummary()) {
             return this.summary;

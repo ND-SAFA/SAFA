@@ -6,7 +6,7 @@ class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = Prompt("Is (1) related to (2)?\n.")
+    CLASSIFICATION = Prompt("Is the functionality of (1) related to (2)?\n.")
     CODE_SUMMARY = Prompt("Provide 5 sentence paragraph describing the high-level usage of the code below. "
                           "Do not focus on implementation details and assume your audience works on this system. "
                           "Enclose the summary in the tags <summary></summary>:\n '{target_content}'")

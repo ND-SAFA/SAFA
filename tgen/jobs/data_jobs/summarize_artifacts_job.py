@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -7,6 +7,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
+from tgen.util.enum_util import EnumDict
 
 
 class SummarizeArtifactsJob(AbstractJob):
@@ -15,18 +16,20 @@ class SummarizeArtifactsJob(AbstractJob):
     """
     TYPE_KEY = "type"
 
-    def __init__(self, artifacts: Dict[str, Dict], summarizer: Summarizer = None, job_args: JobArgs = None):
+    def __init__(self, artifacts: List[Dict], summarizer: Summarizer = None, job_args: JobArgs = None):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
         :param job_args: The arguments to the job.
         """
+        artifacts = [EnumDict(a) for a in artifacts]
         super().__init__(job_args)
         if summarizer is None:
             summarizer = Summarizer(code_or_exceeds_limit_only=False)
         self.artifacts = artifacts
-        self.id2chunker = {id_: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for id_, artifact in artifacts.items()}
-        self.artifact_df = pd.DataFrame.from_dict(self.artifacts, orient="index")
+        self.id2chunker = {artifact[ArtifactKeys.ID]: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for artifact in
+                           artifacts}
+        self.artifact_df = pd.DataFrame(self.artifacts).set_index(ArtifactKeys.ID.value)
         self.summarizer = summarizer
 
     def _run(self) -> Dict[Any, str]:

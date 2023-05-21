@@ -1,4 +1,4 @@
-from tgen.data.prompts.prompt import Prompt, ArtGenPrompt
+from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
 
@@ -22,4 +22,4 @@ class SupportedPrompts(SupportedEnum):
                         "should belong to at least one group. Enclose each group in tags <group></group>. "
                         "Inside each group provide a brief summary of the group's functionality in "
                         "<summary></summary> and the numbers corresponding to the artifacts in the group inside of "
-                        "<artifacts></artifacts>:\n '{target_content}'")
+                        "<artifacts></artifacts>:\n\n '{target_content}'")

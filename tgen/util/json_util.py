@@ -18,7 +18,8 @@ class NpEncoder(json.JSONEncoder):
         from tgen.data.tdatasets.trace_dataset import TraceDataset
         if isinstance(obj, TraceDataset):
             from tgen.data.exporters.api_exporter import ApiExporter
-            return ApiExporter(dataset=obj).export().as_dict()
+            res = ApiExporter(dataset=obj).export().as_dict()
+            return self.default(res)
         if isinstance(obj, uuid.UUID):
             return str(obj)
         if isinstance(obj, np.integer):
@@ -37,11 +38,13 @@ class NpEncoder(json.JSONEncoder):
         from tgen.util.base_object import BaseObject
         if isinstance(obj, BaseObject):
             return str(obj)
-        if isinstance(obj, list):
+        if isinstance(obj, list) or isinstance(obj, tuple):
             return [self.default(v) for v in obj]
-        if hasattr(obj, "__dict__"):
+        if isinstance(obj, dict):
+            return {self.default(k): self.default(v) for k, v in obj.items()}
+        if hasattr(obj, "__dict__") and not isinstance(obj, str):
             instance_fields: Dict = ReflectionUtil.get_fields(obj)
-            return {k: self.default(v) for k, v in instance_fields.items()}
+            return {self.default(k): self.default(v) for k, v in instance_fields.items()}
         return obj
 
 

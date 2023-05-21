@@ -1,8 +1,7 @@
-from typing import Union, List
+from typing import List, Union
 
 from bs4 import BeautifulSoup, Tag
 
-from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.util.logging.logger_manager import logger
 
 
@@ -24,5 +23,5 @@ class LLMResponseUtil:
             content = tags[0].contents[0] if not is_nested else tags
         except AssertionError:
             logger.exception(f"Unable to parse {res}")
-            content = EMPTY_STRING if not is_nested else []
+            content = res if not is_nested else []
         return content

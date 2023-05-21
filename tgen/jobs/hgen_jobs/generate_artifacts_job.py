@@ -39,10 +39,11 @@ class GenerateArtifactsJob(BaseHGenJob):
         """
         manual_clusters = {i: artifacts_in_cluster
                            for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)}
-        clustering_method = SupportedClusteringMethod.MANUAL if len(manual_clusters) > 0 else SupportedClusteringMethod.LLM
+        if len(manual_clusters) > 0:
+            self.hgen_params["clustering_method"] = SupportedClusteringMethod.MANUAL
         return HGenArgs(dataset_for_sources=self._create_dataset(), manual_clusters=manual_clusters,
                         source_layer_id=self.SOURCE_LAYER_ID, target_type=self.target_type,
-                        clustering_method=clustering_method, **self.hgen_params)
+                        **self.hgen_params)
 
     def _create_dataset(self) -> PromptDataset:
         """

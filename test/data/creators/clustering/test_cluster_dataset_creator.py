@@ -1,8 +1,8 @@
 from collections import namedtuple
 from unittest import mock
 
-from tgen.data.creators.clustering.cluster_dataset_creator import ClusterDatasetCreator
-from tgen.data.creators.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys

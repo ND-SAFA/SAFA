@@ -2,7 +2,7 @@ from unittest import mock
 
 from bs4 import BeautifulSoup
 
-from tgen.data.creators.clustering.llm_clustering import LLMClustering
+from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset

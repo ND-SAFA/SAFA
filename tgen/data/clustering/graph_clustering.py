@@ -2,7 +2,7 @@ import uuid
 
 from cdlib import algorithms
 
-from tgen.data.creators.clustering.iclustering import iClustering, Clusters
+from tgen.data.clustering.iclustering import iClustering, Clusters
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 
 

@@ -2,7 +2,6 @@ from typing import List, Union
 
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
@@ -15,7 +14,7 @@ class GenerateArtifactsJob(BaseHGenJob):
     SOURCE_LAYER_ID = "source_layer"
 
     def __init__(self, artifacts: List[EnumDict], target_type: str, llm_manager: AbstractLLMManager,
-                 artifact_ids_by_cluster: List[List[Union[str, int]]] = None, summarizer: Summarizer = None, job_args: JobArgs = None,
+                 artifact_ids_by_cluster: List[List[Union[str, int]]] = None, job_args: JobArgs = None,
                  **hgen_params):
         """
         Initializes the job with args needed for hierarchy generator
@@ -30,7 +29,6 @@ class GenerateArtifactsJob(BaseHGenJob):
         artifacts = [EnumDict(a) for a in artifacts]
         self.artifacts = artifacts
         self.target_type = target_type
-        self.summarizer = summarizer if summarizer is not None else Summarizer(code_or_exceeds_limit_only=True)
         self.artifacts_by_cluster = artifact_ids_by_cluster if artifact_ids_by_cluster is not None else {}
         super().__init__(llm_manager=llm_manager, job_args=job_args, **hgen_params)
 

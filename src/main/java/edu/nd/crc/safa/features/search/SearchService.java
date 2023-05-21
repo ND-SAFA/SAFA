@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
+import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
@@ -154,25 +156,14 @@ public class SearchService {
 
     private List<UUID> calculateRelatedTypes(ProjectAppEntity projectAppEntity, Set<UUID> selectedArtifactIds,
                                              Set<String> relatedTypes) {
-        Map<UUID, ArtifactAppEntity> artifactMap = projectAppEntity.getArtifactIdMap();
-        List<UUID> relatedArtifacts = new ArrayList<>();
-        projectAppEntity
-            .getTraces()
-            .forEach(t -> {
-                if (selectedArtifactIds.contains(t.getSourceId())) {
-                    ArtifactAppEntity targetArtifact = artifactMap.get(t.getTargetId());
-                    if (relatedTypes.contains(targetArtifact.getType())) {
-                        relatedArtifacts.add(targetArtifact.getId());
-                    }
-                }
-                if (selectedArtifactIds.contains(t.getTargetId())) {
-                    ArtifactAppEntity sourceArtifact = artifactMap.get(t.getSourceId());
-                    if (relatedTypes.contains(sourceArtifact.getType())) {
-                        relatedArtifacts.add(sourceArtifact.getId());
-                    }
-                }
-            });
-        return relatedArtifacts;
+        ProjectGraph projectGraph = new ProjectGraph(projectAppEntity);
+        Set<UUID> relatedArtifacts = new HashSet<>();
+        for (UUID selectedArtifactId : selectedArtifactIds) {
+            ArtifactNode artifactNode = projectGraph.getArtifactNode(selectedArtifactId);
+            List<UUID> neighborIds = artifactNode.getNeighborhoodWithTypes(relatedTypes);
+            relatedArtifacts.addAll(neighborIds);
+        }
+        return new ArrayList<>(relatedArtifacts);
     }
 
     private Map<String, String> convertArtifactMapToLayer(Map<UUID, String> artifactMap) {

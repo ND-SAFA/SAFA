@@ -35,17 +35,19 @@ public class HGenService {
      */
     public List<ArtifactAppEntity> generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
         BaseGenerationModels baseModel = request.getModel();
+        String targetType = request.getTargetType();
         TGen controller = baseModel.createTGenController();
         List<TGenSummaryArtifact> artifacts = createArtifacts(projectVersion, request.getArtifacts());
-        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, request.getTargetType(), request.getClusters(),
+        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetType, request.getClusters(),
             baseModel.name());
         TGenHGenResponse response = controller.generateHierarchy(tgenRequest);
-        return response.getDataset().getTargetLayers().get(0).entrySet().stream().map(entry -> {
-            ArtifactAppEntity artifact = new ArtifactAppEntity();
-            artifact.setBody(entry.getValue());
-            artifact.setName(entry.getKey());
-            return artifact;
-        }).collect(Collectors.toList());
+        return response.getDataset().getTargetLayers().get(0).entrySet().stream()
+            .map(entry -> {
+                ArtifactAppEntity artifact = new ArtifactAppEntity();
+                artifact.setBody(entry.getValue());
+                artifact.setName(entry.getKey());
+                return artifact;
+            }).collect(Collectors.toList());
     }
 
     private List<TGenSummaryArtifact> createArtifacts(ProjectVersion projectVersion, List<UUID> artifactIds) {

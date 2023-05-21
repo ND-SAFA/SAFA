@@ -1,12 +1,11 @@
 package edu.nd.crc.safa.features.hgen;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
@@ -34,26 +33,31 @@ public class HGenService {
      * @param request        The request defining artifacts, clusters, and model.
      * @return List of generated artifacts.
      */
-    public List<String> generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
+    public List<ArtifactAppEntity> generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
         BaseGenerationModels baseModel = request.getModel();
         TGen controller = baseModel.createTGenController();
-        Map<String, TGenSummaryArtifact> artifacts = createArtifacts(projectVersion, request.getArtifacts());
-        List<List<String>> clusters = List.of(new ArrayList<>(artifacts.keySet()));
-        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, clusters, baseModel.name());
+        List<TGenSummaryArtifact> artifacts = createArtifacts(projectVersion, request.getArtifacts());
+        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, request.getTargetType(), request.getClusters(),
+            baseModel.name());
         TGenHGenResponse response = controller.generateHierarchy(tgenRequest);
-        return response.getArtifacts();
+        return response.getDataset().getTargetLayers().get(0).entrySet().stream().map(entry -> {
+            ArtifactAppEntity artifact = new ArtifactAppEntity();
+            artifact.setBody(entry.getValue());
+            artifact.setName(entry.getKey());
+            return artifact;
+        }).collect(Collectors.toList());
     }
 
-    private Map<String, TGenSummaryArtifact> createArtifacts(ProjectVersion projectVersion, List<UUID> artifactIds) {
+    private List<TGenSummaryArtifact> createArtifacts(ProjectVersion projectVersion, List<UUID> artifactIds) {
         List<ArtifactAppEntity> artifacts = artifactService.getAppEntities(projectVersion);
-        Map<String, TGenSummaryArtifact> artifactMap = new HashMap<>();
+        List<TGenSummaryArtifact> preparedArtifacts = new ArrayList<>();
         Set<UUID> artifactIdSet = new HashSet<>(artifactIds);
         artifacts.stream()
             .filter(a -> artifactIdSet.contains(a.getId()))
             .forEach(a -> {
                 TGenSummaryArtifactType chunkerType = TGenSummaryArtifactType.getArtifactType(a.getName());
-                artifactMap.put(a.getId().toString(), new TGenSummaryArtifact(a.getName(), a.getBody(), chunkerType));
+                preparedArtifacts.add(new TGenSummaryArtifact(a.getId().toString(), a.getName(), a.getBody(), chunkerType));
             });
-        return artifactMap;
+        return preparedArtifacts;
     }
 }

@@ -57,6 +57,7 @@ public class SummaryService {
             return new ArrayList<>();
         }
         List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
+            a.getId().toString(),
             a.getName(),
             a.getBody(),
             TGenSummaryArtifactType.getArtifactType(a.getName()))

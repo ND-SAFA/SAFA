@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TGenSummaryArtifact {
     /**
+     * The identifier of the artifact.
+     */
+    String id;
+    /**
      * Optional. Name of artifact to calculate type from.
      */
     String name;

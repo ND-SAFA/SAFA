@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -14,6 +16,8 @@ def endpoint(serializer):
     :param serializer: The serializer to use for parsing payload.
     :return: Handler function accepting `POST` method.
     """
+    if serializer is None:
+        raise Exception("Endpoint requires serializer to parse request.")
 
     def method_handler(endpoint_method):
         """
@@ -33,8 +37,12 @@ def endpoint(serializer):
             """
             prediction_payload = ViewUtil.read_request(request, serializer)
             job_tuple = endpoint_method(method_class_instance, prediction_payload)
-            job: AbstractJob = job_tuple[0]
-            post_processor = job_tuple[1]
+            if isinstance(job_tuple, Tuple):
+                job: AbstractJob = job_tuple[0]
+                post_processor = job_tuple[1]
+            else:
+                job = job_tuple
+                post_processor = lambda p: p
 
             def job_handler():
                 """

@@ -6,7 +6,7 @@ from api.endpoints.hgen.hgen_serializer import HGenSerializer
 from api.endpoints.predict.prediction_view import endpoint
 from api.utils.model_util import ModelUtil
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.jobs.hgen_jobs.artifact_generator_job import ArtifactGeneratorJob
+from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 
 DEFAULT_PROMPT = "Generalize the following descriptions into one system requirement.\n\n{}"
 
@@ -29,7 +29,7 @@ class HGenView(APIView):
         clusters = payload["clusters"]
         model, llm_manager = ModelUtil.get_model_manager(model)
         summarizer = Summarizer(code_or_exceeds_limit_only=True, llm_manager=llm_manager)
-        job = ArtifactGeneratorJob(artifacts,
+        job = GenerateArtifactsJob(artifacts,
                                    artifact_ids_by_cluster=clusters,
                                    llm_manager=llm_manager,
                                    hgen_base_prompt=prompt,

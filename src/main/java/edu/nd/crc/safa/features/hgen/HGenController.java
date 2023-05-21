@@ -32,7 +32,8 @@ public class HGenController extends BaseController {
      * @return List of generates artifacts for new level.
      */
     @PostMapping(AppRoutes.HGen.GENERATE)
-    public List<ArtifactAppEntity> generateHierarchy(@PathVariable UUID versionId, @RequestBody HGenRequestDTO request) {
+    public List<ArtifactAppEntity> generateHierarchy(@PathVariable UUID versionId,
+                                                     @RequestBody HGenRequestDTO request) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.serviceProvider.getHGenService().generateHierarchy(projectVersion, request);
     }

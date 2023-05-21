@@ -33,6 +33,6 @@ class HGenView(APIView):
                                    target_type=target_type)
 
         def post_process(summarized_artifact: List[str]):
-            return {"artifacts": summarized_artifact}
+            return {"dataset": summarized_artifact}
 
         return job, post_process

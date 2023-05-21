@@ -15,6 +15,6 @@ class HGenSerializer(AbstractSerializer):
         child=serializers.ListSerializer(
             child=serializers.CharField(max_length=512, help_text="Artifact ID."),
             help_text="Artifact IDs belonging to cluster."),
-        help_text="List of clusters.", required=False)
+        help_text="List of clusters.", required=False, allow_null=True)
     targetType = serializers.CharField(max_length=1028, help_text="The type of artifacts to generate.")
     model = serializers.CharField(max_length=512, required=False, help_text="The model to use for generating artifact.")

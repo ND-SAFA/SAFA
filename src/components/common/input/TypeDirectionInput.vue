@@ -33,17 +33,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TimArtifactLevelSchema } from "@/types";
+import { ArtifactLevelInputProps } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
 import { Typography, Chip } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * The artifact level to display and allow editing of.
-   */
-  artifactLevel: TimArtifactLevelSchema;
-}>();
+const props = defineProps<ArtifactLevelInputProps>();
 
 const allowEditing = computed(() =>
   sessionStore.isEditor(projectStore.project)

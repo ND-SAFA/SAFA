@@ -24,16 +24,11 @@ export default {
 
 <script setup lang="ts">
 import { withDefaults } from "vue";
+import { SearchbarProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { Icon } from "@/components/common/display";
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string;
-    label?: string;
-  }>(),
-  { label: "Search" }
-);
+const props = withDefaults(defineProps<SearchbarProps>(), { label: "Search" });
 
 defineEmits<{
   (e: "update:modelValue"): void;

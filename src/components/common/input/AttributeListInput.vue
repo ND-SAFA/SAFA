@@ -22,14 +22,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { ArtifactSchema } from "@/types";
+import { AttributeListInputProps } from "@/types";
 import { attributesStore } from "@/hooks";
 import { AttributeGrid } from "@/components/common/display";
 import AttributeInput from "./AttributeInput.vue";
 
-const props = defineProps<{
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<AttributeListInputProps>();
 
 const layout = computed(() =>
   attributesStore.getLayoutByType(props.artifact.type)

@@ -29,34 +29,15 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
+import { FileInputProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { Icon } from "@/components/common/display";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The synchronized files value.
-     */
-    modelValue?: File | File[] | null;
-    /**
-     * Whether to allow multiple files to be uploaded.
-     */
-    multiple: boolean;
-    /**
-     * An error message to display, if one exists.
-     */
-    errorMessage?: string | false;
-    /**
-     * A testing selector.
-     */
-    dataCy?: string;
-  }>(),
-  {
-    dataCy: "input-files",
-    errorMessage: undefined,
-    modelValue: undefined,
-  }
-);
+const props = withDefaults(defineProps<FileInputProps>(), {
+  dataCy: "input-files",
+  errorMessage: undefined,
+  modelValue: undefined,
+});
 
 defineEmits<{
   (e: "clear"): void;

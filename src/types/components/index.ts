@@ -6,6 +6,5 @@ export * from "./project-creator";
 export * from "./graph";
 export * from "./models";
 export * from "./settings";
-export * from "./icons";
 export * from "./enums";
 export * from "./project-view";

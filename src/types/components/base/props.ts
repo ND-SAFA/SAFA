@@ -49,6 +49,16 @@ export interface MarginProps {
 }
 
 /**
+ * Defines props for a component that can display a label.
+ */
+export interface LabelProps {
+  /**
+   * The label to display.
+   */
+  label?: string;
+}
+
+/**
  * Defines props for a component with a color.
  */
 export interface ColorProps {
@@ -170,6 +180,26 @@ export interface ExpandableProps {
    * Whether the component can be expanded.
    */
   expandable?: boolean;
+}
+
+/**
+ * Defines props for a component that can display an error.
+ */
+export interface ErrorMessageProps {
+  /**
+   * An error message to display, if one exists.
+   */
+  errorMessage?: string | false;
+}
+
+/**
+ * Defines props for a component that can have multiple items instead of one.
+ */
+export interface MultipleProps {
+  /**
+   * Whether to allow multiple items.
+   */
+  multiple?: boolean;
 }
 
 /**

@@ -171,7 +171,7 @@ export function getBorderColor(
  * @return The color.
  */
 export function getScoreColor(score: number | string): ThemeColor {
-  const [ints, decimals] = String(score).split(".");
+  const [ints, decimals = "0"] = String(score).split(".");
   const tenths = decimals[0];
 
   if (ints === "1" || ["8", "9"].includes(tenths)) {

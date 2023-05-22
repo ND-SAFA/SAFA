@@ -13,10 +13,12 @@ import os.path
 import sys
 
 REPO_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..")
+REPO_PATH = os.path.normpath(REPO_PATH)
 API_PATH = os.path.join(REPO_PATH, "src")
 TGEN_PATH = os.path.join(REPO_PATH, "tgen")
 sys.path.append(TGEN_PATH)
 sys.path.append(API_PATH)
+
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -146,8 +148,9 @@ CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30m
 
-CELERY_S3_BACKEND_SETTINGS = {
-    'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
-    'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
-    'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}'
-}
+if os.environ.get("BACKEND_ACCESS_ID", None):
+    CELERY_S3_BACKEND_SETTINGS = {
+        'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
+        'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
+        'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}'
+    }

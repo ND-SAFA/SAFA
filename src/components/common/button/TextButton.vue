@@ -40,99 +40,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant, SizeType, ThemeColor } from "@/types";
+import type { TextButtonProps, ClickableEmits } from "@/types";
 import { useMargins } from "@/hooks";
 import { Icon, Typography } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * Renders an outlined button.
-   */
-  outlined?: boolean;
-  /**
-   * Renders a flat text button.
-   */
-  text?: boolean;
-  /**
-   * Renders the button as a full width block.
-   */
-  block?: boolean;
-  /**
-   * The loading percentage to render on a loading button.
-   */
-  percentage?: number;
-  /**
-   * The button text to display, if not using the default slot.
-   */
-  label?: string;
-  /**
-   * Whether the component is disabled.
-   */
-  disabled?: boolean;
-  /**
-   * Renders a smaller component.
-   */
-  small?: boolean;
-  /**
-   * Renders a larger component.
-   */
-  large?: boolean;
-  /**
-   * Whether the component is loading.
-   */
-  loading?: boolean;
-  /**
-   * The color to render the component with.
-   */
-  color?: ThemeColor;
-  /**
-   * The type of icon to render.
-   */
-  icon?: IconVariant;
-  /**
-   * The classnames to include on this component.
-   */
-  class?: string;
-  /**
-   * The x margin.
-   */
-  x?: SizeType;
-  /**
-   * The y margin.
-   */
-  y?: SizeType;
-  /**
-   * The left margin.
-   */
-  l?: SizeType;
-  /**
-   * The right margin.
-   */
-  r?: SizeType;
-  /**
-   * The top margin.
-   */
-  t?: SizeType;
-  /**
-   * The bottom margin.
-   */
-  b?: SizeType;
-  /**
-   * If true, the button label will be hidden.
-   */
-  hideLabel?: boolean;
-  /**
-   * The testing selector to set.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<TextButtonProps>();
 
-const emit = defineEmits<{
-  /**
-   * Called when clicked.
-   */
-  (e: "click"): void;
-}>();
+const emit = defineEmits<ClickableEmits>();
 
 const buttonClassName = useMargins(props, () => [
   ["color", `text-${props.color}`],

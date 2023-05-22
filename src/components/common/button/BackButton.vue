@@ -13,18 +13,15 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import type { BackButtonProps } from "@/types";
 import { getParams, navigateBack, navigateTo, Routes } from "@/router";
 import TextButton from "./TextButton.vue";
 
-const props = defineProps<{
-  label?: string;
-  route?: Routes;
-  toProject?: boolean;
-}>();
+const props = defineProps<BackButtonProps>();
 
 const buttonLabel = computed(() => {
   if (props.toProject) {
-    return "Back To Tree View";
+    return "Back To Project";
   } else if (props.label) {
     return props.label;
   } else {

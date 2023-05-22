@@ -96,6 +96,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.documentIds.add(documentId);
     }
 
+    @JsonIgnore
     public boolean hasSummary() {
         return this.summary != null && this.summary.length() > 0;
     }

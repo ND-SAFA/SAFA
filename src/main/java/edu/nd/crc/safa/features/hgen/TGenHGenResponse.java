@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.hgen;
 
-import java.util.List;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +11,5 @@ public class TGenHGenResponse {
     /**
      * Generates artifacts for each cluster.
      */
-    List<String> artifacts;
+    TGenDataset dataset;
 }

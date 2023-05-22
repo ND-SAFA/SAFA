@@ -59,6 +59,16 @@ export interface ClassNameProps {
 }
 
 /**
+ * Defines props for a component with a css style.
+ */
+export interface StyleProps {
+  /**
+   * The css style to apply.
+   */
+  style?: string;
+}
+
+/**
  * Defines props for a component with an icon.
  */
 export interface IconProps {
@@ -100,6 +110,36 @@ export interface SizeProps {
    * Renders a larger component.
    */
   large?: boolean;
+}
+
+/**
+ * Defines props for a component that can be outlined.
+ */
+export interface OutlinedProps {
+  /**
+   * If true, the component will be rendered as outlined.
+   */
+  outlined?: boolean;
+}
+
+/**
+ * Defines props for a component that can be clicked.
+ */
+export interface ClickableProps {
+  /**
+   * Whether the component is clickable.
+   */
+  clickable?: boolean;
+}
+
+/**
+ * Defines props for a component that can be removed.
+ */
+export interface RemovableProps {
+  /**
+   * Whether the component is removable, displaying a remove button.
+   */
+  removable?: boolean;
 }
 
 /**

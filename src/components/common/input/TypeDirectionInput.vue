@@ -11,13 +11,13 @@
       <chip
         v-for="type in allowedTypes"
         :key="type"
-        outline
+        outlined
         :removable="allowEditing"
         :label="getTypeLabel(type)"
         data-cy="chip-type-direction"
         @remove="handleDelete(type)"
       />
-      <chip v-if="allowedTypes.length === 0" outline label="Any Type" />
+      <chip v-if="allowedTypes.length === 0" outlined label="Any Type" />
     </div>
   </div>
 </template>

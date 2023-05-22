@@ -5,6 +5,7 @@ import {
   IconProps,
   LoadingProps,
   MarginProps,
+  OutlinedProps,
   SizeProps,
   TestableProps,
 } from "@/types";
@@ -64,11 +65,8 @@ export interface TextButtonProps
     MarginProps,
     ClassNameProps,
     SizeProps,
+    OutlinedProps,
     TestableProps {
-  /**
-   * Renders an outlined button.
-   */
-  outlined?: boolean;
   /**
    * Renders a flat text button.
    */

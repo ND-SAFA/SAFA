@@ -16,19 +16,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { MessageType } from "@/types";
+import { AlertProps, MessageType } from "@/types";
 import { Typography } from "../content";
 
-const props = defineProps<{
-  /**
-   * The type of alert to render.
-   */
-  type?: MessageType;
-  /**
-   * The message to render.
-   */
-  message?: string;
-}>();
+const props = defineProps<AlertProps>();
 
 const className = computed(() => {
   switch (props.type) {

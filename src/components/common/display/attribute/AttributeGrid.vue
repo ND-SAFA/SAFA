@@ -59,17 +59,14 @@ import { computed, ref, onMounted, watch } from "vue";
 import { GridItem, GridLayout } from "vue3-drr-grid-layout";
 import {
   AttributeSchema,
-  AttributeLayoutSchema,
   AttributePositionSchema,
   GridItemData,
+  AttributeGridProps,
 } from "@/types";
 import { attributesStore } from "@/hooks";
 import { FlexBox } from "../content";
 
-const props = defineProps<{
-  layout: AttributeLayoutSchema;
-  editable?: boolean;
-}>();
+const props = defineProps<AttributeGridProps>();
 
 const gridItemLayout = ref<GridItemData[]>([]);
 const staticLayout = ref<(AttributeSchema | undefined)[][]>([]);

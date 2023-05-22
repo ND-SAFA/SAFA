@@ -9,11 +9,12 @@ class HGenSerializer(AbstractSerializer):
     Serializes the request for hierarchy generation
     """
 
-    artifacts = serializers.DictField(child=SummaryArtifactSerializer(),
-                                      help_text="Artifact map of ID to body.")
+    artifacts = serializers.ListSerializer(child=SummaryArtifactSerializer(),
+                                           help_text="List of artifacts to generate parent artifacts from.")
     clusters = serializers.ListSerializer(
         child=serializers.ListSerializer(
             child=serializers.CharField(max_length=512, help_text="Artifact ID."),
             help_text="Artifact IDs belonging to cluster."),
-        help_text="List of clusters.")
+        help_text="List of clusters.", required=False, allow_null=True)
+    targetType = serializers.CharField(max_length=1028, help_text="The type of artifacts to generate.")
     model = serializers.CharField(max_length=512, required=False, help_text="The model to use for generating artifact.")

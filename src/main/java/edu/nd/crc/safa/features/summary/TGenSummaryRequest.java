@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.summary;
 
-import java.util.Map;
+import java.util.List;
 
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
@@ -16,7 +16,7 @@ public class TGenSummaryRequest {
     /**
      * The artifacts to summarize.
      */
-    Map<String, TGenSummaryArtifact> artifacts;
+    List<TGenSummaryArtifact> artifacts;
     /**
      * The LLM to use. Either GPT or Anthropic
      */

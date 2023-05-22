@@ -4,7 +4,7 @@
     rounded
     size="sm"
     indeterminate
-    color="accent"
+    color="primary"
     data-cy="app-loading"
   />
 </template>

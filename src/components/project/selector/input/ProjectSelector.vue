@@ -5,13 +5,12 @@
     outlined
     dark
     :options-dark="darkMode"
-    options-selected-class="primary"
     label="Project"
     :options="projects"
     option-value="projectId"
     option-label="name"
     class="nav-input"
-    color="accent"
+    color="primary"
   >
     <template #after-options>
       <text-button

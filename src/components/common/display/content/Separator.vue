@@ -32,7 +32,7 @@ const separatorColor = computed(() => {
   if (props.color) {
     return props.color;
   } else if (props.nav) {
-    return "accent";
+    return "primary";
   } else {
     return undefined;
   }

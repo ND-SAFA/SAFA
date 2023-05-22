@@ -8,6 +8,15 @@
   }
 }
 
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.icon-safa {
+  animation: fadeIn 1s;
+}
+
 // Navigation - Searchbar
 
 .nav-search-mode {
@@ -53,15 +62,15 @@
 
 .nav-input {
   & > .q-field__inner > .q-field__control:hover:after {
-    border-color: $color-accent !important;
+    border-color: $color-primary !important;
   }
 
   fieldset, div, label, i {
-    color: $color-accent !important;
+    color: $color-primary !important;
   }
 
   .q-field__control:before {
-    border-color: $color-accent !important;
+    border-color: $color-primary !important;
   }
 
   &.nav-search {
@@ -82,6 +91,7 @@
 // Navigation - Topbar
 
 .nav-topbar {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
   min-height: 70px;
 }
 

@@ -1,4 +1,4 @@
-import { ColorProps, StyleProps, TestableProps } from "@/types";
+import { ClickableProps, ColorProps, StyleProps, TestableProps } from "@/types";
 
 /**
  * Enumerates the types of icons.
@@ -93,4 +93,14 @@ export interface IconDisplayProps
    * How much to rotate the icon (in degrees).
    */
   rotate?: number;
+}
+
+/**
+ * Defines props for the safa icon.
+ */
+export interface SafaIconProps extends ClickableProps {
+  /**
+   * Whether to hide the icon.
+   */
+  hidden?: boolean;
 }

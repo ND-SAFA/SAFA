@@ -26,12 +26,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ClickableProps } from "@/types";
+import { SafaIconProps } from "@/types";
 import { useTheme } from "@/hooks";
 import iconLight from "@/assets/images/SAFA-primary.svg";
 import iconDark from "@/assets/images/SAFA-secondary.svg";
 
-const props = defineProps<ClickableProps>();
+const props = defineProps<SafaIconProps>();
 
 const emit = defineEmits<{
   (e: "click"): void;
@@ -39,7 +39,16 @@ const emit = defineEmits<{
 
 const { darkMode } = useTheme();
 
-const className = computed(() =>
-  props.clickable ? "full-width clickable" : "full-width"
-);
+const className = computed(() => {
+  let classNames = "icon-safa full-width";
+
+  if (props.clickable) {
+    classNames += " clickable";
+  }
+  if (!props.hidden) {
+    classNames += " visible";
+  }
+
+  return classNames;
+});
 </script>

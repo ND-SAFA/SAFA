@@ -82,7 +82,7 @@ function buttonProps(option: GraphMode) {
   return {
     text: !selected,
     outlined: selected,
-    color: selected ? "secondary" : "accent",
+    color: "primary",
   };
 }
 

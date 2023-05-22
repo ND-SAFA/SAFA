@@ -16,7 +16,7 @@
       y="3"
       class="nav-sidebar-header-open"
     >
-      <safa-icon clickable @click="handleLogoClick" />
+      <safa-icon clickable :hidden="!sidebarOpen" @click="handleLogoClick" />
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"

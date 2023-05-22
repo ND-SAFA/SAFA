@@ -1,5 +1,5 @@
 import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
-import { capitalize, getBorderColor, isCodeArtifact } from "@/util";
+import { capitalize, getBorderColor } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
@@ -128,18 +128,16 @@ function svgBody(
   truncateLength: number,
   style: SvgStyle
 ): string {
-  const code = isCodeArtifact(data.artifactName);
-
   return svgText(
     getBody(data.body, truncateLength),
-    { ...style, code },
+    { ...style, code: data.isCode },
     "body",
     `
       display: block;
       width: ${style.width}px;
       height: ${style.height}px;
       line-height: 1rem;
-      text-align: ${code ? "left" : "center"};
+      text-align: ${data.isCode ? "left" : "center"};
     `
   );
 }

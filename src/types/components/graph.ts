@@ -122,6 +122,10 @@ export interface ArtifactCytoElementData extends CytoElementData {
    */
   artifactDeltaState: ArtifactDeltaState;
   /**
+   * Whether the artifact is code.
+   */
+  isCode: boolean;
+  /**
    * Whether the artifact is selected.
    */
   isSelected: boolean;

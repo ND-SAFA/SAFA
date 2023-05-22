@@ -19,6 +19,7 @@ import {
   GraphElementType,
   GraphMode,
 } from "@/types";
+import { isCodeArtifact } from "@/util";
 import {
   useTheme,
   deltaStore,
@@ -37,7 +38,8 @@ const props = defineProps<{
 const { darkMode } = useTheme();
 
 const definition = computed<ArtifactCytoElement>(() => {
-  const { id, body, type, name, safetyCaseType, logicType } = props.artifact;
+  const { id, body, summary, type, name, safetyCaseType, logicType } =
+    props.artifact;
   const warnings = warningStore.artifactWarnings[id] || [];
   const hiddenChildren = subtreeStore.getHiddenChildren(id);
   const hiddenChildWarnings = warningStore.getArtifactWarnings(hiddenChildren);
@@ -52,7 +54,8 @@ const definition = computed<ArtifactCytoElement>(() => {
       type: GraphElementType.node,
       graph: GraphMode.tree,
       id,
-      body,
+      body: summary || body,
+      isCode: !summary && isCodeArtifact(name),
       artifactName: name,
       warnings,
       artifactType: type,

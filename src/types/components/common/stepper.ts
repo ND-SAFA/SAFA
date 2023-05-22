@@ -1,4 +1,4 @@
-import { MinimalProps } from "@/types";
+import { LoadingProps, MinimalProps } from "@/types";
 
 /**
  * Defines a step used by the stepper component.
@@ -36,4 +36,22 @@ export interface StepperProps extends MinimalProps {
    * Useful when displaying long lists of steps
    */
   denseLabels?: boolean;
+}
+
+/**
+ * Defines props for the stepper step that displays a list of items.
+ */
+export interface StepperListStepProps extends LoadingProps {
+  /**
+   * The step title.
+   */
+  title: string;
+  /**
+   * The number of items in this step.
+   */
+  itemCount: number;
+  /**
+   * The message to display when empty.
+   */
+  emptyMessage?: string;
 }

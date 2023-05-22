@@ -9,10 +9,13 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.summary.TGenSummaryArtifactType;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.method.TGen;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +36,7 @@ public class HGenService {
      * @param request        The request defining artifacts, clusters, and model.
      * @return List of generated artifacts.
      */
-    public List<ArtifactAppEntity> generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
+    public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
         BaseGenerationModels baseModel = request.getModel();
         String targetType = request.getTargetType();
         TGen controller = baseModel.createTGenController();
@@ -41,13 +44,25 @@ public class HGenService {
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetType, request.getClusters(),
             baseModel.name());
         TGenHGenResponse response = controller.generateHierarchy(tgenRequest);
-        return response.getDataset().getTargetLayers().get(0).entrySet().stream()
+        List<ArtifactAppEntity> artifactsGenerated = response.getDataset().getTargetLayers().get(0).entrySet().stream()
             .map(entry -> {
                 ArtifactAppEntity artifact = new ArtifactAppEntity();
                 artifact.setBody(entry.getValue());
                 artifact.setName(entry.getKey());
                 return artifact;
             }).collect(Collectors.toList());
+        List<TraceAppEntity> generatedTraces = response.getDataset().getTrueLinks().stream().map(t -> {
+            String sourceName = t.get(0);
+            String targetName = t.get(1);
+            TraceAppEntity traceAppEntity = new TraceAppEntity();
+            traceAppEntity.setSourceName(sourceName);
+            traceAppEntity.setTargetName(targetName);
+            return traceAppEntity;
+        }).collect(Collectors.toList());
+        ProjectCommit projectCommit = new ProjectCommit();
+        projectCommit.addArtifacts(ModificationType.ADDED, artifactsGenerated);
+        projectCommit.addTraces(ModificationType.ADDED, generatedTraces);
+        return projectCommit;
     }
 
     private List<TGenSummaryArtifact> createArtifacts(ProjectVersion projectVersion, List<UUID> artifactIds) {

@@ -1,11 +1,10 @@
 package edu.nd.crc.safa.features.hgen;
 
-import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -32,8 +31,8 @@ public class HGenController extends BaseController {
      * @return List of generates artifacts for new level.
      */
     @PostMapping(AppRoutes.HGen.GENERATE)
-    public List<ArtifactAppEntity> generateHierarchy(@PathVariable UUID versionId,
-                                                     @RequestBody HGenRequestDTO request) {
+    public ProjectCommit generateHierarchy(@PathVariable UUID versionId,
+                                           @RequestBody HGenRequestDTO request) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.serviceProvider.getHGenService().generateHierarchy(projectVersion, request);
     }

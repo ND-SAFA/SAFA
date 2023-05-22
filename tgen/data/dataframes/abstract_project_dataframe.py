@@ -191,7 +191,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         duplicated_indices = set(self.index[is_duplicated])
         if len(duplicated_indices) > 0:
             logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
-        return self[~is_duplicated]
+        return self.__class__(self[~is_duplicated])
 
     @overrides(pd.DataFrame)
     def to_dict(self, orient: str = 'dict', into: Type = dict, index: bool = True) -> Dict:
@@ -202,7 +202,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param index: Whether to include the index item
         :return: The dataframe as a dictionary
         """
-        self.remove_duplicate_indices()
+        if self.index.duplicated(keep='first').any():
+            return self.remove_duplicate_indices().to_dict(orient, into, index)
         return super().to_dict(orient, into, index)
 
     def __setitem__(self, key: Any, value: Any) -> None:

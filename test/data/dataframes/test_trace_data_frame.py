@@ -22,6 +22,12 @@ class TestTraceDataFrame(BaseTest):
         link_does_not_exist = df.get_link(source_id="s3", target_id="t3")
         self.assertIsNone(link_does_not_exist)
 
+    def test_to_dict(self):
+        df = TraceDataFrame(EnumDict({TraceKeys.SOURCE: ["s1", "s1"], TraceKeys.TARGET: ["t1", "t1"],
+                                        TraceKeys.LABEL: [0, 1]}))
+        without_dups = df.to_dict(orient="index")
+        self.assertSize(1, without_dups)
+
     def assert_link(self, link: EnumDict, source_id, target_id, label, link_id):
         self.assertEquals(link[TraceKeys.SOURCE], source_id)
         self.assertEquals(link[TraceKeys.TARGET], target_id)

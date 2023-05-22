@@ -4,14 +4,14 @@
     :src="iconLight"
     alt="SAFA"
     :class="className"
-    @click="$emit('click')"
+    @click="emit('click')"
   />
   <img
     v-else
     :src="iconDark"
     alt="SAFA"
     :class="className"
-    @click="$emit('click')"
+    @click="emit('click')"
   />
 </template>
 
@@ -26,20 +26,14 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ClickableEmits, ClickableProps } from "@/types";
 import { useTheme } from "@/hooks";
 import iconLight from "@/assets/images/SAFA-primary.svg";
 import iconDark from "@/assets/images/SAFA-secondary.svg";
 
-const props = defineProps<{
-  /**
-   * Whether the icon is clickable.
-   */
-  clickable?: boolean;
-}>();
+const props = defineProps<ClickableProps>();
 
-defineEmits<{
-  (e: "click"): void;
-}>();
+const emit = defineEmits<ClickableEmits>();
 
 const { darkMode } = useTheme();
 

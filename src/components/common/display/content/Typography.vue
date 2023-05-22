@@ -55,134 +55,25 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults } from "vue";
-import {
-  ElementType,
-  SizeType,
-  TextAlignType,
-  TextType,
-  ThemeColor,
-} from "@/types";
+import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The text value to display.
-     */
-    value?: string | number;
-    /**
-     * Whether to truncate text with an ellipsis.
-     */
-    ellipsis?: boolean;
-
-    /**
-     * Whether to inherit color from the parent element.
-     */
-    inheritColor?: boolean;
-    /**
-     * Whether to color this text as an error.
-     */
-    error?: boolean;
-    /**
-     * Renders the text with a faded color.
-     */
-    secondary?: boolean;
-    /**
-     * The color to render the component with.
-     */
-    color?: ThemeColor;
-
-    /**
-     * Bolds the text.
-     */
-    bold?: boolean;
-    /**
-     * Sets the text to wrap.
-     */
-    wrap?: boolean;
-
-    /**
-     * The variant of text to render.
-     * @default `body`
-     */
-    variant?: TextType;
-    /**
-     * The element to render the text on.
-     * @default `span`
-     */
-    el?: ElementType;
-    /**
-     * How to align the text.
-     * @default `left`
-     */
-    align?: TextAlignType;
-
-    /**
-     * For expandable variants, whether the content defaults to expanded.
-     */
-    defaultExpanded?: boolean;
-    /**
-     * The length at which to automatically collapse a default expanded component.
-     * If set to 0, the component will never collapse by default.
-     */
-    collapseLength?: number;
-
-    /**
-     * Renders a smaller component.
-     */
-    small?: boolean;
-    /**
-     * Renders a larger component.
-     */
-    large?: boolean;
-
-    /**
-     * The x margin.
-     */
-    x?: SizeType;
-    /**
-     * The y margin.
-     */
-    y?: SizeType;
-    /**
-     * The left margin.
-     */
-    l?: SizeType;
-    /**
-     * The right margin.
-     */
-    r?: SizeType;
-    /**
-     * The top margin.
-     */
-    t?: SizeType;
-    /**
-     * The bottom margin.
-     */
-    b?: SizeType;
-
-    /**
-     * The classnames to include on this component.
-     */
-    class?: string;
-  }>(),
-  {
-    value: "",
-    classes: undefined,
-    color: undefined,
-    variant: "body",
-    el: "span",
-    align: "left",
-    x: "",
-    y: "",
-    l: "",
-    r: "",
-    t: "",
-    b: "",
-    class: "",
-    collapseLength: 500,
-  }
-);
+const props = withDefaults(defineProps<TypographyProps>(), {
+  value: "",
+  classes: undefined,
+  color: undefined,
+  variant: "body",
+  el: "span",
+  align: "left",
+  x: "",
+  y: "",
+  l: "",
+  r: "",
+  t: "",
+  b: "",
+  class: "",
+  collapseLength: 500,
+});
 
 const { darkMode } = useTheme();
 

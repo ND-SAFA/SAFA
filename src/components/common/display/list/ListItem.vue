@@ -47,60 +47,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { IconVariant, ThemeColor, URLQuery } from "@/types";
+import { ClickableEmits, ListItemProps } from "@/types";
 import { Typography, Separator } from "../content";
 import { Icon } from "../icon";
 
-const props = defineProps<{
-  /**
-   * The item title, instead of using the `default` slot.
-   */
-  title?: string;
-  /**
-   * The icon subtitle, instead of using the `subtitle` slot.
-   */
-  subtitle?: string;
-  /**
-   * The item tooltip.
-   * If set to true, a tooltip will be generated based on the title and subtitle.
-   */
-  tooltip?: true | string;
-  /**
-   * Whether the item is clickable. Automatically set if `to` is set.
-   */
-  clickable?: boolean;
-  /**
-   * Where the list item navigates to when clicked.
-   */
-  to?: string | { path: string; query: URLQuery };
-  /**
-   * Whether to render a divider between the title and subtitle.
-   */
-  divider?: boolean;
-  /**
-   * The type of icon to render.
-   */
-  icon?: IconVariant;
-  /**
-   * The color to render the component with.
-   */
-  color?: ThemeColor;
-  /**
-   * The optional number of columns ot take up with the action space, out of 12.
-   */
-  actionCols?: number;
-  /**
-   * The testing selector to set.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<ListItemProps>();
 
-const emit = defineEmits<{
-  /**
-   * Called when clicked.
-   */
-  (e: "click"): void;
-}>();
+const emit = defineEmits<ClickableEmits>();
 
 const slots = useSlots();
 

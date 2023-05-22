@@ -1,4 +1,32 @@
-import { IconVariant, SizeType } from "@/types";
+import { IconVariant } from "@/types";
+
+/**
+ * The methods of alignment.
+ */
+export type AlignType = "start" | "center" | "end";
+
+/**
+ * The methods of justifying.
+ */
+export type JustifyType = AlignType | "between" | "around";
+
+/**
+ * The possible increments for spacing.
+ */
+export type SizeType =
+  | ""
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9"
+  | "10"
+  | "11"
+  | "12";
 
 /**
  * Defines props for a component with margins.
@@ -160,4 +188,14 @@ export interface ClickableEmits {
    * Called when clicked.
    */
   (e: "click"): void;
+}
+
+/**
+ * Defines emits for a component updating a model.
+ */
+export interface ModelEmits<T> {
+  /**
+   * Called when the model is updated.
+   */
+  (e: "update:modelValue", value: T): void;
 }

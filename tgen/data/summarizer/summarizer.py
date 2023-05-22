@@ -80,8 +80,9 @@ class Summarizer(BaseObject):
 
         prompts_for_resummarization = [self._create_summarization_prompts(content, code_or_above_limit_only=False)
                                        for i, content in enumerate(summarized_content) if i in indices2resummarize]
-        return self._summarize_selective(contents=summarized_content, indices2summarize=indices2resummarize,
-                                         prompts_for_summaries=prompts_for_resummarization)
+        summaries = self._summarize_selective(contents=summarized_content, indices2summarize=indices2resummarize,
+                                              prompts_for_summaries=prompts_for_resummarization)
+        return summaries
 
     def summarize_single(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None) -> str:
         """
@@ -140,7 +141,12 @@ class Summarizer(BaseObject):
                                                                       prompt=all_prompts)
         batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG).strip() for r in res.batch_responses] \
             if res else [EMPTY_STRING]
-        return [EMPTY_STRING.join(batch_responses[i: i + n]) for i, n in enumerate(n_chunks_per_summary)]
+        summaries = []
+        start_index = 0
+        for n in n_chunks_per_summary:
+            summaries.append(EMPTY_STRING.join(batch_responses[start_index: start_index + n]))
+            start_index += n
+        return summaries
 
     def _create_summarization_prompts(self, content: str, chunker_type: SupportedChunker = SupportedChunker.NL, id_: str = None,
                                       code_or_above_limit_only: bool = None) -> List[str]:

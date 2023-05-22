@@ -40,13 +40,15 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { TextButtonProps, ClickableEmits } from "@/types";
+import type { TextButtonProps } from "@/types";
 import { useMargins } from "@/hooks";
 import { Icon, Typography } from "@/components/common/display";
 
 const props = defineProps<TextButtonProps>();
 
-const emit = defineEmits<ClickableEmits>();
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 
 const buttonClassName = useMargins(props, () => [
   ["color", `text-${props.color}`],

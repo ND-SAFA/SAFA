@@ -1,14 +1,4 @@
-import { IconVariant } from "@/types";
-
-/**
- * The methods of alignment.
- */
-export type AlignType = "start" | "center" | "end";
-
-/**
- * The methods of justifying.
- */
-export type JustifyType = AlignType | "between" | "around";
+import { IconVariant, ThemeColor } from "@/types";
 
 /**
  * The possible increments for spacing.
@@ -57,14 +47,6 @@ export interface MarginProps {
    */
   b?: SizeType;
 }
-
-export type ThemeColor =
-  | "primary"
-  | "secondary"
-  | "accent"
-  | "positive"
-  | "negative"
-  | string;
 
 /**
  * Defines props for a component with a color.
@@ -171,6 +153,26 @@ export interface RemovableProps {
 }
 
 /**
+ * Defines props for a component that can be made minimal.
+ */
+export interface MinimalProps {
+  /**
+   * Whether the component should be displayed with minimal information.
+   */
+  minimal?: boolean;
+}
+
+/**
+ * Defines props for a component that can be expanded.
+ */
+export interface ExpandableProps {
+  /**
+   * Whether the component can be expanded.
+   */
+  expandable?: boolean;
+}
+
+/**
  * Defines props for a component that can be selected in tests.
  */
 export interface TestableProps {
@@ -178,24 +180,4 @@ export interface TestableProps {
    * The testing selector to set.
    */
   dataCy?: string;
-}
-
-/**
- * Defines emits for a clickable component.
- */
-export interface ClickableEmits {
-  /**
-   * Called when clicked.
-   */
-  (e: "click"): void;
-}
-
-/**
- * Defines emits for a component updating a model.
- */
-export interface ModelEmits<T> {
-  /**
-   * Called when the model is updated.
-   */
-  (e: "update:modelValue", value: T): void;
 }

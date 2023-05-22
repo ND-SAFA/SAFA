@@ -47,13 +47,15 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { ClickableEmits, ListItemProps } from "@/types";
+import { ListItemProps } from "@/types";
 import { Typography, Separator } from "../content";
 import { Icon } from "../icon";
 
 const props = defineProps<ListItemProps>();
 
-const emit = defineEmits<ClickableEmits>();
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 
 const slots = useSlots();
 

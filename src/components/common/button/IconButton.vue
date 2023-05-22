@@ -27,12 +27,14 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { IconButtonProps, ClickableEmits } from "@/types";
+import type { IconButtonProps } from "@/types";
 import { Icon } from "@/components/common/display";
 
 const props = defineProps<IconButtonProps>();
 
-const emit = defineEmits<ClickableEmits>();
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 
 const size = computed(() => {
   if (props.small) {

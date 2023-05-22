@@ -34,12 +34,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ModelEmits, TabListProps } from "@/types";
+import { TabListProps } from "@/types";
 import { useVModel } from "@/hooks";
 
 const props = defineProps<TabListProps>();
 
-defineEmits<ModelEmits<string>>();
+defineEmits<{
+  (e: "update:modelValue", value: string): void;
+}>();
 
 const model = useVModel(props, "modelValue");
 </script>

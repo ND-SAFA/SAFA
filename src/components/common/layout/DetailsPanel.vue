@@ -15,20 +15,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { DetailsOpenState } from "@/types";
+import { DetailsPanelProps } from "@/types";
 import { appStore } from "@/hooks";
 
-const props = defineProps<{
-  /**
-   * The panel being controlled.
-   */
-  panel: DetailsOpenState;
-}>();
+const props = defineProps<DetailsPanelProps>();
 
 const emit = defineEmits<{
-  /**
-   * Emitted when the panel is opened.
-   */
   (e: "open"): void;
 }>();
 

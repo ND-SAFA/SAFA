@@ -82,55 +82,14 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TableColumn, TableRow } from "@/types";
+import { SelectorTableProps, TableRow } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/display";
 import { Searchbar } from "@/components/common/input";
 import { IconButton } from "@/components/common/button";
 import DataTable from "./DataTable.vue";
 
-const props = defineProps<{
-  /**
-   * The columns to render in the table.
-   */
-  columns: TableColumn[];
-  /**
-   * The rows of the table.
-   */
-  rows: TableRow[];
-  /**
-   * The field on each row that is unique.
-   */
-  rowKey: string | ((row: TableRow) => string);
-  /**
-   * Whether to display loading state.
-   */
-  loading?: boolean;
-  /**
-   * The values of selected rows.
-   */
-  selected?: TableRow[];
-  /**
-   * The name of an item.
-   */
-  itemName?: string;
-  /**
-   * Whether elements can be added.
-   */
-  addable?: boolean;
-  /**
-   * Whether these rows are editable.
-   */
-  editable?: boolean | ((row: TableRow) => boolean);
-  /**
-   * Whether these rows are deletable.
-   */
-  deletable?: boolean | ((row: TableRow) => boolean);
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-}>();
+const props = defineProps<SelectorTableProps>();
 
 const emit = defineEmits<{
   (e: "update:selected", rows: TableRow[]): void;

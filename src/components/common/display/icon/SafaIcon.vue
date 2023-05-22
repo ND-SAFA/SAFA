@@ -26,14 +26,16 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ClickableEmits, ClickableProps } from "@/types";
+import { ClickableProps } from "@/types";
 import { useTheme } from "@/hooks";
 import iconLight from "@/assets/images/SAFA-primary.svg";
 import iconDark from "@/assets/images/SAFA-secondary.svg";
 
 const props = defineProps<ClickableProps>();
 
-const emit = defineEmits<ClickableEmits>();
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 
 const { darkMode } = useTheme();
 

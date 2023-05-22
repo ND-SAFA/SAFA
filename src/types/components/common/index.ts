@@ -1,4 +1,3 @@
-export * from "./general";
 export * from "./button";
 export * from "./alert";
 export * from "./attribute";
@@ -7,6 +6,8 @@ export * from "./typography";
 export * from "./flex";
 export * from "./icon";
 export * from "./list";
-
+export * from "./layout";
+export * from "./modal";
 export * from "./stepper";
+export * from "./base-table";
 export * from "./table";

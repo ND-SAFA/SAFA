@@ -91,7 +91,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { TableColumn, TableGroupRow } from "@/types";
+import { GroupableTableRowProps } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import {
@@ -101,34 +101,13 @@ import {
 } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 
-const props = defineProps<{
-  /**
-   * Props passed in from the quasar table.
-   */
-  quasarProps: Record<string, unknown>;
-  /**
-   A generic row of a table, or a group header.
-   */
-  row: TableGroupRow;
-  /**
-   * The visible table columns.
-   */
-  columns: TableColumn[];
-  /**
-   * Whether the row can be expanded.
-   */
-  expandable?: boolean;
-  /**
-   * Whether the row is expanded.
-   */
-  expand?: boolean;
-}>();
+const props = defineProps<GroupableTableRowProps>();
 
 const emit = defineEmits<{
+  (e: "click"): void;
   (e: "update:expanded", expanded: boolean): void;
   (e: "group:open", groupBy: string, groupValue: unknown): void;
   (e: "group:close", groupBy: string, groupValue: unknown): void;
-  (e: "click"): void;
 }>();
 
 const slots = useSlots();

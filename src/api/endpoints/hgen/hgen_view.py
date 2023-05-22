@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from api.endpoints.hgen.hgen_serializer import HGenSerializer
 from api.endpoints.predict.prediction_view import endpoint
 from api.utils.model_util import ModelUtil
-from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 
 DEFAULT_PROMPT = "Generalize the following descriptions into one system requirement.\n\n{}"
@@ -24,18 +23,16 @@ class HGenView(APIView):
         :return: The generated artifact(s).
         """
         model = payload.get("model", ModelUtil.get_default_model())
-        prompt = payload.get("prompt", DEFAULT_PROMPT)
+        target_type = payload["targetType"]
         artifacts = payload["artifacts"]
-        clusters = payload["clusters"]
+        clusters = payload.get("clusters", None)
         model, llm_manager = ModelUtil.get_model_manager(model)
-        summarizer = Summarizer(code_or_exceeds_limit_only=True, llm_manager=llm_manager)
         job = GenerateArtifactsJob(artifacts,
                                    artifact_ids_by_cluster=clusters,
                                    llm_manager=llm_manager,
-                                   hgen_base_prompt=prompt,
-                                   summarizer=summarizer)
+                                   target_type=target_type)
 
         def post_process(summarized_artifact: List[str]):
-            return {"artifacts": summarized_artifact}
+            return {"dataset": summarized_artifact}
 
         return job, post_process

@@ -133,6 +133,10 @@ export interface ArtifactCytoElementData extends CytoElementData {
    * The opacity of this artifact.
    */
   opacity: number;
+  /**
+   * The color associated with the type of this artifact.
+   */
+  typeColor: string;
 
   /**
    * The number of hidden child elements.
@@ -186,6 +190,10 @@ export interface TimNodeCytoElementData extends CytoElementData {
    * The number of artifacts of this artifact type.
    */
   count: number;
+  /**
+   * The color associated with the type of this artifact.
+   */
+  typeColor: string;
   /**
    * The icon for this artifact type.
    */

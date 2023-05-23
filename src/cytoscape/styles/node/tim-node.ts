@@ -1,5 +1,4 @@
 import { TimNodeCytoElementData } from "@/types";
-import { getTypeColor } from "@/util";
 import { TIM_NODE_HEIGHT, TIM_NODE_WIDTH } from "@/cytoscape/styles/config";
 import { svgRect } from "./node-shapes";
 import { svgDiv, svgTitle } from "./svg-node";
@@ -29,7 +28,7 @@ export function svgTIM(data: TimNodeCytoElementData): string {
           height: TIM_NODE_HEIGHT,
         },
         8,
-        getTypeColor(data.artifactType)
+        data.typeColor
       )}
       ${svgTitle(data.artifactType, y, "type")}
       ${svgDiv({

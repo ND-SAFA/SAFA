@@ -26,6 +26,7 @@ import {
   selectionStore,
   subtreeStore,
   warningStore,
+  typeOptionsStore,
 } from "@/hooks";
 import { CyElement3 } from "../base";
 
@@ -48,6 +49,7 @@ const definition = computed<ArtifactCytoElement>(() => {
   const artifactDeltaState = deltaStore.getArtifactDeltaType(id);
   const isSelected = selectionStore.isArtifactInSelected(id);
   const opacity = props.hidden ? 0 : props.faded ? 0.3 : 1;
+  const typeColor = typeOptionsStore.getArtifactLevel(type)?.color || "";
 
   return {
     data: {
@@ -62,6 +64,7 @@ const definition = computed<ArtifactCytoElement>(() => {
       artifactDeltaState,
       isSelected,
       opacity,
+      typeColor,
       hiddenChildren: hiddenChildren.length,
       childWarnings: hiddenChildWarnings,
       childDeltaStates: hiddenChildDeltaStates,

@@ -1,5 +1,4 @@
 import { ArtifactCytoElementData } from "@/types";
-import { getTypeColor } from "@/util";
 import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 
@@ -21,6 +20,6 @@ export function svgDefault(data: ArtifactCytoElementData): string {
       outer,
       inner: { x: 12, y: 20, width: 180, height: 100 },
     },
-    svgRect(outer, 8, getTypeColor(data.artifactType))
+    svgRect(outer, 8, data.typeColor)
   );
 }

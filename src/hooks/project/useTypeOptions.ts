@@ -13,6 +13,7 @@ import {
   allTypeIcons,
   createTIM,
   defaultTypeIcon,
+  getTypeColor,
   isLinkAllowedByType,
   preserveObjectKeys,
   removeMatches,
@@ -87,6 +88,7 @@ export const useTypeOptions = defineStore("typeOptions", {
           allowedTypes: existingType?.allowedTypes || [],
           icon,
           iconIndex: allTypeIcons.indexOf(icon),
+          color: existingType?.color || getTypeColor(artifactType.name),
         };
       });
     },

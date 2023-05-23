@@ -1,5 +1,6 @@
 import { ApprovalType, ProjectSchema, TimSchema, TraceType } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
+import { getTypeColor } from "@/util/theme";
 
 /**
  * @return A project TIM structure initialized to the given values.
@@ -63,6 +64,7 @@ export function createTIM(project?: ProjectSchema): TimSchema {
           icon: defaultTypeIcon,
           allowedTypes: project?.typeDirections[artifactType] || [],
           iconIndex: 0,
+          color: getTypeColor(artifactType),
         },
       }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {}),

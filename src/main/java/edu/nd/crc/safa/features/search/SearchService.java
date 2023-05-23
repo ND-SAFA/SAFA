@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.method.TGen;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,8 @@ public class SearchService {
                                                 List<String> searchTypes,
                                                 String tracingPrompt,
                                                 BaseGenerationModels model) {
-        Map<UUID, ArtifactAppEntity> artifactIdMap = projectAppEntity.getArtifactIdMap();
+        Map<UUID, ArtifactAppEntity> artifactIdMap = ProjectDataStructures.createArtifactMap(
+            projectAppEntity.getArtifacts());
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(

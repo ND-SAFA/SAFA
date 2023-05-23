@@ -21,7 +21,7 @@ def get_task_status(result):
     if result.successful():
         return Status.SUCCESS, "Task finished successfully"
     elif result.failed():
-        return Status.FAILURE, "Task finished with an error"
+        return Status.FAILURE, result.traceback
     elif result.status == "PENDING":
         return Status.NOT_STARTED, "Task is still pending"
     elif result.status == "STARTED":
@@ -44,7 +44,9 @@ def get_result(payload: ResultPayload):
     result = AsyncResult(task_id)
 
     if result.successful():
-        return result.result
+        job_result = result.result
+        result.forget()
+        return job_result
     else:
         status, msg = get_status(payload)
         return JsonResponse({"error": f"Job status: {msg}"}, status=400)

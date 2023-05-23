@@ -38,6 +38,7 @@ export async function saveGitHubCredentials(accessCode: string): Promise<void> {
  * @return Whether the credentials are valid.
  */
 export async function getGitHubCredentials(): Promise<boolean> {
+  return true; // TODO: delete
   return (
     (await authHttpClient<boolean | null>(Endpoint.githubValidateCredentials, {
       method: "GET",
@@ -73,6 +74,18 @@ export async function deleteGitHubCredentials(): Promise<void> {
  * @return The GitHub repositories for this user.
  */
 export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
+  return [
+    {
+      id: "test",
+      name: "Test",
+      description: "Test desc",
+      size: 0,
+      creationDate: "2021-01-01T00:00:00.000Z",
+      owner: "test",
+      branches: ["master", "dev"],
+      defaultBranch: "master",
+    },
+  ]; // TODO: delete
   return (
     (await authHttpClient<GitHubProjectSchema[]>(Endpoint.githubGetProjects, {
       method: "GET",

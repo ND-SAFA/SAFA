@@ -133,7 +133,7 @@ export function handleImportGitHubProject({
 
   appStore.onLoadStart();
 
-  createGitHubProject(owner, repositoryName)
+  createGitHubProject(owner, repositoryName, integrationsStore.gitHubConfig)
     .then(async (job) => {
       await handleJobSubmission(job);
       integrationsStore.gitHubProject = undefined;

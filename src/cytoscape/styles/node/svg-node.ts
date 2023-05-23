@@ -44,9 +44,9 @@ export function svgNode(
         ${svgShape}
         ${svgTitle(title, y - 18, "type")}
         ${svgDiv({
-          x,
+          x: x * 2,
           y: y + 10,
-          width,
+          width: width - x * 2,
         })}
         ${svgTitle(data.artifactName, y + 10, "name")}
         ${svgBody(data, truncateLength, {

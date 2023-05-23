@@ -14,21 +14,31 @@ export function svgRect(
   barColor?: string
 ): string {
   const bar = barColor
-    ? `
-   <clipPath id="node-click-path">
-      <rect
-        rx="${rx}"
-        width="${style.width}" 
-        height="${style.height}"
-      />
-    </clipPath>
-    <rect 
-      style="clip-path: url(#node-click-path);"
-      width="9" 
-      height="100%"
-      fill="${barColor}"
-    />
-  `
+    ? //   ? `
+      //  <clipPath id="node-click-path">
+      //     <rect
+      //       rx="${rx - 1}"
+      //       width="${style.width}"
+      //       height="${style.height}"
+      //     />
+      //   </clipPath>
+      //   <rect
+      //     style="clip-path: url(#node-click-path);"
+      //     width="9"
+      //     height="100%"
+      //     fill="${barColor}"
+      //   />
+      // `
+      `
+        <rect 
+          rx="2"
+          width="4" 
+          height="${style.height - 12}"
+          y="6"
+          x="6"
+          fill="${barColor}"
+        />
+    `
     : "";
 
   return `

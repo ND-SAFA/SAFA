@@ -265,12 +265,12 @@ export function searchModeOptions(): SearchSelectOption[] {
       placeholder: "Search artifacts...",
       artifactSearch: true,
     },
-    {
-      id: SearchMode.artifactTypes,
-      name: "Artifact Type",
-      description: "Find artifacts related to a specific artifact type.",
-      placeholder: "Search artifact types...",
-    },
+    // {
+    //   id: SearchMode.artifactTypes,
+    //   name: "Artifact Type",
+    //   description: "Find artifacts related to a specific artifact type.",
+    //   placeholder: "Search artifact types...",
+    // },
     {
       id: SearchMode.search,
       name: "Search",

@@ -1,6 +1,5 @@
 <template>
   <q-select
-    v-if="project.projectId"
     v-model="project"
     outlined
     dark
@@ -29,7 +28,6 @@
       />
     </template>
   </q-select>
-  <typography v-else variant="subtitle" value="No Project Selected" />
 </template>
 
 <script lang="ts">
@@ -60,7 +58,7 @@ const { darkMode } = useTheme();
 const projects = computed(() => projectStore.allProjects);
 
 const project = computed({
-  get: () => projectStore.project,
+  get: () => (projectStore.projectId ? projectStore.project : undefined),
   set(identifier: IdentifierSchema | undefined) {
     if (!identifier) return;
 

@@ -20,7 +20,7 @@
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"
-        :color="darkMode ? 'secondary' : 'primary'"
+        color="primary"
         data-cy="button-sidebar-close"
         @click="sidebarOpen = false"
       />
@@ -36,7 +36,7 @@
       <icon-button
         icon="nav-toggle"
         tooltip="Open sidebar"
-        :color="darkMode ? 'secondary' : 'primary'"
+        color="primary"
         data-cy="button-sidebar-open"
         :rotate="180"
         @click="sidebarOpen = true"

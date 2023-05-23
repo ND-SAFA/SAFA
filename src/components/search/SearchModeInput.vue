@@ -6,7 +6,7 @@
     :options="modeOptions"
     option-label="name"
     option-value="id"
-    class="nav-search-mode"
+    class="nav-input nav-search-mode"
     data-cy="input-nav-search-mode"
   >
     <template #option="{ opt, itemProps }">

@@ -10,7 +10,7 @@
     :option-label="searchStore.artifactLikeMode ? 'name' : undefined"
     :option-value="searchStore.artifactLikeMode ? 'id' : undefined"
     input-debounce="0"
-    class="nav-search-prompt"
+    class="nav-input nav-search-prompt"
     menu-anchor="bottom middle"
     menu-self="top middle"
     data-cy="input-nav-artifact-search"

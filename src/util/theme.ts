@@ -68,8 +68,9 @@ export const ThemeColors = {
   warningBg: Colors.orangeLight,
   warningBd: Colors.orangeDark,
 
-  defaultNode: Colors.blueLight,
-  generatedNode: Colors.orange,
+  nodeDefaultLight: Colors.blue,
+  nodeDefaultDark: Colors.blueLight,
+  nodeGenerated: Colors.orange,
 };
 
 /**
@@ -90,9 +91,16 @@ export const lightPalette: Record<string, string> = {
   background: ThemeColors.lightBg,
   selected: ThemeColors.lightSelected,
 
-  addedLight: ThemeColors.addedBg,
-  modifiedLight: ThemeColors.modifiedBg,
-  removedLight: ThemeColors.removedBg,
+  added: ThemeColors.added,
+  addedBg: ThemeColors.addedBg,
+  modified: ThemeColors.modified,
+  modifiedBg: ThemeColors.modifiedBg,
+  removed: ThemeColors.removed,
+  removedBg: ThemeColors.removedBg,
+  flagged: ThemeColors.warningBd,
+  flaggedBg: ThemeColors.warningBg,
+
+  nodeDefault: ThemeColors.nodeDefaultLight,
 };
 
 /**
@@ -113,9 +121,14 @@ export const darkPalette: Record<string, string> = {
   background: ThemeColors.darkBg,
   selected: ThemeColors.darkSelected,
 
-  addedLight: ThemeColors.addedBg,
-  modifiedLight: ThemeColors.modifiedBg,
-  removedLight: ThemeColors.removedBg,
+  added: ThemeColors.added,
+  addedBg: ThemeColors.addedBg,
+  modified: ThemeColors.modified,
+  modifiedBg: ThemeColors.modifiedBg,
+  removed: ThemeColors.removed,
+  removedBg: ThemeColors.removedBg,
+
+  nodeDefault: ThemeColors.nodeDefaultDark,
 };
 
 const typeColorMap: Record<string, string> = {
@@ -144,54 +157,6 @@ export function getTypeColor(type = ""): string {
   }
 
   return typeColorMap[type];
-}
-
-/**
- * Returns the background color for the given state.
- * @param state - The state to get the color for.
- * @param dark - Whether the app is in dark mode.
- * @return The color.
- */
-export function getBackgroundColor(
-  state: ArtifactDeltaState | ApprovalType | string,
-  dark: boolean
-): string {
-  switch (state) {
-    case ApprovalType.APPROVED:
-      return ThemeColors.added;
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.addedBg;
-    case ApprovalType.UNREVIEWED:
-      return ThemeColors.modified;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.modifiedBg;
-    case ApprovalType.DECLINED:
-      return ThemeColors.removed;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.removedBg;
-    default:
-      return dark ? ThemeColors.darkBg : ThemeColors.lightBg;
-  }
-}
-
-/**
- * Returns the border color for the given state.
- * @param state - The state to get the color for.
- * @return The color.
- */
-export function getBorderColor(
-  state: ArtifactDeltaState | string = ""
-): string {
-  switch (state) {
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.addedBd;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.modifiedBd;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.removedBd;
-    default:
-      return ThemeColors.defaultNode;
-  }
 }
 
 /**

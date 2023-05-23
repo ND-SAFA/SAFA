@@ -21,41 +21,17 @@ public class TGenConfig {
     public static TGenConfig get() {
         return TGenConfig.staticConfig;
     }
-
-    /**
-     * @return Returns the endpoint for generating hierarchies
-     */
-    public String getHGenEndpoint() {
-        return createTGenEndpoint(baseEndpoint, "hgen");
-    }
-
-    /**
-     * @return Returns summarize endpoint.
-     */
-    public String getSummarizeEndpoint() {
-        return createTGenEndpoint(baseEndpoint, "summarize");
-    }
-
-    /**
-     * @return Returns path to TGEN completion endpoint.
-     */
-    public String getPromptCompletionEndpoint() {
-        return createTGenEndpoint(baseEndpoint, "complete");
-    }
-
-    /**
-     * @return Returns path to Tgen prediction endpint.
-     */
-    public String getPredictEndpoint() {
-        return createTGenEndpoint(baseEndpoint, "predict");
-    }
-
+    
     @PostConstruct
     public void init() {
         TGenConfig.staticConfig = this;
     }
 
-    public String createTGenEndpoint(String... components) {
+    public String getTGenEndpoint(String endpointName) {
+        return buildTGenEndpoint(baseEndpoint, endpointName);
+    }
+
+    public String buildTGenEndpoint(String... components) {
         return FileUtilities.buildUrl(components) + FileUtilities.URL_SEP;
     }
 }

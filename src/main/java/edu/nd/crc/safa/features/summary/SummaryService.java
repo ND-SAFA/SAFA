@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.method.TGen;
 
 import org.springframework.stereotype.Service;
 

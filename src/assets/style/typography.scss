@@ -17,6 +17,14 @@ h1, h2, h3, h4, h6, h6 {
   margin-bottom: 4px;
 }
 
+pre {
+  margin: 0;
+
+  code {
+    padding: 0;
+  }
+}
+
 .text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -63,7 +71,7 @@ h1, h2, h3, h4, h6, h6 {
 }
 
 .artifact-display {
-  max-width: 500px;
+  max-width: 600px;
 }
 
 .trace-matrix-chip {
@@ -73,4 +81,8 @@ h1, h2, h3, h4, h6, h6 {
   &-unreviewed {
     border-style: dashed;
   }
+}
+
+.clickable {
+  cursor: pointer;
 }

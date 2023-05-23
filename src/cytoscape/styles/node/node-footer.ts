@@ -1,5 +1,5 @@
 import { ArtifactCytoElementData, SvgStyle } from "@/types";
-import { getBackgroundColor, getBorderColor, ThemeColors } from "@/util";
+import { ThemeColors } from "@/util";
 import {
   ARTIFACT_BORDER_WIDTH,
   ARTIFACT_CHILDREN_HEIGHT,
@@ -27,13 +27,12 @@ export function svgFooter(
   const warningCount = getWarnings(data);
   const hasWarnings = warningCount > 0;
   const hasChildren = (data.hiddenChildren || 0) > 0;
-  const backgroundColor =
-    hasWarnings && !data.dark
-      ? ThemeColors.warningLight
-      : getBackgroundColor(data.artifactDeltaState, data.dark);
-  const borderColor = hasWarnings
-    ? ThemeColors.warningDark
-    : getBorderColor(data.artifactDeltaState);
+  const borderClass = hasWarnings
+    ? "artifact-border artifact-warning"
+    : "artifact-border";
+  const bgClass = hasWarnings
+    ? "artifact-svg artifact-warning"
+    : "artifact-border";
 
   if (!hasChildren && !hasWarnings && data.childDeltaStates?.length === 0) {
     return "";
@@ -46,8 +45,7 @@ export function svgFooter(
       rx="8" 
       width="${outerStyle.width}" 
       height="${ARTIFACT_CHILDREN_HEIGHT}"
-      fill="${borderColor}"
-      class="artifact-border"
+      class="${borderClass}"
     />
     <rect
       x="${ARTIFACT_BORDER_WIDTH}" 
@@ -55,8 +53,7 @@ export function svgFooter(
       rx="7" 
       width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
       height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
-      fill="${backgroundColor}"
-      class="artifact-svg"
+      class="${bgClass}"
     />
     ${svgChildren(data.hiddenChildren || 0, hasWarnings, textY)}
     ${svgWarnings(warningCount, hasChildren, textY, outerStyle.width)}
@@ -142,7 +139,7 @@ function svgWarnings(
         y: style.y - 2,
       },
       "warning",
-      ThemeColors.warningDark
+      ThemeColors.warningBd
     ) +
     svgText(
       `${warningCount} Warning${warningCount !== 1 ? "s" : ""}`,

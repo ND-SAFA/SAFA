@@ -62,7 +62,7 @@ import {
 } from "@/hooks";
 import { handleDeleteMember, handleGetProjects } from "@/api";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
+import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
 
 const props = defineProps<{
   /**
@@ -113,6 +113,7 @@ const rows = computed(() => projectStore.allProjects);
  */
 function handleReload() {
   loading.value = true;
+  selected.value = undefined;
 
   handleGetProjects({
     onComplete: () => (loading.value = false),

@@ -2,7 +2,8 @@
   <q-select
     v-model="model"
     filled
-    label="Custom Model"
+    label="Generation Model"
+    hint="The model used to generate trace links."
     :options="options"
     option-label="name"
     option-value="id"
@@ -29,13 +30,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GenerationModelSchema } from "@/types";
+import { CustomModelInputProps, GenerationModelSchema } from "@/types";
 import { projectStore, useVModel } from "@/hooks";
 import { ListItem } from "@/components/common/display";
 
-const props = defineProps<{
-  modelValue: GenerationModelSchema | undefined;
-}>();
+const props = defineProps<CustomModelInputProps>();
 
 defineEmits<{
   (e: "update:modelValue", value: GenerationModelSchema | undefined): void;

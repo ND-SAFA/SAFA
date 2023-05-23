@@ -6,14 +6,10 @@
     <div class="q-mt-md">
       <flex-box wrap b="2">
         <div class="q-mb-sm">
-          <attribute-chip
-            :value="artifactLabel"
-            icon="artifact"
-            color="primary"
-          />
+          <attribute-chip :value="artifactLabel" icon="artifact" />
         </div>
         <div class="q-mb-sm">
-          <attribute-chip :value="traceLabel" icon="trace" color="primary" />
+          <attribute-chip :value="traceLabel" icon="trace" />
         </div>
       </flex-box>
       <flex-box

@@ -39,6 +39,12 @@ export const useSaveArtifact = defineStore("saveArtifact", {
       return selectionStore.selectedArtifact?.name !== this.editedArtifact.name;
     },
     /**
+     * @return Whether the base artifact has a summary.
+     */
+    hasSummary(): boolean {
+      return !!selectionStore.selectedArtifact?.summary;
+    },
+    /**
      * @return Whether the artifact type is for an FTA node.
      */
     isFTA(): boolean {

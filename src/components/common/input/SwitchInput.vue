@@ -14,15 +14,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ThemeColor } from "@/types";
+import { SwitchInputProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
-const props = defineProps<{
-  modelValue: boolean;
-  label: string;
-  color?: ThemeColor;
-}>();
+const props = defineProps<SwitchInputProps>();
 
 defineEmits<{
   (e: "update:modelValue", value: boolean): void;

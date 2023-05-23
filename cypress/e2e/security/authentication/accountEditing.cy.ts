@@ -1,4 +1,6 @@
-import { Routes, editUser, invalidUser, deleteUser, DataCy } from "@/fixtures";
+import { Routes, DataCy } from "@/fixtures";
+
+const { invalidUser, editUser, deleteUser } = Cypress.env();
 
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {
@@ -64,7 +66,7 @@ describe("Account Editing", () => {
     it("Successfully deletes my account", () => {
       cy.createNewAccount(deleteUser.email, deleteUser.password);
 
-      cy.loginToPage(deleteUser.email, deleteUser.password, Routes.ACCOUNT);
+      cy.visit(Routes.ACCOUNT);
 
       cy.inputText(DataCy.accountDeletePasswordInput, deleteUser.password)
         .clickButton(DataCy.accountDeleteButton)

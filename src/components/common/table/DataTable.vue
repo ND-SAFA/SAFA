@@ -63,92 +63,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, useSlots, watch } from "vue";
-import { TableColumn, TableRow } from "@/types";
+import { TableProps, TableRow } from "@/types";
 import { sortRows } from "@/util";
 import { useVModel } from "@/hooks";
 
-const props = defineProps<{
-  /**
-   * Whether to display loading state.
-   */
-  loading?: boolean;
-  /**
-   * The columns to render in the table.
-   */
-  columns: TableColumn[];
-  /**
-   * The column names that are currently visible, if not all of them.
-   */
-  visibleColumns?: string[];
-  /**
-   * The rows of the table.
-   */
-  rows: TableRow;
-  /**
-   * The field on each row that is unique.
-   */
-  rowKey: string | ((row: TableRow) => string);
-  /**
-   * The number of rows to display per page.
-   */
-  rowsPerPage?: number;
-  /**
-   * Enables selection of rows.
-   */
-  selection?: "single" | "multiple";
-  /**
-   * The values of selected rows.
-   */
-  selected?: TableRow[];
-  /**
-   * The ids of expanded rows.
-   */
-  expanded?: string[];
-  /**
-   * The text to filter by.
-   */
-  filterText?: string;
-  /**
-   * A function to filter the table with.
-   */
-  filter?: (
-    rows: TableRow[],
-    filterText: string | undefined,
-    cols: TableColumn[]
-  ) => TableRow[];
-  /**
-   * Which attribute to sort by.
-   */
-  sortBy?: string;
-  /**
-   * Whether to sort descending.
-   */
-  sortDesc?: boolean;
-  /**
-   * A function to sort the table with.
-   */
-  sort?(rows: TableRow[], sortBy: string, descending: boolean): TableRow[];
-  /**
-   * Where to place separators. Defaults to horizontal.
-   */
-  separator?: "horizontal" | "vertical" | "cell" | "none";
-  /**
-   * Any cells can be customized through the slot `body-cell-[name]`.
-   */
-  customCells?: string[];
-  /**
-   * Whether to display densely.
-   */
-  dense?: boolean;
-  /**
-   * If true, virtual scroll will be enabled.
-   */
-  virtualScroll?: boolean;
-  /**
-   * The testing selector to set on this table.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<TableProps>();
 
 const emit = defineEmits<{
   (e: "update:selected", rows: TableRow[]): void;

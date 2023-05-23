@@ -27,33 +27,10 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { SelectInputProps } from "@/types";
 import { useVModel } from "@/hooks";
 
-const props = defineProps<{
-  label: string;
-  modelValue?: unknown;
-  options: unknown[];
-  /**
-   * The key of an option's id.
-   */
-  optionValue?: string | ((opt: unknown) => string);
-  /**
-   * The key of an option's display label.
-   */
-  optionLabel?: string | ((opt: unknown) => string);
-  /**
-   * Only saves the option's value, not the entire object.
-   */
-  optionToValue?: boolean;
-  /**
-   * Whether to display as outlined, instead of the default filled.
-   */
-  outlined?: boolean;
-  /**
-   * Whether to disable this input.
-   */
-  disabled?: boolean;
-}>();
+const props = defineProps<SelectInputProps>();
 
 defineEmits<{
   (e: "update:modelValue"): void;

@@ -3,8 +3,12 @@
  */
 export const baseURL = process.env.VUE_APP_API_ENDPOINT;
 
+if (!process.env.VUE_APP_API_ENDPOINT) {
+  console.error("API Endpoint environment variable not defined.");
+}
+
 /**
- * Enumerates all of the possible endpoint paths.
+ * Enumerates all possible endpoint paths.
  */
 export enum Endpoint {
   // Accounts
@@ -123,6 +127,14 @@ export enum Endpoint {
 
   // Files
   getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
+
+  // Search
+  search = "search/:versionId",
+
+  // Generation
+
+  summarize = "summarize",
+  prompt = "prompt",
 }
 
 /**

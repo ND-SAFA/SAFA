@@ -41,29 +41,28 @@ export async function handleEntityChangeMessage(
     ({ meta }) => meta.requiresProject
   );
   const message: ChangeMessageSchema = JSON.parse(frame.body);
-  const isCurrentUser = false; // message.user === sessionStore.userEmail;
-  const updateLayout = message.updateLayout && routeRequiresProject;
   const project = await getChanges(versionId, message);
+  let hasLayoutChange = false;
 
-  // Skip updates by the current user that don't involve a layout update.
-  if (isCurrentUser && !updateLayout) return;
+  // Step - Iterate through message and delete entities.
+  for (const change of message.changes) {
+    if (!notifyUserEntities.includes(change.entity)) return;
 
-  appStore.enqueueChanges(async () => {
-    // Step - Iterate through message and delete entities.
+    if (change.action === ActionType.DELETE) {
+      await handleDeleteChange(change);
+    } else if (change.action === ActionType.UPDATE) {
+      await handleUpdateChange(change, project);
 
-    for (const change of message.changes) {
-      if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
-        if (change.action === ActionType.DELETE) {
-          await handleDeleteChange(change);
-        } else if (change.action === ActionType.UPDATE) {
-          await handleUpdateChange(change, project);
-        }
+      if (change.entity === EntityType.ARTIFACTS) {
+        hasLayoutChange = true;
       }
     }
+  }
 
-    if (!updateLayout) return;
+  // Step - Update default layout if needed.
+  if (!routeRequiresProject || !hasLayoutChange) return;
 
-    // Step - Update default layout after changes are stored.
+  appStore.enqueueChanges(async () => {
     documentStore.updateBaseLayout(project.layout);
   });
 }

@@ -1,5 +1,6 @@
 import { DataCy, Routes, simpleProjectFiles } from "@/fixtures";
-import { validUser } from "@/fixtures/data/user.json";
+
+const validUser = Cypress.env("validUser");
 
 describe("Project Versions", () => {
   before(() => {

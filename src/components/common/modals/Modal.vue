@@ -53,40 +53,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
+import { ModalProps } from "@/types";
 import { Typography, Separator, FlexBox } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
 
-const props = defineProps<{
-  /**
-   * The modal title.
-   */
-  title: string;
-  /**
-   * The modal subtitle.
-   */
-  subtitle?: string;
-  /**
-   * Whether the modal is open.
-   */
-  open: boolean;
-  /**
-   * Whether the component is loading.
-   */
-  loading?: boolean;
-  /**
-   * A fixed width size to set for the modal.
-   */
-  size?: "sm" | "md" | "lg" | "xl";
-  /**
-   * The testing selector to set.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<ModalProps>();
 
 const emit = defineEmits<{
-  /**
-   * Called when closed.
-   */
   (e: "close"): void;
 }>();
 

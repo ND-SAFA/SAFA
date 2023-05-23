@@ -3,7 +3,7 @@
     <div v-if="doDisplay" @click.stop>
       <chip
         clickable
-        outline
+        outlined
         :color="color"
         :class="className"
         @click="handleClick"

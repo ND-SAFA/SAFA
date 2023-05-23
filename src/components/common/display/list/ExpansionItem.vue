@@ -26,11 +26,9 @@ export default {
 
 <script setup lang="ts">
 import { useSlots } from "vue";
+import { ExpansionItemProps } from "@/types";
 
-const props = defineProps<{
-  label: string;
-  caption?: string;
-}>();
+const props = defineProps<ExpansionItemProps>();
 
 const slots = useSlots();
 </script>

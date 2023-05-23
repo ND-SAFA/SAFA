@@ -1,3 +1,4 @@
+export * from "./base";
 export * from "./common";
 export * from "./files";
 export * from "./navigation";
@@ -5,4 +6,5 @@ export * from "./project-creator";
 export * from "./graph";
 export * from "./models";
 export * from "./settings";
-export * from "./icons";
+export * from "./enums";
+export * from "./project-view";

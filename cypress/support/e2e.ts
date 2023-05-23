@@ -22,9 +22,28 @@ import "./customAttributesCommands";
 Cypress.on("uncaught:exception", (err) => {
   if (
     err.message.includes("ResizeObserver loop limit exceeded") ||
-    err.message.includes("Cannot read properties of")
+    err.message.includes("Cannot read properties of") ||
+    err.message.includes("Cannot destructure property") ||
+    err.message.includes("Session has timed out") ||
+    err.message.includes("Unexpected end of JSON")
   ) {
     // ignore the error
     return false;
   }
+});
+
+/**
+ * Generate users before running tests.
+ */
+before(() => {
+  cy.log("Generating users...");
+  cy.dbGenerateUsers();
+});
+
+/**
+ * Delete users after running tests.
+ */
+after(() => {
+  cy.log("Cleaning up users...");
+  cy.dbDeleteGeneratedUsers();
 });

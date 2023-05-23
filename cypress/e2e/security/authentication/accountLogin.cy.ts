@@ -1,4 +1,6 @@
-import { DataCy, Routes, invalidUser, validUser } from "@/fixtures";
+import { DataCy, Routes } from "@/fixtures";
+
+const { invalidUser, validUser } = Cypress.env();
 
 describe("Account Login", () => {
   beforeEach(() => {
@@ -44,5 +46,5 @@ describe("Account Login", () => {
     });
   });
 
-  describe.skip("When I log out, all stored project information is cleared", () => {});
+  // describe.skip("When I log out, all stored project information is cleared", () => {});
 });

@@ -28,10 +28,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
     action(cy: CytoCore, event: EventObject) {
       const artifact = event.target.data() as ArtifactCytoElementData;
 
-      cy.nodes()
-        .filter((n) => n.data().id === artifact.id)
-        .layout(layoutStore.layoutOptions)
-        .run();
+      cy.getElementById(artifact.id).layout(layoutStore.layoutOptions).run();
 
       if (artifact.id === selectionStore.selectedArtifact?.id) {
         selectionStore.selectArtifact(artifact.id);

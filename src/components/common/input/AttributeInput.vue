@@ -104,26 +104,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  AttributeCollectionSchema,
-  AttributeSchema,
-  AttributeDataType,
-} from "@/types";
+import { AttributeDataType, AttributeInputProps } from "@/types";
 import TextInput from "./TextInput.vue";
 import SelectInput from "./SelectInput.vue";
 import ArtifactInput from "./ArtifactInput.vue";
 import MultiselectInput from "./MultiselectInput.vue";
 
-const props = defineProps<{
-  /**
-   * The collection of attribute values.
-   */
-  attributes: AttributeCollectionSchema;
-  /**
-   * The attribute being edited.
-   */
-  attribute: AttributeSchema;
-}>();
+const props = defineProps<AttributeInputProps>();
 
 const intRules = computed(
   () =>

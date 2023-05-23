@@ -27,12 +27,8 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { StepperListStepProps } from "@/types";
 import { Typography, Separator } from "@/components/common/display";
 
-const props = defineProps<{
-  title: string;
-  itemCount: number;
-  emptyMessage?: string;
-  loading?: boolean;
-}>();
+const props = defineProps<StepperListStepProps>();
 </script>

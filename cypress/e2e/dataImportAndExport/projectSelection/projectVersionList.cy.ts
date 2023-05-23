@@ -1,4 +1,6 @@
-import { DataCy, Routes, validUser } from "@/fixtures";
+import { DataCy, Routes } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
 
 describe("Project Version List", () => {
   before(() => {
@@ -23,7 +25,8 @@ describe("Project Version List", () => {
     it("Selects and loads a project and version", () => {
       cy.projectSelectorContinue("project").projectSelectorContinue("version");
 
-      cy.getCy(DataCy.appLoading).should("be.visible");
+      cy.getCy(DataCy.appLoading).should("not.exist");
+      cy.clickButton(DataCy.navTreeButton);
       cy.waitForProjectLoad(true);
     });
   });

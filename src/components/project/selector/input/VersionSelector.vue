@@ -1,55 +1,45 @@
 <template>
-  <flex-box align="center" r="1">
-    <typography
-      el="h1"
-      variant="subtitle"
-      color="white"
-      class="text-expanded"
-      :value="projectName"
-      x="4"
-    />
-    <q-select
-      v-if="isProjectDefined"
-      v-model="version"
-      dense
-      outlined
-      dark
-      :options-dark="darkMode"
-      options-selected-class="primary"
-      label="Version"
-      :options="versions"
-      option-value="versionId"
-      class="nav-input nav-version"
-      color="accent"
-    >
-      <template #selected>
-        {{ versionToString(version) }}
-      </template>
-      <template #option="{ opt, itemProps }">
-        <list-item v-bind="itemProps" :title="versionToString(opt)" />
-      </template>
-      <template #after-options>
-        <text-button
-          text
-          label="Add Version"
-          icon="add"
-          @click="openCreateVersion = true"
-        />
-      </template>
-    </q-select>
-
-    <version-creator
-      :open="openCreateVersion"
-      :project="project"
-      @close="openCreateVersion = false"
-      @create="handleVersionCreated"
-    />
-  </flex-box>
+  <q-select
+    v-if="isProjectDefined"
+    v-model="version"
+    outlined
+    dark
+    :options-dark="darkMode"
+    options-selected-class="primary"
+    label="Version"
+    :options="versions"
+    option-value="versionId"
+    class="nav-input nav-version q-ml-sm"
+    color="accent"
+  >
+    <template #selected>
+      {{ versionToString(version) }}
+    </template>
+    <template #option="{ opt, itemProps }">
+      <list-item v-bind="itemProps" :title="versionToString(opt)" />
+    </template>
+    <template #after-options>
+      <text-button
+        text
+        label="Add Version"
+        icon="add"
+        @click="openCreateVersion = true"
+      />
+    </template>
+    <template #after>
+      <version-creator
+        :open="openCreateVersion"
+        :project="project"
+        @close="openCreateVersion = false"
+        @create="handleVersionCreated"
+      />
+    </template>
+  </q-select>
 </template>
 
 <script lang="ts">
 /**
- * Displays the current project version.
+ * Displays the current project version, and allows it to be changed.
  */
 export default {
   name: "VersionSelector",
@@ -62,8 +52,8 @@ import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore, useTheme } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
-import { Typography, FlexBox, TextButton, ListItem } from "@/components/common";
-import VersionCreator from "./VersionCreator.vue";
+import { TextButton, ListItem } from "@/components/common";
+import { VersionCreator } from "@/components/project/creator";
 
 const versions = ref<VersionSchema[]>([]);
 const openCreateVersion = ref(false);
@@ -72,9 +62,6 @@ const { darkMode } = useTheme();
 
 const project = computed(() => projectStore.project);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);
-const projectName = computed(() =>
-  isProjectDefined.value ? project.value.name : "No Project Selected"
-);
 
 const version = computed({
   get: () => projectStore.version,

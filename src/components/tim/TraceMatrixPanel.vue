@@ -10,10 +10,16 @@
     </flex-box>
 
     <panel-card>
-      <flex-box wrap align="center">
-        <attribute-chip artifact-type :value="sourceType" />
-        <icon class="q-mx-xs" size="sm" color="primary" variant="trace" />
+      <flex-box column align="center">
         <attribute-chip artifact-type :value="targetType" />
+        <icon
+          class="q-mx-xs"
+          size="sm"
+          color="primary"
+          variant="trace"
+          :rotate="-90"
+        />
+        <attribute-chip artifact-type :value="sourceType" />
       </flex-box>
       <separator class="q-my-sm" />
       <typography variant="caption" value="Total Trace Links" />

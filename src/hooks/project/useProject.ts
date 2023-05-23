@@ -5,7 +5,7 @@ import {
   GenerationModelSchema,
   VersionSchema,
 } from "@/types";
-import { createProject, removeMatches } from "@/util";
+import { createProject, createProjectIdentifier, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
@@ -31,6 +31,12 @@ export const useProject = defineStore("project", {
     project: createProject(),
   }),
   getters: {
+    /**
+     * @return The full project identifier.
+     */
+    projectIdentifier(): IdentifierSchema {
+      return createProjectIdentifier(this.project);
+    },
     /**
      * @return The current project id.
      */

@@ -1,3 +1,5 @@
+import { ClickableProps, ColorProps, StyleProps, TestableProps } from "@/types";
+
 /**
  * Enumerates the types of icons.
  */
@@ -23,6 +25,7 @@ export type IconVariant =
   | "back"
   | "account"
   | "search"
+  | "generate"
   | "notification"
   | "share"
   | "logs"
@@ -66,3 +69,38 @@ export type IconVariant =
   | "group-open-all"
   | "group-close"
   | "group-close-all";
+
+/**
+ * Defines props for an icon.
+ */
+export interface IconDisplayProps
+  extends ColorProps,
+    StyleProps,
+    TestableProps {
+  /**
+   * The icon variant to render.
+   */
+  variant?: IconVariant;
+  /**
+   * The id of an icon, if not rendering a preset variant.
+   */
+  id?: string;
+  /**
+   * The size of the icon.
+   */
+  size?: "sm" | "md" | "lg";
+  /**
+   * How much to rotate the icon (in degrees).
+   */
+  rotate?: number;
+}
+
+/**
+ * Defines props for the safa icon.
+ */
+export interface SafaIconProps extends ClickableProps {
+  /**
+   * Whether to hide the icon.
+   */
+  hidden?: boolean;
+}

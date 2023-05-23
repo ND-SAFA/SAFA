@@ -66,42 +66,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
-import { TableColumn } from "@/types";
+import { GroupableTableHeaderProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { Searchbar, SelectInput } from "@/components/common/input";
 import { CommitButtons, IconButton } from "@/components/common/button";
 import { FlexBox, Separator } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * The columns to render in the table.
-   */
-  columns: TableColumn[];
-  /**
-   * The search text to filter with.
-   */
-  searchText: string;
-  /**
-   * The label for the searchbar.
-   */
-  searchLabel: string;
-  /**
-   * The row key to group by.
-   */
-  groupBy: string | undefined;
-  /**
-   * The row keys to sort by.
-   */
-  sortBy: string | undefined;
-  /**
-   * Whether to sort in descending order.
-   */
-  sortDesc: boolean;
-  /**
-   * Whether the table is in fullscreen mode.
-   */
-  inFullscreen: boolean;
-}>();
+const props = defineProps<GroupableTableHeaderProps>();
 
 const emit = defineEmits<{
   (e: "update:searchText", text: string): void;

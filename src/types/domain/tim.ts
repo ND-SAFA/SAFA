@@ -16,6 +16,10 @@ export interface TimArtifactLevelSchema extends ArtifactTypeSchema {
    * The index of the icon representing this artifact type.
    */
   iconIndex: number;
+  /**
+   * The unique color associated with this type.
+   */
+  color: string;
 }
 
 /**

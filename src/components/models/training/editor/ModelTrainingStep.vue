@@ -7,7 +7,7 @@
     <template #title>
       <flex-box justify="between">
         <typography variant="subtitle" :value="stepName" />
-        <chip outline :color="stepColor" :label="step.status" />
+        <chip outlined :color="stepColor" :label="step.status" />
       </flex-box>
     </template>
     <flex-box v-if="step.type === 'document'" t="2" align="center">
@@ -15,7 +15,7 @@
       <chip
         v-for="document in step.documents"
         :key="document.url"
-        outline
+        outlined
         class="q-ma-sm"
         :label="document.name"
       />
@@ -25,7 +25,7 @@
       <chip
         v-for="repo in step.repositories"
         :key="repo.url"
-        outline
+        outlined
         class="q-ma-sm"
         :label="repo.name"
       />
@@ -33,11 +33,11 @@
     <flex-box v-else-if="step.type === 'project'" t="2" align="center">
       <typography value="Trained on project data:" />
       <flex-box v-for="project in step.projects" :key="project.id">
-        <chip outline color="primary" class="q-ma-sm" :label="project.name" />
+        <chip outlined color="primary" class="q-ma-sm" :label="project.name" />
         <chip
           v-for="level in project.levels"
           :key="level.source + level.target"
-          outline
+          outlined
           class="q-ma-sm"
           :label="`${level.source} To ${level.target}`"
         />

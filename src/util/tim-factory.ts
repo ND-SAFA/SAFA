@@ -1,5 +1,6 @@
 import { ApprovalType, ProjectSchema, TimSchema, TraceType } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
+import { getTypeColor } from "@/util/theme";
 
 /**
  * @return A project TIM structure initialized to the given values.
@@ -17,6 +18,21 @@ export function createTIM(project?: ProjectSchema): TimSchema {
     artifactCounts[type] = (artifactCounts[type] || 0) + 1;
     artifactTypes[id] = type;
   });
+
+  // Add trace counts from the artifact types, in case a type direction exists with 0 links.
+  Object.entries(project?.typeDirections || {}).forEach(
+    ([name, allowedTypes]) => {
+      allowedTypes.forEach((allowedType) => {
+        const type = `${name}${delimiter}${allowedType}`;
+
+        traceCounts[type] = {
+          total: 0,
+          generated: 0,
+          approved: 0,
+        };
+      });
+    }
+  );
 
   project?.traces.forEach(
     ({ sourceId, targetId, approvalStatus, traceType }) => {
@@ -46,8 +62,9 @@ export function createTIM(project?: ProjectSchema): TimSchema {
           name: artifactType,
           count,
           icon: defaultTypeIcon,
-          allowedTypes: [],
+          allowedTypes: project?.typeDirections[artifactType] || [],
           iconIndex: 0,
+          color: getTypeColor(artifactType),
         },
       }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {}),

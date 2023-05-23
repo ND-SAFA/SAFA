@@ -1,9 +1,9 @@
 <template>
   <private-page
     title="Open Project"
-    subtitle="Select a project and version to load."
+    subtitle="Select a project and version to load, or view past uploads."
   >
-    <project-version-stepper />
+    <project-loader />
   </private-page>
 </template>
 
@@ -17,5 +17,5 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { PrivatePage, ProjectVersionStepper } from "@/components";
+import { PrivatePage, ProjectLoader } from "@/components";
 </script>

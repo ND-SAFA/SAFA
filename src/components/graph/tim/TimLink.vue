@@ -4,7 +4,7 @@
 
 <script lang="ts">
 /**
- * Displays link between two artifact layers.
+ * Displays trace link edges between artifact types.
  */
 export default {
   name: "TimLink",

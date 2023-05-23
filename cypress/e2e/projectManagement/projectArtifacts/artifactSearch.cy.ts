@@ -20,7 +20,7 @@ describe("Artifact Search", () => {
 
   describe("I can see how many artifact match my search", () => {
     it("Displays the count of matching artifacts in the nav bar", () => {
-      cy.inputText(DataCy.artifactSearchNavInput, "F21");
+      cy.enableBasicSearch().inputText(DataCy.artifactSearchNavInput, "F21");
 
       cy.getCy(DataCy.artifactSearchItem).should("have.length", 1);
       cy.getCy(DataCy.artifactSearchCount).should("contain", 1);

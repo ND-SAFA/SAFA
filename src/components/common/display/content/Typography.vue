@@ -6,16 +6,18 @@
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
+    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre v-if="isExpanded" :class="className">{{ value }}</pre>
-    <div v-else :class="className + ' text-ellipsis text-expanded'">
-      {{ value }}
+    <pre v-if="isExpanded" v-highlightjs :class="className">
+      <code>{{value}}</code>
+    </pre>
+    <div v-else :class="className + ' text-grey-8'">
+      Code is hidden to save space.
     </div>
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
+    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
       {{ isExpanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
@@ -37,6 +39,9 @@
   <h3 v-else-if="el === 'h3'" :class="className">
     {{ value }}
   </h3>
+  <a v-else-if="el === 'a'" :class="className" :href="value">
+    {{ value }}
+  </a>
 </template>
 
 <script lang="ts">
@@ -50,128 +55,25 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults } from "vue";
-import {
-  ElementType,
-  SizeType,
-  TextAlignType,
-  TextType,
-  ThemeColor,
-} from "@/types";
+import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The text value to display.
-     */
-    value?: string | number;
-    /**
-     * Whether to truncate text with an ellipsis.
-     */
-    ellipsis?: boolean;
-
-    /**
-     * Whether to inherit color from the parent element.
-     */
-    inheritColor?: boolean;
-    /**
-     * Whether to color this text as an error.
-     */
-    error?: boolean;
-    /**
-     * Renders the text with a faded color.
-     */
-    secondary?: boolean;
-    /**
-     * The color to render the component with.
-     */
-    color?: ThemeColor;
-
-    /**
-     * Bolds the text.
-     */
-    bold?: boolean;
-    /**
-     * Sets the text to wrap.
-     */
-    wrap?: boolean;
-
-    /**
-     * The variant of text to render.
-     * @default `body`
-     */
-    variant?: TextType;
-    /**
-     * The element to render the text on.
-     * @default `span`
-     */
-    el?: ElementType;
-    /**
-     * How to align the text.
-     * @default `left`
-     */
-    align?: TextAlignType;
-
-    /**
-     * For expandable variants, whether the content defaults to expanded.
-     */
-    defaultExpanded?: boolean;
-
-    /**
-     * Renders a smaller component.
-     */
-    small?: boolean;
-    /**
-     * Renders a larger component.
-     */
-    large?: boolean;
-
-    /**
-     * The x margin.
-     */
-    x?: SizeType;
-    /**
-     * The y margin.
-     */
-    y?: SizeType;
-    /**
-     * The left margin.
-     */
-    l?: SizeType;
-    /**
-     * The right margin.
-     */
-    r?: SizeType;
-    /**
-     * The top margin.
-     */
-    t?: SizeType;
-    /**
-     * The bottom margin.
-     */
-    b?: SizeType;
-
-    /**
-     * The classnames to include on this component.
-     */
-    class?: string;
-  }>(),
-  {
-    value: "",
-    classes: undefined,
-    color: undefined,
-    variant: "body",
-    el: "span",
-    align: "left",
-    x: "",
-    y: "",
-    l: "",
-    r: "",
-    t: "",
-    b: "",
-    class: "",
-  }
-);
+const props = withDefaults(defineProps<TypographyProps>(), {
+  value: "",
+  classes: undefined,
+  color: undefined,
+  variant: "body",
+  el: "span",
+  align: "left",
+  x: "",
+  y: "",
+  l: "",
+  r: "",
+  t: "",
+  b: "",
+  class: "",
+  collapseLength: 500,
+});
 
 const { darkMode } = useTheme();
 
@@ -197,7 +99,9 @@ const className = useMargins(props, () => [
 ]);
 
 const isExpanded = ref(
-  props.defaultExpanded && String(props.value).length < 500
+  props.defaultExpanded &&
+    (props.collapseLength === 0 ||
+      String(props.value).length < props.collapseLength)
 );
 
 const isExpandable = computed(() => props.variant === "expandable");

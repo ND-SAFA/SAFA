@@ -2,7 +2,7 @@
   <flex-box v-if="doDisplay" b="2">
     <text-button
       text
-      label="View Body"
+      label="View Content"
       icon="artifact"
       data-cy="button-artifact-body"
       @click="handleViewBody"

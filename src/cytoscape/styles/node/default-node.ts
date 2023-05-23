@@ -1,10 +1,9 @@
 import { ArtifactCytoElementData } from "@/types";
-import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 
 /**
- * Creates the SVG safety case context.
+ * Creates the default SVG node.
  *
  * @param data - The artifact data to render.
  *
@@ -19,13 +18,8 @@ export function svgDefault(data: ArtifactCytoElementData): string {
       marginTop: 6,
       truncateLength: 90,
       outer,
-      inner: { x: 10, y: 20, width: 180, height: 100 },
+      inner: { x: 12, y: 20, width: 180, height: 100 },
     },
-    svgRect(
-      outer,
-      getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState, data.dark),
-      8
-    )
+    svgRect(outer, 8, data.typeColor)
   );
 }

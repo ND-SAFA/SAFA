@@ -12,7 +12,7 @@ describe("Trace Link Approval", () => {
   });
 
   beforeEach(() => {
-    cy.initProjectVersion().openTraceApproval();
+    cy.initProjectVersion().switchToTableView("approval");
   });
 
   describe("I can approve an un-reviewed or declined trace link", () => {

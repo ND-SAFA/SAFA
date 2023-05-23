@@ -2,6 +2,13 @@
 const fs = require("fs");
 
 module.exports = {
+  configureWebpack: {
+    resolve: {
+      fallback: {
+        fs: false,
+      },
+    },
+  },
   transpileDependencies: ["quasar"],
   pluginOptions: {
     electronBuilder: {

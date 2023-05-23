@@ -36,7 +36,7 @@ describe("Job Status", () => {
     it("Shows completed jobs", () => {
       cy.getCy(DataCy.jobProgress, "first", 10000).should(
         "contain.text",
-        "100%"
+        "Completed"
       );
     });
   });

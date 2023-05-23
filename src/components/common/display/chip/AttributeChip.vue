@@ -2,13 +2,13 @@
   <chip
     v-if="!props.confidenceScore"
     :class="chipClassName"
-    :outline="enumerated"
+    :outlined="enumerated"
     :color="displayColor"
     :removable="props.removable"
     :data-cy="props.dataCy"
     @remove="emit('remove')"
   >
-    <q-tooltip :hidden="text.length < 10">
+    <q-tooltip :hidden="text.length < 15">
       {{ text }}
     </q-tooltip>
     <icon
@@ -21,6 +21,7 @@
     <typography
       ellipsis
       inherit-color
+      :small="text.length >= 15"
       :l="iconVisible ? '1' : ''"
       :value="text"
     />
@@ -48,7 +49,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant, ThemeColor } from "@/types";
+import { AttributeChipProps } from "@/types";
 import {
   camelcaseToDisplay,
   getEnumColor,
@@ -60,51 +61,7 @@ import { FlexBox, Typography } from "../content";
 import { Icon } from "../icon";
 import Chip from "./Chip.vue";
 
-const props = defineProps<{
-  /**
-   * The chip text.
-   */
-  value: string;
-
-  /**
-   * The color to render the component with.
-   */
-  color?: ThemeColor;
-  /**
-   * The type of icon to render.
-   */
-  icon?: IconVariant;
-  /**
-   * Whether the chip is removable. Displays a remove icon button.
-   */
-  removable?: boolean;
-
-  /**
-   * If true, the chip text will be converted from "camelCase" to "Display Case".
-   */
-  format?: boolean;
-  /**
-   * Whether this chip is for an artifact type, customizing the display and icon.
-   */
-  artifactType?: boolean;
-  /**
-   * Whether this chip is for a delta type, customizing the display and icon.
-   */
-  deltaType?: boolean;
-  /**
-   * Whether this chip is for an approval type, customizing the display and icon.
-   */
-  approvalType?: boolean;
-  /**
-   * Whether to render a confidence score instead of a chip.
-   */
-  confidenceScore?: boolean;
-
-  /**
-   * The testing selector to set.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<AttributeChipProps>();
 
 const emit = defineEmits<{
   /**

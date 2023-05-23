@@ -1,7 +1,7 @@
 <template>
   <q-chip
     :class="props.class"
-    :outline="props.outline"
+    :outline="props.outlined"
     :color="props.color"
     :data-cy="props.dataCy"
     :style="props.style"
@@ -25,43 +25,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ThemeColor } from "@/types";
+import { ChipProps } from "@/types";
 import { Typography } from "../content";
 
-const props = defineProps<{
-  /**
-   * A chip label to display.
-   */
-  label?: string;
-  /**
-   * The class names for the chip.
-   */
-  class?: string;
-  /**
-   * The css style of the chip.
-   */
-  style?: string;
-  /**
-   * Whether the chip is outlined.
-   */
-  outline?: boolean;
-  /**
-   * Whether the chip is clickable.
-   */
-  clickable?: boolean;
-  /**
-   * Whether the chip is removable. Displays a remove icon button.
-   */
-  removable?: boolean;
-  /**
-   * The color of the chip
-   */
-  color?: ThemeColor;
-  /**
-   * A testing selector to set on the chip.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<ChipProps>();
 
 const emit = defineEmits<{
   /**

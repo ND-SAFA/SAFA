@@ -3,7 +3,7 @@
     <icon-button
       v-for="definition in viewButtons"
       :key="definition.label"
-      color="accent"
+      color="primary"
       :tooltip="definition.label"
       :icon="definition.icon"
       :data-cy="definition.dataCy"

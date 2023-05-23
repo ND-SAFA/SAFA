@@ -1,5 +1,4 @@
 import { ArtifactCytoElementData } from "@/types";
-import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 
@@ -19,14 +18,8 @@ export function svgDefault(data: ArtifactCytoElementData): string {
       marginTop: 6,
       truncateLength: 90,
       outer,
-      inner: { x: 10, y: 20, width: 180, height: 100 },
+      inner: { x: 12, y: 20, width: 180, height: 100 },
     },
-    svgRect(
-      outer,
-      getBorderColor(data.artifactType),
-      getBackgroundColor(data.artifactDeltaState, data.dark),
-      8
-      // getTypeColor(data.artifactType)
-    )
+    svgRect(outer, 8, data.typeColor)
   );
 }

@@ -26,14 +26,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { GenMethodInputProps } from "@/types";
 import { traceModelOptions } from "@/util";
 import { useVModel } from "@/hooks";
 import { ListItem } from "@/components/common/display";
 
-const props = defineProps<{
-  modelValue?: string;
-  onlyTrainable?: boolean;
-}>();
+const props = defineProps<GenMethodInputProps>();
 
 defineEmits<{
   (e: "update:modelValue"): void;

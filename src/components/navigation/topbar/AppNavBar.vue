@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated :class="darkMode ? 'bg-neutral' : 'bg-primary'">
+  <q-header elevated class="bg-neutral">
     <q-toolbar class="nav-topbar">
       <div class="full-width">
         <header-bar />
@@ -22,12 +22,9 @@ export default {
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { useTheme } from "@/hooks";
 import { Routes } from "@/router";
 import { HeaderBar, LoadingBar } from "./header";
 import { GraphBar } from "./graph";
-
-const { darkMode } = useTheme();
 
 const currentRoute = useRoute();
 const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);

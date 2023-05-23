@@ -1,0 +1,104 @@
+import {
+  ArtifactSchema,
+  ClickableProps,
+  ColorProps,
+  IconProps,
+  SelectOption,
+  TestableProps,
+  URLQuery,
+} from "@/types";
+
+/**
+ * Defines props for a component that displays an artifact list item.
+ */
+export interface ArtifactListItemProps extends ClickableProps {
+  /**
+   * The artifact to display.
+   */
+  artifact: ArtifactSchema;
+  /**
+   * Whether to display the title.
+   */
+  displayTitle?: boolean;
+  /**
+   * Whether to display a divider between the content.
+   */
+  displayDivider?: boolean;
+}
+
+/**
+ * Defines props for a component that displays a expansion item.
+ */
+export interface ExpansionItemProps {
+  /**
+   * The label to display.
+   */
+  label: string;
+  /**
+   * The caption ti display under the label.
+   */
+  caption?: string;
+}
+
+/**
+ * Defines props for a component that displays a list of components.
+ */
+export interface ListProps {
+  /**
+   * Whether to add a border to the list.
+   */
+  bordered?: boolean;
+  /**
+   * The number of pixels to set the scroll area height to.
+   */
+  scrollHeight?: number;
+}
+
+/**
+ * Defines props for a component that displays a list item.
+ */
+export interface ListItemProps
+  extends ClickableProps,
+    IconProps,
+    ColorProps,
+    TestableProps {
+  /**
+   * The item title, instead of using the `default` slot.
+   */
+  title?: string;
+  /**
+   * The icon subtitle, instead of using the `subtitle` slot.
+   */
+  subtitle?: string;
+  /**
+   * The item tooltip.
+   * If set to true, a tooltip will be generated based on the title and subtitle.
+   */
+  tooltip?: true | string;
+  /**
+   * Where the list item navigates to when clicked.
+   */
+  to?: string | { path: string; query: URLQuery };
+  /**
+   * Whether to render a divider between the title and subtitle.
+   */
+  divider?: boolean;
+  /**
+   * The optional number of columns ot take up with the action space, out of 12.
+   */
+  actionCols?: number;
+}
+
+/**
+ * Defines props for a component that displays a set of tabs.
+ */
+export interface TabListProps {
+  /**
+   * The tab id currently selected.
+   */
+  modelValue: string;
+  /**
+   * The tabs to display.
+   */
+  tabs: SelectOption[];
+}

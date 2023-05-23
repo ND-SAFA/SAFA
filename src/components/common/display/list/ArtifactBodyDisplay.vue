@@ -30,30 +30,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactListItemProps } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { AttributeChip } from "../chip";
 import ListItem from "./ListItem.vue";
 
-const props = defineProps<{
-  /**
-   * The artifact to display.
-   */
-  artifact: ArtifactSchema;
-  /**
-   * Whether to display the title.
-   */
-  displayTitle?: boolean;
-  /**
-   * Whether to display a divider between the content.
-   */
-  displayDivider?: boolean;
-  /**
-   * Whether the content is clickable.
-   */
-  clickable?: boolean;
-}>();
+const props = defineProps<ArtifactListItemProps>();
 
 const emit = defineEmits<{
   /**

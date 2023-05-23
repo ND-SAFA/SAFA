@@ -3,7 +3,7 @@
     v-if="runUpdate"
     text
     label="Load Changes"
-    color="accent"
+    color="primary"
     icon="sync"
     data-cy="button-nav-load-update"
     @click="handleClick"

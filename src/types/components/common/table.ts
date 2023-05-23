@@ -1,62 +1,204 @@
+import {
+  ExpandableProps,
+  LoadingProps,
+  MinimalProps,
+  TableColumn,
+  TableGroupRow,
+  TableRow,
+  TestableProps,
+} from "@/types";
+
 /**
- * A column within a data table.
+ * The props for a table component.
  */
-export interface TableColumn<T = Record<string, unknown>> {
+export interface TableProps<Row = TableRow>
+  extends LoadingProps,
+    TestableProps {
   /**
-   * The column field id.
+   * The columns to render in the table.
    */
-  name: keyof T | string;
+  columns: TableColumn<Row>[];
   /**
-   * The column display name.
+   * The column names that are currently visible, if not all of them.
    */
-  label: string;
+  visibleColumns?: string[];
   /**
-   * A function for returning the field id from a row item.
+   * The rows of the table.
    */
-  field(row: T): unknown;
+  rows: Row[];
   /**
-   * Whether this column is required and cannot be hidden.
+   * The field on each row that is unique.
    */
-  required?: boolean;
+  rowKey: string | ((row: Row) => string);
   /**
-   * Whether this column is sortable.
+   * The number of rows to display per page.
    */
-  sortable?: boolean;
+  rowsPerPage?: number;
   /**
-   * How to align the text content.
+   * Enables selection of rows.
    */
-  align?: "left" | "center";
+  selection?: "single" | "multiple";
   /**
-   * A function for formatting the cell text.
+   * The values of selected rows.
    */
-  format?(value: unknown): string;
+  selected?: Row[];
   /**
-   * A function for comparing two rows when sorting by this column.
+   * The ids of expanded rows.
    */
-  sort?(a: unknown, b: unknown): number;
+  expanded?: string[];
+  /**
+   * The text to filter by.
+   */
+  filterText?: string;
+  /**
+   * A function to filter the table with.
+   */
+  filter?: (
+    rows: Row[],
+    filterText: string | undefined,
+    cols: TableColumn[]
+  ) => Row[];
+  /**
+   * Which attribute to sort by.
+   */
+  sortBy?: string;
+  /**
+   * Whether to sort descending.
+   */
+  sortDesc?: boolean;
+  /**
+   * A function to sort the table with.
+   */
+  sort?(rows: Row[], sortBy: string, descending: boolean): Row[];
+  /**
+   * Where to place separators. Defaults to horizontal.
+   */
+  separator?: "horizontal" | "vertical" | "cell" | "none";
+  /**
+   * Any cells can be customized through the slot `body-cell-[name]`.
+   */
+  customCells?: string[];
+  /**
+   * Whether to display densely.
+   */
+  dense?: boolean;
+  /**
+   * If true, virtual scroll will be enabled.
+   */
+  virtualScroll?: boolean;
 }
 
 /**
- * A generic row of a table.
+ * The props for a table component that can display groups of rows.
  */
-export type TableRow = Record<string, unknown>;
+export interface GroupableTableProps
+  extends Pick<
+      TableProps,
+      "columns" | "rows" | "rowKey" | "loading" | "expanded" | "customCells"
+    >,
+    ExpandableProps {
+  /**
+   * The name of an item.
+   */
+  itemName?: string;
+  /**
+   * The default row key to group by.
+   */
+  defaultGroupBy?: string;
+  /**
+   * The default row keys to sort by.
+   */
+  defaultSortBy?: string;
+  /**
+   * The default sort direction.
+   */
+  defaultSortDesc?: boolean;
+  /**
+   * Determines whether a row should be visible.
+   */
+  filterRow?(row: TableRow): boolean;
+}
 
 /**
- * A generic row of a table, or a group header.
+ * The props for a table header component on groupable tables.
  */
-export type TableGroupRow =
-  | TableRow
-  | {
-      /**
-       * The field name that is being grouped by.
-       */
-      $groupBy: string;
-      /**
-       * The field value that all rows share for this group.
-       */
-      $groupValue: string;
-      /**
-       * The number of rows in this group.
-       */
-      $groupRows: number;
-    };
+export interface GroupableTableHeaderProps {
+  /**
+   * The columns to render in the table.
+   */
+  columns: TableColumn[];
+  /**
+   * The search text to filter with.
+   */
+  searchText: string;
+  /**
+   * The label for the searchbar.
+   */
+  searchLabel: string;
+  /**
+   * The row key to group by.
+   */
+  groupBy: string | undefined;
+  /**
+   * The row keys to sort by.
+   */
+  sortBy: string | undefined;
+  /**
+   * Whether to sort in descending order.
+   */
+  sortDesc: boolean;
+  /**
+   * Whether the table is in fullscreen mode.
+   */
+  inFullscreen: boolean;
+}
+
+/**
+ * The props for a groupable table row component.
+ */
+export interface GroupableTableRowProps extends ExpandableProps {
+  /**
+   * Props passed in from the quasar table.
+   */
+  quasarProps: Record<string, unknown>;
+  /**
+   A generic row of a table, or a group header.
+   */
+  row: TableGroupRow;
+  /**
+   * The visible table columns.
+   */
+  columns: TableColumn[];
+  /**
+   * Whether the row is expanded.
+   */
+  expand?: boolean;
+}
+
+/**
+ * The props for a table component that can display selectable rows.
+ */
+export interface SelectorTableProps
+  extends Pick<TableProps, "columns" | "rows" | "rowKey" | "loading">,
+    MinimalProps {
+  /**
+   * The values of selected rows.
+   */
+  selected?: TableRow[];
+  /**
+   * The name of an item.
+   */
+  itemName?: string;
+  /**
+   * Whether elements can be added.
+   */
+  addable?: boolean;
+  /**
+   * Whether these rows are editable.
+   */
+  editable?: boolean | ((row: TableRow) => boolean);
+  /**
+   * Whether these rows are deletable.
+   */
+  deletable?: boolean | ((row: TableRow) => boolean);
+}

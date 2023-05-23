@@ -34,22 +34,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { SelectOption } from "@/types";
+import { TabListProps } from "@/types";
 import { useVModel } from "@/hooks";
 
-const props = defineProps<{
-  /**
-   * The tab id currently selected.
-   */
-  modelValue: string;
-  /**
-   * The tabs to display.
-   */
-  tabs: SelectOption[];
-}>();
+const props = defineProps<TabListProps>();
 
 defineEmits<{
-  (e: "update:modelValue", value: number): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
 const model = useVModel(props, "modelValue");

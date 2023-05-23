@@ -49,6 +49,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { ArtifactInput } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import {
@@ -57,12 +58,7 @@ import {
   AttributeChip,
 } from "@/components/common/display";
 
-const props = defineProps<{
-  modelValue: string[] | string | undefined;
-  multiple?: boolean;
-  label?: string;
-  onlyDocumentArtifacts?: boolean;
-}>();
+const props = defineProps<ArtifactInput>();
 
 const model = useVModel(props, "modelValue");
 

@@ -1,5 +1,4 @@
 import { ArtifactCytoElementData } from "@/types";
-import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgCircle, svgRect, svgRhombus } from "./node-shapes";
 import { svgDefault } from "./default-node";
 import { svgNode } from "./svg-node";
@@ -44,11 +43,7 @@ function svgGoal(data: ArtifactCytoElementData): string {
       outer,
       inner: { x: 10, y: 20, width: 180, height: 100 },
     },
-    svgRect(
-      outer,
-      getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState, data.dark)
-    )
+    svgRect(outer)
   );
 }
 
@@ -71,11 +66,7 @@ function svgSolution(data: ArtifactCytoElementData): string {
       outer: { width: 200, height: 200 },
       inner: { x: 40, y: 35, width: 120, height: 82 },
     },
-    svgCircle(
-      radius,
-      getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState, data.dark)
-    )
+    svgCircle(radius)
   );
 }
 
@@ -99,11 +90,6 @@ function svgStrategy(data: ArtifactCytoElementData): string {
       outer: { width: outerWidth + xOffset, height: outerHeight },
       inner: { x: 30, y: 20, width: 180, height: 100 },
     },
-    svgRhombus(
-      { width: outerWidth, height: outerHeight },
-      xOffset,
-      getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState, data.dark)
-    )
+    svgRhombus({ width: outerWidth, height: outerHeight }, xOffset)
   );
 }

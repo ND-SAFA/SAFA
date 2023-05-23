@@ -1,10 +1,8 @@
 <template>
-  <q-card>
-    <flex-box>
-      <search-mode-input />
-      <search-prompt-input />
-    </flex-box>
-  </q-card>
+  <flex-box>
+    <search-mode-input />
+    <search-prompt-input />
+  </flex-box>
 </template>
 
 <script lang="ts">

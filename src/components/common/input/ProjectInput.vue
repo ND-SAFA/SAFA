@@ -24,13 +24,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ProjectInputProps } from "@/types";
 import { projectStore, useVModel } from "@/hooks";
 
-const props = defineProps<{
-  modelValue: string[] | string | undefined;
-  multiple?: boolean;
-  excludeCurrentProject?: boolean;
-}>();
+const props = defineProps<ProjectInputProps>();
 
 const model = useVModel(props, "modelValue");
 

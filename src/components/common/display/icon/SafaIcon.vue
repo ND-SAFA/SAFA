@@ -1,18 +1,5 @@
 <template>
-  <img
-    v-if="!darkMode"
-    :src="iconLight"
-    alt="SAFA"
-    :class="className"
-    @click="$emit('click')"
-  />
-  <img
-    v-else
-    :src="iconDark"
-    alt="SAFA"
-    :class="className"
-    @click="$emit('click')"
-  />
+  <img :src="iconLight" alt="SAFA" :class="className" @click="emit('click')" />
 </template>
 
 <script lang="ts">
@@ -26,24 +13,25 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useTheme } from "@/hooks";
+import { SafaIconProps } from "@/types";
 import iconLight from "@/assets/images/SAFA-primary.svg";
-import iconDark from "@/assets/images/SAFA-secondary.svg";
 
-const props = defineProps<{
-  /**
-   * Whether the icon is clickable.
-   */
-  clickable?: boolean;
-}>();
+const props = defineProps<SafaIconProps>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const { darkMode } = useTheme();
+const className = computed(() => {
+  let classNames = "icon-safa full-width";
 
-const className = computed(() =>
-  props.clickable ? "full-width clickable" : "full-width"
-);
+  if (props.clickable) {
+    classNames += " clickable";
+  }
+  if (!props.hidden) {
+    classNames += " visible";
+  }
+
+  return classNames;
+});
 </script>

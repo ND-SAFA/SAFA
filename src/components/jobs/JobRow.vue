@@ -16,7 +16,7 @@
       />
     </q-td>
     <q-td align="end">
-      <chip outline :color="jobStatus(props.job).color()" data-cy="job-status">
+      <chip outlined :color="jobStatus(props.job).color()" data-cy="job-status">
         <q-circular-progress
           v-if="jobStatus(props.job).isInProgress()"
           :color="jobStatus(props.job).color()"

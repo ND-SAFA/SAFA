@@ -1,17 +1,15 @@
 <template>
   <q-select
-    v-if="project.projectId"
     v-model="project"
     outlined
     dark
     :options-dark="darkMode"
-    options-selected-class="primary"
     label="Project"
     :options="projects"
     option-value="projectId"
     option-label="name"
     class="nav-input"
-    color="accent"
+    color="primary"
   >
     <template #after-options>
       <text-button
@@ -30,7 +28,6 @@
       />
     </template>
   </q-select>
-  <typography v-else variant="subtitle" value="No Project Selected" />
 </template>
 
 <script lang="ts">
@@ -51,7 +48,7 @@ import {
   handleLoadVersion,
   handleGetProjects,
 } from "@/api";
-import { TextButton, Typography } from "@/components/common";
+import { TextButton } from "@/components/common";
 import { ProjectIdentifierModal } from "../../base";
 
 const openCreateProject = ref(false);
@@ -61,7 +58,7 @@ const { darkMode } = useTheme();
 const projects = computed(() => projectStore.allProjects);
 
 const project = computed({
-  get: () => projectStore.project,
+  get: () => (projectStore.projectId ? projectStore.project : undefined),
   set(identifier: IdentifierSchema | undefined) {
     if (!identifier) return;
 

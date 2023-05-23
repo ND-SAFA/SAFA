@@ -1,5 +1,5 @@
 import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
-import { capitalize, getBorderColor, isCodeArtifact } from "@/util";
+import { capitalize } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
@@ -25,7 +25,6 @@ export function svgNode(
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : data.artifactType;
-  const color = getBorderColor(data.artifactType);
   const footer = svgFooter(data, outer);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
   const outerHeight = outer.height + heightOffset;
@@ -45,10 +44,9 @@ export function svgNode(
         ${svgShape}
         ${svgTitle(title, y - 18, "type")}
         ${svgDiv({
-          x,
+          x: x * 2,
           y: y + 10,
-          width,
-          color,
+          width: width - x * 2,
         })}
         ${svgTitle(data.artifactName, y + 10, "name")}
         ${svgBody(data, truncateLength, {
@@ -102,12 +100,11 @@ export function svgTitle(
  *
  * @return stringified SVG for the node.
  */
-export function svgDiv(style: Omit<SvgStyle, "height">): string {
+export function svgDiv(style: Omit<SvgStyle, "height" | "color">): string {
   return `
      <line 
         x1="${style.x}" y1="${style.y}" 
         x2="${style.x + style.width}" y2="${style.y}" 
-        stroke="${style.color}" 
         stroke-width="2"
         class="artifact-svg-div"
       />
@@ -128,18 +125,16 @@ function svgBody(
   truncateLength: number,
   style: SvgStyle
 ): string {
-  const code = isCodeArtifact(data.artifactName);
-
   return svgText(
     getBody(data.body, truncateLength),
-    { ...style, code },
+    { ...style, code: data.isCode },
     "body",
     `
       display: block;
       width: ${style.width}px;
       height: ${style.height}px;
       line-height: 1rem;
-      text-align: ${code ? "left" : "center"};
+      text-align: ${data.isCode ? "left" : "center"};
     `
   );
 }

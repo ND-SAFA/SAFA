@@ -32,25 +32,16 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch, withDefaults } from "vue";
+import { ArtifactTypeInputProps } from "@/types";
 import { artifactStore, typeOptionsStore, useVModel } from "@/hooks";
 import { AttributeChip, Typography } from "@/components/common/display";
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string[] | string | null;
-    multiple?: boolean;
-    label?: string;
-    hint?: string;
-    errorMessage?: string;
-    showCount?: boolean;
-  }>(),
-  {
-    label: "Artifact Types",
-    multiple: false,
-    hint: undefined,
-    errorMessage: undefined,
-  }
-);
+const props = withDefaults(defineProps<ArtifactTypeInputProps>(), {
+  label: "Artifact Types",
+  multiple: false,
+  hint: undefined,
+  errorMessage: undefined,
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string[] | string | null): void;

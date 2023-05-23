@@ -7,16 +7,17 @@ from api.endpoints.completion.completion_serializer import CompletionPayload, Co
 from api.utils.model_util import ModelUtil
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.util.reflection_util import ReflectionUtil
+
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
 
-def perform_completion(model: str, prompt: str, llm_manager: AbstractLLMManager, **params) -> str:
+def complete_prompt(model: str, prompt: str, llm_manager: AbstractLLMManager, **params) -> str:
     """
     Performs a completion for a prompt.
     :param model: The model to use.
@@ -53,5 +54,5 @@ def perform_completion(prediction_payload: CompletionPayload):
     llm_name = prediction_payload["model"].lower()
     prompt: str = prediction_payload["prompt"]
     model, llm_manager = ModelUtil.get_model_manager(llm_name)
-    completion = perform_completion(model, prompt, llm_manager)
+    completion = complete_prompt(model, prompt, llm_manager)
     return {"completion": completion}

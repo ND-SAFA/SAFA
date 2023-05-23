@@ -22,7 +22,7 @@ from rest_framework import permissions
 
 from api.endpoints.completion.completion_view import perform_completion
 from api.endpoints.hgen.hgen_view import perform_hgen
-from api.endpoints.jobs.result_view import retrieve_result
+from api.endpoints.jobs.result_view import get_result, get_status
 from api.endpoints.predict.predict_view import predict
 from api.endpoints.summarize.summarize_view import perform_summarization
 
@@ -53,5 +53,6 @@ urlpatterns = [
     path('complete/', perform_completion),
     path('summarize/', perform_summarization),
     path('hgen/', perform_hgen),
-    path('results/', retrieve_result)
+    path('status/', get_status),
+    path('results/', get_result)
 ]

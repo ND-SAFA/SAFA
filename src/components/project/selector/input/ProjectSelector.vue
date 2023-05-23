@@ -48,7 +48,7 @@ import {
   handleLoadVersion,
   handleGetProjects,
 } from "@/api";
-import { TextButton, Typography } from "@/components/common";
+import { TextButton } from "@/components/common";
 import { ProjectIdentifierModal } from "../../base";
 
 const openCreateProject = ref(false);

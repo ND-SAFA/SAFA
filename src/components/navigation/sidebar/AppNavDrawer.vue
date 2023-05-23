@@ -6,7 +6,6 @@
     :breakpoint="0"
     :width="260"
     :mini="!sidebarOpen"
-    :style="style"
   >
     <flex-box
       v-if="sidebarOpen"
@@ -59,19 +58,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import { ThemeColors } from "@/util";
-import { appStore, useScreen, useTheme } from "@/hooks";
+import { appStore, useScreen } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
-const { darkMode } = useTheme();
 const { smallWindow } = useScreen();
-
-const style = computed(() =>
-  darkMode.value ? `background-color: ${ThemeColors.darkGrey}` : ""
-);
 
 const sidebarOpen = computed({
   get(): boolean {

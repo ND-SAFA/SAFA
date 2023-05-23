@@ -29,10 +29,10 @@ export function svgFooter(
   const hasChildren = (data.hiddenChildren || 0) > 0;
   const backgroundColor =
     hasWarnings && !data.dark
-      ? ThemeColors.warningLight
+      ? ThemeColors.warningBg
       : getBackgroundColor(data.artifactDeltaState, data.dark);
   const borderColor = hasWarnings
-    ? ThemeColors.warningDark
+    ? ThemeColors.warningBd
     : getBorderColor(data.artifactDeltaState);
 
   if (!hasChildren && !hasWarnings && data.childDeltaStates?.length === 0) {
@@ -142,7 +142,7 @@ function svgWarnings(
         y: style.y - 2,
       },
       "warning",
-      ThemeColors.warningDark
+      ThemeColors.warningBd
     ) +
     svgText(
       `${warningCount} Warning${warningCount !== 1 ? "s" : ""}`,

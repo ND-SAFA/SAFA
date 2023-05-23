@@ -74,9 +74,9 @@ import {
   FlexBox,
   SelectInput,
   MultiselectInput,
+  TextInput,
+  IconButton,
 } from "@/components/common";
-import TextInput from "@/components/common/input/TextInput.vue";
-import IconButton from "@/components/common/button/IconButton.vue";
 
 const projects = ref<GitHubProjectSchema[]>([]);
 

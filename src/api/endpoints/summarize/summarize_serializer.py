@@ -1,7 +1,25 @@
+from typing import List, TypedDict
+
 from rest_framework import serializers
 
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from tgen.data.chunkers.supported_chunker import SupportedChunker
+
+
+class SummaryArtifactPayload(TypedDict):
+    """
+    Type of summary artifact.
+    """
+    id: str
+    name: str
+    content: str
+    type: str
+
+
+class SummarizePayload(TypedDict):
+    artifacts: List[SummaryArtifactPayload]
+    model: str
+    prompt: str
 
 
 class SummaryArtifactSerializer(AbstractSerializer):

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import json
 import os.path
 import sys
 
@@ -22,6 +23,7 @@ sys.path.append(API_PATH)
 from pathlib import Path
 
 from dotenv import load_dotenv
+from tgen.util.json_util import NpEncoder
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -142,11 +144,34 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Celery Configuration Options
+"""
+Celery Configuration Options
+"""
 CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30m
+from kombu.serialization import register
+
+
+# Encoder function
+def np_encoder_dumps(obj):
+    return json.dumps(obj, cls=NpEncoder)
+
+
+# Decoder function
+def np_encoder_loads(obj):
+    return json.loads(obj)
+
+
+register('NpEncoder', np_encoder_dumps, np_encoder_loads,
+         content_type='application/x-myjson',
+         content_encoding='utf-8')
+
+# Tell celery to use your new serializer:
+CELERY_ACCEPT_CONTENT = ['NpEncoder']
+CELERY_TASK_SERIALIZER = 'NpEncoder'
+CELERY_RESULT_SERIALIZER = 'NpEncoder'
 
 if os.environ.get("BACKEND_ACCESS_ID", None):
     CELERY_S3_BACKEND_SETTINGS = {

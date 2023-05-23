@@ -1,13 +1,10 @@
-from typing import Tuple
-
-from django.http import JsonResponse
+from celery import Task
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.views import APIView
 
 from api.endpoints.base.docs.doc_generator import autodoc
 from api.utils.view_util import ViewUtil
-from tgen.jobs.abstract_job import AbstractJob
-from tgen.util.json_util import NpEncoder
-from tgen.util.status import Status
 
 
 def endpoint(serializer):
@@ -19,49 +16,37 @@ def endpoint(serializer):
     if serializer is None:
         raise Exception("Endpoint requires serializer to parse request.")
 
-    def method_handler(endpoint_method):
+    def decorator(func: Task):
         """
-        Decorator for performing endpoint method alongside auto documenting it and job handling.
-        :param endpoint_method: The method performing endpoint logic.
-        :return: Request handler
+        Decorates task function in API view for POST request.
+        :param func: The function to handle the payload of request.
+        :return: View wrapped function.
         """
 
-        @autodoc(serializer)
-        @csrf_exempt
-        def request_handler(method_class_instance, request):
+        class APIDecorator(APIView):
             """
-            Decorator serializing request and performing job handling.
-            :param method_class_instance: The instance of the class encapsulating method (`self`).
-            :param request: The request containing payload.
-            :return: Endpoint response containing error if occurred or job result if successful.
+            Internal class supported the autogeneration of endpoint documentation.
             """
-            prediction_payload = ViewUtil.read_request(request, serializer)
-            job_tuple = endpoint_method(method_class_instance, prediction_payload)
-            if isinstance(job_tuple, Tuple):
-                job: AbstractJob = job_tuple[0]
-                post_processor = job_tuple[1]
-            else:
-                job = job_tuple
-                post_processor = lambda p: p
 
-            def job_handler():
+            @autodoc(serializer)
+            @csrf_exempt
+            def post(self, request: HttpRequest):
                 """
-                Runs jobs and returns body if successful.y
-                :return: Error if failure occurs, job result otherwise.
+                The POST method handler logic.
+                :param request: The incoming request.
+                :return: JSON response.
                 """
-                job_result = job.run()
-                job_dict = job_result.to_json(as_dict=True)
-                if job_result.status == Status.FAILURE:
-                    return JsonResponse(job_dict, status=400)
-                return job_dict["body"]
+                assert request.method == 'POST', "Only POST accepted for request."
+                payload = ViewUtil.read_request(request, serializer)
+                if isinstance(func, Task):
+                    task = func.delay(payload)
+                    return JsonResponse({"task_id": task.id})
+                else:
+                    response = func(payload)
+                    if isinstance(response, JsonResponse):
+                        return response
+                    return JsonResponse(response)
 
-            job_runnable = job if callable(job) else lambda: job_handler()
-            response_body = job_runnable()
-            if isinstance(response_body, JsonResponse):
-                return response_body
-            response_processed = post_processor(response_body)
-            return JsonResponse(response_processed, encoder=NpEncoder)
+        return APIDecorator.as_view()
 
-        return request_handler
-
-    return method_handler
+    return decorator

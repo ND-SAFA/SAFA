@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
@@ -35,7 +37,7 @@ class ModelUtil:
         return "gpt"
 
     @staticmethod
-    def get_model_manager(llm_name: str) -> AbstractLLMManager:
+    def get_model_manager(llm_name: str) -> Tuple[str, AbstractLLMManager]:
         """
         Returns the model and corresponding LLM manager for given library name.
         :param llm_name: The id of the LLM library.

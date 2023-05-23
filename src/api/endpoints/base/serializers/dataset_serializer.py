@@ -1,7 +1,17 @@
+from typing import Dict, List, TypedDict
+
 from rest_framework import serializers
 
 from api.utils.serializer_utility import SerializerUtility
 from tgen.data.readers.definitions.api_definition import ApiDefinition
+
+
+class DatasetPayload(TypedDict):
+    """
+    Type of payload for a dataset
+    """
+    source_layers: List[Dict[str, str]]
+    target_layers: List[Dict[str, str]]
 
 
 class DatasetSerializer(serializers.Serializer):

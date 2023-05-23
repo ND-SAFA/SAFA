@@ -20,7 +20,7 @@
 // Navigation - Searchbar
 
 .nav-search-mode {
-  min-width: 150px;
+  min-width: 150px !important;
 
   & > .q-field__inner > .q-field__control {
     border-bottom-right-radius: 0;
@@ -59,6 +59,10 @@
 }
 
 // Navigation - Inputs
+
+.nav-mode-selected {
+  background-color: $color-background !important;
+}
 
 .nav-input {
   background-color: $color-background;

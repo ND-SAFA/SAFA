@@ -13,16 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.http import HttpResponse
 from django.urls import path, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from api.endpoints.completion.completion_view import CompletionView
-from api.endpoints.hgen.hgen_view import HGenView
-from api.endpoints.predict.prediction_view import PredictView
-from api.endpoints.summarize.summarize_view import SummarizeView
+from api.endpoints.completion.completion_view import perform_completion
+from api.endpoints.hgen.hgen_view import perform_hgen
+from api.endpoints.jobs.result_view import get_result, get_status
+from api.endpoints.predict.predict_view import predict
+from api.endpoints.summarize.summarize_view import perform_summarization
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
@@ -47,8 +49,10 @@ urlpatterns = [
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
-    path('predict/', PredictView.as_view()),
-    path('complete/', CompletionView.as_view()),
-    path('summarize/', SummarizeView.as_view()),
-    path('hgen/', HGenView.as_view())
+    path('predict/', predict),
+    path('complete/', perform_completion),
+    path('summarize/', perform_summarization),
+    path('hgen/', perform_hgen),
+    path('status/', get_status),
+    path('results/', get_result)
 ]

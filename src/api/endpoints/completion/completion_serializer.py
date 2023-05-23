@@ -1,10 +1,18 @@
-from typing import Dict
+from typing import Dict, TypedDict
 
 from rest_framework import serializers
 
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.variables.variable import Variable
+
+
+class CompletionPayload(TypedDict):
+    """
+    Types the completion payload.
+    """
+    model: str
+    prompt: str
 
 
 class CompletionSerializer(AbstractSerializer):

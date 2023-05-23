@@ -1,9 +1,13 @@
+from typing import Generic, TypeVar
+
 from rest_framework import serializers
 
 from api.utils.serializer_utility import SerializerUtility
 
+PayloadType = TypeVar("PayloadType")
 
-class AbstractSerializer(serializers.Serializer):
+
+class AbstractSerializer(serializers.Serializer, Generic[PayloadType]):
     """
     Abstract class for all serializeres.
     """
@@ -14,7 +18,7 @@ class AbstractSerializer(serializers.Serializer):
         """
         SerializerUtility.update_error()
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> PayloadType:
         """
         Recursively creates child data. Under construction, currently non-functional.
         :param validated_data: The data created.

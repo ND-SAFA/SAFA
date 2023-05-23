@@ -1,6 +1,11 @@
 -r tgen/requirements.txt
+celery-s3==1.0.1
 Django==4.2
 django-cors-headers==3.13.0
 djangorestframework==3.14.0
 gunicorn==20.1.0
 drf_yasg==1.21.5
+celery~=5.2.7
+mock~=5.0.1
+setuptools~=58.1.0
+boto3~=1.26.136

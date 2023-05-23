@@ -1,7 +1,19 @@
+from typing import TypedDict
+
 from rest_framework import serializers
 
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.base.serializers.dataset_serializer import DatasetSerializer
+from tgen.server.api.api_definition import ApiDefinition
+
+
+class PredictionPayload(TypedDict):
+    """
+    Types the payload for the prediction endpoint.
+    """
+    dataset: ApiDefinition
+    model: str
+    prompt: str
 
 
 class PredictionSerializer(AbstractSerializer):

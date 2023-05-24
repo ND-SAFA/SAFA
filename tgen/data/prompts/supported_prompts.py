@@ -11,7 +11,8 @@ class SupportedPrompts(SupportedEnum):
                           "Do not focus on implementation details and assume your audience works on this system:\n '{target_content}'")
     NL_SUMMARY = Prompt("Summarize the following:\n '{target_content}'")
     ARTIFACT_GENERATION = ArtGenPrompt("Write a single {artifact_type} that describes on the {artifact_id} functionality of the "
-                                       "following software descriptions. Enclose the {artifact_type} in the tags <doc></doc>:\n "
+                                       "following software descriptions. An example of a good {artifact_type} is {example}. "
+                                       "Enclose the {artifact_type} in the tags <doc></doc>:\n "
                                        "'{target_content}'")
     UAV_SYSTEM_REQUIREMENT = Prompt("Given a summary of python code, write a system-level requirement\n "
                                     "The requirements should reference physical world entities related to the UAV systems, "
@@ -24,3 +25,4 @@ class SupportedPrompts(SupportedEnum):
                         "Inside each group name the group's functionality in <summary></summary> "
                         "and the numbers corresponding to the artifacts in the group inside of <artifacts></artifacts>:"
                         "\n\n '{target_content}'")
+    ARTIFACT_EXAMPLE = Prompt("Write a single example of a {artifact_type} body. Enclose the body in <example></example>.")

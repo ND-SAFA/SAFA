@@ -6,6 +6,8 @@ from tgen.data.clustering.iclustering import Clusters
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 
@@ -48,12 +50,19 @@ class HGenArgs(BaseObject):
     The path to save checkpoints to if desired
     """
     export_path: str = None
+    """
+    The LLM to use for generating the example artifact type
+    """
+    llm_manager_for_example: AbstractLLMManager = None
 
     def __post_init__(self) -> None:
         """
         Asserts necessary params have been provided and converts Enum into the proper class
         :return: None
         """
+        if self.llm_manager_for_example is None:
+            self.llm_manager_for_example = AnthropicManager()
+
         assert self.tgen_trainer or self.dataset_creator_for_sources or self.dataset_for_sources, \
             "Must provide either a dataset creator to make a dataset with traces between artifacts of the source layer, " \
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."

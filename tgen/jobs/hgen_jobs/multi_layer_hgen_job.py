@@ -34,6 +34,7 @@ class MultiLayerHGenJob(AbstractJob):
         """
         current_hgen_job = self.starting_hgen_job
         for i, next_target_type in enumerate(self.target_types):
+            current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
             res = current_hgen_job.run()
             if res.status != Status.SUCCESS:
                 raise Exception(res.body)

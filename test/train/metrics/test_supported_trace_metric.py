@@ -15,8 +15,8 @@ class TestSupportedTraceMetric(BaseTest):
     @patch("datasets.list_metrics")
     def test_get_metric_path_from_datasets(self, list_metrics_mock: mock.MagicMock):
         list_metrics_mock.return_value = self.TEST_LIST_METRICS
-        path = get_metric_path("accuracy")
-        self.assertEquals(path, "accuracy")
+        path = get_metric_path("map")
+        self.assertEquals(path, "/home/kat/git-repos/safa/tgen/tgen/train/metrics/map_metric.py")
 
     @patch("datasets.list_metrics")
     def test_get_metric_path_unknown(self, list_metrics_mock: mock.MagicMock):

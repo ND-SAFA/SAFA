@@ -67,7 +67,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(1)  # trying to avoid rate limit
+            time.sleep(2)  # trying to avoid rate limit
         return res
 
     @staticmethod

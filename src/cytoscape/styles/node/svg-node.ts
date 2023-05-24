@@ -47,6 +47,7 @@ export function svgNode(
           x: x * 2,
           y: y + 10,
           width: width - x * 2,
+          color: data.typeColor,
         })}
         ${svgTitle(data.artifactName, y + 10, "name")}
         ${svgBody(data, truncateLength, {
@@ -100,13 +101,14 @@ export function svgTitle(
  *
  * @return stringified SVG for the node.
  */
-export function svgDiv(style: Omit<SvgStyle, "height" | "color">): string {
+export function svgDiv(style: Omit<SvgStyle, "height">): string {
   return `
      <line 
         x1="${style.x}" y1="${style.y}" 
         x2="${style.x + style.width}" y2="${style.y}" 
         stroke-width="2"
         class="artifact-svg-div"
+        stroke="${style.color}"
       />
   `;
 }

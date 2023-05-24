@@ -12,7 +12,8 @@ export enum Colors {
   greyDarkest = "#272727",
   greyDark = "#333",
   grey = "#36405A",
-  greyLight = "#F0F5FF",
+  greyLight = "#5A5C64",
+  greyLightest = "#F0F5FF",
 
   green = "#00AD69",
   greenLight = "#6CD8A9",
@@ -43,14 +44,14 @@ export const ThemeColors = {
   error: Colors.red,
 
   whiteBg: Colors.white,
-  lightBg: Colors.greyLight,
+  lightBg: Colors.greyLightest,
   lightText: Colors.grey,
-  lightSelected: Colors.greyLight,
+  lightSelected: Colors.greyLightest,
 
   blackBg: Colors.black,
   darkBg: Colors.greyDark,
   darkText: Colors.white,
-  darkSelected: Colors.greyLight,
+  darkSelected: Colors.greyLightest,
 
   added: Colors.green,
   addedBg: Colors.greenLight,
@@ -68,8 +69,8 @@ export const ThemeColors = {
   warningBg: Colors.orangeLight,
   warningBd: Colors.orangeDark,
 
-  nodeDefaultLight: Colors.blue,
-  nodeDefaultDark: Colors.blueLight,
+  nodeDefaultLight: Colors.greyLight,
+  nodeDefaultDark: Colors.greyLightest,
   nodeGenerated: Colors.orange,
 };
 
@@ -132,7 +133,7 @@ export const darkPalette: Record<string, string> = {
 };
 
 const typeColorMap: Record<string, string> = {
-  "": ThemeColors.modifiedBg,
+  "": Colors.blueLight,
 };
 
 /**
@@ -143,16 +144,15 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      ThemeColors.addedBg,
-      ThemeColors.removedBg,
-      ThemeColors.secondary,
-      ThemeColors.accent,
-      ThemeColors.modified,
+      Colors.greenLight,
+      Colors.redLight,
+      Colors.orange,
+      Colors.orangeDark,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =
       remainingColors.length === 0
-        ? ThemeColors.modifiedBg
+        ? Colors.blueLight
         : remainingColors[Math.floor(Math.random() * remainingColors.length)];
   }
 

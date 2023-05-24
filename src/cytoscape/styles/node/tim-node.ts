@@ -26,15 +26,16 @@ export function svgTIM(data: TimNodeCytoElementData): string {
         {
           width: TIM_NODE_WIDTH,
           height: TIM_NODE_HEIGHT,
+          color: data.typeColor,
         },
-        8,
-        data.typeColor
+        8
       )}
       ${svgTitle(data.artifactType, y, "type")}
       ${svgDiv({
         x,
         y: y + 37,
         width: TIM_NODE_WIDTH - x * 2,
+        color: data.typeColor,
       })}
       ${svgTitle(count, y + 50, "count")}
     </svg>

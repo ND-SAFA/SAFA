@@ -49,6 +49,7 @@
             </flex-box>
           </flex-box>
         </panel-card>
+        <external-links />
       </flex-item>
     </flex-box>
   </private-page>
@@ -68,6 +69,7 @@ import { computed } from "vue";
 import { CreatorTabTypes } from "@/types";
 import { useScreen } from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
+import ExternalLinks from "@/components/account/ExternalLinks.vue";
 import {
   PrivatePage,
   FlexBox,

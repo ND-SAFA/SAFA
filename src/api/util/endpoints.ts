@@ -52,9 +52,9 @@ export enum Endpoint {
   githubCreateCredentials = "accounts/github/credentials/:accessCode",
   githubEditCredentials = "accounts/github/credentials",
   githubValidateCredentials = "accounts/github/credentials/check",
-  githubGetProjects = "projects/github",
-  githubCreateProject = "projects/import/github/:repositoryName",
-  githubSyncProject = "projects/versions/:versionId/import/github/:repositoryName",
+  githubGetProjects = "integrations/github/repos",
+  githubCreateProject = "projects/import/github/:owner/:repositoryName",
+  githubSyncProject = "projects/versions/:versionId/import/github/:owner/:repositoryName",
 
   // Commits
   commit = "projects/versions/:versionId/commit",

@@ -1,4 +1,4 @@
-import { GitHubProjectSchema, JobSchema } from "@/types";
+import { GitHubImportSchema, GitHubProjectSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -39,14 +39,9 @@ export async function saveGitHubCredentials(accessCode: string): Promise<void> {
  */
 export async function getGitHubCredentials(): Promise<boolean> {
   return (
-    (
-      await authHttpClient<{ payload: boolean | null }>(
-        Endpoint.githubValidateCredentials,
-        {
-          method: "GET",
-        }
-      )
-    ).payload === true
+    (await authHttpClient<boolean | null>(Endpoint.githubValidateCredentials, {
+      method: "GET",
+    })) === true
   );
 }
 
@@ -57,14 +52,9 @@ export async function getGitHubCredentials(): Promise<boolean> {
  */
 export async function refreshGitHubCredentials(): Promise<boolean> {
   return (
-    (
-      await authHttpClient<{ payload: boolean | null }>(
-        Endpoint.githubEditCredentials,
-        {
-          method: "PUT",
-        }
-      )
-    ).payload === true
+    (await authHttpClient<boolean | null>(Endpoint.githubEditCredentials, {
+      method: "PUT",
+    })) === true
   );
 }
 
@@ -84,58 +74,61 @@ export async function deleteGitHubCredentials(): Promise<void> {
  */
 export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
   return (
-    (
-      await authHttpClient<{ payload: GitHubProjectSchema[] }>(
-        Endpoint.githubGetProjects,
-        {
-          method: "GET",
-        }
-      )
-    ).payload || []
+    (await authHttpClient<GitHubProjectSchema[]>(Endpoint.githubGetProjects, {
+      method: "GET",
+    })) || []
   );
 }
 
 /**
  * Creates a new project based on a GitHub project.
  *
+ * @param owner - The owner of the repository to create a project from.
  * @param repositoryName - The repository to create a project from.
+ * @param configuration - The configuration to use for the integration.
  * @return The created import job.
  */
 export async function createGitHubProject(
-  repositoryName: string
+  owner: string,
+  repositoryName: string,
+  configuration?: GitHubImportSchema
 ): Promise<JobSchema> {
-  return (
-    await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.githubCreateProject, {
-        repositoryName,
-      }),
-      {
-        method: "POST",
-      }
-    )
-  ).payload;
+  return await authHttpClient<JobSchema>(
+    fillEndpoint(Endpoint.githubCreateProject, {
+      owner,
+      repositoryName,
+    }),
+    {
+      method: "POST",
+      body: JSON.stringify(configuration),
+    }
+  );
 }
 
 /**
  * Synchronizes the state of GitHub artifacts in a project.
  *
- * @param versionId - The project version to sync.
+ * @param versionId - The project version to sync data with.
+ * @param owner - The owner of the repository to sync a project from.
  * @param repositoryName - The repository to create a project from.
+ * @param configuration - The configuration to use for the sync.
  * @return The created import job.
  */
 export async function createGitHubProjectSync(
   versionId: string,
-  repositoryName: string
+  owner: string,
+  repositoryName: string,
+  configuration?: GitHubImportSchema
 ): Promise<JobSchema> {
-  return (
-    await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.githubSyncProject, {
-        versionId,
-        repositoryName,
-      }),
-      {
-        method: "PUT",
-      }
-    )
-  ).payload;
+  return await authHttpClient<JobSchema>(
+    fillEndpoint(Endpoint.githubSyncProject, {
+      versionId,
+      owner,
+      repositoryName,
+    }),
+    {
+      method: "PUT",
+      body: JSON.stringify(configuration),
+    }
+  );
 }

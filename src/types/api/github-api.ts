@@ -1,4 +1,30 @@
 /**
+ * Represents a GitHub import request.
+ */
+export interface GitHubImportSchema {
+  /**
+   * The branch to import.
+   */
+  branch?: string;
+  /**
+   * File patterns to include.
+   * Matches based on java's default globbing.
+   * See https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
+   */
+  include?: string[];
+  /**
+   * File patterns to exclude.
+   * Matches based on java's default globbing.
+   * See https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)
+   */
+  exclude?: string[];
+  /**
+   * The artifact type id to import as.
+   */
+  artifactType?: string;
+}
+
+/**
  * Represents a GitHub installation (authorized organization).
  */
 export interface GitHubOrganizationSchema {
@@ -19,7 +45,7 @@ export interface GitHubProjectSchema {
   /**
    * The project's id.
    */
-  id: number;
+  id: string;
   /**
    * The project's name.
    */
@@ -31,7 +57,7 @@ export interface GitHubProjectSchema {
   /**
    * The project's url.
    */
-  html_url?: string;
+  url?: string;
   /**
    * The project's size.
    */
@@ -39,9 +65,17 @@ export interface GitHubProjectSchema {
   /**
    * A timestamp for the project was created.
    */
-  created_at: string;
+  creationDate: string;
   /**
    * The owner of this project.
    */
   owner: string;
+  /**
+   * The list of active branches in this repository.
+   */
+  branches: string[];
+  /**
+   * The default branch for this repository.
+   */
+  defaultBranch: string;
 }

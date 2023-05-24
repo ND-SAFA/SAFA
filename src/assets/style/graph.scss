@@ -29,7 +29,7 @@ $graph-border-radius: 8px;
 
 .artifact-svg-wrapper {
   // Node Border
-  .artifact-border { fill: $color-node-default; }
+  //.artifact-border { fill: $color-node-default; }
   &.artifact-svg-delta-ADDED > .artifact-border { fill: $color-added; }
   &.artifact-svg-delta-MODIFIED > .artifact-border { fill: $color-modified; }
   &.artifact-svg-delta-REMOVED > .artifact-border { fill: $color-removed; }
@@ -43,7 +43,7 @@ $graph-border-radius: 8px;
   .artifact-svg.artifact-warning { fill: $color-flagged-bg; }
 
   // Node Divider
-  .artifact-svg-div { stroke: $color-node-default; }
+  //.artifact-svg-div { stroke: $color-node-default; }
   &.artifact-svg-delta-ADDED > .artifact-svg-div { stroke: $color-added; }
   &.artifact-svg-delta-MODIFIED > .artifact-svg-div { stroke: $color-modified; }
   &.artifact-svg-delta-REMOVED > .artifact-svg-div { stroke: $color-removed; }

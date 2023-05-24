@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import {
+  GitHubImportSchema,
   GitHubOrganizationSchema,
   GitHubProjectSchema,
   InstallationSchema,
@@ -46,6 +47,10 @@ export const useIntegrations = defineStore("integrations", {
      * A selected GitHub project to import.
      */
     gitHubProject: undefined as GitHubProjectSchema | undefined,
+    /**
+     * The configuration for the GitHub import.
+     */
+    gitHubConfig: {} as GitHubImportSchema,
   }),
   getters: {},
   actions: {
@@ -101,6 +106,8 @@ export const useIntegrations = defineStore("integrations", {
      * @param project - The project to select.
      */
     selectGitHubProject(project: GitHubProjectSchema | undefined): void {
+      this.gitHubConfig = {};
+
       if (!this.gitHubProject || this.gitHubProject?.id !== project?.id) {
         this.gitHubProject = project;
       } else {

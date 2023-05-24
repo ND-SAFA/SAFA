@@ -20,6 +20,6 @@ export function svgDefault(data: ArtifactCytoElementData): string {
       outer,
       inner: { x: 12, y: 20, width: 180, height: 100 },
     },
-    svgRect(outer, 8, data.typeColor)
+    svgRect({ ...outer, color: data.typeColor }, 8)
   );
 }

@@ -20,7 +20,7 @@ if not IS_TEST:
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
-    MAX_COMPLETION_PROMPTS: int = 20
+    MAX_COMPLETION_PROMPTS: int = 10
     prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="")
 
     def __init__(self, llm_args: OpenAIArgs = None):

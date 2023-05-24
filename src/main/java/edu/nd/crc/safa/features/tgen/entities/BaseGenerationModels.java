@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
+import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.method.BertMethodIdentifier;
-import edu.nd.crc.safa.features.tgen.method.TGen;
 
 import lombok.Getter;
 

@@ -1,9 +1,10 @@
-package edu.nd.crc.safa.features.tgen.method;
+package edu.nd.crc.safa.features.tgen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
 import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.summary.TGenSummaryRequest;
@@ -23,7 +25,10 @@ import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.entities.TGenStatus;
+import edu.nd.crc.safa.features.tgen.entities.TGenTask;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.method.BertMethodIdentifier;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -55,8 +60,8 @@ public class TGen implements ITraceGenerationController {
      * @return The generated artifacts per cluster.
      */
     public TGenHGenResponse generateHierarchy(TGenHGenRequest request) {
-        String summarizeEndpoint = TGenConfig.get().getHGenEndpoint();
-        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenHGenResponse.class);
+        String summarizeEndpoint = getEndpoint("hgen");
+        return this.requestTGen(summarizeEndpoint, request, TGenHGenResponse.class);
     }
 
     /**
@@ -66,8 +71,8 @@ public class TGen implements ITraceGenerationController {
      * @return TGen response.
      */
     public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
-        String summarizeEndpoint = TGenConfig.get().getSummarizeEndpoint();
-        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
+        String summarizeEndpoint = getEndpoint("summarize");
+        return this.requestTGen(summarizeEndpoint, request, TGenSummaryResponse.class);
     }
 
     /**
@@ -77,8 +82,8 @@ public class TGen implements ITraceGenerationController {
      * @return The completion string.
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
-        String generatePromptEndpoint = TGenConfig.get().getPromptCompletionEndpoint();
-        return this.safaRequestBuilder.sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
+        String generatePromptEndpoint = getEndpoint("complete");
+        return this.requestTGen(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
     /**
@@ -105,9 +110,8 @@ public class TGen implements ITraceGenerationController {
     }
 
     public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
-        String predictEndpoint = TGenConfig.get().getPredictEndpoint();
-        return this.safaRequestBuilder
-            .sendPost(predictEndpoint, payload, TGenPredictionOutput.class);
+        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
+        return this.requestTGen(predictEndpoint, payload, TGenPredictionOutput.class);
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
@@ -145,6 +149,34 @@ public class TGen implements ITraceGenerationController {
             artifactLevelsMap.add(artifactLevelsArtifactMap);
         });
         return artifactLevelsMap;
+    }
+
+    private <T> T requestTGen(String endpoint, Object payload, Class<T> responseClass) {
+        TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
+        String statusEndpoint = getEndpoint("status");
+        String resultEndpoint = getEndpoint("results");
+        TGenStatus tGenStatus;
+        do {
+            sleep(3);
+            tGenStatus = this.safaRequestBuilder.sendPost(statusEndpoint, task, TGenStatus.class);
+        } while (tGenStatus != null && tGenStatus.getStatus() > 0);
+
+        if (tGenStatus.getStatus() == 0) {
+            return this.safaRequestBuilder.sendPost(resultEndpoint, task, responseClass);
+        }
+        throw new SafaError(tGenStatus.getMessage());
+    }
+
+    public String getEndpoint(String endpointName) {
+        return TGenConfig.get().getTGenEndpoint(endpointName);
+    }
+
+    public void sleep(int secondsToSleep) {
+        try {
+            TimeUnit.SECONDS.sleep(secondsToSleep);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

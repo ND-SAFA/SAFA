@@ -133,7 +133,8 @@ function handleGenerate(): void {
         };
 
   handleGenerateArtifacts(config, {
-    onComplete: () => handleClear(),
+    onSuccess: () => handleClear(),
+    onComplete: () => (loading.value = false),
   });
 }
 </script>

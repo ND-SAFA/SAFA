@@ -13,9 +13,8 @@ from tgen.util.enum_util import EnumDict
 class GenerateArtifactsJob(BaseHGenJob):
     SOURCE_LAYER_ID = "source_layer"
 
-    def __init__(self, artifacts: List[EnumDict], target_type: str, llm_manager: AbstractLLMManager,
-                 artifact_ids_by_cluster: List[List[Union[str, int]]] = None, job_args: JobArgs = None,
-                 **hgen_params):
+    def __init__(self, artifacts: List[EnumDict], target_type: str, artifact_ids_by_cluster: List[List[Union[str, int]]] = None,
+                 job_args: JobArgs = None, **hgen_params):
         """
         Initializes the job with args needed for hierarchy generator
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
@@ -30,7 +29,7 @@ class GenerateArtifactsJob(BaseHGenJob):
         self.artifacts = artifacts
         self.target_type = target_type
         self.artifacts_by_cluster = artifact_ids_by_cluster if artifact_ids_by_cluster is not None else {}
-        super().__init__(llm_manager=llm_manager, job_args=job_args, **hgen_params)
+        super().__init__(job_args=job_args, **hgen_params)
 
     def get_hgen_args(self) -> HGenArgs:
         """

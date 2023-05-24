@@ -22,8 +22,6 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -42,13 +40,12 @@ class HierarchyGenerator(BaseObject):
     BASE_PROMPT = SupportedPrompts.ARTIFACT_GENERATION
     GENERATION_TAG = "doc"
 
-    def __init__(self, args: HGenArgs, hgen_llm_manager: AbstractLLMManager):
+    def __init__(self, args: HGenArgs):
         """
         Initializes the generator with necessary trainer information
         :param args: The arguments required for the hierarchy generation
         """
         self.args = args
-        self.hgen_llm_manager = hgen_llm_manager
 
     def run(self) -> TraceDataset:
         """
@@ -106,10 +103,10 @@ class HierarchyGenerator(BaseObject):
         :return: The content for the generated artifacts
         """
         example = self._get_example_of_target_type()
-        prompt_creator = GenerationPromptCreator(prompt_args=self.hgen_llm_manager.prompt_args,
+        prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_llm_manager.prompt_args,
                                                  base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type,
                                                                                            example=example))
-        hgen_trainer = LLMTrainer(llm_manager=self.hgen_llm_manager,
+        hgen_trainer = LLMTrainer(llm_manager=self.args.hgen_llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
                                   prompt_creator=prompt_creator)
         if export_path:

@@ -3,12 +3,11 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 
 
 class BaseHGenJob(AbstractJob):
 
-    def __init__(self, llm_manager: AbstractLLMManager, job_args: JobArgs = None, hgen_args: HGenArgs = None, **hgen_params):
+    def __init__(self, hgen_args: HGenArgs = None, job_args: JobArgs = None, **hgen_params):
         """
         Initializes the job with args needed for hierarchy generator
         :param llm_manager: Model Manager in charge of generating artifacts
@@ -16,7 +15,6 @@ class BaseHGenJob(AbstractJob):
         :param hgen_args: The hgen args to use if created prior to start of the job
         :param hgen_params: Any additional parameters for the hgen args
         """
-        self.llm_manager = llm_manager
         self.hgen_params = hgen_params
         self.hgen_args = hgen_args
         super().__init__(job_args)
@@ -26,7 +24,7 @@ class BaseHGenJob(AbstractJob):
         Runs the hierarchy generator and exports the resulting dataset
         :return: The result of the job
         """
-        hgen = HierarchyGenerator(self.get_hgen_args(), self.llm_manager)
+        hgen = HierarchyGenerator(self.get_hgen_args())
         generated_dataset = hgen.run()
         return generated_dataset
 

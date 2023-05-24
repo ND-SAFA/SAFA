@@ -68,6 +68,5 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.assertEquals(n_expected_links, len(dataset.trace_df))
 
     def _get_job(self):
-        llm_manager = OpenAIManager(OpenAIArgs())
-        starting_hgen_job = GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", llm_manager)
+        starting_hgen_job = GenerateArtifactsJob(self.project.ARTIFACTS, "user_story")
         return MultiLayerHGenJob(starting_hgen_job, ["epic", "requirement"])

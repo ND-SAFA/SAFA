@@ -13,6 +13,8 @@ import json
 import os.path
 import sys
 
+from kombu.serialization import register
+
 REPO_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..")
 REPO_PATH = os.path.normpath(REPO_PATH)
 API_PATH = os.path.join(REPO_PATH, "src")
@@ -151,7 +153,6 @@ CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
-from kombu.serialization import register
 
 
 # Encoder function

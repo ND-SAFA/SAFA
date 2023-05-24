@@ -6,40 +6,38 @@ import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape/styles/config";
  *
  * @param style - The node style to render.
  * @param rx - The border roundness.
- * @param barColor - The color to render the sidebar with.
  */
 export function svgRect(
-  style: Pick<SvgStyle, "width" | "height">,
-  rx = 0,
-  barColor?: string
+  style: Pick<SvgStyle, "width" | "height" | "color">,
+  rx = 0
 ): string {
-  const bar = barColor
-    ? //   ? `
-      //  <clipPath id="node-click-path">
-      //     <rect
-      //       rx="${rx - 1}"
-      //       width="${style.width}"
-      //       height="${style.height}"
-      //     />
-      //   </clipPath>
-      //   <rect
-      //     style="clip-path: url(#node-click-path);"
-      //     width="9"
-      //     height="100%"
-      //     fill="${barColor}"
-      //   />
-      // `
-      `
-        <rect 
-          rx="2"
-          width="4" 
-          height="${style.height - 12}"
-          y="6"
-          x="6"
-          fill="${barColor}"
-        />
-    `
-    : "";
+  // const bar = barColor
+  //   ? //   ? `
+  //     //  <clipPath id="node-click-path">
+  //     //     <rect
+  //     //       rx="${rx - 1}"
+  //     //       width="${style.width}"
+  //     //       height="${style.height}"
+  //     //     />
+  //     //   </clipPath>
+  //     //   <rect
+  //     //     style="clip-path: url(#node-click-path);"
+  //     //     width="9"
+  //     //     height="100%"
+  //     //     fill="${barColor}"
+  //     //   />
+  //     // `
+  //     `
+  //       <rect
+  //         rx="2"
+  //         width="4"
+  //         height="${style.height - 12}"
+  //         y="6"
+  //         x="6"
+  //         fill="${barColor}"
+  //       />
+  //   `
+  //   : "";
 
   return `
     <rect 
@@ -47,6 +45,7 @@ export function svgRect(
       width="${style.width}" 
       height="${style.height}"
       class="artifact-border"
+      fill="${style.color}"
     />
     <rect
       rx="${rx === 0 ? 0 : rx - 1}" 
@@ -56,7 +55,6 @@ export function svgRect(
       height="${style.height - ARTIFACT_BORDER_WIDTH * 2}"
       class="artifact-svg"
     />
-    ${bar}
   `;
 }
 

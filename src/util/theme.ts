@@ -132,7 +132,7 @@ export const darkPalette: Record<string, string> = {
 };
 
 const typeColorMap: Record<string, string> = {
-  "": ThemeColors.modifiedBg,
+  "": Colors.blueLight,
 };
 
 /**
@@ -143,16 +143,15 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      ThemeColors.addedBg,
-      ThemeColors.removedBg,
-      ThemeColors.secondary,
-      ThemeColors.accent,
-      ThemeColors.modified,
+      Colors.greenLight,
+      Colors.redLight,
+      Colors.orange,
+      Colors.orangeDark,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =
       remainingColors.length === 0
-        ? ThemeColors.modifiedBg
+        ? Colors.blueLight
         : remainingColors[Math.floor(Math.random() * remainingColors.length)];
   }
 

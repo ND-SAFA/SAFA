@@ -60,9 +60,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { GenerateArtifactSchema } from "@/types";
-import { artifactStore } from "@/hooks";
+import { appStore, artifactStore, selectionStore } from "@/hooks";
 import { handleGenerateArtifacts } from "@/api";
 import {
   DetailsPanel,
@@ -105,8 +105,8 @@ function buttonProps(option: "single" | "multiple") {
 /**
  * Clears all input fields.
  */
-function handleClear(): void {
-  childArtifactIds.value = [];
+function handleReset(): void {
+  childArtifactIds.value = selectionStore.selectedGroupIds;
   childArtifactType.value = "";
   parentArtifactType.value = "";
   loading.value = false;
@@ -133,8 +133,16 @@ function handleGenerate(): void {
         };
 
   handleGenerateArtifacts(config, {
-    onSuccess: () => handleClear(),
+    onSuccess: () => handleReset(),
     onComplete: () => (loading.value = false),
   });
 }
+watch(
+  () => appStore.isDetailsPanelOpen === "generateArtifact",
+  (openState) => {
+    if (!openState) return;
+
+    handleReset();
+  }
+);
 </script>

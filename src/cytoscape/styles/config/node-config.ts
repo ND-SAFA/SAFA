@@ -6,7 +6,7 @@ import { ThemeColors } from "@/util";
  */
 export const NODE_BORDER_WIDTH = 0;
 
-export const NODE_BORDER_COLOR = ThemeColors.modifiedBg;
+export const NODE_BORDER_COLOR = ThemeColors.nodeDefaultLight;
 export const NODE_BG_COLOR = {
   LIGHT: ThemeColors.whiteBg,
   DARK: ThemeColors.blackBg,

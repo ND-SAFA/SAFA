@@ -28,6 +28,7 @@
       <generate-trace-link-panel />
       <artifact-level-panel />
       <trace-matrix-panel />
+      <artifact-generation-panel />
     </div>
   </q-drawer>
 </template>
@@ -63,6 +64,7 @@ import {
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
+import { ArtifactGenerationPanel } from "@/components/hgen";
 
 const openState = computed(() => appStore.isDetailsPanelOpen);
 const drawerOpen = computed(() => typeof openState.value === "string");
@@ -79,6 +81,8 @@ const title = computed(() => {
       return "Artifact Body";
     case "saveArtifact":
       return "Save Artifact";
+    case "generateArtifact":
+      return "Generate Artifacts";
     case "displayTrace":
       return "Trace Link";
     case "saveTrace":

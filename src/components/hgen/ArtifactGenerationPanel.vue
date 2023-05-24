@@ -1,5 +1,53 @@
 <template>
-  <details-panel panel="displayArtifactBody"> </details-panel>
+  <details-panel panel="generateArtifact">
+    <panel-card>
+      <q-btn-group flat class="q-mb-md">
+        <text-button
+          v-bind="buttonProps('single')"
+          label="Single"
+          icon="artifact"
+          @click="mode = 'single'"
+        />
+        <text-button
+          v-bind="buttonProps('multiple')"
+          label="Multiple"
+          icon="nav-artifact"
+          @click="mode = 'multiple'"
+        />
+      </q-btn-group>
+
+      <div v-if="mode === 'single'" class="q-mb-md">
+        <artifact-input
+          v-model="childArtifactIds"
+          multiple
+          label="Child Artifacts"
+          hint="Generate a single parent artifact for these artifacts."
+        />
+      </div>
+      <div v-else class="q-mb-md">
+        <artifact-type-input
+          v-model="childArtifactType"
+          label="Child Artifact Type"
+          hint="Generate multiple parent artifacts by clustering these type of artifacts by functionality."
+        />
+      </div>
+      <artifact-type-input
+        v-model="parentArtifactType"
+        label="Parent Artifact Type"
+        hint="The type of parent artifact to create."
+      />
+
+      <flex-box full-width justify="end" t="2">
+        <text-button
+          :disabled="!canGenerate"
+          :loading="loading"
+          label="Generate"
+          color="primary"
+          @click="handleGenerate"
+        />
+      </flex-box>
+    </panel-card>
+  </details-panel>
 </template>
 
 <script lang="ts">
@@ -12,5 +60,80 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { DetailsPanel } from "@/components/common";
+import { computed, ref } from "vue";
+import { GenerateArtifactSchema } from "@/types";
+import { artifactStore } from "@/hooks";
+import { handleGenerateArtifacts } from "@/api";
+import {
+  DetailsPanel,
+  PanelCard,
+  FlexBox,
+  TextButton,
+  ArtifactInput,
+  ArtifactTypeInput,
+} from "@/components/common";
+
+const mode = ref<"single" | "multiple">("single");
+const childArtifactIds = ref<string[]>([]);
+const childArtifactType = ref<string>("");
+const parentArtifactType = ref<string>("");
+const loading = ref(false);
+
+const canGenerate = computed(() => {
+  if (mode.value === "single") {
+    return childArtifactIds.value.length > 0 && parentArtifactType.value !== "";
+  } else {
+    return childArtifactType.value !== "" && parentArtifactType.value !== "";
+  }
+});
+
+/**
+ * Returns props for a mode button.
+ * @param option - The mode button to get props for.
+ */
+function buttonProps(option: "single" | "multiple") {
+  const selected = mode.value === option;
+
+  return {
+    text: !selected,
+    outlined: selected,
+    color: "primary",
+    class: selected ? "nav-mode-selected" : "",
+  };
+}
+
+/**
+ * Clears all input fields.
+ */
+function handleClear(): void {
+  childArtifactIds.value = [];
+  childArtifactType.value = "";
+  parentArtifactType.value = "";
+  loading.value = false;
+}
+
+/**
+ * Generates new parent artifacts based on inputted child artifacts.
+ */
+function handleGenerate(): void {
+  loading.value = true;
+
+  const config: GenerateArtifactSchema =
+    mode.value === "single"
+      ? {
+          artifacts: childArtifactIds.value,
+          targetType: parentArtifactType.value,
+          clusters: [childArtifactIds.value],
+        }
+      : {
+          artifacts: artifactStore
+            .getArtifactsByType(childArtifactType.value)
+            .map(({ id }) => id),
+          targetType: parentArtifactType.value,
+        };
+
+  handleGenerateArtifacts(config, {
+    onComplete: () => handleClear(),
+  });
+}
 </script>

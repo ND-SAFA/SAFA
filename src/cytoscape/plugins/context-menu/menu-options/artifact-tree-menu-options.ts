@@ -24,13 +24,29 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new artifact",
     coreAsWell: true,
     onClickFunction(event: EventObject): void {
-      projectStore.ifProjectDefined(() => {
-        layoutStore.savedPosition = event.position;
-        appStore.openArtifactCreatorTo({ isNewArtifact: true });
-      });
+      layoutStore.savedPosition = event.position;
+      appStore.openArtifactCreatorTo({ isNewArtifact: true });
     },
     isVisible(): boolean {
-      return sessionStore.isEditor(projectStore.project);
+      return (
+        projectStore.isProjectDefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
+    },
+  },
+  {
+    id: "generate-artifact",
+    content: "Generate Artifacts",
+    tooltipText: "Generate parent artifacts from other artifacts.",
+    coreAsWell: true,
+    onClickFunction(): void {
+      appStore.openDetailsPanel("generateArtifact");
+    },
+    isVisible(): boolean {
+      return (
+        projectStore.isProjectDefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {
@@ -39,12 +55,13 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
-      projectStore.ifProjectDefined(() => {
-        appStore.openDetailsPanel("saveTrace");
-      });
+      appStore.openDetailsPanel("saveTrace");
     },
     isVisible(): boolean {
-      return sessionStore.isEditor(projectStore.project);
+      return (
+        projectStore.isProjectDefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {
@@ -53,12 +70,13 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Draw a new trace link between artifacts",
     coreAsWell: true,
     onClickFunction(): void {
-      projectStore.ifProjectDefined(() => {
-        enableDrawMode();
-      });
+      enableDrawMode();
     },
     isVisible(): boolean {
-      return sessionStore.isEditor(projectStore.project);
+      return (
+        projectStore.isProjectDefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {
@@ -68,12 +86,13 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     hasTrailingDivider: true,
     onClickFunction(): void {
-      projectStore.ifProjectDefined(() => {
-        appStore.openDetailsPanel("generateTrace");
-      });
+      appStore.openDetailsPanel("generateTrace");
     },
     isVisible(): boolean {
-      return sessionStore.isEditor(projectStore.project);
+      return (
+        projectStore.isProjectDefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {

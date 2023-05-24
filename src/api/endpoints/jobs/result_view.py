@@ -18,13 +18,14 @@ class ResultSerializer(AbstractSerializer[ResultPayload]):
 
 
 def get_task_status(result):
-    if result.successful():
+    status = result.status
+    if status == "SUCCESS":
         return Status.SUCCESS, "Task finished successfully"
-    elif result.failed():
+    elif status == "FAILED":
         return Status.FAILURE, result.traceback
-    elif result.status == "PENDING":
+    elif status == "PENDING":
         return Status.NOT_STARTED, "Task is still pending"
-    elif result.status == "STARTED":
+    elif status == "STARTED":
         return Status.IN_PROGRESS, "Task is still running"
     else:
         raise Exception(f"Status is unknown:{result.status}")

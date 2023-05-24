@@ -15,10 +15,12 @@ import sys
 
 from kombu.serialization import register
 
-REPO_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..")
+REPO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..")
 REPO_PATH = os.path.normpath(REPO_PATH)
+
 API_PATH = os.path.join(REPO_PATH, "src")
 TGEN_PATH = os.path.join(REPO_PATH, "tgen")
+
 sys.path.append(TGEN_PATH)
 sys.path.append(API_PATH)
 

@@ -17,9 +17,12 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.testres.test_anthropic_responses import fake_anthropic_completion
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
@@ -50,9 +53,9 @@ class TestHierarchyGeneration(BaseTest):
             return trainer_dataset_manager[DatasetRole.EVAL]
 
     @mock.patch.object(ClusterDatasetCreator, "get_clusters")
-    @mock.patch("openai.Completion.create")
-    def test_run(self, mock_completion_api: mock.MagicMock, mock_cluster: mock.MagicMock):
-        mock_completion_api.side_effect = fake_open_ai_completion
+    @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=fake_anthropic_completion)
+    @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)
+    def test_run(self, mock_completion_open_ai: mock.MagicMock, mock_completion_anthr: mock.MagicMock, mock_cluster: mock.MagicMock):
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
                             self.get_dataset_creator_with_trace_dataset_creator(),
                             self.FakeDatasetCreator()]

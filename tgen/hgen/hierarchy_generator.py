@@ -14,6 +14,7 @@ from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.csv_keys import CSVKeys
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.supported_prompts import SupportedPrompts
@@ -22,8 +23,11 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
+from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.file_util import FileUtil
@@ -38,13 +42,13 @@ class HierarchyGenerator(BaseObject):
     BASE_PROMPT = SupportedPrompts.ARTIFACT_GENERATION
     GENERATION_TAG = "doc"
 
-    def __init__(self, args: HGenArgs, llm_manager: AbstractLLMManager):
+    def __init__(self, args: HGenArgs, hgen_llm_manager: AbstractLLMManager):
         """
         Initializes the generator with necessary trainer information
         :param args: The arguments required for the hierarchy generation
         """
         self.args = args
-        self.llm_manager = llm_manager
+        self.hgen_llm_manager = hgen_llm_manager
 
     def run(self) -> TraceDataset:
         """
@@ -101,9 +105,11 @@ class HierarchyGenerator(BaseObject):
         :param export_path: The path to export dataset checkpoints to
         :return: The content for the generated artifacts
         """
-        prompt_creator = GenerationPromptCreator(prompt_args=self.llm_manager.prompt_args,
-                                                 base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type))
-        hgen_trainer = LLMTrainer(llm_manager=self.llm_manager,
+        example = self._get_example_of_target_type()
+        prompt_creator = GenerationPromptCreator(prompt_args=self.hgen_llm_manager.prompt_args,
+                                                 base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type,
+                                                                                           example=example))
+        hgen_trainer = LLMTrainer(llm_manager=self.hgen_llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
                                   prompt_creator=prompt_creator)
         if export_path:
@@ -283,3 +289,18 @@ class HierarchyGenerator(BaseObject):
             trainer.trainer_args.output_dir = export_path
         if hasattr(trainer.trainer_args, "metrics"):
             trainer.trainer_args.metrics = []
+
+    def _get_example_of_target_type(self) -> str:
+        """
+        Gets an example of the target artifact to use in the generation prompt for theLLM
+        :return: An example of the target artifact
+        """
+        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value.format(artifact_type=self.args.target_type)
+        example_prompt = GenerationPromptCreator(prompt_args=self.args.llm_manager_for_example.prompt_args,
+                                                 base_prompt=example_prompt_format).create('')[PromptKeys.PROMPT]
+        args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
+        res = self.args.llm_manager_for_example.make_completion_request(prompt=example_prompt,
+                                                                        completion_type=LLMCompletionType.GENERATION,
+                                                                        **args)
+        example = LLMResponseUtil.parse(res.batch_responses[0], "example")
+        return example

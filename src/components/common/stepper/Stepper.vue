@@ -19,7 +19,7 @@
       <slot :name="idx + 1" />
     </q-step>
 
-    <template #navigation>
+    <template v-if="!props.hideActions" #navigation>
       <q-stepper-navigation class="q-mt-sm">
         <slot name="actions" />
         <flex-box full-width align="end">

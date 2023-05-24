@@ -12,7 +12,7 @@ export enum Colors {
   greyDarkest = "#272727",
   greyDark = "#333",
   grey = "#36405A",
-  greyLight = "#5A5C64",
+  greyLight = "#94969e",
   greyLightest = "#F0F5FF",
 
   green = "#00AD69",
@@ -133,7 +133,7 @@ export const darkPalette: Record<string, string> = {
 };
 
 const typeColorMap: Record<string, string> = {
-  "": Colors.blueLight,
+  "": Colors.blue,
 };
 
 /**
@@ -144,15 +144,16 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
+      Colors.blueLight,
       Colors.greenLight,
-      Colors.redLight,
       Colors.orange,
       Colors.orangeDark,
+      Colors.red,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =
       remainingColors.length === 0
-        ? Colors.blueLight
+        ? Colors.blue
         : remainingColors[Math.floor(Math.random() * remainingColors.length)];
   }
 

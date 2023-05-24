@@ -36,6 +36,10 @@ export interface StepperProps extends MinimalProps {
    * Useful when displaying long lists of steps
    */
   denseLabels?: boolean;
+  /**
+   * If true, the actions will be hidden.
+   */
+  hideActions?: boolean;
 }
 
 /**

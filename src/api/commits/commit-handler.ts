@@ -1,4 +1,4 @@
-import { Commit } from "@/types";
+import { CommitSchema } from "@/types";
 import { appStore, commitStore, traceStore, artifactStore } from "@/hooks";
 import { handleGetGeneratedLinks, persistCommit } from "@/api";
 
@@ -8,7 +8,7 @@ import { handleGetGeneratedLinks, persistCommit } from "@/api";
  * @param commit - The commit to save.
  * @return The saved commit.
  */
-export async function saveCommit(commit: Commit): Promise<Commit> {
+export async function saveCommit(commit: CommitSchema): Promise<CommitSchema> {
   try {
     appStore.isSaving = true;
 
@@ -79,7 +79,7 @@ export async function redoCommit(): Promise<void> {
  *
  * @param commit - The commit to apply.
  */
-async function applyArtifactChanges(commit: Commit): Promise<void> {
+async function applyArtifactChanges(commit: CommitSchema): Promise<void> {
   await artifactStore.addOrUpdateArtifacts([
     ...commit.artifacts.added,
     ...commit.artifacts.modified,

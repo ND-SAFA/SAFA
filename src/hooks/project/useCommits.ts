@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactSchema,
-  Commit,
+  CommitSchema,
   CommitHistory,
   TraceLinkSchema,
 } from "@/types";
@@ -49,7 +49,7 @@ export const useCommits = defineStore("commits", {
      * @param commit - The commit to create a reversion for.
      * @return The reversion commit.
      */
-    getRevert(commit: Commit): Commit {
+    getRevert(commit: CommitSchema): CommitSchema {
       return {
         ...createCommit(commit.commitVersion),
         artifacts: {
@@ -75,7 +75,7 @@ export const useCommits = defineStore("commits", {
      *
      * @param commit - The commit to save.
      */
-    saveCommit(commit: Commit): void {
+    saveCommit(commit: CommitSchema): void {
       this.$patch({
         commits: [...this.commits, { commit, revert: this.getRevert(commit) }],
         revertedCommits: [],
@@ -87,7 +87,7 @@ export const useCommits = defineStore("commits", {
      *
      * @return The undone commit.
      */
-    undoLastCommit(): Commit | undefined {
+    undoLastCommit(): CommitSchema | undefined {
       if (!this.canUndo) return;
 
       const lastCommitIndex = this.commits.length - 1;
@@ -105,7 +105,7 @@ export const useCommits = defineStore("commits", {
      *
      * @return The redone commit.
      */
-    redoLastUndoneCommit(): Commit | undefined {
+    redoLastUndoneCommit(): CommitSchema | undefined {
       if (!this.canRedo) return;
 
       const lastCommitIndex = this.revertedCommits.length - 1;

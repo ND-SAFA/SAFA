@@ -1,6 +1,6 @@
 import {
   ArtifactSchema,
-  Commit,
+  CommitSchema,
   ConfirmationType,
   ConfirmDialogueMessage,
   DocumentSchema,
@@ -188,7 +188,7 @@ export function createArtifactOfType(
 /**
  * @returns An empty commit.
  */
-export function createCommit(version: VersionSchema): Commit {
+export function createCommit(version: VersionSchema): CommitSchema {
   return {
     commitVersion: version,
     artifacts: {

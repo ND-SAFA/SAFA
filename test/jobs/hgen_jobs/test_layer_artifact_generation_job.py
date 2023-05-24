@@ -41,5 +41,4 @@ class TestLayerArtifactGenerationJob(BaseJobTest):
                 self.assertIsNotNone(dataset.trace_df.get_link(source_id=artifact_id, target_id=cluster_id))
 
     def _get_job(self) -> AbstractJob:
-        llm_manager = OpenAIManager(OpenAIArgs())
-        return GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", llm_manager)
+        return GenerateArtifactsJob(self.project.ARTIFACTS, "user_story")

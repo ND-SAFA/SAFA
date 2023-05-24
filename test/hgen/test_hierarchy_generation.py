@@ -247,5 +247,6 @@ class TestHierarchyGeneration(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         args = HGenArgs(tgen_trainer=tgen_trainer, target_type=self.TARGET_TYPE,
                         source_layer_id=self.LAYER_ID if not layer_id else layer_id, export_path=TEST_OUTPUT_DIR,
+                        hgen_llm_manager=llm_manager,
                         **params)
-        return HierarchyGenerator(args, llm_manager)
+        return HierarchyGenerator(args)

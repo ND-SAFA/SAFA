@@ -58,4 +58,4 @@ class MultiLayerHGenJob(AbstractJob):
                              dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
                              clustering_method=SupportedClusteringMethod.LLM, clustering_params=current_args.clustering_params,
                              export_path=current_args.export_path)
-        return BaseHGenJob(current_hgen_job.llm_manager, current_hgen_job.job_args, hgen_args)
+        return BaseHGenJob(hgen_args, current_hgen_job.job_args)

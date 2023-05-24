@@ -2,9 +2,11 @@ from collections import Set
 from dataclasses import dataclass, field
 from typing import Union
 
+from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.clustering.iclustering import Clusters
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
@@ -22,6 +24,10 @@ class HGenArgs(BaseObject):
     The type of higher-level artifact that will be generated
     """
     target_type: str
+    """
+    The LLM manager to use to generate the new artifact content
+    """
+    hgen_llm_manager: AbstractLLMManager = field(default_factory=get_default_llm_manager)
     """
     The trainer used to generate intra layer trace links between source artifacts
     """
@@ -53,16 +59,17 @@ class HGenArgs(BaseObject):
     """
     The LLM to use for generating the example artifact type
     """
-    llm_manager_for_example: AbstractLLMManager = None
+    llm_manager_for_example: AbstractLLMManager = field(default_factory=AnthropicManager)
+    """
+    The LLM to use for generating the example artifact type
+    """
+    hgen_summarizer: Summarizer = field(default_factory=Summarizer)
 
     def __post_init__(self) -> None:
         """
         Asserts necessary params have been provided and converts Enum into the proper class
         :return: None
         """
-        if self.llm_manager_for_example is None:
-            self.llm_manager_for_example = AnthropicManager()
-
         assert self.tgen_trainer or self.dataset_creator_for_sources or self.dataset_for_sources, \
             "Must provide either a dataset creator to make a dataset with traces between artifacts of the source layer, " \
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."

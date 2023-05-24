@@ -6,6 +6,19 @@ from typing import Dict
 class DataclassUtil:
 
     @staticmethod
+    def convert_to_dict(dataclass_: dataclass, **val2replace) -> Dict:
+        """
+        Converts the dataclass to a dictionary
+        :param dataclass_: The dataclass to convert
+        :param val2replace: Dictionary mapping attr to the new value for it
+        :return: the dataclass as a dictionary
+        """
+        args = {k: v for k, v in vars(dataclass_).items() if k not in val2replace.keys()}
+        args.update(val2replace)
+        return args
+
+
+    @staticmethod
     def set_unique_args(child_dataclass: dataclass, parent_dataclass: dataclass, **kwargs) -> Dict:
         """
         Sets arguments that are unique to this class and returns those belonging to super class.

@@ -8,6 +8,7 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
+from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.status import Status
 
@@ -22,7 +23,8 @@ class MultiLayerHGenJob(AbstractJob):
         :param job_args: The arguments need for the job
         """
         self.starting_hgen_job = starting_hgen_job
-        if self.starting_hgen_job.get_hgen_args().target_type == target_types[0]:  # target types should not include start target type
+        if len(target_types) > 0 and self.starting_hgen_job.get_hgen_args().target_type == target_types[0]:
+            # target types should not include start target type
             target_types.pop(0)
         self.target_types = target_types
         super().__init__(job_args)
@@ -54,8 +56,8 @@ class MultiLayerHGenJob(AbstractJob):
         if current_args.clustering_method != SupportedClusteringMethod.LLM:
             logger.warn(f"{current_args.clustering_method} for higher level artifact generation is not currently supported. Using "
                         f"{SupportedClusteringMethod.LLM.name} instead")
-        hgen_args = HGenArgs(source_layer_id=current_args.target_type, target_type=next_target_type,
-                             dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
-                             clustering_method=SupportedClusteringMethod.LLM, clustering_params=current_args.clustering_params,
-                             export_path=current_args.export_path)
-        return BaseHGenJob(hgen_args, current_hgen_job.job_args)
+        new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
+                                                   target_type=next_target_type,
+                                                   dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
+                                                   clustering_method=SupportedClusteringMethod.LLM, tgen_trainer=None)
+        return BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)

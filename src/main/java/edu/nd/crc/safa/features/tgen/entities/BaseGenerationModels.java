@@ -105,7 +105,7 @@ public enum BaseGenerationModels {
      * @return Returns the default model.
      */
     public static ModelAppEntity getDefaultModel() {
-        return new ModelAppEntity(BaseGenerationModels.ANTHROPIC);
+        return new ModelAppEntity(BaseGenerationModels.GPT);
     }
 
     /**

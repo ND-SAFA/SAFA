@@ -13,10 +13,14 @@ import json
 import os.path
 import sys
 
-REPO_PATH = os.path.join(os.path.basename(__file__), "..", "..", "..")
+from kombu.serialization import register
+
+REPO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..")
 REPO_PATH = os.path.normpath(REPO_PATH)
+
 API_PATH = os.path.join(REPO_PATH, "src")
 TGEN_PATH = os.path.join(REPO_PATH, "tgen")
+
 sys.path.append(TGEN_PATH)
 sys.path.append(API_PATH)
 
@@ -150,8 +154,7 @@ Celery Configuration Options
 CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30m
-from kombu.serialization import register
+CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 
 
 # Encoder function

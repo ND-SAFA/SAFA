@@ -23,4 +23,3 @@ if "BROKER_URL" in os.environ:
 
     # Load task modules from all registered Django apps.
     celery_app.autodiscover_tasks()
-    celery_app.autodiscover_tasks(['api.endpoints.predict'])

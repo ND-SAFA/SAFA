@@ -150,7 +150,7 @@ Celery Configuration Options
 CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30m
+CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 from kombu.serialization import register
 
 

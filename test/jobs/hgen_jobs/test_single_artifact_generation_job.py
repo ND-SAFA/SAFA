@@ -35,4 +35,4 @@ class TestSingleArtifactGenerationJob(BaseJobTest):
                 self.assertIn(expected_artifact[ArtifactKeys.CONTENT.value], artifact_content[i])
 
     def _get_job(self) -> AbstractJob:
-        return GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", self.ARTIFACTS_BY_CLUSTER)
+        return GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", self.ARTIFACTS_BY_CLUSTER, hgen_llm_manager=OpenAIManager())

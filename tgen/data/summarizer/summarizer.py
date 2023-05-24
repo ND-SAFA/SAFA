@@ -102,7 +102,7 @@ class Summarizer(BaseObject):
         return summary
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
-                            index_to_chunker_to_use: Dict[str, SupportedChunker] = None):
+                            index_to_chunker_to_use: Dict[str, SupportedChunker] = None) -> pd.DataFrame:
         """
         Summarizes the information in a dataframe in a given column
         :param df: The dataframe to summarize

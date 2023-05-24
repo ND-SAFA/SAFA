@@ -4,6 +4,7 @@ from unittest import mock
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerKeys
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
@@ -68,5 +69,6 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.assertEquals(n_expected_links, len(dataset.trace_df))
 
     def _get_job(self):
-        starting_hgen_job = GenerateArtifactsJob(self.project.ARTIFACTS, "user_story")
+        starting_hgen_job = GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", hgen_llm_manager=OpenAIManager(),
+                                                 hgen_summarizer=Summarizer(OpenAIManager()))
         return MultiLayerHGenJob(starting_hgen_job, ["epic", "requirement"])

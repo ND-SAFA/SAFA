@@ -32,7 +32,7 @@ export function svgFooter(
     : "artifact-border";
   const bgClass = hasWarnings
     ? "artifact-svg artifact-warning"
-    : "artifact-border";
+    : "artifact-svg";
 
   if (!hasChildren && !hasWarnings && data.childDeltaStates?.length === 0) {
     return "";
@@ -46,6 +46,7 @@ export function svgFooter(
       width="${outerStyle.width}" 
       height="${ARTIFACT_CHILDREN_HEIGHT}"
       class="${borderClass}"
+      fill="${data.typeColor}"
     />
     <rect
       x="${ARTIFACT_BORDER_WIDTH}" 
@@ -92,7 +93,7 @@ function svgChildren(
     svgIcon(
       {
         ...style,
-        y: style.y - 2,
+        y: style.y - 4,
       },
       "expand_more"
     ) +

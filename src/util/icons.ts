@@ -60,6 +60,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-magnify";
     case "generate":
       return "mdi-creation";
+    case "generateArtifacts":
+      return "mdi-folder-multiple-plus-outline";
     case "notification":
       return "mdi-bell-outline";
     case "share":

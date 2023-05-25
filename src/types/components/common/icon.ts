@@ -26,6 +26,7 @@ export type IconVariant =
   | "account"
   | "search"
   | "generate"
+  | "generateArtifacts"
   | "notification"
   | "share"
   | "logs"

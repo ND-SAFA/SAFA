@@ -1,6 +1,6 @@
 import {
   ArtifactSchema,
-  Commit,
+  CommitSchema,
   VersionSchema,
   TraceLinkSchema,
 } from "@/types";
@@ -15,7 +15,7 @@ export class CommitBuilder {
   /**
    * The commit being built
    */
-  commit: Commit;
+  commit: CommitSchema;
 
   /**
    * Creates a commit builder.
@@ -106,7 +106,7 @@ export class CommitBuilder {
   /**
    * Saves this commit.
    */
-  save(): Promise<Commit> {
+  save(): Promise<CommitSchema> {
     return saveCommit(this.commit);
   }
 

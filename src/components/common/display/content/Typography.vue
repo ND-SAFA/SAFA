@@ -54,7 +54,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, withDefaults } from "vue";
+import { ref, computed, withDefaults, watch } from "vue";
 import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
@@ -85,6 +85,7 @@ const className = useMargins(props, () => [
   [props.variant === "caption", "text-caption text-grey-8"],
   [props.variant === "code", "text-body1"],
   [props.variant === "body" || props.variant === "expandable", "text-body1"],
+  [props.el === "a", "text-primary"],
   ["align", `text-${props.align}`],
   [!!props.color && !darkMode.value, `text-${props.color}`],
   ["inheritColor", "inherit-color"],
@@ -105,4 +106,19 @@ const isExpanded = ref(
 );
 
 const isExpandable = computed(() => props.variant === "expandable");
+
+/**
+ * Collapse the text if it changes and is too long.
+ */
+watch(
+  () => [props.value, props.variant],
+  () => {
+    if (
+      props.collapseLength === 0 ||
+      String(props.value).length < props.collapseLength
+    )
+      return;
+    isExpanded.value = false;
+  }
+);
 </script>

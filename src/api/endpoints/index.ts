@@ -17,4 +17,5 @@ export * from "./files-api";
 export * from "./installations-api";
 export * from "./attribute-api";
 export * from "./search-api";
-export * from "./generation-api";
+export * from "./summarization-api";
+export * from "./hgen-api";

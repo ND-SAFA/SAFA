@@ -1,5 +1,10 @@
 <template>
-  <q-page-sticky position="bottom-left" :offset="fabPos" class="artifact-fab">
+  <q-page-sticky
+    v-if="doDisplay"
+    position="bottom-left"
+    :offset="fabPos"
+    class="artifact-fab"
+  >
     <q-fab
       v-model="open"
       v-touch-pan.prevent.mouse="handleMoveFab"
@@ -27,15 +32,21 @@
         @click="handleDrawTraceLink"
       />
       <q-fab-action
-        v-if="isEditor"
         label="Create Trace Link"
         icon="mdi-ray-start-end"
         class="bg-background"
         data-cy="button-fab-create-trace"
         @click="handleAddTraceLink"
       />
+
       <q-fab-action
-        v-if="isEditor"
+        label="Generate Artifacts"
+        icon="mdi-folder-multiple-plus-outline"
+        class="bg-background"
+        data-cy="button-fab-generate-artifact"
+        @click="handleGenerateArtifact"
+      />
+      <q-fab-action
         label="Create Artifact"
         icon="mdi-folder-plus-outline"
         class="bg-background"
@@ -69,6 +80,9 @@ const isTreeMode = computed(
 );
 const isCreateLinkEnabled = computed(() => appStore.isCreateLinkEnabled);
 const isEditor = computed(() => sessionStore.isEditor(projectStore.project));
+const doDisplay = computed(
+  () => projectStore.isProjectDefined && isEditor.value
+);
 
 /**
  * Handles moving the fab tro another location.
@@ -88,39 +102,38 @@ function handleMoveFab(ev: {
  * Opens the add artifact modal.
  */
 function handleAddArtifact(): void {
-  projectStore.ifProjectDefined(() => {
-    appStore.openArtifactCreatorTo({ isNewArtifact: true });
-  });
+  appStore.openArtifactCreatorTo({ isNewArtifact: true });
 }
 
 /**
  * Opens the add trace link modal.
  */
 function handleAddTraceLink(): void {
-  projectStore.ifProjectDefined(() => {
-    appStore.openDetailsPanel("saveTrace");
-  });
+  appStore.openDetailsPanel("saveTrace");
 }
 
 /**
  * Enables the trace link creator.
  */
 function handleDrawTraceLink(): void {
-  projectStore.ifProjectDefined(() => {
-    if (isCreateLinkEnabled.value) {
-      disableDrawMode();
-    } else {
-      enableDrawMode();
-    }
-  });
+  if (isCreateLinkEnabled.value) {
+    disableDrawMode();
+  } else {
+    enableDrawMode();
+  }
 }
 
 /**
- * Opens the generate trace link modal.
+ * Opens the generate trace link panel.
  */
 function handleGenerateTraceLink(): void {
-  projectStore.ifProjectDefined(() => {
-    appStore.openDetailsPanel("generateTrace");
-  });
+  appStore.openDetailsPanel("generateTrace");
+}
+
+/**
+ * Opens the generate artifact panel.
+ */
+function handleGenerateArtifact(): void {
+  appStore.openDetailsPanel("generateArtifact");
 }
 </script>

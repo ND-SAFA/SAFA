@@ -34,7 +34,7 @@ export const useArtifacts = defineStore("artifacts", {
     /**
      * @return A collection of current artifact lists, keyed by their type.
      */
-    getArtifactsByType(): Record<string, ArtifactSchema[]> {
+    allArtifactsByType(): Record<string, ArtifactSchema[]> {
       return collectByField(this.currentArtifacts, "type");
     },
   },
@@ -127,6 +127,15 @@ export const useArtifacts = defineStore("artifacts", {
      */
     getArtifactById(id: string): ArtifactSchema | undefined {
       return this.allArtifacts.find((artifact) => artifact.id === id);
+    },
+    /**
+     * Finds all artifacts of the given type.
+     *
+     * @param type - The type to find.
+     * @return The matching artifacts.
+     */
+    getArtifactsByType(type: string): ArtifactSchema[] {
+      return this.allArtifacts.filter((artifact) => artifact.type === type);
     },
   },
 });

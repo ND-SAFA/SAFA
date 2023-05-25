@@ -54,7 +54,7 @@ const options = ref(typeOptionsStore.artifactTypes);
 
 const optionCount = computed(() =>
   props.showCount && typeof model.value === "string"
-    ? artifactStore.getArtifactsByType[model.value]?.length || 0
+    ? artifactStore.allArtifactsByType[model.value]?.length || 0
     : 0
 );
 

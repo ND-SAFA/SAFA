@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides summarization endpoints.
  */
 @RestController
-public class SummaryController extends BaseController {
-    public SummaryController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
+public class SummarizeController extends BaseController {
+    public SummarizeController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
     }
 

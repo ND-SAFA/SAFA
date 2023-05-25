@@ -30,13 +30,6 @@ class ModelUtil:
         return model.lower().strip() in ModelUtil.model_map
 
     @staticmethod
-    def get_default_model() -> str:
-        """
-        :return: Returns the default library key.
-        """
-        return "gpt"
-
-    @staticmethod
     def get_model_manager(llm_name: str) -> Tuple[str, AbstractLLMManager]:
         """
         Returns the model and corresponding LLM manager for given library name.

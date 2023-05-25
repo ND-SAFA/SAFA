@@ -106,8 +106,20 @@ function buttonProps(option: "single" | "multiple") {
  * Clears all input fields.
  */
 function handleReset(): void {
-  childArtifactIds.value = selectionStore.selectedGroupIds;
-  childArtifactType.value = "";
+  if (selectionStore.selectedGroupIds.length > 0) {
+    mode.value = "single";
+    childArtifactIds.value = selectionStore.selectedGroupIds;
+    childArtifactType.value = "";
+  } else if (selectionStore.selectedArtifactLevel) {
+    mode.value = "multiple";
+    childArtifactType.value = selectionStore.selectedArtifactLevel.name;
+    childArtifactIds.value = [];
+  } else {
+    mode.value = "single";
+    childArtifactIds.value = [];
+    childArtifactType.value = "";
+  }
+
   parentArtifactType.value = "";
   loading.value = false;
 }

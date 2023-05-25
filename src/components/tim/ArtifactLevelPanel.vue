@@ -1,11 +1,18 @@
 <template>
   <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
-    <flex-box b="2">
+    <flex-box column b="2">
       <text-button
         text
-        label="View In Tree"
+        label="View Artifacts"
         icon="artifact"
         @click="handleViewLevel"
+      />
+      <text-button
+        text
+        color="primary"
+        label="Generate Parents"
+        icon="generateArtifacts"
+        @click="handleGenerateParents"
       />
     </flex-box>
 
@@ -39,7 +46,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { layoutStore, selectionStore, typeOptionsStore } from "@/hooks";
+import {
+  appStore,
+  layoutStore,
+  selectionStore,
+  typeOptionsStore,
+} from "@/hooks";
 import {
   PanelCard,
   Typography,
@@ -71,5 +83,14 @@ function handleViewLevel(): void {
   if (!artifactLevel.value) return;
 
   layoutStore.viewTreeTypes([artifactLevel.value.name]);
+}
+
+/**
+ * Opens the generate artifact panel.
+ */
+function handleGenerateParents(): void {
+  if (!artifactLevel.value) return;
+
+  appStore.openDetailsPanel("generateArtifact");
 }
 </script>

@@ -26,6 +26,9 @@ public class SummaryService {
         TGen controller = baseModel.createTGenController();
         List<TGenSummaryArtifact> artifacts = new ArrayList<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
+            if (artifact.getId() == null) { // HOTFIX: set id to name. Name may not always be unique going forward.
+                artifact.setId(artifact.getName());
+            }
             TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifact.getName());
             artifact.setType(artifactType);
             artifacts.add(artifact);

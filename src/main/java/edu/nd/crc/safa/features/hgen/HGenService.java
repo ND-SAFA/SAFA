@@ -103,6 +103,7 @@ public class HGenService {
             ArtifactAppEntity sourceArtifact = artifactMap.get(UUID.fromString(sourceId));
             traceAppEntity.setSourceName(sourceArtifact.getName());
             traceAppEntity.setTargetName(targetName);
+            traceAppEntity.asManualTrace();
             return traceAppEntity;
         }).collect(Collectors.toList());
     }

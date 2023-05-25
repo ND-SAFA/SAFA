@@ -26,6 +26,9 @@ public class SummaryService {
         TGen controller = baseModel.createTGenController();
         List<TGenSummaryArtifact> artifacts = new ArrayList<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
+            if (artifact.getId() == null) { // For non-artifacts, ad-hoc id is created for them.
+                artifact.setId(artifact.getName());
+            }
             TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifact.getName());
             artifact.setType(artifactType);
             artifacts.add(artifact);

@@ -157,7 +157,7 @@ public class TGen implements ITraceGenerationController {
         String resultEndpoint = getEndpoint("results");
         TGenStatus tGenStatus;
         do {
-            sleep(3);
+            sleep(Defaults.WAIT_SECONDS);
             tGenStatus = this.safaRequestBuilder.sendPost(statusEndpoint, task, TGenStatus.class);
         } while (tGenStatus != null && tGenStatus.getStatus() > 0);
 
@@ -181,6 +181,6 @@ public class TGen implements ITraceGenerationController {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
-        static final int WAIT_SECONDS = 5;
+        static final int WAIT_SECONDS = 1;
     }
 }

@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.features.summary;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,10 +17,12 @@ public class TGenSummaryArtifact {
     /**
      * The identifier of the artifact.
      */
+    @Nullable
     String id;
     /**
      * Optional. Name of artifact to calculate type from.
      */
+    @NotNull
     String name;
     /**
      * The content to summarize.

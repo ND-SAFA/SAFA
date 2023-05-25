@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.summary;
 
 import java.util.List;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides summarization endpoints.
  */
 @RestController
-public class SummaryController extends BaseController {
-    public SummaryController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
+public class SummarizeController extends BaseController {
+    public SummarizeController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
     }
 
@@ -27,7 +28,7 @@ public class SummaryController extends BaseController {
      * @return List of summaries.
      */
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
-    public List<String> summarizeArtifacts(@RequestBody SummarizeRequestDTO request) {
+    public List<String> summarizeArtifacts(@RequestBody @Valid SummarizeRequestDTO request) {
         return serviceProvider.getSummaryService().generateSummaries(request);
     }
 }

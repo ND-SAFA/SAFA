@@ -21,7 +21,7 @@ if not IS_TEST:
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
-    MAX_COMPLETION_PROMPTS: int = 10
+    MAX_COMPLETION_PROMPTS: int = 20
     prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="")
 
     def __init__(self, llm_args: OpenAIArgs = None):
@@ -70,7 +70,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(2)  # trying to avoid rate limit
+            time.sleep(0.25)  # trying to avoid rate limit
         return res
 
     @staticmethod

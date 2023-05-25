@@ -1,9 +1,9 @@
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.train.args.anthropic_args import AnthropicArgs
 
-DEFAULT_LLM_MANAGER_CLS = OpenAIManager
-DEFAULT_LLM_ARGS_CLS = OpenAIArgs
+DEFAULT_LLM_MANAGER_CLS = AnthropicManager
+DEFAULT_LLM_ARGS_CLS = lambda: AnthropicArgs(model="claude-instant-v1-100k")
 
 
 def get_default_llm_manager() -> AbstractLLMManager:

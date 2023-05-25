@@ -11,6 +11,7 @@ from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResp
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.util.list_util import ListUtil
+from tgen.util.logging.logger_manager import logger
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
@@ -32,6 +33,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             llm_args = OpenAIArgs()
         assert isinstance(llm_args, OpenAIArgs), "Must use OpenAI args with OpenAI manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
+        logger.info(f"Created Anthropic manager with Model: {self.llm_args.model}")
 
     def _make_fine_tune_request_impl(self, **kwargs) -> OpenAIObject:
         """
@@ -60,6 +62,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         prompt = params.get(OpenAIParams.PROMPT)
         batches = ListUtil.batch(prompt, n=OpenAIManager.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None
+        logger.info(f"Starting OpenAI batch: {params['model']}")
         for batch in tqdm(batches, desc="Making completion requests"):
             params[OpenAIParams.PROMPT] = batch
             batch_res = openai.Completion.create(**params)

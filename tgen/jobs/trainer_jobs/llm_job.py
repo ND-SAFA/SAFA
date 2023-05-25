@@ -1,6 +1,6 @@
 from typing import Union
 
-from tgen.constants.model_constants import DEFAULT_LLM_MANAGER_CLS
+from tgen.constants.model_constants import get_default_llm_manager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
@@ -28,7 +28,7 @@ class LLMJob(AbstractTrainerJob):
         :param trainer_dataset_manager: The dataset manager for training and prediction
         """
         if llm_manager is None:
-            llm_manager = DEFAULT_LLM_MANAGER_CLS(trainer_args)
+            llm_manager = get_default_llm_manager()
         if trainer_args is None:
             trainer_args = llm_manager.llm_args
         if prompt_creator is None:

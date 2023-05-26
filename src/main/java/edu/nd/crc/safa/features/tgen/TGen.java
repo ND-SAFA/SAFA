@@ -86,6 +86,11 @@ public class TGen implements ITraceGenerationController {
         return this.requestTGen(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
+    public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
+        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
+        return this.requestTGen(predictEndpoint, payload, TGenPredictionOutput.class);
+    }
+
     /**
      * Generates trace link predictions for each pair of source and target artifacts.
      *
@@ -109,10 +114,6 @@ public class TGen implements ITraceGenerationController {
         return convertPredictionsToLinks(output.getPredictions());
     }
 
-    public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
-        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
-        return this.requestTGen(predictEndpoint, payload, TGenPredictionOutput.class);
-    }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
         return predictions
@@ -151,7 +152,7 @@ public class TGen implements ITraceGenerationController {
         return artifactLevelsMap;
     }
 
-    private <T> T requestTGen(String endpoint, Object payload, Class<T> responseClass) {
+    private <T extends AbstractTGenResponse> T requestTGen(String endpoint, Object payload, Class<T> responseClass) {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");

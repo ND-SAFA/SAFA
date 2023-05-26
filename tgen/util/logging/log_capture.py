@@ -55,23 +55,18 @@ class LogCapture(logging.Handler):
         :return: None
         """
         entry = "".join(args)
-        if len(entry) == 0:
-            return
-        if "\n" in entry:
-            self.add_entry(self.current_entry)
-        elif "\r" in entry:
-            self.current_entry = entry
-        else:
-            self.current_entry += entry
-        print(*args)
+        print(*args, end="")
+        self.add_entry(entry)
 
-    def add_entry(self, entry: str) -> None:
+    def add_entry(self, *entries: str, delimiter="") -> None:
         """
         Records log to capture.
         :param entry: The log to capture.
         :return: None
         """
-        self.logs.append(entry)
+        entry = delimiter.join(filter(lambda e: e is not None, entries))
+        if len(entry) > 0:
+            self.logs.append(entry)
 
     def register(self, logger=None):
         """

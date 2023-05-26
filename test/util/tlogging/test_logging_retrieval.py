@@ -28,4 +28,4 @@ class TestLoggingRetrieval(TestCase):
         perform_log("Test message")
         perform_tqdm(10)
         statements = log_capture.get_logs()
-        self.assertEqual(len(statements), 2)
+        self.assertEqual(len(statements), 4)

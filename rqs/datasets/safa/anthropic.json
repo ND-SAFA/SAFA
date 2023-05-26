@@ -7,7 +7,7 @@
           "task": "PREDICT",
           "trainer_args": {
             "object_type": "ANTHROPIC",
-            "model": "claude-v1.3"
+            "model": "claude-instant-v1"
           },
           "llm_manager": {
             "object_type": "ANTHROPIC"

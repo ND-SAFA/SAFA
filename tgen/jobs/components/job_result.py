@@ -60,7 +60,7 @@ class JobResult(BaseObject):
         :return: Experimental vars as a string
         """
         if len(self.experimental_vars) < 1:
-            return repr(None)
+            return "No experimental vars."
         printable = {}
         for name, val in self.experimental_vars.items():
             from tgen.util.base_object import BaseObject

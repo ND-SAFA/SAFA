@@ -29,7 +29,7 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         artifacts_df = self._get_artifacts_df(self.data_file)
         if self.summarizer is not None:
-            artifacts_df = self.summarizer.summarize_dataframe(artifacts_df, ArtifactKeys.CONTENT.value)
+            artifacts_df = self.summarizer.summarize_dataframe(artifacts_df, ArtifactKeys.CONTENT.value, ArtifactKeys.LAYER_ID.value)
         trace_df = self._get_trace_df(list(artifacts_df.index))
         layer_df = self._get_layer_dataframe()
         return artifacts_df, trace_df, layer_df

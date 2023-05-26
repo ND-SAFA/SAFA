@@ -39,13 +39,13 @@ class TestLLMClustering(BaseTest):
         self.assertDictEqual(clusters, self.expected_clusters)
 
     def test_get_clusters_from_response(self):
-        clusters = LLMClustering._get_clusters_from_response(self.res, self.artifact_df)
+        clusters = LLMClustering._get_clusters_from_response(self.res, list(self.artifact_df.index))
         self.assertDictEqual(self.expected_clusters, clusters)
 
         missing_art_res = GenerationResponse(batch_responses=['<group>\n<summary>Air lease and arm/disarm functionality</summary>\n'
                                                               '<artifacts>0,1,11</artifacts>\n</group>\n\n<group>\
                                                               n<summary>Circular flight path functionality</summary>\n \n</group>'])
-        missing_artifacts_cluster = LLMClustering._get_clusters_from_response(missing_art_res, self.artifact_df)
+        missing_artifacts_cluster = LLMClustering._get_clusters_from_response(missing_art_res, list(self.artifact_df.index))
         self.assertIn('Air lease and arm/disarm functionality', missing_artifacts_cluster)
         self.assertNotIn('Circular flight path functionality', missing_artifacts_cluster)
 

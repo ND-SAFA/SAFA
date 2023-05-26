@@ -6,7 +6,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.util.enum_util import EnumDict
 
 

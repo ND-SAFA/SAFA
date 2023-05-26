@@ -72,7 +72,9 @@ class HierarchyGenerator(BaseObject):
         cluster_dataset_creator = ClusterDatasetCreator(prompt_dataset=source_layer_only_dataset,
                                                         layer_id=target_layer_id,
                                                         cluster_methods=self.args.clustering_method,
-                                                        manual_clusters=self.args.manual_clusters, **self.args.clustering_params)
+                                                        manual_clusters=self.args.manual_clusters,
+                                                        summarizer=self.args.hgen_summarizer,
+                                                        **self.args.clustering_params)
 
         # Step 3: Create higher-level artifacts from Clusters
         hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
@@ -102,6 +104,7 @@ class HierarchyGenerator(BaseObject):
         :param export_path: The path to export dataset checkpoints to
         :return: The content for the generated artifacts
         """
+        logger.info(f"\nGenerating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         example = self._get_example_of_target_type()
         prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_llm_manager.prompt_args,
                                                  base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type,
@@ -111,7 +114,6 @@ class HierarchyGenerator(BaseObject):
                                   prompt_creator=prompt_creator)
         if export_path:
             self._update_trainer_args(hgen_trainer, export_path)
-        logger.info(f"Generating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         artifact_generations = hgen_trainer.perform_prediction().predictions
         return artifact_generations
 
@@ -225,6 +227,8 @@ class HierarchyGenerator(BaseObject):
         :return: The trace dataset
         """
         layer_artifact_df = original_artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
+        if len(layer_artifact_df) == 0:
+            raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [layer_id],
                                    LayerKeys.TARGET_TYPE: [layer_id]})
         layer_trace_df = TraceDataFrame() if original_trace_df is None else \
@@ -292,6 +296,7 @@ class HierarchyGenerator(BaseObject):
         Gets an example of the target artifact to use in the generation prompt for theLLM
         :return: An example of the target artifact
         """
+        logger.info("Getting example of target type.")
         example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value.format(artifact_type=self.args.target_type)
         example_prompt = GenerationPromptCreator(prompt_args=self.args.llm_manager_for_example.prompt_args,
                                                  base_prompt=example_prompt_format).create('')[PromptKeys.PROMPT]

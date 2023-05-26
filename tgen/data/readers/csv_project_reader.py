@@ -70,7 +70,8 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
 
         artifact_df = ArtifactDataFrame(artifact_df_entries)
         if self.summarizer is not None:
-            artifact_df = self.summarizer.summarize_dataframe(artifact_df, StructuredKeys.Artifact.CONTENT.value)
+            artifact_df = self.summarizer.summarize_dataframe(artifact_df, col2summarize=StructuredKeys.Artifact.CONTENT.value,
+                                                              col2use4chunker=StructuredKeys.Artifact.LAYER_ID.value)
         trace_df = TraceDataFrame(trace_df_entries)
         layer_mapping_df = LayerDataFrame([EnumDict({
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),

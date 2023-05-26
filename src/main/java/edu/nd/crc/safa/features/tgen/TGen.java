@@ -156,11 +156,16 @@ public class TGen implements ITraceGenerationController {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");
-        TGenStatus tGenStatus;
-        do {
-            sleep(Defaults.WAIT_SECONDS);
+        boolean jobFinshed = false;
+        TGenStatus tGenStatus = null;
+        while (tGenStatus == null || !jobFinshed) {
             tGenStatus = this.safaRequestBuilder.sendPost(statusEndpoint, task, TGenStatus.class);
-        } while (tGenStatus != null && tGenStatus.getStatus() > 0);
+            if (tGenStatus.getStatus() <= 0) { // TODO : Update to use enum
+                jobFinshed = true;
+            } else {
+                sleep(Defaults.WAIT_SECONDS);
+            }
+        }
 
         if (tGenStatus.getStatus() == 0) {
             T response = this.safaRequestBuilder.sendPost(resultEndpoint, task, responseClass);

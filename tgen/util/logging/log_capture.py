@@ -57,7 +57,7 @@ class LogCapture(logging.Handler):
         entry = "".join(args)
         print(*args, end="")
         self.add_entry(entry)
-        
+
     def add_entry(self, *entries: str, delimiter="") -> None:
         """
         Records log to capture.
@@ -65,8 +65,8 @@ class LogCapture(logging.Handler):
         :return: None
         """
         entry = delimiter.join(filter(lambda e: e is not None, entries))
-        self.logs.append(entry)
-        i = 0
+        if len(entry) > 0:
+            self.logs.append(entry)
 
     def register(self, logger=None):
         """

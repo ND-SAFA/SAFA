@@ -1,9 +1,7 @@
 import os
-from copy import deepcopy
 from typing import List, Tuple
 
 import pandas as pd
-from tqdm import tqdm
 
 from tgen.constants.dataset_constants import EXCLUDED_FILES
 from tgen.constants.deliminator_constants import EMPTY_STRING
@@ -93,7 +91,6 @@ class FolderEntityFormat(AbstractEntityFormat):
         """
         return True
 
-
     @staticmethod
     def _remove_empty_contents(artifact_names: List[str], contents: List[str]) -> Tuple[List[str], List[str]]:
         """
@@ -109,4 +106,3 @@ class FolderEntityFormat(AbstractEntityFormat):
             logger.warning(f"{artifact_names[i]} does not contain any content. Skipping...")
             continue
         return artifact_names, contents
-

@@ -5,6 +5,7 @@ from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.util.enum_util import EnumDict
+from tgen.util.logging.logger_manager import logger
 
 
 class ClassificationPromptCreator(AbstractPromptCreator):
@@ -30,6 +31,7 @@ class ClassificationPromptCreator(AbstractPromptCreator):
         self.pos_class = pos_class
         self.neg_class = neg_class
         self.artifact_prompt_format = artifact_prompt_format
+        logger.info(f"Base Prompt: {self.base_prompt}")
 
     def create(self, target_content: str, source_content: str = EMPTY_STRING, label: int = None, **kwargs) -> EnumDict[str, str]:
         """

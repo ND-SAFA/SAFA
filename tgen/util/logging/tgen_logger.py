@@ -1,20 +1,10 @@
 from logging import Logger
 
-from tgen.util.override import overrides
-
 
 class TGenLogger(Logger):
     """
     Handles Logging for TGEN
     """
-
-    @overrides(Logger)
-    def _log(self, level, msg, args, exc_info=None, extra=None, stack_info=False, stacklevel=1) -> None:
-        """
-        Ensures that logging only occurs on main process (see Python logging docs for details on params)
-        :return: None
-        """
-        super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
 
     def log_with_title(self, title: str, message: str) -> None:
         """

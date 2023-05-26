@@ -1,4 +1,5 @@
-from typing import List, TypedDict, Dict, Optional
+from typing import Dict, List, Optional, TypedDict
+
 import anthropic
 
 from tgen.constants.anthropic_constants import ANTHROPIC_MAX_THREADS
@@ -9,6 +10,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
+from tgen.util.logging.logger_manager import logger
 from tgen.util.thread_util import ThreadUtil
 
 
@@ -56,6 +58,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
+        logger.info(f"Created Anthropic manager with Model: {self.llm_args.model}")
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """
@@ -81,6 +84,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: Anthropic's response to completion request.
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
+        logger.info(f"Starting Anthropic batch: {params['model']}")
         prompts = params[AnthropicParams.PROMPT]
         response = []
         if isinstance(prompts, str):

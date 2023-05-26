@@ -1,16 +1,24 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Data
 public class SubtreeAppEntity {
-    private List<UUID> parents;
-    private List<UUID> children;
-    private List<UUID> subtree;
-    @JsonIgnore private List<UUID> supertree;
-    private List<UUID> neighbors;
+    private Set<UUID> parents;
+    private Set<UUID> children;
+    private Set<UUID> subtree;
+    private Set<UUID> supertree;
+    private Set<UUID> neighbors;
+
+    public SubtreeAppEntity() {
+        parents = new HashSet<>();
+        children = new HashSet<>();
+        neighbors = new HashSet<>();
+        subtree = new HashSet<>();
+        supertree = new HashSet<>();
+    }
 }

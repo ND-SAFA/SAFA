@@ -87,7 +87,6 @@ public class ProjectAppEntity implements IAppEntity {
                             List<ModelAppEntity> models,
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts) {
-        this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.name = project.getName();

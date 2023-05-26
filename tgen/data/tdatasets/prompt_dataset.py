@@ -3,7 +3,6 @@ import uuid
 from typing import Any, Optional, Tuple
 
 import pandas as pd
-from tqdm import tqdm
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
@@ -22,6 +21,7 @@ from tgen.models.model_manager import ModelManager
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
+from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 class PromptDataset(iDataset):
@@ -142,7 +142,7 @@ class PromptDataset(iDataset):
         entries = []
         traces = self.trace_dataset.trace_df
         save_path = os.path.join(os.getcwd(), self.__SAVE_FILENAME)
-        for i, row in tqdm(traces.itertuples(), total=len(traces), desc="Generating prompts dataframe from trace links"):
+        for i, row in tgen_tqdm(traces.itertuples(), total=len(traces), desc="Generating prompts dataframe from trace links"):
             if i % self.__SAVE_AFTER_N == 0:
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
@@ -162,8 +162,8 @@ class PromptDataset(iDataset):
         :return: A prompts based dataset.
         """
         entries = []
-        for id_, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
-                                  desc="Generating prompts dataframe from artifacts"):
+        for id_, artifact in tgen_tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
+                                       desc="Generating prompts dataframe from artifacts"):
             entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
                                            summarizer=summarizer, artifact_id=id_)
             entries.append(entry)

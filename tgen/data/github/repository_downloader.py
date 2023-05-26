@@ -11,7 +11,6 @@ from typing import Callable, List, Union
 import git as local_git
 from github import Github, Repository
 from github.Issue import Issue
-from tqdm import tqdm
 
 from tgen.data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
@@ -25,6 +24,7 @@ from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTI
     PULL_ARTIFACT_FILE
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 class RepositoryDownloader:
@@ -133,7 +133,7 @@ class RepositoryDownloader:
         :return: Set of artifacts representing issues in repository.
         """
         issue_artifacts = []
-        for issue in tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
+        for issue in tgen_tqdm(repo.get_issues(state="all"), desc="Scraping issues"):
             if issue.pull_request is not None:  # Pull requests handled in parse_pulls.
                 continue
             RepositoryDownloader.wait_for_rate_limit(github_instance)
@@ -150,7 +150,7 @@ class RepositoryDownloader:
         :return: Set of artifacts representing pulls in repository.
         """
         pulls = []
-        for pr in tqdm(repo.get_pulls(state="all"), desc="Scraping pulls"):
+        for pr in tgen_tqdm(repo.get_pulls(state="all"), desc="Scraping pulls"):
             RepositoryDownloader.wait_for_rate_limit(github_instance)
             pulls.append(GPull.parse(pr))
         return GArtifactSet(pulls, GArtifactType.PULL)
@@ -163,7 +163,7 @@ class RepositoryDownloader:
         :return: Set of artifacts representing commits in repository.
         """
         commits = []
-        for commit in tqdm(repo.iter_commits(), desc="Parsing commits from repository."):
+        for commit in tgen_tqdm(repo.iter_commits(), desc="Parsing commits from repository."):
             try:
                 commits.append(GCommit.parse_commit(commit))
             except Exception as e:
@@ -202,6 +202,6 @@ class RepositoryDownloader:
             reset_timestamp = calendar.timegm(core_rate_limit.reset.timetuple())
             sleep_time = reset_timestamp - calendar.timegm(time.gmtime())
             logger.info("Wait untill git core API rate limit reset, reset time = {} seconds".format(sleep_time))
-            for i in tqdm(range(sleep_time), desc="Rate Limit Wait"):
+            for i in tgen_tqdm(range(sleep_time), desc="Rate Limit Wait"):
                 time.sleep(1)
             remaining = github_instance.get_rate_limit().core.remaining

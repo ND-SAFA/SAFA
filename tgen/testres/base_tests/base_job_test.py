@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager

@@ -2,7 +2,7 @@ import threading
 from queue import Queue
 from typing import Callable, List
 
-from tqdm import tqdm
+from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 class ThreadUtil:
@@ -25,7 +25,7 @@ class ThreadUtil:
         for item in iterable:
             item_queue.put(item)
 
-        progress_bar = tqdm(total=len(iterable), desc=title)
+        progress_bar = tgen_tqdm(total=len(iterable), desc=title)
 
         def thread_body() -> None:
             """

@@ -24,6 +24,7 @@ class TestLoggingRetrieval(TestCase):
         """
         Tests that logs are captured
         """
+        log_capture.clear()
         perform_log("Test message")
         perform_tqdm(10)
         statements = log_capture.get_logs()

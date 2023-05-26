@@ -15,12 +15,14 @@ import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
 import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.summary.TGenSummaryRequest;
 import edu.nd.crc.safa.features.summary.TGenSummaryResponse;
+import edu.nd.crc.safa.features.tgen.api.AbstractTGenResponse;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
@@ -35,15 +37,13 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
  */
 public class TGen implements ITraceGenerationController {
 
-    private static final Logger log = LoggerFactory.getLogger(TGen.class);
+    public static JobLogger logger;
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final BertMethodIdentifier methodId;
@@ -163,7 +163,11 @@ public class TGen implements ITraceGenerationController {
         } while (tGenStatus != null && tGenStatus.getStatus() > 0);
 
         if (tGenStatus.getStatus() == 0) {
-            return this.safaRequestBuilder.sendPost(resultEndpoint, task, responseClass);
+            T response = this.safaRequestBuilder.sendPost(resultEndpoint, task, responseClass);
+            if (logger != null) {
+                logger.log(response.getLog());
+            }
+            return response;
         }
         throw new SafaError(tGenStatus.getMessage());
     }

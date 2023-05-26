@@ -3,7 +3,6 @@ from typing import Iterable, List, Set, Union
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from tqdm import tqdm
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -14,10 +13,10 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.list_util import ListUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 class CreateSourceSplitsJob(AbstractJob):
@@ -52,7 +51,7 @@ class CreateSourceSplitsJob(AbstractJob):
             all_split_ids = set(ListUtil.flatten(split_id_batches))
 
             stages = [e for e in DatasetRole if e != DatasetRole.PRE_TRAIN]
-            for split_ids, stage in tqdm(zip(split_id_batches, stages), desc="Processing splits."):
+            for split_ids, stage in tgen_tqdm(zip(split_id_batches, stages), desc="Processing splits."):
                 other_ids = all_split_ids - set(split_ids)
                 logger.info("Creating split artifacts")
                 split_artifact_df = CreateSourceSplitsJob.create_task_split_artifact_df(dataset.artifact_df,

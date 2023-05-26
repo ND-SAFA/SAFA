@@ -66,8 +66,8 @@ public class SubtreeCalculator {
         for (TraceAppEntity trace : traces) {
             UUID sourceId = trace.getSourceId();
             UUID targetId = trace.getTargetId();
-            subtrees.get(sourceId).getChildren().add(targetId);
-            subtrees.get(targetId).getParents().add(sourceId);
+            subtrees.get(sourceId).getParents().add(targetId);
+            subtrees.get(targetId).getChildren().add(sourceId);
         }
     }
 

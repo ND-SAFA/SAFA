@@ -125,7 +125,7 @@ class LLMClustering(iClustering):
         """
         okay_clusters = {name: artifacts for name, artifacts in clusters.items() if len(artifacts) > LLMClustering.CLUSTER_MIN}
         clustered_artifacts = {a for artifacts in okay_clusters.values() for a in artifacts}
-        artifact2cluster = list(set(artifact_df.index.values).difference(clustered_artifacts))
+        artifact2cluster = [artifact for artifact in artifact_df.index.values if artifact not in clustered_artifacts]
         if len(artifact2cluster) < 0:
             return clusters
         logger.info(f"\nRe-clustering groups with less than {LLMClustering.CLUSTER_MIN} artifacts")

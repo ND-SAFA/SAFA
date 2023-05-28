@@ -21,6 +21,7 @@ from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.override import overrides
 
 
 class LLMClustering(iClustering):
@@ -35,6 +36,7 @@ class LLMClustering(iClustering):
     CLUSTER_MIN = 1
 
     @staticmethod
+    @overrides(iClustering)
     def cluster(trace_dataset: TraceDataset, target_artifact_type: str, llm_manager: AbstractLLMManager = None, **kwargs) -> Clusters:
         """
         Performs clustering by using the model to predict artifact groups

@@ -18,12 +18,12 @@ from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestLLMClustering(BaseTest):
-    res = GenerationResponse(batch_responses=['<group>\n<summary>Air lease and arm/disarm functionality</summary>\n'
-                                              '<artifacts>0,1,11</artifacts>\n</group>\n\n<group>\n<summary>Circular flight path '
-                                              'functionality</summary>\n<artifacts>2,5,9</artifacts> \n</group>\n\n<group>\n'
-                                              '<summary>Travel and hover flight path functionality</summary>'
-                                              '\n<artifacts>3,10,8</artifacts> \n</group>\n\n<group> \n<summary>Waypoint flight '
-                                              'path functionality</summary>\n<artifacts>4,7,6</artifacts>\n</group>'])
+    res = GenerationResponse(batch_responses=['<group>\n<feature>Air lease and arm/disarm functionality</feature>\n'
+                                              '<artifacts>0,1,11</artifacts>\n</group>\n\n<group>\n<feature>Circular flight path '
+                                              'functionality</feature>\n<artifacts>2,5,9</artifacts> \n</group>\n\n<group>\n'
+                                              '<feature>Travel and hover flight path functionality</feature>'
+                                              '\n<artifacts>3,10,8</artifacts> \n</group>\n\n<group> \n<feature>Waypoint flight '
+                                              'path functionality</feature>\n<artifacts>4,7,6</artifacts>\n</group>'])
     expected_clusters = {'Air lease and arm/disarm functionality': ['s1', 's2', 't6'],
                          'Circular flight path functionality': ['s3', 't3', 't4'],
                          'Travel and hover flight path functionality': ['t1', 't5', 's6'],
@@ -39,18 +39,18 @@ class TestLLMClustering(BaseTest):
         self.assertDictEqual(clusters, self.expected_clusters)
 
     def test_get_clusters_from_response(self):
-        clusters = LLMClustering._get_clusters_from_response(self.res, list(self.artifact_df.index))
+        clusters = LLMClustering._get_clusters_from_response(self.res.batch_responses[0], list(self.artifact_df.index))
         self.assertDictEqual(self.expected_clusters, clusters)
 
-        missing_art_res = GenerationResponse(batch_responses=['<group>\n<summary>Air lease and arm/disarm functionality</summary>\n'
+        missing_art_res = GenerationResponse(batch_responses=['<group>\n<feature>Air lease and arm/disarm functionality</feature>\n'
                                                               '<artifacts>0,1,11</artifacts>\n</group>\n\n<group>\
-                                                              n<summary>Circular flight path functionality</summary>\n \n</group>'])
-        missing_artifacts_cluster = LLMClustering._get_clusters_from_response(missing_art_res, list(self.artifact_df.index))
+                                                              n<feature>Circular flight path functionality</feature>\n \n</group>'])
+        missing_artifacts_cluster = LLMClustering._get_clusters_from_response(missing_art_res.batch_responses[0], list(self.artifact_df.index))
         self.assertIn('Air lease and arm/disarm functionality', missing_artifacts_cluster)
         self.assertNotIn('Circular flight path functionality', missing_artifacts_cluster)
 
         bad_res = GenerationResponse(batch_responses=['Claude is dumb sometimes'])
-        bad_res_clusters = LLMClustering._get_clusters_from_response(bad_res, self.artifact_df)
+        bad_res_clusters = LLMClustering._get_clusters_from_response(bad_res.batch_responses[0], self.artifact_df)
         self.assertSize(0, bad_res_clusters)
 
     def test_get_cluster_name_and_artifacts(self):
@@ -60,12 +60,12 @@ class TestLLMClustering(BaseTest):
         self.assertEqual("Air lease and arm/disarm functionality", cluster_name_)
         self.assertListEqual(artifacts, [artifact_ids[0], artifact_ids[1], artifact_ids[11]])
 
-        bad_group_empty = BeautifulSoup('<group>\n<summary>Air lease and arm/disarm functionality</summary>'
+        bad_group_empty = BeautifulSoup('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
                                         '\n<artifacts></artifacts>\n</group>', features="lxml").find(LLMClustering.CLUSTER_TAG)
         cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_empty, artifact_ids)
         self.assertSize(0, artifacts)
 
-        bad_group_format = BeautifulSoup('<group>\n<summary>Air lease and arm/disarm functionality</summary>'
+        bad_group_format = BeautifulSoup('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
                                          '\n<artifacts>Claude is dumb sometimes</artifacts>\n</group>', features="lxml") \
             .find(LLMClustering.CLUSTER_TAG)
         cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_format, artifact_ids)

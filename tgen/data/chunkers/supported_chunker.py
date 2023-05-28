@@ -34,5 +34,5 @@ class SupportedChunker(SupportedEnum):
         """
         try:
             return SupportedChunker[ext.upper()]
-        except KeyError:
+        except Exception:
             return SupportedChunker.NL

@@ -17,18 +17,17 @@ from tgen.testres.object_creator import ObjectCreator
 
 
 class TestClusterDatasetCreator(BaseTest):
-    ARTIFACT2CLUSTERS = {'s1': 0, 's2': 0, 's3': 2, 't1': 0, 't2': 2, 't3': 5, 's4': 3, 's5': 4, 's6': 1, 't4': 3, 't5': 3, 't6': 4}
+    ARTIFACT2CLUSTERS = {'s1': 0, 's2': 0, 's3': 2, 't1': 0, 't2': 2, 't3': 5, 's4': 3, 's5': 4, 's6': 3, 't4': 3, 't5': 3, 't6': 4}
     METHOD2CLUSTER = {SupportedClusteringMethod.GRAPH: {0: ['s1', 's2', 't1'],
                                                         2: ['s3', 't2'],
                                                         5: ['t3']},
-                      SupportedClusteringMethod.LLM: {3: ['s4', 't4', 't5'],
-                                                      1: ['s6'],
+                      SupportedClusteringMethod.LLM: {3: ['s4', 't4', 't5', 's6'],
                                                       4: ['s5', 't6']}}
 
-    res = GenerationResponse(batch_responses=['<group>\n<summary>3</summary>\n'
-                                              '<artifacts>6,9,10</artifacts>\n</group>\n\n<group>\n<summary>1</summary>\
-                                              n<artifacts>8</artifacts> \n</group>\n\n<group>\n'
-                                              '<summary>4</summary>\n<artifacts>7,11</artifacts> \n</group>'])
+    res = GenerationResponse(batch_responses=['<group>\n<feature>1</feature>\n'
+                                              '<artifacts>8</artifacts> \n<group>\n<feature>3</feature>\n'
+                                              '<artifacts>6,9,10</artifacts>\n</group>\n\n</group>\n\n<group>\n'
+                                              '<feature>4</feature>\n<artifacts>7,11</artifacts> \n</group>'])
 
     @mock.patch.object(AbstractLLMManager, "make_completion_request")
     def test_get_clusters(self, completion_request_mock: mock.MagicMock):

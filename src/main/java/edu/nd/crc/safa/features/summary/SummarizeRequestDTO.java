@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.summary;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.tgen.api.AbstractGenerationRequest;
+import edu.nd.crc.safa.features.tgen.api.requests.AbstractGenerationRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

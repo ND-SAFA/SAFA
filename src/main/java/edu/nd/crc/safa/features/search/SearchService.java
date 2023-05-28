@@ -16,12 +16,14 @@ import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.responses.TGenPredictionResponse;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -94,10 +96,10 @@ public class SearchService {
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
         TGen controller = model.createTGenController();
-        TGenPredictionOutput response = controller.performPrediction(payload);
+        TGenPredictionResponse response = controller.generateLinks(payload);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenPredictionOutput.PredictedLink::getTarget)
+            .map(TGenPredictionResponse.PredictedLink::getTarget)
             .filter(t -> !sourceLayer.containsKey(t))
             .map(UUID::fromString)
             .collect(Collectors.toList());

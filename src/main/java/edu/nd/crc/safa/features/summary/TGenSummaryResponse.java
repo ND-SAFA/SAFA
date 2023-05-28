@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.summary;
 
 import java.util.Map;
 
-import edu.nd.crc.safa.features.tgen.api.AbstractTGenResponse;
+import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

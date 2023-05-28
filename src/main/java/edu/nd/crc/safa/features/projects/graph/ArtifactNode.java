@@ -16,10 +16,12 @@ import lombok.Getter;
 @Getter
 public class ArtifactNode {
 
-    ArtifactAppEntity artifact;
-    Set<ArtifactNode> neighbors = new HashSet<>();
-    Set<ArtifactNode> parents = new HashSet<>();
-    Set<ArtifactNode> children = new HashSet<>();
+    private final ArtifactAppEntity artifact;
+    private final Set<ArtifactNode> neighbors = new HashSet<>();
+    private final Set<ArtifactNode> parents = new HashSet<>();
+    private final Set<ArtifactNode> children = new HashSet<>();
+    private final Set<ArtifactNode> subtree = new HashSet<>();
+    private final Set<ArtifactNode> supertree = new HashSet<>();
 
     public ArtifactNode(ArtifactAppEntity artifact) {
         this.artifact = artifact;

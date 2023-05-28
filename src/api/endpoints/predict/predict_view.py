@@ -3,9 +3,7 @@ import os.path
 import uuid
 from typing import Optional
 
-from celery import shared_task
-
-from api.endpoints.base.views.endpoint import endpoint
+from api.endpoints.base.views.endpoint import async_endpoint
 from api.endpoints.predict.predict_serializer import PredictionPayload, PredictionSerializer
 from api.experiment_creator import JobCreator, PredictionJobTypes
 from api.utils.model_util import ModelUtil
@@ -36,17 +34,16 @@ def create_predict_definition(task_id: str, dataset: ApiDefinition, model: str, 
     return JobCreator.create_prediction_definition(dataset=dataset, **prediction_job_args)
 
 
-@endpoint(PredictionSerializer)
-@shared_task
+@async_endpoint(PredictionSerializer)
 def predict(prediction_payload: PredictionPayload):
     model = prediction_payload.get("model", "gpt")
     dataset_definition: ApiDefinition = prediction_payload["dataset"]
     prompt: Optional[str] = prediction_payload.get("prompt", None)
-
     dataset: ApiDefinition = DefinitionCreator.create(ApiDefinition, dataset_definition)
 
     api_id = uuid.uuid4()
     prediction_job = create_predict_definition(str(api_id), dataset, model, prompt)
 
     prediction_result = ViewUtil.run_job(prediction_job)
+
     return {"predictions": prediction_result.prediction_entries}

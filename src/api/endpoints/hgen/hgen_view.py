@@ -1,13 +1,10 @@
-from celery import shared_task
-
-from api.endpoints.base.views.endpoint import endpoint
+from api.endpoints.base.views.endpoint import async_endpoint
 from api.endpoints.hgen.hgen_serializer import HGenSerializer
 from api.utils.view_util import ViewUtil
 from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 
 
-@endpoint(HGenSerializer)
-@shared_task
+@async_endpoint(HGenSerializer)
 def perform_hgen(payload):
     """
     Performs generation of single artifacts from cluster.

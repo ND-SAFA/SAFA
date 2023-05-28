@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from rest_framework import serializers
 
@@ -13,7 +13,7 @@ class PredictionPayload(TypedDict):
     """
     dataset: ApiDefinition
     model: str
-    prompt: str
+    prompt: Optional[str]
 
 
 class PredictionSerializer(AbstractSerializer):

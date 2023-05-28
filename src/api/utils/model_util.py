@@ -12,11 +12,11 @@ class ModelUtil:
     model_map = {
         "gpt": {
             "model": "text-davinci-003",
-            "util": OpenAIManager()
+            "util": OpenAIManager
         },
         "anthropic": {
             "model": "claude-v1.3",
-            "util": AnthropicManager()
+            "util": AnthropicManager
         }
     }
 
@@ -39,5 +39,5 @@ class ModelUtil:
         llm_name = llm_name.lower()
         assert llm_name in ModelUtil.model_map, f"Model should be one of {list(ModelUtil.model_map.keys())}"
         model = ModelUtil.model_map[llm_name]["model"]
-        llm_manager = ModelUtil.model_map[llm_name]["util"]
+        llm_manager = ModelUtil.model_map[llm_name]["util"]()
         return model, llm_manager

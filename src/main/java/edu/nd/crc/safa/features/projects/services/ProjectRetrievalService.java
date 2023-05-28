@@ -25,7 +25,7 @@ import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
-import edu.nd.crc.safa.features.projects.graph.SubtreeCalculator;
+import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -110,8 +110,9 @@ public class ProjectRetrievalService {
 
         List<AttributeLayoutAppEntity> attributeLayouts =
             this.attributeLayoutService.getAppEntities(projectVersion, user);
-
-        Map<UUID, SubtreeAppEntity> subtrees = SubtreeCalculator.calculateSubtrees(entities);
+        
+        ProjectGraph graph = new ProjectGraph(entities);
+        Map<UUID, SubtreeAppEntity> subtrees = graph.getSubtreeInfo();
 
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),

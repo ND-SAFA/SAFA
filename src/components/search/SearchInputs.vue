@@ -21,9 +21,13 @@
         style="transition: width 0.5s ease-in-out"
       >
         <flex-box full-width>
-          <custom-model-input
-            v-model="searchStore.searchModel"
-            style="min-width: 150px; flex-grow: 1"
+          <artifact-type-input
+            v-model="searchStore.relatedTypes"
+            multiple
+            clearable
+            label="Include Artifact Types"
+            hint="What types do I want to see related to my search."
+            class="full-width"
           />
           <text-input
             v-model="searchStore.maxResults"
@@ -34,14 +38,6 @@
             style="min-width: 130px"
           />
         </flex-box>
-        <artifact-type-input
-          v-model="searchStore.relatedTypes"
-          multiple
-          clearable
-          label="Include Artifact Types"
-          hint="What types do I want to see related to my search."
-          class="full-width q-my-md"
-        />
       </expansion-item>
       <text-button
         v-close-popup
@@ -72,7 +68,6 @@ import {
   ArtifactTypeInput,
   TextInput,
   TextButton,
-  CustomModelInput,
   ExpansionItem,
 } from "@/components/common";
 

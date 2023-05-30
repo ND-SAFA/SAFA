@@ -43,7 +43,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { layoutStore, selectionStore } from "@/hooks";
+import { documentStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
@@ -84,7 +84,7 @@ const approvedCount = computed(() => {
 function handleViewLevel(): void {
   if (!traceMatrix.value) return;
 
-  layoutStore.viewTreeTypes([
+  documentStore.addDocumentOfTypes([
     traceMatrix.value.sourceType,
     traceMatrix.value.targetType,
   ]);

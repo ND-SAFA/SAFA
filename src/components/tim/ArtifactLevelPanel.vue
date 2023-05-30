@@ -48,7 +48,7 @@ export default {
 import { computed } from "vue";
 import {
   appStore,
-  layoutStore,
+  documentStore,
   selectionStore,
   typeOptionsStore,
 } from "@/hooks";
@@ -82,7 +82,7 @@ const iconId = computed(() =>
 function handleViewLevel(): void {
   if (!artifactLevel.value) return;
 
-  layoutStore.viewTreeTypes([artifactLevel.value.name]);
+  documentStore.addDocumentOfTypes([artifactLevel.value.name]);
 }
 
 /**

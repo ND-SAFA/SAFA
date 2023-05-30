@@ -49,6 +49,37 @@ export async function handleCreateDocument(
 }
 
 /**
+ * Creates a new document from an existing document and updates app state.
+ *
+ * @param document - The document to create.
+ * @param onSuccess - Called if the creation is successful.
+ * @param onError - Called if the creation fails.
+ * @param onComplete - Called after the action completes.
+ */
+export async function handleCreatePresetDocument(
+  document: DocumentSchema,
+  { onSuccess, onError, onComplete }: IOHandlerCallback
+): Promise<void> {
+  const { name, type, artifactIds } = document;
+
+  appStore.onLoadStart();
+
+  try {
+    await documentStore.removeDocument(document);
+    await handleCreateDocument(name, type, artifactIds);
+
+    logStore.onSuccess(`Document has been created: ${name}`);
+    onSuccess?.();
+  } catch (e) {
+    logStore.onError(`Cannot create document: ${name}`);
+    onError?.(e as Error);
+  } finally {
+    appStore.onLoadEnd();
+    onComplete?.();
+  }
+}
+
+/**
  * Updates an existing document and updates app state.
  *
  * @param document - The document to edit.

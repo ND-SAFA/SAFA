@@ -10,10 +10,18 @@
     label="View"
     class="nav-input nav-document"
     option-label="name"
-    option-value="documentId"
+    option-value="name"
     color="accent"
     data-cy="button-document-select-open"
   >
+    <template v-if="canSave" #append>
+      <icon-button
+        tooltip="Save View"
+        icon="save"
+        data-cy="button-document-select-save"
+        @click="handleSave"
+      />
+    </template>
     <template #option="{ opt, itemProps }">
       <list-item
         v-bind="itemProps"
@@ -68,7 +76,7 @@ import {
   sessionStore,
   useTheme,
 } from "@/hooks";
-import { handleSwitchDocuments } from "@/api";
+import { handleCreatePresetDocument, handleSwitchDocuments } from "@/api";
 import { IconButton, TextButton, ListItem } from "@/components/common";
 
 const { darkMode } = useTheme();
@@ -83,6 +91,10 @@ const document = computed({
     handleSwitchDocuments(document);
   },
 });
+
+const canSave = computed(
+  () => !document.value?.documentId && document.value?.name !== "Default"
+);
 
 /**
  * Returns whether a document can be edited.
@@ -107,5 +119,12 @@ function handleCreateOpen(): void {
 function handleEditOpen(document: DocumentSchema): void {
   documentSaveStore.baseDocument = document;
   appStore.openDetailsPanel("document");
+}
+
+/**
+ * Saves a new document.
+ */
+function handleSave(): void {
+  handleCreatePresetDocument(document.value, {});
 }
 </script>

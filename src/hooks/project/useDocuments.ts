@@ -189,6 +189,24 @@ export const useDocuments = defineStore("documents", {
       await this.switchDocuments(document);
     },
     /**
+     * Creates and adds a new document for multiple types of artifacts.
+     *
+     * @param types - The artifact types to include in the document.
+     */
+    async addDocumentOfTypes(types: string[]): Promise<void> {
+      const artifactsByType = artifactStore.allArtifactsByType;
+      const document = createDocument({
+        project: projectStore.projectIdentifier,
+        name: types.join(", "),
+        artifactIds: types
+          .map((type) => artifactsByType[type].map(({ id }) => id))
+          .reduce((acc, cur) => [...acc, ...cur], []),
+      });
+
+      await this.addDocument(document);
+      layoutStore.mode = GraphMode.tree;
+    },
+    /**
      * Adds artifacts to the current document.
      *
      * @param newIds - The new artifacts to add.

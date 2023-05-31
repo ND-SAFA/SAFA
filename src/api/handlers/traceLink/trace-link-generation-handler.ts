@@ -75,7 +75,6 @@ export async function handleGetGeneratedLinks({
  * Generates links between sets of artifact types and adds them to the project.
  *
  * @param method - The base model to generate with.
- * @param model - The model to generate with. Used over the method.
  * @param artifactLevels - An array of source and target artifact types to generate traces between.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
@@ -83,7 +82,6 @@ export async function handleGetGeneratedLinks({
  */
 export async function handleGenerateLinks(
   method: ModelType | undefined,
-  model: GenerationModelSchema | undefined,
   artifactLevels: ArtifactLevelSchema[],
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
@@ -93,7 +91,7 @@ export async function handleGenerateLinks(
 
   try {
     const job = await createGeneratedLinks({
-      requests: [createGeneratedMatrix(artifactLevels, method, model)],
+      requests: [createGeneratedMatrix(artifactLevels, method)],
       projectVersion: projectStore.version,
     });
 

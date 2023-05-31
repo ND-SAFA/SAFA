@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,44 +45,22 @@ import org.javatuples.Pair;
  */
 public class TGen implements ITraceGenerationController {
 
-    public static JobLogger logger;
-
     private final SafaRequestBuilder safaRequestBuilder;
     private final BertMethodIdentifier methodId;
+    public JobLogger logger;
 
     public TGen(BertMethodIdentifier methodId) {
         this.safaRequestBuilder = ServiceProvider.instance.getSafaRequestBuilder();
         this.methodId = methodId;
     }
 
-    public static TGenPredictionRequestDTO createTraceGenerationPayload(
-        String statePath,
-        TracingPayload tracingPayload) {
-        TGenDataset dataset = new TGenDataset(
-            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
-            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
-        return new TGenPredictionRequestDTO(statePath, dataset, null);
-    }
-
-    public static List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload, Function<ArtifactLevel,
-        List<ArtifactAppEntity>> getter) {
-        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
-
-        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
-            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
-            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
-            artifactLevelsMap.add(artifactLevelsArtifactMap);
-        });
-        return artifactLevelsMap;
-    }
-
     /**
-     * A Hack. Logs message to current static
+     * Logs message to current job.
      *
-     * @param message
-     * @return
+     * @param message The message to log.
+     * @return The updated job entry associated with logger.
      */
-    protected static JobLogEntry log(String message) {
+    protected JobLogEntry log(String message) {
         if (logger != null) {
             return logger.log(message);
         }
@@ -98,7 +75,7 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenHGenResponse generateHierarchy(TGenHGenRequest request) {
         String summarizeEndpoint = getEndpoint("hgen");
-        return this.requestTGen(summarizeEndpoint, request, TGenHGenResponse.class);
+        return this.performTGenJob(summarizeEndpoint, request, TGenHGenResponse.class);
     }
 
     /**
@@ -109,7 +86,7 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
         String summarizeEndpoint = getEndpoint("summarize");
-        return this.requestTGen(summarizeEndpoint, request, TGenSummaryResponse.class);
+        return this.performTGenJob(summarizeEndpoint, request, TGenSummaryResponse.class);
     }
 
     /**
@@ -120,16 +97,22 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
         String generatePromptEndpoint = getEndpoint("complete");
-        return this.requestTGen(generatePromptEndpoint, request, TGenPromptResponse.class);
-    }
-
-    public TGenTraceGenerationResponse generateLinks(TGenPredictionRequestDTO payload) {
-        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
-        return this.requestTGen(predictEndpoint, payload, TGenTraceGenerationResponse.class);
+        return this.performTGenJob(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
     /**
-     * Generates trace link predictions for each pair of source and target artifacts.
+     * Generates links through TGEN.
+     *
+     * @param payload The payload to send TGEN.
+     * @return TGEN's response.
+     */
+    public TGenTraceGenerationResponse generateLinks(TGenPredictionRequestDTO payload) {
+        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
+        return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class);
+    }
+
+    /**
+     * Generates links using a deep learning model using its baseline state.
      *
      * @param tracingPayload Levels of artifacts defining sources and targets.
      * @return List of generated trace links.
@@ -138,12 +121,17 @@ public class TGen implements ITraceGenerationController {
         return this.generateLinksWithState(methodId.getStatePath(), tracingPayload);
     }
 
+    /**
+     * Generates links using a deep learning model starting at a given state.
+     *
+     * @param statePath      Path to the state of model. Either GPT, Anthropic, or path to huggingface model.
+     * @param tracingPayload The artifact to trace between.
+     * @return List of generated traces.
+     */
     public List<TraceAppEntity> generateLinksWithState(
         String statePath,
         TracingPayload tracingPayload) {
         // Step - Build request
-        UUID jobId = UUID.randomUUID(); //TODO : Remove this when replacing with actual job.
-
         TGenPredictionRequestDTO payload = createTraceGenerationPayload(
             statePath,
             tracingPayload);
@@ -153,23 +141,25 @@ public class TGen implements ITraceGenerationController {
         return convertPredictionsToLinks(output.getPredictions());
     }
 
-    private List<TraceAppEntity> convertPredictionsToLinks(List<TGenTraceGenerationResponse.PredictedLink> predictions) {
-        return predictions
-            .stream()
-            .filter(p -> p.getScore() > ProjectVariables.TRACE_THRESHOLD)
-            .map(p -> new TraceAppEntity(
-                null,
-                p.getSource(),
-                null,
-                p.getTarget(),
-                null,
-                ApprovalStatus.UNREVIEWED,
-                p.getScore(),
-                TraceType.GENERATED
-            )).collect(Collectors.toList());
+    /**
+     * Sets the current logger to log TGEN statuses to.
+     *
+     * @param logger The logger.
+     */
+    public void setLogger(JobLogger logger) {
+        this.logger = logger;
     }
 
-    private <T extends AbstractTGenResponse> T requestTGen(String endpoint, Object payload, Class<T> responseClass) {
+    /**
+     * Submits job to TGen and polls status until job is completed or has failed.
+     *
+     * @param endpoint      The endpoint to send payload to.
+     * @param payload       The job to submit to TGEN.
+     * @param responseClass The class for the job result.
+     * @param <T>           The generic for the job result class.
+     * @return Parsed TGEN response if job is successful.
+     */
+    private <T extends AbstractTGenResponse> T performTGenJob(String endpoint, Object payload, Class<T> responseClass) {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");
@@ -201,31 +191,70 @@ public class TGen implements ITraceGenerationController {
         throw new SafaError(tGenStatus.getMessage());
     }
 
-    private Pair<Integer, JobLogEntry> writeLogs(List<String> logs, int currentLogIndex, JobLogEntry entry) {
-        System.out.println("Logs:" + logs.size());
-        System.out.println("Index:" + currentLogIndex);
-        System.out.println("Entry:" + entry);
+    /**
+     * Converts trace link predictions to actual trace links.
+     *
+     * @param predictions TGEN link predictions.
+     * @return The trace link entities.
+     */
+    private List<TraceAppEntity> convertPredictionsToLinks(
+        List<TGenTraceGenerationResponse.PredictedLink> predictions) {
+        return predictions
+            .stream()
+            .filter(p -> p.getScore() > ProjectVariables.TRACE_THRESHOLD)
+            .map(p -> new TraceAppEntity(
+                null,
+                p.getSource(),
+                null,
+                p.getTarget(),
+                null,
+                ApprovalStatus.UNREVIEWED,
+                p.getScore(),
+                TraceType.GENERATED
+            )).collect(Collectors.toList());
+    }
+
+    /**
+     * Writes the latest logs to the job logger.
+     *
+     * @param logs            List of logs incoming from TGEN.
+     * @param currentLogIndex The index of the current log to write.
+     * @param jobLog          The job entry to log under.
+     * @return The new current log index and the updated job log.
+     */
+    private Pair<Integer, JobLogEntry> writeLogs(List<String> logs, int currentLogIndex, JobLogEntry jobLog) {
         if (currentLogIndex >= logs.size()) {
-            return new Pair<>(currentLogIndex, entry);
+            return new Pair<>(currentLogIndex, jobLog);
         }
         String currentLog = String.join("\n", logs.subList(currentLogIndex, logs.size()));
         if (currentLog.length() > 0) {
-            if (entry == null) {
-                entry = log(currentLog);
+            if (jobLog == null) {
+                jobLog = log(currentLog);
             } else {
-                entry = logger.addToLog(entry, currentLog);
+                jobLog = logger.addToLog(jobLog, currentLog);
             }
 
-            return new Pair(logs.size(), entry);
+            return new Pair(logs.size(), jobLog);
         }
-        return new Pair(currentLogIndex, entry);
+        return new Pair(currentLogIndex, jobLog);
     }
 
-    public String getEndpoint(String endpointName) {
+    /**
+     * Returns TGEN endpoint path.
+     *
+     * @param endpointName The name of the endpoint.
+     * @return Endpoint path according to current environment.
+     */
+    private String getEndpoint(String endpointName) {
         return TGenConfig.get().getTGenEndpoint(endpointName);
     }
 
-    public void sleep(int secondsToSleep) {
+    /**
+     * Sleeps the current thread.
+     *
+     * @param secondsToSleep The number of seconds to sleep.
+     */
+    private void sleep(int secondsToSleep) {
         try {
             TimeUnit.SECONDS.sleep(secondsToSleep);
         } catch (InterruptedException ie) {
@@ -233,6 +262,44 @@ public class TGen implements ITraceGenerationController {
         }
     }
 
+    /**
+     * Converts Client trace generation payload into TGEN payload.
+     *
+     * @param statePath      The state of the model to generate links with.
+     * @param tracingPayload The tracing payload defined by client.
+     * @return The payload to send TGEN.
+     */
+    private TGenPredictionRequestDTO createTraceGenerationPayload(
+        String statePath,
+        TracingPayload tracingPayload) {
+        TGenDataset dataset = new TGenDataset(
+            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
+            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
+        return new TGenPredictionRequestDTO(statePath, dataset, null);
+    }
+
+    /**
+     * Creates the artifact payload based on the given TracingPayload and a getter function.
+     *
+     * @param tracingPayload The TracingPayload object containing the artifact levels.
+     * @param getter         A function that retrieves a list of ArtifactAppEntity objects based on the ArtifactLevel.
+     * @return A list of maps representing the artifact levels and their corresponding artifacts.
+     */
+    private List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload,
+                                                            Function<ArtifactLevel, List<ArtifactAppEntity>> getter) {
+        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
+
+        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
+            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
+            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
+            artifactLevelsMap.add(artifactLevelsArtifactMap);
+        });
+        return artifactLevelsMap;
+    }
+
+    /**
+     * Contains default values for magic constants.
+     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
         static final int WAIT_SECONDS = 1;

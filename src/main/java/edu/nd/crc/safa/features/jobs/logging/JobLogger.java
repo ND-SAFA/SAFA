@@ -31,6 +31,7 @@ public class JobLogger {
      * Add a new log message.
      *
      * @param message The message to add.
+     * @return Updated job entry.
      */
     public JobLogEntry log(String message) {
         Timestamp timestamp = Timestamp.from(Instant.now());
@@ -39,6 +40,16 @@ public class JobLogger {
         return entry;
         // Uncomment to show job logs on the command line
         //System.out.println(entry);
+    }
+    
+    /**
+     * Add a new log message.
+     *
+     * @param format The format of the message.
+     * @param args   Args to fill into the format.
+     */
+    public void log(String format, Object... args) {
+        log(String.format(format, args));
     }
 
     /**
@@ -53,16 +64,6 @@ public class JobLogger {
         entry.setEntry(newBody);
         entry = loggingService.saveLog(entry);
         return entry;
-    }
-
-    /**
-     * Add a new log message.
-     *
-     * @param format The format of the message.
-     * @param args   Args to fill into the format.
-     */
-    public void log(String format, Object... args) {
-        log(String.format(format, args));
     }
 
     /**

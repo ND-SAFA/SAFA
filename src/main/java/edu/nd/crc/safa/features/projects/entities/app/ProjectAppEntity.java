@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -33,30 +34,47 @@ import lombok.Data;
  */
 @Data
 public class ProjectAppEntity implements IAppEntity {
-    UUID projectId;
+    private UUID projectId;
+
     @NotNull
-    String name;
+    private String name;
+
     @NotNull
-    String description;
+    private String description;
+
     @Valid
-    ProjectVersion projectVersion;
+    private ProjectVersion projectVersion;
+
     @NotNull
-    List<@Valid @NotNull ArtifactAppEntity> artifacts;
+    private List<@Valid @NotNull ArtifactAppEntity> artifacts;
+
     @NotNull
-    List<@Valid @NotNull TraceAppEntity> traces;
+    private List<@Valid @NotNull TraceAppEntity> traces;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    List<ProjectMemberAppEntity> members;
+    private List<ProjectMemberAppEntity> members;
+
     @Nullable
-    String currentDocumentId;
-    List<@Valid @NotNull DocumentAppEntity> documents;
-    List<@Valid @NotNull TypeAppEntity> artifactTypes;
-    Map<UUID, List<@Valid @NotNull RuleName>> warnings;
+    private String currentDocumentId;
+
+    private List<@Valid @NotNull DocumentAppEntity> documents;
+
+    private List<@Valid @NotNull TypeAppEntity> artifactTypes;
+
+    private Map<UUID, List<@Valid @NotNull RuleName>> warnings;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    ProjectParsingErrors errors;
-    Map<UUID, LayoutPosition> layout;
-    List<ModelAppEntity> models;
-    List<CustomAttributeAppEntity> attributes;
-    List<AttributeLayoutAppEntity> attributeLayouts;
+    private ProjectParsingErrors errors;
+
+    private Map<UUID, LayoutPosition> layout;
+
+    private List<ModelAppEntity> models;
+
+    private List<CustomAttributeAppEntity> attributes;
+
+    private List<AttributeLayoutAppEntity> attributeLayouts;
+
+    private Map<UUID, SubtreeAppEntity> subtrees;
 
     public ProjectAppEntity() {
         this.name = "";
@@ -72,6 +90,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.models = new ArrayList<>();
         this.attributes = new ArrayList<>();
         this.attributeLayouts = new ArrayList<>();
+        this.subtrees = new HashMap<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -86,8 +105,8 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, LayoutPosition> layout,
                             List<ModelAppEntity> models,
                             List<CustomAttributeAppEntity> attributes,
-                            List<AttributeLayoutAppEntity> attributeLayouts) {
-        this();
+                            List<AttributeLayoutAppEntity> attributeLayouts,
+                            Map<UUID, SubtreeAppEntity> subtrees) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.name = project.getName();
@@ -105,6 +124,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.models = models;
         this.attributes = attributes;
         this.attributeLayouts = attributeLayouts;
+        this.subtrees = subtrees;
     }
 
     public ProjectAppEntity(ProjectCommit projectCommit) {

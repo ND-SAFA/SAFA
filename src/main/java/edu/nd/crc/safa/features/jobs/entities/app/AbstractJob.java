@@ -21,7 +21,6 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.TGen;
 
 import com.google.errorprone.annotations.ForOverride;
 import lombok.Getter;
@@ -190,7 +189,6 @@ public abstract class AbstractJob implements Job {
     private void notifyBeforeJob() throws Exception {
         try {
             beforeJob();
-            TGen.logger = dbLogger;
             rootLogger.setLevel(Level.INFO);
             Handler logHandler = new ConsoleHandler() {
                 @Override
@@ -215,7 +213,6 @@ public abstract class AbstractJob implements Job {
             afterJob(success);
             String log = logRecords.stream().map(LogRecord::getMessage).collect(Collectors.joining("\n"));
             dbLogger.log(log);
-            TGen.logger = null;
         } catch (Exception e) {
             dbLogger.log("Error in reporting job finishing:");
             dbLogger.logException(e);

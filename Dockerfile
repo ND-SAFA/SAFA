@@ -9,21 +9,22 @@ RUN curl -q -s "https://get.sdkman.io" | bash
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install gradle $GRADLE_VERSION
 
 # Step 3 - Install deps
+WORKDIR /app
 ADD build.gradle .
 ADD settings.gradle .
 ADD gradlew .
 ADD gradle gradle
+RUN chmod +x gradlew
 RUN ./gradlew --no-daemon dependencies
 
 # Step 3 - Copy source code
 ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
-WORKDIR /app
 ADD src/main/resources src/main/resources
 ADD src/main/java src/main/java
 ADD src/test src/test
 
 # Step 4 - Install gradle version for building
-RUN chmod +x gradlew
+
 RUN ./gradlew build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
 
 ## Step - Create endpoint

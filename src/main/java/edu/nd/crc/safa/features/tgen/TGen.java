@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,16 +17,17 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
 import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.summary.TGenSummaryRequest;
 import edu.nd.crc.safa.features.summary.TGenSummaryResponse;
-import edu.nd.crc.safa.features.tgen.api.AbstractTGenResponse;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
+import edu.nd.crc.safa.features.tgen.api.responses.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.TGenStatus;
 import edu.nd.crc.safa.features.tgen.entities.TGenTask;
@@ -37,6 +39,7 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.javatuples.Pair;
 
 /**
  * Responsible for providing an API for predicting trace links via TGEN.
@@ -51,6 +54,40 @@ public class TGen implements ITraceGenerationController {
     public TGen(BertMethodIdentifier methodId) {
         this.safaRequestBuilder = ServiceProvider.instance.getSafaRequestBuilder();
         this.methodId = methodId;
+    }
+
+    public static TGenPredictionRequestDTO createTraceGenerationPayload(
+        String statePath,
+        TracingPayload tracingPayload) {
+        TGenDataset dataset = new TGenDataset(
+            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
+            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
+        return new TGenPredictionRequestDTO(statePath, dataset, null);
+    }
+
+    public static List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload, Function<ArtifactLevel,
+        List<ArtifactAppEntity>> getter) {
+        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
+
+        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
+            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
+            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
+            artifactLevelsMap.add(artifactLevelsArtifactMap);
+        });
+        return artifactLevelsMap;
+    }
+
+    /**
+     * A Hack. Logs message to current static
+     *
+     * @param message
+     * @return
+     */
+    protected static JobLogEntry log(String message) {
+        if (logger != null) {
+            return logger.log(message);
+        }
+        return null;
     }
 
     /**
@@ -86,9 +123,9 @@ public class TGen implements ITraceGenerationController {
         return this.requestTGen(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
-    public TGenPredictionOutput performPrediction(TGenPredictionRequestDTO payload) {
+    public TGenTraceGenerationResponse generateLinks(TGenPredictionRequestDTO payload) {
         String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
-        return this.requestTGen(predictEndpoint, payload, TGenPredictionOutput.class);
+        return this.requestTGen(predictEndpoint, payload, TGenTraceGenerationResponse.class);
     }
 
     /**
@@ -105,17 +142,18 @@ public class TGen implements ITraceGenerationController {
         String statePath,
         TracingPayload tracingPayload) {
         // Step - Build request
+        UUID jobId = UUID.randomUUID(); //TODO : Remove this when replacing with actual job.
+
         TGenPredictionRequestDTO payload = createTraceGenerationPayload(
             statePath,
             tracingPayload);
 
         // Step - Send request
-        TGenPredictionOutput output = this.performPrediction(payload);
+        TGenTraceGenerationResponse output = this.generateLinks(payload);
         return convertPredictionsToLinks(output.getPredictions());
     }
 
-
-    private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
+    private List<TraceAppEntity> convertPredictionsToLinks(List<TGenTraceGenerationResponse.PredictedLink> predictions) {
         return predictions
             .stream()
             .filter(p -> p.getScore() > ProjectVariables.TRACE_THRESHOLD)
@@ -131,35 +169,21 @@ public class TGen implements ITraceGenerationController {
             )).collect(Collectors.toList());
     }
 
-    private TGenPredictionRequestDTO createTraceGenerationPayload(
-        String statePath,
-        TracingPayload tracingPayload) {
-        TGenDataset dataset = new TGenDataset(
-            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
-            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
-        return new TGenPredictionRequestDTO(statePath, dataset);
-    }
-
-    private List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload, Function<ArtifactLevel,
-        List<ArtifactAppEntity>> getter) {
-        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
-
-        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
-            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
-            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
-            artifactLevelsMap.add(artifactLevelsArtifactMap);
-        });
-        return artifactLevelsMap;
-    }
-
     private <T extends AbstractTGenResponse> T requestTGen(String endpoint, Object payload, Class<T> responseClass) {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");
         boolean jobFinshed = false;
         TGenStatus tGenStatus = null;
+        int currentLogIndex = 0;
+        JobLogEntry jobEntry = null;
+        Pair<Integer, JobLogEntry> logResponse;
         while (tGenStatus == null || !jobFinshed) {
             tGenStatus = this.safaRequestBuilder.sendPost(statusEndpoint, task, TGenStatus.class);
+            List<String> logs = tGenStatus.getLogs();
+            logResponse = writeLogs(logs, currentLogIndex, jobEntry);
+            currentLogIndex = logResponse.getValue0();
+            jobEntry = logResponse.getValue1();
             if (tGenStatus.getStatus() <= 0) { // TODO : Update to use enum
                 jobFinshed = true;
             } else {
@@ -169,12 +193,32 @@ public class TGen implements ITraceGenerationController {
 
         if (tGenStatus.getStatus() == 0) {
             T response = this.safaRequestBuilder.sendPost(resultEndpoint, task, responseClass);
-            if (logger != null) {
-                logger.log(response.getLog());
-            }
+            logResponse = writeLogs(response.getLogs(), currentLogIndex, jobEntry);
+            currentLogIndex = logResponse.getValue0();
+            jobEntry = logResponse.getValue1();
             return response;
         }
         throw new SafaError(tGenStatus.getMessage());
+    }
+
+    private Pair<Integer, JobLogEntry> writeLogs(List<String> logs, int currentLogIndex, JobLogEntry entry) {
+        System.out.println("Logs:" + logs.size());
+        System.out.println("Index:" + currentLogIndex);
+        System.out.println("Entry:" + entry);
+        if (currentLogIndex >= logs.size()) {
+            return new Pair<>(currentLogIndex, entry);
+        }
+        String currentLog = String.join("\n", logs.subList(currentLogIndex, logs.size()));
+        if (currentLog.length() > 0) {
+            if (entry == null) {
+                entry = log(currentLog);
+            } else {
+                entry = logger.addToLog(entry, currentLog);
+            }
+
+            return new Pair(logs.size(), entry);
+        }
+        return new Pair(currentLogIndex, entry);
     }
 
     public String getEndpoint(String endpointName) {

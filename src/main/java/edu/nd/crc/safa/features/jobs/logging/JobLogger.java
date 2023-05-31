@@ -17,11 +17,9 @@ import lombok.Setter;
  */
 public class JobLogger {
     private final JobLoggingService loggingService;
-
+    private final JobDbEntity job;
     @Setter
     private int stepNum;
-
-    private final JobDbEntity job;
 
     public JobLogger(JobLoggingService loggingService, JobDbEntity job, int stepNum) {
         this.loggingService = loggingService;
@@ -34,20 +32,34 @@ public class JobLogger {
      *
      * @param message The message to add.
      */
-    public void log(String message) {
+    public JobLogEntry log(String message) {
         Timestamp timestamp = Timestamp.from(Instant.now());
         JobLogEntry entry = new JobLogEntry(job, (short) stepNum, timestamp, message);
         loggingService.saveLog(entry);
-
+        return entry;
         // Uncomment to show job logs on the command line
         //System.out.println(entry);
+    }
+
+    /**
+     * Adds additional string to log.
+     *
+     * @param entry    The Job log entry to add content to.
+     * @param addition The new content to add.
+     * @return The saved entity.
+     */
+    public JobLogEntry addToLog(JobLogEntry entry, String addition) {
+        String newBody = entry.getEntry() + addition;
+        entry.setEntry(newBody);
+        entry = loggingService.saveLog(entry);
+        return entry;
     }
 
     /**
      * Add a new log message.
      *
      * @param format The format of the message.
-     * @param args Args to fill into the format.
+     * @param args   Args to fill into the format.
      */
     public void log(String format, Object... args) {
         log(String.format(format, args));

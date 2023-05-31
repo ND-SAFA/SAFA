@@ -8,9 +8,9 @@ if docker ps -a --format '{{.Names}}' | grep -q "^$container_name$"; then
     docker rm $container_name
 fi
 
-# Re-build 'tgen' image
+# Re-build image
 echo "Re-building '${container_name}' image..."
-docker build -t tgen .
+docker build -t $container_name .
 
 ## Run the newly built image
 port=${1:-3000}

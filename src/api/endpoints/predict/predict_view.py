@@ -3,7 +3,7 @@ import os.path
 import uuid
 from typing import Optional
 
-from api.endpoints.base.views.endpoint import async_endpoint
+from api.endpoints.base.views.endpoint import async_endpoint, endpoint
 from api.endpoints.predict.predict_serializer import PredictionPayload, PredictionSerializer
 from api.experiment_creator import JobCreator, PredictionJobTypes
 from api.utils.model_util import ModelUtil
@@ -12,6 +12,7 @@ from tgen.data.prompts.classification_prompt_creator import ClassificationPrompt
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.testres.definition_creator import DefinitionCreator
+from tgen.util.logging.logger_manager import logger
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -34,8 +35,7 @@ def create_predict_definition(task_id: str, dataset: ApiDefinition, model: str, 
     return JobCreator.create_prediction_definition(dataset=dataset, **prediction_job_args)
 
 
-@async_endpoint(PredictionSerializer)
-def predict(prediction_payload: PredictionPayload):
+def p(prediction_payload: PredictionPayload):
     model = prediction_payload.get("model", "gpt")
     dataset_definition: ApiDefinition = prediction_payload["dataset"]
     prompt: Optional[str] = prediction_payload.get("prompt", None)
@@ -47,3 +47,13 @@ def predict(prediction_payload: PredictionPayload):
     prediction_result = ViewUtil.run_job(prediction_job)
 
     return {"predictions": prediction_result.prediction_entries}
+
+
+@async_endpoint(PredictionSerializer)
+def perform_prediction(prediction_payload: PredictionPayload):
+    return p(prediction_payload)
+
+
+@endpoint(PredictionSerializer)
+def perform_prediction_sync(payload: PredictionPayload):
+    return p(payload)

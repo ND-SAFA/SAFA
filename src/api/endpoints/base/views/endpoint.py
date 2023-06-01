@@ -1,5 +1,4 @@
 import threading
-import time
 from typing import Any, Callable, Dict, Optional
 
 from celery import Task, current_task, shared_task
@@ -73,7 +72,7 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
     pre_process = [pre_process] if pre_process else []
     post_process = [post_process] if post_process else []
 
-    def inner_decorator(func=None, *args, **kwargs):
+    def decorator(func=None, *args, **kwargs):
         """
         Decorates function as endpoint run as celery task.
         :param func: The function to run as celery task.
@@ -81,66 +80,55 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
         :param kwargs: Additional keyword arguments constructing task.
         :return: Wrapped function.
         """
-        task_decorator = shared_task(*args, **kwargs, name=func.__name__)
 
-        def task_wrapper(f):
+        @endpoint(serializer)
+        @shared_task(*args, **kwargs, name=func.__name__, bind=True)
+        def task_endpoint(self, *task_args, **task_kwargs):
             """
-            Constructs wrapper for task enabling pre and post processing of task.
-            :param f: The function to wrap.
-            :return: Decorator for function adding pre-processing, post-processing, and appends log.
+            Constructs an task endpoint who will queue a job performing function being wrapped.
+            :param task_args: Positional arguments.
+            :param task_kwargs: Keyword arguments.
+            :return: JsonResponse containing function output as body.
             """
+            state = endpoint_preprocess()
 
-            def task_processor(*task_args, **task_kwargs):
-                """
-                Runs function and appends global logs.
-                :param task_args: The
-                :param task_kwargs: 
-                :return: 
-                """
-                state = endpoint_preprocess()
+            for p in pre_process:
+                p_state = p(*task_args, **task_kwargs)
+                assert isinstance(p_state, dict), "Expected pre-processing output to be a dictionary."
+                state.update(p_state)
 
-                for p in pre_process:
-                    p_state = p(*task_args, **task_kwargs)
-                    assert isinstance(p_state, dict), "Expected pre-processing output to be a dictionary."
-                    state.update(p_state)
+            result = {}
+            state["is_running"] = True
 
-                is_running = True
+            def run_job():
+                result.update(func(*task_args, **task_kwargs))
+                state["is_running"] = False
 
-                def update_logs():
-                    while is_running:
-                        log_capture = state["log_capture"]
-                        current_task.update_task_result({"logs": log_capture.get_logs()})
-                        threading.Event().wait(1)
+            logger.info(f"Welcome to TGEN. Beginning job: {current_task.request.id}")
+            thread = threading.Thread(target=run_job)
+            thread.start()
 
-                thread = threading.Thread(target=update_logs)
-                thread.start()
+            def write_logs():
+                log_capture = state["log_capture"]
+                logs = log_capture.get_logs()
+                current_task.update_state(state='PROGRESS', meta={'logs': logs})
 
-                logger.info(f"Welcome to TGEN. Beginning job: {current_task.request.id}")
-                time.sleep(30)
-                result = f(*task_args, **task_kwargs)
-                is_running = False
+            while state["is_running"]:
+                write_logs()
+                threading.Event().wait(1)
+            thread.join()
 
-                thread.join()
-                endpoint_postprocess(state, result)
-                for post in post_process:
-                    post(state, result)
+            endpoint_postprocess(state, result)
+            for post in post_process:
+                post(state, result)
+            write_logs()
 
-                return result
-
-            return task_processor
-
-        def async_endpoint_builder(f):
-            """
-            Builds asynchronous endpoint from function.
-            :param f: The function to wrap.
-            :return: Wrapped function acting as celery task.
-            """
-            return endpoint(serializer)(task_decorator(task_wrapper(f)))
+            return result
 
         assert func is not None, "Expected function to be defined."
-        return async_endpoint_builder(func)
+        return task_endpoint
 
-    return inner_decorator
+    return decorator
 
 
 def endpoint_preprocess():

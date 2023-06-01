@@ -15,7 +15,7 @@ class ModelUtil:
             "util": OpenAIManager
         },
         "anthropic": {
-            "model": "claude-v1.3",
+            "model": "claude-instant-v1-100k",
             "util": AnthropicManager
         }
     }

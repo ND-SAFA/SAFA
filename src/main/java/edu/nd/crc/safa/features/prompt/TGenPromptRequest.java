@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.prompt;
 
-import edu.nd.crc.safa.features.tgen.api.AbstractGenerationRequest;
+import edu.nd.crc.safa.features.tgen.api.requests.AbstractGenerationRequest;
 
 import lombok.Data;
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
@@ -57,6 +58,11 @@ public enum BaseGenerationModels {
      */
     String name;
 
+    /**
+     * The job to log tgen logs under.
+     */
+    JobAppEntity job;
+
     BaseGenerationModels(String id, String statePath, String name) {
         this.id = UUID.fromString(id);
         this.statePath = statePath;
@@ -91,7 +97,7 @@ public enum BaseGenerationModels {
      * @return Returns the default model for search, tracing, and generation.
      */
     public static BaseGenerationModels getDefault() {
-        return BaseGenerationModels.ANTHROPIC;
+        return BaseGenerationModels.GPT;
     }
 
     /**

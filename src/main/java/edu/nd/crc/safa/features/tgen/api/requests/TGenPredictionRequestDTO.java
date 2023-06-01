@@ -1,16 +1,14 @@
-package edu.nd.crc.safa.features.tgen.api;
+package edu.nd.crc.safa.features.tgen.api.requests;
 
 import javax.annotation.Nullable;
 
-import lombok.AllArgsConstructor;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * The payload to the prediction endpoint of TGEN.
  */
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 public class TGenPredictionRequestDTO {
     /**
@@ -27,8 +25,9 @@ public class TGenPredictionRequestDTO {
     @Nullable
     String prompt;
 
-    public TGenPredictionRequestDTO(String model, TGenDataset dataset) {
+    public TGenPredictionRequestDTO(String model, TGenDataset dataset, String prompt) {
         this.model = model;
         this.dataset = dataset;
+        this.prompt = prompt;
     }
 }

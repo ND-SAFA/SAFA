@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +22,8 @@ public class TGenStatus {
      * Message corresponding with status, used for reading error message.
      */
     String message;
+    /**
+     * The current logs of the job.
+     */
+    List<String> logs;
 }

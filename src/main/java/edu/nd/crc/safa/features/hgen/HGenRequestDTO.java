@@ -5,7 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.tgen.api.AbstractGenerationRequest;
+import edu.nd.crc.safa.features.tgen.api.requests.AbstractGenerationRequest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

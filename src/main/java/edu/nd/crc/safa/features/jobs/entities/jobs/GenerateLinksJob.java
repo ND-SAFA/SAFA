@@ -113,6 +113,7 @@ public class GenerateLinksJob extends CommitJob {
             } else {
                 ModelAppEntity model = tracingPayload.getModel();
                 TGen bertModel = model.getBaseModel().createTGenController();
+                bertModel.setLogger(this.getDbLogger());
                 String statePath = model.getStatePath();
                 this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
             }

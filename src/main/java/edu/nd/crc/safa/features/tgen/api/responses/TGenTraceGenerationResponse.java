@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.api;
+package edu.nd.crc.safa.features.tgen.api.responses;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Output of TGEN /predict/ endpoint.
+ * Output of predicting trace links.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TGenPredictionOutput extends AbstractTGenResponse {
+public class TGenTraceGenerationResponse extends AbstractTGenResponse {
     /**
      * List of links with their predicted similarity score.
      */

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.prompt;
 
+import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TGenPromptResponse {
+public class TGenPromptResponse extends AbstractTGenResponse {
     /**
      * The completion to prompt.
      */

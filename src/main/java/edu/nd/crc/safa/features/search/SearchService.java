@@ -16,8 +16,8 @@ import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.api.responses.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
@@ -94,10 +94,10 @@ public class SearchService {
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
         TGen controller = model.createTGenController();
-        TGenPredictionOutput response = controller.performPrediction(payload);
+        TGenTraceGenerationResponse response = controller.generateLinks(payload);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenPredictionOutput.PredictedLink::getTarget)
+            .map(TGenTraceGenerationResponse.PredictedLink::getTarget)
             .filter(t -> !sourceLayer.containsKey(t))
             .map(UUID::fromString)
             .collect(Collectors.toList());
@@ -133,7 +133,10 @@ public class SearchService {
         Map<UUID, String> targetLayer = new HashMap<>();
         for (String artifactTypeName : artifactTypes) {
             List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(artifactTypeName);
-            artifacts.forEach(a -> targetLayer.put(a.getId(), a.getTraceString()));
+            artifacts
+                .stream()
+                .filter(a -> a.getTraceString().length() > 0)
+                .forEach(a -> targetLayer.put(a.getId(), a.getTraceString()));
         }
         return targetLayer;
     }

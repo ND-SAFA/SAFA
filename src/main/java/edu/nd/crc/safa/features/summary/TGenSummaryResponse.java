@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.summary;
 
 import java.util.Map;
 
+import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +12,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class TGenSummaryResponse {
+public class TGenSummaryResponse extends AbstractTGenResponse {
     /**
      * The content sent to summarize.
      */

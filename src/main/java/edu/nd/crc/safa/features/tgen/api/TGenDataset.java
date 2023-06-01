@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,5 +34,17 @@ public class TGenDataset {
     public TGenDataset(List<Map<String, String>> sourceLayers, List<Map<String, String>> targetLayers) {
         this.sourceLayers = sourceLayers;
         this.targetLayers = targetLayers;
+    }
+
+    /**
+     * @return Returns the number of comparisons that are made for search or prediction.
+     */
+    @JsonIgnore
+    public int getNumOfCandidates() {
+        int total = 0;
+        for (int i = 0; i < sourceLayers.size(); i++) {
+            total += sourceLayers.get(i).size() * targetLayers.get(i).size();
+        }
+        return total;
     }
 }

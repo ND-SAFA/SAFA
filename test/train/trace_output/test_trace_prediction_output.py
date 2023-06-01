@@ -18,18 +18,18 @@ class TestTracePredictionOutput(BaseTest):
     def test_can_compare_with_metric(self):
         result1 = self.get_prediction_output(precision_at_k=0.8)
         result2 = self.get_prediction_output(precision_at_k=0.3)
-        self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION.name))
+        self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION_AT_K.name))
         self.assertFalse(result1._can_compare_with_metric(result2, None))
         self.assertFalse(result1._can_compare_with_metric(result2, "precision_at_k"))
 
     def test_get_comparison_vals(self):
         result1 = self.get_prediction_output(precision_at_k=0.8)
         result2 = self.get_prediction_output(precision_at_k=0.3)
-        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION.name)
+        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION_AT_K.name)
         self.assertEquals(metric1, 0.8)
         self.assertEquals(metric2, 0.3)
 
     def get_prediction_output(self, results_dict=None, precision_at_k=0.8):
         if results_dict is None:
-            results_dict = {"metrics": {SupportedTraceMetric.PRECISION.name: precision_at_k}}
+            results_dict = {"metrics": {SupportedTraceMetric.PRECISION_AT_K.name: precision_at_k}}
         return TracePredictionOutput(**results_dict)

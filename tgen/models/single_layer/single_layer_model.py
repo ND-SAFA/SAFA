@@ -3,8 +3,7 @@ from typing import List
 
 import torch
 from torch import nn
-
-from tgen.util.logging.tgen_tqdm import tgen_tqdm
+from tqdm import tqdm
 
 
 class SingleLayerModel(nn.Module):
@@ -46,7 +45,7 @@ def train(model: SingleLayerModel, training_data: List[List[float]], labels: Lis
     loss = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters())
     cost = []
-    for epoch in tgen_tqdm(range(epochs), desc="Training..."):
+    for epoch in tqdm(range(epochs), desc="Training..."):
         total = 0
         for input_, label in zip(shuffled_data, shuffled_labels):
             yhat = model(input_)

@@ -25,8 +25,14 @@ class GenerationTestProject:
             ArtifactKeys.ID.value: "s3",
             ArtifactKeys.CONTENT.value: "content3",
             SummarizeArtifactsJob.TYPE_KEY: "unknown"
-        }]
-    ARTIFACT_MAP = {"s1": 0, "s2": 1, "s3": 2}
+        },
+        {
+            ArtifactKeys.ID.value: "s4",
+            ArtifactKeys.CONTENT.value: "content4",
+            SummarizeArtifactsJob.TYPE_KEY: "nl"
+        }
+    ]
+    ARTIFACT_MAP = {"s1": 0, "s2": 1, "s3": 2, "s4": 3}
 
     @staticmethod
     def get_artifact(artifact_id: str):

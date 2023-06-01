@@ -3,10 +3,12 @@ from unittest import mock
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.test_anthropic_responses import fake_anthropic_completion
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
@@ -41,4 +43,4 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertNotIn("java", artifact[ArtifactKeys.CONTENT])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeArtifactsJob(self.project.ARTIFACTS)
+        return SummarizeArtifactsJob(self.project.ARTIFACTS, summarizer=Summarizer(AnthropicManager()))

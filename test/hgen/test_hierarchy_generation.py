@@ -185,7 +185,7 @@ class TestHierarchyGeneration(BaseTest):
         dataset = self.get_dataset_creator_with_trace_dataset_creator(include_summarizer=False).create()
         hgen = self.get_hierarchy_generator(tgen_trainer=None, dataset_for_sources=dataset)
         layer_id = hgen._get_target_layer_id(dataset)
-        self.assertEqual(layer_id, self.TARGET_TYPE)
+        self.assertEqual(layer_id, self.TARGET_TYPE.capitalize())
 
         # target type is already in artifact layer ids
         dataset = self.get_dataset_creator_with_trace_dataset_creator(include_summarizer=False).create()

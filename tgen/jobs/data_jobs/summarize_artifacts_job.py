@@ -27,8 +27,6 @@ class SummarizeArtifactsJob(AbstractJob):
         if summarizer is None:
             summarizer = Summarizer(code_or_exceeds_limit_only=False)
         self.artifacts = artifacts
-        self.id2chunker = {artifact[ArtifactKeys.ID]: SupportedChunker.get_chunker_from_ext(artifact[self.TYPE_KEY]) for artifact in
-                           artifacts}
         self.artifact_df = pd.DataFrame(self.artifacts).set_index(ArtifactKeys.ID.value)
         self.summarizer = summarizer
 
@@ -37,5 +35,5 @@ class SummarizeArtifactsJob(AbstractJob):
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
-        summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.id2chunker)
+        summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.TYPE_KEY)
         return summarized_df.to_dict(orient='index')

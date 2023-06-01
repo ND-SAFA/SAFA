@@ -73,3 +73,4 @@ class HGenArgs(BaseObject):
         assert self.tgen_trainer or self.dataset_creator_for_sources or self.dataset_for_sources, \
             "Must provide either a dataset creator to make a dataset with traces between artifacts of the source layer, " \
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."
+        self.target_type = self.target_type.capitalize()

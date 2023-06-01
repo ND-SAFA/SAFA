@@ -31,7 +31,7 @@ def get_res(prompt, **kwargs):
         for i in range(n_per_group):
             if i < len(artifacts):
                 group_artifacts.append(artifacts.pop(i))
-        group_tags.append(f'<group>\n<summary>{uuid.uuid4()}{group_num + 1}</summary>\n ' \
+        group_tags.append(f'<group>\n<feature>{uuid.uuid4()}{group_num + 1}</feature>\n ' \
                           f'<artifacts>{",".join(group_artifacts)}</artifacts>\n</group>\n\n')
     return [{"completion": "".join(group_tags)}]
 
@@ -49,7 +49,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult):
         dataset: TraceDataset = job_result.body
-        layers = ["source_layer", "user_story", "epic", "requirement"]
+        layers = ["source_layer", "User_story", "Epic", "Requirement"]
         n_expected_links = 0
         for i, layer in enumerate(layers):
             target_artifacts = dataset.artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer)

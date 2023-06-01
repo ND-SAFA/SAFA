@@ -47,6 +47,7 @@ public class JobLogger {
      *
      * @param format The format of the message.
      * @param args   Args to fill into the format.
+     * @return The updated job entry after committing log.
      */
     public JobLogEntry log(String format, Object... args) {
         return log(String.format(format, args));

@@ -86,7 +86,7 @@ public class TGen implements ITraceGenerationController {
      */
     public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
         String summarizeEndpoint = getEndpoint("summarize");
-        return this.performTGenJob(summarizeEndpoint, request, TGenSummaryResponse.class);
+        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
     }
 
     /**
@@ -300,7 +300,10 @@ public class TGen implements ITraceGenerationController {
 
         tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
             Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
-            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
+            artifacts
+                .stream()
+                .filter(a -> a.getTraceString().length() > 0)
+                .forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
             artifactLevelsMap.add(artifactLevelsArtifactMap);
         });
         return artifactLevelsMap;

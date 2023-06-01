@@ -48,12 +48,13 @@ class VSMTrainer(AbstractTrainer):
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
-    def perform_training(self) -> TraceTrainOutput:
+    def perform_training(self, dataset_role: DatasetRole = DatasetRole.TRAIN) -> TraceTrainOutput:
         """
         Performs training on the model using the Train dataset
+         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :return: The train output (not currently used)
         """
-        train_dataset: TraceDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
+        train_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
         start_time = time.perf_counter()
         self.train(train_dataset)
         finish_time = time.perf_counter()

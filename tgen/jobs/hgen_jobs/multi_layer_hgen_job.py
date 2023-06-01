@@ -2,6 +2,8 @@ from copy import deepcopy
 from typing import List
 
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -35,12 +37,13 @@ class MultiLayerHGenJob(AbstractJob):
         :return: The final dataset created by the top level hgen job
         """
         current_hgen_job = self.starting_hgen_job
+        current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
         for i, next_target_type in enumerate(self.target_types):
-            current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
             res = current_hgen_job.run()
             if res.status != Status.SUCCESS:
                 raise Exception(res.body)
-            current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type, res.body)
+            dataset = res.body
+            current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type, dataset)
         return current_hgen_job.run().body
 
     @staticmethod
@@ -60,4 +63,6 @@ class MultiLayerHGenJob(AbstractJob):
                                                    target_type=next_target_type,
                                                    dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
                                                    clustering_method=SupportedClusteringMethod.LLM, tgen_trainer=None)
-        return BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)
+        next_job = BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)
+        next_job.result.experimental_vars = {"target_type": next_target_type}
+        return next_job

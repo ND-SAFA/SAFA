@@ -1,4 +1,5 @@
 import datasets
+from typing import Dict
 
 from tgen.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -23,8 +24,7 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
 
-    # TODO
-    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> Dict[str, float]:
         """
         Confusion matrix metric calculates the number of true and false positives and the true/false negatives.
         :param predictions: predicted labels

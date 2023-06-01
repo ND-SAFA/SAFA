@@ -1,11 +1,14 @@
 import logging
 from typing import List
 
+global tqdm_log_capture
+
 
 class LogCapture(logging.Handler):
     """
     Stores logs in list making accessible for sending between API requests.
     """
+    _instance = None
 
     def __init__(self):
         """
@@ -48,16 +51,6 @@ class LogCapture(logging.Handler):
         entry = self.format(record)
         self.add_entry(entry)
 
-    def write(self, *args) -> None:
-        """
-        Overrides writes to std out to add to log. Used for tqdm.
-        :param args: Arguments passed to std out.
-        :return: None
-        """
-        entry = "".join(args)
-        print(*args, end="")
-        self.add_entry(entry)
-
     def add_entry(self, *entries: str, delimiter="") -> None:
         """
         Records log to capture.
@@ -76,6 +69,3 @@ class LogCapture(logging.Handler):
         if logger is None:
             logger = logging.getLogger()
         logger.addHandler(self)
-
-
-log_capture = LogCapture()

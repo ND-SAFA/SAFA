@@ -14,11 +14,11 @@ from tgen.train.args.open_ai_args import OpenAIArgs
 
 class TestLayerArtifactGenerationJob(BaseJobTest):
     project = GenerationTestProject()
-    res = [{"completion": '<group>\n<summary>functionality 1</summary>\n'
-                          '<artifacts>0,1</artifacts>\n</group>\n\n<group>\n<summary>functionality 2</summary>'
-                          '\n<artifacts>2</artifacts> \n</group>\n'}]
+    res = [{"completion": '<group>\n<feature>functionality 1</feature>\n'
+                          '<artifacts>0,1</artifacts>\n</group>\n\n<group>\n<feature>functionality 2</feature>'
+                          '\n<artifacts>2,3</artifacts> \n</group>\n'}]
 
-    CLUSTERS = {"functionality 1": ["s1", "s2"], "functionality 2": ["s3"]}
+    CLUSTERS = {"functionality 1": ["s1", "s2"], "functionality 2": ["s3", "s4"]}
 
     @mock.patch.object(AnthropicManager, "make_completion_request_impl", return_value=res)
     @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)

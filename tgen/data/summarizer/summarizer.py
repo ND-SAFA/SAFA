@@ -75,7 +75,7 @@ class Summarizer(BaseObject):
             indices2summarize.add(i)
             prompts_for_summaries.append(prompts)
 
-        logger.info(f"Summarizing {len(indices2summarize)} artifacts")
+        logger.info(f"\nSummarizing {len(indices2summarize)} artifacts")
         summarized_content = self._summarize_selective(contents, indices2summarize, prompts_for_summaries)
 
         prompts_for_resummarization = [self._create_summarization_prompts(content, code_or_above_limit_only=False)
@@ -101,7 +101,7 @@ class Summarizer(BaseObject):
                                                                                                   code_or_above_limit_only=False))[0]
         return summary
 
-    def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str,
+    def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str, col2use4chunker: str = None,
                             index_to_chunker_to_use: Dict[str, SupportedChunker] = None) -> pd.DataFrame:
         """
         Summarizes the information in a dataframe in a given column
@@ -111,7 +111,11 @@ class Summarizer(BaseObject):
         :return: The dataframe with the contents in the given column summarized
         """
         ids = list(df.index)
-        chunker_types = None if index_to_chunker_to_use is None else [index_to_chunker_to_use[index] for index in ids]
+        chunker_types = None
+        if index_to_chunker_to_use:
+            chunker_types = [index_to_chunker_to_use[index] for index in ids]
+        elif col2use4chunker:
+            chunker_types = [SupportedChunker.get_chunker_from_ext(row[col2use4chunker]) for _, row in df.iterrows()]
         summaries = self.summarize_bulk(list(df[col2summarize]), chunker_types, ids)
         df[col2summarize] = summaries
         return df
@@ -124,7 +128,8 @@ class Summarizer(BaseObject):
         """
         return TokenLimitCalculator.estimate_num_tokens(content, self.model_for_token_limit) > self.token_limit
 
-    def _summarize_chunks(self, llm_manager: AbstractLLMManager, prompts: Union[List[str], List[List[str]]]) -> List[str]:
+    @staticmethod
+    def _summarize_chunks(llm_manager: AbstractLLMManager, prompts: Union[List[str], List[List[str]]]) -> List[str]:
         """
         Summarizes all chunks using a given OpenAI model.
         :param llm_manager: The utility file containing API to AI library.

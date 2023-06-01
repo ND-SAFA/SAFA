@@ -134,9 +134,8 @@ class LLMTrainer(AbstractTrainer):
         scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores)
-        trace_df = trace_dataset.trace_df
 
-        if trace_dataset is not None and len(trace_df) > 0:
+        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)

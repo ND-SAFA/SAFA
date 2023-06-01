@@ -6,6 +6,7 @@ import networkx as nx
 import pandas as pd
 import torch
 from datasets import Dataset
+from tqdm import tqdm
 
 from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
@@ -23,7 +24,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
 from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger
-from tgen.util.logging.tgen_tqdm import tgen_tqdm
 from tgen.util.thread_util import ThreadUtil
 
 
@@ -110,7 +110,7 @@ class TraceDataset(iDataset):
         :return: the dataset in a dataframe
         """
         link_ids_to_rows = {}
-        for index in tgen_tqdm(self.trace_df.index, desc="Converting links to trace dataframe format."):
+        for index in tqdm(self.trace_df.index, desc="Converting links to trace dataframe format."):
             link = self.trace_df.get_link(index)
             source = self.artifact_df.get_artifact(link[TraceKeys.SOURCE])
             target = self.artifact_df.get_artifact(link[TraceKeys.TARGET])

@@ -1,8 +1,9 @@
 from unittest import TestCase
 
+from tqdm import tqdm
+
 from tgen.util.logging.log_capture import log_capture
 from tgen.util.logging.logger_manager import logger
-from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 def perform_log(log_message):
@@ -11,7 +12,7 @@ def perform_log(log_message):
 
 def perform_tqdm(n_items):
     sum = 0
-    for i in tgen_tqdm(range(n_items)):
+    for i in tqdm(range(n_items)):
         sum += i
 
 

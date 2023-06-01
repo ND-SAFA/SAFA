@@ -1,8 +1,9 @@
 from typing import List
 
+from tqdm import tqdm
+
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.abstract_data_processor import AbstractDataProcessor
-from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 
 class DataCleaner(AbstractDataProcessor):
@@ -15,7 +16,7 @@ class DataCleaner(AbstractDataProcessor):
         """
         processed = []
         word_lists = [AbstractDataProcessingStep.get_word_list(content) for content in tokens]
-        for word_list in tgen_tqdm(word_lists, desc="Cleaning artifacts..."):
+        for word_list in tqdm(word_lists, desc="Cleaning artifacts..."):
             processed_word_list = word_list
             for step in self.ordered_steps:
                 processed_word_list = step.run(processed_word_list)

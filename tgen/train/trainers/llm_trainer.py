@@ -1,4 +1,3 @@
-import os
 from typing import Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
@@ -20,8 +19,6 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.util.file_util import FileUtil
-from tgen.util.json_util import JsonUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.uncased_dict import UncasedDict
 
@@ -138,7 +135,7 @@ class LLMTrainer(AbstractTrainer):
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores)
 
-        if trace_dataset is not None:
+        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)

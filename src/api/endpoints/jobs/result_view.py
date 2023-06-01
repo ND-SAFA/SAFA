@@ -21,11 +21,11 @@ def get_task_status(result):
     status = result.status
     if status == "SUCCESS":
         return Status.SUCCESS, "Task finished successfully"
-    elif status == "FAILED":
+    elif status == "FAILURE":
         return Status.FAILURE, result.traceback
     elif status == "PENDING":
         return Status.NOT_STARTED, "Task is still pending"
-    elif status == "STARTED":
+    elif status in ["STARTED", "PROGRESS"]:
         return Status.IN_PROGRESS, "Task is still running"
     else:
         raise Exception(f"Status is unknown:{result.status}")
@@ -35,8 +35,10 @@ def get_task_status(result):
 def get_status(payload: ResultPayload):
     task_id = payload["task_id"]
     result = AsyncResult(task_id)
-    status, msg = get_task_status(result)
-    return {"status": status, "message": msg}
+    results_obj = result.result
+    logs = results_obj["logs"] if results_obj is not None else []
+    status, message = get_task_status(result)
+    return JsonResponse({"status": status, "message": message, "logs": logs})
 
 
 @endpoint(ResultSerializer)

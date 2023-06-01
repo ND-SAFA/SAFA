@@ -20,8 +20,12 @@ class DatasetSerializer(serializers.Serializer):
     """
     source_layers = serializers.ListSerializer(
         child=serializers.DictField(
-            child=serializers.CharField(help_text="The artifact body."),
-            help_text="Map of artifact IDs to bodies."
+            child=serializers.CharField(
+                help_text="The artifact body.",
+                allow_blank=True,
+                allow_null=False),
+            help_text="Map of artifact IDs to bodies.",
+            allow_empty=True
         ),
         help_text="List of source artifacts layers.",
         required=True)

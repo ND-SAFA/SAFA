@@ -8,7 +8,9 @@ class SupportedPrompts(SupportedEnum):
     """
     CLASSIFICATION = Prompt("Is (1) related to (2)? Answer 'yes' or 'no'.\n")
     CODE_SUMMARY = Prompt("Provide 5 sentence paragraph describing the high-level usage of the code below. "
-                          "Do not focus on implementation details and assume your audience works on this system:\n '{target_content}'")
+                          "Do not focus on implementation details and assume you are a software engineer working on this system. "
+                          "Enclose summary in the tags <summary></summary>."
+                          "\n\n '{target_content}'")
     NL_SUMMARY = Prompt("Summarize the following:\n '{target_content}'")
     ARTIFACT_GENERATION = ArtGenPrompt("Write a single {artifact_type} that describes on the {artifact_id} functionality of the "
                                        "following software descriptions. An example of a good {artifact_type} is {example}. "

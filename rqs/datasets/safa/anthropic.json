@@ -16,8 +16,8 @@
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "CSV",
-                "project_path": "~/desktop/safa/datasets/safa/exported/safa_eval.csv"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/paper/drone-nl"
               }
             }
           }

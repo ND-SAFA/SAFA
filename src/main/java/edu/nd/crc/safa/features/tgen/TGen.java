@@ -111,7 +111,6 @@ public class TGen implements ITraceGenerationController {
         int candidates = payload.getDataset().getNumOfCandidates();
         log(String.format("Number of candidates: %s", candidates));
         if (candidates <= Defaults.CANDIDATE_THRESHOLD) {
-            System.out.println("PAYLOAD:" + payload);
             predictEndpoint = getEndpoint("predict-sync");
             return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
 

@@ -107,8 +107,17 @@ public class TGen implements ITraceGenerationController {
      * @return TGEN's response.
      */
     public TGenTraceGenerationResponse generateLinks(TGenPredictionRequestDTO payload) {
-        String predictEndpoint = TGenConfig.get().getTGenEndpoint("predict");
-        return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class);
+        String predictEndpoint;
+        int candidates = payload.getDataset().getNumOfCandidates();
+        log(String.format("Number of candidates: %s", candidates));
+        if (candidates <= Defaults.CANDIDATE_THRESHOLD) {
+            predictEndpoint = getEndpoint("predict-sync");
+            return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
+
+        } else {
+            predictEndpoint = getEndpoint("predict");
+            return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class);
+        }
     }
 
     /**
@@ -303,5 +312,6 @@ public class TGen implements ITraceGenerationController {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
         static final int WAIT_SECONDS = 1;
+        static final int CANDIDATE_THRESHOLD = 100;
     }
 }

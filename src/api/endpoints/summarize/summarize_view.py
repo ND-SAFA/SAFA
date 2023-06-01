@@ -1,5 +1,3 @@
-from celery import shared_task
-
 from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.summarize.summarize_serializer import SummarizePayload, SummarizeSerializer
 from api.utils.view_util import ViewUtil
@@ -10,7 +8,6 @@ from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 
 
 @endpoint(SummarizeSerializer)
-@shared_task
 def perform_summarization(request_data: SummarizePayload):
     """
     Performs artifact summarization.

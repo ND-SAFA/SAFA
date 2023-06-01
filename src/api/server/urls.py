@@ -23,7 +23,7 @@ from rest_framework import permissions
 from api.endpoints.completion.completion_view import perform_completion
 from api.endpoints.hgen.hgen_view import perform_hgen
 from api.endpoints.jobs.result_view import get_result, get_status
-from api.endpoints.predict.predict_view import predict
+from api.endpoints.predict.predict_view import perform_prediction, perform_prediction_sync
 from api.endpoints.summarize.summarize_view import perform_summarization
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
@@ -49,7 +49,8 @@ urlpatterns = [
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
-    path('predict/', predict),
+    path('predict/', perform_prediction),
+    path('predict-sync/', perform_prediction_sync),
     path('complete/', perform_completion),
     path('summarize/', perform_summarization),
     path('hgen/', perform_hgen),

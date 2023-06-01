@@ -19,7 +19,7 @@ class CsvEntityFormat(AbstractEntityFormat):
         :param summarizer: If provided, will summarize the artifact content
         :return: DataFrame of parsed entities.
         """
-        return pd.read_csv(data_path)
+        return pd.read_csv(data_path, **kwargs)
 
     @staticmethod
     def get_file_extensions() -> List[str]:

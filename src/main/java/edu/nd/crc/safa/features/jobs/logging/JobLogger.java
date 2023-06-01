@@ -41,15 +41,15 @@ public class JobLogger {
         // Uncomment to show job logs on the command line
         //System.out.println(entry);
     }
-    
+
     /**
      * Add a new log message.
      *
      * @param format The format of the message.
      * @param args   Args to fill into the format.
      */
-    public void log(String format, Object... args) {
-        log(String.format(format, args));
+    public JobLogEntry log(String format, Object... args) {
+        return log(String.format(format, args));
     }
 
     /**

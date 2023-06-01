@@ -6,12 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
@@ -77,7 +72,6 @@ public abstract class AbstractJob implements Job {
      */
     Authentication authentication;
     private JobLogger dbLogger;
-    private List<LogRecord> logRecords;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;
@@ -87,7 +81,6 @@ public abstract class AbstractJob implements Job {
         this.notificationService = this.serviceProvider.getNotificationService();
 
         this.dbLogger = new JobLogger(serviceProvider.getJobLoggingService(), jobDbEntity, 0);
-        this.logRecords = new ArrayList<>();
     }
 
     /**
@@ -189,14 +182,6 @@ public abstract class AbstractJob implements Job {
     private void notifyBeforeJob() throws Exception {
         try {
             beforeJob();
-            rootLogger.setLevel(Level.INFO);
-            Handler logHandler = new ConsoleHandler() {
-                @Override
-                public void publish(LogRecord record) {
-                    logRecords.add(record);
-                }
-            };
-            rootLogger.addHandler(logHandler);
         } catch (Exception e) {
             dbLogger.log("Error in reporting job starting");
             throw e;
@@ -211,8 +196,6 @@ public abstract class AbstractJob implements Job {
     private void notifyAfterJob(boolean success) {
         try {
             afterJob(success);
-            String log = logRecords.stream().map(LogRecord::getMessage).collect(Collectors.joining("\n"));
-            dbLogger.log(log);
         } catch (Exception e) {
             dbLogger.log("Error in reporting job finishing:");
             dbLogger.logException(e);

@@ -1,4 +1,4 @@
-from api.endpoints.base.views.endpoint import async_endpoint
+from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.summarize.summarize_serializer import SummarizePayload, SummarizeSerializer
 from api.utils.view_util import ViewUtil
 from tgen.constants.model_constants import get_default_llm_manager
@@ -7,7 +7,7 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 
 
-@async_endpoint(SummarizeSerializer)
+@endpoint(SummarizeSerializer)
 def perform_summarization(request_data: SummarizePayload):
     """
     Performs artifact summarization.

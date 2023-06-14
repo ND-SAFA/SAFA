@@ -24,7 +24,6 @@ import { pinia } from "@/plugins";
 import { appStore } from "@/hooks/core";
 import selectionStore from "@/hooks/graph/useSelection";
 import subtreeStore from "@/hooks/project/useSubtree";
-import deltaStore from "@/hooks/project/useDelta";
 
 /**
  * This module handles the layout positions of the graph.
@@ -152,7 +151,6 @@ export const useLayout = defineStore("layout", {
       disableDrawMode();
       subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
-      deltaStore.clear();
       appStore.closeSidePanels();
 
       // Wait for graph to render.

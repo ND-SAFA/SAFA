@@ -19,6 +19,7 @@ export function handleSetProjectDelta(
       deltaStore.afterVersion = targetVersion;
       await deltaStore.setDeltaPayload(deltaPayload);
       logStore.onSuccess("Delta state was updated successfully.");
+      console.log(targetVersion, deltaStore.afterVersion);
       onComplete();
     })
     .catch((e) => {

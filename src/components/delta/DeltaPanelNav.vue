@@ -1,30 +1,22 @@
 <template>
   <panel-card>
     <text-button
-      v-if="!selectorVisible"
-      block
-      label="Compare Versions"
-      color="primary"
-      icon="view-delta"
-      @click="handleChange"
-    />
-    <text-button
-      v-else
+      v-if="version && !!version.versionId"
       block
       outlined
       label="Hide Delta View"
       icon="cancel"
-      @click="handleChange"
+      class="q-mb-md"
+      @click="handleClose"
     />
     <select-input
       v-model="version"
-      :disabled="!selectorVisible"
       :options="versions"
       :loading="loading"
       option-value="versionId"
       :option-label="getVersionName"
       label="Delta Version"
-      class="q-mt-md"
+      hint="The version to load the delta between."
     />
   </panel-card>
 </template>
@@ -51,7 +43,6 @@ import {
 import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
 const loading = ref(false);
-const selectorVisible = ref(deltaStore.inDeltaView);
 const versions = ref<VersionSchema[]>([]);
 
 const version = computed({
@@ -92,16 +83,10 @@ async function loadVersions(): Promise<void> {
 }
 
 /**
- * Changes whether delta view is enabled.
+ * Disables delta view.
  */
-function handleChange(): void {
-  if (selectorVisible.value) {
-    deltaStore.setIsDeltaViewEnabled(false);
-    handleReloadProject();
-    selectorVisible.value = false;
-  } else {
-    selectorVisible.value = true;
-  }
+function handleClose(): void {
+  handleReloadProject();
 }
 
 onMounted(() => loadVersions());

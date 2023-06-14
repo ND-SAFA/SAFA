@@ -27,7 +27,6 @@
     />
     <text-button
       v-bind="buttonProps(options.delta)"
-      :disabled="isDeltaDisabled"
       :hide-label="smallWindow"
       label="Delta"
       data-cy="button-nav-delta"
@@ -70,7 +69,6 @@ const { smallWindow } = useScreen();
 const value = ref<GraphMode[]>([]);
 
 const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
-const isDeltaDisabled = computed(() => layoutStore.mode === GraphMode.tim);
 
 /**
  * Returns props for a mode button.
@@ -142,11 +140,6 @@ watch(
 
 watch(
   () => isTreeDisabled.value,
-  () => updateValue()
-);
-
-watch(
-  () => isDeltaDisabled.value,
   () => updateValue()
 );
 </script>

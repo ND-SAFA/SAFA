@@ -1,6 +1,6 @@
 import { ProjectSchema } from "@/types";
 import { createProject } from "@/util";
-import { documentStore, subtreeStore, projectStore } from "@/hooks";
+import { documentStore, subtreeStore, projectStore, deltaStore } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
 import {
   getTraceMatrices,
@@ -44,6 +44,7 @@ export async function handleSetProject(project: ProjectSchema): Promise<void> {
  * Reloads the current project.
  */
 export async function handleReloadProject(): Promise<void> {
+  deltaStore.setIsDeltaViewEnabled(false);
   await handleLoadVersion(
     projectStore.versionId,
     documentStore.currentDocument

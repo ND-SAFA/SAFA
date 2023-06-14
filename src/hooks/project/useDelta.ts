@@ -5,6 +5,7 @@ import {
   ArtifactDeltaState,
   ArtifactSchema,
   EntityModification,
+  GraphMode,
   ProjectDelta,
   TraceLinkSchema,
   VersionSchema,
@@ -75,6 +76,13 @@ export const useDelta = defineStore("delta", {
      * @param isDeltaViewEnabled - Whether to enable this view.
      */
     setIsDeltaViewEnabled(isDeltaViewEnabled: boolean): void {
+      if (this.inDeltaView && !isDeltaViewEnabled) {
+        layoutStore.mode = GraphMode.tim;
+        this.afterVersion = undefined;
+      } else {
+        appStore.closeSidePanels();
+      }
+
       this.inDeltaView = isDeltaViewEnabled;
 
       disableDrawMode();
@@ -84,15 +92,7 @@ export const useDelta = defineStore("delta", {
      */
     clear(): void {
       this.setIsDeltaViewEnabled(false);
-      appStore.closeSidePanels();
       this.$reset();
-    },
-    /**
-     * Removes delta artifacts and traces from the current project.
-     */
-    removeDeltaAdditions(): void {
-      artifactStore.deleteArtifacts(Object.values(this.addedArtifacts));
-      traceStore.deleteTraceLinks(Object.values(this.addedTraces));
     },
     /**
      * Sets the current artifact deltas.
@@ -100,20 +100,34 @@ export const useDelta = defineStore("delta", {
      * @param payload - All artifact deltas.
      */
     async setDeltaPayload(payload: ProjectDelta): Promise<void> {
-      this.removeDeltaAdditions();
       this.projectDelta = payload;
 
-      artifactStore.addOrUpdateArtifacts([
+      const artifacts = [
         ...Object.values(payload.artifacts.added),
+        ...Object.values(payload.artifacts.modified).map(({ after }) => after),
         ...Object.values(payload.artifacts.removed),
-      ]);
-      traceStore.addOrUpdateTraceLinks([
+      ];
+      const traces = [
         ...Object.values(payload.traces.added),
-        ...Object.values(payload.traces.modified).map(({ before }) => before),
-      ]);
-      await subtreeStore.restoreHiddenNodesAfter(async () =>
-        layoutStore.setArtifactTreeLayout()
-      );
+        ...Object.values(payload.traces.modified).map(({ after }) => after),
+      ];
+
+      artifactStore.addOrUpdateArtifacts(artifacts);
+      traceStore.addOrUpdateTraceLinks(traces);
+
+      artifactStore.initializeArtifacts({
+        currentArtifactIds: artifacts
+          .map(({ id }) => [
+            id,
+            ...(subtreeStore.subtreeMap[id]?.neighbors || []),
+          ])
+          .reduce((acc, cur) => [...acc, ...cur], []),
+      });
+      await subtreeStore.restoreHiddenNodesAfter(async () => {
+        layoutStore.mode = GraphMode.tree;
+        await layoutStore.updatePositions({});
+        layoutStore.setArtifactTreeLayout();
+      });
       this.setIsDeltaViewEnabled(true);
     },
     /**

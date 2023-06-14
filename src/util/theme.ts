@@ -32,6 +32,9 @@ export enum Colors {
   orangeLight = "#FFD592",
   orangeDark = "#DD8300",
 
+  brownLight = "#bb9457",
+  brownDark = "#6f1d1b",
+
   // gradient1 = "#6290C3",
   // gradient2 = "#F59700",
   // gradient3 = "#5BC0BE",
@@ -81,8 +84,8 @@ export const ThemeColors = {
   warningBg: Colors.orangeLight,
   warningBd: Colors.orangeDark,
 
-  nodeDefaultLight: Colors.greyLight,
-  nodeDefaultDark: Colors.greyLightest,
+  nodeDefaultLight: Colors.brownLight,
+  nodeDefaultDark: Colors.brownDark,
   nodeGenerated: Colors.orange,
 };
 

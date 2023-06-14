@@ -1,17 +1,7 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactSchema,
-  ProjectSchema,
-  SubtreeLinkSchema,
-  SubtreeMap,
-  TraceLinkSchema,
-} from "@/types";
-import {
-  createPhantomLinks,
-  createSubtreeMap,
-  getMatchingChildren,
-} from "@/util";
+import { ProjectSchema, SubtreeLinkSchema, SubtreeMapSchema } from "@/types";
+import { createPhantomLinks, getMatchingChildren } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 import { pinia } from "@/plugins";
 import traceStore from "./useTraces";
@@ -25,7 +15,7 @@ export const useSubtree = defineStore("subtrees", {
     /**
      * A map containing root artifact names as keys and children names are values.
      */
-    subtreeMap: {} as SubtreeMap,
+    subtreeMap: {} as SubtreeMapSchema,
     /**
      * List of phantom links used when hiding subtrees.
      */
@@ -41,6 +31,12 @@ export const useSubtree = defineStore("subtrees", {
   }),
   getters: {},
   actions: {
+    /**
+     * Updates the subtree map.
+     */
+    initializeProject(project: ProjectSchema): void {
+      this.subtreeMap = project.subtrees;
+    },
     /**
      * Returns the subtree of an artifact.
      *
@@ -88,30 +84,12 @@ export const useSubtree = defineStore("subtrees", {
       }
     },
     /**
-     * Recalculates the subtree map of project artifacts and updates store.
-     *
-     * @param artifacts - The artifacts to create the subtree for.
-     * @param traces - The traces to create the subtree for.
-     */
-    updateSubtreeMap(
-      artifacts: ArtifactSchema[] = artifactStore.allArtifacts,
-      traces: TraceLinkSchema[] = traceStore.allTraces
-    ): void {
-      this.subtreeMap = createSubtreeMap(artifacts, traces);
-    },
-    /**
      * Resets all hidden nodes.
      */
     resetHiddenNodes(): void {
       this.collapsedParentNodes = [];
       this.hiddenSubtreeNodes = [];
       cyDisplayAll();
-    },
-    /**
-     * Updates the subtree map.
-     */
-    initializeProject(project: ProjectSchema): void {
-      this.updateSubtreeMap(project.artifacts, project.traces);
     },
     /**
      * Creates phantom links between the given artifacts.

@@ -1,9 +1,7 @@
 import {
   ArtifactSchema,
   InternalTraceType,
-  SubtreeItem,
   SubtreeLinkSchema,
-  SubtreeMap,
   TraceLinkSchema,
 } from "@/types";
 
@@ -41,7 +39,6 @@ export function getMatchingChildren(
 }
 
 /**
- * TODO: this is very inefficient.
  * Creates fantom links from the given traces for all hidden subtrees.
  *
  * @param traces - The current trace links.
@@ -84,104 +81,4 @@ export function createPhantomLinks(
           ? { ...base, target: rootId }
           : { ...base, source: rootId };
       });
-}
-
-/**
- * Computes the subtree map of given artifacts.
- *
- * @param artifacts - All artifacts in the system.
- * @param traces - All traces in the system.
- * @return The computed subtree map.
- */
-export function createSubtreeMap(
-  artifacts: ArtifactSchema[],
-  traces: TraceLinkSchema[]
-): SubtreeMap {
-  const computedSubtrees = {};
-  const traversedIds: string[] = [];
-
-  return artifacts
-    .map((artifact) => ({
-      [artifact.id]: getSubtree(
-        artifacts,
-        traces,
-        artifact.id,
-        computedSubtrees,
-        traversedIds
-      ),
-    }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-}
-
-/**
- * Returns list of children names for artifact specified.
- *
- * @param artifacts - All artifacts in the system.
- * @param traces - All traces in the system.
- * @param artifactId - The id of the root artifact whose subtree is being calculated.
- * @param subtreeMapCache - A cache of previously calculated subtrees.
- * @param traversedIds - A cache of previously traversed artifacts.
- * @return The child ids in the subtree.
- */
-function getSubtree(
-  artifacts: ArtifactSchema[],
-  traces: TraceLinkSchema[],
-  artifactId: string,
-  subtreeMapCache: SubtreeMap,
-  traversedIds: string[]
-): SubtreeItem {
-  const currentItem: SubtreeItem = {
-    parents: [],
-    children: [],
-    subtree: [],
-  };
-
-  if (artifactId in subtreeMapCache || traversedIds.includes(artifactId)) {
-    return subtreeMapCache[artifactId] || currentItem;
-  }
-
-  traversedIds.push(artifactId);
-
-  for (const childId of getChildren(artifacts, traces, artifactId)) {
-    if (!(childId in subtreeMapCache)) {
-      subtreeMapCache[childId] = getSubtree(
-        artifacts,
-        traces,
-        childId,
-        subtreeMapCache,
-        traversedIds
-      );
-    }
-
-    subtreeMapCache[childId].parents.push(artifactId);
-    currentItem.children.push(childId);
-    currentItem.subtree = [
-      ...currentItem.subtree,
-      ...[...subtreeMapCache[childId].subtree, childId].filter(
-        (id) => !currentItem.subtree.includes(id)
-      ),
-    ];
-  }
-
-  subtreeMapCache[artifactId] = currentItem;
-
-  return currentItem;
-}
-
-/**
- * Returns list of artifact ids corresponding to children of artifact.
- *
- * @param artifacts - All artifacts in the system.
- * @param traces - All traces in the system.
- * @param artifactId - The id of the root artifact whose subtree is being calculated.
- * @return The computed child artifact ids.
- */
-function getChildren(
-  artifacts: ArtifactSchema[],
-  traces: TraceLinkSchema[],
-  artifactId: string
-): string[] {
-  return traces
-    .filter(({ targetId }) => targetId === artifactId)
-    .map(({ sourceId }) => sourceId);
 }

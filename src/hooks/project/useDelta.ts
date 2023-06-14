@@ -124,6 +124,7 @@ export const useDelta = defineStore("delta", {
           ])
           .reduce((acc, cur) => [...acc, ...cur], []),
       });
+
       await subtreeStore.restoreHiddenNodesAfter(async () => {
         layoutStore.mode = GraphMode.tree;
         await layoutStore.updatePositions({});

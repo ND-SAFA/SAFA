@@ -22,8 +22,8 @@ export function svgFooter(
 ): string {
   const baseY = outerStyle.height + 4;
   const textY = data.childDeltaStates?.length
-    ? outerStyle.height + 2
-    : outerStyle.height + 8;
+    ? outerStyle.height + 6
+    : outerStyle.height + 10;
   const warningCount = getWarnings(data);
   const hasWarnings = warningCount > 0;
   const hasChildren = (data.hiddenChildren || 0) > 0;
@@ -60,7 +60,7 @@ export function svgFooter(
     ${svgWarnings(warningCount, hasChildren, textY, outerStyle.width)}
     ${svgStoplight(data, {
       x: 6,
-      y: textY + 22,
+      y: textY + 18,
       width: outerStyle.width - 12,
     })}
   `;

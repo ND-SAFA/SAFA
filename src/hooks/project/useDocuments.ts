@@ -195,6 +195,7 @@ export const useDocuments = defineStore("documents", {
      */
     async addDocumentOfTypes(types: string[]): Promise<void> {
       const artifactsByType = artifactStore.allArtifactsByType;
+      console.log({ types, existing: Object.keys(artifactsByType) });
       const document = createDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),

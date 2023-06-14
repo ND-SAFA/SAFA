@@ -7,13 +7,6 @@
         icon="artifact"
         @click="handleViewLevel"
       />
-      <text-button
-        text
-        color="primary"
-        label="Generate Parents"
-        icon="generateArtifacts"
-        @click="handleGenerateParents"
-      />
     </flex-box>
 
     <panel-card :title="artifactLevelName">
@@ -31,6 +24,17 @@
     >
       <type-direction-input :artifact-level="artifactLevel" />
       <type-icon-input :artifact-level="artifactLevel" />
+    </panel-card>
+
+    <panel-card>
+      <text-button
+        text
+        block
+        color="primary"
+        label="Generate Parents"
+        icon="generateArtifacts"
+        @click="handleGenerateParents"
+      />
     </panel-card>
   </details-panel>
 </template>

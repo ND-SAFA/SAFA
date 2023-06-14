@@ -34,7 +34,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @return A collection of current artifact lists, keyed by their type.
      */
     allArtifactsByType(): Record<string, ArtifactSchema[]> {
-      return collectByField(this.currentArtifacts, "type");
+      return collectByField(this.allArtifacts, "type");
     },
   },
   actions: {

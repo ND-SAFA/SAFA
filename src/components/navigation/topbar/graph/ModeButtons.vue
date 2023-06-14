@@ -134,6 +134,11 @@ function handleDeltaView(): void {
 onMounted(() => updateValue());
 
 watch(
+  () => layoutStore.mode,
+  () => updateValue()
+);
+
+watch(
   () => deltaStore.inDeltaView,
   () => updateValue()
 );

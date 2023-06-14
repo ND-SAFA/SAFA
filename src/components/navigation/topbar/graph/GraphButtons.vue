@@ -1,5 +1,6 @@
 <template>
   <flex-box v-if="!isDisabled">
+    <separator vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
       :key="definition.label"
@@ -24,6 +25,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { IconVariant } from "@/types";
 import { layoutStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
@@ -33,17 +35,19 @@ const viewButtons = [
   {
     handler: () => cyZoomIn(),
     label: "Zoom In",
-    icon: "graph-zoom-in",
+    icon: "graph-zoom-in" as IconVariant,
+    dataCy: "button-nav-graph-zoom-in",
   },
   {
     handler: () => cyZoomOut(),
     label: "Zoom Out",
-    icon: "graph-zoom-out",
+    icon: "graph-zoom-out" as IconVariant,
+    dataCy: "button-nav-graph-zoom-out",
   },
   {
     handler: () => cyCenterNodes(true),
     label: "Center Graph",
-    icon: "graph-center",
+    icon: "graph-center" as IconVariant,
     dataCy: "button-nav-graph-center",
   },
   {
@@ -55,7 +59,8 @@ const viewButtons = [
       }
     },
     label: "Regenerate Layout",
-    icon: "graph-refresh",
+    icon: "graph-refresh" as IconVariant,
+    dataCy: "button-nav-graph-refresh",
   },
 ];
 

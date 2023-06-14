@@ -140,6 +140,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-link-box";
     case "nav-settings":
       return "mdi-cog-box";
+    case "filter-open":
+      return "mdi-filter-menu-outline";
+    case "filter-close":
+      return "mdi-filter-minus-outline";
     case "group-open":
       return "mdi-chevron-up";
     case "group-open-all":

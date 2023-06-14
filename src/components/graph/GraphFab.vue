@@ -17,39 +17,44 @@
       data-cy="button-fab-toggle"
     >
       <q-fab-action
+        outline
         label="Generate Trace Links"
         icon="mdi-link-variant-plus"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-generate-trace"
         @click="handleGenerateTraceLink"
       />
       <q-fab-action
         v-if="isTreeMode"
+        outline
         :label="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
         :icon="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-draw-trace"
         @click="handleDrawTraceLink"
       />
       <q-fab-action
+        outline
         label="Create Trace Link"
         icon="mdi-ray-start-end"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-create-trace"
         @click="handleAddTraceLink"
       />
 
       <q-fab-action
+        outline
         label="Generate Artifacts"
         icon="mdi-folder-multiple-plus-outline"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-generate-artifact"
         @click="handleGenerateArtifact"
       />
       <q-fab-action
+        outline
         label="Create Artifact"
         icon="mdi-folder-plus-outline"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-create-artifact"
         @click="handleAddArtifact"
       />
@@ -59,10 +64,10 @@
 
 <script lang="ts">
 /**
- * Displays the artifact tree action buttons.
+ * Displays action buttons for the artifact tree graph.
  */
 export default {
-  name: "ArtifactFab",
+  name: "GraphFab",
 };
 </script>
 

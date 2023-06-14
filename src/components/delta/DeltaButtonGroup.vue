@@ -65,9 +65,7 @@ const title = computed(
 
 const className = computed(
   () =>
-    `rounded q-mb-sm bd-${getEnumColor(props.deltaType)} bg-${getEnumColor(
-      props.deltaType
-    )}`
+    `rounded q-mb-sm bd-${getEnumColor(props.deltaType)} bg-${props.deltaType}`
 );
 
 const itemFields = computed<SelectOption[]>(() => {

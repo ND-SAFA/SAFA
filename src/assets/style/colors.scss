@@ -37,15 +37,15 @@ $color-node-default: var(--q-nodeDefault);
   background-color: $color-neutral !important;
 }
 
-.bg-primary {
+.bg-modified {
   background-color: $color-modified-bg !important;
 }
 
-.bg-positive {
+.bg-added {
   background-color: $color-added-bg !important;
 }
 
-.bg-negative {
+.bg-removed {
   background-color:$color-removed-bg !important;
 }
 

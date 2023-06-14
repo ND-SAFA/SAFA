@@ -19,7 +19,6 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { DeltaType } from "@/types";
-import { getEnumColor } from "@/util";
 import { ListItem } from "@/components/common";
 
 const props = defineProps<{
@@ -37,5 +36,5 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const className = computed(() => `bg-${getEnumColor(props.deltaType)}`);
+const className = computed(() => `bg-${props.deltaType}`);
 </script>

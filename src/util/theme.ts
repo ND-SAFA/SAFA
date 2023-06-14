@@ -17,22 +17,24 @@ export enum Colors {
 
   green = "#00AD69",
   greenLight = "#6CD8A9",
+  greenLightest = "#A9F6D5",
   greenDark = "#188958",
 
   blue = "#5975B8",
   blueLight = "#729FCF",
-  blueLightest = "#8DA5D3",
+  blueLightest = "#B0D6FF",
   blueDark = "#204184",
 
   red = "#E11F26",
   redLight = "#E27171",
+  redLightest = "#FFA5A5",
   redDark = "#AF001E",
 
   orange = "#F5B53F",
   orangeLight = "#FFD592",
   orangeDark = "#DD8300",
 
-  brownLight = "#bb9457",
+  brownLight = "#DCBA82",
   brownDark = "#6f1d1b",
 
   // gradient1 = "#6290C3",
@@ -45,7 +47,7 @@ export enum Colors {
   gradient2 = "#168aad",
   gradient3 = "#52b69a",
   gradient4 = "#76c893",
-  gradient5 = "#b5e48c",
+  gradient5 = "#ABD784",
 }
 
 /**
@@ -69,15 +71,15 @@ export const ThemeColors = {
   darkSelected: Colors.greyLightest,
 
   added: Colors.green,
-  addedBg: Colors.greenLight,
+  addedBg: Colors.greenLightest,
   addedBd: Colors.greenDark,
 
   modified: Colors.blue,
-  modifiedBg: Colors.blueLight,
+  modifiedBg: Colors.blueLightest,
   modifiedBd: Colors.blueDark,
 
   removed: Colors.red,
-  removedBg: Colors.redLight,
+  removedBg: Colors.redLightest,
   removedBd: Colors.redDark,
 
   warning: Colors.orange,

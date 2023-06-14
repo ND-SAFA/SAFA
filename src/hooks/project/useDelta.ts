@@ -110,6 +110,7 @@ export const useDelta = defineStore("delta", {
       const traces = [
         ...Object.values(payload.traces.added),
         ...Object.values(payload.traces.modified).map(({ after }) => after),
+        ...Object.values(payload.traces.removed),
       ];
 
       artifactStore.addOrUpdateArtifacts(artifacts);

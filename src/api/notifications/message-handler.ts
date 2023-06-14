@@ -15,6 +15,7 @@ import {
   jobStore,
   membersStore,
   projectStore,
+  subtreeStore,
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
@@ -175,6 +176,9 @@ async function handleUpdateChange(
       return handleReloadJobs();
     case EntityType.LAYOUT:
       documentStore.updateBaseLayout(project.layout);
+      break;
+    case EntityType.SUBTREES:
+      subtreeStore.initializeProject(project);
       break;
     case EntityType.MODELS:
       projectStore.updateProject({ models: project.models });

@@ -1,13 +1,10 @@
 <template>
-  <text-button
-    outlined
-    block
-    :color="color"
-    class="q-mb-sm"
+  <list-item
+    clickable
+    :class="className"
+    :title="props.name"
     @click="emit('click')"
-  >
-    <typography ellipsis :value="name" :color="color" />
-  </text-button>
+  />
 </template>
 
 <script lang="ts">
@@ -21,8 +18,9 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { DeltaType, ThemeColor } from "@/types";
-import { TextButton, Typography } from "@/components/common";
+import { DeltaType } from "@/types";
+import { getEnumColor } from "@/util";
+import { ListItem } from "@/components/common";
 
 const props = defineProps<{
   /**
@@ -39,16 +37,5 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const color = computed<ThemeColor>(() => {
-  switch (props.deltaType) {
-    case "added":
-      return "positive";
-    case "modified":
-      return "primary";
-    case "removed":
-      return "negative";
-    default:
-      return "black";
-  }
-});
+const className = computed(() => `bg-${getEnumColor(props.deltaType)}`);
 </script>

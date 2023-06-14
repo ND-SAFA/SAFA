@@ -1,6 +1,7 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
+  DeltaType,
   JobStatus,
   ThemeColor,
 } from "@/types";
@@ -37,17 +38,11 @@ export enum Colors {
   brownLight = "#DCBA82",
   brownDark = "#6f1d1b",
 
-  // gradient1 = "#6290C3",
-  // gradient2 = "#F59700",
-  // gradient3 = "#5BC0BE",
-  // gradient4 = "#C16200",
-  // gradient5 = "#74121D",
-
-  gradient1 = "#1e6091",
-  gradient2 = "#168aad",
-  gradient3 = "#52b69a",
-  gradient4 = "#76c893",
-  gradient5 = "#ABD784",
+  gradient1 = "#9EF01A",
+  gradient2 = "#77D241",
+  gradient3 = "#4FB468",
+  gradient4 = "#28958F",
+  gradient5 = "#0077B6",
 }
 
 /**
@@ -206,17 +201,20 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | string
+  state: ApprovalType | ArtifactDeltaState | DeltaType | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case "added":
       return "positive";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case "modified":
       return "primary";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case "removed":
       return "negative";
     default:
       return "";

@@ -32,11 +32,17 @@ export enum Colors {
   orangeLight = "#FFD592",
   orangeDark = "#DD8300",
 
-  gradient1 = "#6290C3",
-  gradient2 = "#F59700",
-  gradient3 = "#5BC0BE",
-  gradient4 = "#C16200",
-  gradient5 = "#74121D",
+  // gradient1 = "#6290C3",
+  // gradient2 = "#F59700",
+  // gradient3 = "#5BC0BE",
+  // gradient4 = "#C16200",
+  // gradient5 = "#74121D",
+
+  gradient1 = "#1e6091",
+  gradient2 = "#168aad",
+  gradient3 = "#52b69a",
+  gradient4 = "#76c893",
+  gradient5 = "#b5e48c",
 }
 
 /**

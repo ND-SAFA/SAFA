@@ -31,6 +31,12 @@ export enum Colors {
   orange = "#F5B53F",
   orangeLight = "#FFD592",
   orangeDark = "#DD8300",
+
+  gradient1 = "#6290C3",
+  gradient2 = "#F59700",
+  gradient3 = "#5BC0BE",
+  gradient4 = "#C16200",
+  gradient5 = "#74121D",
 }
 
 /**
@@ -144,11 +150,16 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      Colors.blueLight,
-      Colors.greenLight,
-      Colors.orange,
-      Colors.orangeDark,
-      Colors.red,
+      // Colors.blueLight,
+      // Colors.greenLight,
+      // Colors.orange,
+      // Colors.orangeDark,
+      // Colors.red,
+      Colors.gradient1,
+      Colors.gradient2,
+      Colors.gradient3,
+      Colors.gradient4,
+      Colors.gradient5,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =

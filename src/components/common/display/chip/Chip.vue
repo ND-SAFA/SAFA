@@ -2,9 +2,9 @@
   <q-chip
     :class="props.class"
     :outline="props.outlined"
-    :color="props.color"
+    :color="chipColor"
     :data-cy="props.dataCy"
-    :style="props.style"
+    :style="chipStyle"
     :clickable="props.clickable"
     :removable="removable"
     @click="emit('click')"
@@ -25,6 +25,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { ChipProps } from "@/types";
 import { Typography } from "../content";
 
@@ -42,4 +43,24 @@ const emit = defineEmits<{
    */
   (e: "remove"): void;
 }>();
+
+const chipColor = computed(() => {
+  if (props.color?.includes("#")) {
+    return "";
+  } else if (props.color) {
+    return props.color;
+  } else {
+    return "";
+  }
+});
+
+const chipStyle = computed(() => {
+  if (props.style) {
+    return props.style;
+  } else if (props.color?.includes("#")) {
+    return `color: ${props.color}; border-color: ${props.color} !important`;
+  } else {
+    return "";
+  }
+});
 </script>

@@ -20,7 +20,7 @@
     />
     <typography
       ellipsis
-      inherit-color
+      color="text"
       :small="text.length >= 15"
       :l="iconVisible ? '1' : ''"
       :value="text"
@@ -94,6 +94,10 @@ const iconId = computed(() =>
   props.artifactType ? typeOptionsStore.getArtifactTypeIcon(props.value) : ""
 );
 
+const typeColor = computed(() =>
+  props.artifactType ? typeOptionsStore.tim.artifacts[props.value].color : ""
+);
+
 const iconVisible = computed(() => iconId.value || props.icon);
 
 const displayColor = computed(() => {
@@ -101,6 +105,8 @@ const displayColor = computed(() => {
     return props.color;
   } else if (props.confidenceScore) {
     return getScoreColor(props.value);
+  } else if (props.artifactType) {
+    return typeColor.value || "primary";
   } else if (enumerated.value) {
     return getEnumColor(props.value);
   } else {
@@ -110,7 +116,7 @@ const displayColor = computed(() => {
 
 const iconColor = computed(() => {
   if (props.artifactType) {
-    return "primary";
+    return typeColor.value || "primary";
   } else {
     return displayColor.value;
   }

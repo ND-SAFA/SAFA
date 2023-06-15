@@ -1,7 +1,12 @@
 import { defineStore } from "pinia";
 
 import { computed, onMounted, ref, watch } from "vue";
-import { DocumentSchema, IdentifierSchema, VersionSchema } from "@/types";
+import {
+  DocumentSchema,
+  IdentifierSchema,
+  IOHandlerCallback,
+  VersionSchema,
+} from "@/types";
 import {
   documentStore,
   projectStore,
@@ -15,8 +20,11 @@ import { pinia } from "@/plugins";
 
 export const useGetVersionApi = defineStore("getVersionApi", () => {
   const getVersionApi = useApi("getVersionApi");
+  const loadVersionApi = useApi("loadVersionApi");
 
   const allVersions = ref<VersionSchema[]>([]);
+
+  const getLoading = computed(() => getVersionApi.loading);
 
   const currentProject = computed(() => projectStore.project);
   const currentVersion = computed({
@@ -29,12 +37,27 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
   });
 
   /**
-   * Loads the versions of the current project.
+   * Loads the versions of a project.
+   * If no project id is given, the current project is used, and all versions will be set.
+   *
+   * @param projectId - The id of the project to load the versions of.
+   * @param callbacks - Callbacks for the action.
    */
-  async function handleLoadCurrentProjectVersions(): Promise<void> {
-    const { projectId } = currentProject.value;
+  async function handleGetProjectVersions(
+    projectId?: string,
+    callbacks: IOHandlerCallback<VersionSchema[]> = {}
+  ): Promise<void> {
+    const id = projectId || currentProject.value?.projectId;
 
-    allVersions.value = projectId ? await getProjectVersions(projectId) : [];
+    await getVersionApi.handleRequest(async () => {
+      const versions = id ? await getProjectVersions(id) : [];
+
+      if (!projectId) {
+        allVersions.value = versions;
+      }
+
+      return versions;
+    }, callbacks);
   }
 
   /**
@@ -54,7 +77,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
       ({ meta }) => meta.requiresProject
     );
 
-    await getVersionApi.handleRequest(
+    await loadVersionApi.handleRequest(
       async () => {
         sessionStore.updateSession({ versionId });
 
@@ -102,17 +125,19 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
   }
 
   // Load the versions of the current project on mount.
-  onMounted(() => handleLoadCurrentProjectVersions());
+  onMounted(() => handleGetProjectVersions());
 
   // Load the versions of the current project whenever the current project changes.
   watch(
     () => currentProject.value,
-    () => handleLoadCurrentProjectVersions()
+    () => handleGetProjectVersions()
   );
 
   return {
+    getLoading,
     allVersions,
     currentVersion,
+    handleGetProjectVersions,
     handleLoadVersion,
     handleLoadCurrentVersion,
   };

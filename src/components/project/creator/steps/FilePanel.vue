@@ -116,8 +116,7 @@ export default {
 import { computed, watch } from "vue";
 import { CreatorFilePanel } from "@/types";
 import { getIcon } from "@/util";
-import { projectSaveStore } from "@/hooks";
-import { parseFilePanel } from "@/api";
+import { parseApiStore, projectSaveStore } from "@/hooks";
 import {
   ExpansionItem,
   FileInput,
@@ -140,8 +139,6 @@ const props = defineProps<{
   label: string;
   newLabel: string;
 }>();
-
-// const emit = defineEmits<{}>();
 
 const errorMessage = computed(() => {
   if (!props.panel.name) {
@@ -201,7 +198,10 @@ watch(
   () => props.panel.file,
   (file) => {
     if (file) {
-      parseFilePanel(props.panel, projectSaveStore.artifactMap);
+      parseApiStore.handleParseProjectFile(
+        props.panel,
+        projectSaveStore.artifactMap
+      );
     } else {
       props.panel.artifacts = [];
       props.panel.traces = [];

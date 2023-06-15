@@ -11,6 +11,7 @@
     option-value="versionId"
     class="nav-input nav-version q-ml-sm"
     color="accent"
+    @click="getVersionApiStore.handleGetProjectVersions"
   >
     <template #selected>
       {{ versionToString(getVersionApiStore.currentVersion) }}

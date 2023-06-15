@@ -1,6 +1,6 @@
 import { APIOptions } from "@/types";
 import { logStore, sessionApiStore } from "@/hooks";
-import { baseURL } from "@/api";
+import { BASE_URL } from "@/api";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -20,7 +20,7 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   { setJsonContentType = true, parseResponse = true, arrayBuffer = false } = {}
 ): Promise<T> {
-  const res = await fetch(`${baseURL}/${relativeUrl}`, {
+  const res = await fetch(`${BASE_URL}/${relativeUrl}`, {
     ...options,
     credentials: "include",
     headers: setJsonContentType

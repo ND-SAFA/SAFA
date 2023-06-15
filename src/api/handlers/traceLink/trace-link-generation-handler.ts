@@ -11,6 +11,7 @@ import {
   approvalStore,
   appStore,
   artifactStore,
+  jobApiStore,
   logStore,
   projectStore,
 } from "@/hooks";
@@ -18,7 +19,6 @@ import {
   createGeneratedLinks,
   createModelTraining,
   getGeneratedLinks,
-  handleJobSubmission,
 } from "@/api";
 
 /**
@@ -95,7 +95,7 @@ export async function handleGenerateLinks(
       projectVersion: projectStore.version,
     });
 
-    await handleJobSubmission(job);
+    await jobApiStore.handleCreateJob(job);
 
     logStore.onInfo(
       `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
@@ -132,7 +132,7 @@ export async function handleTrainModel(
       requests: [createGeneratedMatrix(artifactLevels, model.baseModel, model)],
     });
 
-    await handleJobSubmission(job);
+    await jobApiStore.handleCreateJob(job);
     logStore.onInfo(
       `Started training model on: ${matricesName}. You'll receive a notification once complete.`
     );

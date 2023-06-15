@@ -1,11 +1,27 @@
 /**
  * The base URL for the project
  */
-export const baseURL = process.env.VUE_APP_API_ENDPOINT;
+export const BASE_URL = process.env.VUE_APP_API_ENDPOINT;
 
 if (!process.env.VUE_APP_API_ENDPOINT) {
   console.error("API Endpoint environment variable not defined.");
 }
+
+/**
+ * The number of times to attempt to reconnect to server
+ * if connection is lost.
+ */
+export const MAX_RECONNECT_ATTEMPTS = 20;
+/**
+ * The amount of time to
+ */
+export const RECONNECT_WAIT_TIME = 5000;
+/**
+ * Returns a WebSocket url resolving function. Use only after all modules
+ * have been loaded.
+ * @constructor
+ */
+export const WEBSOCKET_URL = (): string => `${BASE_URL}/websocket`;
 
 /**
  * Enumerates all possible endpoint paths.

@@ -5,13 +5,13 @@ import {
   VersionSchema,
 } from "@/types";
 import { versionToString } from "@/util";
-import { identifierSaveStore, logStore, projectStore } from "@/hooks";
 import {
-  deleteProject,
-  deleteProjectVersion,
-  handleClearProject,
-  saveProject,
-} from "@/api";
+  identifierSaveStore,
+  logStore,
+  projectStore,
+  setProjectApiStore,
+} from "@/hooks";
+import { deleteProject, deleteProjectVersion, saveProject } from "@/api";
 
 /**
  * Saves a project, updates app state, and logs the status.
@@ -69,7 +69,7 @@ export function handleDeleteProject({
       if (project.name !== projectStore.project.name) return;
 
       // Clear the current project if it has been deleted.
-      await handleClearProject();
+      await setProjectApiStore.handleClearProject();
     })
     .catch((e) => {
       logStore.onError(`Unable to delete project: ${project.name}.`);

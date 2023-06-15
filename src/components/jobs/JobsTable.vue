@@ -59,8 +59,8 @@ export default {
 import { computed, onMounted, ref } from "vue";
 import { JobLogSchema, JobSchema } from "@/types";
 import { jobColumns, timestampToDisplay } from "@/util";
-import { appStore, jobStore } from "@/hooks";
-import { getJobLog, handleReloadJobs } from "@/api";
+import { appStore, jobApiStore, jobStore } from "@/hooks";
+import { getJobLog } from "@/api";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";
 
@@ -77,7 +77,7 @@ const expanded = computed(() =>
  * Reloads the list of jobs.
  */
 function handleReload() {
-  handleReloadJobs();
+  jobApiStore.handleReloadJobs();
 }
 
 /**

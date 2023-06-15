@@ -5,7 +5,12 @@ import {
   JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
-import { integrationsStore, logStore, projectStore } from "@/hooks";
+import {
+  integrationsStore,
+  jobApiStore,
+  logStore,
+  projectStore,
+} from "@/hooks";
 import { getParam, QueryParams } from "@/router";
 import {
   getGitHubCredentials,
@@ -19,7 +24,6 @@ import {
   getProjectInstallations,
   createGitHubProjectSync,
   createJiraProjectSync,
-  handleJobSubmission,
   getJiraInstallations,
 } from "@/api";
 
@@ -65,7 +69,7 @@ export async function handleSyncInstallation(
         integrationsStore.gitHubConfig
       );
 
-      await handleJobSubmission(job);
+      await jobApiStore.handleCreateJob(job);
     } else if (installation.type === "JIRA") {
       const job = await createJiraProjectSync(
         projectStore.versionId,
@@ -73,7 +77,7 @@ export async function handleSyncInstallation(
         installation.installationId
       );
 
-      await handleJobSubmission(job);
+      await jobApiStore.handleCreateJob(job);
     } else {
       throw new Error("Unknown installation type");
     }

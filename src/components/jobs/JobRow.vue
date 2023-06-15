@@ -84,8 +84,13 @@ export default {
 import { computed } from "vue";
 import { JobSchema, StepperStep } from "@/types";
 import { jobStatus } from "@/util";
-import { getVersionApiStore, jobStore, logStore, useVModel } from "@/hooks";
-import { handleDeleteJob } from "@/api";
+import {
+  getVersionApiStore,
+  jobApiStore,
+  jobStore,
+  logStore,
+  useVModel,
+} from "@/hooks";
 import {
   Typography,
   Icon,
@@ -141,7 +146,7 @@ function handleExpand(): void {
  * Attempts to delete a job.
  */
 function handleDelete(): void {
-  handleDeleteJob(props.job, {});
+  jobApiStore.handleDeleteJob(props.job, {});
 }
 
 /**

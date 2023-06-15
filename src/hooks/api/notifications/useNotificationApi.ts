@@ -24,13 +24,13 @@ import {
   stompApiStore,
   setProjectApiStore,
   getVersionApiStore,
+  jobApiStore,
 } from "@/hooks";
 import { router } from "@/router";
 import {
   Endpoint,
   fillEndpoint,
   getChanges,
-  handleReloadJobs,
   handleReloadWarnings,
 } from "@/api";
 import { pinia } from "@/plugins";
@@ -141,7 +141,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
       case EntityType.WARNINGS:
         return handleReloadWarnings(versionId);
       case EntityType.JOBS:
-        return handleReloadJobs();
+        return jobApiStore.handleReloadJobs();
       case EntityType.LAYOUT:
         documentStore.updateBaseLayout(project.layout);
         break;

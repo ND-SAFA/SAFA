@@ -3,9 +3,10 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { IOHandlerCallback, ProjectSchema } from "@/types";
 import {
+  createVersionApiStore,
+  getVersionApiStore,
   integrationsStore,
   jobApiStore,
-  logStore,
   projectSaveStore,
   projectStore,
 } from "@/hooks";
@@ -14,8 +15,6 @@ import {
   createGitHubProject,
   createJiraProject,
   createProjectCreationJob,
-  handleLoadVersion,
-  handleUploadProjectVersion,
   saveProject,
 } from "@/api";
 import { pinia } from "@/plugins";
@@ -79,12 +78,13 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
       {
         onSuccess: async (project) => {
           if (files.length === 0) {
-            logStore.onSuccess(`Project has been created: ${project.name}`);
             projectStore.addProject(project);
 
-            await handleLoadVersion(project.projectVersion?.versionId || "");
+            await getVersionApiStore.handleLoadVersion(
+              project.projectVersion?.versionId || ""
+            );
           } else {
-            await handleUploadProjectVersion(
+            await createVersionApiStore.handleImportVersion(
               project.projectId,
               project.projectVersion?.versionId || "",
               files,
@@ -95,7 +95,11 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
         },
         onError,
       },
-      { useAppLoad: true }
+      {
+        useAppLoad: true,
+        success: `Project has been created: ${project.name}`,
+        error: `Unable to create project: ${project.name}`,
+      }
     );
   }
 

@@ -2,7 +2,7 @@
   <modal
     :title="`Current Version: ${versionName}`"
     :open="props.open"
-    :loading="isLoading"
+    :loading="createVersionApiStore.loading"
     data-cy="modal-version-create"
     @close="emit('close')"
   >
@@ -45,7 +45,8 @@ export default {
 import { ref, watch, computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
-import { getCurrentVersion, handleCreateVersion } from "@/api";
+import { createVersionApiStore } from "@/hooks";
+import { getCurrentVersion } from "@/api";
 import { Modal, TextButton, FlexBox } from "@/components/common";
 
 const props = defineProps<{
@@ -58,7 +59,6 @@ const emit = defineEmits<{
   (e: "create", version: VersionSchema): void;
 }>();
 
-const isLoading = ref(false);
 const currentVersion = ref<VersionSchema | undefined>();
 
 const versionName = computed(() => versionToString(currentVersion.value));
@@ -91,12 +91,13 @@ function nextVersion(type: VersionType): string {
 function handleClick(versionType: VersionType) {
   if (!props.project) return;
 
-  isLoading.value = true;
-
-  handleCreateVersion(props.project.projectId, versionType, {
-    onSuccess: (version) => emit("create", version),
-    onComplete: () => (isLoading.value = false),
-  });
+  createVersionApiStore.handleCreateVersion(
+    props.project.projectId,
+    versionType,
+    {
+      onSuccess: (version) => emit("create", version),
+    }
+  );
 }
 
 watch(

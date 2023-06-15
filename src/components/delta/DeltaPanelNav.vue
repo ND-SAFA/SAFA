@@ -34,12 +34,8 @@ export default {
 import { ref, onMounted, computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { deltaStore, projectStore } from "@/hooks";
-import {
-  getProjectVersions,
-  handleReloadProject,
-  handleSetProjectDelta,
-} from "@/api";
+import { deltaStore, projectStore, setProjectApiStore } from "@/hooks";
+import { getProjectVersions, handleSetProjectDelta } from "@/api";
 import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
 const loading = ref(false);
@@ -86,7 +82,7 @@ async function loadVersions(): Promise<void> {
  * Disables delta view.
  */
 function handleClose(): void {
-  handleReloadProject();
+  setProjectApiStore.handleReloadProject();
 }
 
 onMounted(() => loadVersions());

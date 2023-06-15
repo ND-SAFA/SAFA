@@ -6,9 +6,9 @@ import {
   PasswordChangeSchema,
   UserPasswordSchema,
 } from "@/types";
+import { setProjectApiStore } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
-  handleClearProject,
   createLoginSession,
   savePassword,
   deleteAccount,
@@ -140,7 +140,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
   async function handleLogout(sendLogoutRequest = false): Promise<void> {
     document.cookie = "";
 
-    await handleClearProject();
+    await setProjectApiStore.handleClearProject();
     await navigateTo(Routes.LOGIN_ACCOUNT);
     sessionStore.clearSession();
     logStore.notifications = [];

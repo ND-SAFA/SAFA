@@ -5,7 +5,7 @@
     addable
     editable
     :deletable="isDeletable"
-    :loading="loading"
+    :loading="getProjectApiStore.loading"
     :columns="columns"
     :rows="rows"
     row-key="projectId"
@@ -55,12 +55,13 @@ import { useRoute } from "vue-router";
 import { IdentifierSchema, ProjectRole } from "@/types";
 import { projectExpandedColumns, projectNameColumn } from "@/util";
 import {
+  getProjectApiStore,
   identifierSaveStore,
   logStore,
   projectStore,
   sessionStore,
 } from "@/hooks";
-import { handleDeleteMember, handleGetProjects } from "@/api";
+import { handleDeleteMember } from "@/api";
 import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
 
@@ -86,7 +87,6 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const loading = ref(true);
 const saveOpen = ref(false);
 const deleteOpen = ref(false);
 
@@ -112,12 +112,9 @@ const rows = computed(() => projectStore.allProjects);
  * Loads all projects.
  */
 function handleReload() {
-  loading.value = true;
   selected.value = undefined;
 
-  handleGetProjects({
-    onComplete: () => (loading.value = false),
-  });
+  getProjectApiStore.handleGetProjects({});
 }
 
 /**

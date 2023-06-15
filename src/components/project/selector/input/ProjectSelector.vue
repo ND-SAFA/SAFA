@@ -1,11 +1,11 @@
 <template>
   <q-select
-    v-model="project"
+    v-model="getProjectApiStore.currentProject"
     outlined
     dark
     :options-dark="darkMode"
     label="Project"
-    :options="projects"
+    :options="getProjectApiStore.allProjects"
     option-value="projectId"
     option-label="name"
     class="nav-input"
@@ -40,10 +40,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { IdentifierSchema } from "@/types";
-import { getVersionApiStore, projectStore, useTheme } from "@/hooks";
-import { handleGetProjects } from "@/api";
+import { ref } from "vue";
+import { getProjectApiStore, useTheme } from "@/hooks";
 import { TextButton } from "@/components/common";
 import { ProjectIdentifierModal } from "../../base";
 
@@ -51,23 +49,10 @@ const openCreateProject = ref(false);
 
 const { darkMode } = useTheme();
 
-const projects = computed(() => projectStore.allProjects);
-
-const project = computed({
-  get: () => (projectStore.projectId ? projectStore.project : undefined),
-  set(identifier: IdentifierSchema | undefined) {
-    if (!identifier) return;
-
-    getVersionApiStore.handleLoadCurrentVersion(identifier);
-  },
-});
-
 /**
  * Reloads projects when a new one is created.
  */
 async function handleProjectCreated(): Promise<void> {
-  await handleGetProjects({});
+  await getProjectApiStore.handleGetProjects({});
 }
-
-onMounted(() => handleGetProjects({}));
 </script>

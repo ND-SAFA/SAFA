@@ -6,14 +6,12 @@ import {
   PasswordChangeSchema,
   UserPasswordSchema,
 } from "@/types";
-import { setProjectApiStore } from "@/hooks";
+import { getProjectApiStore, setProjectApiStore } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
   createLoginSession,
   savePassword,
   deleteAccount,
-  handleLoadLastProject,
-  handleGetProjects,
   getCurrentUser,
   deleteSession,
   createUser,
@@ -118,10 +116,10 @@ export const useSessionApi = defineStore("sessionApi", () => {
       sessionStore.user = await getCurrentUser();
       sessionStore.updateSession(session);
 
-      await handleGetProjects({
+      await getProjectApiStore.handleGetProjects({
         onComplete: async () => {
           if (goToPath === Routes.ARTIFACT) {
-            await handleLoadLastProject();
+            await getProjectApiStore.handleLoadLastProject();
           } else if (typeof goToPath === "string") {
             await navigateTo(goToPath, query);
           } else {
@@ -157,7 +155,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
   async function handleAuthentication(): Promise<void> {
     sessionStore.user = await getCurrentUser();
 
-    await handleGetProjects({});
+    await getProjectApiStore.handleGetProjects({});
   }
 
   /**
@@ -166,11 +164,11 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * @param password - The old and new password.
    * @param callbacks - The callbacks to run on success or error.
    */
-  function handleChangePassword(
+  async function handleChangePassword(
     password: PasswordChangeSchema,
     callbacks: IOHandlerCallback
-  ): void {
-    sessionApi.handleRequest(() => savePassword(password), callbacks, {
+  ): Promise<void> {
+    await sessionApi.handleRequest(() => savePassword(password), callbacks, {
       success: "Your password has been updated.",
       error: "Unable to update your password.",
     });

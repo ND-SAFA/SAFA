@@ -45,8 +45,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { StepperStep } from "@/types";
-import { projectSaveStore } from "@/hooks";
-import { handleImportProject } from "@/api";
+import { createProjectApiStore, projectSaveStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
 import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
@@ -99,7 +98,7 @@ function handleValidateTraces(isValid: boolean): void {
  * Attempts to create a project.
  */
 function handleSave(): void {
-  handleImportProject(projectSaveStore.creationRequest, {
+  createProjectApiStore.handleImportProject({
     onSuccess: () => handleClearData(),
   });
 }

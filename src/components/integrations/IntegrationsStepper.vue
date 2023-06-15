@@ -35,12 +35,8 @@ export default {
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { StepperStep } from "@/types";
-import { integrationsStore } from "@/hooks";
-import {
-  handleImportGitHubProject,
-  handleImportJiraProject,
-  handleSyncInstallation,
-} from "@/api";
+import { createProjectApiStore, integrationsStore } from "@/hooks";
+import { handleSyncInstallation } from "@/api";
 import { Stepper, PanelCard } from "@/components/common";
 import {
   JiraOrganizationSelector,
@@ -84,9 +80,9 @@ function handleSaveProject(): void {
   if (props.type === "create") {
     // Create a new project.
     if (source.value === "Jira") {
-      handleImportJiraProject(callbacks);
+      createProjectApiStore.handleImportJiraProject(callbacks);
     } else if (source.value === "GitHub") {
-      handleImportGitHubProject(callbacks);
+      createProjectApiStore.handleImportGitHubProject(callbacks);
     }
   } else {
     // Sync with the current project.

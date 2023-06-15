@@ -24,6 +24,9 @@ import { sessionStore, logStore } from "@/hooks/core";
 import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/useApi";
 
+/**
+ * Creates a store for handling session API requests.
+ */
 export const useSessionApi = defineStore("sessionApi", () => {
   const createdAccount = ref(false);
   const passwordSubmitted = ref(false);

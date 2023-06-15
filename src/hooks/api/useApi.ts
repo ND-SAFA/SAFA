@@ -3,8 +3,13 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { IOHandlerCallback } from "@/types";
 import { pinia } from "@/plugins";
-import { logStore } from "@/hooks/core";
+import { appStore, logStore } from "@/hooks/core";
 
+/**
+ * Creates a store for handling API requests.
+ *
+ * @param id - The unique store id to use.
+ */
 export const useApi = (id: string) =>
   defineStore(`apiStore-${id}`, () => {
     const loading = ref(false);
@@ -31,26 +36,30 @@ export const useApi = (id: string) =>
      * as well as optionally reporting success and error messages.
      *
      * @param cb - The callback to run.
-     * @param messages - The success & error messages to display.
+     * @param config - The success & error messages to display.
      * @param onSuccess - The callback to run on success.
      * @param onError - The callback to run on error.
      * @param onComplete - The callback to run on completion.
      */
-    async function handleRequest(
-      cb: () => Promise<void>,
-      { onSuccess, onError, onComplete }: IOHandlerCallback = {},
-      messages: { success?: string; error?: string } = {}
+    async function handleRequest<T = void>(
+      cb: () => Promise<T>,
+      { onSuccess, onError, onComplete }: IOHandlerCallback<T> = {},
+      config: { success?: string; error?: string; useAppLoad?: boolean } = {}
     ): Promise<void> {
       loading.value = true;
       error.value = false;
 
       try {
-        await cb();
+        if (config.useAppLoad) {
+          appStore.onLoadStart();
+        }
 
-        onSuccess?.();
+        const res = await cb();
 
-        if (messages.success) {
-          logStore.onSuccess(messages.success);
+        onSuccess?.(res);
+
+        if (config.success) {
+          logStore.onSuccess(config.success);
         }
       } catch (e) {
         error.value = true;
@@ -58,11 +67,15 @@ export const useApi = (id: string) =>
         onError?.(e as Error);
         logStore.onDevError(String(e));
 
-        if (messages.error) {
-          logStore.onError(messages.error);
+        if (config.error) {
+          logStore.onError(config.error);
         }
       } finally {
         loading.value = false;
+
+        if (config.useAppLoad) {
+          appStore.onLoadEnd();
+        }
 
         onComplete?.();
       }

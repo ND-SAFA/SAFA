@@ -22,7 +22,7 @@
         label="Create Project From Files"
         color="primary"
         :disabled="disabled"
-        :loading="loading"
+        :loading="createProjectApiStore.loading"
         class="q-mt-md"
         data-cy="button-create-project"
         @click="handleCreate"
@@ -42,8 +42,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, withDefaults } from "vue";
-import { identifierSaveStore } from "@/hooks";
-import { handleBulkImportProject } from "@/api";
+import { createProjectApiStore, identifierSaveStore } from "@/hooks";
 import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
@@ -64,7 +63,6 @@ const emit = defineEmits<{
 }>();
 
 const selectedFiles = ref<File[]>([]);
-const loading = ref(false);
 const emptyFiles = ref(false);
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
@@ -87,17 +85,15 @@ const disabled = computed(() => {
  * Attempts to save the project.
  */
 async function handleCreate() {
-  loading.value = true;
-
-  handleBulkImportProject(identifier.value, selectedFiles.value, {
-    onSuccess: () => {
-      selectedFiles.value = [];
-      loading.value = false;
-      emit("submit");
-    },
-    onError: () => {
-      loading.value = false;
-    },
-  });
+  await createProjectApiStore.handleBulkImportProject(
+    identifier.value,
+    selectedFiles.value,
+    {
+      onSuccess: () => {
+        selectedFiles.value = [];
+        emit("submit");
+      },
+    }
+  );
 }
 </script>

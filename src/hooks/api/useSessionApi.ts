@@ -6,7 +6,12 @@ import {
   PasswordChangeSchema,
   UserPasswordSchema,
 } from "@/types";
-import { getProjectApiStore, setProjectApiStore } from "@/hooks";
+import {
+  getProjectApiStore,
+  setProjectApiStore,
+  sessionStore,
+  logStore,
+} from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
   createLoginSession,
@@ -18,7 +23,6 @@ import {
   createPasswordReset,
   updatePassword,
 } from "@/api";
-import { sessionStore, logStore } from "@/hooks/core";
 import { pinia } from "@/plugins";
 import { useApi } from "@/hooks/api/useApi";
 

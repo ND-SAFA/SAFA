@@ -7,16 +7,16 @@ import {
   projectStore,
   sessionStore,
   setProjectApiStore,
+  useApi,
 } from "@/hooks";
 import { navigateTo, QueryParams, Routes, router } from "@/router";
 import { getProjectVersion, getProjectVersions } from "@/api";
-import { useApi } from "@/hooks/api/useApi";
 import { pinia } from "@/plugins";
 
 export const useGetVersionApi = defineStore("getVersionApi", () => {
-  const allVersions = ref<VersionSchema[]>([]);
+  const getVersionApi = useApi("getVersionApi");
 
-  const getVersionApi = useApi("getVersionApi")();
+  const allVersions = ref<VersionSchema[]>([]);
 
   const currentProject = computed(() => projectStore.project);
   const currentVersion = computed({

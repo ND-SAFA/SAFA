@@ -1,14 +1,13 @@
 import { defineStore } from "pinia";
 
 import { ChangeMessageSchema, IOHandlerCallback, JobSchema } from "@/types";
+import { jobStore, useApi } from "@/hooks";
 import { deleteJobById, Endpoint, fillEndpoint, getUserJobs } from "@/api";
 import { pinia } from "@/plugins";
-import { jobStore } from "@/hooks/project";
-import { useApi } from "@/hooks/api/useApi";
 import stompApiStore from "./useStompApi";
 
 export const useJobApi = defineStore("jobApi", () => {
-  const jobApi = useApi("jobApi")();
+  const jobApi = useApi("jobApi");
 
   /**
    * Subscribes to updates for job with given id.

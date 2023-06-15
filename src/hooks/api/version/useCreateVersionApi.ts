@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, VersionSchema, VersionType } from "@/types";
-import { jobApiStore } from "@/hooks";
+import { jobApiStore, useApi } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   createFlatFileUploadJob,
@@ -11,10 +11,9 @@ import {
   createRevisionVersion,
 } from "@/api";
 import { pinia } from "@/plugins";
-import { useApi } from "@/hooks/api/useApi";
 
 export const useCreateVersionApi = defineStore("createVersionApi", () => {
-  const createVersionApi = useApi("createVersionApi")();
+  const createVersionApi = useApi("createVersionApi");
 
   const loading = computed(() => createVersionApi.loading);
 

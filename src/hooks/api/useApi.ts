@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 
 import { ref, computed } from "vue";
 import { IOHandlerCallback } from "@/types";
+import { appStore, logStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import { appStore, logStore } from "@/hooks/core";
 
 /**
  * Creates a store for handling API requests.

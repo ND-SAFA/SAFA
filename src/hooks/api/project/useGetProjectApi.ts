@@ -2,14 +2,18 @@ import { defineStore } from "pinia";
 
 import { computed, onMounted } from "vue";
 import { IdentifierSchema, IOHandlerCallback } from "@/types";
-import { getVersionApiStore, projectStore, sessionStore } from "@/hooks";
+import {
+  getVersionApiStore,
+  projectStore,
+  sessionStore,
+  useApi,
+} from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects } from "@/api";
 import { pinia } from "@/plugins";
-import { useApi } from "@/hooks/api/useApi";
 
 export const useGetProjectApi = defineStore("getProjectApi", () => {
-  const getProjectApi = useApi("getProjectApi")();
+  const getProjectApi = useApi("getProjectApi");
 
   const loading = computed(() => getProjectApi.loading);
   const allProjects = computed(() => projectStore.allProjects);

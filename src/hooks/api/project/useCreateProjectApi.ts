@@ -9,6 +9,7 @@ import {
   jobApiStore,
   projectSaveStore,
   projectStore,
+  useApi,
 } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
@@ -18,10 +19,9 @@ import {
   saveProject,
 } from "@/api";
 import { pinia } from "@/plugins";
-import { useApi } from "@/hooks/api/useApi";
 
 export const useCreateProjectApi = defineStore("createProjectApi", () => {
-  const createProjectApi = useApi("createProjectApi")();
+  const createProjectApi = useApi("createProjectApi");
 
   const loading = computed(() => createProjectApi.loading);
 

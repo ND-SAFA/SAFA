@@ -19,6 +19,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { DeltaType } from "@/types";
+import { useTheme } from "@/hooks";
 import { ListItem } from "@/components/common";
 
 const props = defineProps<{
@@ -36,5 +37,9 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const className = computed(() => `bg-${props.deltaType}`);
+const { darkMode } = useTheme();
+
+const className = computed(() =>
+  darkMode.value ? "" : ` bg-${props.deltaType}`
+);
 </script>

@@ -39,7 +39,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { IdentifierSchema, VersionSchema } from "@/types";
 import { actionsColumn, versionColumns } from "@/util";
 import {
-  editProjectApiStore,
+  projectApiStore,
   getVersionApiStore,
   projectStore,
   sessionStore,
@@ -133,7 +133,7 @@ function handleConfirmAdd(version: VersionSchema) {
  * @param version - The version to delete.
  */
 function handleOpenDelete(version: VersionSchema) {
-  editProjectApiStore.handleDeleteVersion(version, {
+  projectApiStore.handleDeleteVersion(version, {
     onSuccess: () => {
       versions.value = versions.value.filter(
         ({ versionId }) => versionId != version.versionId

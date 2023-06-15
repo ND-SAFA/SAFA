@@ -53,8 +53,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import { handleDownloadProject } from "@/api";
+import {
+  identifierSaveStore,
+  projectApiStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -84,6 +88,6 @@ function handleDelete(): void {
  * Downloads project files
  */
 function handleDownload(fileType: "csv" | "json" = "csv"): void {
-  handleDownloadProject(fileType);
+  projectApiStore.handleDownloadProject(fileType);
 }
 </script>

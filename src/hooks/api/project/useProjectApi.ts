@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
-
 import { computed } from "vue";
+import { saveAs } from "file-saver";
+
 import { IOHandlerCallback, ProjectSchema, VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import {
@@ -10,10 +11,15 @@ import {
   setProjectApiStore,
   useApi,
 } from "@/hooks";
-import { deleteProject, deleteProjectVersion, saveProject } from "@/api";
+import {
+  deleteProject,
+  deleteProjectVersion,
+  saveProject,
+  getProjectFiles,
+} from "@/api";
 import { pinia } from "@/plugins";
 
-export const useEditProjectApi = defineStore("editProjectApi", () => {
+export const useProjectApi = defineStore("projectApi", () => {
   const saveProjectApi = useApi("saveProjectApi");
   const deleteProjectApi = useApi("deleteProjectApi");
   const deleteVersionApi = useApi("deleteVersionApi");
@@ -46,6 +52,26 @@ export const useEditProjectApi = defineStore("editProjectApi", () => {
         error: `Unable to save project: ${identifier.name}`,
       }
     );
+  }
+
+  /**
+   * Creates a file download for project files, either in csv for json format.
+   *
+   * @param fileType - The file format to download.
+   */
+  async function handleDownloadProject(
+    fileType: "csv" | "json" = "csv"
+  ): Promise<void> {
+    const data = await getProjectFiles(projectStore.versionId, fileType);
+
+    const fileName = `${projectStore.project.name}-${versionToString(
+      projectStore.version
+    )}.zip`;
+    const blob = new Blob([data], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(blob, fileName);
   }
 
   /**
@@ -116,9 +142,10 @@ export const useEditProjectApi = defineStore("editProjectApi", () => {
     deleteProjectLoading,
     deleteVersionLoading,
     handleSaveProject,
+    handleDownloadProject,
     handleDeleteProject,
     handleDeleteVersion,
   };
 });
 
-export default useEditProjectApi(pinia);
+export default useProjectApi(pinia);

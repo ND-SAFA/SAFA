@@ -1,7 +1,7 @@
 <template>
   <modal
     size="md"
-    :loading="editProjectApiStore.saveProjectLoading"
+    :loading="projectApiStore.saveProjectLoading"
     :open="props.open"
     :title="modalTitle"
     data-cy="modal-project-edit"
@@ -43,7 +43,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { editProjectApiStore, identifierSaveStore } from "@/hooks";
+import { projectApiStore, identifierSaveStore } from "@/hooks";
 import { Modal, TextButton } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
@@ -85,7 +85,7 @@ function handleCancel(): void {
  * Confirms the project saving.
  */
 function handleSave(): void {
-  editProjectApiStore.handleSaveProject({
+  projectApiStore.handleSaveProject({
     onSuccess: () => emit("save"),
   });
 }

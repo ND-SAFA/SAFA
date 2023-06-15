@@ -207,6 +207,7 @@ export const useDocuments = defineStore("documents", {
         ],
       });
 
+      await this.removeDocument("");
       await this.addDocument(document);
     },
     /**
@@ -224,6 +225,7 @@ export const useDocuments = defineStore("documents", {
           .reduce((acc, cur) => [...acc, ...cur], []),
       });
 
+      await this.removeDocument("");
       await this.addDocument(document);
       layoutStore.mode = GraphMode.tree;
     },

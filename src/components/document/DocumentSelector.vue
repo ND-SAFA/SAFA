@@ -14,7 +14,7 @@
     color="accent"
     data-cy="button-document-select-open"
   >
-    <template v-if="canSave" #append>
+    <template v-if="canSave()" #append>
       <icon-button
         small
         tooltip="Save View"
@@ -31,14 +31,25 @@
         :data-cy-name="opt.name"
       >
         <template #actions>
-          <icon-button
-            v-if="canEdit(opt.name)"
-            v-close-popup
-            icon="more"
-            :tooltip="`Edit ${opt.name}`"
-            data-cy="button-document-select-edit"
-            @click="handleEditOpen(opt)"
-          />
+          <flex-box justify="end">
+            <icon-button
+              v-if="canSave(opt)"
+              small
+              :tooltip="`Save ${opt.name}`"
+              icon="save"
+              data-cy="button-document-select-save"
+              @click="handleSave"
+            />
+            <icon-button
+              v-if="canEdit(opt.name)"
+              v-close-popup
+              small
+              icon="more"
+              :tooltip="`Edit ${opt.name}`"
+              data-cy="button-document-select-edit"
+              @click="handleEditOpen(opt)"
+            />
+          </flex-box>
         </template>
       </list-item>
     </template>
@@ -78,7 +89,7 @@ import {
   useTheme,
 } from "@/hooks";
 import { handleCreatePresetDocument, handleSwitchDocuments } from "@/api";
-import { IconButton, TextButton, ListItem } from "@/components/common";
+import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
 
 const { darkMode } = useTheme();
 
@@ -93,9 +104,14 @@ const document = computed({
   },
 });
 
-const canSave = computed(
-  () => !document.value?.documentId && document.value?.name !== "Default"
-);
+/**
+ * Returns whether a document can be saved.
+ * @param doc - The document to check.
+ * @return Whether saving is allowed.
+ */
+function canSave(doc = document.value): boolean {
+  return doc.name !== "Default" && !doc.documentId;
+}
 
 /**
  * Returns whether a document can be edited.

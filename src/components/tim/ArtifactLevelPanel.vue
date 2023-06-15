@@ -61,7 +61,6 @@ import {
   TypeIconInput,
   TextButton,
   Icon,
-  FlexBox,
   DetailsPanel,
 } from "@/components/common";
 

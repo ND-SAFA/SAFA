@@ -45,7 +45,6 @@ import { documentStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   Typography,
-  FlexBox,
   TextButton,
   Icon,
   DetailsPanel,

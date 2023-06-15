@@ -16,6 +16,7 @@
   >
     <template v-if="canSave" #append>
       <icon-button
+        small
         tooltip="Save View"
         icon="save"
         data-cy="button-document-select-save"

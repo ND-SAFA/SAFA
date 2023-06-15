@@ -1,5 +1,15 @@
 <template>
   <div v-if="doDisplay">
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View Related Artifacts`"
+        icon="view-tree"
+        @click="handleViewNeighborhood"
+      />
+    </panel-card>
+
     <panel-card :title="parentTitle">
       <template #title-actions>
         <text-button
@@ -100,6 +110,7 @@ import { computed } from "vue";
 import {
   appStore,
   artifactStore,
+  documentStore,
   selectionStore,
   subtreeStore,
   traceStore,
@@ -147,6 +158,15 @@ const childTitle = computed(() =>
     ? "1 Child Artifact"
     : `${children.value.length} Child Artifacts`
 );
+
+/**
+ * Opens a new view with this artifact and all artifacts it traces to.
+ */
+function handleViewNeighborhood(): void {
+  if (!artifact.value) return;
+
+  documentStore.addDocumentOfNeighborhood(artifact.value);
+}
 
 /**
  * Selects an artifact.

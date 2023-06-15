@@ -1,14 +1,5 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <flex-box b="2">
-      <text-button
-        text
-        label="View In Tree"
-        icon="artifact"
-        @click="handleViewLevel"
-      />
-    </flex-box>
-
     <panel-card :title="`${sourceType} to ${targetType}`">
       <template #title-actions>
         <icon
@@ -25,6 +16,16 @@
       <typography el="p" :value="generatedCount" />
       <typography variant="caption" value="Approved Trace Links" />
       <typography el="p" :value="approvedCount" />
+    </panel-card>
+
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View ${targetType} & ${sourceType} Artifacts`"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
     </panel-card>
   </details-panel>
 </template>

@@ -1,5 +1,9 @@
 <template>
-  <expansion-item :model-value="itemFields.length > 0" :label="title">
+  <expansion-item
+    :model-value="itemFields.length > 0"
+    :label="title"
+    :class="className"
+  >
     <artifact-delta-button
       v-for="{ name, id } in itemFields"
       :key="name"
@@ -28,7 +32,7 @@ import {
   DeltaType,
   SelectOption,
 } from "@/types";
-import { capitalize } from "@/util";
+import { capitalize, getEnumColor } from "@/util";
 import { ExpansionItem } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -57,6 +61,11 @@ const emit = defineEmits<{
 const itemCount = computed(() => Object.keys(props.items).length);
 const title = computed(
   () => `${itemCount.value} ${capitalize(props.deltaType)}`
+);
+
+const className = computed(
+  () =>
+    `rounded q-mb-sm bd-${getEnumColor(props.deltaType)} bg-${props.deltaType}`
 );
 
 const itemFields = computed<SelectOption[]>(() => {

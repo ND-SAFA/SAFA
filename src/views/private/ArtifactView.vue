@@ -1,7 +1,7 @@
 <template>
   <private-page full-window graph>
     <project-tree />
-    <artifact-fab />
+    <graph-fab />
 
     <tab-list v-if="isTableMode" v-model="tab" :tabs="tabs" class="q-pa-lg">
       <template #artifact>
@@ -33,7 +33,7 @@ import { layoutStore } from "@/hooks";
 import {
   ArtifactTable,
   PrivatePage,
-  ArtifactFab,
+  GraphFab,
   TabList,
   TraceTable,
   ProjectTree,

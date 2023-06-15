@@ -1,6 +1,7 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
+  DeltaType,
   JobStatus,
   ThemeColor,
 } from "@/types";
@@ -17,20 +18,31 @@ export enum Colors {
 
   green = "#00AD69",
   greenLight = "#6CD8A9",
+  greenLightest = "#A9F6D5",
   greenDark = "#188958",
 
   blue = "#5975B8",
   blueLight = "#729FCF",
-  blueLightest = "#8DA5D3",
+  blueLightest = "#B0D6FF",
   blueDark = "#204184",
 
   red = "#E11F26",
   redLight = "#E27171",
+  redLightest = "#FFA5A5",
   redDark = "#AF001E",
 
   orange = "#F5B53F",
   orangeLight = "#FFD592",
   orangeDark = "#DD8300",
+
+  brownLight = "#DCBA82",
+  brownDark = "#6f1d1b",
+
+  gradient1 = "#9EF01A",
+  gradient2 = "#77D241",
+  gradient3 = "#4FB468",
+  gradient4 = "#28958F",
+  gradient5 = "#0077B6",
 }
 
 /**
@@ -54,23 +66,23 @@ export const ThemeColors = {
   darkSelected: Colors.greyLightest,
 
   added: Colors.green,
-  addedBg: Colors.greenLight,
+  addedBg: Colors.greenLightest,
   addedBd: Colors.greenDark,
 
   modified: Colors.blue,
-  modifiedBg: Colors.blueLight,
+  modifiedBg: Colors.blueLightest,
   modifiedBd: Colors.blueDark,
 
   removed: Colors.red,
-  removedBg: Colors.redLight,
+  removedBg: Colors.redLightest,
   removedBd: Colors.redDark,
 
   warning: Colors.orange,
   warningBg: Colors.orangeLight,
   warningBd: Colors.orangeDark,
 
-  nodeDefaultLight: Colors.greyLight,
-  nodeDefaultDark: Colors.greyLightest,
+  nodeDefaultLight: Colors.brownLight,
+  nodeDefaultDark: Colors.brownDark,
   nodeGenerated: Colors.orange,
 };
 
@@ -144,11 +156,16 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      Colors.blueLight,
-      Colors.greenLight,
-      Colors.orange,
-      Colors.orangeDark,
-      Colors.red,
+      // Colors.blueLight,
+      // Colors.greenLight,
+      // Colors.orange,
+      // Colors.orangeDark,
+      // Colors.red,
+      Colors.gradient1,
+      Colors.gradient2,
+      Colors.gradient3,
+      Colors.gradient4,
+      Colors.gradient5,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =
@@ -184,17 +201,20 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | string
+  state: ApprovalType | ArtifactDeltaState | DeltaType | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case "added":
       return "positive";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case "modified":
       return "primary";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case "removed":
       return "negative";
     default:
       return "";

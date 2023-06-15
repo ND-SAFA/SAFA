@@ -210,6 +210,14 @@ export type TimNodeCytoElement = CytoElement<TimNodeCytoElementData>;
  */
 export interface TimEdgeCytoElementData extends CytoEdgeData {
   /**
+   * The name of the source artifact type.
+   */
+  sourceType: string;
+  /**
+   The name of the target artifact type.
+   */
+  targetType: string;
+  /**
    * The number of links between these artifact layers.
    */
   count: number;

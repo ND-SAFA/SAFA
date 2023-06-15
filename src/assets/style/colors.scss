@@ -37,6 +37,18 @@ $color-node-default: var(--q-nodeDefault);
   background-color: $color-neutral !important;
 }
 
+.bg-modified {
+  background-color: $color-modified-bg !important;
+}
+
+.bg-added {
+  background-color: $color-added-bg !important;
+}
+
+.bg-removed {
+  background-color:$color-removed-bg !important;
+}
+
 // Border Palette Tags
 
 .bd-primary {

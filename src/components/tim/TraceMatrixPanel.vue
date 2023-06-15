@@ -1,17 +1,7 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <flex-box b="2">
-      <text-button
-        text
-        label="View In Tree"
-        icon="artifact"
-        @click="handleViewLevel"
-      />
-    </flex-box>
-
-    <panel-card>
-      <flex-box column align="center">
-        <attribute-chip artifact-type :value="targetType" />
+    <panel-card :title="`${sourceType} to ${targetType}`">
+      <template #title-actions>
         <icon
           class="q-mx-xs"
           size="sm"
@@ -19,15 +9,23 @@
           variant="trace"
           :rotate="-90"
         />
-        <attribute-chip artifact-type :value="sourceType" />
-      </flex-box>
-      <separator class="q-my-sm" />
+      </template>
       <typography variant="caption" value="Total Trace Links" />
       <typography el="p" :value="totalCount" />
       <typography variant="caption" value="Generated Trace Links" />
       <typography el="p" :value="generatedCount" />
       <typography variant="caption" value="Approved Trace Links" />
       <typography el="p" :value="approvedCount" />
+    </panel-card>
+
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View ${targetType} & ${sourceType} Artifacts`"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
     </panel-card>
   </details-panel>
 </template>
@@ -46,12 +44,10 @@ import { computed } from "vue";
 import { documentStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
-  AttributeChip,
   Typography,
   FlexBox,
   TextButton,
   Icon,
-  Separator,
   DetailsPanel,
 } from "@/components/common";
 

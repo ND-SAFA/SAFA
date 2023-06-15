@@ -1,21 +1,5 @@
 <template>
   <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
-    <flex-box column b="2">
-      <text-button
-        text
-        label="View Artifacts"
-        icon="artifact"
-        @click="handleViewLevel"
-      />
-      <text-button
-        text
-        color="primary"
-        label="Generate Parents"
-        icon="generateArtifacts"
-        @click="handleGenerateParents"
-      />
-    </flex-box>
-
     <panel-card :title="artifactLevelName">
       <template #title-actions>
         <icon :id="iconId" size="md" color="primary" />
@@ -31,6 +15,24 @@
     >
       <type-direction-input :artifact-level="artifactLevel" />
       <type-icon-input :artifact-level="artifactLevel" />
+    </panel-card>
+
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View ${artifactLevelName} Artifacts`"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
+      <text-button
+        text
+        block
+        color="primary"
+        label="Generate Parents"
+        icon="generateArtifacts"
+        @click="handleGenerateParents"
+      />
     </panel-card>
   </details-panel>
 </template>

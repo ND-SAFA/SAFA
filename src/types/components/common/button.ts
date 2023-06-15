@@ -45,6 +45,11 @@ export interface IconButtonProps
    */
   tooltip: string;
   /**
+   * The ms to wait before displaying the tooltip.
+   * @default 200
+   */
+  tooltipDelay?: number;
+  /**
    * Whether to render this button as a fab.
    */
   fab?: boolean;

@@ -66,6 +66,8 @@ export type IconVariant =
   | "nav-artifact"
   | "nav-trace"
   | "nav-settings"
+  | "filter-open"
+  | "filter-close"
   | "group-open"
   | "group-open-all"
   | "group-close"

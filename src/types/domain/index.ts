@@ -15,3 +15,4 @@ export * from "./installations";
 export * from "./tim";
 export * from "./search";
 export * from "./hgen";
+export * from "./subtree";

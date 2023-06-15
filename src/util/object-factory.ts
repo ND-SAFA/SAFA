@@ -94,6 +94,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
+    subtrees: project?.subtrees || {},
     models: project?.models || [],
     attributes: project?.attributes || [],
     attributeLayouts: project?.attributeLayouts || [],

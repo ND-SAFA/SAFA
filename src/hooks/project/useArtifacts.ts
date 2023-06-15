@@ -11,7 +11,6 @@ import {
 import { pinia } from "@/plugins";
 import documentStore from "@/hooks/project/useDocuments";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
-import subtreeStore from "@/hooks/project/useSubtree";
 import projectStore from "@/hooks/project/useProject";
 import layoutStore from "@/hooks/graph/useLayout";
 import selectionStore from "@/hooks/graph/useSelection";
@@ -35,7 +34,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @return A collection of current artifact lists, keyed by their type.
      */
     allArtifactsByType(): Record<string, ArtifactSchema[]> {
-      return collectByField(this.currentArtifacts, "type");
+      return collectByField(this.allArtifacts, "type");
     },
   },
   actions: {
@@ -74,7 +73,6 @@ export const useArtifacts = defineStore("artifacts", {
         artifacts: updatedArtifacts,
       });
       typeOptionsStore.updateTIM();
-      subtreeStore.updateSubtreeMap();
     },
     /**
      * Adds a created artifact and updates the layout.
@@ -103,7 +101,6 @@ export const useArtifacts = defineStore("artifacts", {
         currentArtifacts: removeMatches(this.currentArtifacts, "id", ids),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
-      subtreeStore.updateSubtreeMap();
       typeOptionsStore.updateTIM();
 
       if (ids.includes(selectionStore.selectedArtifact?.id || "")) {

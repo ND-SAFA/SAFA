@@ -11,7 +11,6 @@ import {
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 import { pinia } from "@/plugins";
 import documentStore from "@/hooks/project/useDocuments";
-import subtreeStore from "@/hooks/project/useSubtree";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
@@ -75,7 +74,6 @@ export const useTraces = defineStore("traces", {
         currentArtifactIds: documentStore.currentDocument.artifactIds,
       });
       projectStore.updateProject({ traces: updatedTraces });
-      subtreeStore.updateSubtreeMap();
       typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },
@@ -97,7 +95,6 @@ export const useTraces = defineStore("traces", {
         currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
       });
       projectStore.updateProject({ traces: allTraces });
-      subtreeStore.updateSubtreeMap();
       typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },

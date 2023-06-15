@@ -33,7 +33,9 @@ const iconId = computed(() => {
 });
 
 const iconColor = computed(() => {
-  if (props.color) {
+  if (props.color?.includes("#")) {
+    return "";
+  } else if (props.color) {
     return props.color;
   }
 
@@ -58,6 +60,8 @@ const iconStyle = computed(() => {
     return props.style;
   } else if (props.rotate) {
     return `transform: rotate(${props.rotate}deg)`;
+  } else if (props.color?.includes("#")) {
+    return `color: ${props.color}`;
   } else {
     return "";
   }

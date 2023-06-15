@@ -10,7 +10,7 @@
     @click="emit('click')"
   >
     <icon :variant="props.icon" :rotate="props.rotate" />
-    <q-tooltip :delay="200">
+    <q-tooltip :delay="props.tooltipDelay || 200">
       {{ tooltip }}
     </q-tooltip>
   </q-btn>

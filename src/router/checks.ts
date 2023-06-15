@@ -1,6 +1,8 @@
 import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
-import { appStore, projectStore, sessionStore } from "@/hooks";
-import { handleAuthentication, handleLoadVersion } from "@/api";
+import { handleLoadVersion } from "@/api";
+import { sessionApiStore } from "@/hooks/api";
+import { appStore, sessionStore } from "@/hooks/core";
+import { projectStore } from "@/hooks/project";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
@@ -21,6 +23,13 @@ type RouteChecks = Record<
  * are ignored.
  */
 export const routerBeforeChecks: RouteChecks = {
+  async resetPublicState(to) {
+    const isPublic = to.matched.some(({ meta }) => meta.isPublic);
+
+    if (!isPublic) return;
+
+    sessionApiStore.handleReset();
+  },
   async redirectToLoginIfNoSessionFound(to) {
     const isPublic = to.matched.some(({ meta }) => meta.isPublic);
 
@@ -29,7 +38,7 @@ export const routerBeforeChecks: RouteChecks = {
     }
 
     try {
-      await handleAuthentication();
+      await sessionApiStore.handleAuthentication();
 
       return;
     } catch (e) {

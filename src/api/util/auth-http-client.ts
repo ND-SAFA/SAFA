@@ -1,7 +1,6 @@
 import { APIOptions } from "@/types";
-import { logStore } from "@/hooks";
+import { logStore, sessionApiStore } from "@/hooks";
 import { baseURL } from "@/api";
-import { handleLogout } from "@/api/handlers";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -43,7 +42,7 @@ export default async function authHttpClient<T>(
     // Ensure that we don't log out if the expired credential status is for an integration.
     const message = "Session has timed out. Please log back in.";
 
-    await handleLogout();
+    await sessionApiStore.handleLogout();
 
     logStore.onWarning(message);
     throw Error(message);

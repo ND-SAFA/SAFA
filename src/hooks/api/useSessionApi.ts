@@ -32,16 +32,16 @@ export const useSessionApi = defineStore("sessionApi", () => {
   const loading = computed(() => sessionApi.loading);
   const error = computed(() => sessionApi.error);
 
-  const loginErrorMessage = computed(() =>
-    error.value ? "Invalid username or password." : false
+  const loginErrorMessage = sessionApi.errorMessage(
+    "Invalid username or password."
   );
 
-  const createErrorMessage = computed(() =>
-    error.value ? "Unable to create an account." : false
+  const createErrorMessage = sessionApi.errorMessage(
+    "Unable to create an account."
   );
 
-  const passwordErrorMessage = computed(() =>
-    error.value ? "Unable to reset password." : false
+  const passwordErrorMessage = sessionApi.errorMessage(
+    "Unable to update password."
   );
 
   /**

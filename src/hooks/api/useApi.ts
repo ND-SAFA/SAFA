@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { IOHandlerCallback } from "@/types";
 import { pinia } from "@/plugins";
 import { logStore } from "@/hooks/core";
@@ -16,6 +16,14 @@ export const useApi = (id: string) =>
     function handleReset(): void {
       loading.value = false;
       error.value = false;
+    }
+
+    /**
+     * Creates a reactive error message for inputs.
+     * @param message - The message to display.
+     */
+    function errorMessage(message: string) {
+      return computed(() => (error.value ? message : false));
     }
 
     /**
@@ -60,7 +68,7 @@ export const useApi = (id: string) =>
       }
     }
 
-    return { loading, error, handleRequest, handleReset };
+    return { loading, error, errorMessage, handleRequest, handleReset };
   });
 
 export default (id: string) => useApi(id)(pinia);

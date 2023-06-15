@@ -67,7 +67,14 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
 
       if (!artifact.id) return;
 
-      selectionStore.selectArtifact(artifact.id);
+      if (selectionStore.selectedArtifactId !== artifact.id) {
+        selectionStore.selectArtifact(artifact.id);
+      } else {
+        documentStore.addDocumentOfNeighborhood({
+          id: artifact.id,
+          name: artifact.artifactName,
+        });
+      }
     },
   },
   selectAllArtifacts: {

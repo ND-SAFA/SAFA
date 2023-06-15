@@ -6,8 +6,10 @@ import {
   DocumentType,
   ProjectSchema,
   GraphMode,
+  ArtifactSchema,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
+import { subtreeStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
@@ -189,13 +191,31 @@ export const useDocuments = defineStore("documents", {
       await this.switchDocuments(document);
     },
     /**
+     * Creates and adds a new document based on the neighborhood of an artifact.
+     *
+     * @param artifact - The artifact to display the neighborhood of.
+     */
+    async addDocumentOfNeighborhood(
+      artifact: Pick<ArtifactSchema, "name" | "id">
+    ): Promise<void> {
+      const document = createDocument({
+        project: projectStore.projectIdentifier,
+        name: artifact.name,
+        artifactIds: [
+          artifact.id,
+          ...subtreeStore.subtreeMap[artifact.id].neighbors,
+        ],
+      });
+
+      await this.addDocument(document);
+    },
+    /**
      * Creates and adds a new document for multiple types of artifacts.
      *
      * @param types - The artifact types to include in the document.
      */
     async addDocumentOfTypes(types: string[]): Promise<void> {
       const artifactsByType = artifactStore.allArtifactsByType;
-      console.log({ types, existing: Object.keys(artifactsByType) });
       const document = createDocument({
         project: projectStore.projectIdentifier,
         name: types.join(", "),

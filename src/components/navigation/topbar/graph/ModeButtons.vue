@@ -25,12 +25,9 @@
       icon="view-table"
       @click="handleTableView"
     />
-    <text-button
+    <delta-mode-button
       v-bind="buttonProps(options.delta)"
       :hide-label="smallWindow"
-      label="Delta"
-      data-cy="button-nav-delta"
-      icon="view-delta"
       @click="handleDeltaView"
     />
   </q-btn-group>
@@ -56,6 +53,7 @@ import {
   useScreen,
 } from "@/hooks";
 import { TextButton } from "@/components/common";
+import DeltaModeButton from "./DeltaModeButton.vue";
 
 const options = {
   tim: GraphMode.tim,
@@ -127,6 +125,8 @@ function handleTableView(): void {
  * Opens delta view.
  */
 function handleDeltaView(): void {
+  if (!deltaStore.inDeltaView) return;
+
   appStore.openDetailsPanel("delta");
   updateValue();
 }

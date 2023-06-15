@@ -1,51 +1,53 @@
 <template>
-  <panel-card>
-    <text-button
-      v-if="version && !!version.versionId"
-      block
-      outlined
-      label="Hide Delta View"
-      icon="cancel"
-      class="q-mb-md"
-      @click="handleClose"
-    />
-    <select-input
-      v-model="version"
-      :options="versions"
-      :loading="loading"
-      option-value="versionId"
-      :option-label="getVersionName"
-      label="Delta Version"
-      hint="The version to view the delta between."
-    />
-  </panel-card>
+  <text-button
+    :loading="loading"
+    label="Delta"
+    data-cy="button-nav-delta"
+    icon="view-delta"
+    @click="emit('click')"
+  >
+    <q-menu v-if="!deltaVersion">
+      <typography variant="caption" x="2" y="1" value="Compare Against" />
+      <q-list>
+        <list-item
+          v-for="version in versions"
+          :key="version.versionId"
+          v-close-popup
+          clickable
+          :title="getVersionName(version)"
+          @click="deltaVersion = version"
+        />
+      </q-list>
+    </q-menu>
+  </text-button>
 </template>
 
 <script lang="ts">
 /**
- * Displays the delta panel navigation.
+ * A button for opening delta view options.
  */
 export default {
-  name: "DeltaPanelNav",
+  name: "DeltaModeButton",
 };
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
-import {
-  getProjectVersions,
-  handleReloadProject,
-  handleSetProjectDelta,
-} from "@/api";
-import { TextButton, PanelCard, SelectInput } from "@/components/common";
+import { getProjectVersions, handleSetProjectDelta } from "@/api";
+import { TextButton, ListItem } from "@/components/common";
+import Typography from "@/components/common/display/content/Typography.vue";
+
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
 
 const loading = ref(false);
 const versions = ref<VersionSchema[]>([]);
 
-const version = computed({
+const deltaVersion = computed({
   get() {
     return deltaStore.afterVersion;
   },
@@ -82,12 +84,10 @@ async function loadVersions(): Promise<void> {
     : [];
 }
 
-/**
- * Disables delta view.
- */
-function handleClose(): void {
-  handleReloadProject();
-}
+watch(
+  () => projectStore.projectId,
+  () => loadVersions()
+);
 
 onMounted(() => loadVersions());
 </script>

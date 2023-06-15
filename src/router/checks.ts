@@ -1,6 +1,5 @@
 import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
-import { handleLoadVersion } from "@/api";
-import { sessionApiStore } from "@/hooks/api";
+import { getVersionApiStore, sessionApiStore } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
 import { projectStore } from "@/hooks/project";
 import { QueryParams, Routes } from "@/router/routes";
@@ -68,6 +67,6 @@ export const routerAfterChecks: RouteChecks = {
 
     if (typeof versionId !== "string") return;
 
-    await handleLoadVersion(versionId, undefined, false);
+    await getVersionApiStore.handleLoadVersion(versionId, undefined, false);
   },
 };

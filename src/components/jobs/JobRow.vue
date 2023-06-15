@@ -84,8 +84,8 @@ export default {
 import { computed } from "vue";
 import { JobSchema, StepperStep } from "@/types";
 import { jobStatus } from "@/util";
-import { jobStore, logStore, useVModel } from "@/hooks";
-import { handleDeleteJob, handleLoadVersion } from "@/api";
+import { getVersionApiStore, jobStore, logStore, useVModel } from "@/hooks";
+import { handleDeleteJob } from "@/api";
 import {
   Typography,
   Icon,
@@ -156,7 +156,7 @@ async function handleViewLogs(): Promise<void> {
  */
 function handleLoad(): void {
   if (props.job.completedEntityId) {
-    handleLoadVersion(props.job.completedEntityId);
+    getVersionApiStore.handleLoadVersion(props.job.completedEntityId);
   } else {
     logStore.onError("Unable to view this project right now.");
   }

@@ -42,12 +42,8 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { IdentifierSchema } from "@/types";
-import { projectStore, useTheme } from "@/hooks";
-import {
-  getProjectVersions,
-  handleLoadVersion,
-  handleGetProjects,
-} from "@/api";
+import { getVersionApiStore, projectStore, useTheme } from "@/hooks";
+import { handleGetProjects } from "@/api";
 import { TextButton } from "@/components/common";
 import { ProjectIdentifierModal } from "../../base";
 
@@ -62,9 +58,7 @@ const project = computed({
   set(identifier: IdentifierSchema | undefined) {
     if (!identifier) return;
 
-    getProjectVersions(identifier.projectId).then((versions) => {
-      handleLoadVersion(versions[0].versionId);
-    });
+    getVersionApiStore.handleLoadCurrentVersion(identifier);
   },
 });
 

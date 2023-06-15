@@ -23,13 +23,13 @@ import {
   logStore,
   stompApiStore,
   setProjectApiStore,
+  getVersionApiStore,
 } from "@/hooks";
 import { router } from "@/router";
 import {
   Endpoint,
   fillEndpoint,
   getChanges,
-  handleLoadVersion,
   handleReloadJobs,
   handleReloadWarnings,
 } from "@/api";
@@ -125,7 +125,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         membersStore.updateMembers(project.members);
         break;
       case EntityType.VERSION:
-        return handleLoadVersion(versionId);
+        return getVersionApiStore.handleLoadVersion(versionId);
       case EntityType.TYPES:
         typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);
         break;

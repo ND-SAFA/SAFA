@@ -39,8 +39,7 @@ export default {
 import { ref, computed } from "vue";
 import { StepperStep, IdentifierSchema, VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { projectStore } from "@/hooks";
-import { handleLoadVersion } from "@/api";
+import { getVersionApiStore, projectStore } from "@/hooks";
 import { Stepper, PanelCard } from "@/components/common";
 import { ProjectSelectorTable, VersionSelectorTable } from "./table";
 
@@ -138,7 +137,7 @@ async function handleSubmit(): Promise<void> {
 
   loading.value = true;
 
-  await handleLoadVersion(selectedVersion.value.versionId);
+  await getVersionApiStore.handleLoadVersion(selectedVersion.value.versionId);
 
   loading.value = false;
   handleClear();

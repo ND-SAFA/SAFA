@@ -37,30 +37,12 @@ $graph-border-radius: 8px;
 
   // Node Background
   .artifact-svg { fill: $color-background; }
-  &.artifact-svg-delta-ADDED > .artifact-svg { fill: $color-added-bg; }
-  &.artifact-svg-delta-MODIFIED > .artifact-svg { fill: $color-modified-bg; }
-  &.artifact-svg-delta-REMOVED > .artifact-svg { fill: $color-removed-bg; }
   .artifact-svg.artifact-warning { fill: $color-flagged-bg; }
 
   // Node Divider
-  //.artifact-svg-div { stroke: $color-node-default; }
   &.artifact-svg-delta-ADDED > .artifact-svg-div { stroke: $color-added; }
   &.artifact-svg-delta-MODIFIED > .artifact-svg-div { stroke: $color-modified; }
   &.artifact-svg-delta-REMOVED > .artifact-svg-div { stroke: $color-removed; }
-
-  &.artifact-svg-delta-ADDED,
-  &.artifact-svg-delta-MODIFIED,
-  &.artifact-svg-delta-REMOVED {
-    // Node Text
-    & > foreignObject > * {
-      color: black;
-    }
-
-    // Node Text Highlight
-    &:hover > foreignObject > * {
-      color: $color-text;
-    }
-  }
 
   // Node Highlight
   &:hover > .artifact-svg {

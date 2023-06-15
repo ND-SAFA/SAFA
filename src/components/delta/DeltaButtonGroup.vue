@@ -33,7 +33,6 @@ import {
   SelectOption,
 } from "@/types";
 import { capitalize, getEnumColor } from "@/util";
-import { deltaStore, useTheme } from "@/hooks";
 import { ExpansionItem } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -59,17 +58,13 @@ const emit = defineEmits<{
   (e: "click", id: string): void;
 }>();
 
-const { darkMode } = useTheme();
-
 const itemCount = computed(() => Object.keys(props.items).length);
 const title = computed(
   () => `${itemCount.value} ${capitalize(props.deltaType)}`
 );
 
 const className = computed(
-  () =>
-    `rounded q-mb-sm bd-${getEnumColor(props.deltaType)}` +
-    (darkMode.value ? "" : ` bg-${props.deltaType}`)
+  () => `rounded q-mb-sm bd-${getEnumColor(props.deltaType)}`
 );
 
 const itemFields = computed<SelectOption[]>(() => {

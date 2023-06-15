@@ -6,14 +6,14 @@
       @click="handleAddedSelect"
     />
     <delta-button-group
-      delta-type="removed"
-      :items="removedArtifacts"
-      @click="handleRemovedSelect"
-    />
-    <delta-button-group
       delta-type="modified"
       :items="modifiedArtifacts"
       @click="handleModifiedSelect"
+    />
+    <delta-button-group
+      delta-type="removed"
+      :items="removedArtifacts"
+      @click="handleRemovedSelect"
     />
 
     <artifact-delta-diff

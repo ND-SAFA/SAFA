@@ -2,6 +2,7 @@ import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
 import { capitalize } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
+import { svgStoplight } from "@/cytoscape/styles/node/node-stoplight";
 import { svgFooter } from "./node-footer";
 import { getBody, sanitizeText } from "./node-helper";
 
@@ -56,6 +57,17 @@ export function svgNode(
           width: bodyWidth || width,
           height,
         })}
+        ${svgStoplight(
+          {
+            ...data,
+            childDeltaStates: [data.artifactDeltaState],
+          },
+          {
+            x: 6,
+            y: outerHeight - 22,
+            width: outer.width - 12,
+          }
+        )}
         ${footer}
       </svg>
     </div>

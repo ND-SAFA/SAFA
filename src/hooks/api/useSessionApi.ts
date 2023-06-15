@@ -161,21 +161,16 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * Updates a user's password.
    *
    * @param password - The old and new password.
-   * @param onSuccess - Called if the action is successful.
-   * @param onError - Called if the action fails.
+   * @param callbacks - The callbacks to run on success or error.
    */
   function handleChangePassword(
     password: PasswordChangeSchema,
-    { onSuccess, onError }: IOHandlerCallback
+    callbacks: IOHandlerCallback
   ): void {
-    sessionApi.handleRequest(
-      () => savePassword(password),
-      { onSuccess, onError },
-      {
-        success: "Your password has been updated.",
-        error: "Unable to update your password.",
-      }
-    );
+    sessionApi.handleRequest(() => savePassword(password), callbacks, {
+      success: "Your password has been updated.",
+      error: "Unable to update your password.",
+    });
   }
 
   /**

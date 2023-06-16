@@ -9,11 +9,14 @@ import {
   artifactStore,
   traceGenerationApiStore,
   projectStore,
+  useApi,
 } from "@/hooks";
 import { persistCommit } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useCommitApi = defineStore("commitApi", () => {
+  const commitApi = useApi("commitApi");
+
   /**
    * Creates a new commit based on the current project version.
    */
@@ -30,80 +33,89 @@ export const useCommitApi = defineStore("commitApi", () => {
   /**
    * Saves commit to the application store, and persist the commit.
    *
-   * @param commitOrCb - The commit to save, or a cllback to create it.
+   * @param commitOrCb - The commit to save, or a callback to create it.
    * @return The saved commit.
    */
   async function handleSave(
     commitOrCb: CommitSchema | ((builder: CommitBuilder) => CommitBuilder)
-  ): Promise<CommitSchema> {
-    try {
-      const commit =
-        typeof commitOrCb === "function"
-          ? commitOrCb(buildCommit()).commit
-          : commitOrCb;
+  ): Promise<CommitSchema | undefined> {
+    return commitApi.handleRequest(
+      async () => {
+        appStore.isSaving = true;
 
-      appStore.isSaving = true;
+        const commit =
+          typeof commitOrCb === "function"
+            ? commitOrCb(buildCommit()).commit
+            : commitOrCb;
 
-      const commitResponse = await persistCommit(commit);
+        const commitResponse = await persistCommit(commit);
 
-      const fullCommit = {
-        ...commitResponse,
-        artifacts: {
-          added: commitResponse.artifacts.added,
-          modified: commitResponse.artifacts.modified,
-          removed: commit.artifacts.removed,
-        },
-        traces: {
-          added: commitResponse.traces.added,
-          modified: commitResponse.traces.modified,
-          removed: commit.traces.removed,
-        },
-      };
+        const fullCommit = {
+          ...commitResponse,
+          artifacts: {
+            added: commitResponse.artifacts.added,
+            modified: commitResponse.artifacts.modified,
+            removed: commit.artifacts.removed,
+          },
+          traces: {
+            added: commitResponse.traces.added,
+            modified: commitResponse.traces.modified,
+            removed: commit.traces.removed,
+          },
+        };
 
-      commitStore.saveCommit(fullCommit);
+        commitStore.saveCommit(fullCommit);
 
-      return fullCommit;
-    } finally {
-      appStore.isSaving = false;
-    }
+        return fullCommit;
+      },
+      {
+        onComplete: () => (appStore.isSaving = false),
+      }
+    );
   }
 
   /**
    * Undoes the last commit.
    */
   async function handleUndo(): Promise<void> {
-    try {
-      appStore.isSaving = true;
+    await commitApi.handleRequest(
+      async () => {
+        appStore.isSaving = true;
 
-      const commit = await commitStore.undoLastCommit();
+        const commit = await commitStore.undoLastCommit();
 
-      if (!commit) return;
+        if (!commit) return;
 
-      const commitResponse = await persistCommit(commit);
+        const commitResponse = await persistCommit(commit);
 
-      await applyArtifactChanges(commitResponse);
-    } finally {
-      appStore.isSaving = false;
-    }
+        await applyArtifactChanges(commitResponse);
+      },
+      {
+        onComplete: () => (appStore.isSaving = false),
+      }
+    );
   }
 
   /**
    * Reattempts the last undone commit.
    */
   async function handleRedo(): Promise<void> {
-    try {
-      appStore.isSaving = true;
+    await commitApi.handleRequest(
+      async () => {
+        appStore.isSaving = true;
 
-      const commit = await commitStore.redoLastUndoneCommit();
+        const commit = await commitStore.redoLastUndoneCommit();
 
-      if (!commit) return;
+        if (!commit) return;
 
-      const commitResponse = await persistCommit(commit);
+        const commitResponse = await persistCommit(commit);
 
-      await applyArtifactChanges(commitResponse);
-    } finally {
-      appStore.isSaving = false;
-    }
+        await applyArtifactChanges(commitResponse);
+      },
+      {
+        onComplete: () => (appStore.isSaving = false),
+      }
+    );
   }
 
   /**

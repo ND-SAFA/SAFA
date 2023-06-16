@@ -4,11 +4,11 @@ import { computed } from "vue";
 import { IOHandlerCallback, ProjectSchema } from "@/types";
 import {
   createVersionApiStore,
+  getProjectApiStore,
   getVersionApiStore,
   integrationsStore,
   jobApiStore,
   projectSaveStore,
-  projectStore,
   useApi,
 } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
@@ -78,7 +78,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
       {
         onSuccess: async (project) => {
           if (files.length === 0) {
-            projectStore.addProject(project);
+            getProjectApiStore.addProject(project);
 
             await getVersionApiStore.handleLoad(
               project.projectVersion?.versionId || ""

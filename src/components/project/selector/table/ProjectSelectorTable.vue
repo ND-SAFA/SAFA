@@ -59,7 +59,6 @@ import {
   identifierSaveStore,
   logStore,
   memberApiStore,
-  projectStore,
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
@@ -106,7 +105,7 @@ const columns = computed(() =>
     : [projectNameColumn, ...projectExpandedColumns]
 );
 
-const rows = computed(() => projectStore.allProjects);
+const rows = computed(() => getProjectApiStore.allProjects);
 
 /**
  * Loads all projects.

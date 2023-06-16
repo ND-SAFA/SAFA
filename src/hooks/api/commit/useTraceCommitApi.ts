@@ -21,7 +21,7 @@ export const useTraceCommitApi = defineStore("traceCommitApi", () => {
 
     return commitApiStore
       .handleSave((builder) => builder.withNewTraceLink(traceLink))
-      .then(({ traces }) => traces.added);
+      .then((commit) => commit?.traces.added || []);
   }
 
   /**
@@ -40,7 +40,7 @@ export const useTraceCommitApi = defineStore("traceCommitApi", () => {
 
     return commitApiStore
       .handleSave((builder) => builder.withModifiedTraceLink(traceLink))
-      .then(({ traces }) => traces.modified);
+      .then((commit) => commit?.traces.modified || []);
   }
 
   /**
@@ -59,7 +59,7 @@ export const useTraceCommitApi = defineStore("traceCommitApi", () => {
 
     return commitApiStore
       .handleSave((builder) => builder.withModifiedTraceLink(traceLink))
-      .then(({ traces }) => traces.modified);
+      .then((commit) => commit?.traces.modified || []);
   }
 
   /**
@@ -78,7 +78,7 @@ export const useTraceCommitApi = defineStore("traceCommitApi", () => {
 
     return commitApiStore
       .handleSave((builder) => builder.withModifiedTraceLink(...traceLinks))
-      .then(({ traces }) => traces.modified);
+      .then((commit) => commit?.traces.modified || []);
   }
 
   /**
@@ -97,7 +97,7 @@ export const useTraceCommitApi = defineStore("traceCommitApi", () => {
 
     return commitApiStore
       .handleSave((builder) => builder.withModifiedTraceLink(traceLink))
-      .then(({ traces }) => traces.modified);
+      .then((commit) => commit?.traces.modified || []);
   }
 
   return {

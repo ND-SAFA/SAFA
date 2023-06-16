@@ -2,12 +2,12 @@
   <stepper-list-step
     title="Jira Projects"
     empty-message="There are no projects."
-    :item-count="integrationsStore.jiraProjectList.length"
+    :item-count="jiraApiStore.projectList.length"
     :loading="jiraApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in integrationsStore.jiraProjectList"
+        v-for="item in jiraApiStore.projectList"
         :key="item.name"
         :title="item.name"
         :subtitle="item.key"

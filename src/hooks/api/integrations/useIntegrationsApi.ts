@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { ref } from "vue";
 import { InstallationSchema, IOHandlerCallback } from "@/types";
 import { useApi, integrationsStore, jobApiStore, projectStore } from "@/hooks";
 import {
@@ -12,6 +13,8 @@ import { pinia } from "@/plugins";
 export const useIntegrationsApi = defineStore("integrationsApi", () => {
   const integrationsApi = useApi("integrationsApi");
 
+  const installations = ref<InstallationSchema[]>([]);
+
   /**
    * Handles loading installations affiliated with the current project.
    *
@@ -21,7 +24,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await integrationsApi.handleRequest(async () => {
-      integrationsStore.installations = await getProjectInstallations(
+      installations.value = await getProjectInstallations(
         projectStore.projectId
       );
     }, callbacks);
@@ -91,6 +94,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
   }
 
   return {
+    installations,
     handleReload,
     handleSync,
     handleNewSync,

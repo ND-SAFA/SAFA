@@ -2,62 +2,64 @@ import { defineStore } from "pinia";
 
 import { ArtifactMap, CreatorFilePanel, TraceLinkSchema } from "@/types";
 import { extractTraceId } from "@/util";
+import { useApi } from "@/hooks";
 import { parseArtifactFile, parseTraceFile } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useParseApi = defineStore("useParseApi", () => {
+  const parseApi = useApi("parseApi");
+
   /**
    * Parses a file for the project creator.
    *
    * @param panel - The panel to parse the file of.
    * @param artifactMap - A collection of all parsed artifacts, keyed by name.
    */
-  function handleParseProjectFile(
+  async function handleParseProjectFile(
     panel: CreatorFilePanel,
     artifactMap: ArtifactMap
-  ): void {
-    if (!panel.file) return;
+  ): Promise<void> {
+    await parseApi.handleRequest(
+      async () => {
+        if (!panel.file) return;
 
-    const [fileType = "", fileTargetType = ""] =
-      panel.file.name?.split(".")[0]?.split("2") || [];
+        const [fileType = "", fileTargetType = ""] =
+          panel.file.name?.split(".")[0]?.split("2") || [];
 
-    const handleError = () => {
-      panel.errorMessage = "Unable to parse this file";
-    };
+        panel.loading = true;
+        panel.type = panel.type || fileType;
+        if (panel.variant === "artifact") {
+          await parseArtifactFile(panel.type, panel.file).then(
+            ({ entities, errors }) => {
+              panel.artifacts = entities;
+              panel.errorMessage =
+                errors.length === 0 ? undefined : errors.join(", ");
+              panel.itemNames = entities.map(({ name }) => name);
 
-    panel.loading = true;
-    panel.type = panel.type || fileType;
+              entities.forEach((artifact) => {
+                artifactMap[artifact.name] = artifact;
+              });
+            }
+          );
+        } else {
+          panel.toType = panel.toType || fileTargetType;
 
-    if (panel.variant === "artifact") {
-      parseArtifactFile(panel.type, panel.file)
-        .then(({ entities, errors }) => {
-          panel.artifacts = entities;
-          panel.errorMessage =
-            errors.length === 0 ? undefined : errors.join(", ");
-          panel.itemNames = entities.map(({ name }) => name);
+          await parseTraceFile(panel.file).then(({ entities, errors }) => {
+            panel.traces = entities;
 
-          entities.forEach((artifact) => {
-            artifactMap[artifact.name] = artifact;
+            errors.push(...getTraceErrors(panel, artifactMap, entities));
+
+            panel.errorMessage =
+              errors.length === 0 ? undefined : errors.join(", ");
+            panel.itemNames = entities.map(extractTraceId);
           });
-        })
-        .catch(handleError)
-        .finally(() => (panel.loading = false));
-    } else {
-      panel.toType = panel.toType || fileTargetType;
-
-      parseTraceFile(panel.file)
-        .then(({ entities, errors }) => {
-          panel.traces = entities;
-
-          errors.push(...getTraceErrors(panel, artifactMap, entities));
-
-          panel.errorMessage =
-            errors.length === 0 ? undefined : errors.join(", ");
-          panel.itemNames = entities.map(extractTraceId);
-        })
-        .catch(handleError)
-        .finally(() => (panel.loading = false));
-    }
+        }
+      },
+      {
+        onError: () => (panel.errorMessage = "Unable to parse this file"),
+        onComplete: () => (panel.loading = false),
+      }
+    );
   }
 
   /**

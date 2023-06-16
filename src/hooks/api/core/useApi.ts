@@ -46,7 +46,7 @@ export const useApi = (id: string) =>
       cb: () => Promise<T>,
       { onSuccess, onError, onComplete }: IOHandlerCallback<T> = {},
       config: { success?: string; error?: string; useAppLoad?: boolean } = {}
-    ): Promise<void> {
+    ): Promise<T | undefined> {
       loading.value = true;
       error.value = false;
 
@@ -62,6 +62,8 @@ export const useApi = (id: string) =>
         if (config.success) {
           logStore.onSuccess(config.success);
         }
+
+        return res;
       } catch (e) {
         error.value = true;
 

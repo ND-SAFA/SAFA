@@ -5,6 +5,7 @@ import { saveAs } from "file-saver";
 import { IOHandlerCallback, ProjectSchema, VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import {
+  getProjectApiStore,
   identifierSaveStore,
   logStore,
   projectStore,
@@ -42,7 +43,9 @@ export const useProjectApi = defineStore("projectApi", () => {
       async () => {
         const project = await saveProject(identifier);
 
-        projectStore.addProject(identifier.projectId ? identifier : project);
+        getProjectApiStore.addProject(
+          identifier.projectId ? identifier : project
+        );
 
         return project;
       },
@@ -62,16 +65,18 @@ export const useProjectApi = defineStore("projectApi", () => {
   async function handleDownload(
     fileType: "csv" | "json" = "csv"
   ): Promise<void> {
-    const data = await getProjectFiles(projectStore.versionId, fileType);
+    await saveProjectApi.handleRequest(async () => {
+      const data = await getProjectFiles(projectStore.versionId, fileType);
 
-    const fileName = `${projectStore.project.name}-${versionToString(
-      projectStore.version
-    )}.zip`;
-    const blob = new Blob([data], {
-      type: "application/octet-stream",
+      const fileName = `${projectStore.project.name}-${versionToString(
+        projectStore.version
+      )}.zip`;
+      const blob = new Blob([data], {
+        type: "application/octet-stream",
+      });
+
+      saveAs(blob, fileName);
     });
-
-    saveAs(blob, fileName);
   }
 
   /**
@@ -90,7 +95,7 @@ export const useProjectApi = defineStore("projectApi", () => {
       async () => {
         await deleteProject(project.projectId);
 
-        projectStore.allProjects = projectStore.allProjects.filter(
+        getProjectApiStore.allProjects = getProjectApiStore.allProjects.filter(
           ({ projectId }) => projectId !== project.projectId
         );
 

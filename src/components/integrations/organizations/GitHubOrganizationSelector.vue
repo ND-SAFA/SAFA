@@ -2,12 +2,12 @@
   <stepper-list-step
     title="GitHub Organizations"
     empty-message="There are no organizations."
-    :item-count="integrationsStore.gitHubOrganizationList.length"
+    :item-count="gitHubApiStore.organizationList.length"
     :loading="gitHubApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in integrationsStore.gitHubOrganizationList"
+        v-for="item in gitHubApiStore.organizationList"
         :key="item.name"
         :title="item.name"
         clickable

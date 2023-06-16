@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { IdentifierSchema, IOHandlerCallback } from "@/types";
+import { removeMatches } from "@/util";
 import {
   getVersionApiStore,
   projectStore,
@@ -15,8 +16,15 @@ import { pinia } from "@/plugins";
 export const useGetProjectApi = defineStore("getProjectApi", () => {
   const getProjectApi = useApi("getProjectApi");
 
+  const allProjects = ref<IdentifierSchema[]>([]);
+
+  const unloadedProjects = computed(() =>
+    allProjects.value.filter(
+      ({ projectId }) => projectId !== projectStore.projectId
+    )
+  );
+
   const loading = computed(() => getProjectApi.loading);
-  const allProjects = computed(() => projectStore.allProjects);
 
   const currentProject = computed({
     get: () => (projectStore.projectId ? projectStore.project : undefined),
@@ -26,6 +34,18 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
       getVersionApiStore.handleLoadCurrent(identifier);
     },
   });
+
+  /**
+   * Adds or replaces a project in the project list.
+   *
+   * @param project - The project to add.
+   */
+  function addProject(project: IdentifierSchema): void {
+    allProjects.value = [
+      project,
+      ...removeMatches(allProjects.value, "projectId", [project.projectId]),
+    ];
+  }
 
   /**
    * Stores all projects for the current user.
@@ -42,7 +62,7 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
 
     await getProjectApi.handleRequest(
       async () => {
-        projectStore.allProjects = await getProjects();
+        allProjects.value = await getProjects();
       },
       callbacks,
       { error: "Unable to load your projects." }
@@ -58,10 +78,9 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
     let versionId = getParam(QueryParams.VERSION);
 
     if (!versionId) {
-      const projects = projectStore.allProjects;
-
-      if (projects.length > 0) {
-        versionId = (await getCurrentVersion(projects[0].projectId)).versionId;
+      if (allProjects.value.length > 0) {
+        versionId = (await getCurrentVersion(allProjects.value[0].projectId))
+          .versionId;
       }
     }
     if (typeof versionId === "string") {
@@ -76,7 +95,9 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
   return {
     loading,
     allProjects,
+    unloadedProjects,
     currentProject,
+    addProject,
     handleReload,
     handleLoadRecent,
   };

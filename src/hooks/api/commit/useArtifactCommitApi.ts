@@ -18,7 +18,7 @@ export const useArtifactCommitApi = defineStore("artifactCommitApi", () => {
   ): Promise<ArtifactSchema[]> {
     return commitApiStore
       .handleSave((builder) => builder.withNewArtifact(artifact))
-      .then(({ artifacts }) => artifacts.added);
+      .then((commit) => commit?.artifacts.added || []);
   }
 
   /**
@@ -34,7 +34,7 @@ export const useArtifactCommitApi = defineStore("artifactCommitApi", () => {
   ): Promise<ArtifactSchema[]> {
     return commitApiStore
       .handleSave((builder) => builder.withModifiedArtifact(artifact))
-      .then(({ artifacts }) => artifacts.modified);
+      .then((commit) => commit?.artifacts.modified || []);
   }
 
   /**
@@ -59,7 +59,7 @@ export const useArtifactCommitApi = defineStore("artifactCommitApi", () => {
           .withRemovedArtifact(artifact)
           .withModifiedTraceLink(...traceLinks)
       )
-      .then(({ artifacts }) => artifacts.removed[0]);
+      .then(() => artifact);
   }
 
   return { handleCreate, handleUpdate, handleDelete };

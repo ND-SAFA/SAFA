@@ -140,16 +140,18 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * @param sendLogoutRequest - Whether to send the API request to log out.
    */
   async function handleLogout(sendLogoutRequest = false): Promise<void> {
-    document.cookie = "";
+    await sessionApi.handleRequest(async () => {
+      document.cookie = "";
 
-    await setProjectApiStore.handleClear();
-    await navigateTo(Routes.LOGIN_ACCOUNT);
-    sessionStore.clearSession();
-    logStore.notifications = [];
+      await setProjectApiStore.handleClear();
+      await navigateTo(Routes.LOGIN_ACCOUNT);
+      sessionStore.clearSession();
+      logStore.notifications = [];
 
-    if (sendLogoutRequest) {
-      await deleteSession();
-    }
+      if (sendLogoutRequest) {
+        await deleteSession();
+      }
+    });
   }
 
   /**
@@ -157,9 +159,11 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * @throws If the authentication token is invalid.
    */
   async function handleAuthentication(): Promise<void> {
-    sessionStore.user = await getCurrentUser();
+    await sessionApi.handleRequest(async () => {
+      sessionStore.user = await getCurrentUser();
 
-    await getProjectApiStore.handleReload({});
+      await getProjectApiStore.handleReload({});
+    });
   }
 
   /**

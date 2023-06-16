@@ -2,12 +2,12 @@
   <stepper-list-step
     title="Jira Organizations"
     empty-message="There are no organizations."
-    :item-count="integrationsStore.jiraOrganizationList.length"
+    :item-count="jiraApiStore.organizationList.length"
     :loading="jiraApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in integrationsStore.jiraOrganizationList"
+        v-for="item in jiraApiStore.organizationList"
         :key="item.name"
         :title="item.name"
         clickable

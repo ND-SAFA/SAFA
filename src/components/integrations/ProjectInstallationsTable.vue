@@ -44,7 +44,7 @@ export default {
 import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
 import { installationsColumns } from "@/util";
-import { integrationsApiStore, integrationsStore } from "@/hooks";
+import { integrationsApiStore } from "@/hooks";
 import {
   Modal,
   TextButton,
@@ -56,7 +56,7 @@ import IntegrationsStepper from "./IntegrationsStepper.vue";
 const modalOpen = ref(false);
 const loading = ref(false);
 
-const rows = computed(() => integrationsStore.installations);
+const rows = computed(() => integrationsApiStore.installations);
 
 /**
  * Syncs the current project with the selected installation's data.

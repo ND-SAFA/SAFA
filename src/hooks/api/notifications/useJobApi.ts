@@ -29,8 +29,10 @@ export const useJobApi = defineStore("jobApi", () => {
    * @param job - The job to view.
    */
   async function handleViewLogs(job: JobSchema): Promise<void> {
-    jobLog.value = await getJobLog(job.id);
-    jobSteps.value = job.steps;
+    await jobApi.handleRequest(async () => {
+      jobLog.value = await getJobLog(job.id);
+      jobSteps.value = job.steps;
+    });
   }
 
   /**
@@ -51,12 +53,14 @@ export const useJobApi = defineStore("jobApi", () => {
 
     await stompApiStore.subscribeToStomp(
       fillEndpoint(Endpoint.jobTopic, { jobId }),
-      (frame) => {
-        const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);
+      async (frame) => {
+        await jobApi.handleRequest(async () => {
+          const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);
 
-        if (!("status" in job)) return;
+          if (!("status" in job)) return;
 
-        jobStore.updateJob(job);
+          jobStore.updateJob(job);
+        });
       }
     );
   }

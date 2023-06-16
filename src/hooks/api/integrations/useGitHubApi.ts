@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
-import { GitHubProjectSchema, IOHandlerCallback } from "@/types";
+import { computed, ref } from "vue";
+import {
+  GitHubOrganizationSchema,
+  GitHubProjectSchema,
+  IOHandlerCallback,
+} from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
 import { getParam, QueryParams } from "@/router";
 import {
@@ -17,6 +21,9 @@ import { pinia } from "@/plugins";
 export const useGitHubApi = defineStore("gitHubApi", () => {
   const githubApi = useApi("githubApi");
 
+  const organizationList = ref<GitHubOrganizationSchema[]>([]);
+  const projectList = ref<GitHubProjectSchema[]>([]);
+
   const loading = computed(() => githubApi.loading);
 
   /**
@@ -30,8 +37,10 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
    * Clears the saved GitHub credentials.
    */
   async function handleDeleteCredentials(): Promise<void> {
-    await deleteGitHubCredentials();
-    integrationsStore.validGitHubCredentials = false;
+    await githubApi.handleRequest(async () => {
+      await deleteGitHubCredentials();
+      integrationsStore.validGitHubCredentials = false;
+    });
   }
 
   /**
@@ -91,32 +100,29 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
   ): Promise<void> {
     await githubApi.handleRequest(async () => {
       integrationsStore.gitHubOrganization = undefined;
-      integrationsStore.gitHubOrganizationList = [];
+      organizationList.value = [];
 
       const projects = await getGitHubProjects();
 
       // Add organizations to the list based on the projects.
       projects.forEach(({ owner }) => {
-        if (
-          integrationsStore.gitHubOrganizationList.find(
-            ({ id }) => id === owner
-          )
-        )
-          return;
+        if (organizationList.value.find(({ id }) => id === owner)) return;
 
-        integrationsStore.gitHubOrganizationList.push({
+        organizationList.value.push({
           id: owner,
           name: owner,
         });
       });
 
-      integrationsStore.gitHubProjectList = projects;
+      projectList.value = projects;
 
       return projects;
     }, callbacks);
   }
 
   return {
+    organizationList,
+    projectList,
     loading,
     handleAuthRedirect,
     handleDeleteCredentials,

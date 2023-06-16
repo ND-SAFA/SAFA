@@ -10,12 +10,15 @@ import {
   notificationApiStore,
   projectStore,
   subtreeStore,
+  useApi,
 } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
 import { getProjectArtifactTypes, getTraceMatrices } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useSetProjectApi = defineStore("setProjectApi", () => {
+  const setProjectApi = useApi("setProjectApi");
+
   /**
    * Moves user to the document if one is set by currentDocumentId.
    * Otherwise default document would continue to be in view.
@@ -51,17 +54,19 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
    * @param project - Project created containing entities.
    */
   async function handleSet(project: ProjectSchema): Promise<void> {
-    const projectId = project.projectId;
-    const versionId = project.projectVersion?.versionId || "";
+    await setProjectApi.handleRequest(async () => {
+      const projectId = project.projectId;
+      const versionId = project.projectVersion?.versionId || "";
 
-    project.artifactTypes = await getProjectArtifactTypes(projectId);
-    project.typeDirections = await getTraceMatrices(projectId);
-    projectStore.initializeProject(project);
+      project.artifactTypes = await getProjectArtifactTypes(projectId);
+      project.typeDirections = await getTraceMatrices(projectId);
+      projectStore.initializeProject(project);
 
-    await notificationApiStore.handleSubscribeVersion(projectId, versionId);
-    await integrationsApiStore.handleReload();
-    await setCurrentDocument(project);
-    await updateParam(QueryParams.VERSION, versionId);
+      await notificationApiStore.handleSubscribeVersion(projectId, versionId);
+      await integrationsApiStore.handleReload();
+      await setCurrentDocument(project);
+      await updateParam(QueryParams.VERSION, versionId);
+    });
   }
 
   /**

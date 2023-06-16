@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
-import { IOHandlerCallback } from "@/types";
+import { computed, ref } from "vue";
+import {
+  IOHandlerCallback,
+  JiraOrganizationSchema,
+  JiraProjectSchema,
+} from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
 import { getParam, QueryParams } from "@/router";
 import {
@@ -17,6 +21,9 @@ import { pinia } from "@/plugins";
 
 export const useIntegrationsApi = defineStore("integrationsApi", () => {
   const jiraApi = useApi("jiraApi");
+
+  const organizationList = ref<JiraOrganizationSchema[]>([]);
+  const projectList = ref<JiraProjectSchema[]>([]);
 
   const loading = computed(() => jiraApi.loading);
 
@@ -94,7 +101,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
   ): Promise<void> {
     await jiraApi.handleRequest(async () => {
       integrationsStore.jiraOrganization = undefined;
-      integrationsStore.jiraOrganizationList = await getJiraInstallations();
+      organizationList.value = await getJiraInstallations();
     }, callbacks);
   }
 
@@ -112,11 +119,13 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
 
     await jiraApi.handleRequest(async () => {
       integrationsStore.jiraProject = undefined;
-      integrationsStore.jiraProjectList = await getJiraProjects(installationId);
+      projectList.value = await getJiraProjects(installationId);
     }, callbacks);
   }
 
   return {
+    organizationList,
+    projectList,
     loading,
     handleAuthRedirect,
     handleDeleteCredentials,

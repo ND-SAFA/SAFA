@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   DocumentSchema,
   IdentifierSchema,
@@ -123,9 +123,6 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
 
     await handleLoadVersion(versions[0].versionId);
   }
-
-  // Load the versions of the current project on mount.
-  onMounted(() => handleGetProjectVersions());
 
   // Load the versions of the current project whenever the current project changes.
   watch(

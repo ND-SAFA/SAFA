@@ -24,7 +24,7 @@ import {
   updatePassword,
 } from "@/api";
 import { pinia } from "@/plugins";
-import { useApi } from "@/hooks/api/useApi";
+import { useApi } from "@/hooks/api/core/useApi";
 
 /**
  * Creates a store for handling session API requests.

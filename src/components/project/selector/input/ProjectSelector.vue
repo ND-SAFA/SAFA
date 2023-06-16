@@ -10,6 +10,7 @@
     option-label="name"
     class="nav-input"
     color="primary"
+    @popup-show="getProjectApiStore.handleGetProjects({})"
   >
     <template #after-options>
       <text-button

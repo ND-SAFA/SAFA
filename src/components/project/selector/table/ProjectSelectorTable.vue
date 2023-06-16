@@ -58,10 +58,10 @@ import {
   getProjectApiStore,
   identifierSaveStore,
   logStore,
+  memberApiStore,
   projectStore,
   sessionStore,
 } from "@/hooks";
-import { handleDeleteMember } from "@/api";
 import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
 
@@ -182,7 +182,7 @@ function handleLeave(project: IdentifierSchema) {
   if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
-    handleDeleteMember(member);
+    memberApiStore.handleDeleteMember(member);
   }
 }
 

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { IdentifierSchema, IOHandlerCallback } from "@/types";
 import {
   getVersionApiStore,
@@ -72,8 +72,6 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
       await navigateTo(Routes.HOME);
     }
   }
-
-  onMounted(() => handleGetProjects({}));
 
   return {
     loading,

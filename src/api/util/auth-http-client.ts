@@ -1,5 +1,5 @@
 import { APIOptions } from "@/types";
-import { logStore, sessionApiStore } from "@/hooks";
+import { LOGOUT_ERROR } from "@/util";
 import { BASE_URL } from "@/api";
 
 /**
@@ -40,12 +40,7 @@ export default async function authHttpClient<T>(
   if (res.status === 403 && !relativeUrl.includes("credentials")) {
     // Log out of the app if credentials expire.
     // Ensure that we don't log out if the expired credential status is for an integration.
-    const message = "Session has timed out. Please log back in.";
-
-    await sessionApiStore.handleLogout();
-
-    logStore.onWarning(message);
-    throw Error(message);
+    throw Error(LOGOUT_ERROR);
   } else if (!parseResponse) {
     return content as unknown as T;
   }
@@ -53,7 +48,6 @@ export default async function authHttpClient<T>(
   const data = content ? JSON.parse(content) : undefined;
 
   if (!res.ok) {
-    logStore.onDevError(data.error);
     throw Error(data.error);
   } else {
     return data;

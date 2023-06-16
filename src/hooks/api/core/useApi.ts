@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 
 import { ref, computed } from "vue";
 import { IOHandlerCallback } from "@/types";
-import { appStore, logStore } from "@/hooks";
+import { LOGOUT_ERROR } from "@/util";
+import { appStore, logStore, sessionApiStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -63,6 +64,13 @@ export const useApi = (id: string) =>
         }
       } catch (e) {
         error.value = true;
+
+        if ((e as Error)?.message === LOGOUT_ERROR) {
+          // If the user's token has expired, log them out.
+          await sessionApiStore.handleLogout();
+          logStore.onWarning(LOGOUT_ERROR);
+          return;
+        }
 
         onError?.(e as Error);
         logStore.onDevError(String(e));

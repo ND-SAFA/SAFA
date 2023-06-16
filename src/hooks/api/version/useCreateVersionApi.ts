@@ -84,7 +84,11 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
           await navigateTo(Routes.UPLOAD_STATUS);
         },
       },
-      { useAppLoad: true }
+      {
+        useAppLoad: true,
+        success: "Successfully uploaded files.",
+        error: "Unable to upload files.",
+      }
     );
   }
 

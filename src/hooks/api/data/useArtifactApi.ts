@@ -33,7 +33,7 @@ export const useArtifactApi = defineStore("artifactApi", () => {
    */
   async function handleCheckName(): Promise<void> {
     await artifactNameApi.handleRequest(async () => {
-      const { name } = artifactSaveStore.editedArtifact;
+      const name = artifactSaveStore.editedArtifact.name || "";
 
       if (nameCheckTimer.value) {
         clearTimeout(nameCheckTimer.value);

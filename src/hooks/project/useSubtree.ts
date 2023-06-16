@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { ProjectSchema, SubtreeLinkSchema, SubtreeMapSchema } from "@/types";
+import {
+  ProjectSchema,
+  SubtreeItemSchema,
+  SubtreeLinkSchema,
+  SubtreeMapSchema,
+} from "@/types";
 import { createPhantomLinks, getMatchingChildren } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 import { pinia } from "@/plugins";
@@ -65,6 +70,25 @@ export const useSubtree = defineStore("subtrees", {
       return this.subtreeMap[artifactId]?.children || [];
     },
     /**
+     * Returns the subtree information of an artifact, creating one if none exists.
+     *
+     * @param artifactId - The artifact to add for.
+     *
+     */
+    getSubtreeItem(artifactId: string): SubtreeItemSchema {
+      if (!this.subtreeMap[artifactId]) {
+        this.subtreeMap[artifactId] = {
+          parents: [],
+          children: [],
+          subtree: [],
+          supertree: [],
+          neighbors: [],
+        };
+      }
+
+      return this.subtreeMap[artifactId];
+    },
+    /**
      * Returns the relationship between artifacts.
      *
      * @param sourceId - The source artifact's id.
@@ -82,6 +106,23 @@ export const useSubtree = defineStore("subtrees", {
       } else {
         return undefined;
       }
+    },
+    /**
+     * Updates the subtree of an artifact, creating one if none exists.
+     *
+     * @param artifactId - The artifact to update.
+     * @param getUpdatedSubtree - The subtree changes to update with.
+     */
+    updateSubtree(
+      artifactId: string,
+      getUpdatedSubtree: (item: SubtreeItemSchema) => Partial<SubtreeItemSchema>
+    ): void {
+      const existingSubtree = this.getSubtreeItem(artifactId);
+
+      this.subtreeMap[artifactId] = {
+        ...existingSubtree,
+        ...getUpdatedSubtree(existingSubtree),
+      };
     },
     /**
      * Resets all hidden nodes.

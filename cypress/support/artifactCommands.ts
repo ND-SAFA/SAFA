@@ -2,7 +2,7 @@ import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("fillArtifactFields", ({ name, type, body, parent }) => {
   if (name === undefined) name = `New ${Math.random()}`;
-  if (type === undefined) type = "Designs{downArrow}{enter}";
+  if (type === undefined) type = "Design{downArrow}{enter}";
   if (body === undefined) body = "New Artifact";
 
   cy.inputText(DataCy.artifactSaveNameInput, name)

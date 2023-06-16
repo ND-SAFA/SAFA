@@ -1,7 +1,7 @@
 <template>
   <panel-card>
     <text-button
-      v-if="version && !!version.versionId"
+      v-if="deltaVersion && !!deltaVersion.versionId"
       block
       outlined
       label="Hide Delta View"

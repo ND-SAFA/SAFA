@@ -19,7 +19,7 @@ import {
 } from "@/api";
 import { pinia } from "@/plugins";
 
-export const useIntegrationsApi = defineStore("integrationsApi", () => {
+export const useJiraApi = defineStore("jiraApi", () => {
   const jiraApi = useApi("jiraApi");
 
   const organizationList = ref<JiraOrganizationSchema[]>([]);
@@ -84,9 +84,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
       },
       { onSuccess, onError },
       {
-        error: accessCode
-          ? "Unable to save Jira access code."
-          : "Unable to refresh Jira credentials.",
+        error: accessCode ? "Unable to save Jira access code." : undefined,
       }
     );
   }
@@ -135,4 +133,4 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
   };
 });
 
-export default useIntegrationsApi(pinia);
+export default useJiraApi(pinia);

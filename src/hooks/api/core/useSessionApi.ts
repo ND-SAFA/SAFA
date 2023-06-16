@@ -159,11 +159,9 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * @throws If the authentication token is invalid.
    */
   async function handleAuthentication(): Promise<void> {
-    await sessionApi.handleRequest(async () => {
-      sessionStore.user = await getCurrentUser();
+    sessionStore.user = await getCurrentUser();
 
-      await getProjectApiStore.handleReload({});
-    });
+    await getProjectApiStore.handleReload({});
   }
 
   /**

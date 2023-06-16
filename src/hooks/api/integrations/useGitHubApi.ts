@@ -83,9 +83,7 @@ export const useGitHubApi = defineStore("gitHubApi", () => {
       },
       { onSuccess, onError },
       {
-        error: accessCode
-          ? "Unable to save GitHub access code."
-          : "Unable to refresh GitHub credentials.",
+        error: accessCode ? "Unable to save GitHub access code." : undefined,
       }
     );
   }

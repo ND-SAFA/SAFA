@@ -5,7 +5,7 @@
       v-if="!generateApproval"
       text
       color="primary"
-      :loading="generateLoading"
+      :loading="artifactGenerationApiStore.summaryGenLoading"
       :icon="hasSummary ? 'graph-refresh' : 'add'"
       :label="hasSummary ? 'Resummarize' : 'Summarize'"
       @click="handleGenerateSummary"
@@ -14,7 +14,7 @@
       <text-button text icon="save" label="Save" @click="handleSaveSummary" />
       <text-button
         text
-        :loading="generateLoading"
+        :loading="artifactGenerationApiStore.summaryGenLoading"
         icon="graph-refresh"
         label="Retry"
         @click="handleGenerateSummary"
@@ -66,7 +66,6 @@ import { artifactGenerationApiStore, selectionStore } from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
-const generateLoading = ref(false);
 const generateConfirmation = ref<ArtifactSummaryConfirmation | undefined>(
   undefined
 );
@@ -93,10 +92,7 @@ const generateApproval = computed(() => !!generateConfirmation.value);
 function handleGenerateSummary(): void {
   if (!artifact.value) return;
 
-  generateLoading.value = true;
-
   artifactGenerationApiStore.handleGenerateArtifactSummary(artifact.value, {
-    onComplete: () => (generateLoading.value = false),
     onSuccess: (confirmation) => (generateConfirmation.value = confirmation),
   });
 }

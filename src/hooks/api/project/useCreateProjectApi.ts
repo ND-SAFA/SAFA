@@ -42,7 +42,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
       async () => createProjectCreationJob(projectCreationRequest),
       {
         onSuccess: async (job) => {
-          await jobApiStore.handleCreateJob(job);
+          await jobApiStore.handleCreate(job);
           await navigateTo(Routes.UPLOAD_STATUS);
 
           onSuccess?.();
@@ -124,7 +124,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
         onSuccess: async (job) => {
           integrationsStore.jiraProject = undefined;
 
-          await jobApiStore.handleCreateJob(job);
+          await jobApiStore.handleCreate(job);
           await navigateTo(Routes.UPLOAD_STATUS);
 
           onSuccess?.();
@@ -165,7 +165,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
         onSuccess: async (job) => {
           integrationsStore.gitHubProject = undefined;
 
-          await jobApiStore.handleCreateJob(job);
+          await jobApiStore.handleCreate(job);
           await navigateTo(Routes.UPLOAD_STATUS);
 
           onSuccess?.();

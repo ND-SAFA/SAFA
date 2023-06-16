@@ -146,7 +146,7 @@ function handleExpand(): void {
  * Attempts to delete a job.
  */
 function handleDelete(): void {
-  jobApiStore.handleDeleteJob(props.job, {});
+  jobApiStore.handleDelete(props.job, {});
 }
 
 /**

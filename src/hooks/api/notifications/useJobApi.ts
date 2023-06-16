@@ -1,13 +1,45 @@
 import { defineStore } from "pinia";
 
-import { ChangeMessageSchema, IOHandlerCallback, JobSchema } from "@/types";
+import { ref } from "vue";
+import {
+  ChangeMessageSchema,
+  IOHandlerCallback,
+  JobLogSchema,
+  JobSchema,
+} from "@/types";
 import { jobStore, useApi } from "@/hooks";
-import { deleteJobById, Endpoint, fillEndpoint, getUserJobs } from "@/api";
+import {
+  deleteJobById,
+  Endpoint,
+  fillEndpoint,
+  getJobLog,
+  getUserJobs,
+} from "@/api";
 import { pinia } from "@/plugins";
 import stompApiStore from "./useStompApi";
 
 export const useJobApi = defineStore("jobApi", () => {
   const jobApi = useApi("jobApi");
+
+  const jobLog = ref<JobLogSchema[][]>([]);
+  const jobSteps = ref<string[]>([]);
+
+  /**
+   * Gets the log for a job.
+   * @param job - The job to view.
+   */
+  async function handleViewLogs(job: JobSchema): Promise<void> {
+    jobLog.value = await getJobLog(job.id);
+    jobSteps.value = job.steps;
+  }
+
+  /**
+   * Closes the job log.
+   */
+  function handleCloseLogs(): void {
+    jobLog.value = [];
+    jobSteps.value = [];
+  }
 
   /**
    * Subscribes to updates for job with given id.
@@ -33,7 +65,7 @@ export const useJobApi = defineStore("jobApi", () => {
    * Subscribes to job updates via websocket messages, updates the
    * store, and selects the job.
    */
-  async function handleCreateJob(job: JobSchema): Promise<void> {
+  async function handleCreate(job: JobSchema): Promise<void> {
     await subscribeToJob(job.id);
     jobStore.updateJob(job);
     jobStore.selectedJob = job;
@@ -45,7 +77,7 @@ export const useJobApi = defineStore("jobApi", () => {
    * @param job - The job to delete.
    * @param callbacks - The callbacks to run on success or error.
    */
-  async function handleDeleteJob(
+  async function handleDelete(
     job: JobSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
@@ -61,7 +93,7 @@ export const useJobApi = defineStore("jobApi", () => {
   /**
    * Reloads the current list of jobs.
    */
-  async function handleReloadJobs(): Promise<void> {
+  async function handleReload(): Promise<void> {
     await jobApi.handleRequest(
       async () => {
         const jobs = await getUserJobs();
@@ -82,9 +114,13 @@ export const useJobApi = defineStore("jobApi", () => {
   }
 
   return {
-    handleCreateJob,
-    handleDeleteJob,
-    handleReloadJobs,
+    jobLog,
+    jobSteps,
+    handleViewLogs,
+    handleCloseLogs,
+    handleCreate,
+    handleDelete,
+    handleReload,
   };
 });
 

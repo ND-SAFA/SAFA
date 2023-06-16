@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed, ref } from "vue";
 import {
   GenerateArtifactSchema,
   IOHandlerCallback,
@@ -20,7 +21,15 @@ import { pinia } from "@/plugins";
 export const useArtifactGenerationApi = defineStore(
   "artifactGenerationApi",
   () => {
+    const nameGenerationApi = useApi("nameGenerationApi");
+    const bodyGenerationApi = useApi("bodyGenerationApi");
+    const summaryGenerationApi = useApi("summaryGenerationApi");
     const artifactGenerationApi = useApi("artifactGenerationApi");
+
+    const nameGenLoading = computed(() => nameGenerationApi.loading);
+    const bodyGenLoading = computed(() => bodyGenerationApi.loading);
+    const summaryGenLoading = computed(() => summaryGenerationApi.loading);
+    const artifactGenLoading = computed(() => artifactGenerationApi.loading);
 
     /**
      * Generates a summary for an artifact, and updates the app state.
@@ -32,7 +41,7 @@ export const useArtifactGenerationApi = defineStore(
       artifact: ArtifactSchema,
       callbacks: IOHandlerCallback<ArtifactSummaryConfirmation>
     ): Promise<void> {
-      await artifactGenerationApi.handleRequest(
+      await summaryGenerationApi.handleRequest(
         async () => {
           const summary = await createSummary(artifact);
 
@@ -64,11 +73,11 @@ export const useArtifactGenerationApi = defineStore(
      * @param callbacks - The callbacks to use for the action.
      */
     async function handleGenerateArtifactName(
-      callbacks: IOHandlerCallback
+      callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       const artifact = artifactSaveStore.editedArtifact;
 
-      await artifactGenerationApi.handleRequest(
+      await nameGenerationApi.handleRequest(
         async () => {
           artifact.name = await createPrompt(
             `Generate a 3 word name for:\n\`\`\`\n${artifact.body}\n\`\`\``
@@ -88,11 +97,11 @@ export const useArtifactGenerationApi = defineStore(
      * @param callbacks - The callbacks to use for the action.
      */
     async function handleGenerateArtifactBody(
-      callbacks: IOHandlerCallback
+      callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       const artifact = artifactSaveStore.editedArtifact;
 
-      await artifactGenerationApi.handleRequest(
+      await bodyGenerationApi.handleRequest(
         async () => {
           artifact.body = await createPrompt(artifact.body);
         },
@@ -132,6 +141,10 @@ export const useArtifactGenerationApi = defineStore(
     }
 
     return {
+      nameGenLoading,
+      bodyGenLoading,
+      summaryGenLoading,
+      artifactGenLoading,
       handleGenerateArtifactSummary,
       handleGenerateArtifactName,
       handleGenerateArtifactBody,

@@ -14,7 +14,7 @@
           v-model:expanded="quasarProps.expand"
           :quasar-props="quasarProps"
           :job="quasarProps.row"
-          @view-logs="handleViewLogs"
+          @view-logs="jobApiStore.handleViewLogs"
         />
       </template>
     </data-table>
@@ -22,16 +22,16 @@
     <modal
       size="xl"
       title="Logs"
-      :open="jobLog.length > 0"
-      @close="handleCloseLogs"
+      :open="jobApiStore.jobLog.length > 0"
+      @close="jobApiStore.handleCloseLogs"
     >
       <q-timeline data-cy="text-job-log">
-        <template v-for="(items, idx) in jobLog" :key="idx">
+        <template v-for="(items, idx) in jobApiStore.jobLog" :key="idx">
           <q-timeline-entry
             v-for="item in items"
             :key="item.entry"
             :subtitle="timestampToDisplay(item.timestamp)"
-            :title="jobSteps[idx]"
+            :title="jobApiStore.jobSteps[idx]"
           >
             <typography
               v-for="line in item.entry.split('\n')"
@@ -56,16 +56,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { JobLogSchema, JobSchema } from "@/types";
+import { computed, onMounted } from "vue";
 import { jobColumns, timestampToDisplay } from "@/util";
 import { appStore, jobApiStore, jobStore } from "@/hooks";
-import { getJobLog } from "@/api";
 import { DataTable, PanelCard, Modal, Typography } from "@/components/common";
 import JobRow from "./JobRow.vue";
-
-const jobLog = ref<JobLogSchema[][]>([]);
-const jobSteps = ref<string[]>([]);
 
 const rows = computed(() => jobStore.jobs);
 const loading = computed(() => appStore.isLoading > 0);
@@ -73,29 +68,5 @@ const expanded = computed(() =>
   jobStore.selectedJob ? [jobStore.selectedJob.id] : []
 );
 
-/**
- * Reloads the list of jobs.
- */
-function handleReload() {
-  jobApiStore.handleReloadJobs();
-}
-
-/**
- * Gets the log for a job.
- * @param job - The job to view.
- */
-async function handleViewLogs(job: JobSchema): Promise<void> {
-  jobLog.value = await getJobLog(job.id);
-  jobSteps.value = job.steps;
-}
-
-/**
- * Closes the job log.
- */
-function handleCloseLogs(): void {
-  jobLog.value = [];
-  jobSteps.value = [];
-}
-
-onMounted(() => handleReload());
+onMounted(() => jobApiStore.handleReload());
 </script>

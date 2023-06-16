@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { ArtifactSchema, IOHandlerCallback } from "@/types";
 import {
   useApi,
@@ -10,13 +10,59 @@ import {
   traceApiStore,
   traceStore,
   artifactCommitApiStore,
+  artifactSaveStore,
 } from "@/hooks";
+import { getDoesArtifactExist } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useArtifactApi = defineStore("artifactApi", () => {
   const artifactApi = useApi("artifactApi");
+  const artifactNameApi = useApi("artifactNameApi");
+
+  const nameCheckTimer = ref<ReturnType<typeof setTimeout> | undefined>();
+  const nameLoading = ref(false);
 
   const loading = computed(() => artifactApi.loading);
+
+  const nameError = computed(() =>
+    nameLoading.value ? false : artifactSaveStore.nameError
+  );
+
+  /**
+   * Verifies that the edited artifact's name is unique.
+   */
+  async function handleCheckName(): Promise<void> {
+    await artifactNameApi.handleRequest(async () => {
+      const { name } = artifactSaveStore.editedArtifact;
+
+      if (nameCheckTimer.value) {
+        clearTimeout(nameCheckTimer.value);
+      }
+
+      artifactSaveStore.isNameValid = false;
+      nameLoading.value = true;
+
+      nameCheckTimer.value = setTimeout(() => {
+        if (!name) {
+          artifactSaveStore.isNameValid = false;
+          nameLoading.value = false;
+        } else if (!artifactSaveStore.hasNameChanged) {
+          artifactSaveStore.isNameValid = true;
+          nameLoading.value = false;
+        } else {
+          getDoesArtifactExist(projectStore.versionId, name)
+            .then((nameExists) => {
+              artifactSaveStore.isNameValid = !nameExists;
+              nameLoading.value = false;
+            })
+            .catch(() => {
+              artifactSaveStore.isNameValid = false;
+              nameLoading.value = false;
+            });
+        }
+      }, 500);
+    });
+  }
 
   /**
    * Creates or updates an artifact, and updates app state.
@@ -130,7 +176,26 @@ export const useArtifactApi = defineStore("artifactApi", () => {
     );
   }
 
-  return { loading, handleSave, handleDuplicate, handleDelete };
+  // Check the name is unique when the artifact name is edited.
+  watch(
+    () => artifactSaveStore.editedArtifact.name,
+    () => handleCheckName()
+  );
+
+  // Update the artifact type when the artifact type is edited.
+  watch(
+    () => artifactSaveStore.editedArtifact.type,
+    () => artifactSaveStore.updateArtifactType()
+  );
+
+  return {
+    loading,
+    nameLoading,
+    nameError,
+    handleSave,
+    handleDuplicate,
+    handleDelete,
+  };
 });
 
 export default useArtifactApi(pinia);

@@ -53,7 +53,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
                 installation.installationId
               );
 
-        await jobApiStore.handleCreateJob(job);
+        await jobApiStore.handleCreate(job);
       },
       callbacks,
       {

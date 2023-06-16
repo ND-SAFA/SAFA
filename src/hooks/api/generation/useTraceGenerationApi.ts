@@ -96,7 +96,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
           projectVersion: projectStore.version,
         });
 
-        await jobApiStore.handleCreateJob(job);
+        await jobApiStore.handleCreate(job);
       },
       callbacks,
       {
@@ -130,7 +130,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
           ],
         });
 
-        await jobApiStore.handleCreateJob(job);
+        await jobApiStore.handleCreate(job);
       },
       callbacks,
       {

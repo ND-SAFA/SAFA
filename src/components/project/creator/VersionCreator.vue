@@ -42,11 +42,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
-import { createVersionApiStore } from "@/hooks";
-import { getCurrentVersion } from "@/api";
+import { createVersionApiStore, projectStore } from "@/hooks";
 import { Modal, TextButton, FlexBox } from "@/components/common";
 
 const props = defineProps<{
@@ -59,20 +58,18 @@ const emit = defineEmits<{
   (e: "create", version: VersionSchema): void;
 }>();
 
-const currentVersion = ref<VersionSchema | undefined>();
-
-const versionName = computed(() => versionToString(currentVersion.value));
+const versionName = computed(() => versionToString(projectStore.version));
 
 /**
  * Returns the next version name.
  * @param type - The type of new version.
  */
 function nextVersion(type: VersionType): string {
-  if (currentVersion.value === undefined) {
+  if (projectStore.version === undefined) {
     return "X.X.X";
   }
 
-  const { majorVersion, minorVersion, revision } = currentVersion.value;
+  const { majorVersion, minorVersion, revision } = projectStore.version;
 
   switch (type) {
     case "major":
@@ -99,15 +96,4 @@ function handleClick(versionType: VersionType) {
     }
   );
 }
-
-watch(
-  () => props.open,
-  (open) => {
-    if (!open || !props.project) return;
-
-    getCurrentVersion(props.project.projectId).then(
-      (version) => (currentVersion.value = version)
-    );
-  }
-);
 </script>

@@ -137,7 +137,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
       case EntityType.WARNINGS:
         return warningApiStore.handleReloadWarnings(versionId);
       case EntityType.JOBS:
-        return jobApiStore.handleReloadJobs();
+        return jobApiStore.handleReload();
       case EntityType.LAYOUT:
         documentStore.updateBaseLayout(project.layout);
         break;

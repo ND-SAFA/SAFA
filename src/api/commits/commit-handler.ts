@@ -86,15 +86,15 @@ export async function redoCommit(): Promise<void> {
  * @param commit - The commit to apply.
  */
 async function applyArtifactChanges(commit: CommitSchema): Promise<void> {
-  await artifactStore.addOrUpdateArtifacts([
+  artifactStore.addOrUpdateArtifacts([
     ...commit.artifacts.added,
     ...commit.artifacts.modified,
   ]);
-  await artifactStore.deleteArtifacts(commit.artifacts.removed);
-  await traceStore.addOrUpdateTraceLinks([
+  artifactStore.deleteArtifacts(commit.artifacts.removed);
+  traceStore.addOrUpdateTraceLinks([
     ...commit.traces.added,
     ...commit.traces.modified,
   ]);
-  await traceStore.deleteTraceLinks(commit.traces.removed);
+  traceStore.deleteTraceLinks(commit.traces.removed);
   await traceGenerationApiStore.handleGetGeneratedLinks();
 }

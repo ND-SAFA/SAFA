@@ -26,8 +26,7 @@ export default {
 
 <script setup lang="ts">
 import { ArtifactSchema } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
-import { handleDeleteArtifact } from "@/api";
+import { appStore, artifactApiStore, selectionStore } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
 const props = defineProps<{
@@ -48,6 +47,6 @@ function handleEdit() {
  * Opens the delete artifact window.
  */
 function handleDelete() {
-  handleDeleteArtifact(props.artifact, {});
+  artifactApiStore.handleDelete(props.artifact);
 }
 </script>

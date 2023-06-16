@@ -36,8 +36,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
-import { handleDeleteArtifact } from "@/api";
+import {
+  appStore,
+  artifactApiStore,
+  projectStore,
+  selectionStore,
+  sessionStore,
+} from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
 const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
@@ -50,7 +55,7 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 function handleDelete(): void {
   if (!artifact.value) return;
 
-  handleDeleteArtifact(artifact.value, {
+  artifactApiStore.handleDelete(artifact.value, {
     onSuccess: () => appStore.closeSidePanels(),
   });
 }

@@ -12,13 +12,9 @@ import {
   projectStore,
   traceStore,
   artifactSaveStore,
+  artifactApiStore,
 } from "@/hooks";
-import {
-  createGeneratedArtifacts,
-  createPrompt,
-  createSummary,
-  handleSaveArtifact,
-} from "@/api";
+import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useArtifactGenerationApi = defineStore(
@@ -41,7 +37,7 @@ export const useArtifactGenerationApi = defineStore(
           const summary = await createSummary(artifact);
 
           const confirm = () =>
-            handleSaveArtifact(
+            artifactApiStore.handleSave(
               {
                 ...artifact,
                 summary: generateConfirmation.summary,

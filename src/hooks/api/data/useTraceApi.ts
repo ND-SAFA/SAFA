@@ -100,7 +100,7 @@ export const useTraceApi = defineStore("traceApi", () => {
       async () => {
         const updatedLinks = await updateDeclinedLink(traceLink);
 
-        await traceStore.deleteTraceLinks(updatedLinks);
+        traceStore.deleteTraceLinks(updatedLinks);
         approvalStore.declineLink(traceLink);
       },
       callbacks,
@@ -127,7 +127,7 @@ export const useTraceApi = defineStore("traceApi", () => {
           async () => {
             await updateDeclinedLinks(unreviewed);
 
-            await traceStore.deleteTraceLinks(unreviewed);
+            traceStore.deleteTraceLinks(unreviewed);
             unreviewed.map((link) => approvalStore.declineLink(link));
           },
           {

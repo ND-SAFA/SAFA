@@ -5,7 +5,7 @@ import {
   GenerationModelSchema,
   VersionSchema,
 } from "@/types";
-import { createProject, createProjectIdentifier, removeMatches } from "@/util";
+import { createProject, createProjectIdentifier } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
@@ -21,10 +21,6 @@ import attributesStore from "./useAttributes";
  */
 export const useProject = defineStore("project", {
   state: () => ({
-    /**
-     * All projects available to the current user.
-     */
-    allProjects: [] as IdentifierSchema[],
     /**
      * The currently loaded project.
      */
@@ -83,14 +79,6 @@ export const useProject = defineStore("project", {
     models(): GenerationModelSchema[] {
       return this.project.models;
     },
-    /**
-     * @return All projects that arent currently loaded.
-     */
-    unloadedProjects(): IdentifierSchema[] {
-      return this.allProjects.filter(
-        ({ projectId }) => projectId !== this.projectId
-      );
-    },
   },
   actions: {
     /**
@@ -129,17 +117,6 @@ export const useProject = defineStore("project", {
       } else {
         logStore.onWarning("Please select a project.");
       }
-    },
-    /**
-     * Adds or replaces a project in the project list.
-     *
-     * @param project - The project to add.
-     */
-    addProject(project: IdentifierSchema): void {
-      this.allProjects = [
-        project,
-        ...removeMatches(this.allProjects, "projectId", [project.projectId]),
-      ];
     },
   },
 });

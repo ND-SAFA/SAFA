@@ -30,7 +30,7 @@
 
     <artifact-summary />
 
-    <attribute-list-display :artifact="artifact" />
+    <attribute-list-display v-if="!!artifact" :artifact="artifact" />
   </panel-card>
 </template>
 

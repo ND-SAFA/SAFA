@@ -27,15 +27,17 @@ Cypress.Commands.add("doesExist", (dataCy) => {
 });
 
 Cypress.Commands.add("inputText", (dataCy, inputValue, clear, last) => {
+  const el = last
+    ? cy.getCy(dataCy, "last")
+    : cy.getCy(dataCy).filter(":visible");
+
   if (clear) {
-    cy.getCy(dataCy).clear();
+    el.clear();
   }
 
-  if (last === true && inputValue.length > 0) {
-    cy.getCy(dataCy, "last").type(inputValue);
-  } else if (inputValue.length > 0) {
-    cy.getCy(dataCy).type(inputValue);
-  }
+  if (inputValue.length === 0) return;
+
+  el.type(inputValue);
 });
 
 Cypress.Commands.add(

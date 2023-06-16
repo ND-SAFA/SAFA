@@ -84,8 +84,13 @@ export default {
 import { computed } from "vue";
 import { JobSchema, StepperStep } from "@/types";
 import { jobStatus } from "@/util";
-import { jobStore, logStore, useVModel } from "@/hooks";
-import { handleDeleteJob, handleLoadVersion } from "@/api";
+import {
+  getVersionApiStore,
+  jobApiStore,
+  jobStore,
+  logStore,
+  useVModel,
+} from "@/hooks";
 import {
   Typography,
   Icon,
@@ -141,7 +146,7 @@ function handleExpand(): void {
  * Attempts to delete a job.
  */
 function handleDelete(): void {
-  handleDeleteJob(props.job, {});
+  jobApiStore.handleDelete(props.job, {});
 }
 
 /**
@@ -156,7 +161,7 @@ async function handleViewLogs(): Promise<void> {
  */
 function handleLoad(): void {
   if (props.job.completedEntityId) {
-    handleLoadVersion(props.job.completedEntityId);
+    getVersionApiStore.handleLoad(props.job.completedEntityId);
   } else {
     logStore.onError("Unable to view this project right now.");
   }

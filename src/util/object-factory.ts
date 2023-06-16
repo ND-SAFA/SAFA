@@ -20,6 +20,8 @@ import {
   AttributeSchema,
   AttributeType,
   AttributeLayoutSchema,
+  ArtifactLevelSchema,
+  GeneratedMatrixSchema,
 } from "@/types";
 
 /**
@@ -268,5 +270,25 @@ export function createAttributeLayout(
     name: layout?.name || "",
     artifactTypes: layout?.artifactTypes || [],
     positions: layout?.positions?.map((pos) => ({ ...pos })) || [],
+  };
+}
+
+/**
+ * Creates a generated trace matrix defined over many artifact levels for
+ * some tracing method or custom model.
+ *
+ * @param artifactLevels - The artifact levels to train on.
+ * @param method - If a baseline method is used, this defines that method.
+ * @param model - If a custom model is used,
+ */
+export function createGeneratedMatrix(
+  artifactLevels: ArtifactLevelSchema[],
+  method?: ModelType,
+  model?: GenerationModelSchema
+): GeneratedMatrixSchema {
+  return {
+    method: model?.baseModel || method || ModelType.NLBert,
+    model,
+    artifactLevels: artifactLevels,
   };
 }

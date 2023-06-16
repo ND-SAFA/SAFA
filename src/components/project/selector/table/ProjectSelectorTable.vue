@@ -5,7 +5,7 @@
     addable
     editable
     :deletable="isDeletable"
-    :loading="loading"
+    :loading="getProjectApiStore.loading"
     :columns="columns"
     :rows="rows"
     row-key="projectId"
@@ -55,12 +55,12 @@ import { useRoute } from "vue-router";
 import { IdentifierSchema, ProjectRole } from "@/types";
 import { projectExpandedColumns, projectNameColumn } from "@/util";
 import {
+  getProjectApiStore,
   identifierSaveStore,
   logStore,
-  projectStore,
+  memberApiStore,
   sessionStore,
 } from "@/hooks";
-import { handleDeleteMember, handleGetProjects } from "@/api";
 import { SelectorTable, IconButton } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
 
@@ -86,7 +86,6 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const loading = ref(true);
 const saveOpen = ref(false);
 const deleteOpen = ref(false);
 
@@ -106,18 +105,15 @@ const columns = computed(() =>
     : [projectNameColumn, ...projectExpandedColumns]
 );
 
-const rows = computed(() => projectStore.allProjects);
+const rows = computed(() => getProjectApiStore.allProjects);
 
 /**
  * Loads all projects.
  */
 function handleReload() {
-  loading.value = true;
   selected.value = undefined;
 
-  handleGetProjects({
-    onComplete: () => (loading.value = false),
-  });
+  getProjectApiStore.handleReload();
 }
 
 /**
@@ -185,7 +181,7 @@ function handleLeave(project: IdentifierSchema) {
   if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
-    handleDeleteMember(member);
+    memberApiStore.handleDelete(member);
   }
 }
 

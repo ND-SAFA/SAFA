@@ -33,8 +33,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { ModelShareType } from "@/types";
 import { modelShareOptions } from "@/util";
-import { modelSaveStore } from "@/hooks";
-import { handleShareModel } from "@/api";
+import { modelApiStore, modelSaveStore } from "@/hooks";
 import {
   Modal,
   ProjectInput,
@@ -72,7 +71,7 @@ function handleReset() {
 function handleSave() {
   if (!model.value || !projectId.value) return;
 
-  handleShareModel(projectId.value, model.value, shareMethod.value);
+  modelApiStore.handleShare(projectId.value, model.value, shareMethod.value);
 
   emit("close");
 }

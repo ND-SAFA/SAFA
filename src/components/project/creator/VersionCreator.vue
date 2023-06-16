@@ -2,7 +2,7 @@
   <modal
     :title="`Current Version: ${versionName}`"
     :open="props.open"
-    :loading="isLoading"
+    :loading="createVersionApiStore.loading"
     data-cy="modal-version-create"
     @close="emit('close')"
   >
@@ -42,10 +42,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { computed } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
-import { getCurrentVersion, handleCreateVersion } from "@/api";
+import { createVersionApiStore, projectStore } from "@/hooks";
 import { Modal, TextButton, FlexBox } from "@/components/common";
 
 const props = defineProps<{
@@ -58,21 +58,18 @@ const emit = defineEmits<{
   (e: "create", version: VersionSchema): void;
 }>();
 
-const isLoading = ref(false);
-const currentVersion = ref<VersionSchema | undefined>();
-
-const versionName = computed(() => versionToString(currentVersion.value));
+const versionName = computed(() => versionToString(projectStore.version));
 
 /**
  * Returns the next version name.
  * @param type - The type of new version.
  */
 function nextVersion(type: VersionType): string {
-  if (currentVersion.value === undefined) {
+  if (projectStore.version === undefined) {
     return "X.X.X";
   }
 
-  const { majorVersion, minorVersion, revision } = currentVersion.value;
+  const { majorVersion, minorVersion, revision } = projectStore.version;
 
   switch (type) {
     case "major":
@@ -91,22 +88,8 @@ function nextVersion(type: VersionType): string {
 function handleClick(versionType: VersionType) {
   if (!props.project) return;
 
-  isLoading.value = true;
-
-  handleCreateVersion(props.project.projectId, versionType, {
+  createVersionApiStore.handleCreate(props.project.projectId, versionType, {
     onSuccess: (version) => emit("create", version),
-    onComplete: () => (isLoading.value = false),
   });
 }
-
-watch(
-  () => props.open,
-  (open) => {
-    if (!open || !props.project) return;
-
-    getCurrentVersion(props.project.projectId).then(
-      (version) => (currentVersion.value = version)
-    );
-  }
-);
 </script>

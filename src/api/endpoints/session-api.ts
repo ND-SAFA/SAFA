@@ -6,7 +6,7 @@ import {
   PasswordChangeSchema,
   UserSchema,
 } from "@/types";
-import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
+import { BASE_URL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
  * Custom fetch call for session endpoints.
@@ -15,7 +15,7 @@ import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
  * @throws Error - Response status was not 200.
  */
 async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
-  const response = await fetch(`${baseURL}/${args[0]}`, {
+  const response = await fetch(`${BASE_URL}/${args[0]}`, {
     ...args[1],
     credentials: "include",
     headers: {

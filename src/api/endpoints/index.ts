@@ -1,3 +1,6 @@
+export * from "./commit-api";
+export * from "./artifact-api";
+export * from "./link-api";
 export * from "./parse-api";
 export * from "./project-api";
 export * from "./session-api";

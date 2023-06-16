@@ -28,8 +28,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { projectStore } from "@/hooks";
-import { handleUploadProjectVersion } from "@/api";
+import { createVersionApiStore, projectStore } from "@/hooks";
 import { SwitchInput, PanelCard, TextButton } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
@@ -38,15 +37,14 @@ const props = defineProps<{
 }>();
 
 const files = ref<File[]>([]);
-const loading = ref(false);
 const replaceAllArtifacts = ref(false);
 
 /**
  * Resets component data.
  */
 function handleReset() {
+  createVersionApiStore.handleReset();
   files.value = [];
-  loading.value = false;
   replaceAllArtifacts.value = false;
 }
 
@@ -54,17 +52,15 @@ function handleReset() {
  * Uploads a new project version.
  */
 function handleSubmit() {
-  loading.value = true;
-
-  handleUploadProjectVersion(
-    projectStore.projectId,
-    projectStore.versionId,
-    files.value,
-    true,
-    replaceAllArtifacts.value
-  )
-    .then(() => handleReset())
-    .finally(() => (loading.value = false));
+  createVersionApiStore
+    .handleImport(
+      projectStore.projectId,
+      projectStore.versionId,
+      files.value,
+      true,
+      replaceAllArtifacts.value
+    )
+    .then(() => handleReset());
 }
 
 watch(

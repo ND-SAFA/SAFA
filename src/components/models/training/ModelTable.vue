@@ -16,8 +16,8 @@
       deletable
       @row:add="handleAdd"
       @row:edit="handleEdit"
-      @row:delete="handleDelete"
-      @refresh="handleRefresh"
+      @row:delete="modelApiStore.handleDelete"
+      @refresh="modelApiStore.handleReload"
     >
       <template #expanded-item="{ row }">
         <model-training :model="row" />
@@ -46,8 +46,7 @@ export default {
 import { computed, ref } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelColumns } from "@/util";
-import { modelSaveStore, projectStore } from "@/hooks";
-import { handleDeleteModel, handleLoadModels } from "@/api";
+import { modelApiStore, modelSaveStore, projectStore } from "@/hooks";
 import { IconButton, PanelCard, SelectorTable } from "@/components/common";
 import { ModelTraining } from "./editor";
 import ModelShareModal from "./ModelShareModal.vue";
@@ -92,20 +91,5 @@ function handleEdit(model: GenerationModelSchema) {
 function handleShare(model: GenerationModelSchema) {
   modelSaveStore.baseModel = model;
   shareOpen.value = true;
-}
-
-/**
- * Opens the modal to delete a model.
- * @param model - The model to delete.
- */
-function handleDelete(model: GenerationModelSchema) {
-  handleDeleteModel(model);
-}
-
-/**
- * Refreshes the loaded models.
- */
-function handleRefresh() {
-  handleLoadModels();
 }
 </script>

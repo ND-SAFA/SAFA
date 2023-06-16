@@ -25,7 +25,7 @@ describe("Artifacts", () => {
 
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
-      cy.inputText(DataCy.artifactSaveTypeInput, "Designs{downArrow}{enter}");
+      cy.inputText(DataCy.artifactSaveTypeInput, "Design{downArrow}{enter}");
 
       cy.getCy(DataCy.artifactSaveSubmitButton).should("be.enabled");
     });

@@ -4,7 +4,6 @@ import {
   GitHubImportSchema,
   GitHubOrganizationSchema,
   GitHubProjectSchema,
-  InstallationSchema,
   JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
@@ -15,10 +14,6 @@ import { pinia } from "@/plugins";
  */
 export const useIntegrations = defineStore("integrations", {
   state: () => ({
-    /**
-     * The 3rd party installations linked to the current project.
-     */
-    installations: [] as InstallationSchema[],
     /**
      * Whether this user is connected to Jira.
      */
@@ -39,10 +34,6 @@ export const useIntegrations = defineStore("integrations", {
      * A selected GitHub installation to import from.
      */
     gitHubOrganization: undefined as GitHubOrganizationSchema | undefined,
-    /**
-     * All GitHub projects for this user.
-     */
-    gitHubProjectList: [] as GitHubProjectSchema[],
     /**
      * A selected GitHub project to import.
      */

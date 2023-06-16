@@ -8,8 +8,8 @@ import {
   selectionStore,
   layoutStore,
   sessionStore,
+  artifactApiStore,
 } from "@/hooks";
-import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { enableDrawMode } from "@/cytoscape/plugins";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 import { ftaMenuItem } from "./fta-menu-options";
@@ -154,7 +154,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactSchema) => {
-        handleDeleteArtifact(artifact, {});
+        artifactApiStore.handleDelete(artifact);
       });
     },
     isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
@@ -173,7 +173,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactSchema) => {
-        await handleDuplicateArtifact(artifact, {});
+        await artifactApiStore.handleDuplicate(artifact);
       });
     },
     isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-primary full-height row items-center justify-center">
+  <q-page :class="className">
     <q-card flat bordered class="q-pa-sm card-page">
       <q-card-section class="q-pb-none">
         <div class="q-mx-auto width-max q-mb-md">
@@ -25,5 +25,15 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import { useTheme } from "@/hooks";
 import { SafaIcon } from "@/components/common/display";
+
+const { darkMode } = useTheme();
+
+const className = computed(() =>
+  darkMode.value
+    ? "bg-neutral full-height row items-center justify-center"
+    : "bg-primary full-height row items-center justify-center"
+);
 </script>

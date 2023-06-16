@@ -4,7 +4,7 @@
     :minimal="props.minimal"
     addable
     :deletable="deletable"
-    :loading="loading"
+    :loading="getVersionApiStore.getLoading"
     :columns="columns"
     :rows="rows"
     row-key="projectId"
@@ -38,8 +38,12 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { IdentifierSchema, VersionSchema } from "@/types";
 import { actionsColumn, versionColumns } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
-import { getProjectVersions, handleDeleteVersion } from "@/api";
+import {
+  projectApiStore,
+  getVersionApiStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { SelectorTable } from "@/components/common";
 import { VersionCreator } from "@/components/project/creator";
 
@@ -71,7 +75,6 @@ const emit = defineEmits<{
 }>();
 
 const selected = ref<VersionSchema | undefined>();
-const loading = ref(true);
 const addOpen = ref(false);
 const versions = ref<VersionSchema[]>([]);
 
@@ -105,11 +108,9 @@ const deletable = computed(
  * Loads project versions.
  */
 function handleReload() {
-  loading.value = true;
-
-  getProjectVersions(props.project.projectId)
-    .then((loadedVersions) => (versions.value = loadedVersions))
-    .finally(() => (loading.value = false));
+  getVersionApiStore.handleReload(props.project.projectId, {
+    onSuccess: (loadedVersions) => (versions.value = loadedVersions),
+  });
 }
 
 /**
@@ -132,7 +133,7 @@ function handleConfirmAdd(version: VersionSchema) {
  * @param version - The version to delete.
  */
 function handleOpenDelete(version: VersionSchema) {
-  handleDeleteVersion(version, {
+  projectApiStore.handleDeleteVersion(version, {
     onSuccess: () => {
       versions.value = versions.value.filter(
         ({ versionId }) => versionId != version.versionId

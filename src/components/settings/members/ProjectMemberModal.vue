@@ -42,8 +42,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { MembershipSchema, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
-import { projectStore } from "@/hooks";
-import { handleInviteMember } from "@/api";
+import { memberApiStore, projectStore } from "@/hooks";
 import {
   Modal,
   ProjectInput,
@@ -113,7 +112,7 @@ function handleSubmit() {
   projectIds.value.forEach((projectId) => {
     if (!isValid.value || !userRole.value) return;
 
-    handleInviteMember(projectId, userEmail.value, userRole.value, {
+    memberApiStore.handleInvite(projectId, userEmail.value, userRole.value, {
       onSuccess: () => emit("submit"),
     });
   });

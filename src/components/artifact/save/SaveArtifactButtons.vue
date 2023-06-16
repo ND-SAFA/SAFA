@@ -31,8 +31,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
-import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
+import {
+  appStore,
+  artifactApiStore,
+  artifactSaveStore,
+  selectionStore,
+} from "@/hooks";
 import { TextButton, FlexBox } from "@/components/common";
 
 const loading = ref(false);
@@ -47,7 +51,7 @@ function handleDelete(): void {
   const artifact = selectionStore.selectedArtifact;
   if (!artifact) return;
 
-  handleDeleteArtifact(artifact, {
+  artifactApiStore.handleDelete(artifact, {
     onSuccess: () => appStore.closeSidePanels(),
   });
 }
@@ -58,7 +62,7 @@ function handleDelete(): void {
 function handleSubmit(): void {
   loading.value = true;
 
-  handleSaveArtifact(
+  artifactApiStore.handleSave(
     artifactSaveStore.finalizedArtifact,
     artifactSaveStore.isUpdate,
     artifactSaveStore.parentArtifact,

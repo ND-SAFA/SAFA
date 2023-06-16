@@ -40,7 +40,7 @@
       <flex-box full-width justify="end" t="2">
         <text-button
           :disabled="!canGenerate"
-          :loading="loading"
+          :loading="artifactGenerationApiStore.artifactGenLoading"
           label="Generate"
           color="primary"
           @click="handleGenerate"
@@ -62,8 +62,12 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { GenerateArtifactSchema } from "@/types";
-import { appStore, artifactStore, selectionStore } from "@/hooks";
-import { handleGenerateArtifacts } from "@/api";
+import {
+  appStore,
+  artifactGenerationApiStore,
+  artifactStore,
+  selectionStore,
+} from "@/hooks";
 import {
   DetailsPanel,
   PanelCard,
@@ -77,7 +81,6 @@ const mode = ref<"single" | "multiple">("single");
 const childArtifactIds = ref<string[]>([]);
 const childArtifactType = ref<string>("");
 const parentArtifactType = ref<string>("");
-const loading = ref(false);
 
 const canGenerate = computed(() => {
   if (mode.value === "single") {
@@ -121,15 +124,12 @@ function handleReset(): void {
   }
 
   parentArtifactType.value = "";
-  loading.value = false;
 }
 
 /**
  * Generates new parent artifacts based on inputted child artifacts.
  */
 function handleGenerate(): void {
-  loading.value = true;
-
   const config: GenerateArtifactSchema =
     mode.value === "single"
       ? {
@@ -144,9 +144,8 @@ function handleGenerate(): void {
           targetType: parentArtifactType.value,
         };
 
-  handleGenerateArtifacts(config, {
+  artifactGenerationApiStore.handleGenerateArtifacts(config, {
     onSuccess: () => handleReset(),
-    onComplete: () => (loading.value = false),
   });
 }
 watch(

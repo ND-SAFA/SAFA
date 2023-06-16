@@ -1,7 +1,7 @@
 <template>
   <panel-card>
     <text-button
-      v-if="version && !!version.versionId"
+      v-if="deltaVersion && !!deltaVersion.versionId"
       block
       outlined
       label="Hide Delta View"
@@ -10,9 +10,9 @@
       @click="handleClose"
     />
     <select-input
-      v-model="version"
-      :options="versions"
-      :loading="loading"
+      v-model="deltaVersion"
+      :options="deltaApiStore.deltaVersions"
+      :loading="deltaApiStore.loading"
       option-value="versionId"
       :option-label="getVersionName"
       label="Delta Version"
@@ -31,32 +31,18 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { deltaStore, projectStore } from "@/hooks";
-import {
-  getProjectVersions,
-  handleReloadProject,
-  handleSetProjectDelta,
-} from "@/api";
+import { deltaApiStore, deltaStore, setProjectApiStore } from "@/hooks";
 import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
-const loading = ref(false);
-const versions = ref<VersionSchema[]>([]);
-
-const version = computed({
+const deltaVersion = computed({
   get() {
     return deltaStore.afterVersion;
   },
   set(newVersion) {
-    if (!newVersion || !projectStore.version) return;
-
-    loading.value = true;
-
-    handleSetProjectDelta(projectStore.version, newVersion, () => {
-      loading.value = false;
-    });
+    deltaApiStore.handleCreate(newVersion);
   },
 });
 
@@ -70,24 +56,9 @@ function getVersionName(version: VersionSchema): string {
 }
 
 /**
- * Loads the versions of the current project.
- */
-async function loadVersions(): Promise<void> {
-  const projectId = projectStore.projectId;
-
-  versions.value = projectId
-    ? (await getProjectVersions(projectId)).filter(
-        ({ versionId }) => versionId !== projectStore.version?.versionId
-      )
-    : [];
-}
-
-/**
  * Disables delta view.
  */
 function handleClose(): void {
-  handleReloadProject();
+  setProjectApiStore.handleReload();
 }
-
-onMounted(() => loadVersions());
 </script>

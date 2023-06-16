@@ -7,7 +7,7 @@
     :multiple="!!multiple"
     :options="options"
     :hint="hint"
-    :error-message="errorMessage"
+    :error-message="errorMessage || undefined"
     use-input
     new-value-mode="add-unique"
     input-debounce="0"

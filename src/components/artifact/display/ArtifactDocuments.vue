@@ -27,8 +27,7 @@ export default {
 import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
-import { documentStore, selectionStore } from "@/hooks";
-import { handleSwitchDocuments } from "@/api";
+import { documentApiStore, documentStore, selectionStore } from "@/hooks";
 import { List, ListItem, PanelCard } from "@/components/common";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
@@ -48,7 +47,7 @@ const doDisplay = computed(() => documents.value.length > 0);
  * @param document - The document to switch to.
  */
 function handleSwitch(document: DocumentSchema): void {
-  handleSwitchDocuments(document);
+  documentApiStore.handleSwitch(document);
 }
 
 /**

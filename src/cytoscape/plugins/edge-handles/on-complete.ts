@@ -6,7 +6,7 @@ import {
   GraphMode,
   TimNodeCytoElementData,
 } from "@/types";
-import { handleCreateLink, handleCreateTraceType } from "@/api";
+import { traceApiStore, traceMatrixApiStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape/plugins";
 
 /**
@@ -33,11 +33,14 @@ export function onArtifactTreeEdgeComplete(
     const sourceData: ArtifactCytoElementData = sourceNode.data();
     const targetData: ArtifactCytoElementData = targetNode.data();
 
-    handleCreateLink(sourceData, targetData);
+    traceApiStore.handleCreate(sourceData, targetData);
   } else {
     const sourceData: TimNodeCytoElementData = sourceNode.data();
     const targetData: TimNodeCytoElementData = targetNode.data();
 
-    handleCreateTraceType(sourceData.artifactType, targetData.artifactType);
+    traceMatrixApiStore.handleCreate(
+      sourceData.artifactType,
+      targetData.artifactType
+    );
   }
 }

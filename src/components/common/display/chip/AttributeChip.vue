@@ -95,7 +95,9 @@ const iconId = computed(() =>
 );
 
 const typeColor = computed(() =>
-  props.artifactType ? typeOptionsStore.tim.artifacts[props.value].color : ""
+  props.artifactType
+    ? typeOptionsStore.tim.artifacts[props.value]?.color || "primary"
+    : "primary"
 );
 
 const iconVisible = computed(() => iconId.value || props.icon);
@@ -106,7 +108,7 @@ const displayColor = computed(() => {
   } else if (props.confidenceScore) {
     return getScoreColor(props.value);
   } else if (props.artifactType) {
-    return typeColor.value || "primary";
+    return typeColor.value;
   } else if (enumerated.value) {
     return getEnumColor(props.value);
   } else {
@@ -116,7 +118,7 @@ const displayColor = computed(() => {
 
 const iconColor = computed(() => {
   if (props.artifactType) {
-    return typeColor.value || "primary";
+    return typeColor.value;
   } else {
     return displayColor.value;
   }

@@ -66,7 +66,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from "vue";
 import { GitHubProjectSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
+import { gitHubApiStore, integrationsStore } from "@/hooks";
 import {
   StepperListStep,
   List,
@@ -125,7 +125,7 @@ function handleReload() {
 
   integrationsStore.gitHubProject = undefined;
 
-  projects.value = integrationsStore.gitHubProjectList.filter(
+  projects.value = gitHubApiStore.projectList.filter(
     ({ owner }) => owner === organizationName.value
   );
 }

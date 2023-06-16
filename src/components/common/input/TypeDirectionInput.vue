@@ -34,8 +34,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
-import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
-import { handleRemoveDirection } from "@/api";
+import {
+  projectStore,
+  sessionStore,
+  traceMatrixApiStore,
+  typeOptionsStore,
+} from "@/hooks";
 import { Typography, Chip } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
@@ -60,6 +64,6 @@ function getTypeLabel(type: string) {
  * @param removedType - The type to remove.
  */
 function handleDelete(removedType: string) {
-  handleRemoveDirection(props.artifactLevel, removedType);
+  traceMatrixApiStore.handleDeleteDirection(props.artifactLevel, removedType);
 }
 </script>

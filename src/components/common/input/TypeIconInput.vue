@@ -30,8 +30,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
 import { allTypeIcons } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
-import { handleSaveArtifactTypeIcon } from "@/api";
+import { artifactTypeApiStore, projectStore, sessionStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
@@ -53,7 +52,10 @@ const icon = computed({
   set(iconId: string) {
     props.artifactLevel.iconIndex = allTypeIcons.indexOf(iconId);
 
-    handleSaveArtifactTypeIcon({ ...props.artifactLevel, icon: iconId });
+    artifactTypeApiStore.handleSaveIcon({
+      ...props.artifactLevel,
+      icon: iconId,
+    });
   },
 });
 </script>

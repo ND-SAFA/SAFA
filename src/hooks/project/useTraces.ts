@@ -82,9 +82,7 @@ export const useTraces = defineStore("traces", {
      *
      * @param deletedTraces - The trace links, or ids, to remove.
      */
-    async deleteTraceLinks(
-      deletedTraces: TraceLinkSchema[] | string[]
-    ): Promise<void> {
+    deleteTraceLinks(deletedTraces: TraceLinkSchema[] | string[]): void {
       if (deletedTraces.length === 0) return;
 
       const ids = standardizeValueArray(deletedTraces, "traceLinkId");

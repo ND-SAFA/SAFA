@@ -31,7 +31,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { ArtifactLevelSchema, ModelType } from "@/types";
-import { handleGenerateLinks } from "@/api";
+import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "../save";
 
@@ -74,7 +74,7 @@ function handleReset(): void {
 function handleSubmit(): void {
   loading.value = true;
 
-  handleGenerateLinks(undefined, matrices.value, {
+  traceGenerationApiStore.handleGenerate(undefined, matrices.value, {
     onComplete: () => {
       emit("submit");
       handleReset();

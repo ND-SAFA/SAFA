@@ -26,8 +26,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant } from "@/types";
-import { layoutStore } from "@/hooks";
-import { handleRegenerateLayout } from "@/api";
+import { layoutApiStore, layoutStore } from "@/hooks";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
@@ -53,7 +52,7 @@ const viewButtons = [
   {
     handler: () => {
       if (layoutStore.isTreeMode) {
-        handleRegenerateLayout({});
+        layoutApiStore.handleRegenerate();
       } else {
         layoutStore.resetLayout();
       }

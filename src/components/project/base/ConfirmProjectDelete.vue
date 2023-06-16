@@ -1,6 +1,6 @@
 <template>
   <modal
-    :loading="loading"
+    :loading="projectApiStore.deleteProjectLoading"
     :open="props.open"
     title="Delete Project"
     subtitle="Are you sure you want to delete this project? Type in the project's name to confirm deletion."
@@ -17,7 +17,7 @@
         color="negative"
         label="Delete"
         :disabled="!canDelete"
-        :loading="loading"
+        :loading="projectApiStore.deleteProjectLoading"
         data-cy="button-project-delete"
         @click="handleConfirm"
       />
@@ -36,8 +36,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { identifierSaveStore } from "@/hooks";
-import { handleDeleteProject } from "@/api";
+import { projectApiStore, identifierSaveStore } from "@/hooks";
 import { Modal, TextInput, TextButton } from "@/components/common";
 
 const props = defineProps<{
@@ -50,7 +49,6 @@ const emit = defineEmits<{
 }>();
 
 const confirmText = ref("");
-const loading = ref(false);
 
 const projectName = computed(
   () => identifierSaveStore.baseIdentifier?.name || ""
@@ -77,14 +75,11 @@ function handleCancel(): void {
  * Confirms the project deletion.
  */
 function handleConfirm(): void {
-  loading.value = true;
-
-  handleDeleteProject({
+  projectApiStore.handleDeleteProject({
     onSuccess: () => {
       emit("confirm");
       handleClear();
     },
-    onComplete: () => (loading.value = false),
   });
 }
 

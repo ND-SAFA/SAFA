@@ -1,6 +1,6 @@
 <template>
   <text-button
-    :loading="loading"
+    :loading="deltaApiStore.loading"
     label="Delta"
     data-cy="button-nav-delta"
     icon="view-delta"
@@ -10,7 +10,7 @@
       <typography variant="caption" x="2" y="1" value="Compare Against" />
       <q-list>
         <list-item
-          v-for="version in versions"
+          v-for="version in deltaApiStore.deltaVersions"
           :key="version.versionId"
           v-close-popup
           clickable
@@ -32,33 +32,22 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { deltaStore, projectStore } from "@/hooks";
-import { getProjectVersions, handleSetProjectDelta } from "@/api";
-import { TextButton, ListItem } from "@/components/common";
-import Typography from "@/components/common/display/content/Typography.vue";
+import { deltaApiStore, deltaStore } from "@/hooks";
+import { TextButton, ListItem, Typography } from "@/components/common";
 
 const emit = defineEmits<{
   (e: "click"): void;
 }>();
-
-const loading = ref(false);
-const versions = ref<VersionSchema[]>([]);
 
 const deltaVersion = computed({
   get() {
     return deltaStore.afterVersion;
   },
   set(newVersion) {
-    if (!newVersion || !projectStore.version) return;
-
-    loading.value = true;
-
-    handleSetProjectDelta(projectStore.version, newVersion, () => {
-      loading.value = false;
-    });
+    deltaApiStore.handleCreate(newVersion);
   },
 });
 
@@ -70,24 +59,4 @@ const deltaVersion = computed({
 function getVersionName(version: VersionSchema): string {
   return versionToString(version);
 }
-
-/**
- * Loads the versions of the current project.
- */
-async function loadVersions(): Promise<void> {
-  const projectId = projectStore.projectId;
-
-  versions.value = projectId
-    ? (await getProjectVersions(projectId)).filter(
-        ({ versionId }) => versionId !== projectStore.version?.versionId
-      )
-    : [];
-}
-
-watch(
-  () => projectStore.projectId,
-  () => loadVersions()
-);
-
-onMounted(() => loadVersions());
 </script>

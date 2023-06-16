@@ -89,8 +89,7 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
-import { attributeSaveStore } from "@/hooks";
-import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
+import { attributeApiStore, attributeSaveStore } from "@/hooks";
 import {
   FlexBox,
   TextButton,
@@ -121,16 +120,20 @@ const keyError = computed(() => store.value.keyError);
  * Saves an attribute.
  */
 function handleSave() {
-  handleSaveAttribute(store.value.editedAttribute, store.value.isUpdate, {
-    onSuccess: () => emit("save"),
-  });
+  attributeApiStore.handleSaveAttribute(
+    store.value.editedAttribute,
+    store.value.isUpdate,
+    {
+      onSuccess: () => emit("save"),
+    }
+  );
 }
 
 /**
  * Deletes an attribute.
  */
 function handleDelete() {
-  handleDeleteAttribute(store.value.editedAttribute, {});
+  attributeApiStore.handleDeleteAttribute(store.value.editedAttribute);
 }
 
 onMounted(() => store.value.resetAttribute(props.attribute));

@@ -1,15 +1,16 @@
 <template>
   <q-select
-    v-model="project"
+    v-model="getProjectApiStore.currentProject"
     outlined
     dark
     :options-dark="darkMode"
     label="Project"
-    :options="projects"
+    :options="getProjectApiStore.allProjects"
     option-value="projectId"
     option-label="name"
     class="nav-input"
     color="primary"
+    @popup-show="getProjectApiStore.handleReload()"
   >
     <template #after-options>
       <text-button
@@ -40,14 +41,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { IdentifierSchema } from "@/types";
-import { projectStore, useTheme } from "@/hooks";
-import {
-  getProjectVersions,
-  handleLoadVersion,
-  handleGetProjects,
-} from "@/api";
+import { ref } from "vue";
+import { getProjectApiStore, useTheme } from "@/hooks";
 import { TextButton } from "@/components/common";
 import { ProjectIdentifierModal } from "../../base";
 
@@ -55,25 +50,10 @@ const openCreateProject = ref(false);
 
 const { darkMode } = useTheme();
 
-const projects = computed(() => projectStore.allProjects);
-
-const project = computed({
-  get: () => (projectStore.projectId ? projectStore.project : undefined),
-  set(identifier: IdentifierSchema | undefined) {
-    if (!identifier) return;
-
-    getProjectVersions(identifier.projectId).then((versions) => {
-      handleLoadVersion(versions[0].versionId);
-    });
-  },
-});
-
 /**
  * Reloads projects when a new one is created.
  */
 async function handleProjectCreated(): Promise<void> {
-  await handleGetProjects({});
+  await getProjectApiStore.handleReload();
 }
-
-onMounted(() => handleGetProjects({}));
 </script>

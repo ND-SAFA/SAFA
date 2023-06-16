@@ -212,11 +212,16 @@ watch(
 );
 
 watch(
-  () => [valid.value, props.panel.loading],
+  () => valid.value,
   () => {
     props.panel.valid = valid.value;
+  }
+);
 
-    if (!valid.value || props.panel.loading) return;
+watch(
+  () => props.panel.loading,
+  () => {
+    if (props.panel.loading || !valid.value) return;
 
     props.panel.open = false;
   }

@@ -28,6 +28,7 @@ export const useParseApi = defineStore("useParseApi", () => {
 
         panel.loading = true;
         panel.type = panel.type || fileType;
+
         if (panel.variant === "artifact") {
           await parseArtifactFile(panel.type, panel.file).then(
             ({ entities, errors }) => {

@@ -33,7 +33,7 @@ export const useProjectApi = defineStore("projectApi", () => {
    *
    * @param callbacks - Callbacks for the action.
    */
-  async function handleSaveProject(
+  async function handleSave(
     callbacks: IOHandlerCallback<ProjectSchema>
   ): Promise<void> {
     const identifier = identifierSaveStore.editedIdentifier;
@@ -59,7 +59,7 @@ export const useProjectApi = defineStore("projectApi", () => {
    *
    * @param fileType - The file format to download.
    */
-  async function handleDownloadProject(
+  async function handleDownload(
     fileType: "csv" | "json" = "csv"
   ): Promise<void> {
     const data = await getProjectFiles(projectStore.versionId, fileType);
@@ -97,7 +97,7 @@ export const useProjectApi = defineStore("projectApi", () => {
         if (project.name !== projectStore.project.name) return;
 
         // Clear the current project if it has been deleted.
-        await setProjectApiStore.handleClearProject();
+        await setProjectApiStore.handleClear();
       },
       callbacks,
       {
@@ -141,8 +141,8 @@ export const useProjectApi = defineStore("projectApi", () => {
     saveProjectLoading,
     deleteProjectLoading,
     deleteVersionLoading,
-    handleSaveProject,
-    handleDownloadProject,
+    handleSave,
+    handleDownload,
     handleDeleteProject,
     handleDeleteVersion,
   };

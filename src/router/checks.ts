@@ -67,6 +67,6 @@ export const routerAfterChecks: RouteChecks = {
 
     if (typeof versionId !== "string") return;
 
-    await getVersionApiStore.handleLoadVersion(versionId, undefined, false);
+    await getVersionApiStore.handleLoad(versionId, undefined, false);
   },
 };

@@ -98,7 +98,7 @@ function handleValidateTraces(isValid: boolean): void {
  * Attempts to create a project.
  */
 function handleSave(): void {
-  createProjectApiStore.handleImportProject({
+  createProjectApiStore.handleImport({
     onSuccess: () => handleClearData(),
   });
 }

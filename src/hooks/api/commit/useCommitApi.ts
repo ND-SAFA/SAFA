@@ -126,11 +126,10 @@ export const useCommitApi = defineStore("commitApi", () => {
     if (commit.traces.modified.length === 0) return;
 
     // Reload generated links if any are modified.
-    await traceGenerationApiStore.handleGetGeneratedLinks();
+    await traceGenerationApiStore.handleReload();
   }
 
   return {
-    buildCommit,
     handleSave,
     handleUndo,
     handleRedo,

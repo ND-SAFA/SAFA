@@ -53,7 +53,7 @@ function handleReset() {
  */
 function handleSubmit() {
   createVersionApiStore
-    .handleImportVersion(
+    .handleImport(
       projectStore.projectId,
       projectStore.versionId,
       files.value,

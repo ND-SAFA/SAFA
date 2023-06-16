@@ -34,7 +34,7 @@
       <search-option v-bind="itemProps" :option="opt" />
     </template>
     <template v-if="!searchStore.basicSearchMode" #no-option>
-      <search-inputs @submit="searchApiStore.handleProjectSearch" />
+      <search-inputs @submit="searchApiStore.handleSearch" />
     </template>
   </q-select>
 </template>

@@ -47,7 +47,7 @@ const doDisplay = computed(() => documents.value.length > 0);
  * @param document - The document to switch to.
  */
 function handleSwitch(document: DocumentSchema): void {
-  documentApiStore.handleSwitchDocuments(document);
+  documentApiStore.handleSwitch(document);
 }
 
 /**

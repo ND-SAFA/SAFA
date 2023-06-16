@@ -11,7 +11,7 @@
     option-value="versionId"
     class="nav-input nav-version q-ml-sm"
     color="accent"
-    @popup-show="getVersionApiStore.handleGetProjectVersions"
+    @popup-show="getVersionApiStore.handleReload"
   >
     <template #selected>
       {{ versionToString(getVersionApiStore.currentVersion) }}
@@ -68,6 +68,6 @@ const isProjectDefined = computed(() => projectStore.isProjectDefined);
  */
 async function handleVersionCreated(version: VersionSchema): Promise<void> {
   openCreateVersion.value = false;
-  await getVersionApiStore.handleLoadVersion(version.versionId);
+  await getVersionApiStore.handleLoad(version.versionId);
 }
 </script>

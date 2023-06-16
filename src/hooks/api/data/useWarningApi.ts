@@ -12,7 +12,7 @@ export const useWarningApi = defineStore("warningApi", () => {
    *
    * @param versionId - The project version to load from.
    */
-  async function handleReloadWarnings(versionId: string): Promise<void> {
+  async function handleReload(versionId: string): Promise<void> {
     await warningApi.handleRequest(async () => {
       warningStore.artifactWarnings = await getWarningsInProjectVersion(
         versionId
@@ -20,7 +20,7 @@ export const useWarningApi = defineStore("warningApi", () => {
     });
   }
 
-  return { handleReloadWarnings };
+  return { handleReload };
 });
 
 export default useWarningApi(pinia);

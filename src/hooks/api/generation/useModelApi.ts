@@ -20,7 +20,7 @@ export const useModelApi = defineStore("modelApi", () => {
   /**
    * Loads models for the current project.
    */
-  async function handleLoadModels(): Promise<void> {
+  async function handleReload(): Promise<void> {
     await modelApi.handleRequest(async () =>
       projectStore.updateProject({
         models: await getProjectModels(projectStore.projectId),
@@ -33,7 +33,7 @@ export const useModelApi = defineStore("modelApi", () => {
    *
    * @param callbacks - Callbacks for the request.
    */
-  async function handleSaveModel(
+  async function handleSave(
     callbacks: IOHandlerCallback<GenerationModelSchema>
   ): Promise<void> {
     const model = modelSaveStore.editedModel;
@@ -63,9 +63,7 @@ export const useModelApi = defineStore("modelApi", () => {
    *
    * @param model - The model to create.
    */
-  async function handleDeleteModel(
-    model: GenerationModelSchema
-  ): Promise<void> {
+  async function handleDelete(model: GenerationModelSchema): Promise<void> {
     await logStore.confirm(
       "Delete Model",
       `Are you sure you want to delete ${model.name}?`,
@@ -97,7 +95,7 @@ export const useModelApi = defineStore("modelApi", () => {
    * @param model - The model to share.
    * @param shareMethod - The method by which to share.
    */
-  async function handleShareModel(
+  async function handleShare(
     targetProject: string,
     model: GenerationModelSchema,
     shareMethod: ModelShareType
@@ -113,10 +111,10 @@ export const useModelApi = defineStore("modelApi", () => {
   }
 
   return {
-    handleLoadModels,
-    handleSaveModel,
-    handleDeleteModel,
-    handleShareModel,
+    handleReload,
+    handleSave,
+    handleDelete,
+    handleShare,
   };
 });
 

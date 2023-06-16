@@ -74,7 +74,7 @@ function handleReset(): void {
 function handleSubmit(): void {
   loading.value = true;
 
-  traceGenerationApiStore.handleGenerateLinks(undefined, matrices.value, {
+  traceGenerationApiStore.handleGenerate(undefined, matrices.value, {
     onComplete: () => {
       emit("submit");
       handleReset();

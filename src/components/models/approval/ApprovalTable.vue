@@ -162,7 +162,7 @@ const columns = computed(() =>
  * Refreshes table data.
  */
 function handleRefresh() {
-  traceGenerationApiStore.handleGetGeneratedLinks();
+  traceGenerationApiStore.handleReload();
 }
 
 /**

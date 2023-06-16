@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   GenerateArtifactSchema,
   IOHandlerCallback,
@@ -37,7 +37,7 @@ export const useArtifactGenerationApi = defineStore(
      * @param artifact - The artifact to summarize.
      * @param callbacks - The callbacks to use for the action.
      */
-    async function handleGenerateArtifactSummary(
+    async function handleGenerateSummary(
       artifact: ArtifactSchema,
       callbacks: IOHandlerCallback<ArtifactSummaryConfirmation>
     ): Promise<void> {
@@ -72,7 +72,7 @@ export const useArtifactGenerationApi = defineStore(
      *
      * @param callbacks - The callbacks to use for the action.
      */
-    async function handleGenerateArtifactName(
+    async function handleGenerateName(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       const artifact = artifactSaveStore.editedArtifact;
@@ -96,7 +96,7 @@ export const useArtifactGenerationApi = defineStore(
      *
      * @param callbacks - The callbacks to use for the action.
      */
-    async function handleGenerateArtifactBody(
+    async function handleGenerateBody(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       const artifact = artifactSaveStore.editedArtifact;
@@ -145,9 +145,9 @@ export const useArtifactGenerationApi = defineStore(
       bodyGenLoading,
       summaryGenLoading,
       artifactGenLoading,
-      handleGenerateArtifactSummary,
-      handleGenerateArtifactName,
-      handleGenerateArtifactBody,
+      handleGenerateSummary,
+      handleGenerateName,
+      handleGenerateBody,
       handleGenerateArtifacts,
     };
   }

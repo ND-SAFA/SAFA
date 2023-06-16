@@ -88,12 +88,8 @@ function nextVersion(type: VersionType): string {
 function handleClick(versionType: VersionType) {
   if (!props.project) return;
 
-  createVersionApiStore.handleCreateVersion(
-    props.project.projectId,
-    versionType,
-    {
-      onSuccess: (version) => emit("create", version),
-    }
-  );
+  createVersionApiStore.handleCreate(props.project.projectId, versionType, {
+    onSuccess: (version) => emit("create", version),
+  });
 }
 </script>

@@ -114,7 +114,7 @@ const rows = computed(() => projectStore.allProjects);
 function handleReload() {
   selected.value = undefined;
 
-  getProjectApiStore.handleGetProjects({});
+  getProjectApiStore.handleReload();
 }
 
 /**
@@ -182,7 +182,7 @@ function handleLeave(project: IdentifierSchema) {
   if (!member || (member.role === ProjectRole.OWNER && ownerCount === 1)) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
-    memberApiStore.handleDeleteMember(member);
+    memberApiStore.handleDelete(member);
   }
 }
 

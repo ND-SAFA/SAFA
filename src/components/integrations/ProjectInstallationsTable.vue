@@ -65,7 +65,7 @@ const rows = computed(() => integrationsStore.installations);
 function handleSync(installation: InstallationSchema): void {
   loading.value = true;
 
-  integrationsApiStore.handleSyncInstallation(installation, {
+  integrationsApiStore.handleSync(installation, {
     onComplete: () => (loading.value = false),
   });
 }

@@ -25,7 +25,7 @@ export const useMemberApi = defineStore("memberApi", () => {
   /**
    * Returns the current project's members.
    */
-  async function handleGetMembers(): Promise<void> {
+  async function handleReload(): Promise<void> {
     await memberApi.handleRequest(
       async () => {
         const members = await getProjectMembers(projectStore.projectId);
@@ -45,7 +45,7 @@ export const useMemberApi = defineStore("memberApi", () => {
    * @param projectRole - The role to set for the given user.
    * @param callbacks - Callbacks for the request.
    */
-  async function handleInviteMember(
+  async function handleInvite(
     projectId: string,
     memberEmail: string,
     projectRole: ProjectRole,
@@ -74,7 +74,7 @@ export const useMemberApi = defineStore("memberApi", () => {
    *
    * @param member - The member to delete.
    */
-  function handleDeleteMember(member: MembershipSchema): void {
+  function handleDelete(member: MembershipSchema): void {
     const email =
       sessionStore.user?.email === member.email
         ? "yourself"
@@ -90,7 +90,7 @@ export const useMemberApi = defineStore("memberApi", () => {
           async () => {
             await deleteProjectMember(member);
             membersStore.deleteMembers([member.projectMembershipId]);
-            await getProjectApiStore.handleGetProjects({});
+            await getProjectApiStore.handleReload();
           },
           {},
           {
@@ -104,9 +104,9 @@ export const useMemberApi = defineStore("memberApi", () => {
 
   return {
     loading,
-    handleGetMembers,
-    handleInviteMember,
-    handleDeleteMember,
+    handleReload,
+    handleInvite,
+    handleDelete,
   };
 });
 

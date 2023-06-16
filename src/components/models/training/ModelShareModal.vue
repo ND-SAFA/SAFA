@@ -71,11 +71,7 @@ function handleReset() {
 function handleSave() {
   if (!model.value || !projectId.value) return;
 
-  modelApiStore.handleShareModel(
-    projectId.value,
-    model.value,
-    shareMethod.value
-  );
+  modelApiStore.handleShare(projectId.value, model.value, shareMethod.value);
 
   emit("close");
 }

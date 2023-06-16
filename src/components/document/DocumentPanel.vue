@@ -147,7 +147,7 @@ function handleSaveChildren() {
  * Attempts to save the document.
  */
 function handleSubmit() {
-  documentApiStore.handleSaveDocument({
+  documentApiStore.handleSave({
     onSuccess: () => handleClose(),
   });
 }
@@ -156,7 +156,7 @@ function handleSubmit() {
  * Attempts to delete the document after confirming.
  */
 function handleDelete() {
-  documentApiStore.handleDeleteDocument({
+  documentApiStore.handleDelete({
     onSuccess: () => handleClose(),
   });
 }

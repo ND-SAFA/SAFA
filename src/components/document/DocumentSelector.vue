@@ -100,7 +100,7 @@ const document = computed({
     return documentStore.currentDocument;
   },
   set(document) {
-    documentApiStore.handleSwitchDocuments(document);
+    documentApiStore.handleSwitch(document);
   },
 });
 
@@ -142,6 +142,6 @@ function handleEditOpen(document: DocumentSchema): void {
  * Saves a new document.
  */
 function handleSave(): void {
-  documentApiStore.handleCreatePresetDocument(document.value);
+  documentApiStore.handleCreatePreset(document.value);
 }
 </script>

@@ -13,7 +13,7 @@ export const useLayoutApi = defineStore("layoutApi", () => {
    *
    * @param callbacks - Callbacks to handle the result of the operation.
    */
-  async function handleRegenerateLayout(
+  async function handleRegenerate(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await layoutApi.handleRequest(
@@ -47,7 +47,7 @@ export const useLayoutApi = defineStore("layoutApi", () => {
     );
   }
 
-  return { handleRegenerateLayout };
+  return { handleRegenerate };
 });
 
 export default useLayoutApi(pinia);

@@ -83,13 +83,13 @@ function handleSaveProject(): void {
   if (props.type === "create") {
     // Create a new project.
     if (source.value === "Jira") {
-      createProjectApiStore.handleImportJiraProject(callbacks);
+      createProjectApiStore.handleJiraImport(callbacks);
     } else if (source.value === "GitHub") {
-      createProjectApiStore.handleImportGitHubProject(callbacks);
+      createProjectApiStore.handleGitHubImport(callbacks);
     }
   } else {
     // Sync with the current project.
-    integrationsApiStore.handleSyncNewInstallation(source.value, callbacks);
+    integrationsApiStore.handleNewSync(source.value, callbacks);
   }
 }
 

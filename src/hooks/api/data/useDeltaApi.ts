@@ -25,7 +25,7 @@ export const useDeltaApi = defineStore("deltaApi", () => {
    * @param targetVersion - The target version of the project.
    * @param callbacks - Callbacks for the request.
    */
-  async function handleSetProjectDelta(
+  async function handleCreate(
     targetVersion?: VersionSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -48,7 +48,7 @@ export const useDeltaApi = defineStore("deltaApi", () => {
     );
   }
 
-  return { loading, deltaVersions, handleSetProjectDelta };
+  return { loading, deltaVersions, handleCreate };
 });
 
 export default useDeltaApi(pinia);

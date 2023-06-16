@@ -108,7 +108,7 @@ const deletable = computed(
  * Loads project versions.
  */
 function handleReload() {
-  getVersionApiStore.handleGetProjectVersions(props.project.projectId, {
+  getVersionApiStore.handleReload(props.project.projectId, {
     onSuccess: (loadedVersions) => (versions.value = loadedVersions),
   });
 }

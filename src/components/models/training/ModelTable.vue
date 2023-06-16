@@ -16,8 +16,8 @@
       deletable
       @row:add="handleAdd"
       @row:edit="handleEdit"
-      @row:delete="handleDelete"
-      @refresh="handleRefresh"
+      @row:delete="modelApiStore.handleDelete"
+      @refresh="modelApiStore.handleReload"
     >
       <template #expanded-item="{ row }">
         <model-training :model="row" />
@@ -91,20 +91,5 @@ function handleEdit(model: GenerationModelSchema) {
 function handleShare(model: GenerationModelSchema) {
   modelSaveStore.baseModel = model;
   shareOpen.value = true;
-}
-
-/**
- * Opens the modal to delete a model.
- * @param model - The model to delete.
- */
-function handleDelete(model: GenerationModelSchema) {
-  modelApiStore.handleDeleteModel(model);
-}
-
-/**
- * Refreshes the loaded models.
- */
-function handleRefresh() {
-  modelApiStore.handleLoadModels();
 }
 </script>

@@ -56,7 +56,7 @@ const isValid = computed(() =>
 async function handleSubmit(): Promise<void> {
   isLoading.value = true;
 
-  await traceGenerationApiStore.handleTrainModel(props.model, matrices.value, {
+  await traceGenerationApiStore.handleTrain(props.model, matrices.value, {
     onComplete: () => (isLoading.value = false),
     onSuccess: () => {
       matrices.value = [{ source: "", target: "" }];

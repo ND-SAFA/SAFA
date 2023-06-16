@@ -85,7 +85,7 @@ function handleCancel(): void {
  * Confirms the project saving.
  */
 function handleSave(): void {
-  projectApiStore.handleSaveProject({
+  projectApiStore.handleSave({
     onSuccess: () => emit("save"),
   });
 }

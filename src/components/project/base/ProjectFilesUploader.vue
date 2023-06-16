@@ -85,7 +85,7 @@ const disabled = computed(() => {
  * Attempts to save the project.
  */
 async function handleCreate() {
-  await createProjectApiStore.handleBulkImportProject(
+  await createProjectApiStore.handleBulkImport(
     identifier.value,
     selectedFiles.value,
     {

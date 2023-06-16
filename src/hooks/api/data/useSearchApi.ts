@@ -18,7 +18,7 @@ export const useSearchApi = defineStore("searchApi", () => {
   /**
    * Handles searching a project, and updating the UI to display the search results.
    */
-  async function handleProjectSearch(): Promise<void> {
+  async function handleSearch(): Promise<void> {
     await searchApi.handleRequest(
       async () => {
         const searchQuery = searchStore.searchQuery;
@@ -43,7 +43,7 @@ export const useSearchApi = defineStore("searchApi", () => {
     );
   }
 
-  return { handleProjectSearch };
+  return { handleSearch };
 });
 
 export default useSearchApi(pinia);

@@ -88,6 +88,6 @@ function handleDelete(): void {
  * Downloads project files
  */
 function handleDownload(fileType: "csv" | "json" = "csv"): void {
-  projectApiStore.handleDownloadProject(fileType);
+  projectApiStore.handleDownload(fileType);
 }
 </script>

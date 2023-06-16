@@ -92,7 +92,7 @@ const generateApproval = computed(() => !!generateConfirmation.value);
 function handleGenerateSummary(): void {
   if (!artifact.value) return;
 
-  artifactGenerationApiStore.handleGenerateArtifactSummary(artifact.value, {
+  artifactGenerationApiStore.handleGenerateSummary(artifact.value, {
     onSuccess: (confirmation) => (generateConfirmation.value = confirmation),
   });
 }

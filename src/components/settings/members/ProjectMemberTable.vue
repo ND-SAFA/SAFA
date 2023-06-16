@@ -79,7 +79,7 @@ const ownerCount = computed(
 async function handleRefresh(): Promise<void> {
   if (project.value.projectId === "") return;
 
-  await memberApiStore.handleGetMembers();
+  await memberApiStore.handleReload();
 }
 
 /**
@@ -99,7 +99,7 @@ function handleDelete(member: MembershipSchema): void {
   if (member.role === ProjectRole.OWNER && ownerCount.value === 1) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
-    memberApiStore.handleDeleteMember(member);
+    memberApiStore.handleDelete(member);
   }
 }
 </script>

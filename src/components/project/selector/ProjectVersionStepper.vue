@@ -137,7 +137,7 @@ async function handleSubmit(): Promise<void> {
 
   loading.value = true;
 
-  await getVersionApiStore.handleLoadVersion(selectedVersion.value.versionId);
+  await getVersionApiStore.handleLoad(selectedVersion.value.versionId);
 
   loading.value = false;
   handleClear();

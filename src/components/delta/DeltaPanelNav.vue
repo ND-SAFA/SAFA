@@ -42,7 +42,7 @@ const deltaVersion = computed({
     return deltaStore.afterVersion;
   },
   set(newVersion) {
-    deltaApiStore.handleSetProjectDelta(newVersion);
+    deltaApiStore.handleCreate(newVersion);
   },
 });
 
@@ -59,6 +59,6 @@ function getVersionName(version: VersionSchema): string {
  * Disables delta view.
  */
 function handleClose(): void {
-  setProjectApiStore.handleReloadProject();
+  setProjectApiStore.handleReload();
 }
 </script>

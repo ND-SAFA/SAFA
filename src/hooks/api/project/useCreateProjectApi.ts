@@ -31,7 +31,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    * @param onSuccess - Called if the action is successful.
    * @param onError - Called if the action fails.
    */
-  async function handleImportProject({
+  async function handleImport({
     onSuccess,
     onError,
   }: IOHandlerCallback): Promise<void> {
@@ -65,7 +65,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    * @param onSuccess - Called if the action is successful.
    * @param onError - Called if the action fails.
    */
-  async function handleBulkImportProject(
+  async function handleBulkImport(
     project: Pick<
       ProjectSchema,
       "projectId" | "name" | "description" | "projectVersion"
@@ -80,11 +80,11 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
           if (files.length === 0) {
             projectStore.addProject(project);
 
-            await getVersionApiStore.handleLoadVersion(
+            await getVersionApiStore.handleLoad(
               project.projectVersion?.versionId || ""
             );
           } else {
-            await createVersionApiStore.handleImportVersion(
+            await createVersionApiStore.handleImport(
               project.projectId,
               project.projectVersion?.versionId || "",
               files,
@@ -109,7 +109,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    * @param onSuccess - Called if the action is successful.
    * @param onError - Called if the action fails.
    */
-  async function handleImportJiraProject({
+  async function handleJiraImport({
     onSuccess,
     onError,
   }: IOHandlerCallback): Promise<void> {
@@ -145,7 +145,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    * @param onSuccess - Called if the action is successful.
    * @param onError - Called if the action fails.
    */
-  async function handleImportGitHubProject({
+  async function handleGitHubImport({
     onSuccess,
     onError,
   }: IOHandlerCallback): Promise<void> {
@@ -182,10 +182,10 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
 
   return {
     loading,
-    handleImportProject,
-    handleBulkImportProject,
-    handleImportJiraProject,
-    handleImportGitHubProject,
+    handleImport,
+    handleBulkImport,
+    handleJiraImport,
+    handleGitHubImport,
   };
 });
 

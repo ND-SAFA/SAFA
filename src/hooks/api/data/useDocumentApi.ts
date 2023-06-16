@@ -28,7 +28,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    * @param type - The document type create.
    * @param artifactIds - The artifacts shown in the document.
    */
-  async function handleCreateDocument(
+  async function handleCreate(
     name: string,
     type: DocumentType,
     artifactIds: string[]
@@ -62,7 +62,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    * @param document - The document to create.
    * @param callbacks - The callbacks to call on success, error, and complete.
    */
-  async function handleCreatePresetDocument(
+  async function handleCreatePreset(
     document: DocumentSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -71,7 +71,7 @@ const useDocumentApi = defineStore("documentApi", () => {
     await documentApi.handleRequest(
       async () => {
         await documentStore.removeDocument(document);
-        await handleCreateDocument(name, type, artifactIds);
+        await handleCreate(name, type, artifactIds);
       },
       callbacks,
       {
@@ -87,7 +87,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    *
    * @param document - The document to edit.
    */
-  async function handleUpdateDocument(document: DocumentSchema): Promise<void> {
+  async function handleUpdate(document: DocumentSchema): Promise<void> {
     await documentApi.handleRequest(async () => {
       const versionId = projectStore.versionIdWithLog;
       const updatedDocument = await saveDocument(versionId, document);
@@ -102,7 +102,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    *
    * @param callbacks - The callbacks to call on success, error, and complete.
    */
-  function handleDeleteDocument(callbacks: IOHandlerCallback): void {
+  function handleDelete(callbacks: IOHandlerCallback): void {
     const document = documentSaveStore.editedDocument;
     const { name } = document;
 
@@ -134,7 +134,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    * @param versionId - The project version to load documents for.
    * @param artifacts - The full list of artifacts.
    */
-  async function handleReloadDocuments(
+  async function handleReload(
     versionId = projectStore.versionId,
     artifacts = projectStore.project.artifacts
   ): Promise<void> {
@@ -152,9 +152,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    *
    * @param callbacks - The callbacks to call on success, error, and complete.
    */
-  async function handleSaveDocument(
-    callbacks: IOHandlerCallback
-  ): Promise<void> {
+  async function handleSave(callbacks: IOHandlerCallback): Promise<void> {
     const document = documentSaveStore.finalizedDocument;
     const isUpdate = documentSaveStore.isUpdate;
     const { name, type, artifactIds } = document;
@@ -162,8 +160,8 @@ const useDocumentApi = defineStore("documentApi", () => {
     await documentApi.handleRequest(
       async () =>
         isUpdate
-          ? handleUpdateDocument(document)
-          : handleCreateDocument(name, type, artifactIds),
+          ? handleUpdate(document)
+          : handleCreate(name, type, artifactIds),
       callbacks,
       {
         useAppLoad: true,
@@ -182,9 +180,7 @@ const useDocumentApi = defineStore("documentApi", () => {
    *
    * @param document - The current document.
    */
-  async function handleSwitchDocuments(
-    document: DocumentSchema
-  ): Promise<void> {
+  async function handleSwitch(document: DocumentSchema): Promise<void> {
     await documentApi.handleRequest(async () => {
       await documentStore.switchDocuments(document);
 
@@ -197,13 +193,13 @@ const useDocumentApi = defineStore("documentApi", () => {
   }
 
   return {
-    handleCreateDocument,
-    handleCreatePresetDocument,
-    handleUpdateDocument,
-    handleDeleteDocument,
-    handleReloadDocuments,
-    handleSaveDocument,
-    handleSwitchDocuments,
+    handleCreate,
+    handleCreatePreset,
+    handleUpdate,
+    handleDelete,
+    handleReload,
+    handleSave,
+    handleSwitch,
   };
 });
 

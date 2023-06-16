@@ -10,7 +10,7 @@
     option-label="name"
     class="nav-input"
     color="primary"
-    @popup-show="getProjectApiStore.handleGetProjects({})"
+    @popup-show="getProjectApiStore.handleReload()"
   >
     <template #after-options>
       <text-button
@@ -54,6 +54,6 @@ const { darkMode } = useTheme();
  * Reloads projects when a new one is created.
  */
 async function handleProjectCreated(): Promise<void> {
-  await getProjectApiStore.handleGetProjects({});
+  await getProjectApiStore.handleReload();
 }
 </script>

@@ -145,13 +145,13 @@ const showDocumentType = computed(() => documentTypes.value.length > 1);
  * Generates the name of the artifact based on the body.
  */
 function handleGenerateName() {
-  artifactGenerationApiStore.handleGenerateArtifactName();
+  artifactGenerationApiStore.handleGenerateName();
 }
 
 /**
  * Generates the body of the artifact based on a prompt.
  */
 function handleGenerateBody() {
-  artifactGenerationApiStore.handleGenerateArtifactBody();
+  artifactGenerationApiStore.handleGenerateBody();
 }
 </script>

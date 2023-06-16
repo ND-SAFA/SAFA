@@ -43,7 +43,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         // (entityIds.length should be 1 and equal to projectId)
         if (change.entityIds[0] !== projectStore.projectId) return;
 
-        return setProjectApiStore.handleClearProject();
+        return setProjectApiStore.handleClear();
       case EntityType.MEMBERS:
         // (entityIds = projectMembershipsIds)
         membersStore.deleteMembers(change.entityIds);
@@ -52,7 +52,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         // (entityIds = project version id)
         if (change.entityIds[0] !== projectStore.versionId) return;
 
-        return setProjectApiStore.handleClearProject();
+        return setProjectApiStore.handleClear();
       case EntityType.TYPES:
         // (entityIds = type id)
         typeOptionsStore.removeArtifactTypes(change.entityIds);
@@ -121,7 +121,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         membersStore.updateMembers(project.members);
         break;
       case EntityType.VERSION:
-        return getVersionApiStore.handleLoadVersion(versionId);
+        return getVersionApiStore.handleLoad(versionId);
       case EntityType.TYPES:
         typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);
         break;
@@ -135,7 +135,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         traceStore.addOrUpdateTraceLinks(project.traces);
         break;
       case EntityType.WARNINGS:
-        return warningApiStore.handleReloadWarnings(versionId);
+        return warningApiStore.handleReload(versionId);
       case EntityType.JOBS:
         return jobApiStore.handleReload();
       case EntityType.LAYOUT:

@@ -161,7 +161,7 @@ async function handleViewLogs(): Promise<void> {
  */
 function handleLoad(): void {
   if (props.job.completedEntityId) {
-    getVersionApiStore.handleLoadVersion(props.job.completedEntityId);
+    getVersionApiStore.handleLoad(props.job.completedEntityId);
   } else {
     logStore.onError("Unable to view this project right now.");
   }

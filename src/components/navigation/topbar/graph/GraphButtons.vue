@@ -52,7 +52,7 @@ const viewButtons = [
   {
     handler: () => {
       if (layoutStore.isTreeMode) {
-        layoutApiStore.handleRegenerateLayout();
+        layoutApiStore.handleRegenerate();
       } else {
         layoutStore.resetLayout();
       }

@@ -31,7 +31,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
    *
    * @param callbacks - The callbacks to use for the action.
    */
-  async function handleGetGeneratedLinks(
+  async function handleReload(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     if (!projectStore.isProjectDefined) return;
@@ -80,7 +80,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
    * @param artifactLevels - An array of source and target artifact types to generate traces between.
    * @param callbacks - The callbacks to use for the action.
    */
-  async function handleGenerateLinks(
+  async function handleGenerate(
     method: ModelType | undefined,
     artifactLevels: ArtifactLevelSchema[],
     callbacks: IOHandlerCallback
@@ -113,7 +113,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
    * @param artifactLevels - An array of source and target artifact types to train on traces between.
    * @param callbacks - The callbacks to use for the action.
    */
-  async function handleTrainModel(
+  async function handleTrain(
     model: GenerationModelSchema,
     artifactLevels: ArtifactLevelSchema[],
     callbacks: IOHandlerCallback
@@ -140,7 +140,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
     );
   }
 
-  return { handleGetGeneratedLinks, handleGenerateLinks, handleTrainModel };
+  return { handleReload, handleGenerate, handleTrain };
 });
 
 export default useTraceGenerationApi(pinia);

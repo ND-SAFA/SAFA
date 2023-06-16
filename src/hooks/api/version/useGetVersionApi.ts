@@ -32,7 +32,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
     set(version: VersionSchema | undefined) {
       if (!version) return;
 
-      handleLoadVersion(version.versionId);
+      handleLoad(version.versionId);
     },
   });
 
@@ -43,7 +43,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
    * @param projectId - The id of the project to load the versions of.
    * @param callbacks - Callbacks for the action.
    */
-  async function handleGetProjectVersions(
+  async function handleReload(
     projectId?: string,
     callbacks: IOHandlerCallback<VersionSchema[]> = {}
   ): Promise<void> {
@@ -68,7 +68,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
    * @param document - The document to start with viewing.
    * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
    */
-  async function handleLoadVersion(
+  async function handleLoad(
     versionId: string,
     document?: DocumentSchema,
     doNavigate = true
@@ -93,7 +93,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
           allVersions.value = [project.projectVersion, ...allVersions.value];
         }
 
-        await setProjectApiStore.handleSetProject(project);
+        await setProjectApiStore.handleSet(project);
 
         if (document) {
           // If a document is given, switch to it.
@@ -116,27 +116,27 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
    *
    * @param identifier - The project to load the current version of.
    */
-  async function handleLoadCurrentVersion(
+  async function handleLoadCurrent(
     identifier: IdentifierSchema
   ): Promise<void> {
     const versions = await getProjectVersions(identifier.projectId);
 
-    await handleLoadVersion(versions[0].versionId);
+    await handleLoad(versions[0].versionId);
   }
 
   // Load the versions of the current project whenever the current project changes.
   watch(
     () => currentProject.value,
-    () => handleGetProjectVersions()
+    () => handleReload()
   );
 
   return {
     getLoading,
     allVersions,
     currentVersion,
-    handleGetProjectVersions,
-    handleLoadVersion,
-    handleLoadCurrentVersion,
+    handleReload,
+    handleLoad,
+    handleLoadCurrent,
   };
 });
 

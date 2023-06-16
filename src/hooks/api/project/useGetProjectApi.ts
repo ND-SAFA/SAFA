@@ -23,7 +23,7 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
     set(identifier: IdentifierSchema | undefined) {
       if (!identifier) return;
 
-      getVersionApiStore.handleLoadCurrentVersion(identifier);
+      getVersionApiStore.handleLoadCurrent(identifier);
     },
   });
 
@@ -32,8 +32,8 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
    *
    * @param callbacks - The callbacks to call after the action.
    */
-  async function handleGetProjects(
-    callbacks: IOHandlerCallback
+  async function handleReload(
+    callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     if (!sessionStore.doesSessionExist) {
       callbacks.onSuccess?.();
@@ -52,7 +52,7 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
   /**
    * Loads the last stored project.
    */
-  async function handleLoadLastProject(): Promise<void> {
+  async function handleLoadRecent(): Promise<void> {
     if (!sessionStore.doesSessionExist) return;
 
     let versionId = getParam(QueryParams.VERSION);
@@ -65,7 +65,7 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
       }
     }
     if (typeof versionId === "string") {
-      await getVersionApiStore.handleLoadVersion(versionId).catch(() => {
+      await getVersionApiStore.handleLoad(versionId).catch(() => {
         navigateTo(Routes.HOME);
       });
     } else {
@@ -77,8 +77,8 @@ export const useGetProjectApi = defineStore("getProjectApi", () => {
     loading,
     allProjects,
     currentProject,
-    handleGetProjects,
-    handleLoadLastProject,
+    handleReload,
+    handleLoadRecent,
   };
 });
 

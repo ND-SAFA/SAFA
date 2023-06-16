@@ -62,7 +62,7 @@ const canSave = computed(() => modelSaveStore.canSave);
  * Saves the current model.
  */
 function handleSave() {
-  modelApiStore.handleSaveModel({
+  modelApiStore.handleSave({
     onSuccess: () => emit("close"),
   });
 }

@@ -17,7 +17,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
    *
    * @param callbacks - Called once the action is complete.
    */
-  async function handleLoadInstallations(
+  async function handleReload(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await integrationsApi.handleRequest(async () => {
@@ -33,7 +33,7 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
    * @param installation - The installation to sync data with.
    * @param callbacks - Called once the action is complete.
    */
-  async function handleSyncInstallation(
+  async function handleSync(
     installation: Omit<InstallationSchema, "lastUpdate">,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -70,35 +70,30 @@ export const useIntegrationsApi = defineStore("integrationsApi", () => {
    * @param installationType - The installation type to sync data with.
    * @param callbacks - Called once the action is complete.
    */
-  async function handleSyncNewInstallation(
+  async function handleNewSync(
     installationType?: "Jira" | "GitHub",
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    if (installationType === "Jira") {
-      await handleSyncInstallation(
-        {
-          type: "JIRA",
-          installationOrgId: integrationsStore.jiraOrganization?.id || "",
-          installationId: integrationsStore.jiraProject?.id || "",
-        },
-        callbacks
-      );
-    } else if (installationType === "GitHub") {
-      await handleSyncInstallation(
-        {
-          type: "GITHUB",
-          installationOrgId: integrationsStore.gitHubOrganization?.id || "",
-          installationId: integrationsStore.gitHubProject?.name || "",
-        },
-        callbacks
-      );
-    }
+    await handleSync(
+      installationType === "Jira"
+        ? {
+            type: "JIRA",
+            installationOrgId: integrationsStore.jiraOrganization?.id || "",
+            installationId: integrationsStore.jiraProject?.id || "",
+          }
+        : {
+            type: "GITHUB",
+            installationOrgId: integrationsStore.gitHubOrganization?.id || "",
+            installationId: integrationsStore.gitHubProject?.name || "",
+          },
+      callbacks
+    );
   }
 
   return {
-    handleLoadInstallations,
-    handleSyncInstallation,
-    handleSyncNewInstallation,
+    handleReload,
+    handleSync,
+    handleNewSync,
   };
 });
 

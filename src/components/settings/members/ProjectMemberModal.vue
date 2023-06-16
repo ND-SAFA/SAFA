@@ -112,14 +112,9 @@ function handleSubmit() {
   projectIds.value.forEach((projectId) => {
     if (!isValid.value || !userRole.value) return;
 
-    memberApiStore.handleInviteMember(
-      projectId,
-      userEmail.value,
-      userRole.value,
-      {
-        onSuccess: () => emit("submit"),
-      }
-    );
+    memberApiStore.handleInvite(projectId, userEmail.value, userRole.value, {
+      onSuccess: () => emit("submit"),
+    });
   });
 }
 

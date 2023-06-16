@@ -47,7 +47,7 @@ const deltaVersion = computed({
     return deltaStore.afterVersion;
   },
   set(newVersion) {
-    deltaApiStore.handleSetProjectDelta(newVersion);
+    deltaApiStore.handleCreate(newVersion);
   },
 });
 

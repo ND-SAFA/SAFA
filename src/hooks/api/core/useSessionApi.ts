@@ -120,10 +120,10 @@ export const useSessionApi = defineStore("sessionApi", () => {
       sessionStore.user = await getCurrentUser();
       sessionStore.updateSession(session);
 
-      await getProjectApiStore.handleGetProjects({
+      await getProjectApiStore.handleReload({
         onComplete: async () => {
           if (goToPath === Routes.ARTIFACT) {
-            await getProjectApiStore.handleLoadLastProject();
+            await getProjectApiStore.handleLoadRecent();
           } else if (typeof goToPath === "string") {
             await navigateTo(goToPath, query);
           } else {
@@ -142,7 +142,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
   async function handleLogout(sendLogoutRequest = false): Promise<void> {
     document.cookie = "";
 
-    await setProjectApiStore.handleClearProject();
+    await setProjectApiStore.handleClear();
     await navigateTo(Routes.LOGIN_ACCOUNT);
     sessionStore.clearSession();
     logStore.notifications = [];
@@ -159,7 +159,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
   async function handleAuthentication(): Promise<void> {
     sessionStore.user = await getCurrentUser();
 
-    await getProjectApiStore.handleGetProjects({});
+    await getProjectApiStore.handleReload({});
   }
 
   /**

@@ -24,7 +24,7 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
    * @param versionType - The version type to create.
    * @param callbacks - The callbacks to use on success, error, and complete.
    */
-  async function handleCreateVersion(
+  async function handleCreate(
     projectId: string,
     versionType: VersionType,
     callbacks: IOHandlerCallback<VersionSchema>
@@ -57,7 +57,7 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
    * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful.
    * @param isCompleteSet - Whether to delete any other artifacts in the current version.
    */
-  async function handleImportVersion(
+  async function handleImport(
     projectId: string,
     versionId: string,
     selectedFiles: File[],
@@ -91,8 +91,8 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
   return {
     loading,
     handleReset: () => createVersionApi.handleReset(),
-    handleCreateVersion,
-    handleImportVersion,
+    handleCreate,
+    handleImport,
   };
 });
 

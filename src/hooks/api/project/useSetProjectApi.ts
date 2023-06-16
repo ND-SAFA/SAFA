@@ -37,7 +37,7 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
   /**
    * Clears project store data.
    */
-  async function handleClearProject(): Promise<void> {
+  async function handleClear(): Promise<void> {
     const project = createProject();
 
     projectStore.initializeProject(project);
@@ -50,7 +50,7 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
    *
    * @param project - Project created containing entities.
    */
-  async function handleSetProject(project: ProjectSchema): Promise<void> {
+  async function handleSet(project: ProjectSchema): Promise<void> {
     const projectId = project.projectId;
     const versionId = project.projectVersion?.versionId || "";
 
@@ -59,7 +59,7 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
     projectStore.initializeProject(project);
 
     await notificationApiStore.handleSubscribeVersion(projectId, versionId);
-    await integrationsApiStore.handleLoadInstallations();
+    await integrationsApiStore.handleReload();
     await setCurrentDocument(project);
     await updateParam(QueryParams.VERSION, versionId);
   }
@@ -67,15 +67,15 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
   /**
    * Reloads the current project.
    */
-  async function handleReloadProject(): Promise<void> {
+  async function handleReload(): Promise<void> {
     deltaStore.setIsDeltaViewEnabled(false);
-    await getVersionApiStore.handleLoadVersion(
+    await getVersionApiStore.handleLoad(
       projectStore.versionId,
       documentStore.currentDocument
     );
   }
 
-  return { handleClearProject, handleSetProject, handleReloadProject };
+  return { handleClear, handleSet, handleReload };
 });
 
 export default useSetProjectApi(pinia);

@@ -24,9 +24,17 @@ export const useIntegrations = defineStore("integrations", {
      */
     validJiraCredentials: false,
     /**
+     * All Jira organizations for this user.
+     */
+    jiraOrganizationList: [] as JiraOrganizationSchema[],
+    /**
      * A selected Jira installation to import from.
      */
     jiraOrganization: undefined as JiraOrganizationSchema | undefined,
+    /**
+     * All Jira projects for this user.
+     */
+    jiraProjectList: [] as JiraProjectSchema[],
     /**
      * A selected Jira project to import.
      */
@@ -35,6 +43,10 @@ export const useIntegrations = defineStore("integrations", {
      * Whether this user is connected to GitHub.
      */
     validGitHubCredentials: false,
+    /**
+     * All GitHub organizations for this user.
+     */
+    gitHubOrganizationList: [] as GitHubOrganizationSchema[],
     /**
      * A selected GitHub installation to import from.
      */

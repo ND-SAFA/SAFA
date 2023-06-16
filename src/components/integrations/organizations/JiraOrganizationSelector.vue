@@ -2,12 +2,12 @@
   <stepper-list-step
     title="Jira Organizations"
     empty-message="There are no organizations."
-    :item-count="organizations.length"
-    :loading="loading"
+    :item-count="integrationsStore.jiraOrganizationList.length"
+    :loading="jiraApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in organizations"
+        v-for="item in integrationsStore.jiraOrganizationList"
         :key="item.name"
         :title="item.name"
         clickable
@@ -27,14 +27,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch, ref, onMounted } from "vue";
+import { watch, onMounted } from "vue";
 import { JiraOrganizationSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadJiraOrganizations } from "@/api";
+import { integrationsStore, jiraApiStore } from "@/hooks";
 import { StepperListStep, List, ListItem } from "@/components/common";
-
-const organizations = ref<JiraOrganizationSchema[]>([]);
-const loading = ref(false);
 
 /**
  * Reloads the organizations list.
@@ -42,15 +38,7 @@ const loading = ref(false);
 function handleReload(): void {
   if (!integrationsStore.validJiraCredentials) return;
 
-  integrationsStore.jiraOrganization = undefined;
-  loading.value = true;
-
-  handleLoadJiraOrganizations({
-    onSuccess: (jiraOrganizations) => {
-      organizations.value = jiraOrganizations;
-    },
-    onComplete: () => (loading.value = false),
-  });
+  jiraApiStore.handleLoadOrganizations();
 }
 
 /**

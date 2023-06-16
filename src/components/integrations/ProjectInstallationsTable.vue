@@ -44,8 +44,7 @@ export default {
 import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
 import { installationsColumns } from "@/util";
-import { integrationsStore } from "@/hooks";
-import { handleSyncInstallation } from "@/api";
+import { integrationsApiStore, integrationsStore } from "@/hooks";
 import {
   Modal,
   TextButton,
@@ -66,7 +65,7 @@ const rows = computed(() => integrationsStore.installations);
 function handleSync(installation: InstallationSchema): void {
   loading.value = true;
 
-  handleSyncInstallation(installation, {
+  integrationsApiStore.handleSyncInstallation(installation, {
     onComplete: () => (loading.value = false),
   });
 }

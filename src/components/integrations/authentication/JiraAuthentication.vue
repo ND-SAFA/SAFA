@@ -1,12 +1,12 @@
 <template>
   <authentication-list-item
     title="Jira"
-    :loading="loading"
+    :loading="jiraApiStore.loading"
     :has-credentials="hasCredentials"
     :inactive="props.inactive"
     @click="emit('click')"
-    @connect="handleAuthentication"
-    @disconnect="handleDeleteCredentials"
+    @connect="jiraApiStore.handleAuthRedirect"
+    @disconnect="jiraApiStore.handleDeleteCredentials"
   />
 </template>
 
@@ -20,13 +20,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { integrationsStore } from "@/hooks";
-import {
-  authorizeJira,
-  deleteJiraCredentials,
-  handleAuthorizeJira,
-} from "@/api";
+import { computed, onMounted } from "vue";
+import { integrationsStore, jiraApiStore } from "@/hooks";
 import AuthenticationListItem from "./AuthenticationListItem.vue";
 
 const props = defineProps<{
@@ -37,30 +32,9 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const loading = ref(false);
-
 const hasCredentials = computed(() => integrationsStore.validJiraCredentials);
 
-/**
- * Opens the Jira authentication window.
- */
-function handleAuthentication(): void {
-  authorizeJira();
-}
-
-/**
- * Clears the saved Jira credentials.
- */
-async function handleDeleteCredentials(): Promise<void> {
-  await deleteJiraCredentials();
-  integrationsStore.validJiraCredentials = false;
-}
-
 onMounted(() => {
-  loading.value = true;
-
-  handleAuthorizeJira({
-    onComplete: () => (loading.value = false),
-  });
+  jiraApiStore.handleVerifyCredentials();
 });
 </script>

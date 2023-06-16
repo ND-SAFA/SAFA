@@ -2,12 +2,12 @@
   <stepper-list-step
     title="Jira Projects"
     empty-message="There are no projects."
-    :item-count="projects.length"
-    :loading="loading"
+    :item-count="integrationsStore.jiraProjectList.length"
+    :loading="jiraApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in projects"
+        v-for="item in integrationsStore.jiraProjectList"
         :key="item.name"
         :title="item.name"
         :subtitle="item.key"
@@ -34,14 +34,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from "vue";
+import { onMounted, watch, computed } from "vue";
 import { JiraProjectSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadJiraProjects } from "@/api";
+import { integrationsStore, jiraApiStore } from "@/hooks";
 import { StepperListStep, List, ListItem } from "@/components/common";
-
-const projects = ref<JiraProjectSchema[]>([]);
-const loading = ref(false);
 
 const projectName = computed(() => integrationsStore.jiraProject?.name);
 
@@ -51,15 +47,7 @@ const projectName = computed(() => integrationsStore.jiraProject?.name);
 function handleReload() {
   if (!integrationsStore.jiraOrganization) return;
 
-  integrationsStore.jiraProject = undefined;
-  loading.value = true;
-
-  handleLoadJiraProjects({
-    onSuccess: (jiraProjects) => {
-      projects.value = jiraProjects;
-    },
-    onComplete: () => (loading.value = false),
-  });
+  jiraApiStore.handleLoadProjects();
 }
 
 /**

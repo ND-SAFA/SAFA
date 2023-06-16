@@ -6,16 +6,13 @@ import {
   deltaStore,
   documentStore,
   getVersionApiStore,
+  integrationsApiStore,
   notificationApiStore,
   projectStore,
   subtreeStore,
 } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
-import {
-  getProjectArtifactTypes,
-  getTraceMatrices,
-  handleLoadInstallations,
-} from "@/api";
+import { getProjectArtifactTypes, getTraceMatrices } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useSetProjectApi = defineStore("setProjectApi", () => {
@@ -62,7 +59,7 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
     projectStore.initializeProject(project);
 
     await notificationApiStore.handleSubscribeVersion(projectId, versionId);
-    await handleLoadInstallations({});
+    await integrationsApiStore.handleLoadInstallations();
     await setCurrentDocument(project);
     await updateParam(QueryParams.VERSION, versionId);
   }

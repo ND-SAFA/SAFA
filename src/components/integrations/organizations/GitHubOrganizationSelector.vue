@@ -2,12 +2,12 @@
   <stepper-list-step
     title="GitHub Organizations"
     empty-message="There are no organizations."
-    :item-count="organizations.length"
-    :loading="loading"
+    :item-count="integrationsStore.gitHubOrganizationList.length"
+    :loading="gitHubApiStore.loading"
   >
     <list>
       <list-item
-        v-for="item in organizations"
+        v-for="item in integrationsStore.gitHubOrganizationList"
         :key="item.name"
         :title="item.name"
         clickable
@@ -27,14 +27,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, watch } from "vue";
 import { GitHubOrganizationSchema } from "@/types";
-import { integrationsStore } from "@/hooks";
-import { handleLoadGitHubProjects } from "@/api";
+import { gitHubApiStore, integrationsStore } from "@/hooks";
 import { StepperListStep, List, ListItem } from "@/components/common";
-
-const organizations = ref<GitHubOrganizationSchema[]>([]);
-const loading = ref(false);
 
 /**
  * Loads a user's GitHub organizations.
@@ -42,24 +38,7 @@ const loading = ref(false);
 async function handleReload() {
   if (!integrationsStore.validGitHubCredentials) return;
 
-  integrationsStore.gitHubOrganization = undefined;
-  loading.value = true;
-
-  handleLoadGitHubProjects({
-    onSuccess: (projects) => {
-      organizations.value = [];
-
-      projects.forEach(({ owner }) => {
-        if (organizations.value.find(({ id }) => id === owner)) return;
-
-        organizations.value.push({ id: owner, name: owner });
-      });
-
-      integrationsStore.gitHubProjectList = projects;
-    },
-    onError: () => (organizations.value = []),
-    onComplete: () => (loading.value = false),
-  });
+  await gitHubApiStore.handleLoadProjects();
 }
 
 /**

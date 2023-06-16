@@ -34,8 +34,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { modelSaveStore } from "@/hooks";
-import { handleSaveModel } from "@/api";
+import { modelApiStore, modelSaveStore } from "@/hooks";
 import {
   Modal,
   GenMethodInput,
@@ -63,7 +62,7 @@ const canSave = computed(() => modelSaveStore.canSave);
  * Saves the current model.
  */
 function handleSave() {
-  handleSaveModel({
+  modelApiStore.handleSaveModel({
     onSuccess: () => emit("close"),
   });
 }

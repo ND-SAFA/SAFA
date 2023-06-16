@@ -46,8 +46,7 @@ export default {
 import { computed, ref } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelColumns } from "@/util";
-import { modelSaveStore, projectStore } from "@/hooks";
-import { handleDeleteModel, handleLoadModels } from "@/api";
+import { modelApiStore, modelSaveStore, projectStore } from "@/hooks";
 import { IconButton, PanelCard, SelectorTable } from "@/components/common";
 import { ModelTraining } from "./editor";
 import ModelShareModal from "./ModelShareModal.vue";
@@ -99,13 +98,13 @@ function handleShare(model: GenerationModelSchema) {
  * @param model - The model to delete.
  */
 function handleDelete(model: GenerationModelSchema) {
-  handleDeleteModel(model);
+  modelApiStore.handleDeleteModel(model);
 }
 
 /**
  * Refreshes the loaded models.
  */
 function handleRefresh() {
-  handleLoadModels();
+  modelApiStore.handleLoadModels();
 }
 </script>

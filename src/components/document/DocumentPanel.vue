@@ -93,8 +93,7 @@ export default {
 import { computed, watch } from "vue";
 import { PanelType } from "@/types";
 import { documentTypeOptions } from "@/util";
-import { appStore, documentSaveStore } from "@/hooks";
-import { handleDeleteDocument, handleSaveDocument } from "@/api";
+import { appStore, documentApiStore, documentSaveStore } from "@/hooks";
 import {
   ArtifactInput,
   ArtifactTypeInput,
@@ -148,7 +147,7 @@ function handleSaveChildren() {
  * Attempts to save the document.
  */
 function handleSubmit() {
-  handleSaveDocument({
+  documentApiStore.handleSaveDocument({
     onSuccess: () => handleClose(),
   });
 }
@@ -157,7 +156,7 @@ function handleSubmit() {
  * Attempts to delete the document after confirming.
  */
 function handleDelete() {
-  handleDeleteDocument({
+  documentApiStore.handleDeleteDocument({
     onSuccess: () => handleClose(),
   });
 }

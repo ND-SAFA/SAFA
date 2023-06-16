@@ -62,8 +62,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ArtifactSummaryConfirmation } from "@/types";
-import { selectionStore } from "@/hooks";
-import { handleGenerateArtifactSummary } from "@/api";
+import { artifactGenerationApiStore, selectionStore } from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
@@ -96,7 +95,7 @@ function handleGenerateSummary(): void {
 
   generateLoading.value = true;
 
-  handleGenerateArtifactSummary(artifact.value, {
+  artifactGenerationApiStore.handleGenerateArtifactSummary(artifact.value, {
     onComplete: () => (generateLoading.value = false),
     onSuccess: (confirmation) => (generateConfirmation.value = confirmation),
   });

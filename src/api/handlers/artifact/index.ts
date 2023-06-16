@@ -1,4 +1,1 @@
-export * from "./artifact-edit-handler";
-export * from "./artifact-type-handler";
-export * from "./artifact-summarization-handler";
-export * from "./artifact-generation-handler";
+export * from "./artifact-handler";

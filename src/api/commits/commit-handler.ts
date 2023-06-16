@@ -1,6 +1,12 @@
 import { CommitSchema } from "@/types";
-import { appStore, commitStore, traceStore, artifactStore } from "@/hooks";
-import { handleGetGeneratedLinks, persistCommit } from "@/api";
+import {
+  appStore,
+  commitStore,
+  traceStore,
+  artifactStore,
+  traceGenerationApiStore,
+} from "@/hooks";
+import { persistCommit } from "@/api";
 
 /**
  * Saves commit to the application store, and persist the commit.
@@ -90,5 +96,5 @@ async function applyArtifactChanges(commit: CommitSchema): Promise<void> {
     ...commit.traces.modified,
   ]);
   await traceStore.deleteTraceLinks(commit.traces.removed);
-  await handleGetGeneratedLinks({});
+  await traceGenerationApiStore.handleGetGeneratedLinks();
 }

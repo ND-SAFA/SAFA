@@ -98,9 +98,14 @@ export const useDelta = defineStore("delta", {
      * Sets the current artifact deltas.
      *
      * @param payload - All artifact deltas.
+     * @param afterVersion - The version that artifact deltas have been made to.
      */
-    async setDeltaPayload(payload: ProjectDelta): Promise<void> {
+    async setDeltaPayload(
+      payload: ProjectDelta,
+      afterVersion?: VersionSchema
+    ): Promise<void> {
       this.projectDelta = payload;
+      this.afterVersion = afterVersion;
 
       const artifacts = [
         ...Object.values(payload.artifacts.added),

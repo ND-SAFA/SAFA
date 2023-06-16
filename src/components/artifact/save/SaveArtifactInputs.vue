@@ -115,20 +115,21 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
-import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
 import {
-  getDoesArtifactExist,
-  handleGenerateArtifactBody,
-  handleGenerateArtifactName,
-} from "@/api";
+  artifactGenerationApiStore,
+  artifactSaveStore,
+  documentStore,
+  projectStore,
+} from "@/hooks";
+import { getDoesArtifactExist } from "@/api";
 import {
   ArtifactInput,
   ArtifactTypeInput,
   AttributeListInput,
   TextInput,
   SelectInput,
+  IconButton,
 } from "@/components/common";
-import IconButton from "@/components/common/button/IconButton.vue";
 
 const safetyCaseTypes = safetyCaseOptions();
 const logicTypes = logicTypeOptions();
@@ -156,7 +157,7 @@ const nameError = computed(() =>
 function handleGenerateName() {
   genNameLoading.value = true;
 
-  handleGenerateArtifactName({
+  artifactGenerationApiStore.handleGenerateArtifactName({
     onComplete: () => (genNameLoading.value = false),
   });
 }
@@ -167,7 +168,7 @@ function handleGenerateName() {
 function handleGenerateBody() {
   genBodyLoading.value = true;
 
-  handleGenerateArtifactBody({
+  artifactGenerationApiStore.handleGenerateArtifactBody({
     onComplete: () => (genBodyLoading.value = false),
   });
 }

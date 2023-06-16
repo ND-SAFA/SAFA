@@ -62,8 +62,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
-import { handleCreateLink } from "@/api";
+import {
+  appStore,
+  artifactStore,
+  traceApiStore,
+  traceStore,
+  typeOptionsStore,
+} from "@/hooks";
 import {
   Typography,
   ArtifactInput,
@@ -134,7 +139,7 @@ function handleOpen(): void {
 async function handleSubmit(): Promise<void> {
   if (!sourceArtifact.value || !targetArtifact.value) return;
 
-  await handleCreateLink(sourceArtifact.value, targetArtifact.value);
+  await traceApiStore.handleCreate(sourceArtifact.value, targetArtifact.value);
 
   appStore.closeSidePanels();
 }

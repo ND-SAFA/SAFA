@@ -82,13 +82,13 @@ import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
+  documentApiStore,
   documentSaveStore,
   documentStore,
   projectStore,
   sessionStore,
   useTheme,
 } from "@/hooks";
-import { handleCreatePresetDocument, handleSwitchDocuments } from "@/api";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
 
 const { darkMode } = useTheme();
@@ -100,7 +100,7 @@ const document = computed({
     return documentStore.currentDocument;
   },
   set(document) {
-    handleSwitchDocuments(document);
+    documentApiStore.handleSwitchDocuments(document);
   },
 });
 
@@ -142,6 +142,6 @@ function handleEditOpen(document: DocumentSchema): void {
  * Saves a new document.
  */
 function handleSave(): void {
-  handleCreatePresetDocument(document.value, {});
+  documentApiStore.handleCreatePresetDocument(document.value);
 }
 </script>

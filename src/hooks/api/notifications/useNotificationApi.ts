@@ -25,14 +25,10 @@ import {
   setProjectApiStore,
   getVersionApiStore,
   jobApiStore,
+  warningApiStore,
 } from "@/hooks";
 import { router } from "@/router";
-import {
-  Endpoint,
-  fillEndpoint,
-  getChanges,
-  handleReloadWarnings,
-} from "@/api";
+import { Endpoint, fillEndpoint, getChanges } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useNotificationApi = defineStore("notificationApi", () => {
@@ -139,7 +135,7 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         traceStore.addOrUpdateTraceLinks(project.traces);
         break;
       case EntityType.WARNINGS:
-        return handleReloadWarnings(versionId);
+        return warningApiStore.handleReloadWarnings(versionId);
       case EntityType.JOBS:
         return jobApiStore.handleReloadJobs();
       case EntityType.LAYOUT:

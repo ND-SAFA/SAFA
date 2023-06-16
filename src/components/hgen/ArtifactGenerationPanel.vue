@@ -62,8 +62,12 @@ export default {
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { GenerateArtifactSchema } from "@/types";
-import { appStore, artifactStore, selectionStore } from "@/hooks";
-import { handleGenerateArtifacts } from "@/api";
+import {
+  appStore,
+  artifactGenerationApiStore,
+  artifactStore,
+  selectionStore,
+} from "@/hooks";
 import {
   DetailsPanel,
   PanelCard,
@@ -144,7 +148,7 @@ function handleGenerate(): void {
           targetType: parentArtifactType.value,
         };
 
-  handleGenerateArtifacts(config, {
+  artifactGenerationApiStore.handleGenerateArtifacts(config, {
     onSuccess: () => handleReset(),
     onComplete: () => (loading.value = false),
   });

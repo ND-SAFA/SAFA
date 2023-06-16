@@ -38,7 +38,7 @@
           icon="trace-decline-all"
           color="negative"
           class="q-ml-sm"
-          @click="handleDeclineAll"
+          @click="traceApiStore.handleDeclineAll"
         />
       </template>
 
@@ -83,9 +83,15 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { ApprovalType, FlatTraceLink } from "@/types";
 import { approvalTypeOptions, approvalColumns } from "@/util";
-import { approvalStore, appStore, projectStore, sessionStore } from "@/hooks";
+import {
+  approvalStore,
+  appStore,
+  projectStore,
+  sessionStore,
+  traceApiStore,
+  traceGenerationApiStore,
+} from "@/hooks";
 import { Routes } from "@/router";
-import { handleDeclineAll, handleGetGeneratedLinks } from "@/api";
 import {
   PanelCard,
   GroupableTable,
@@ -156,7 +162,7 @@ const columns = computed(() =>
  * Refreshes table data.
  */
 function handleRefresh() {
-  handleGetGeneratedLinks({});
+  traceGenerationApiStore.handleGetGeneratedLinks();
 }
 
 /**

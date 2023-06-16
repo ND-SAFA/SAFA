@@ -29,7 +29,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ArtifactLevelSchema, GenerationModelSchema } from "@/types";
-import { handleTrainModel } from "@/api";
+import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "@/components/traceLink";
 
@@ -56,7 +56,7 @@ const isValid = computed(() =>
 async function handleSubmit(): Promise<void> {
   isLoading.value = true;
 
-  await handleTrainModel(props.model, matrices.value, {
+  await traceGenerationApiStore.handleTrainModel(props.model, matrices.value, {
     onComplete: () => (isLoading.value = false),
     onSuccess: () => {
       matrices.value = [{ source: "", target: "" }];

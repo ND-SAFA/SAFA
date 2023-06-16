@@ -1,11 +1,12 @@
 import { ArtifactSchema, IOHandlerCallback } from "@/types";
-import { artifactStore, logStore, projectStore, traceStore } from "@/hooks";
 import {
-  createArtifact,
-  deleteArtifact,
-  updateArtifact,
-  handleCreateLink,
-} from "@/api";
+  artifactStore,
+  logStore,
+  projectStore,
+  traceApiStore,
+  traceStore,
+} from "@/hooks";
+import { createArtifact, deleteArtifact, updateArtifact } from "@/api";
 
 /**
  * Creates or updates an artifact, and updates app state.
@@ -42,7 +43,7 @@ export async function handleSaveArtifact(
 
       if (parentArtifact) {
         for (const createdArtifact of createdArtifacts) {
-          await handleCreateLink(createdArtifact, parentArtifact);
+          await traceApiStore.handleCreate(createdArtifact, parentArtifact);
         }
       }
     }

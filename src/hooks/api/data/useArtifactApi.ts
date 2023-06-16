@@ -9,8 +9,8 @@ import {
   projectStore,
   traceApiStore,
   traceStore,
+  artifactCommitApiStore,
 } from "@/hooks";
-import { createArtifact, deleteArtifact, updateArtifact } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useArtifactApi = defineStore("artifactApi", () => {
@@ -38,11 +38,17 @@ export const useArtifactApi = defineStore("artifactApi", () => {
         const versionId = projectStore.versionIdWithLog;
 
         if (isUpdate) {
-          const updatedArtifacts = await updateArtifact(versionId, artifact);
+          const updatedArtifacts = await artifactCommitApiStore.handleUpdate(
+            versionId,
+            artifact
+          );
 
           artifactStore.addOrUpdateArtifacts(updatedArtifacts);
         } else {
-          const createdArtifacts = await createArtifact(versionId, artifact);
+          const createdArtifacts = await artifactCommitApiStore.handleCreate(
+            versionId,
+            artifact
+          );
 
           artifactStore.addCreatedArtifact(createdArtifacts[0]);
 
@@ -109,7 +115,7 @@ export const useArtifactApi = defineStore("artifactApi", () => {
 
         await artifactApi.handleRequest(
           async () => {
-            await deleteArtifact(artifact, relatedTraces);
+            await artifactCommitApiStore.handleDelete(artifact, relatedTraces);
 
             artifactStore.deleteArtifacts([artifact]);
             traceStore.deleteTraceLinks(relatedTraces);

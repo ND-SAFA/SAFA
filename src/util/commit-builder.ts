@@ -5,11 +5,9 @@ import {
   TraceLinkSchema,
 } from "@/types";
 import { createCommit } from "@/util";
-import { projectStore } from "@/hooks";
-import { saveCommit } from "@/api";
 
 /**
- * Responsible for creating a commit and saving it to the database.
+ * Responsible for creating a commit of changes.
  */
 export class CommitBuilder {
   /**
@@ -86,40 +84,10 @@ export class CommitBuilder {
   /**
    * Adds a modified trace link to this commit.
    *
-   * @param traceLink - The link to modify.
-   */
-  withModifiedTraceLink(traceLink: TraceLinkSchema): this {
-    this.commit.traces.modified.push(traceLink);
-    return this;
-  }
-
-  /**
-   * Adds modified trace links to this commit.
-   *
    * @param traceLinks - The links to modify.
    */
-  withModifiedTraceLinks(traceLinks: TraceLinkSchema[]): this {
+  withModifiedTraceLink(...traceLinks: TraceLinkSchema[]): this {
     this.commit.traces.modified.push(...traceLinks);
     return this;
-  }
-
-  /**
-   * Saves this commit.
-   */
-  save(): Promise<CommitSchema> {
-    return saveCommit(this.commit);
-  }
-
-  /**
-   * Creates a new commit based on the current project version.
-   */
-  static withCurrentVersion(): CommitBuilder {
-    const version = projectStore.version;
-
-    if (version === undefined) {
-      throw Error("No project version is selected.");
-    }
-
-    return new CommitBuilder(version);
   }
 }

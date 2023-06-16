@@ -27,8 +27,7 @@ export default {
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
 import { ColorProps } from "@/types";
-import { commitStore } from "@/hooks";
-import { redoCommit, undoCommit } from "@/api";
+import { commitApiStore, commitStore } from "@/hooks";
 import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
 
@@ -38,16 +37,14 @@ const props = withDefaults(defineProps<ColorProps>(), {
 
 const buttons = computed(() => [
   {
-    handler: () => {
-      undoCommit().then();
-    },
+    handler: () => commitApiStore.handleUndo(),
     label: "Undo",
     icon: "undo",
     isDisabled: !commitStore.canUndo,
     dataCy: "button-nav-undo",
   },
   {
-    handler: () => redoCommit().then(),
+    handler: () => commitApiStore.handleRedo(),
     label: "Redo",
     icon: "redo",
     isDisabled: !commitStore.canRedo,

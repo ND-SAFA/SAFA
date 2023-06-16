@@ -8,14 +8,13 @@ import {
   TraceType,
   IOHandlerCallback,
 } from "@/types";
-import { useApi, logStore, traceStore, approvalStore } from "@/hooks";
 import {
-  createLink,
-  updateApprovedLink,
-  updateDeclinedLink,
-  updateDeclinedLinks,
-  updateUnreviewedLink,
-} from "@/api";
+  useApi,
+  logStore,
+  traceStore,
+  approvalStore,
+  traceCommitApiStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
 
 export const useTraceApi = defineStore("traceApi", () => {
@@ -49,7 +48,7 @@ export const useTraceApi = defineStore("traceApi", () => {
 
     await traceApi.handleRequest(
       async () => {
-        const createdLinks = await createLink(traceLink);
+        const createdLinks = await traceCommitApiStore.handleCreate(traceLink);
 
         traceStore.addOrUpdateTraceLinks(createdLinks);
       },
@@ -73,7 +72,7 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await traceApi.handleRequest(
       async () => {
-        const updatedLinks = await updateApprovedLink(traceLink);
+        const updatedLinks = await traceCommitApiStore.handleApprove(traceLink);
 
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.approveLink(traceLink);
@@ -98,7 +97,7 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await traceApi.handleRequest(
       async () => {
-        const updatedLinks = await updateDeclinedLink(traceLink);
+        const updatedLinks = await traceCommitApiStore.handleDecline(traceLink);
 
         traceStore.deleteTraceLinks(updatedLinks);
         approvalStore.declineLink(traceLink);
@@ -125,7 +124,7 @@ export const useTraceApi = defineStore("traceApi", () => {
 
         await traceApi.handleRequest(
           async () => {
-            await updateDeclinedLinks(unreviewed);
+            await traceCommitApiStore.handleDeclineAll(unreviewed);
 
             traceStore.deleteTraceLinks(unreviewed);
             unreviewed.map((link) => approvalStore.declineLink(link));
@@ -158,7 +157,9 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await traceApi.handleRequest(
       async () => {
-        const updatedLinks = await updateUnreviewedLink(traceLink);
+        const updatedLinks = await traceCommitApiStore.handleUnreview(
+          traceLink
+        );
 
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.resetLink(traceLink);

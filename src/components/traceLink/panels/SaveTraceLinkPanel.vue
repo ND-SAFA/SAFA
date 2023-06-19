@@ -2,16 +2,18 @@
   <details-panel
     panel="saveTrace"
     data-cy="panel-trace-save"
-    @open="handleOpen"
+    @open="traceSaveStore.resetTrace"
   >
     <panel-card>
       <artifact-input
-        v-model="sourceArtifactId"
+        v-model="traceSaveStore.sourceIds"
+        multiple
         label="Source Artifact"
         data-cy="button-trace-save-source"
       />
       <artifact-input
-        v-model="targetArtifactId"
+        v-model="traceSaveStore.targetIds"
+        multiple
         label="Target Artifact"
         class="q-my-md"
         data-cy="button-trace-save-target"
@@ -32,7 +34,7 @@
         el="p"
         color="negative"
         class="q-my-md"
-        :value="errorMessage"
+        :value="traceSaveStore.errorMessage"
       />
 
       <template #actions>
@@ -41,7 +43,7 @@
             label="Create"
             icon="save"
             color="primary"
-            :disabled="!canSave"
+            :disabled="!traceSaveStore.canSave"
             data-cy="button-trace-save"
             @click="handleSubmit"
           />
@@ -61,12 +63,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   appStore,
-  artifactStore,
   traceApiStore,
-  traceStore,
+  traceSaveStore,
   typeOptionsStore,
 } from "@/hooks";
 import {
@@ -80,66 +81,13 @@ import {
   DetailsPanel,
 } from "@/components/common";
 
-const sourceArtifactId = ref("");
-const targetArtifactId = ref("");
-
-const sourceArtifact = computed(() =>
-  artifactStore.getArtifactById(sourceArtifactId.value)
-);
-const targetArtifact = computed(() =>
-  artifactStore.getArtifactById(targetArtifactId.value)
-);
-
-const errorMessage = computed(() => {
-  if (!sourceArtifact.value || !targetArtifact.value) return "";
-
-  const isLinkAllowed = traceStore.isLinkAllowed(
-    sourceArtifact.value,
-    targetArtifact.value
-  );
-
-  return isLinkAllowed === true
-    ? ""
-    : isLinkAllowed || "Cannot create a trace link.";
-});
-
-const canSave = computed(
-  () =>
-    !!sourceArtifactId.value &&
-    !!targetArtifactId.value &&
-    errorMessage.value === ""
-);
-
 const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
-
-/**
- * Resets the panel state.
- */
-function handleOpen(): void {
-  const openState = appStore.isTraceCreatorOpen;
-
-  sourceArtifactId.value = "";
-  targetArtifactId.value = "";
-
-  if (typeof openState !== "object") return;
-
-  if (openState.type === "source") {
-    sourceArtifactId.value = openState.artifactId;
-  } else if (openState.type === "target") {
-    targetArtifactId.value = openState.artifactId;
-  } else {
-    sourceArtifactId.value = openState.sourceId;
-    targetArtifactId.value = openState.targetId;
-  }
-}
 
 /**
  * Creates a trace link from the given artifacts.
  */
 async function handleSubmit(): Promise<void> {
-  if (!sourceArtifact.value || !targetArtifact.value) return;
-
-  await traceApiStore.handleCreate(sourceArtifact.value, targetArtifact.value);
+  await traceApiStore.handleCreateAll();
 
   appStore.closeSidePanels();
 }

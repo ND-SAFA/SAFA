@@ -16,6 +16,7 @@ import {
   approvalStore,
   traceCommitApiStore,
   subtreeStore,
+  traceSaveStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -35,10 +36,12 @@ export const useTraceApi = defineStore("traceApi", () => {
    *
    * @param source - The artifact to link from.
    * @param target - The artifact to link to.
+   * @param callbacks - The callbacks to call after the action.
    */
   async function handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
-    target: ArtifactSchema | ArtifactCytoElementData
+    target: ArtifactSchema | ArtifactCytoElementData,
+    callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     const sourceName =
       "artifactName" in source ? source.artifactName : source.name;
@@ -68,12 +71,25 @@ export const useTraceApi = defineStore("traceApi", () => {
           children: [...children, source.id],
         }));
       },
-      {},
+      callbacks,
       {
         success: `Created a new trace link: ${sourceName} -> ${targetName}`,
         error: `Unable to create trace link: ${sourceName} -> ${targetName}`,
       }
     );
+  }
+
+  /**
+   * Creates a new trace link between all source to all target artifacts in the saved trace store.
+   */
+  async function handleCreateAll(): Promise<void> {
+    for (const target of traceSaveStore.targets) {
+      for (const source of traceSaveStore.sources) {
+        if (!source || !target) continue;
+
+        await handleCreate(source, target);
+      }
+    }
   }
 
   /**
@@ -222,6 +238,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     declineLoading,
     unreviewLoading,
     handleCreate,
+    handleCreateAll,
     handleApprove,
     handleDecline,
     handleDeclineAll,

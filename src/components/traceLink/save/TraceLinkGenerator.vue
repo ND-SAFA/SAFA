@@ -10,7 +10,7 @@
       block
       label="Generate Trace Links"
       :disabled="!isValid"
-      :loading="loading"
+      :loading="traceGenerationApiStore.loading"
       color="primary"
       data-cy="button-trace-generate"
       class="q-mt-md"
@@ -47,7 +47,6 @@ const createEmptyArtifactLevel = (): ArtifactLevelSchema[] => [
   { source: "", target: "" },
 ];
 
-const loading = ref(false);
 const isValid = ref(false);
 const method = ref<ModelType | undefined>();
 const matrices = ref(createEmptyArtifactLevel());
@@ -62,7 +61,6 @@ const areMatricesValid = computed(() =>
  * Resets this component's data.
  */
 function handleReset(): void {
-  loading.value = false;
   isValid.value = false;
   method.value = undefined;
   matrices.value = createEmptyArtifactLevel();
@@ -72,8 +70,6 @@ function handleReset(): void {
  * Attempts to generate the selected trace links.
  */
 function handleSubmit(): void {
-  loading.value = true;
-
   traceGenerationApiStore.handleGenerate(undefined, matrices.value, {
     onComplete: () => {
       emit("submit");

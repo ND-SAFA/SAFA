@@ -27,19 +27,19 @@ export interface EntityModification<T> {
 }
 
 /**
- * Defines the delta artifacts state.
+ * Defines the delta entities state.
  */
 export interface EntityDelta<T> {
   /**
-   * A collection of all added artifacts.
+   * A collection of all added entities.
    */
   added: Record<string, T>;
   /**
-   * A collection of all removed artifacts.
+   * A collection of all removed entities.
    */
   removed: Record<string, T>;
   /**
-   * A collection of all modified artifacts.
+   * A collection of all modified entities.
    */
   modified: Record<string, EntityModification<T>>;
 }

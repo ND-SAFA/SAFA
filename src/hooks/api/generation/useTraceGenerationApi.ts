@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed } from "vue";
 import {
   ApprovalType,
   ArtifactLevelSchema,
@@ -25,6 +26,8 @@ import { pinia } from "@/plugins";
 
 export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
   const traceGenerationApi = useApi("traceGenerationApi");
+
+  const loading = computed(() => traceGenerationApi.loading);
 
   /**
    * Updates the storage of generated links.
@@ -140,7 +143,7 @@ export const useTraceGenerationApi = defineStore("traceGenerationApi", () => {
     );
   }
 
-  return { handleReload, handleGenerate, handleTrain };
+  return { loading, handleReload, handleGenerate, handleTrain };
 });
 
 export default useTraceGenerationApi(pinia);

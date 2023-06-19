@@ -17,6 +17,7 @@
     <separator vertical />
     <text-button
       text
+      :loading="artifactApiStore.deleteLoading"
       label="Delete"
       icon="delete"
       data-cy="button-artifact-delete"

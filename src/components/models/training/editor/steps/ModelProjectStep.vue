@@ -11,7 +11,7 @@
       color="primary"
       class="q-mt-sm"
       :disabled="!isValid"
-      :loading="isLoading"
+      :loading="traceGenerationApiStore.loading"
       @click="handleSubmit"
     />
   </div>
@@ -41,7 +41,6 @@ const emit = defineEmits<{
   (e: "submit"): void;
 }>();
 
-const isLoading = ref(false);
 const matrices = ref<ArtifactLevelSchema[]>([{ source: "", target: "" }]);
 
 const isValid = computed(() =>
@@ -54,10 +53,7 @@ const isValid = computed(() =>
  * Trains the current model on selected trace links within the current project.
  */
 async function handleSubmit(): Promise<void> {
-  isLoading.value = true;
-
   await traceGenerationApiStore.handleTrain(props.model, matrices.value, {
-    onComplete: () => (isLoading.value = false),
     onSuccess: () => {
       matrices.value = [{ source: "", target: "" }];
       emit("submit");

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed } from "vue";
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
@@ -19,7 +20,15 @@ import {
 import { pinia } from "@/plugins";
 
 export const useTraceApi = defineStore("traceApi", () => {
-  const traceApi = useApi("traceApi");
+  const createTraceApi = useApi("traceApi");
+  const approveTraceApi = useApi("approveTraceApi");
+  const unreviewTraceApi = useApi("unreviewTraceApi");
+  const declineTraceApi = useApi("declineTraceApi");
+
+  const createLoading = computed(() => createTraceApi.loading);
+  const approveLoading = computed(() => approveTraceApi.loading);
+  const unreviewLoading = computed(() => unreviewTraceApi.loading);
+  const declineLoading = computed(() => declineTraceApi.loading);
 
   /**
    * Creates a new trace link.
@@ -47,7 +56,7 @@ export const useTraceApi = defineStore("traceApi", () => {
       score: 1,
     };
 
-    await traceApi.handleRequest(
+    await createTraceApi.handleRequest(
       async () => {
         const createdLinks = await traceCommitApiStore.handleCreate(traceLink);
 
@@ -77,7 +86,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await approveTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleApprove(traceLink);
 
@@ -102,7 +111,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await declineTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleDecline(traceLink);
 
@@ -135,7 +144,7 @@ export const useTraceApi = defineStore("traceApi", () => {
 
         const unreviewed = approvalStore.unreviewedLinks;
 
-        await traceApi.handleRequest(
+        await declineTraceApi.handleRequest(
           async () => {
             await traceCommitApiStore.handleDeclineAll(unreviewed);
 
@@ -168,7 +177,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await unreviewTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleUnreview(
           traceLink
@@ -208,6 +217,10 @@ export const useTraceApi = defineStore("traceApi", () => {
   }
 
   return {
+    createLoading,
+    approveLoading,
+    declineLoading,
+    unreviewLoading,
     handleCreate,
     handleApprove,
     handleDecline,

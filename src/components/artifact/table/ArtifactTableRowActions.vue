@@ -8,6 +8,7 @@
     />
     <icon-button
       icon="delete"
+      :loading="artifactApiStore.deleteLoading"
       :tooltip="`Delete '${artifact.name}'`"
       data-cy="button-artifact-delete-icon"
       @click="handleDelete"

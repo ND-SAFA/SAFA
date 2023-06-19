@@ -16,6 +16,7 @@
       </template>
       <template #2>
         <version-selector-table
+          v-if="selectedProject"
           :minimal="props.minimal"
           :open="isVersionStep"
           :project="selectedProject"
@@ -59,7 +60,6 @@ const defaultVersionStep = (): StepperStep => ({
   done: false,
 });
 
-const loading = ref(false);
 const currentStep = ref(1);
 const steps = ref([defaultProjectStep(), defaultVersionStep()]);
 const selectedProject = ref<IdentifierSchema | undefined>(undefined);
@@ -132,14 +132,11 @@ function handleVersionSelect(version: VersionSchema | undefined) {
 /**
  * Loads the selected project.
  */
-async function handleSubmit(): Promise<void> {
+function handleSubmit(): void {
   if (!selectedProject.value || !selectedVersion.value) return;
 
-  loading.value = true;
-
-  await getVersionApiStore.handleLoad(selectedVersion.value.versionId);
-
-  loading.value = false;
-  handleClear();
+  getVersionApiStore
+    .handleLoad(selectedVersion.value.versionId)
+    .then(() => handleClear());
 }
 </script>

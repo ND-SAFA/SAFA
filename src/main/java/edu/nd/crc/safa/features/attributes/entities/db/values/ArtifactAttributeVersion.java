@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -43,6 +44,10 @@ public class ArtifactAttributeVersion {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "attribute_id", nullable = false)
     private CustomAttribute attribute;
+
+    @Lob
+    @Column(columnDefinition = "mediumtext", nullable = false)
+    private String value;
 
     public CustomAttributeStorageType getValueType() {
         return attribute.getType().getStorageType();

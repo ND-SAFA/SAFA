@@ -126,9 +126,9 @@ const deltaOptions = deltaTypeOptions();
 const countOptions = traceCountOptions();
 
 const groupBy = ref<string | undefined>("type");
-const visibleTypes = ref<string[]>([]);
+const visibleTypes = ref<string[] | null>(null);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
-const deltaTypes = ref<ArtifactDeltaState[]>([]);
+const deltaTypes = ref<ArtifactDeltaState[] | null>(null);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
@@ -150,13 +150,14 @@ const rows = computed(() => artifactStore.flatArtifacts);
  */
 function filterRow(row: FlatArtifact): boolean {
   const subtree = subtreeStore.getSubtreeItem(row.id);
+  const visible = visibleTypes.value || [];
+  const delta = deltaTypes.value || [];
 
   return (
-    (visibleTypes.value.length === 0 ||
-      visibleTypes.value.includes(row.type)) &&
+    ((visible.length || 0) === 0 || visible.includes(row.type)) &&
     (!inDeltaView.value ||
-      deltaTypes.value.length === 0 ||
-      deltaTypes.value.includes(getDeltaType(row))) &&
+      delta.length === 0 ||
+      delta.includes(getDeltaType(row))) &&
     (countType.value === TraceCountTypes.all ||
       (countType.value === TraceCountTypes.onlyTraced &&
         subtree.neighbors.length > 0) ||

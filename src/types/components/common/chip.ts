@@ -24,6 +24,10 @@ export interface ChipProps
    * A chip label to display.
    */
   label?: string;
+  /**
+   * If true, the chip is displayed more compactly.
+   */
+  dense?: boolean;
 }
 
 /**
@@ -58,4 +62,8 @@ export interface AttributeChipProps
    * Whether to render a confidence score instead of a chip.
    */
   confidenceScore?: boolean;
+  /**
+   * If true, the chip is displayed more compactly.
+   */
+  dense?: boolean;
 }

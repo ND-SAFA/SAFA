@@ -15,12 +15,24 @@
     >
       <template #header-right>
         <multiselect-input
+          v-model="visibleTypes"
+          outlined
+          dense
+          clearable
+          :use-chips="false"
+          :options="typeOptions"
+          label="Visible Types"
+          b=""
+          class="q-mr-sm table-input"
+          data-cy="input-trace-table-types"
+        />
+        <multiselect-input
           v-if="inDeltaView"
           v-model="deltaTypes"
           outlined
           dense
           :use-chips="false"
-          :options="options"
+          :options="deltaOptions"
           label="Delta Types"
           option-to-value
           option-value="id"
@@ -73,6 +85,7 @@ import {
   attributesStore,
   deltaStore,
   selectionStore,
+  typeOptionsStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -88,13 +101,15 @@ const customCells: (keyof FlatArtifact | string)[] = [
   "actions",
 ];
 
-const options = deltaTypeOptions();
+const deltaOptions = deltaTypeOptions();
 
 const groupBy = ref<string | undefined>("type");
+const visibleTypes = ref<string[]>([]);
 const deltaTypes = ref<ArtifactDeltaState[]>([]);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
+const typeOptions = computed(() => typeOptionsStore.artifactTypes);
 
 const columns = computed(() => [
   ...artifactColumns,
@@ -112,9 +127,11 @@ const rows = computed(() => artifactStore.flatArtifacts);
  */
 function filterRow(row: FlatArtifact): boolean {
   return (
-    !inDeltaView.value ||
-    deltaTypes.value.length === 0 ||
-    deltaTypes.value.includes(getDeltaType(row))
+    (visibleTypes.value.length === 0 ||
+      visibleTypes.value.includes(row.type)) &&
+    (!inDeltaView.value ||
+      deltaTypes.value.length === 0 ||
+      deltaTypes.value.includes(getDeltaType(row)))
   );
 }
 

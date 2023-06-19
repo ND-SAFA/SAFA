@@ -205,6 +205,10 @@ export interface ArtifactTypeInputProps
    * If true, the number of artifacts matching this type is displayed.
    */
   showCount?: boolean;
+  /**
+   * If true, the input and chips are displayed more compactly.
+   */
+  dense?: boolean;
 }
 
 /**

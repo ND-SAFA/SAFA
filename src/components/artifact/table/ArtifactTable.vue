@@ -26,6 +26,19 @@
           class="q-mr-sm table-input"
           data-cy="input-trace-table-types"
         />
+        <select-input
+          v-model="countType"
+          outlined
+          dense
+          :options="countOptions"
+          option-to-value
+          option-label="name"
+          option-value="id"
+          label="Visible Types"
+          b=""
+          class="q-mr-sm table-input"
+          data-cy="input-trace-table-count"
+        />
         <multiselect-input
           v-if="inDeltaView"
           v-model="deltaTypes"
@@ -71,13 +84,19 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ArtifactDeltaState, FlatArtifact, TableGroupRow } from "@/types";
+import {
+  ArtifactDeltaState,
+  FlatArtifact,
+  TableGroupRow,
+  TraceCountTypes,
+} from "@/types";
 import {
   deltaTypeOptions,
   artifactAttributesColumns,
   artifactColumns,
   artifactDeltaColumn,
   actionsColumn,
+  traceCountOptions,
 } from "@/util";
 import {
   appStore,
@@ -85,6 +104,7 @@ import {
   attributesStore,
   deltaStore,
   selectionStore,
+  subtreeStore,
   typeOptionsStore,
 } from "@/hooks";
 import {
@@ -93,6 +113,7 @@ import {
   AttributeChip,
   MultiselectInput,
 } from "@/components/common";
+import SelectInput from "@/components/common/input/SelectInput.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 const customCells: (keyof FlatArtifact | string)[] = [
@@ -102,9 +123,11 @@ const customCells: (keyof FlatArtifact | string)[] = [
 ];
 
 const deltaOptions = deltaTypeOptions();
+const countOptions = traceCountOptions();
 
 const groupBy = ref<string | undefined>("type");
 const visibleTypes = ref<string[]>([]);
+const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const deltaTypes = ref<ArtifactDeltaState[]>([]);
 
 const loading = computed(() => appStore.isLoading > 0);
@@ -126,12 +149,19 @@ const rows = computed(() => artifactStore.flatArtifacts);
  * @return Whether to keep the row.
  */
 function filterRow(row: FlatArtifact): boolean {
+  const subtree = subtreeStore.getSubtreeItem(row.id);
+
   return (
     (visibleTypes.value.length === 0 ||
       visibleTypes.value.includes(row.type)) &&
     (!inDeltaView.value ||
       deltaTypes.value.length === 0 ||
-      deltaTypes.value.includes(getDeltaType(row)))
+      deltaTypes.value.includes(getDeltaType(row))) &&
+    (countType.value === TraceCountTypes.all ||
+      (countType.value === TraceCountTypes.onlyTraced &&
+        subtree.neighbors.length > 0) ||
+      (countType.value === TraceCountTypes.notTraced &&
+        subtree.neighbors.length === 0))
   );
 }
 

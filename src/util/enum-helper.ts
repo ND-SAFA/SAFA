@@ -15,6 +15,7 @@ import {
   SearchSelectOption,
   SelectOption,
   SettingsTabTypes,
+  TraceCountTypes,
   TracePredictionTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
@@ -82,6 +83,19 @@ export function deltaTypeOptions(): SelectOption[] {
     createEnumOption(ArtifactDeltaState.ADDED),
     createEnumOption(ArtifactDeltaState.MODIFIED),
     createEnumOption(ArtifactDeltaState.REMOVED),
+  ];
+}
+
+/**
+ * Returns display names for each trace count type.
+ *
+ * @return The select option names and ids.
+ */
+export function traceCountOptions(): SelectOption[] {
+  return [
+    createEnumOption(TraceCountTypes.all, "All Artifacts"),
+    createEnumOption(TraceCountTypes.onlyTraced, "Only Traced Artifacts"),
+    createEnumOption(TraceCountTypes.notTraced, "Only Orphan Artifacts"),
   ];
 }
 

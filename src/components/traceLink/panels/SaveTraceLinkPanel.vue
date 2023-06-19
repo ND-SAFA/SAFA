@@ -8,13 +8,13 @@
       <artifact-input
         v-model="traceSaveStore.sourceIds"
         multiple
-        label="Source Artifact"
+        label="Source Artifacts"
         data-cy="button-trace-save-source"
       />
       <artifact-input
         v-model="traceSaveStore.targetIds"
         multiple
-        label="Target Artifact"
+        label="Target Artifacts"
         class="q-my-md"
         data-cy="button-trace-save-target"
       />

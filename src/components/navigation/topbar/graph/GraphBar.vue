@@ -5,7 +5,7 @@
       <mode-buttons />
     </flex-box>
     <flex-box align="center">
-      <type-buttons />
+      <visible-type-buttons />
       <graph-buttons />
       <commit-buttons />
     </flex-box>
@@ -26,5 +26,5 @@ import { FlexBox, CommitButtons } from "@/components/common";
 import { DocumentSelector } from "@/components/document";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
-import TypeButtons from "./TypeButtons.vue";
+import VisibleTypeButtons from "./VisibleTypeButtons.vue";
 </script>

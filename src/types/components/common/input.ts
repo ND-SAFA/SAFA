@@ -183,6 +183,10 @@ export interface ArtifactInput extends LabelProps, MultipleProps {
    * If true, only artifacts in the current view are displayed.
    */
   onlyDocumentArtifacts?: boolean;
+  /**
+   * If set, these types will be hidden from the initial artifact list.
+   */
+  defaultHiddenTypes?: string[];
 }
 
 /**

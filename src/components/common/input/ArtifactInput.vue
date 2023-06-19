@@ -14,6 +14,7 @@
     option-value="id"
     input-debounce="0"
     @filter="filter"
+    @popup-show="handleReloadOptions"
   >
     <template #before-options>
       <flex-box full-width justify="end" y="1">
@@ -80,7 +81,7 @@ const artifacts = computed(() =>
 );
 
 const options = ref(artifacts.value);
-const hiddenTypes = ref<string[]>([]);
+const hiddenTypes = ref(props.defaultHiddenTypes || []);
 
 const selectedCount = computed(() => {
   if (typeof model.value === "string") {
@@ -140,6 +141,16 @@ function handleTypeChange(
     hiddenTypes.value = [];
   }
 
+  filter("", (fn) => fn());
+}
+
+/**
+ * If default hidden types are set, the artifact list will be re-filtered when opened.
+ */
+function handleReloadOptions(): void {
+  if (!props.defaultHiddenTypes) return;
+
+  hiddenTypes.value = props.defaultHiddenTypes;
   filter("", (fn) => fn());
 }
 </script>

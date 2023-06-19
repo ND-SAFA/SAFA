@@ -6,17 +6,19 @@
   >
     <panel-card>
       <artifact-input
-        v-model="traceSaveStore.sourceIds"
-        multiple
-        label="Source Artifacts"
-        data-cy="button-trace-save-source"
-      />
-      <artifact-input
         v-model="traceSaveStore.targetIds"
         multiple
         label="Target Artifacts"
-        class="q-my-md"
+        :default-hidden-types="traceSaveStore.defaultHiddenTargetTypes"
         data-cy="button-trace-save-target"
+      />
+      <artifact-input
+        v-model="traceSaveStore.sourceIds"
+        multiple
+        label="Source Artifacts"
+        class="q-my-md"
+        :default-hidden-types="traceSaveStore.defaultHiddenSourceTypes"
+        data-cy="button-trace-save-source"
       />
 
       <expansion-item
@@ -63,7 +65,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import {
   appStore,
   traceApiStore,
@@ -91,4 +93,13 @@ async function handleSubmit(): Promise<void> {
 
   appStore.closeSidePanels();
 }
+
+watch(
+  () => appStore.isTraceCreatorOpen,
+  (open) => {
+    if (!open) return;
+
+    traceSaveStore.resetTrace();
+  }
+);
 </script>

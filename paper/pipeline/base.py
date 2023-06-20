@@ -7,9 +7,10 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import NpEncoder
 
-DEFAULT_RANKING_QUESTION = "Rank the artifacts from most to least relevant to the source.\n\nSource: "
-DEFAULT_RANKING_FORMAT = "Instructions: Provide a comma delimited list of the ranked artifact IDs. " \
-                         "The ID is in the format 'ID: [ARTIFACT ID]'."
+DEFAULT_RANKING_QUESTION = "Rank the artifacts from most to least relevant to the source. " \
+                           "Provide the ranked artifacts as comma delimited list of artifact ids. " \
+                           "\n\nSource: "
+DEFAULT_RANKING_FORMAT = ""
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 

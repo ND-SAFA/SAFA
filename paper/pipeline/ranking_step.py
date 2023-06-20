@@ -19,7 +19,7 @@ def create_ranking_prompts(s: RankingStore):
     prompts = []
     source_ids = []
     for s_name, target_ids in trace_queries.items():
-        target_ids.sort()
+        #  target_ids.sort()
         prompt = create_prompts(artifact_map, s_name, target_ids, s.prompt_question, s.prompt_format)
         prompts.append(prompt)
         source_ids.append(s_name)
@@ -52,7 +52,7 @@ def create_prompts(artifact_map, source_name, target_names, base_prompt, suffix_
     prompt = base_prompt + f"\"{artifact_map[source_name]}\"\n\n# Artifacts\n\n"
     for t_name in target_names:
         prompt += format_artifact(t_name)
-    prompt += f"\n{suffix_prompt}"
+    prompt += f"\n{suffix_prompt}".strip()
     return prompt
 
 

@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StopWatch;
 
 /**
  * Implements custom any custom artifact repository logic.
@@ -135,42 +133,9 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
-        //TODO remove stopwatches
-        StopWatch stopWatch = new StopWatch();
-
-        stopWatch.start("Getting artifacts");
         List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
-
-        stopWatch.stop();
-
-        stopWatch.start("Adding attributes");
         attachCustomAttributesToArtifactVersions(versions);
-        stopWatch.stop();
-
-        //printStopwatch(stopWatch, "      |--  ");
-
         return versions;
-    }
-
-    private void printStopwatch(StopWatch stopWatch, String prefix) {
-        int maxLen = 0;
-        int maxTimeLen = 0;
-        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
-            int len = taskInfo.getTaskName().length();
-            if (len > maxLen) {
-                maxLen = len;
-            }
-
-            int timeLen = (int) Math.log10(taskInfo.getTimeMillis());
-            if (timeLen > maxTimeLen) {
-                maxTimeLen = timeLen;
-            }
-        }
-
-        String formatString = "%" + maxLen + "s: %" + (maxTimeLen + 1) + "d";
-        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
-            System.out.println(prefix + String.format(formatString, taskInfo.getTaskName(), taskInfo.getTimeMillis()));
-        }
     }
 
     @Override
@@ -202,52 +167,12 @@ public class ArtifactVersionRepositoryImpl
      * Private helper methods
      */
 
-    private void attachDocumentLinks(ArtifactVersion artifactVersion,
-                                     ArtifactAppEntity artifactAppEntity) {
-        //TODO: Skipping versioning system, currently using artifact version which is not usually the user wants.
-        Artifact artifact = artifactVersion.getArtifact();
-        List<DocumentArtifact> allDocumentArtifactVersions = this.documentArtifactRepository.findByArtifact(artifact);
-        List<UUID> documentIds = new ArrayList<>();
-        for (DocumentArtifact documentArtifact : allDocumentArtifactVersions) {
-            documentIds.add(documentArtifact.getDocument().getDocumentId());
-        }
-
-        artifactAppEntity.setDocumentIds(documentIds);
-    }
-
     private void attachCustomAttributesToArtifactVersion(ArtifactVersion artifactVersion) {
-        Map<String, JsonNode> customFields =
-                attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
-        customFields.forEach(artifactVersion::addCustomAttributeValue);
+        attributeValueService.attachCustomAttributesToArtifact(artifactVersion);
     }
 
     private void attachCustomAttributesToArtifactVersions(List<ArtifactVersion> artifactVersion) {
         attributeValueService.attachCustomAttributesToArtifacts(artifactVersion);
-    }
-
-    private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
-        switch (artifact.getDocumentType()) {
-            case SAFETY_CASE:
-                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
-                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
-                if (safetyCaseArtifactOptional.isPresent()) {
-                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
-                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
-                }
-                //TODO: Throw error if not found?
-                break;
-            case FTA:
-                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
-                if (ftaArtifactOptional.isPresent()) {
-                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
-                    artifactAppEntity.setDocumentType(DocumentType.FTA);
-                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     public void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {

@@ -41,23 +41,18 @@ public class AttributeValueService {
      * goes from keyname to json nodes containing the values.
      *
      * @param artifactVersion The artifact version we're looking at.
-     * @return A map from attribute keynames to values.
      */
-    public Map<String, JsonNode> getCustomAttributeValuesForArtifact(ArtifactVersion artifactVersion) {
+    public void attachCustomAttributesToArtifact(ArtifactVersion artifactVersion) {
 
         List<ArtifactAttributeVersion> attributeVersions =
             serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersion(artifactVersion);
-
-        Map<String, JsonNode> out = new HashMap<>();
 
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
             // TODO handle types correctly
             JsonNode jsonValue = TextNode.valueOf(attributeVersion.getValue());
 
-            out.put(attributeVersion.getAttribute().getKeyname(), jsonValue);
+            artifactVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
         }
-
-        return out;
     }
 
     /**
@@ -65,23 +60,14 @@ public class AttributeValueService {
      * goes from keyname to json nodes containing the values.
      *
      * @param artifactVersion The artifact version we're looking at.
-     * @return A map from attribute keynames to values.
      */
     public void attachCustomAttributesToArtifacts(List<ArtifactVersion> artifactVersion) {
-        //TODO remove stopwatches
-        StopWatch stopWatch = new StopWatch();
-
-        stopWatch.start("Set up map");
         Map<UUID, ArtifactVersion> artifactVersionMap = new HashMap<>();
         artifactVersion.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
-        stopWatch.stop();
 
-        stopWatch.start("Retrieve attribute versions");
         List<ArtifactAttributeVersion> attributeVersions =
             serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersion);
-        stopWatch.stop();
 
-        stopWatch.start("Convert values");
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
             // TODO handle types correctly
             JsonNode jsonValue = TextNode.valueOf(attributeVersion.getValue());
@@ -90,9 +76,6 @@ public class AttributeValueService {
                 = artifactVersionMap.get(attributeVersion.getArtifactVersion().getVersionEntityId());
             thisVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
         }
-        stopWatch.stop();
-
-        //printStopwatch(stopWatch, "        |--  ");
     }
 
     private void printStopwatch(StopWatch stopWatch, String prefix) {

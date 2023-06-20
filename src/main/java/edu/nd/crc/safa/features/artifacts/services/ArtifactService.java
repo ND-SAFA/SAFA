@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
-    ArtifactVersionRepository artifactVersionRepository;
+    private IVersionRepository<ArtifactVersion, ArtifactAppEntity> artifactVersionRepository;
 
     public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion) {
         return getAppEntities(projectVersion, null);
@@ -31,7 +31,8 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     }
     
     public List<ArtifactAppEntity> getAppEntities(Project project) {
-        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository.findByProjectVersionProject(project);
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
+            .retrieveVersionEntitiesByProject(project);
         return versionToAppEntity(artifactVersions);
     }
 

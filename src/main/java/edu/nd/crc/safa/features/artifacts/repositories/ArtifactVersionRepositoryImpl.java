@@ -189,21 +189,13 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
 
-        ArtifactAppEntity artifactAppEntity =
-            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
-                artifactVersion.getTypeName(),
-                artifactVersion.getName(),
-                artifactVersion.getSummary(),
-                artifactVersion.getContent(),
-                artifactVersion.getArtifact().getDocumentType(),
-                artifactVersion.getCustomAttributeValues());
-
-        // Step 2 - Attach document links
-        attachDocumentLinks(artifactVersion, artifactAppEntity);
-
-        // Step 3 - Attach Safety Case or FTA information
-        attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
-        return artifactAppEntity;
+        return new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
+            artifactVersion.getTypeName(),
+            artifactVersion.getName(),
+            artifactVersion.getSummary(),
+            artifactVersion.getContent(),
+            artifactVersion.getArtifact().getDocumentType(),
+            artifactVersion.getCustomAttributeValues());
     }
 
     /**

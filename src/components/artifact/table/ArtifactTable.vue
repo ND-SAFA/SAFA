@@ -2,6 +2,7 @@
   <panel-card>
     <groupable-table
       v-model:group-by="groupBy"
+      :expanded="expanded"
       :columns="columns"
       :rows="rows"
       row-key="id"
@@ -56,6 +57,16 @@
         />
       </template>
 
+      <template #body-expanded="{ row }">
+        <typography
+          default-expanded
+          :collapse-length="0"
+          :variant="getVariant(row)"
+          el="p"
+          :value="row.body"
+        />
+      </template>
+
       <template #body-cell-type="{ row }">
         <attribute-chip :value="row.type" artifact-type />
       </template>
@@ -88,6 +99,7 @@ import {
   ArtifactDeltaState,
   FlatArtifact,
   TableGroupRow,
+  TextType,
   TraceCountTypes,
 } from "@/types";
 import {
@@ -97,6 +109,7 @@ import {
   artifactDeltaColumn,
   actionsColumn,
   traceCountOptions,
+  isCodeArtifact,
 } from "@/util";
 import {
   appStore,
@@ -112,8 +125,9 @@ import {
   GroupableTable,
   AttributeChip,
   MultiselectInput,
+  Typography,
+  SelectInput,
 } from "@/components/common";
-import SelectInput from "@/components/common/input/SelectInput.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 const customCells: (keyof FlatArtifact | string)[] = [
@@ -126,13 +140,17 @@ const deltaOptions = deltaTypeOptions();
 const countOptions = traceCountOptions();
 
 const groupBy = ref<string | undefined>("type");
-const visibleTypes = ref<string[] | null>(null);
+const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
-const deltaTypes = ref<ArtifactDeltaState[] | null>(null);
+const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
 const typeOptions = computed(() => typeOptionsStore.artifactTypes);
+
+const expanded = computed(() =>
+  selectionStore.selectedArtifactId ? [selectionStore.selectedArtifactId] : []
+);
 
 const columns = computed(() => [
   ...artifactColumns,
@@ -164,6 +182,15 @@ function filterRow(row: FlatArtifact): boolean {
       (countType.value === TraceCountTypes.notTraced &&
         subtree.neighbors.length === 0))
   );
+}
+
+/**
+ * Returns the typography variant for a rendering the body of a row.
+ * @param row - The artifact to display.
+ * @return The typography variant to use.
+ */
+function getVariant(row: FlatArtifact): TextType {
+  return isCodeArtifact(row.name || "") ? "code" : "expandable";
 }
 
 /**

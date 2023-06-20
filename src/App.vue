@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lff" class="bg-background">
+  <q-layout view="lHh LpR lfr" class="bg-background">
     <app-nav />
     <q-page-container>
       <router-view v-slot="{ Component }">

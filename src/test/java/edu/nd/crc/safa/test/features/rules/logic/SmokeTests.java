@@ -71,8 +71,8 @@ class SmokeTests extends ApplicationBaseTest {
         targetVersion.setEntityVersionId(UUID.randomUUID());
 
         Map<UUID, ArtifactVersion> artifactMap = Map.of(
-            sourceVersion.getEntityVersionId(), sourceVersion,
-            targetVersion.getEntityVersionId(), targetVersion
+            sourceArtifact.getArtifactId(), sourceVersion,
+            targetArtifact.getArtifactId(), targetVersion
         );
 
         boolean result = verifier.satisfiesLinkCountRule(function, sourceArtifact.getArtifactId(),
@@ -101,12 +101,14 @@ class SmokeTests extends ApplicationBaseTest {
         Artifact sourceArtifact = new Artifact();
         sourceArtifact.setName(sourceName);
         sourceArtifact.setType(sourceType);
+        sourceArtifact.setArtifactId(UUID.randomUUID());
 
         ArtifactType targetType = new ArtifactType();
         targetType.setName("requirement");
         Artifact targetArtifact = new Artifact();
         targetArtifact.setName(targetName);
         targetArtifact.setType(targetType);
+        targetArtifact.setArtifactId(UUID.randomUUID());
 
         TraceLink link = new TraceLink(sourceArtifact, targetArtifact);
 
@@ -122,8 +124,8 @@ class SmokeTests extends ApplicationBaseTest {
         targetVersion.setEntityVersionId(UUID.randomUUID());
 
         Map<UUID, ArtifactVersion> artifactMap = Map.of(
-            sourceVersion.getEntityVersionId(), sourceVersion,
-            targetVersion.getEntityVersionId(), targetVersion
+            sourceArtifact.getArtifactId(), sourceVersion,
+            targetArtifact.getArtifactId(), targetVersion
         );
 
         boolean isSatisfied = verifier.satisfiesChildCountRule(function, sourceArtifact.getArtifactId(),

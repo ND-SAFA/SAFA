@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 public class TreeVerifier {
 
     public static final Retrievers<ArtifactVersion, TraceLink> dbEntityRetrievers = new Retrievers<>(
-        ArtifactVersion::getVersionEntityId,
+        a -> a.getArtifact().getArtifactId(),
         ArtifactVersion::getTypeName,
         t -> t.getSourceArtifact().getArtifactId(),
         t -> t.getTargetArtifact().getArtifactId()

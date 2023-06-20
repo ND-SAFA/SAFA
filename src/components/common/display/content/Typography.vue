@@ -1,24 +1,24 @@
 <template>
-  <div v-if="isExpandable" class="width-100">
-    <div v-if="isExpanded" :class="className + ' text-white-space-normal'">
+  <div v-if="expandable" class="width-100">
+    <div v-if="expanded" :class="className + ' text-white-space-normal'">
       {{ value }}
     </div>
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
-      {{ isExpanded ? "See Less" : "See More" }}
+    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
+      {{ expanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre v-if="isExpanded" v-highlightjs :class="className">
+    <pre v-if="expanded" v-highlightjs :class="className">
       <code>{{value}}</code>
     </pre>
     <div v-else :class="className + ' text-grey-8'">
       Code is hidden to save space.
     </div>
-    <q-btn flat size="sm" color="grey-8" @click.stop="isExpanded = !isExpanded">
-      {{ isExpanded ? "See Less" : "See More" }}
+    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
+      {{ expanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
   <span v-else-if="el === 'span'" :class="className">
@@ -99,13 +99,13 @@ const className = useMargins(props, () => [
   ["class", props.class],
 ]);
 
-const isExpanded = ref(
+const expanded = ref(
   props.defaultExpanded &&
     (props.collapseLength === 0 ||
       String(props.value).length < props.collapseLength)
 );
 
-const isExpandable = computed(() => props.variant === "expandable");
+const expandable = computed(() => props.variant === "expandable");
 
 /**
  * Collapse the text if it changes and is too long.
@@ -118,7 +118,7 @@ watch(
       String(props.value).length < props.collapseLength
     )
       return;
-    isExpanded.value = false;
+    expanded.value = false;
   }
 );
 </script>

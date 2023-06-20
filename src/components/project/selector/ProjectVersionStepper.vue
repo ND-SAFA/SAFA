@@ -62,8 +62,8 @@ const defaultVersionStep = (): StepperStep => ({
 
 const currentStep = ref(1);
 const steps = ref([defaultProjectStep(), defaultVersionStep()]);
-const selectedProject = ref<IdentifierSchema | undefined>(undefined);
-const selectedVersion = ref<VersionSchema | undefined>(undefined);
+const selectedProject = ref<IdentifierSchema>();
+const selectedVersion = ref<VersionSchema>();
 
 const isProjectStep = computed(() => currentStep.value === 1);
 const isVersionStep = computed(() => currentStep.value === 2);

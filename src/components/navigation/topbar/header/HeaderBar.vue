@@ -28,8 +28,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { computed } from "vue";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
@@ -38,10 +38,6 @@ import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();
-const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
 
-watch(
-  () => currentRoute.path,
-  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
-);
+const graphVisible = computed(() => currentRoute.path === Routes.ARTIFACT);
 </script>

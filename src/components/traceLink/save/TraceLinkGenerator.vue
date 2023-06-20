@@ -48,7 +48,7 @@ const createEmptyArtifactLevel = (): ArtifactLevelSchema[] => [
 ];
 
 const isValid = ref(false);
-const method = ref<ModelType | undefined>();
+const method = ref<ModelType>();
 const matrices = ref(createEmptyArtifactLevel());
 
 const areMatricesValid = computed(() =>

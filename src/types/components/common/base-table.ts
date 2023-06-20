@@ -1,11 +1,11 @@
 /**
  * A column within a data table.
  */
-export interface TableColumn<T = Record<string, unknown>> {
+export interface TableColumn<Row = Record<string, unknown>> {
   /**
    * The column field id.
    */
-  name: keyof T | string;
+  name: keyof Row | string;
   /**
    * The column display name.
    */
@@ -13,7 +13,7 @@ export interface TableColumn<T = Record<string, unknown>> {
   /**
    * A function for returning the field id from a row item.
    */
-  field(row: T): unknown;
+  field(row: Row): unknown;
   /**
    * Whether this column is required and cannot be hidden.
    */

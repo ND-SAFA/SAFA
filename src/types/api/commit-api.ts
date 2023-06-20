@@ -26,17 +26,17 @@ export interface CommitSchema {
 /**
  * Encapsulates the changes for a generic type of project entity.
  */
-export interface EntityCommitSchema<T> {
+export interface EntityCommitSchema<Entity> {
   /**
    * The entities that were added.
    */
-  added: T[];
+  added: Entity[];
   /**
    * The entities that were removed
    */
-  removed: T[];
+  removed: Entity[];
   /**
    * The entities that were modified.
    */
-  modified: T[];
+  modified: Entity[];
 }

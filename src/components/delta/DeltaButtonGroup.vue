@@ -27,7 +27,7 @@ export default {
 import { computed } from "vue";
 import {
   ArtifactSchema,
-  EntityModification,
+  EntityModificationSchema,
   TraceLinkSchema,
   DeltaType,
   SelectOption,
@@ -46,7 +46,7 @@ const props = defineProps<{
    */
   items: Record<
     string,
-    ArtifactSchema | EntityModification<ArtifactSchema> | TraceLinkSchema
+    ArtifactSchema | EntityModificationSchema<ArtifactSchema> | TraceLinkSchema
   >;
   /**
    *  If true, items will be interpreted as traces instead of artifacts.
@@ -79,7 +79,7 @@ const itemFields = computed<SelectOption[]>(() => {
     );
   } else {
     return props.deltaType === "modified"
-      ? (items as EntityModification<ArtifactSchema>[]).map(
+      ? (items as EntityModificationSchema<ArtifactSchema>[]).map(
           ({ after: { id, name } }) => ({ id, name })
         )
       : (items as ArtifactSchema[]).map(({ id, name }) => ({ id, name }));

@@ -4,9 +4,9 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   ArtifactSchema,
-  EntityModification,
+  EntityModificationSchema,
   GraphMode,
-  ProjectDelta,
+  VersionDeltaSchema,
   TraceLinkSchema,
   VersionSchema,
 } from "@/types";
@@ -53,7 +53,10 @@ export const useDelta = defineStore("delta", {
     /**
      * @return A collection of all modified artifacts.
      */
-    modifiedArtifacts(): Record<string, EntityModification<ArtifactSchema>> {
+    modifiedArtifacts(): Record<
+      string,
+      EntityModificationSchema<ArtifactSchema>
+    > {
       return this.projectDelta.artifacts.modified;
     },
     /**
@@ -101,7 +104,7 @@ export const useDelta = defineStore("delta", {
      * @param afterVersion - The version that artifact deltas have been made to.
      */
     async setDeltaPayload(
-      payload: ProjectDelta,
+      payload: VersionDeltaSchema,
       afterVersion?: VersionSchema
     ): Promise<void> {
       this.projectDelta = payload;

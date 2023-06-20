@@ -1,8 +1,8 @@
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
-  DeltaArtifact,
-  EntityModification,
+  ArtifactDeltaSchema,
+  EntityModificationSchema,
 } from "@/types";
 
 /**
@@ -12,8 +12,8 @@ import {
  * @return Whether this item is a modified artifact.
  */
 export function isModifiedArtifact(
-  artifact: DeltaArtifact
-): artifact is EntityModification<ArtifactSchema> {
+  artifact: ArtifactDeltaSchema
+): artifact is EntityModificationSchema<ArtifactSchema> {
   const requiredFields = ["before", "after"];
   return containsFields(artifact, requiredFields);
 }
@@ -25,7 +25,7 @@ export function isModifiedArtifact(
  * @return Whether this item is an artifact.
  */
 export function isArtifact(
-  artifact: DeltaArtifact
+  artifact: ArtifactDeltaSchema
 ): artifact is ArtifactSchema {
   const requiredFields = ["id", "body", "type"];
   return containsFields(artifact, requiredFields);

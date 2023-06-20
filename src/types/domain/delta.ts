@@ -1,7 +1,12 @@
 /**
  * Enumerates the types of artifact deltas.
  */
-import { ArtifactSchema, TraceLinkSchema } from "@/types";
+import {
+  ArtifactSchema,
+  LayoutPositionsSchema,
+  SubtreeMapSchema,
+  TraceLinkSchema,
+} from "@/types";
 
 /**
  * Enumerates the types of delta state.
@@ -11,72 +16,64 @@ export enum ArtifactDeltaState {
   MODIFIED = "MODIFIED",
   ADDED = "ADDED",
   REMOVED = "REMOVED",
+  IMPACTED = "IMPACTED",
 }
-
-/**
- * Defines all artifact delta types.
- */
-export type DeltaType = "added" | "modified" | "removed";
 
 /**
  * Defines a modification over some delta
  */
-export interface EntityModification<T> {
-  before: T;
-  after: T;
+export interface EntityModificationSchema<Entity> {
+  before: Entity;
+  after: Entity;
 }
 
 /**
  * Defines the delta entities state.
  */
-export interface EntityDelta<T> {
+export interface EntityDeltaSchema<Entity> {
   /**
    * A collection of all added entities.
    */
-  added: Record<string, T>;
+  added: Record<string, Entity>;
   /**
    * A collection of all removed entities.
    */
-  removed: Record<string, T>;
+  removed: Record<string, Entity>;
   /**
    * A collection of all modified entities.
    */
-  modified: Record<string, EntityModification<T>>;
+  modified: Record<string, EntityModificationSchema<Entity>>;
+  /**
+   * A collection of all impacted entities.
+   */
+  impacted?: Record<string, Entity>;
 }
 
 /**
- * Defines the delta payload state.
+ * Defines the changed project data between two versions.
  */
-export interface ProjectDelta {
+export interface VersionDeltaSchema {
   /**
    * Mapping of artifact names and their corresponding changes.
    */
-  artifacts: EntityDelta<ArtifactSchema>;
+  artifacts: EntityDeltaSchema<ArtifactSchema>;
   /**
    * Mapping of trace ids and their corresponding changes.
    */
-  traces: EntityDelta<TraceLinkSchema>;
+  traces: EntityDeltaSchema<TraceLinkSchema>;
+  /**
+   * Map of artifact ids to their position in the delta graph.
+   */
+  layout?: LayoutPositionsSchema;
+  /**
+   * Map of delta artifact ids to their subtree information.
+   */
+  subtrees?: SubtreeMapSchema;
 }
 
 /**
  * Represents an artifact delta.
  */
-export type DeltaArtifact = ArtifactSchema | EntityModification<ArtifactSchema>;
-
-/**
- * Represents a changed artifact.
- */
-export interface ChangedArtifact {
-  /**
-   * The artifact name.
-   */
-  name: string;
-  /**
-   * The artifact delta type.
-   */
-  deltaType: string;
-  /**
-   * The changed artifact.
-   */
-  artifact: DeltaArtifact;
-}
+export type ArtifactDeltaSchema =
+  | ArtifactSchema
+  | EntityModificationSchema<ArtifactSchema>;

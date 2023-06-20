@@ -36,7 +36,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
+import { DeltaType, ArtifactDeltaSchema, ChangedArtifact } from "@/types";
 import { deltaStore } from "@/hooks";
 import { PanelCard } from "@/components/common";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
@@ -54,7 +54,7 @@ const removedArtifacts = computed(() => deltaStore.removedArtifacts);
  */
 function handleArtifactSelect(
   name: string,
-  artifact: DeltaArtifact,
+  artifact: ArtifactDeltaSchema,
   deltaType: DeltaType
 ): void {
   selectedDelta.value = { name, artifact, deltaType };

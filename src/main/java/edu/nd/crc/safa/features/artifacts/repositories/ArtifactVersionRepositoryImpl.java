@@ -130,14 +130,14 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
         List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
-        attachCustomAttributesToArtifactVersions(versions);
+        attributeValueService.attachCustomAttributesToArtifacts(versions);
         return versions;
     }
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
         List<ArtifactVersion> versions = artifactVersionRepository.findByArtifact(artifact);
-        attachCustomAttributesToArtifactVersions(versions);
+        attributeValueService.attachCustomAttributesToArtifacts(versions);
         return versions;
     }
 
@@ -150,8 +150,8 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
 
-        ArtifactAppEntity artifactAppEntity =
-            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
+        ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
+            artifactVersion.getArtifact().getArtifactId(),
             artifactVersion.getTypeName(),
             artifactVersion.getName(),
             artifactVersion.getSummary(),
@@ -207,10 +207,6 @@ public class ArtifactVersionRepositoryImpl
             default:
                 break;
         }
-    }
-
-    private void attachCustomAttributesToArtifactVersions(List<ArtifactVersion> artifactVersion) {
-        attributeValueService.attachCustomAttributesToArtifacts(artifactVersion);
     }
 
     public void createOrUpdateDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {

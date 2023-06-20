@@ -27,8 +27,6 @@ public class RuleService {
 
     private final RuleRepository ruleRepository;
 
-    // TODO see if non-app-entity versions are really needed
-
     /**
      * Returns the warnings of given artifacts using default and project rules.
      *

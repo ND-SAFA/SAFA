@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -154,21 +155,67 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
 
-        return new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
+        ArtifactAppEntity artifactAppEntity =
+            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
             artifactVersion.getTypeName(),
             artifactVersion.getName(),
             artifactVersion.getSummary(),
             artifactVersion.getContent(),
             artifactVersion.getArtifact().getDocumentType(),
             artifactVersion.getCustomAttributeValues());
+
+        // Step 2 - Attach document links
+        attachDocumentLinks(artifactVersion, artifactAppEntity);
+
+        // Step 3 - Attach Safety Case or FTA information
+        attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
+        return artifactAppEntity;
     }
 
     /**
      * Private helper methods
      */
 
+    private void attachDocumentLinks(ArtifactVersion artifactVersion,
+                                     ArtifactAppEntity artifactAppEntity) {
+        //TODO: Skipping versioning system, currently using artifact version which is not usually the user wants.
+        Artifact artifact = artifactVersion.getArtifact();
+        List<DocumentArtifact> allDocumentArtifactVersions = this.documentArtifactRepository.findByArtifact(artifact);
+        List<UUID> documentIds = new ArrayList<>();
+        for (DocumentArtifact documentArtifact : allDocumentArtifactVersions) {
+            documentIds.add(documentArtifact.getDocument().getDocumentId());
+        }
+
+        artifactAppEntity.setDocumentIds(documentIds);
+    }
+
     private void attachCustomAttributesToArtifactVersion(ArtifactVersion artifactVersion) {
         attributeValueService.attachCustomAttributesToArtifact(artifactVersion);
+    }
+
+    private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {
+        switch (artifact.getDocumentType()) {
+            case SAFETY_CASE:
+                Optional<SafetyCaseArtifact> safetyCaseArtifactOptional =
+                    this.safetyCaseArtifactRepository.findByArtifact(artifact);
+                if (safetyCaseArtifactOptional.isPresent()) {
+                    SafetyCaseArtifact safetyCaseArtifact = safetyCaseArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.SAFETY_CASE);
+                    artifactAppEntity.setSafetyCaseType(safetyCaseArtifact.getSafetyCaseType());
+                }
+                //TODO: Throw error if not found?
+                break;
+            case FTA:
+                Optional<FTAArtifact> ftaArtifactOptional = this.ftaArtifactRepository.findByArtifact(artifact);
+                if (ftaArtifactOptional.isPresent()) {
+                    FTAArtifact ftaArtifact = ftaArtifactOptional.get();
+                    artifactAppEntity.setDocumentType(DocumentType.FTA);
+                    artifactAppEntity.setLogicType(ftaArtifact.getLogicType());
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void attachCustomAttributesToArtifactVersions(List<ArtifactVersion> artifactVersion) {

@@ -1,14 +1,13 @@
 import math
 import os
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
 DATA_PATH = os.path.expanduser("~/desktop/safa/datasets/open-source")
 if __name__ == "__main__":
-    dataset_name = "cchit"
-    export_dataset_name = "cchit"
-    target_artifact_mask_creator = lambda df: df["source"].astype(int) > 1108
+    dataset_name = "cm1"
+    export_dataset_name = "cm1"
     DATASET_INPUT_PATH = os.path.join(DATA_PATH, dataset_name)
     SOURCE_EXPORT_PATH = os.path.expanduser(f"~/desktop/safa/datasets/paper/{export_dataset_name}/source.csv")
     TRACE_EXPORT_PATH = os.path.expanduser(f"~/desktop/safa/datasets/paper/{export_dataset_name}/traces.csv")
@@ -17,8 +16,9 @@ if __name__ == "__main__":
     project_reader = StructuredProjectReader(DATASET_INPUT_PATH)
     artifact_df, trace_df, layer_df = project_reader.read_project()
     artifact_types = list(artifact_df[ArtifactKeys.LAYER_ID].unique())
+    artifact_df = ArtifactDataFrame(artifact_df.reset_index()[~artifact_df.reset_index()["id"].str.startswith("/")])
     trace_df = trace_df[trace_df["source"].isin(artifact_df.index) & trace_df["target"].isin(artifact_df.index)]
-    query_df = trace_df[target_artifact_mask_creator(trace_df)]
+    query_df = trace_df  # [target_artifact_mask_creator(trace_df)]
     counts_df = query_df.reset_index().groupby("source")["target"].nunique()
 
 

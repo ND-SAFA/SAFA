@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 
-from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_CHECK_VALUE
 from tgen.constants.deliminator_constants import PERIOD
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -54,7 +54,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
             StructuredKeys.TRACES: trace_definitions,
             StructuredKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions(),
             StructuredKeys.OVERRIDES: {
-                "allowed_orphans": NO_ORPHAN_CHECK_VALUE
+                "allowed_orphans": NO_CHECK_VALUE
             }
         }
 

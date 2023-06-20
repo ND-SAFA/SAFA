@@ -1,7 +1,7 @@
 from typing import Dict
 
 import datasets
-from sklearn.metrics import precision_score
+from sklearn.metrics import precision_score, recall_score
 
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -37,11 +37,10 @@ class ClassificationMetrics(AbstractTraceMetric):
         :return: Precision@K score.
         """
         predictions = list(map(lambda p: 1 if p >= 0.5 else 0, predictions))
-        metrics = {}
-        metrics["precision"] = precision_score(references, predictions)
-        metrics["recall"]
-        print("METRICS")
-        print(metrics)
+        metrics = {
+            "precision": precision_score(references, predictions),
+            "recall": recall_score(references, predictions)
+        }
         return metrics
 
     def _info(self) -> datasets.MetricInfo:

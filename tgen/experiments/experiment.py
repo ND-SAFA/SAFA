@@ -17,7 +17,7 @@ class Experiment(BaseObject):
     _EXPERIMENT_DIR_NAME = "experiment_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
-                 experiment_id: int = EXPERIMENT_ID_DEFAULT, delete_prev_experiment_dir: bool = True):
+                 experiment_id: int = EXPERIMENT_ID_DEFAULT, delete_prev_experiment_dir: bool = False):
         """
         Represents an experiment run
         :param steps: List of all experiment steps to run

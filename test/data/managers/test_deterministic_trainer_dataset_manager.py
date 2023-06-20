@@ -1,12 +1,12 @@
 import os
 from typing import List
 
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.variables.experimental_variable import ExperimentalVariable
 
 
@@ -23,7 +23,7 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         dataset_files = os.listdir(dataset_container_manager_first.get_output_path())
         for dataset_role in expected_dataset_roles:
             self.assertIn(dataset_container_manager_first.get_dataset_filename(dataset_role,
-                                                                               dataset_container_manager_first.dataset_name),
+                                                                               dataset_container_manager_first.DATASET_NAME),
                           dataset_files)
         dataset_container_manager_second = self.create_dataset_manager(expected_dataset_roles[1:])
         datasets2 = dataset_container_manager_second.get_datasets()

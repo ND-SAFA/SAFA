@@ -50,12 +50,11 @@ class MetricsManager:
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
         trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
-        scores = self.trace_matrix.scores
+        scores = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
         labels = self.trace_matrix.labels
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
             args = {"trace_matrix": self.trace_matrix} if metric.name in trace_matrix_metrics else {}
-
             metric_result = metric.compute(predictions=scores, references=labels, **args)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict):

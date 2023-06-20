@@ -49,10 +49,8 @@ class TraceDataset(iDataset):
         self.trace_df = trace_df
         if not pos_link_ids or not neg_link_ids:
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(trace_df)
-        self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
         self.trace_matrix = TraceMatrix(trace_df, randomize=randomize)
-        self.shuffle_link_ids()
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
         """
@@ -215,7 +213,6 @@ class TraceDataset(iDataset):
         if len(self.pos_link_ids) > 0:
             if augmenter:
                 self.augment_pos_links(augmenter)
-            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
 
     def prepare_for_testing(self) -> None:
         """
@@ -223,32 +220,6 @@ class TraceDataset(iDataset):
         :return: None
         """
         return
-
-    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks pos trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.pos_link_ids = self._resize_data(self.pos_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks neg trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def shuffle_link_ids(self) -> None:
-        """
-        Shuffles the positive and negative link ids.
-        :return: None
-        """
-        random.shuffle(self.pos_link_ids)
-        random.shuffle(self.neg_link_ids)
 
     def construct_graph_from_traces(self) -> nx.Graph:
         """
@@ -401,7 +372,7 @@ class TraceDataset(iDataset):
         Returns the length of the dataset
         :return: the length of the dataset
         """
-        return len(self.pos_link_ids) + len(self.neg_link_ids)
+        return len(self.trace_df)
 
     def __add__(self, other: "TraceDataset") -> "TraceDataset":
         """

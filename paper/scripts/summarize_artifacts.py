@@ -13,7 +13,7 @@ datasets = {
         "export_path": "drone-pl/code.csv",
     },
     "itrust": {
-        "type": "JSP Code",
+        "type": "Java Code",
         "export_path": "itrust/code.csv",
     }
 }

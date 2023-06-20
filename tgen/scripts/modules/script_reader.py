@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from tgen.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
 from tgen.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
 from tgen.jobs.components.job_result import JobResult
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.util.file_util import FileUtil
@@ -77,7 +77,7 @@ class ScriptOutputReader:
         """
         bucket_name = os.environ.get("BUCKET", None)
         if bucket_name:
-            bucket_path = os.path.join(bucket_name, self.script_name)
+            bucket_path = os.path.join(f"s3://{bucket_name}", self.script_name)
             for output_path in [self.val_output_path, self.eval_output_path]:
                 subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
 
@@ -156,7 +156,8 @@ class ScriptOutputReader:
         """
         if base_entry is None:
             base_entry = {}
-        job_output = job_output[ScriptOutputReader.PREDICTION_OUTPUT] if ScriptOutputReader.PREDICTION_OUTPUT in job_output else job_output
+        job_output = job_output[
+            ScriptOutputReader.PREDICTION_OUTPUT] if ScriptOutputReader.PREDICTION_OUTPUT in job_output else job_output
         metric_key = ScriptOutputReader.find_eval_key(job_output, [ScriptOutputReader.EVAL_METRICS, ScriptOutputReader.METRICS])
         if metric_key is not None and job_output[metric_key] is not None and len(job_output[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_output[metric_key], metrics)}

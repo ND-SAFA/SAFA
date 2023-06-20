@@ -63,6 +63,7 @@ export const artifactAttributesColumns: (
     field: (row: FlatArtifact) => (row[key] === undefined ? "" : row[key]),
     sortable: true,
     align: "left",
+    classes: "data-table-cell",
   }));
 
 export const artifactMatrixColumns: (

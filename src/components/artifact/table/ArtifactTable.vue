@@ -59,6 +59,15 @@
 
       <template #body-expanded="{ row }">
         <typography
+          v-if="row.summary"
+          default-expanded
+          :collapse-length="0"
+          variant="expandable"
+          el="p"
+          :value="row.summary"
+        />
+        <typography
+          v-else
           default-expanded
           :collapse-length="0"
           :variant="getVariant(row)"

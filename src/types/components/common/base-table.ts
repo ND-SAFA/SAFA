@@ -27,6 +27,10 @@ export interface TableColumn<Row = Record<string, unknown>> {
    */
   align?: "left" | "center";
   /**
+   * Any classes to apply.
+   */
+  classes?: string;
+  /**
    * A function for formatting the cell text.
    */
   format?(value: unknown): string;

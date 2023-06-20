@@ -57,13 +57,14 @@ export const useSaveTrace = defineStore("saveTrace", {
      */
     defaultHiddenSourceTypes(): string[] {
       const allTypes = typeOptionsStore.artifactTypes;
+      let hiddenTypes: string[] = [];
 
       if (this.sourceCount > 0) {
         const sourceTypes = this.sources
           .map((source) => source?.type || "")
           .filter((type) => !!type);
 
-        return allTypes.filter((type) => !sourceTypes.includes(type));
+        hiddenTypes = allTypes.filter((type) => !sourceTypes.includes(type));
       } else if (this.targetCount > 0) {
         const targetTypes = this.targets
           .map((target) => target?.type || "")
@@ -74,10 +75,14 @@ export const useSaveTrace = defineStore("saveTrace", {
           )
           .filter((type) => !!type);
 
-        return allTypes.filter((type) => !sourceTypes.includes(type));
-      } else {
-        return [];
+        hiddenTypes = allTypes.filter((type) => !sourceTypes.includes(type));
       }
+
+      if (hiddenTypes.length === allTypes.length) {
+        hiddenTypes = [];
+      }
+
+      return hiddenTypes;
     },
     /**
      * @return The default artifact types hidden from target artifacts.
@@ -88,13 +93,14 @@ export const useSaveTrace = defineStore("saveTrace", {
      */
     defaultHiddenTargetTypes(): string[] {
       const allTypes = typeOptionsStore.artifactTypes;
+      let hiddenTypes: string[] = [];
 
       if (this.targetCount > 0) {
         const targetTypes = this.targets
           .map((target) => target?.type || "")
           .filter((type) => !!type);
 
-        return allTypes.filter((type) => !targetTypes.includes(type));
+        hiddenTypes = allTypes.filter((type) => !targetTypes.includes(type));
       } else if (this.sourceCount > 0) {
         const sourceTypes = this.sources
           .map((source) => source?.type || "")
@@ -105,10 +111,14 @@ export const useSaveTrace = defineStore("saveTrace", {
           )
           .filter((type) => !!type);
 
-        return allTypes.filter((type) => !targetTypes.includes(type));
-      } else {
-        return [];
+        hiddenTypes = allTypes.filter((type) => !targetTypes.includes(type));
       }
+
+      if (hiddenTypes.length === allTypes.length) {
+        hiddenTypes = [];
+      }
+
+      return hiddenTypes;
     },
     /**
      * @return If the source and target ids are valid, returns empty, else returns an error message.

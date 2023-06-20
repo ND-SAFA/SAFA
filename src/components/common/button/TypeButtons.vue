@@ -12,8 +12,8 @@
         v-bind="buttonProps(level)"
         dense
         :tooltip-delay="0"
-        data-cy="button-nav-type"
         icon="artifact"
+        data-cy="button-filter-type"
         @click="emit('click', level, artifactLevels)"
       />
       <separator v-show="visible" vertical color="primary" />

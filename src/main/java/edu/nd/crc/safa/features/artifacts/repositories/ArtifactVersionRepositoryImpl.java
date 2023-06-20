@@ -31,6 +31,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 
 /**
  * Implements custom any custom artifact repository logic.
@@ -134,15 +135,48 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
+        //TODO remove stopwatches
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start("Getting artifacts");
         List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
-        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+
+        stopWatch.stop();
+
+        stopWatch.start("Adding attributes");
+        attachCustomAttributesToArtifactVersions(versions);
+        stopWatch.stop();
+
+        //printStopwatch(stopWatch, "      |--  ");
+
         return versions;
+    }
+
+    private void printStopwatch(StopWatch stopWatch, String prefix) {
+        int maxLen = 0;
+        int maxTimeLen = 0;
+        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
+            int len = taskInfo.getTaskName().length();
+            if (len > maxLen) {
+                maxLen = len;
+            }
+
+            int timeLen = (int) Math.log10(taskInfo.getTimeMillis());
+            if (timeLen > maxTimeLen) {
+                maxTimeLen = timeLen;
+            }
+        }
+
+        String formatString = "%" + maxLen + "s: %" + (maxTimeLen + 1) + "d";
+        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
+            System.out.println(prefix + String.format(formatString, taskInfo.getTaskName(), taskInfo.getTimeMillis()));
+        }
     }
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
         List<ArtifactVersion> versions = artifactVersionRepository.findByArtifact(artifact);
-        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+        attachCustomAttributesToArtifactVersions(versions);
         return versions;
     }
 
@@ -195,6 +229,10 @@ public class ArtifactVersionRepositoryImpl
         Map<String, JsonNode> customFields =
                 attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
         customFields.forEach(artifactVersion::addCustomAttributeValue);
+    }
+
+    private void attachCustomAttributesToArtifactVersions(List<ArtifactVersion> artifactVersion) {
+        attributeValueService.attachCustomAttributesToArtifacts(artifactVersion);
     }
 
     private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {

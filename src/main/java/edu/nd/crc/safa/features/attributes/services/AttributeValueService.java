@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 /**
  * Contains util functions for interacting with artifact fields.
@@ -56,6 +58,62 @@ public class AttributeValueService {
         }
 
         return out;
+    }
+
+    /**
+     * Gets a map with all the custom attributes that are set for this artifact. The map
+     * goes from keyname to json nodes containing the values.
+     *
+     * @param artifactVersion The artifact version we're looking at.
+     * @return A map from attribute keynames to values.
+     */
+    public void attachCustomAttributesToArtifacts(List<ArtifactVersion> artifactVersion) {
+        //TODO remove stopwatches
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start("Set up map");
+        Map<UUID, ArtifactVersion> artifactVersionMap = new HashMap<>();
+        artifactVersion.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
+        stopWatch.stop();
+
+        stopWatch.start("Retrieve attribute versions");
+        List<ArtifactAttributeVersion> attributeVersions =
+            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersion);
+        stopWatch.stop();
+
+        stopWatch.start("Convert values");
+        for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
+            // TODO handle types correctly
+            JsonNode jsonValue = TextNode.valueOf(attributeVersion.getValue());
+
+            ArtifactVersion thisVersion
+                = artifactVersionMap.get(attributeVersion.getArtifactVersion().getVersionEntityId());
+            thisVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
+        }
+        stopWatch.stop();
+
+        //printStopwatch(stopWatch, "        |--  ");
+    }
+
+    private void printStopwatch(StopWatch stopWatch, String prefix) {
+        int maxLen = 0;
+        int maxTimeLen = 0;
+        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
+            int len = taskInfo.getTaskName().length();
+            if (len > maxLen) {
+                maxLen = len;
+            }
+
+            int timeLen = (int) Math.log10(taskInfo.getTimeMillis());
+            if (timeLen > maxTimeLen) {
+                maxTimeLen = timeLen;
+            }
+        }
+
+        String formatString = "%" + maxLen + "s: %" + (maxTimeLen + 1) + "d";
+        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
+            System.out.println(prefix + String.format(formatString, taskInfo.getTaskName(), taskInfo.getTimeMillis()));
+        }
     }
 
     /**

@@ -6,6 +6,7 @@
     :color="displayColor"
     :removable="props.removable"
     :data-cy="props.dataCy"
+    :dense="props.dense"
     @remove="emit('remove')"
   >
     <q-tooltip :hidden="text.length < 15">
@@ -16,7 +17,7 @@
       :id="iconId"
       :variant="props.icon"
       :color="iconColor"
-      size="sm"
+      :size="props.dense ? 'xs' : 'sm'"
     />
     <typography
       ellipsis

@@ -9,7 +9,7 @@ import {
   IdentifierSchema,
   MessageType,
   ModelType,
-  ProjectDelta,
+  VersionDeltaSchema,
   ProjectSchema,
   SafetyCaseType,
   SessionSchema,
@@ -106,7 +106,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
 /**
  * @return An empty project delta.
  */
-export function createProjectDelta(): ProjectDelta {
+export function createProjectDelta(): VersionDeltaSchema {
   return {
     artifacts: {
       added: {},

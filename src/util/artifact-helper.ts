@@ -33,6 +33,7 @@ export function flattenArtifact(artifact: ArtifactSchema): FlatArtifact {
     name: artifact.name,
     type: artifact.type,
     body: artifact.body,
+    summary: artifact.summary || "",
     ...(artifact.attributes || {}),
   };
 }

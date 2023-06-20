@@ -16,13 +16,15 @@ import { getDoesArtifactExist } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useArtifactApi = defineStore("artifactApi", () => {
-  const artifactApi = useApi("artifactApi");
+  const artifactSaveApi = useApi("artifactSaveApi");
+  const artifactDeleteApi = useApi("artifactDeleteApi");
   const artifactNameApi = useApi("artifactNameApi");
 
   const nameCheckTimer = ref<ReturnType<typeof setTimeout> | undefined>();
   const nameLoading = ref(false);
 
-  const loading = computed(() => artifactApi.loading);
+  const saveLoading = computed(() => artifactSaveApi.loading);
+  const deleteLoading = computed(() => artifactDeleteApi.loading);
 
   const nameError = computed(() =>
     nameLoading.value ? false : artifactSaveStore.nameError
@@ -79,7 +81,7 @@ export const useArtifactApi = defineStore("artifactApi", () => {
     parentArtifact: ArtifactSchema | undefined,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
-    await artifactApi.handleRequest(
+    await artifactSaveApi.handleRequest(
       async () => {
         const versionId = projectStore.versionIdWithLog;
 
@@ -159,7 +161,7 @@ export const useArtifactApi = defineStore("artifactApi", () => {
             sourceId === artifact.id || targetId === artifact.id
         );
 
-        await artifactApi.handleRequest(
+        await artifactDeleteApi.handleRequest(
           async () => {
             await artifactCommitApiStore.handleDelete(artifact, relatedTraces);
 
@@ -189,7 +191,8 @@ export const useArtifactApi = defineStore("artifactApi", () => {
   );
 
   return {
-    loading,
+    saveLoading,
+    deleteLoading,
     nameLoading,
     nameError,
     handleSave,

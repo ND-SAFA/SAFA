@@ -20,17 +20,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { HeaderBar, LoadingBar } from "./header";
 import { GraphBar } from "./graph";
 
 const currentRoute = useRoute();
-const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
 
-watch(
-  () => currentRoute.path,
-  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
-);
+const graphVisible = computed(() => currentRoute.path === Routes.ARTIFACT);
 </script>

@@ -7,6 +7,7 @@
     :style="chipStyle"
     :clickable="props.clickable"
     :removable="removable"
+    :dense="props.dense"
     @click="emit('click')"
     @remove="emit('remove')"
   >

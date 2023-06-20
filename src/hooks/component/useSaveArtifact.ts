@@ -98,6 +98,9 @@ export const useSaveArtifact = defineStore("saveArtifact", {
         ? false
         : "This name is already used, please select another.";
     },
+    /**
+     * @return Whether the artifact is valid and can be saved.
+     */
     canSave(): boolean {
       const { logicType, safetyCaseType, type, body } = this.editedArtifact;
 

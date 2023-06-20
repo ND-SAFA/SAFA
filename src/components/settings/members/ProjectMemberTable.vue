@@ -58,7 +58,7 @@ import {
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
-const editedMember = ref<MembershipSchema | undefined>();
+const editedMember = ref<MembershipSchema>();
 const modalOpen = ref(false);
 
 const project = computed(() => projectStore.project);

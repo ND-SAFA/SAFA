@@ -27,12 +27,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
       layoutStore.savedPosition = event.position;
       appStore.openArtifactCreatorTo({ isNewArtifact: true });
     },
-    isVisible(): boolean {
-      return (
-        projectStore.isProjectDefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: isEditor,
   },
   {
     id: "generate-artifact",
@@ -42,12 +37,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(): void {
       appStore.openDetailsPanel("generateArtifact");
     },
-    isVisible(): boolean {
-      return (
-        projectStore.isProjectDefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: isEditor,
   },
   {
     id: "add-link",
@@ -55,14 +45,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
-      appStore.openDetailsPanel("saveTrace");
+      appStore.openTraceCreatorTo();
     },
-    isVisible(): boolean {
-      return (
-        projectStore.isProjectDefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: isEditor,
   },
   {
     id: "draw-link",
@@ -72,12 +57,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(): void {
       enableDrawMode();
     },
-    isVisible(): boolean {
-      return (
-        projectStore.isProjectDefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: isEditor,
   },
   {
     id: "generate-link",
@@ -88,12 +68,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(): void {
       appStore.openDetailsPanel("generateTrace");
     },
-    isVisible(): boolean {
-      return (
-        projectStore.isProjectDefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: isEditor,
   },
   {
     id: "view-artifact",
@@ -107,7 +82,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return artifactData !== undefined;
+      return !!artifactData;
     },
   },
   {
@@ -124,7 +99,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return artifactData !== undefined;
+      return !!artifactData?.body;
     },
   },
   {
@@ -139,12 +114,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openArtifactCreatorTo({});
       });
     },
-    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return (
-        artifactData !== undefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: hasValidData,
   },
   {
     id: "delete-artifact",
@@ -157,12 +127,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         artifactApiStore.handleDelete(artifact);
       });
     },
-    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return (
-        artifactData !== undefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
-    },
+    isVisible: hasValidData,
   },
   {
     id: "duplicate-artifact",
@@ -176,12 +141,37 @@ export const artifactTreeMenuItems: MenuItem[] = [
         await artifactApiStore.handleDuplicate(artifact);
       });
     },
-    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return (
-        artifactData !== undefined &&
-        sessionStore.isEditor(projectStore.project)
-      );
+    isVisible: hasValidData,
+  },
+  {
+    id: "add-link-parent",
+    content: "Add Parent",
+    tooltipText: "Create a new trace link to a parent",
+    selector: "node",
+    onClickFunction(event: EventObject): void {
+      handleOnClick(event, async (artifact: ArtifactSchema) => {
+        appStore.openTraceCreatorTo({
+          type: "source",
+          artifactId: artifact.id,
+        });
+      });
     },
+    isVisible: hasValidData,
+  },
+  {
+    id: "add-link-child",
+    content: "Add Child",
+    tooltipText: "Create a new trace link to a child",
+    selector: "node",
+    onClickFunction(event: EventObject): void {
+      handleOnClick(event, async (artifact: ArtifactSchema) => {
+        appStore.openTraceCreatorTo({
+          type: "target",
+          artifactId: artifact.id,
+        });
+      });
+    },
+    isVisible: hasValidData,
   },
   {
     id: "highlight-subtree",
@@ -217,10 +207,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
       await subtreeStore.showSubtree(artifactId);
     },
     isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      if (artifactData !== undefined) {
-        return subtreeStore.collapsedParentNodes.includes(artifactData.id);
-      }
-      return false;
+      return artifactData
+        ? subtreeStore.collapsedParentNodes.includes(artifactData.id)
+        : false;
     },
   },
   ftaMenuItem,
@@ -228,14 +217,35 @@ export const artifactTreeMenuItems: MenuItem[] = [
 ];
 
 /**
+ * Determines whether a project is loaded & the user is an editor of it.
+ */
+function isEditor(): boolean {
+  return (
+    projectStore.isProjectDefined && sessionStore.isEditor(projectStore.project)
+  );
+}
+
+/**
+ * Determines whether an artifact node has valid data.
+ * @param artifactData - The artifact data to check.
+ * @return Whether the artifact has valid data.
+ */
+function hasValidData(
+  artifactData: ArtifactCytoElementData | undefined
+): boolean {
+  return !!artifactData && isEditor();
+}
+
+/**
  * Determines whether an artifact node has a subtree.
  * @param artifactData - The artifact data to check.
  * @return Whether the artifact has a subtree.
  */
 function hasSubtree(artifactData?: ArtifactCytoElementData): boolean {
-  if (!artifactData) return false;
-
-  return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
+  return (
+    !!artifactData &&
+    !subtreeStore.collapsedParentNodes.includes(artifactData.id)
+  );
 }
 
 /**

@@ -58,6 +58,7 @@
       v-for="(column, idx) in props.columns"
       :key="column.name"
       :align="idx === 0 ? 'start' : 'end'"
+      :class="column.classes"
     >
       <icon-button
         v-if="idx === 0 && props.expandable"

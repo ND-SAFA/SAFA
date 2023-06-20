@@ -72,6 +72,7 @@ const emit = defineEmits<{
   (e: "delete"): void;
 }>();
 
+// Loading state is kept local to allow for multiple trace approval rows to display at once.
 const approveLoading = ref(false);
 const declineLoading = ref(false);
 const unreviewLoading = ref(false);

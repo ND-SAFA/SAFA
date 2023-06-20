@@ -1,5 +1,5 @@
 <template>
-  <div v-if="doDisplay">
+  <div>
     <panel-card>
       <text-button
         text
@@ -141,10 +141,6 @@ const children = computed(() =>
         .getChildren(artifact.value.id)
         .map((id) => artifactStore.getArtifactById(id))
     : []
-);
-
-const doDisplay = computed(
-  () => parents.value.length + children.value.length > 0
 );
 
 const parentTitle = computed(() =>

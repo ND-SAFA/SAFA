@@ -8,6 +8,7 @@
     :options="options"
     :hint="hint"
     :error-message="errorMessage || undefined"
+    :dense="props.dense"
     use-input
     new-value-mode="add-unique"
     input-debounce="0"
@@ -15,7 +16,12 @@
     @popup-hide="emit('blur')"
   >
     <template #selected-item="{ opt }">
-      <attribute-chip v-if="!!opt" artifact-type :value="opt" />
+      <attribute-chip
+        v-if="!!opt"
+        artifact-type
+        :value="opt"
+        :dense="props.dense"
+      />
       <typography v-if="optionCount > 0" l="1" :value="optionCountDisplay" />
     </template>
   </q-select>

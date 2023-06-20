@@ -51,13 +51,14 @@ import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
 import { FilePanelList } from "@/components/project/creator/steps";
 
+const currentRoute = useRoute();
+
 const steps = ref<StepperStep[]>([
   { title: "Name Project", done: false },
   { title: "Upload Artifacts", done: false },
   { title: "Upload Trace Links", done: false },
   { title: "View TIM", done: true },
 ]);
-const currentRoute = useRoute();
 const currentStep = ref(1);
 
 const name = computed({

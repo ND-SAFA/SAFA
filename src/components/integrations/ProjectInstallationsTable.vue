@@ -54,7 +54,6 @@ import {
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 const modalOpen = ref(false);
-const loading = ref(false);
 
 const rows = computed(() => integrationsApiStore.installations);
 
@@ -63,10 +62,6 @@ const rows = computed(() => integrationsApiStore.installations);
  * @param installation - THe installation to sync.
  */
 function handleSync(installation: InstallationSchema): void {
-  loading.value = true;
-
-  integrationsApiStore.handleSync(installation, {
-    onComplete: () => (loading.value = false),
-  });
+  integrationsApiStore.handleSync(installation);
 }
 </script>

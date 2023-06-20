@@ -60,17 +60,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { ArtifactSummaryConfirmation } from "@/types";
+import { computed } from "vue";
 import { artifactGenerationApiStore, selectionStore } from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
 
-const generateConfirmation = ref<ArtifactSummaryConfirmation | undefined>(
-  undefined
-);
-
 const artifact = computed(() => selectionStore.selectedArtifact);
+
+const generateConfirmation = computed(
+  () => artifactGenerationApiStore.summaryGenConfirm
+);
 
 const summary = computed({
   get() {
@@ -92,25 +91,20 @@ const generateApproval = computed(() => !!generateConfirmation.value);
 function handleGenerateSummary(): void {
   if (!artifact.value) return;
 
-  artifactGenerationApiStore.handleGenerateSummary(artifact.value, {
-    onSuccess: (confirmation) => (generateConfirmation.value = confirmation),
-  });
+  artifactGenerationApiStore.handleGenerateSummary(artifact.value);
 }
 
 /**
  * Saves the generated summary for the artifact.
  */
 function handleSaveSummary(): void {
-  if (!generateConfirmation.value) return;
-
-  generateConfirmation.value.confirm();
-  generateConfirmation.value = undefined;
+  generateConfirmation.value?.confirm();
 }
 
 /**
  * Deletes the generated summary for the artifact.
  */
 function handleDeleteSummary(): void {
-  generateConfirmation.value = undefined;
+  generateConfirmation.value?.clear();
 }
 </script>

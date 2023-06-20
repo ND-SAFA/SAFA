@@ -26,6 +26,7 @@ export const actionsColumn: TableColumn<
   label: "Actions",
   field: () => "",
   sortable: false,
+  align: "left",
 };
 
 export const artifactColumns: TableColumn<FlatArtifact>[] = [
@@ -41,6 +42,7 @@ export const artifactColumns: TableColumn<FlatArtifact>[] = [
     label: "Type",
     field: (row) => row.type,
     sortable: true,
+    align: "left",
   },
 ];
 
@@ -49,6 +51,7 @@ export const artifactDeltaColumn: TableColumn<FlatArtifact> = {
   label: "Delta State",
   field: () => "",
   sortable: true,
+  align: "left",
 };
 
 export const artifactAttributesColumns: (
@@ -59,6 +62,8 @@ export const artifactAttributesColumns: (
     name: key,
     field: (row: FlatArtifact) => (row[key] === undefined ? "" : row[key]),
     sortable: true,
+    align: "left",
+    classes: "data-table-cell",
   }));
 
 export const artifactMatrixColumns: (
@@ -69,6 +74,7 @@ export const artifactMatrixColumns: (
     name: id,
     field: () => "",
     sortable: true,
+    align: "left",
   }));
 
 export const jobColumns: TableColumn<JobSchema>[] = [
@@ -81,11 +87,13 @@ export const jobColumns: TableColumn<JobSchema>[] = [
   {
     name: "currentProgress",
     label: "Progress",
+    align: "left",
     field: (job) => job.currentProgress,
   },
   {
     name: "status",
     label: "Status",
+    align: "left",
     field: (job) => job.status,
   },
 ];
@@ -96,36 +104,42 @@ export const approvalColumns: TableColumn<FlatTraceLink>[] = [
     label: "Source Name",
     field: (row) => row.sourceName,
     sortable: true,
+    align: "left",
   },
   {
     name: "sourceType",
     label: "Source Type",
     field: (row) => row.sourceType,
     sortable: true,
+    align: "left",
   },
   {
     name: "targetName",
     label: "Target Name",
     field: (row) => row.targetName,
     sortable: true,
+    align: "left",
   },
   {
     name: "targetType",
     label: "Target Type",
     field: (row) => row.targetType,
     sortable: true,
+    align: "left",
   },
   {
     name: "approvalStatus",
     label: "Approval Status",
     field: (row) => row.approvalStatus,
     sortable: true,
+    align: "left",
   },
   {
     name: "score",
     label: "Confidence Score",
     field: (row) => row.score,
     sortable: true,
+    align: "left",
   },
   actionsColumn,
 ];
@@ -140,11 +154,13 @@ export const installationsColumns: TableColumn<InstallationSchema>[] = [
   {
     label: "Project ID",
     name: "installationId",
+    align: "left",
     field: (row) => row.installationId,
   },
   {
     label: "Last Synced",
     name: "lastUpdate",
+    align: "left",
     field: (row) => row.lastUpdate,
     format: (lastUpdate: string) => timestampToDisplay(lastUpdate),
   },
@@ -155,12 +171,13 @@ export const modelColumns: TableColumn<GenerationModelSchema>[] = [
   {
     name: "name",
     label: "Name",
-    field: (row) => row.name,
     align: "left",
+    field: (row) => row.name,
   },
   {
     name: "baseModel",
     label: "Base Model",
+    align: "left",
     field: (row) => row.baseModel,
   },
   actionsColumn,
@@ -170,8 +187,8 @@ export const projectNameColumn: TableColumn<IdentifierSchema> = {
   name: "name",
   label: "Name",
   sortable: true,
-  field: (row) => row.name,
   align: "left",
+  field: (row) => row.name,
 };
 
 export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
@@ -179,12 +196,14 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     name: "description",
     label: "Description",
     sortable: false,
+    align: "left",
     field: (row) => row.description,
   },
   {
     name: "owner",
     label: "Owner",
     sortable: false,
+    align: "left",
     field: (row) => row.owner,
   },
   actionsColumn,
@@ -195,19 +214,21 @@ export const versionColumns: TableColumn<VersionSchema>[] = [
     name: "majorVersion",
     label: "Major",
     sortable: true,
-    field: (row) => row.majorVersion,
     align: "left",
+    field: (row) => row.majorVersion,
   },
   {
     name: "minorVersion",
     label: "Minor",
     sortable: true,
+    align: "left",
     field: (row) => row.minorVersion,
   },
   {
     name: "revision",
     label: "Revision",
     sortable: true,
+    align: "left",
     field: (row) => row.revision,
   },
 ];
@@ -216,12 +237,13 @@ export const membersColumns: TableColumn<MembershipSchema>[] = [
   {
     label: "Email",
     name: "email",
-    field: (row) => row.email,
     align: "left",
+    field: (row) => row.email,
   },
   {
     label: "Role",
     name: "role",
+    align: "left",
     field: (row) => row.role,
   },
   actionsColumn,

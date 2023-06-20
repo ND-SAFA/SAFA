@@ -4,7 +4,7 @@ import {
   JobSchema,
   MemberRequestSchema,
   MembershipSchema,
-  ProjectDelta,
+  VersionDeltaSchema,
   ProjectSchema,
   ProjectRole,
 } from "@/types";
@@ -69,8 +69,8 @@ export async function deleteProject(projectId: string): Promise<void> {
 export async function getProjectDelta(
   targetVersionId: string,
   sourceVersionId: string
-): Promise<ProjectDelta> {
-  return authHttpClient<ProjectDelta>(
+): Promise<VersionDeltaSchema> {
+  return authHttpClient<VersionDeltaSchema>(
     fillEndpoint(Endpoint.getProjectDelta, {
       sourceVersionId,
       targetVersionId,

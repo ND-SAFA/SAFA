@@ -18,7 +18,7 @@ type HtmlDefinitionFunction<T extends CytoElementData> = (data: T) => string;
 /**
  * Defines an html node.
  */
-export interface HtmlDefinition<T extends CytoElementData> {
+export interface HtmlDefinition<Data extends CytoElementData> {
   /**
    * The cytoscape query selector.
    * `cytoscape que./cytoscape-stylesheets`
@@ -43,7 +43,7 @@ export interface HtmlDefinition<T extends CytoElementData> {
   /**
    * Returns the stringified html of a given artifact.
    */
-  tpl: HtmlDefinitionFunction<T>;
+  tpl: HtmlDefinitionFunction<Data>;
 }
 
 /**

@@ -65,7 +65,7 @@ const projectRoles = projectRoleOptions();
 
 const projectIds = ref<string[]>([]);
 const userEmail = ref("");
-const userRole = ref<ProjectRole | undefined>();
+const userRole = ref<ProjectRole>();
 
 const isUpdate = computed(() => !!props.member);
 

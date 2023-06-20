@@ -2,7 +2,6 @@
   <div class="full-width">
     <flex-box full-width align="center">
       <searchbar v-model="searchText" :label="props.searchLabel" />
-      <commit-buttons color="primary" class="q-ml-md" />
       <icon-button
         dense
         :icon="props.inFullscreen ? 'fullscreen-exit' : 'fullscreen'"
@@ -69,7 +68,7 @@ import { computed, useSlots } from "vue";
 import { GroupableTableHeaderProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { Searchbar, SelectInput } from "@/components/common/input";
-import { CommitButtons, IconButton } from "@/components/common/button";
+import { IconButton } from "@/components/common/button";
 import { FlexBox, Separator } from "@/components/common/display";
 
 const props = defineProps<GroupableTableHeaderProps>();

@@ -56,7 +56,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch, ref, computed, onMounted } from "vue";
+import { watch, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { TraceLinkSchema } from "@/types";
 import {
@@ -76,7 +76,6 @@ import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";
 
 const currentRoute = useRoute();
-const artifactsInView = ref<string[]>([]);
 
 const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
@@ -108,7 +107,7 @@ const className = computed(() => {
  * @return Whether to fade.
  */
 function isArtifactFaded(id: string): boolean {
-  return !artifactsInView.value.includes(id);
+  return !nodesInView.value.includes(id);
 }
 
 /**
@@ -127,13 +126,12 @@ function isArtifactHidden(id: string): boolean {
  */
 function isTraceLinkFaded(link: TraceLinkSchema): boolean {
   return (
-    !artifactsInView.value.includes(link.targetId) ||
-    !artifactsInView.value.includes(link.sourceId)
+    !nodesInView.value.includes(link.targetId) ||
+    !nodesInView.value.includes(link.sourceId)
   );
 }
 
 onMounted(() => {
-  artifactsInView.value = nodesInView.value;
   layoutStore.resetLayout();
 });
 
@@ -144,13 +142,6 @@ watch(
     if (currentRoute.path !== Routes.ARTIFACT) return;
 
     layoutStore.resetLayout();
-  }
-);
-
-watch(
-  () => nodesInView.value,
-  () => {
-    artifactsInView.value = nodesInView.value;
   }
 );
 

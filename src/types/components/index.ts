@@ -8,3 +8,5 @@ export * from "./models";
 export * from "./settings";
 export * from "./enums";
 export * from "./project-view";
+export * from "./traces";
+export * from "./delta";

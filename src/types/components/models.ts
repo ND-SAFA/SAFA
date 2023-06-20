@@ -19,4 +19,8 @@ export interface ArtifactSummaryConfirmation {
    * A callback to save the summary.
    */
   confirm: () => void;
+  /**
+   * A callback to clear the summary & confirmation.
+   */
+  clear: () => void;
 }

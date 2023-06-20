@@ -91,7 +91,7 @@ export interface IconDisplayProps
   /**
    * The size of the icon.
    */
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   /**
    * How much to rotate the icon (in degrees).
    */

@@ -25,6 +25,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
   const allVersions = ref<VersionSchema[]>([]);
 
   const getLoading = computed(() => getVersionApi.loading);
+  const loadLoading = computed(() => loadVersionApi.loading);
 
   const currentProject = computed(() => projectStore.project);
   const currentVersion = computed({
@@ -132,6 +133,7 @@ export const useGetVersionApi = defineStore("getVersionApi", () => {
 
   return {
     getLoading,
+    loadLoading,
     allVersions,
     currentVersion,
     handleReload,

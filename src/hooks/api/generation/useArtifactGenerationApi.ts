@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   GenerateArtifactSchema,
   IOHandlerCallback,
@@ -26,6 +26,10 @@ export const useArtifactGenerationApi = defineStore(
     const summaryGenerationApi = useApi("summaryGenerationApi");
     const artifactGenerationApi = useApi("artifactGenerationApi");
 
+    const summaryGenConfirm = ref<ArtifactSummaryConfirmation | undefined>(
+      undefined
+    );
+
     const nameGenLoading = computed(() => nameGenerationApi.loading);
     const bodyGenLoading = computed(() => bodyGenerationApi.loading);
     const summaryGenLoading = computed(() => summaryGenerationApi.loading);
@@ -39,25 +43,25 @@ export const useArtifactGenerationApi = defineStore(
      */
     async function handleGenerateSummary(
       artifact: ArtifactSchema,
-      callbacks: IOHandlerCallback<ArtifactSummaryConfirmation>
+      callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await summaryGenerationApi.handleRequest(
         async () => {
           const summary = await createSummary(artifact);
 
+          const clear = () => (summaryGenConfirm.value = undefined);
           const confirm = () =>
             artifactApiStore.handleSave(
               {
                 ...artifact,
-                summary: generateConfirmation.summary,
+                summary: summaryGenConfirm.value?.summary || "",
               },
               true,
               undefined,
-              {}
+              { onComplete: clear }
             );
-          const generateConfirmation = { summary, confirm };
 
-          return generateConfirmation;
+          summaryGenConfirm.value = { summary, confirm, clear };
         },
         callbacks,
         {
@@ -141,6 +145,7 @@ export const useArtifactGenerationApi = defineStore(
     }
 
     return {
+      summaryGenConfirm,
       nameGenLoading,
       bodyGenLoading,
       summaryGenLoading,

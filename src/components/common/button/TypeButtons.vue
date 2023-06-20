@@ -12,9 +12,9 @@
         v-bind="buttonProps(level)"
         dense
         :tooltip-delay="0"
-        data-cy="button-nav-type"
         icon="artifact"
-        @click="handleClick(level)"
+        data-cy="button-filter-type"
+        @click="emit('click', level, artifactLevels)"
       />
       <separator v-show="visible" vertical color="primary" />
       <icon-button
@@ -30,7 +30,7 @@
 
 <script lang="ts">
 /**
- * Buttons for changing which artifact types are visible.
+ * Buttons for selecting artifact types.
  */
 export default {
   name: "TypeButtons",
@@ -40,13 +40,35 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
-import { selectionStore, typeOptionsStore } from "@/hooks";
-import { IconButton } from "@/components/common";
-import Separator from "@/components/common/display/content/Separator.vue";
+import { typeOptionsStore } from "@/hooks";
+import { IconButton, Separator } from "@/components/common";
 
-const visible = ref(false);
+const props = defineProps<{
+  /**
+   * Whether the buttons are visible by default.
+   * @default false
+   */
+  defaultVisible?: boolean;
+  /**
+   * Which type buttons are not active.
+   * Defaults to all buttons being active.
+   */
+  hiddenTypes: string[];
+}>();
 
-const hiddenTypes = computed(() => selectionStore.ignoreTypes);
+const emit = defineEmits<{
+  /**
+   * Emitted when a type option is selected.
+   */
+  (
+    e: "click",
+    option: TimArtifactLevelSchema,
+    allOptions: TimArtifactLevelSchema[]
+  ): void;
+}>();
+
+const visible = ref(props.defaultVisible || false);
+
 const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
 
 /**
@@ -54,26 +76,12 @@ const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
  * @param option - The type button to get props for.
  */
 function buttonProps(option: TimArtifactLevelSchema) {
-  const hidden = hiddenTypes.value.find((type) => type === option.name);
+  const hidden = props.hiddenTypes.find((type) => type === option.name);
 
   return {
     style: `color: ${option.color};` + (hidden ? "opacity: 0.3" : ""),
     tooltip: option.name,
     class: !hidden ? "nav-mode-selected" : "",
   };
-}
-
-/**
- * Toggles whether a type is visible.
- * @param option - The type to toggle.
- */
-function handleClick(option: TimArtifactLevelSchema) {
-  const hidden = hiddenTypes.value.find((type) => type === option.name);
-
-  selectionStore.filterGraph({
-    type: "ignore",
-    ignoreType: option.name,
-    action: hidden ? "remove" : "add",
-  });
 }
 </script>

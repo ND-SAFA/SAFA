@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed } from "vue";
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
@@ -15,21 +16,32 @@ import {
   approvalStore,
   traceCommitApiStore,
   subtreeStore,
+  traceSaveStore,
 } from "@/hooks";
 import { pinia } from "@/plugins";
 
 export const useTraceApi = defineStore("traceApi", () => {
-  const traceApi = useApi("traceApi");
+  const createTraceApi = useApi("traceApi");
+  const approveTraceApi = useApi("approveTraceApi");
+  const unreviewTraceApi = useApi("unreviewTraceApi");
+  const declineTraceApi = useApi("declineTraceApi");
+
+  const createLoading = computed(() => createTraceApi.loading);
+  const approveLoading = computed(() => approveTraceApi.loading);
+  const unreviewLoading = computed(() => unreviewTraceApi.loading);
+  const declineLoading = computed(() => declineTraceApi.loading);
 
   /**
    * Creates a new trace link.
    *
    * @param source - The artifact to link from.
    * @param target - The artifact to link to.
+   * @param callbacks - The callbacks to call after the action.
    */
   async function handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
-    target: ArtifactSchema | ArtifactCytoElementData
+    target: ArtifactSchema | ArtifactCytoElementData,
+    callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     const sourceName =
       "artifactName" in source ? source.artifactName : source.name;
@@ -47,7 +59,7 @@ export const useTraceApi = defineStore("traceApi", () => {
       score: 1,
     };
 
-    await traceApi.handleRequest(
+    await createTraceApi.handleRequest(
       async () => {
         const createdLinks = await traceCommitApiStore.handleCreate(traceLink);
 
@@ -59,12 +71,25 @@ export const useTraceApi = defineStore("traceApi", () => {
           children: [...children, source.id],
         }));
       },
-      {},
+      callbacks,
       {
         success: `Created a new trace link: ${sourceName} -> ${targetName}`,
         error: `Unable to create trace link: ${sourceName} -> ${targetName}`,
       }
     );
+  }
+
+  /**
+   * Creates a new trace link between all source to all target artifacts in the saved trace store.
+   */
+  async function handleCreateAll(): Promise<void> {
+    for (const target of traceSaveStore.targets) {
+      for (const source of traceSaveStore.sources) {
+        if (!source || !target) continue;
+
+        await handleCreate(source, target);
+      }
+    }
   }
 
   /**
@@ -77,7 +102,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await approveTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleApprove(traceLink);
 
@@ -102,7 +127,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await declineTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleDecline(traceLink);
 
@@ -135,7 +160,7 @@ export const useTraceApi = defineStore("traceApi", () => {
 
         const unreviewed = approvalStore.unreviewedLinks;
 
-        await traceApi.handleRequest(
+        await declineTraceApi.handleRequest(
           async () => {
             await traceCommitApiStore.handleDeclineAll(unreviewed);
 
@@ -168,7 +193,7 @@ export const useTraceApi = defineStore("traceApi", () => {
     traceLink: TraceLinkSchema,
     callbacks: IOHandlerCallback
   ): Promise<void> {
-    await traceApi.handleRequest(
+    await unreviewTraceApi.handleRequest(
       async () => {
         const updatedLinks = await traceCommitApiStore.handleUnreview(
           traceLink
@@ -208,7 +233,12 @@ export const useTraceApi = defineStore("traceApi", () => {
   }
 
   return {
+    createLoading,
+    approveLoading,
+    declineLoading,
+    unreviewLoading,
     handleCreate,
+    handleCreateAll,
     handleApprove,
     handleDecline,
     handleDeclineAll,

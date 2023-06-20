@@ -19,7 +19,7 @@
       <q-fab-action
         outline
         label="Generate Trace Links"
-        icon="mdi-link-variant-plus"
+        icon="mdi-chart-timeline-variant-shimmer"
         class="bg-neutral"
         data-cy="button-fab-generate-trace"
         @click="handleGenerateTraceLink"
@@ -45,7 +45,7 @@
       <q-fab-action
         outline
         label="Generate Artifacts"
-        icon="mdi-folder-multiple-plus-outline"
+        icon="mdi-monitor-shimmer"
         class="bg-neutral"
         data-cy="button-fab-generate-artifact"
         @click="handleGenerateArtifact"

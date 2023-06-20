@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.entities.db.Rule;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
@@ -26,6 +27,8 @@ public class RuleService {
 
     private final RuleRepository ruleRepository;
 
+    // TODO see if non-app-entity versions are really needed
+
     /**
      * Returns the warnings of given artifacts using default and project rules.
      *
@@ -40,6 +43,19 @@ public class RuleService {
         TreeVerifier verifier = new TreeVerifier();
         List<ParserRule> rulesToApply = new ArrayList<>(this.getProjectRules(project));
         return verifier.findRuleViolations(artifacts, traceLinks, rulesToApply);
+    }
+
+    /**
+     * Returns the warnings of given artifacts using default and project rules.
+     *
+     * @param project         The project whose rules are applied.
+     * @param projectEntities The entities being checked for violations
+     * @return Returns a map of artifact id's to a list of warning associated with that artifact.
+     */
+    public Map<UUID, List<RuleName>> generateWarningsOnEntities(Project project, ProjectEntities projectEntities) {
+        TreeVerifier verifier = new TreeVerifier();
+        List<ParserRule> rulesToApply = new ArrayList<>(this.getProjectRules(project));
+        return verifier.findRuleViolations(projectEntities, rulesToApply);
     }
 
     /**

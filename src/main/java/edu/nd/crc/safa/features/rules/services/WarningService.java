@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.common.ProjectEntities;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
@@ -26,10 +28,10 @@ public class WarningService {
     private final RuleService ruleService;
 
     /**
-     * Returns mapping of artifact name to the list of violations it is inhibiting.
+     * Returns mapping of artifact UUID to the list of violations it is inhibiting.
      *
      * @param projectVersion - Finds violations in artifact tree at time of this version
-     * @return A mapping of  artifact name's to their resulting violations
+     * @return A mapping of artifact UUIDs to their resulting violations
      */
     public Map<UUID, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifacts = this.artifactVersionRepository
@@ -43,5 +45,16 @@ public class WarningService {
                 .collect(Collectors.toList());
         return this.ruleService.generateWarningsOnEntities(projectVersion.getProject(),
             artifacts, traceLinks);
+    }
+
+    /**
+     * Returns mapping of artifact UUID to the list of violations it is inhibiting.
+     *
+     * @param project - Project the entities belong to
+     * @param entities - Entities in the project
+     * @return A mapping of artifact UUIDs to their resulting violations
+     */
+    public Map<UUID, List<RuleName>> retrieveWarningsForAppEntities(Project project, ProjectEntities entities) {
+        return this.ruleService.generateWarningsOnEntities(project, entities);
     }
 }

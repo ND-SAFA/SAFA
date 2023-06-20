@@ -2,43 +2,45 @@
  Alter Table
  */
 ALTER TABLE artifact_attribute_version
-    ADD COLUMN attribute_value JSON;
+    ADD COLUMN attribute_value MEDIUMTEXT;
 
 /*
  Migrate simple data
+
+ All the the ugliness here is because H2 does not support update with join or JSON_QUOTE
  */
-UPDATE artifact_attribute_version av, string_attribute_value sv
-    SET av.attribute_value = JSON_QUOTE(sv.attribute_value)
-    WHERE av.id = sv.attribute_version_id;
+UPDATE artifact_attribute_version av
+    SET av.attribute_value = CONCAT('"', REPLACE((SELECT sv.attribute_value from string_attribute_value sv where sv.attribute_version_id = av.id), '"', '\\"'), '"')
+    WHERE EXISTS (SELECT * from string_attribute_value sv WHERE av.id = sv.attribute_version_id);
 
-UPDATE artifact_attribute_version av, integer_attribute_value iv
-    SET av.attribute_value = CAST(iv.attribute_value AS JSON)
-    WHERE av.id = iv.attribute_version_id;
+UPDATE artifact_attribute_version av
+    SET av.attribute_value = CAST((SELECT iv.attribute_value from integer_attribute_value iv where iv.attribute_version_id = av.id) AS JSON)
+    WHERE EXISTS (SELECT * from integer_attribute_value iv WHERE av.id = iv.attribute_version_id);
 
-UPDATE artifact_attribute_version av, float_attribute_value fv
-    SET av.attribute_value = CAST(fv.attribute_value AS JSON)
-    WHERE av.id = fv.attribute_version_id;
+UPDATE artifact_attribute_version av
+    SET av.attribute_value = CAST((SELECT fv.attribute_value from float_attribute_value fv where fv.attribute_version_id = av.id) AS JSON)
+    WHERE EXISTS (SELECT * from float_attribute_value fv WHERE av.id = fv.attribute_version_id);
 
-UPDATE artifact_attribute_version av, boolean_attribute_value bv
-    SET av.attribute_value = CAST(bv.attribute_value AS JSON)
-    WHERE av.id = bv.attribute_version_id;
+UPDATE artifact_attribute_version av
+    SET av.attribute_value = CAST((SELECT bv.attribute_value from boolean_attribute_value bv where bv.attribute_version_id = av.id) AS JSON)
+    WHERE EXISTS (SELECT * from boolean_attribute_value bv WHERE av.id = bv.attribute_version_id);
 
 /*
  Migrate array data
  */
-CREATE TEMPORARY TABLE list_values (
+CREATE TABLE list_values (
     id VARCHAR(255),
     attribute_value MEDIUMTEXT
 );
 
 INSERT INTO list_values
-    SELECT saav.attribute_version_id, CONCAT('[', GROUP_CONCAT(JSON_QUOTE(saav.attribute_value) separator ','), ']')
+    SELECT saav.attribute_version_id, CONCAT('[', GROUP_CONCAT(CONCAT('"', REPLACE(saav.attribute_value, '"', '\\"'), '"') separator ','), ']')
     FROM string_array_attribute_value saav
     GROUP BY saav.attribute_version_id;
 
-UPDATE artifact_attribute_version av, list_values lv
-    SET av.attribute_value = lv.attribute_value
-    WHERE av.id = lv.id;
+UPDATE artifact_attribute_version av
+    SET av.attribute_value = (SELECT lv.attribute_value from list_values lv where lv.id = av.id)
+    WHERE EXISTS (SELECT * from list_values lv WHERE av.id = lv.id);
 
 /*
  Drop old tables

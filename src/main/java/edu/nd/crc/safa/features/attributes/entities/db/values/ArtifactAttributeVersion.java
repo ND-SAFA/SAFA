@@ -45,7 +45,7 @@ public class ArtifactAttributeVersion {
     private CustomAttribute attribute;
 
     @Lob
-    @Column(name = "attribute_value", columnDefinition = "json", nullable = false)
+    @Column(name = "attribute_value", columnDefinition = "mediumtext", nullable = false)
     private String value;
 
 }

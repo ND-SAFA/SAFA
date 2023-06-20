@@ -48,21 +48,38 @@ class SmokeTests extends ApplicationBaseTest {
         Artifact sourceArtifact = new Artifact();
         sourceArtifact.setName(sourceName);
         sourceArtifact.setType(sourceType);
+        sourceArtifact.setArtifactId(UUID.randomUUID());
 
         ArtifactType targetType = new ArtifactType();
         targetType.setName("requirement");
         Artifact targetArtifact = new Artifact();
         targetArtifact.setName(targetName);
         targetArtifact.setType(targetType);
+        targetArtifact.setArtifactId(UUID.randomUUID());
 
         TraceLink link = new TraceLink(sourceArtifact, targetArtifact);
 
         List<TraceLink> links = new ArrayList<>();
         links.add(link);
 
-        boolean result = verifier.satisfiesLinkCountRule(function, sourceArtifact, links);
+        ArtifactVersion sourceVersion = new ArtifactVersion();
+        sourceVersion.setArtifact(sourceArtifact);
+        sourceVersion.setEntityVersionId(UUID.randomUUID());
+
+        ArtifactVersion targetVersion = new ArtifactVersion();
+        targetVersion.setArtifact(targetArtifact);
+        targetVersion.setEntityVersionId(UUID.randomUUID());
+
+        Map<UUID, ArtifactVersion> artifactMap = Map.of(
+            sourceVersion.getEntityVersionId(), sourceVersion,
+            targetVersion.getEntityVersionId(), targetVersion
+        );
+
+        boolean result = verifier.satisfiesLinkCountRule(function, sourceArtifact.getArtifactId(),
+            links, artifactMap, TreeVerifier.dbEntityRetrievers);
         assertThat(result).isFalse();
-        result = verifier.satisfiesLinkCountRule(function, targetArtifact, links);
+        result = verifier.satisfiesLinkCountRule(function, targetArtifact.getArtifactId(),
+            links, artifactMap, TreeVerifier.dbEntityRetrievers);
         assertThat(result).isFalse();
     }
 
@@ -96,9 +113,24 @@ class SmokeTests extends ApplicationBaseTest {
         List<TraceLink> links = new ArrayList<>();
         links.add(link);
 
-        boolean isSatisfied = verifier.satisfiesChildCountRule(function, sourceName, links);
+        ArtifactVersion sourceVersion = new ArtifactVersion();
+        sourceVersion.setArtifact(sourceArtifact);
+        sourceVersion.setEntityVersionId(UUID.randomUUID());
+
+        ArtifactVersion targetVersion = new ArtifactVersion();
+        targetVersion.setArtifact(targetArtifact);
+        targetVersion.setEntityVersionId(UUID.randomUUID());
+
+        Map<UUID, ArtifactVersion> artifactMap = Map.of(
+            sourceVersion.getEntityVersionId(), sourceVersion,
+            targetVersion.getEntityVersionId(), targetVersion
+        );
+
+        boolean isSatisfied = verifier.satisfiesChildCountRule(function, sourceArtifact.getArtifactId(),
+            links, artifactMap, TreeVerifier.dbEntityRetrievers);
         assertThat(isSatisfied).isTrue();
-        isSatisfied = verifier.satisfiesChildCountRule(function, targetName, links);
+        isSatisfied = verifier.satisfiesChildCountRule(function, targetArtifact.getArtifactId(),
+            links, artifactMap, TreeVerifier.dbEntityRetrievers);
         assertThat(isSatisfied).isFalse();
     }
 

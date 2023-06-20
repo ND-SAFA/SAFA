@@ -21,14 +21,14 @@ import lombok.AllArgsConstructor;
  */
 public class TreeVerifier {
 
-    private static final Retrievers<ArtifactVersion, TraceLink> dbEntityRetrievers = new Retrievers<>(
+    public static final Retrievers<ArtifactVersion, TraceLink> dbEntityRetrievers = new Retrievers<>(
         ArtifactVersion::getVersionEntityId,
         ArtifactVersion::getTypeName,
         t -> t.getSourceArtifact().getArtifactId(),
         t -> t.getTargetArtifact().getArtifactId()
     );
 
-    private static final Retrievers<ArtifactAppEntity, TraceAppEntity> appEntityRetrievers = new Retrievers<>(
+    public static final Retrievers<ArtifactAppEntity, TraceAppEntity> appEntityRetrievers = new Retrievers<>(
         ArtifactAppEntity::getId,
         ArtifactAppEntity::getType,
         TraceAppEntity::getSourceId,

@@ -15,5 +15,7 @@ public interface ArtifactAttributeVersionRepository extends CrudRepository<Artif
 
     List<ArtifactAttributeVersion> findByArtifactVersion(ArtifactVersion version);
 
+    List<ArtifactAttributeVersion> findByArtifactVersionIn(List<ArtifactVersion> version);
+
     List<ArtifactAttributeVersion> findByAttribute(CustomAttribute attribute);
 }

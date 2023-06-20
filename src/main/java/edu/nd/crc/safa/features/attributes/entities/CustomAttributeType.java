@@ -7,17 +7,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CustomAttributeType {
-    TEXT(CustomAttributeStorageType.STRING, CustomAttributeExtraInfoType.NONE),
-    PARAGRAPH(CustomAttributeStorageType.STRING, CustomAttributeExtraInfoType.NONE),
-    SELECT(CustomAttributeStorageType.STRING, CustomAttributeExtraInfoType.OPTIONS),
-    MULTISELECT(CustomAttributeStorageType.STRING_ARRAY, CustomAttributeExtraInfoType.OPTIONS),
-    RELATION(CustomAttributeStorageType.STRING_ARRAY, CustomAttributeExtraInfoType.NONE),
-    DATE(CustomAttributeStorageType.STRING, CustomAttributeExtraInfoType.NONE),
-    INT(CustomAttributeStorageType.INTEGER, CustomAttributeExtraInfoType.INT_BOUNDS),
-    FLOAT(CustomAttributeStorageType.FLOAT, CustomAttributeExtraInfoType.FLOAT_BOUNDS),
-    BOOLEAN(CustomAttributeStorageType.BOOLEAN, CustomAttributeExtraInfoType.NONE);
+    TEXT(CustomAttributeExtraInfoType.NONE),
+    PARAGRAPH(CustomAttributeExtraInfoType.NONE),
+    SELECT(CustomAttributeExtraInfoType.OPTIONS),
+    MULTISELECT(CustomAttributeExtraInfoType.OPTIONS),
+    RELATION(CustomAttributeExtraInfoType.NONE),
+    DATE(CustomAttributeExtraInfoType.NONE),
+    INT(CustomAttributeExtraInfoType.INT_BOUNDS),
+    FLOAT(CustomAttributeExtraInfoType.FLOAT_BOUNDS),
+    BOOLEAN(CustomAttributeExtraInfoType.NONE);
 
-    private final CustomAttributeStorageType storageType;
     private final CustomAttributeExtraInfoType extraInfoType;
 
     @JsonValue

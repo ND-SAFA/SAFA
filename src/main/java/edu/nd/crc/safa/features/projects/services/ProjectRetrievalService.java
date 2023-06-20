@@ -98,8 +98,9 @@ public class ProjectRetrievalService {
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
 
         // Artifact warnings
-        Map<UUID, List<RuleName>> warnings = this.warningService.retrieveWarningsInProjectVersion(projectVersion);
-
+        Map<UUID, List<RuleName>> warnings
+            = this.warningService.retrieveWarningsForAppEntities(projectVersion.getProject(), entities);
+        
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 

@@ -23,7 +23,6 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.javatuples.Pair;
@@ -48,11 +47,17 @@ public abstract class GenericVersionRepository<
     @Override
     public List<A> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
         List<V> versionEntities = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
-        List<A> appEntities = new ArrayList<>();
-        for (V versionEntity : versionEntities) {
-            appEntities.add(this.retrieveAppEntityFromVersionEntity(versionEntity));
-        }
-        return appEntities;
+        return versionEntities.stream()
+            .map(this::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<A> retrieveAppEntitiesByProject(Project project) {
+        List<V> versions = retrieveVersionEntitiesByProject(project);
+        return versions.stream()
+            .map(this::retrieveAppEntityFromVersionEntity)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -295,31 +300,6 @@ public abstract class GenericVersionRepository<
     }
 
     /**
-     * Returns the most recent entity version that passes given filter
-     *
-     * @param bodies The bodies to filter through
-     * @param filter The filter deciding whether an entity's version is valid.
-     * @return The latest entity version passing given filter.
-     */
-    private V getLatestEntityVersionWithFilter(List<V> bodies,
-                                               ProjectVersionFilter filter) {
-        V closestBodyToVersion = null;
-        for (int i = bodies.size() - 1; i >= 0; i--) {
-            V currentBody = bodies.get(i);
-            ProjectVersion currentBodyVersion = currentBody.getProjectVersion();
-            if (filter.shouldKeep(currentBodyVersion)) {
-                if (closestBodyToVersion == null) {
-                    closestBodyToVersion = currentBody;
-                } else if (currentBodyVersion.isGreaterThan(closestBodyToVersion.getProjectVersion())
-                ) {
-                    closestBodyToVersion = currentBody;
-                }
-            }
-        }
-        return closestBodyToVersion;
-    }
-
-    /**
      * Returns the type of modification made between the source and target entities.
      *
      * @param baseEntity   The original entity whose content is the base for calculating changes.
@@ -424,7 +404,7 @@ public abstract class GenericVersionRepository<
      * @param project The project whose entities are retrieved.
      * @return Returns all versions of the base entities in a project.
      */
-    protected abstract List<V> retrieveVersionEntitiesByProject(Project project);
+    public abstract List<V> retrieveVersionEntitiesByProject(Project project);
 
     /**
      * @param entity The base entities whose versions are retrieved

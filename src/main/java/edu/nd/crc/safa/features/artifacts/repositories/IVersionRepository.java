@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.javatuples.Pair;
@@ -37,6 +38,22 @@ public interface IVersionRepository<
      * @return List of application entities
      */
     List<A> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion);
+
+    /**
+     * Returns the current entities existing in given project.
+     *
+     * @param project The project whose existing entities are retrieved.
+     * @return List of entities in project version.
+     */
+    List<V> retrieveVersionEntitiesByProject(Project project);
+
+    /**
+     * Returns the list of all application entities existing in given project.
+     *
+     * @param project The project whose existing entities are retrieved.
+     * @return List of application entities
+     */
+    List<A> retrieveAppEntitiesByProject(Project project);
 
     /**
      * Returns the version of the entity specified by entity id in given project version.

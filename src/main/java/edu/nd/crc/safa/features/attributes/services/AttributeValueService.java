@@ -1,22 +1,21 @@
 package edu.nd.crc.safa.features.attributes.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeStorageType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.entities.db.values.ArtifactAttributeVersion;
-import edu.nd.crc.safa.features.attributes.entities.db.values.IAttributeValue;
 import edu.nd.crc.safa.features.attributes.repositories.values.ArtifactAttributeVersionRepository;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,16 @@ public class AttributeValueService {
     private final AttributeSystemServiceProvider serviceProvider;
 
     private final Logger logger = LoggerFactory.getLogger(AttributeValueService.class);
+    private final ArtifactAttributeVersionRepository artifactAttributeVersionRepository;
 
-    public AttributeValueService(AttributeSystemServiceProvider serviceProvider) {
+    private final ObjectMapper objectMapper;
+
+    public AttributeValueService(AttributeSystemServiceProvider serviceProvider,
+                                 ArtifactAttributeVersionRepository artifactAttributeVersionRepository,
+                                 ObjectMapper objectMapper) {
         this.serviceProvider = serviceProvider;
+        this.artifactAttributeVersionRepository = artifactAttributeVersionRepository;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -40,23 +46,41 @@ public class AttributeValueService {
      * goes from keyname to json nodes containing the values.
      *
      * @param artifactVersion The artifact version we're looking at.
-     * @return A map from attribute keynames to values.
      */
-    public Map<String, JsonNode> getCustomAttributeValuesForArtifact(ArtifactVersion artifactVersion) {
+    public void attachCustomAttributesToArtifact(ArtifactVersion artifactVersion) {
+        attachCustomAttributesToArtifacts(List.of(artifactVersion));
+    }
+
+    /**
+     * Inserts the values of custom attributes for the given artifact versions.
+     *
+     * @param artifactVersions The artifact versions we're looking at.
+     */
+    public void attachCustomAttributesToArtifacts(List<ArtifactVersion> artifactVersions) {
+        Map<UUID, ArtifactVersion> artifactVersionMap = new HashMap<>();
+        artifactVersions.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
 
         List<ArtifactAttributeVersion> attributeVersions =
-            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersion(artifactVersion);
-
-        Map<String, JsonNode> out = new HashMap<>();
+            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersions);
 
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
-            JsonNode jsonValue = attributeVersion.getValueType().getJsonValueRetriever()
-                .apply(serviceProvider, attributeVersion);
+            JsonNode jsonValue = getJsonValue(attributeVersion);
 
-            out.put(attributeVersion.getAttribute().getKeyname(), jsonValue);
+            // Re-retrieve artifact version by id since the artifact version stored in
+            // the attribute version from the database isn't the same object (just the same data)
+            ArtifactVersion thisVersion
+                = artifactVersionMap.get(attributeVersion.getArtifactVersion().getVersionEntityId());
+            thisVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
         }
+    }
 
-        return out;
+    private JsonNode getJsonValue(ArtifactAttributeVersion attributeVersion) {
+        try {
+            return objectMapper.readValue(attributeVersion.getValue(), JsonNode.class);
+        } catch (JsonProcessingException e) {
+            logger.warn("Could not parse stored attribute with ID: " + attributeVersion.getId(), e);
+            return TextNode.valueOf("");
+        }
     }
 
     /**
@@ -69,37 +93,9 @@ public class AttributeValueService {
      */
     @Transactional
     public void saveAttributeValue(CustomAttribute attribute, ArtifactVersion artifactVersion, JsonNode value) {
-
         ArtifactAttributeVersion attributeVersion = getAttributeVersion(attribute, artifactVersion);
-
-        CustomAttributeStorageType storageType = attribute.getType().getStorageType();
-        if (storageType.isArrayType()) {
-            clearArrayTypeValues(attributeVersion);
-            for (JsonNode innerValue : unpackJsonArray(value)) {
-                saveArtifactValueInner(storageType, innerValue, attributeVersion);
-            }
-        } else {
-            saveArtifactValueInner(storageType, value, attributeVersion);
-        }
-    }
-
-    /**
-     * The save function of regular types is expected to overwrite the old value if one exists, but
-     * for an array, that doesn't really work, so this function clears out the old values before we
-     * write the new values to the database.
-     *
-     * @param attributeVersion The attribute version we're writing to.
-     */
-    private void clearArrayTypeValues(ArtifactAttributeVersion attributeVersion) {
-        CustomAttributeStorageType storageType = attributeVersion.getAttribute().getType().getStorageType();
-        switch (storageType) {
-            case STRING_ARRAY:
-                serviceProvider.getStringArrayAttributeValueRepository().deleteByAttributeVersion(attributeVersion);
-                break;
-            default:
-                logger.error("Unhandled array type: " + storageType);
-                break;
-        }
+        attributeVersion.setValue(value.toString());
+        artifactAttributeVersionRepository.save(attributeVersion);
     }
 
     /**
@@ -150,39 +146,5 @@ public class AttributeValueService {
             repo.save(attributeVersion);
             return attributeVersion;
         });
-    }
-
-    /**
-     * Unpacks a string array that is encoded as a JSON string into an
-     * actual string array.
-     *
-     * @param value JSON encoded string array
-     * @return The parsed array.
-     * @throws SafaError When the string is not formatted correctly.
-     */
-    private JsonNode[] unpackJsonArray(JsonNode value) {
-        assert value.isArray();
-
-        List<JsonNode> nodes = new ArrayList<>();
-        for (Iterator<JsonNode> it = value.elements(); it.hasNext(); ) {
-            nodes.add(it.next());
-        }
-
-        return nodes.toArray(new JsonNode[0]);
-    }
-
-    /**
-     * Actually constructs and sets values in the attribute value object.
-     * @param storageType Storage type of the attribute - used to get the constructor of the attribute type.
-     * @param value The value to set.
-     * @param attributeVersion The artifact attribute version we set a value in.
-     */
-    private void saveArtifactValueInner(CustomAttributeStorageType storageType, JsonNode value,
-                                        ArtifactAttributeVersion attributeVersion) {
-
-        IAttributeValue attributeValueObj = storageType.getAttributeValueConstructor().get();
-        attributeValueObj.setAttributeVersion(attributeVersion);
-        attributeValueObj.setValueFromJsonNode(value);
-        attributeValueObj.save(serviceProvider);
     }
 }

@@ -4,6 +4,7 @@
     label="Delta"
     data-cy="button-nav-delta"
     icon="view-delta"
+    :disabled="deltaApiStore.deltaVersions.length === 0"
     @click="emit('click')"
   >
     <q-menu v-if="!deltaVersion">

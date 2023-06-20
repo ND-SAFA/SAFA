@@ -5,7 +5,7 @@
 DELETE FROM artifact_attribute_version;
 
 ALTER TABLE artifact_attribute_version
-    ADD value MEDIUMTEXT;
+    ADD COLUMN attribute_value MEDIUMTEXT;
 
 DROP TABLE string_attribute_value;
 DROP TABLE string_array_attribute_value;

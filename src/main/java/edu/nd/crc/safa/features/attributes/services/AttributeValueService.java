@@ -12,12 +12,13 @@ import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribu
 import edu.nd.crc.safa.features.attributes.entities.db.values.ArtifactAttributeVersion;
 import edu.nd.crc.safa.features.attributes.repositories.values.ArtifactAttributeVersionRepository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 
 /**
  * Contains util functions for interacting with artifact fields.
@@ -30,10 +31,14 @@ public class AttributeValueService {
     private final Logger logger = LoggerFactory.getLogger(AttributeValueService.class);
     private final ArtifactAttributeVersionRepository artifactAttributeVersionRepository;
 
+    private final ObjectMapper objectMapper;
+
     public AttributeValueService(AttributeSystemServiceProvider serviceProvider,
-                                 ArtifactAttributeVersionRepository artifactAttributeVersionRepository) {
+                                 ArtifactAttributeVersionRepository artifactAttributeVersionRepository,
+                                 ObjectMapper objectMapper) {
         this.serviceProvider = serviceProvider;
         this.artifactAttributeVersionRepository = artifactAttributeVersionRepository;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -43,59 +48,38 @@ public class AttributeValueService {
      * @param artifactVersion The artifact version we're looking at.
      */
     public void attachCustomAttributesToArtifact(ArtifactVersion artifactVersion) {
-
-        List<ArtifactAttributeVersion> attributeVersions =
-            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersion(artifactVersion);
-
-        for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
-            // TODO handle types correctly
-            JsonNode jsonValue = TextNode.valueOf(attributeVersion.getValue());
-
-            artifactVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
-        }
+        attachCustomAttributesToArtifacts(List.of(artifactVersion));
     }
 
     /**
-     * Gets a map with all the custom attributes that are set for this artifact. The map
-     * goes from keyname to json nodes containing the values.
+     * Inserts the values of custom attributes for the given artifact versions.
      *
-     * @param artifactVersion The artifact version we're looking at.
+     * @param artifactVersions The artifact versions we're looking at.
      */
-    public void attachCustomAttributesToArtifacts(List<ArtifactVersion> artifactVersion) {
+    public void attachCustomAttributesToArtifacts(List<ArtifactVersion> artifactVersions) {
         Map<UUID, ArtifactVersion> artifactVersionMap = new HashMap<>();
-        artifactVersion.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
+        artifactVersions.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
 
         List<ArtifactAttributeVersion> attributeVersions =
-            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersion);
+            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersions);
 
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
-            // TODO handle types correctly
-            JsonNode jsonValue = TextNode.valueOf(attributeVersion.getValue());
+            JsonNode jsonValue = getJsonValue(attributeVersion);
 
+            // Re-retrieve artifact version by id since the artifact version stored in
+            // the attribute version from the database isn't the same object (just the same data)
             ArtifactVersion thisVersion
                 = artifactVersionMap.get(attributeVersion.getArtifactVersion().getVersionEntityId());
             thisVersion.addCustomAttributeValue(attributeVersion.getAttribute().getKeyname(), jsonValue);
         }
     }
 
-    private void printStopwatch(StopWatch stopWatch, String prefix) {
-        int maxLen = 0;
-        int maxTimeLen = 0;
-        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
-            int len = taskInfo.getTaskName().length();
-            if (len > maxLen) {
-                maxLen = len;
-            }
-
-            int timeLen = (int) Math.log10(taskInfo.getTimeMillis());
-            if (timeLen > maxTimeLen) {
-                maxTimeLen = timeLen;
-            }
-        }
-
-        String formatString = "%" + maxLen + "s: %" + (maxTimeLen + 1) + "d";
-        for (StopWatch.TaskInfo taskInfo : stopWatch.getTaskInfo()) {
-            System.out.println(prefix + String.format(formatString, taskInfo.getTaskName(), taskInfo.getTimeMillis()));
+    private JsonNode getJsonValue(ArtifactAttributeVersion attributeVersion) {
+        try {
+            return objectMapper.readValue(attributeVersion.getValue(), JsonNode.class);
+        } catch (JsonProcessingException e) {
+            logger.warn("Could not parse stored attribute with ID: " + attributeVersion.getId(), e);
+            return TextNode.valueOf("");
         }
     }
 
@@ -110,7 +94,7 @@ public class AttributeValueService {
     @Transactional
     public void saveAttributeValue(CustomAttribute attribute, ArtifactVersion artifactVersion, JsonNode value) {
         ArtifactAttributeVersion attributeVersion = getAttributeVersion(attribute, artifactVersion);
-        attributeVersion.setValue(value.asText());
+        attributeVersion.setValue(value.toString());
         artifactAttributeVersionRepository.save(attributeVersion);
     }
 

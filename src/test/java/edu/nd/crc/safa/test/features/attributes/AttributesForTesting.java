@@ -16,7 +16,7 @@ import edu.nd.crc.safa.test.builders.DbEntityBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.FloatNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -53,7 +53,7 @@ public class AttributesForTesting {
                     IntNode.valueOf(10), IntNode.valueOf(11)),
 
             CustomAttributeType.FLOAT, new AttributeInfo("A float goes here", "floatField",
-                    FloatNode.valueOf(123.2f), FloatNode.valueOf(321.1f)),
+                    DoubleNode.valueOf(123.2), DoubleNode.valueOf(321.1)),
 
             CustomAttributeType.BOOLEAN, new AttributeInfo("A bool goes here", "booleanField",
                     BooleanNode.TRUE, BooleanNode.FALSE)

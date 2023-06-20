@@ -11,7 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeStorageType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 
 import lombok.Getter;
@@ -49,7 +48,4 @@ public class ArtifactAttributeVersion {
     @Column(name = "attribute_value", columnDefinition = "mediumtext", nullable = false)
     private String value;
 
-    public CustomAttributeStorageType getValueType() {
-        return attribute.getType().getStorageType();
-    }
 }

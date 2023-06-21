@@ -11,7 +11,7 @@ export interface GeneratedMatrixSchema {
   /**
    * The default model to use to generate links.
    */
-  method: ModelType;
+  method?: ModelType;
   /**
    * The custom model used to generate links.
    */

@@ -184,6 +184,10 @@ export interface ArtifactInput extends LabelProps, MultipleProps {
    */
   onlyDocumentArtifacts?: boolean;
   /**
+   * If set, these artifacts will be removed from the list.
+   */
+  hiddenArtifactIds?: string[];
+  /**
    * If set, these types will be hidden from the initial artifact list.
    */
   defaultHiddenTypes?: string[];

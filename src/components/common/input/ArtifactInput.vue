@@ -105,13 +105,16 @@ function filterOptions(
   update(() => {
     if (searchText === "") {
       options.value = artifacts.value.filter(
-        (artifact) => !hiddenTypes.value.includes(artifact.type)
+        (artifact) =>
+          !props.hiddenArtifactIds?.includes(artifact.id) &&
+          !hiddenTypes.value.includes(artifact.type)
       );
     } else {
       const lowercaseSearchText = searchText.toLowerCase();
 
       options.value = artifacts.value.filter(
         (artifact) =>
+          !props.hiddenArtifactIds?.includes(artifact.id) &&
           !hiddenTypes.value.includes(artifact.type) &&
           filterArtifacts(artifact, lowercaseSearchText)
       );

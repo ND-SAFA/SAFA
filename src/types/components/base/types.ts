@@ -14,4 +14,6 @@ export type ThemeColor =
   | "accent"
   | "positive"
   | "negative"
+  | "nodeDefault"
+  | "nodeGenerated"
   | string;

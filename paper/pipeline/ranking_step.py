@@ -37,11 +37,13 @@ def create_ranking_prompts(s: RankingStore):
 
     source_names, target_names = extract_prompt_artifacts(artifact_df)
     artifact_map = create_artifact_map(artifact_df)
-    target_names = registered_sorters[s.sorter](source_names, target_names, artifact_map)  # sorts target names using sorter
+    target_artifact_sorter = registered_sorters[s.sorter]
+    source2sorted_targets = target_artifact_sorter(source_names, target_names, artifact_map)  # sorts target names using sorter
 
     prompts = []
     for s_name in source_names:
-        prompt = create_prompts(artifact_map, s_name, target_names, s)
+        sorted_targets = source2sorted_targets[s_name]
+        prompt = create_prompts(artifact_map, s_name, sorted_targets, s)
         prompts.append(prompt)
     s.source_ids = source_names
     s.prompts = prompts

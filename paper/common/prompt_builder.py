@@ -57,9 +57,9 @@ class PromptBuilder:
         return llm_manager.make_completion_request(LLMCompletionType.GENERATION, **params)
 
     @staticmethod
-    def format_artifact(artifact_name: str, artifact_body: str):
+    def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n"):
         body = artifact_body.replace("\n\n", "\n")
-        return f"ID: {artifact_name}\nBODY: {body}\n\n"
+        return f"<id>{artifact_name}</id>\n<body>{body}</body>{separator}"
 
     @staticmethod
     def join_prompts(prompts, delimiter):

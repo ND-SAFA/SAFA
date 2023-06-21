@@ -80,15 +80,16 @@ def create_map_instructions(s: RankingStore):
     s.map_instructions = map_instructions
 
 
-def process_ranked_artifacts(batch_response, target_ids):
+def process_ranked_artifacts(batch_response, target_ids, add_missing=True) -> List[List[str]]:
     target_ids = list(map(lambda f: remove_file_extension(f), target_ids))
     ranked_target_links = []
-    for r in batch_response.batch_responses:
-        processed_response = process_response(r)
+    for response in batch_response.batch_responses:
+        processed_response = process_response(response)
         processed_artifact_ids = process_artifact_ids(processed_response)
         ranked_target_links.append(processed_artifact_ids)
-    for r_list in ranked_target_links:
-        missing_ids = [t_id for t_id in target_ids if t_id not in r_list]
-        random.shuffle(missing_ids)
-        r_list.extend(missing_ids)
+    if add_missing:
+        for r_list in ranked_target_links:
+            missing_ids = [t_id for t_id in target_ids if t_id not in r_list]
+            random.shuffle(missing_ids)
+            r_list.extend(missing_ids)
     return ranked_target_links

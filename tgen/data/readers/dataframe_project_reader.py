@@ -38,8 +38,8 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             params = {"index_col": 0} if dataframe_cls.index_name() is None else {}
             df: pd.DataFrame = pd.read_csv(os.path.join(self.project_path, filename), **params)
             if self.summarizer:
-                self.summarizer.summarize_dataframe(df, col2summarize=ArtifactKeys.CONTENT.value,
-                                                    col2use4chunker=ArtifactKeys.LAYER_ID.value)
+                df = self.summarizer.summarize_dataframe(df, col2summarize=ArtifactKeys.CONTENT.value,
+                                                             col2use4chunker=ArtifactKeys.LAYER_ID.value)
             dataframes.append(dataframe_cls(df))
         return tuple(dataframes)
 

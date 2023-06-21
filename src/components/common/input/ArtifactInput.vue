@@ -13,11 +13,11 @@
     option-label="name"
     option-value="id"
     input-debounce="0"
-    @filter="filter"
+    @filter="filterOptions"
     @popup-show="handleReloadOptions"
   >
     <template #before-options>
-      <flex-box full-width justify="end" y="1">
+      <flex-box full-width justify="end" y="2">
         <type-buttons
           default-visible
           :hidden-types="hiddenTypes"
@@ -98,7 +98,10 @@ const selectedCount = computed(() => {
  * @param searchText - The search text to filter with.
  * @param update - A function call to update the options.
  */
-function filter(searchText: string, update: (fn: () => void) => void): void {
+function filterOptions(
+  searchText: string,
+  update: (fn: () => void) => void
+): void {
   update(() => {
     if (searchText === "") {
       options.value = artifacts.value.filter(
@@ -141,7 +144,7 @@ function handleTypeChange(
     hiddenTypes.value = [];
   }
 
-  filter("", (fn) => fn());
+  filterOptions("", (fn) => fn());
 }
 
 /**
@@ -151,6 +154,6 @@ function handleReloadOptions(): void {
   if (!props.defaultHiddenTypes) return;
 
   hiddenTypes.value = props.defaultHiddenTypes;
-  filter("", (fn) => fn());
+  filterOptions("", (fn) => fn());
 }
 </script>

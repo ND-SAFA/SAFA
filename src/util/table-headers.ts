@@ -101,28 +101,28 @@ export const jobColumns: TableColumn<JobSchema>[] = [
 export const approvalColumns: TableColumn<FlatTraceLink>[] = [
   {
     name: "sourceName",
-    label: "Source Name",
+    label: "Child Name",
     field: (row) => row.sourceName,
     sortable: true,
     align: "left",
   },
   {
     name: "sourceType",
-    label: "Source Type",
+    label: "Child Type",
     field: (row) => row.sourceType,
     sortable: true,
     align: "left",
   },
   {
     name: "targetName",
-    label: "Target Name",
+    label: "Parent Name",
     field: (row) => row.targetName,
     sortable: true,
     align: "left",
   },
   {
     name: "targetType",
-    label: "Target Type",
+    label: "Parent Type",
     field: (row) => row.targetType,
     sortable: true,
     align: "left",

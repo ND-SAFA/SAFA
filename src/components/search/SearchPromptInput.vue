@@ -21,12 +21,16 @@
       <icon variant="search" />
     </template>
     <template #before-options>
-      <flex-box x="3" t="1" justify="end">
+      <flex-box l="2" y="2" justify="between" align="center">
         <typography
-          align="end"
           variant="caption"
           :value="matchText"
           data-cy="text-artifact-search-count"
+        />
+        <type-buttons
+          default-visible
+          :hidden-types="hiddenTypes"
+          @click="handleTypeChange"
         />
       </flex-box>
     </template>
@@ -50,7 +54,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactSchema, TimArtifactLevelSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import {
   artifactStore,
@@ -59,11 +63,12 @@ import {
   selectionStore,
   typeOptionsStore,
 } from "@/hooks";
-import { Typography, Icon, FlexBox } from "@/components/common";
+import { Typography, Icon, FlexBox, TypeButtons } from "@/components/common";
 import SearchOption from "./SearchOption.vue";
 import SearchInputs from "./SearchInputs.vue";
 
 const searchOptions = ref<ArtifactSchema[] | string[]>([]);
+const hiddenTypes = ref<string[]>([]);
 
 /**
  * Returns the display text for how many matches there are.
@@ -90,25 +95,62 @@ function clearOptions(): void {
 function filterOptions(search: string, update: (fn: () => void) => void) {
   searchStore.searchText = search;
 
-  if (search === "" || searchStore.selectionCount > 0) {
-    update(() => (searchOptions.value = []));
-  } else {
-    update(() => {
-      if (searchStore.artifactLikeMode) {
-        searchOptions.value = artifactStore.currentArtifacts.filter(
-          (artifact) => filterArtifacts(artifact, search)
-        );
-      } else if (searchStore.artifactTypeMode) {
-        const lowercaseSearch = search.toLowerCase();
+  update(() => {
+    if (
+      searchStore.basicSearchMode ||
+      (searchStore.artifactLikeMode && search !== "")
+    ) {
+      // Basic search always shows artifacts.
+      // Artifact-like search only shows artifacts when there is search text.
+      searchOptions.value = artifactStore.currentArtifacts.filter(
+        (artifact) =>
+          !hiddenTypes.value.includes(artifact.type) &&
+          filterArtifacts(artifact, search)
+      );
+    } else if (search === "" || searchStore.selectionCount > 0) {
+      // Non-basic search shows no artifacts when there is no search text.
+      searchOptions.value = [];
+    } else if (searchStore.artifactTypeMode) {
+      // Artifact type search shows artifact types when there is search text.
+      const lowercaseSearch = search.toLowerCase();
 
-        searchOptions.value = typeOptionsStore.artifactTypes.filter((type) =>
-          type.toLowerCase().includes(lowercaseSearch)
-        );
-      } else {
-        searchOptions.value = [];
-      }
-    });
+      searchOptions.value = typeOptionsStore.artifactTypes.filter((type) =>
+        type.toLowerCase().includes(lowercaseSearch)
+      );
+    } else {
+      searchOptions.value = [];
+    }
+  });
+}
+
+/**
+ * Toggles whether a type is visible in the artifact list.
+ * @param option - The type to toggle.
+ * @param allOptions - All possible types.
+ */
+function handleTypeChange(
+  option: TimArtifactLevelSchema,
+  allOptions: TimArtifactLevelSchema[]
+): void {
+  if (hiddenTypes.value.length === 0) {
+    hiddenTypes.value = allOptions
+      .map((type) => type.name)
+      .filter((type) => type !== option.name);
+  } else if (hiddenTypes.value.find((type) => type === option.name)) {
+    hiddenTypes.value = hiddenTypes.value.filter(
+      (type) => type !== option.name
+    );
+  } else {
+    hiddenTypes.value.push(option.name);
   }
+
+  if (hiddenTypes.value.length === allOptions.length) {
+    hiddenTypes.value = [];
+  }
+
+  searchOptions.value = artifactStore.currentArtifacts.filter(
+    (artifact) => !hiddenTypes.value.includes(artifact.type)
+  );
 }
 
 /**

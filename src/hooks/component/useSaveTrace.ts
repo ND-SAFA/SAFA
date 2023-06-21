@@ -131,9 +131,9 @@ export const useSaveTrace = defineStore("saveTrace", {
       for (const target of this.targets) {
         for (const source of this.sources) {
           if (!source) {
-            return "Source artifact does not exist.";
+            return "Child artifact does not exist.";
           } else if (!target) {
-            return "Target artifact does not exist.";
+            return "Parent artifact does not exist.";
           }
 
           const isLinkAllowed = traceStore.isLinkAllowed(source, target);

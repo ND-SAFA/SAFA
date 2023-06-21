@@ -7,6 +7,7 @@
     :options-dark="darkMode"
     options-selected-class="primary"
     :options="options"
+    :disable="disabled"
     label="View"
     class="nav-input nav-document"
     option-label="name"
@@ -82,6 +83,7 @@ import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
+  deltaStore,
   documentApiStore,
   documentSaveStore,
   documentStore,
@@ -103,6 +105,10 @@ const document = computed({
     documentApiStore.handleSwitch(document);
   },
 });
+
+const disabled = computed(() => deltaStore.inDeltaView);
+
+console.log(disabled.value);
 
 /**
  * Returns whether a document can be saved.

@@ -8,14 +8,14 @@
       <artifact-input
         v-model="traceSaveStore.targetIds"
         multiple
-        label="Target Artifacts"
+        label="Parent Artifacts"
         :default-hidden-types="traceSaveStore.defaultHiddenTargetTypes"
         data-cy="button-trace-save-target"
       />
       <artifact-input
         v-model="traceSaveStore.sourceIds"
         multiple
-        label="Source Artifacts"
+        label="Child Artifacts"
         class="q-my-md"
         :default-hidden-types="traceSaveStore.defaultHiddenSourceTypes"
         data-cy="button-trace-save-source"

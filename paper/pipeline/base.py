@@ -10,7 +10,7 @@ from tgen.util.json_util import NpEncoder
 DEFAULT_RANKING_QUESTION = "Rank the artifacts from most to least relevant to the source. " \
                            "Provide the ranked artifacts as comma delimited list of artifact ids. " \
                            "\n\nSource: "
-DEFAULT_RANKING_FORMAT = ""
+DEFAULT_RANKING_FORMAT = None
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 
@@ -38,8 +38,10 @@ class RankingStore:
     # Instructions
     project_path: str  # path to original dataset
     experiment_id: str  # The UUID of the run on the dataset.
+    sorter: str  # The name of the sorter to use
     prompt_question: str = DEFAULT_RANKING_QUESTION  # The prompt used to rank artifacts.
     prompt_format: str = DEFAULT_RANKING_FORMAT
+    prompt_artifacts: List[str] = None
     run_path: str = None  # path to predictions on dataset
 
     # Project
@@ -71,11 +73,12 @@ class DatasetIdentifier:
 
 
 class RankingPipeline:
-    def __init__(self, dataset_id: DatasetIdentifier, steps: List[RankingStep], base_prompt: str = DEFAULT_RANKING_QUESTION,
+    def __init__(self, dataset_id: DatasetIdentifier, steps: List[RankingStep], sorter: str,
+                 base_prompt: str = DEFAULT_RANKING_QUESTION,
                  export_dir: str = DEFAULT_EXPERIMENT_DIR):
         self.steps = steps
         self.store = RankingStore(project_path=dataset_id.dataset_path, run_path=dataset_id.run_path,
-                                  experiment_id=dataset_id.experiment_id, prompt_question=base_prompt)
+                                  experiment_id=dataset_id.experiment_id, prompt_question=base_prompt, sorter=sorter)
         self.dataset_export_dir = os.path.join(export_dir, dataset_id.dataset_name)
 
     def run(self):

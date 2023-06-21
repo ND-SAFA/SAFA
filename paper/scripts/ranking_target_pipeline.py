@@ -17,6 +17,11 @@ if __name__ == "__main__":
 
     dataset_id = DatasetIdentifier(dataset_path=dataset_path, experiment_id=EXPERIMENT_ID, dataset_name=DATASET_NAME)
 
-    steps = [read_predictions, create_ranking_prompts, complete_ranking_prompts, create_map_instructions, compute_map, add_precision]
-    pipeline = RankingPipeline(dataset_id, steps)
+    steps = [read_predictions,
+             create_ranking_prompts,
+             complete_ranking_prompts,
+             create_map_instructions,
+             compute_map,
+             add_precision]
+    pipeline = RankingPipeline(dataset_id, steps, sorter="test")
     pipeline.run()

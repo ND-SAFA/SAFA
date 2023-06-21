@@ -30,7 +30,7 @@ class VSMJob(AbstractTrainerJob):
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
         super().__init__(model_manager=ModelManager("VSM"), trainer_dataset_manager=trainer_dataset_manager,
-                         trainer_args=HuggingFaceArgs(output_dir=job_args.output_dir), job_args=job_args, task=TrainerTask.TRAIN)
+                         trainer_args=None, job_args=job_args, task=TrainerTask.TRAIN)
         self.metrics = metrics
         self._trainer: Optional[VSMTrainer] = None
 

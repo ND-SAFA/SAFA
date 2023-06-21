@@ -175,7 +175,7 @@ class TraceDataset(iDataset):
         Gets link ids in the order that they are given in the trainer dataset
         :return: a list of ordered link ids
         """
-        return [link_id for link_id in self.pos_link_ids + self.neg_link_ids]
+        return list(self.trace_df.index)
 
     def get_ordered_links(self) -> List[EnumDict]:
         """

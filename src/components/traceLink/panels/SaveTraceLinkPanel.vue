@@ -9,6 +9,7 @@
         v-model="traceSaveStore.targetIds"
         multiple
         label="Parent Artifacts"
+        :hidden-artifact-ids="traceSaveStore.hiddenTargetIds"
         :default-hidden-types="traceSaveStore.defaultHiddenTargetTypes"
         data-cy="button-trace-save-target"
       />
@@ -17,6 +18,7 @@
         multiple
         label="Child Artifacts"
         class="q-my-md"
+        :hidden-artifact-ids="traceSaveStore.hiddenSourceIds"
         :default-hidden-types="traceSaveStore.defaultHiddenSourceTypes"
         data-cy="button-trace-save-source"
       />

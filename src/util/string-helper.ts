@@ -128,5 +128,8 @@ export function versionToString(currentVersion?: VersionSchema): string {
  * @return True if the artifact is a code artifact.
  */
 export function isCodeArtifact(name: string): boolean {
-  return name.includes(".");
+  const codeFileRegex =
+    /\.(js|ts|tsx|vue|java|py|cpp|c|php|html|css|sass|scss|json|yaml|yml)$/i;
+
+  return codeFileRegex.test(name);
 }

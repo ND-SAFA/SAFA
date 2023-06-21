@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ArtifactSchema } from "@/types";
-import { appStore, traceStore, typeOptionsStore } from "@/hooks";
+import { appStore, subtreeStore, traceStore, typeOptionsStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import artifactStore from "../project/useArtifacts";
 
@@ -119,6 +119,28 @@ export const useSaveTrace = defineStore("saveTrace", {
       }
 
       return hiddenTypes;
+    },
+    /**
+     * @return The default artifact ids hidden from target artifacts,
+     * as they are already traced to source artifacts.
+     */
+    hiddenTargetIds(): string[] {
+      if (this.sourceCount === 0) return [];
+
+      return (this.sourceIds || [])
+        .map((id) => subtreeStore.getSubtreeItem(id).parents)
+        .reduce((acc, cur) => [...acc, ...cur], []);
+    },
+    /**
+     * @return The default artifact ids hidden from source artifacts,
+     * as they are already traced to target artifacts.
+     */
+    hiddenSourceIds(): string[] {
+      if (this.targetCount === 0) return [];
+
+      return (this.targetIds || [])
+        .map((id) => subtreeStore.getSubtreeItem(id).children)
+        .reduce((acc, cur) => [...acc, ...cur], []);
     },
     /**
      * @return If the source and target ids are valid, returns empty, else returns an error message.

@@ -287,7 +287,7 @@ export function createGeneratedMatrix(
   model?: GenerationModelSchema
 ): GeneratedMatrixSchema {
   return {
-    method: model?.baseModel || method || ModelType.NLBert,
+    method: model?.baseModel || method,
     model,
     artifactLevels: artifactLevels,
   };

@@ -36,7 +36,7 @@ export enum Colors {
   orangeDark = "#DD8300",
 
   brownLight = "#DCBA82",
-  brownDark = "#6f1d1b",
+  brownDark = "#CD9291",
 
   gradient1 = "#9EF01A",
   gradient2 = "#77D241",
@@ -81,9 +81,8 @@ export const ThemeColors = {
   warningBg: Colors.orangeLight,
   warningBd: Colors.orangeDark,
 
-  nodeDefaultLight: Colors.brownLight,
-  nodeDefaultDark: Colors.brownDark,
-  nodeGenerated: Colors.orange,
+  nodeDefault: Colors.brownDark,
+  nodeGenerated: Colors.brownLight,
 };
 
 /**
@@ -113,7 +112,8 @@ export const lightPalette: Record<string, string> = {
   flagged: ThemeColors.warningBd,
   flaggedBg: ThemeColors.warningBg,
 
-  nodeDefault: ThemeColors.nodeDefaultLight,
+  nodeDefault: ThemeColors.nodeDefault,
+  nodeGenerated: ThemeColors.nodeGenerated,
 };
 
 /**
@@ -141,7 +141,8 @@ export const darkPalette: Record<string, string> = {
   removed: ThemeColors.removed,
   removedBg: ThemeColors.removedBg,
 
-  nodeDefault: ThemeColors.nodeDefaultDark,
+  nodeDefault: ThemeColors.nodeDefault,
+  nodeGenerated: ThemeColors.nodeGenerated,
 };
 
 const typeColorMap: Record<string, string> = {

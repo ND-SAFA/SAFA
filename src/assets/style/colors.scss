@@ -22,6 +22,7 @@ $color-flagged: var(--q-flagged);
 $color-flagged-bg: var(--q-flaggedBg);
 
 $color-node-default: var(--q-nodeDefault);
+$color-node-generated: var(--q-nodeGenerated);
 
 // Background Palette Tags
 
@@ -63,4 +64,12 @@ $color-node-default: var(--q-nodeDefault);
 
 .text-text {
   color: $color-text !important;
+}
+
+.text-nodeDefault {
+  color: $color-node-default !important;
+}
+
+.text-nodeGenerated {
+  color: $color-node-generated !important;
 }

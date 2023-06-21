@@ -8,7 +8,7 @@ export const EDGE_WIDTH = 3;
 export const EDGE_ARROW_SCALE = 2;
 
 export const EDGE_COLOR = {
-  DEFAULT: ThemeColors.nodeDefaultLight,
+  DEFAULT: ThemeColors.nodeDefault,
   GENERATED: ThemeColors.nodeGenerated,
   GHOST: ThemeColors.primary,
   ADDED: ThemeColors.added,

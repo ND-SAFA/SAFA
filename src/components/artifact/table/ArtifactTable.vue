@@ -22,7 +22,7 @@
           clearable
           :use-chips="false"
           :options="typeOptions"
-          label="Visible Types"
+          label="Visible Artifacts"
           b=""
           class="q-mr-sm table-input"
           data-cy="input-trace-table-types"
@@ -35,7 +35,7 @@
           option-to-value
           option-label="name"
           option-value="id"
-          label="Visible Types"
+          label="Visible Traces"
           b=""
           class="q-mr-sm table-input"
           data-cy="input-trace-table-count"

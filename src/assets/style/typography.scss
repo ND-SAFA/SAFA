@@ -74,12 +74,20 @@ pre {
   max-width: 600px;
 }
 
-.trace-matrix-chip {
+.trace-chip {
   border-width: 2px;
   border-style: solid;
 
+  &:before { border: none !important; }
+
+  &-generated {
+    border-width: 1px;
+  }
+
   &-unreviewed {
-    border-style: dashed;
+    border-style: dashed !important;
+
+    &:before { border: none !important; }
   }
 }
 

@@ -1,13 +1,7 @@
 <template>
   <div>
     <div v-if="doDisplay" @click.stop>
-      <chip
-        clickable
-        outlined
-        :color="color"
-        :class="className"
-        @click="handleClick"
-      >
+      <chip clickable outlined :class="className" @click="handleClick">
         <typography :value="source.name" color="text" />
         <icon
           size="sm"
@@ -74,11 +68,14 @@ const isUnreviewed = computed(
     traceLink.value?.approvalStatus === ApprovalType.UNREVIEWED
 );
 
-const color = computed(() => (isGenerated.value ? "secondary" : "primary"));
+const className = computed(() => {
+  const base = isGenerated.value
+    ? "trace-chip-generated text-nodeGenerated "
+    : "trace-chip text-nodeDefault ";
+  const unreviewed = isUnreviewed.value ? "trace-chip-unreviewed" : "";
 
-const className = computed(() =>
-  isUnreviewed.value ? "trace-matrix-chip-unreviewed" : "trace-matrix-chip"
-);
+  return base + unreviewed;
+});
 
 /**
  * Selects the trace link represented by this chip.

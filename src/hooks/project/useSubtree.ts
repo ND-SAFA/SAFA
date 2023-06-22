@@ -5,6 +5,7 @@ import {
   SubtreeItemSchema,
   SubtreeLinkSchema,
   SubtreeMapSchema,
+  TraceLinkSchema,
 } from "@/types";
 import { createPhantomLinks, getMatchingChildren } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
@@ -43,33 +44,6 @@ export const useSubtree = defineStore("subtrees", {
       this.subtreeMap = project.subtrees;
     },
     /**
-     * Returns the subtree of an artifact.
-     *
-     * @param artifactId - The artifact to get.
-     * @return The artifact's subtree.
-     */
-    getSubtree(artifactId: string): string[] {
-      return this.subtreeMap[artifactId]?.subtree || [];
-    },
-    /**
-     * Returns the parents of an artifact.
-     *
-     * @param artifactId - The artifact to get.
-     * @return The artifact's parents.
-     */
-    getParents(artifactId: string): string[] {
-      return this.subtreeMap[artifactId]?.parents || [];
-    },
-    /**
-     * Returns the children of an artifact.
-     *
-     * @param artifactId - The artifact to get.
-     * @return The artifact's children.
-     */
-    getChildren(artifactId: string): string[] {
-      return this.subtreeMap[artifactId]?.children || [];
-    },
-    /**
      * Returns the subtree information of an artifact, creating one if none exists.
      *
      * @param artifactId - The artifact to add for.
@@ -87,6 +61,33 @@ export const useSubtree = defineStore("subtrees", {
       }
 
       return this.subtreeMap[artifactId];
+    },
+    /**
+     * Returns the subtree of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's subtree.
+     */
+    getSubtree(artifactId: string): string[] {
+      return this.getSubtreeItem(artifactId).subtree;
+    },
+    /**
+     * Returns the parents of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's parents.
+     */
+    getParents(artifactId: string): string[] {
+      return this.getSubtreeItem(artifactId).parents;
+    },
+    /**
+     * Returns the children of an artifact.
+     *
+     * @param artifactId - The artifact to get.
+     * @return The artifact's children.
+     */
+    getChildren(artifactId: string): string[] {
+      return this.getSubtreeItem(artifactId).children;
     },
     /**
      * Returns the relationship between artifacts.
@@ -108,6 +109,35 @@ export const useSubtree = defineStore("subtrees", {
       }
     },
     /**
+     * Finds the id of all child artifacts that are hidden.
+     * If there are hidden child artifacts, the entire number of hidden subtree artifacts will be returned.
+     *
+     * @param parentId - The parent artifact to search under.
+     * @return The ids of all hidden child artifacts.
+     */
+    getHiddenChildren(parentId: string): string[] {
+      const nodeIsHidden = (id: string) => this.hiddenSubtreeNodes.includes(id);
+
+      return this.getChildren(parentId).filter(nodeIsHidden).length > 0
+        ? this.getSubtree(parentId).filter(nodeIsHidden)
+        : [];
+    },
+    /**
+     * Finds all children of the parent nodes matching the child types.
+     *
+     * @param parentIds - The artifact ids to search under.
+     * @param childTypes - The child artifact types to filter children by.
+     * @return The ids of all matching children.
+     */
+    getMatchingChildren(parentIds: string[], childTypes: string[]): string[] {
+      return getMatchingChildren(
+        parentIds,
+        childTypes,
+        (id) => this.getSubtree(id),
+        artifactStore.getArtifactById
+      );
+    },
+    /**
      * Updates the subtree of an artifact, creating one if none exists.
      *
      * @param artifactId - The artifact to update.
@@ -123,6 +153,44 @@ export const useSubtree = defineStore("subtrees", {
         ...existingSubtree,
         ...getUpdatedSubtree(existingSubtree),
       };
+    },
+    /**
+     * Adds a trace to the subtree.
+     * Note: Only updates the source and target subtrees.
+     *       Does not update the subtree of all neighbors.
+     *
+     * @param traceLink - The trace link to add the subtree for.
+     */
+    addTraceSubtree(traceLink: TraceLinkSchema): void {
+      this.updateSubtree(traceLink.sourceId, (subtree) => ({
+        parents: [...subtree.parents, traceLink.targetId],
+        neighbors: [...subtree.neighbors, traceLink.targetId],
+        supertree: [...subtree.supertree, traceLink.targetId],
+      }));
+      this.updateSubtree(traceLink.targetId, (subtree) => ({
+        children: [...subtree.children, traceLink.sourceId],
+        neighbors: [...subtree.neighbors, traceLink.sourceId],
+        subtree: [...subtree.subtree, traceLink.sourceId],
+      }));
+    },
+    /**
+     * Deletes a trace from the subtree.
+     * Note: Only updates the source and target subtrees.
+     *       Does not update the subtree of all neighbors.
+     *
+     * @param traceLink - The trace link to delete the subtree for.
+     */
+    deleteTraceSubtree(traceLink: TraceLinkSchema): void {
+      this.updateSubtree(traceLink.sourceId, (subtree) => ({
+        parents: subtree.parents.filter((id) => id !== traceLink.targetId),
+        neighbors: subtree.neighbors.filter((id) => id !== traceLink.targetId),
+        supertree: subtree.supertree.filter((id) => id !== traceLink.targetId),
+      }));
+      this.updateSubtree(traceLink.targetId, (subtree) => ({
+        children: subtree.children.filter((id) => id !== traceLink.sourceId),
+        neighbors: subtree.neighbors.filter((id) => id !== traceLink.sourceId),
+        subtree: subtree.subtree.filter((id) => id !== traceLink.sourceId),
+      }));
     },
     /**
      * Resets all hidden nodes.
@@ -232,32 +300,6 @@ export const useSubtree = defineStore("subtrees", {
 
         await this.hideSubtree(id);
       }
-    },
-    /**
-     * Finds the id of all child artifacts that are hidden.
-     *
-     * @param parentId - The parent artifact to search under.
-     * @return The ids of all hidden child artifacts.
-     */
-    getHiddenChildren(parentId: string): string[] {
-      return this.getSubtree(parentId).filter((id) =>
-        this.hiddenSubtreeNodes.includes(id)
-      );
-    },
-    /**
-     * Finds all children of the parent nodes matching the child types.
-     *
-     * @param parentIds - The artifact ids to search under.
-     * @param childTypes - The child artifact types to filter children by.
-     * @return The ids of all matching children.
-     */
-    getMatchingChildren(parentIds: string[], childTypes: string[]): string[] {
-      return getMatchingChildren(
-        parentIds,
-        childTypes,
-        (id) => this.getSubtree(id),
-        artifactStore.getArtifactById
-      );
     },
   },
 });

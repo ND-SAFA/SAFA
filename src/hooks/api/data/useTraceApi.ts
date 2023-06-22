@@ -64,12 +64,7 @@ export const useTraceApi = defineStore("traceApi", () => {
         const createdLinks = await traceCommitApiStore.handleCreate(traceLink);
 
         traceStore.addOrUpdateTraceLinks(createdLinks);
-        subtreeStore.updateSubtree(source.id, ({ parents }) => ({
-          parents: [...parents, target.id],
-        }));
-        subtreeStore.updateSubtree(target.id, ({ children }) => ({
-          children: [...children, source.id],
-        }));
+        subtreeStore.addTraceSubtree(traceLink);
       },
       callbacks,
       {
@@ -133,12 +128,7 @@ export const useTraceApi = defineStore("traceApi", () => {
 
         traceStore.deleteTraceLinks(updatedLinks);
         approvalStore.declineLink(traceLink);
-        subtreeStore.updateSubtree(traceLink.sourceId, ({ parents }) => ({
-          parents: parents.filter((id) => id !== traceLink.targetId),
-        }));
-        subtreeStore.updateSubtree(traceLink.targetId, ({ children }) => ({
-          children: children.filter((id) => id !== traceLink.sourceId),
-        }));
+        subtreeStore.deleteTraceSubtree(traceLink);
       },
       callbacks,
       {

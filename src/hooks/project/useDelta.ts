@@ -115,24 +115,33 @@ export const useDelta = defineStore("delta", {
         ...Object.values(payload.artifacts.modified).map(({ after }) => after),
         ...Object.values(payload.artifacts.removed),
       ];
+
+      const removedTraces = Object.values(payload.traces.removed);
       const traces = [
         ...Object.values(payload.traces.added),
         ...Object.values(payload.traces.modified).map(({ after }) => after),
-        ...Object.values(payload.traces.removed),
+        ...removedTraces,
       ];
 
+      // Add all updated artifacts and traces to the store.
       artifactStore.addOrUpdateArtifacts(artifacts);
       traceStore.addOrUpdateTraceLinks(traces);
 
+      // Add removed traces back into the subtree.
+      removedTraces.forEach((trace) => subtreeStore.addTraceSubtree(trace));
+
+      // Switch the current artifact store to only show artifacts in the delta.
       artifactStore.initializeArtifacts({
         currentArtifactIds: artifacts
           .map(({ id }) => [
             id,
+            // Add all neighbors of the artifact to the list of artifacts to show.
             ...(subtreeStore.subtreeMap[id]?.neighbors || []),
           ])
           .reduce((acc, cur) => [...acc, ...cur], []),
       });
 
+      // Switch to tree view and generate the graph layout for the unique set of delta artifacts.
       await subtreeStore.restoreHiddenNodesAfter(async () => {
         layoutStore.mode = GraphMode.tree;
         await layoutStore.updatePositions({});

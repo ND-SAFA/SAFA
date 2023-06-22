@@ -35,6 +35,7 @@
       </expansion-item>
 
       <typography
+        v-if="!loading"
         el="p"
         color="negative"
         class="q-my-md"
@@ -48,6 +49,7 @@
             icon="save"
             color="primary"
             :disabled="!traceSaveStore.canSave"
+            :loading="loading"
             data-cy="button-trace-save"
             @click="handleSubmit"
           />
@@ -67,7 +69,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   appStore,
   traceApiStore,
@@ -85,14 +87,19 @@ import {
   DetailsPanel,
 } from "@/components/common";
 
+const loading = ref(false);
+
 const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
 
 /**
  * Creates a trace link from the given artifacts.
  */
 async function handleSubmit(): Promise<void> {
+  loading.value = true;
+
   await traceApiStore.handleCreateAll();
 
+  loading.value = false;
   appStore.closeSidePanels();
 }
 

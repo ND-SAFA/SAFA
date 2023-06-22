@@ -5,7 +5,6 @@ import {
   CreateProjectByJsonSchema,
   CreatorFilePanel,
   MembershipSchema,
-  ModelType,
   ProjectRole,
 } from "@/types";
 import { createProject } from "@/util";
@@ -22,7 +21,7 @@ const createEmptyPanel = (variant: "artifact" | "trace"): CreatorFilePanel => ({
   ignoreErrors: false,
   itemNames: [],
   isGenerated: false,
-  generateMethod: ModelType.NLBert,
+  generateMethod: undefined,
 });
 
 /**

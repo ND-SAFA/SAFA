@@ -37,6 +37,6 @@ export interface CreatorFilePanel {
   // Traces
   toType?: string;
   isGenerated: boolean;
-  generateMethod: ModelType;
+  generateMethod?: ModelType;
   traces?: TraceLinkSchema[];
 }

@@ -3,6 +3,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional
 
+from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import NpEncoder
@@ -49,6 +50,7 @@ class RankingStore:
     prompt_format: str = DEFAULT_RANKING_FORMAT
     prompt_artifacts: List[str] = None
     run_path: str = None  # path to predictions on dataset
+    export_path: str = None
 
     # Project
     artifact_map: Dict = field(default=None, repr=False)  # map of artifact name to body
@@ -66,6 +68,9 @@ class RankingStore:
     # Metrics
     map_instructions: Optional[List[Dict]] = field(default=None, repr=False)
     metrics: Optional[Dict] = field(default=None, repr=False)
+
+    # Jobs
+    job_result: Optional[JobResult] = None
 
 
 RankingStep = Callable[[RankingStore], None]
@@ -87,6 +92,8 @@ class RankingPipeline:
         self.store = RankingStore(project_path=dataset_id.dataset_path, run_path=dataset_id.run_path,
                                   experiment_id=dataset_id.experiment_id, prompt_question=base_prompt, sorter=sorter)
         self.dataset_export_dir = os.path.join(export_dir, dataset_id.dataset_name)
+        self.export_path = os.path.join(self.dataset_export_dir, self.store.experiment_id)
+        self.store.export_path = self.export_path
 
     def run(self):
         for step in self.steps:
@@ -95,8 +102,8 @@ class RankingPipeline:
 
     def export(self):
         print(json.dumps(self.store.metrics, indent=4))
-        store_export_path = os.path.join(self.dataset_export_dir, self.store.experiment_id, "store.json")
-        metrics_export_path = os.path.join(self.dataset_export_dir, self.store.experiment_id, "metrics.json")
+        store_export_path = os.path.join(self.export_path, "store.json")
+        metrics_export_path = os.path.join(self.export_path, "metrics.json")
 
         FileUtil.write(json.dumps(self.store.metrics, indent=4), metrics_export_path)
         FileUtil.write(json.dumps(self.store, indent=4, cls=NpEncoder), store_export_path)

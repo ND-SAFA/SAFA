@@ -56,6 +56,7 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result.body = traceback.format_exc()
             self.result.status = Status.FAILURE
         if self.save_job_output and self.job_args.output_dir:
+            logger.info(f"Saving job output: {self.job_args.output_dir}")
             self.save(self.job_args.output_dir)
             dir_name = os.path.dirname(self.job_args.output_dir)
             destination = os.path.join(dir_name, str(uuid.uuid4()))

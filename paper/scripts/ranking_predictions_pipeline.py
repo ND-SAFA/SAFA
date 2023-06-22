@@ -1,8 +1,9 @@
 import os.path
 
 from paper.pipeline.base import DatasetIdentifier, RankingPipeline
+from paper.pipeline.classification_step import compute_precision
 from paper.pipeline.io_step import read_positive_predictions
-from paper.pipeline.map_step import compute_map, create_map_instructions
+from paper.pipeline.map_step import compute_map, create_metric_instructions
 from paper.pipeline.ranking_step import complete_ranking_prompts, create_ranking_prompts
 
 if __name__ == "__main__":
@@ -17,6 +18,13 @@ if __name__ == "__main__":
 
     dataset_id = DatasetIdentifier(dataset_path=dataset_path, experiment_id=EXPERIMENT_ID, run_path=run_path,
                                    dataset_name=DATASET_NAME)
-    steps = [read_positive_predictions, create_ranking_prompts, complete_ranking_prompts, create_map_instructions, compute_map]
-    pipeline = RankingPipeline(dataset_id, steps)
+    steps = [
+        read_positive_predictions,  # reads previous run and extracts positive predictions
+        create_ranking_prompts,  # creates prompts for positively predicted targets
+        complete_ranking_prompts,  # completes the ranking prompts
+        create_metric_instructions,  # creates necessary information for computing metrics
+        compute_map,  # computes average precision for each query and mean AP.
+        compute_precision  # computes precision at 1, 2, and 3 predictions.
+    ]
+    pipeline = RankingPipeline(dataset_id, steps, )
     pipeline.run()

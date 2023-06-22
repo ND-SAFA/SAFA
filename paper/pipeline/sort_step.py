@@ -2,6 +2,7 @@ from typing import Callable, Dict, List
 
 from paper.common.completion_util import complete_prompts
 from paper.common.prompt_builder import PromptBuilder
+from paper.pipeline.response_process_step import process_ranked_artifacts
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -39,7 +40,8 @@ def vsm_sorter(source_names, target_names, artifact_map) -> Dict[str, str]:
         if source not in unsorted_targets:
             unsorted_targets[source] = {}
         unsorted_targets[source][entry["target"]] = entry["score"]
-    sorted_targets = {source: sorted(targets2score, key=targets2score.get) for source, targets2score in unsorted_targets.items()}
+    sorted_targets = {source: sorted(targets2score, key=targets2score.get, reverse=True) for source, targets2score in
+                      unsorted_targets.items()}
     return sorted_targets
 
 
@@ -48,16 +50,26 @@ DEFAULT_SORTING_PROMPT = "Rank the following artifacts from most to least " \
                          "Provide the ranked artifacts as comma delimited list of artifact ids."
 
 
-def claude_sorter(source_names, target_names, artifact_map) -> List[str]:
+def claude_sorter(source_names: List[str], target_names, artifact_map) -> List[str]:
     builder = PromptBuilder()
     builder.with_task(DEFAULT_SORTING_PROMPT)
     for t_name in target_names:
         builder.with_artifact(t_name, artifact_map[t_name])
     prompt = builder.get()
-    batch_response = complete_prompts([prompt])
+    model = "claude-v1.3-100k"  # "claude-v1.3-100k", "claude-instant-v1-100k"
+    batch_response = complete_prompts([prompt], model=model, max_tokens=600)
+    batch_ranked_target_artifacts = process_ranked_artifacts(batch_response, target_names)
+    sorted_target_artifacts = batch_ranked_target_artifacts[0]
+
+    source2target = {}
+
+    for s in source_names:
+        source2target[s] = sorted_target_artifacts
+    return source2target
 
 
 registered_sorters: Dict[str, GenericSorter] = {
     "test": test_sorter,
-    "claude": claude_sorter
+    "claude": claude_sorter,
+    "vsm": vsm_sorter
 }

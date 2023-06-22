@@ -29,19 +29,36 @@ def extract_prompt_artifacts(artifact_df: pd.DataFrame, n_sources: int = 5):
     return source_artifact_names, target_artifact_names
 
 
+def create_trace_queries(entries):
+    entry_map = {}
+    for entry in entries:
+        source = entry["source"]
+        target = entry["target"]
+        if source not in entry_map:
+            entry_map[source] = []
+        entry_map[source].append(target)
+    return entry_map
+
+
 def create_ranking_prompts(s: RankingStore):
     project_path = s.project_path
     project_path = os.path.expanduser(project_path)
     project_reader = StructuredProjectReader(project_path)
     artifact_df, _, _ = project_reader.read_project()
-
-    source_names, target_names = extract_prompt_artifacts(artifact_df)
     artifact_map = create_artifact_map(artifact_df)
-    target_names = registered_sorters[s.sorter](source_names, target_names, artifact_map)  # sorts target names using sorter
+
+    if s.trace_entries is None:  # if using all targets, then sort them.
+        source_names, target_names = extract_prompt_artifacts(artifact_df)
+        target_artifact_sorter = registered_sorters[s.sorter]
+        source2sorted_targets = target_artifact_sorter(source_names, target_names, artifact_map)  # sorts target names using sorter
+    else:  # if filtering from previous run
+        source2sorted_targets = create_trace_queries(s.trace_entries)
+        source_names = list(source2sorted_targets.keys())
 
     prompts = []
     for s_name in source_names:
-        prompt = create_prompts(artifact_map, s_name, target_names, s)
+        sorted_targets = source2sorted_targets[s_name]
+        prompt = create_prompts(artifact_map, s_name, sorted_targets, s)
         prompts.append(prompt)
     s.source_ids = source_names
     s.prompts = prompts

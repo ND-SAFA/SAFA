@@ -23,13 +23,27 @@
           outlined
           dense
           :use-chips="false"
-          :options="options"
+          :options="approvalOptions"
           label="Approval Types"
           option-to-value
           option-value="id"
           option-label="name"
+          class="table-input"
           data-cy="input-approval-type"
           b=""
+        />
+        <select-input
+          v-model="countType"
+          outlined
+          dense
+          :options="countOptions"
+          option-to-value
+          option-label="name"
+          option-value="id"
+          label="Visible Artifacts"
+          b=""
+          class="q-ml-sm table-input"
+          data-cy="input-trace-table-count"
         />
         <text-button
           text
@@ -81,13 +95,18 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { ApprovalType, FlatTraceLink } from "@/types";
-import { approvalTypeOptions, approvalColumns } from "@/util";
+import { ApprovalType, FlatTraceLink, TraceCountTypes } from "@/types";
+import {
+  approvalTypeOptions,
+  approvalColumns,
+  traceCountOptions,
+} from "@/util";
 import {
   approvalStore,
   appStore,
   projectStore,
   sessionStore,
+  subtreeStore,
   traceApiStore,
   traceGenerationApiStore,
 } from "@/hooks";
@@ -98,10 +117,12 @@ import {
   MultiselectInput,
   TextButton,
   AttributeChip,
+  SelectInput,
 } from "@/components/common";
 import { TraceLinkApproval, TraceLinkDisplay } from "@/components/traceLink";
 
-const options = approvalTypeOptions();
+const approvalOptions = approvalTypeOptions();
+const countOptions = traceCountOptions();
 
 const customCells: (keyof FlatTraceLink | string)[] = [
   "sourceType",
@@ -113,6 +134,7 @@ const customCells: (keyof FlatTraceLink | string)[] = [
 
 const currentRoute = useRoute();
 
+const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const approvalTypes = ref<ApprovalType[]>([ApprovalType.UNREVIEWED]);
 const groupBy = ref<string | undefined>("targetName");
 
@@ -171,9 +193,17 @@ function handleRefresh() {
  * @return Whether to keep the row.
  */
 function filterRow(row: FlatTraceLink): boolean {
+  const sourceSubtree = subtreeStore.getSubtreeItem(row.sourceId);
+  const targetSubtree = subtreeStore.getSubtreeItem(row.targetId);
+  const bothTraced =
+    sourceSubtree.neighbors.length > 0 && targetSubtree.neighbors.length > 0;
+
   return (
-    approvalTypes.value.length === 0 ||
-    approvalTypes.value.includes(row.approvalStatus)
+    (countType.value === TraceCountTypes.all ||
+      (countType.value === TraceCountTypes.onlyTraced && bothTraced) ||
+      (countType.value === TraceCountTypes.notTraced && !bothTraced)) &&
+    (approvalTypes.value.length === 0 ||
+      approvalTypes.value.includes(row.approvalStatus))
   );
 }
 

@@ -111,6 +111,7 @@ const groupedRows = computed(() => {
   return Object.entries(rowsByGroup)
     .map(([$groupValue, rows]) => [
       {
+        id: `${groupBy.value}::${$groupValue}`,
         $groupValue,
         $groupBy: groupBy.value,
         $groupRows: rows.length,

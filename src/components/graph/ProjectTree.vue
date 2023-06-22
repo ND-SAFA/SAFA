@@ -19,11 +19,6 @@
         :trace="traceLink"
         :faded="isTraceLinkFaded(traceLink)"
       />
-      <trace-link
-        v-for="traceLink in subtreeLinks"
-        :key="traceLink.traceLinkId"
-        :trace="traceLink"
-      />
     </template>
     <template v-else #elements>
       <tim-node
@@ -86,7 +81,6 @@ const nodesInView = computed(() => selectionStore.artifactsInView);
 const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces
 );
-const subtreeLinks = computed(() => subtreeStore.subtreeLinks);
 const hiddenSubtreeIds = computed(() => subtreeStore.hiddenSubtreeNodes);
 
 const tim = computed(() => typeOptionsStore.tim);

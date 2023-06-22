@@ -1,4 +1,14 @@
-import { GeneratedMatrixSchema, ModelType, VersionSchema } from "@/types";
+import { GeneratedMatrixSchema, VersionSchema } from "@/types";
+
+/**
+ * Enumerates the type of generated trace models.
+ */
+export enum ModelType {
+  AutomotiveBert = "AutomotiveBert",
+  NLBert = "NLBert",
+  PLBert = "PLBert",
+  VSM = "VSM",
+}
 
 /**
  * Represents a model trained to generate trace links.

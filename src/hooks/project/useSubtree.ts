@@ -3,14 +3,12 @@ import { defineStore } from "pinia";
 import {
   ProjectSchema,
   SubtreeItemSchema,
-  SubtreeLinkSchema,
   SubtreeMapSchema,
   TraceLinkSchema,
 } from "@/types";
-import { createPhantomLinks, getMatchingChildren } from "@/util";
+import { getMatchingChildren } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 import { pinia } from "@/plugins";
-import traceStore from "./useTraces";
 import artifactStore from "./useArtifacts";
 
 /**
@@ -22,10 +20,6 @@ export const useSubtree = defineStore("subtrees", {
      * A map containing root artifact names as keys and children names are values.
      */
     subtreeMap: {} as SubtreeMapSchema,
-    /**
-     * List of phantom links used when hiding subtrees.
-     */
-    subtreeLinks: [] as SubtreeLinkSchema[],
     /**
      * List of artifact ids currently hidden within subtrees.
      */
@@ -201,36 +195,6 @@ export const useSubtree = defineStore("subtrees", {
       cyDisplayAll();
     },
     /**
-     * Creates phantom links between the given artifacts.
-     *
-     * @param nodesInSubtree - The nodes in the subtree to create links for.
-     * @param rootId - The root node id.
-     * @param childId - The child node id.
-     * @return A list of phantom links.
-     */
-    createSubtreeLinks(
-      nodesInSubtree: string[],
-      rootId: string,
-      childId: string
-    ): SubtreeLinkSchema[] {
-      const traces = traceStore.currentTraces;
-      const subtreeLinkIds = this.subtreeLinks.map(
-        ({ traceLinkId }) => traceLinkId
-      );
-      const subtreeLinkCreator = createPhantomLinks(
-        traces,
-        subtreeLinkIds,
-        nodesInSubtree,
-        rootId,
-        childId
-      );
-
-      const incomingPhantom = subtreeLinkCreator(true);
-      const outgoingPhantom = subtreeLinkCreator(false);
-
-      return [...this.subtreeLinks, ...incomingPhantom, ...outgoingPhantom];
-    },
-    /**
      * Hides the given artifact's subtree and add replaces child links with
      * phantom links. For any child link leaving a node, a phantom link is added
      * between the target and root node. Similarly, for any linking incoming to a
@@ -240,17 +204,11 @@ export const useSubtree = defineStore("subtrees", {
      */
     async hideSubtree(rootId: string): Promise<void> {
       const childrenInSubtree = this.getSubtree(rootId);
-      const nodesInSubtree = [...childrenInSubtree, rootId];
       const visibleChildren = childrenInSubtree.filter(
         (id) => !this.hiddenSubtreeNodes.includes(id)
       );
 
       this.$patch({
-        subtreeLinks: childrenInSubtree
-          .map((childId) =>
-            this.createSubtreeLinks(nodesInSubtree, rootId, childId)
-          )
-          .reduce((acc, cur) => [...acc, ...cur], this.subtreeLinks),
         hiddenSubtreeNodes: [...this.hiddenSubtreeNodes, ...visibleChildren],
         collapsedParentNodes: [...this.collapsedParentNodes, rootId],
       });
@@ -272,13 +230,6 @@ export const useSubtree = defineStore("subtrees", {
         hiddenSubtreeNodes,
         collapsedParentNodes: this.collapsedParentNodes.filter(
           (id) => id !== rootId
-        ),
-        subtreeLinks: this.subtreeLinks.filter(
-          (link) =>
-            link.rootNode !== rootId &&
-            // Make sure that phantom links created by other parent nodes are removed.
-            (hiddenSubtreeNodes.includes(link.sourceId) ||
-              hiddenSubtreeNodes.includes(link.targetId))
         ),
       });
 

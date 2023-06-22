@@ -16,23 +16,6 @@ export enum TraceType {
 }
 
 /**
- * Enumerates the type of traces used internally.
- */
-export enum InternalTraceType {
-  SUBTREE = "SUBTREE",
-}
-
-/**
- * Enumerates the type of generated trace models.
- */
-export enum ModelType {
-  AutomotiveBert = "AutomotiveBert",
-  NLBert = "NLBert",
-  PLBert = "PLBert",
-  VSM = "VSM",
-}
-
-/**
  * Defines a link.
  */
 export interface LinkSchema {
@@ -96,18 +79,6 @@ export interface FlatTraceLink extends TraceLinkSchema {
    * The body of target artifact.
    */
   targetBody: string;
-}
-
-/**
- * Link used when hiding subtrees to summarize the links of the children
- * of some root node.
- */
-export interface SubtreeLinkSchema extends TraceLinkSchema {
-  type: InternalTraceType.SUBTREE;
-  /**
-   * The id of the artifact.
-   */
-  rootNode: string;
 }
 
 /**

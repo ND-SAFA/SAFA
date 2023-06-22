@@ -1,13 +1,9 @@
-import os
-
 import pandas as pd
 
 from paper.common.completion_util import complete_prompts
-from paper.common.prompt_builder import PromptBuilder
-from paper.pipeline.base import RankingStore, create_artifact_map
-from paper.pipeline.sort_step import registered_sorters
+from paper.common.ranking_prompt_builder import RankingPromptBuilder
+from paper.pipeline.base import RankingStore
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
 
 def extract_prompt_artifacts(artifact_df: pd.DataFrame, n_sources: int = 5):
@@ -41,34 +37,24 @@ def create_trace_queries(entries):
 
 
 def create_ranking_prompts(s: RankingStore):
-    project_path = s.project_path
-    project_path = os.path.expanduser(project_path)
-    project_reader = StructuredProjectReader(project_path)
-    artifact_df, _, _ = project_reader.read_project()
-    artifact_map = create_artifact_map(artifact_df)
-
-    if s.trace_entries is None:  # if using all targets, then sort them.
-        source_names, target_names = extract_prompt_artifacts(artifact_df)
-        target_artifact_sorter = registered_sorters[s.sorter]
-        source2sorted_targets = target_artifact_sorter(source_names, target_names, artifact_map)  # sorts target names using sorter
-    else:  # if filtering from previous run
-        source2sorted_targets = create_trace_queries(s.trace_entries)
-        source_names = list(source2sorted_targets.keys())
+    artifact_map = s.artifact_map
+    source2targets = s.source2targets
+    source_names = s.source_ids
 
     prompts = []
     for s_name in source_names:
-        sorted_targets = source2sorted_targets[s_name]
-        prompt = create_prompts(artifact_map, s_name, sorted_targets, s)
+        prompt = create_prompts(artifact_map, s_name, s)
         prompts.append(prompt)
-    s.source_ids = source_names
+
     s.prompts = prompts
 
 
-def create_prompts(artifact_map, source_name, target_names, s: RankingStore):
+def create_prompts(artifact_map, source_name, s: RankingStore):
+    target_names = s.source2targets[source_name]
     query = artifact_map[source_name]
-    prompt_builder = PromptBuilder(question=s.prompt_question, query=query, body_title="# Artifacts")
-    for target_artifact_name in target_names:
-        prompt_builder.with_artifact(target_artifact_name, artifact_map[target_artifact_name])
+    prompt_builder = RankingPromptBuilder(question=s.prompt_question, query=query, body_title="# Artifacts")
+    for target_index, target_artifact_name in enumerate(target_names):
+        prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name])
     prompt = prompt_builder.get()
     return prompt
 

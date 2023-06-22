@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List
 
 from paper.common.completion_util import complete_prompts
-from paper.common.prompt_builder import PromptBuilder
+from paper.common.ranking_prompt_builder import RankingPromptBuilder
 from paper.pipeline.response_process_step import process_ranked_artifacts
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -51,7 +51,7 @@ DEFAULT_SORTING_PROMPT = "Rank the following artifacts from most to least " \
 
 
 def claude_sorter(source_names: List[str], target_names, artifact_map) -> List[str]:
-    builder = PromptBuilder()
+    builder = RankingPromptBuilder()
     builder.with_task(DEFAULT_SORTING_PROMPT)
     for t_name in target_names:
         builder.with_artifact(t_name, artifact_map[t_name])

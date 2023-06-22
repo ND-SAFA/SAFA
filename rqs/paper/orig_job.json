@@ -14,7 +14,8 @@
                 "classification",
                 "confusion_matrix",
                 "specificity",
-                "accuracy"
+                "accuracy",
+                "map"
               ]
             }
           },

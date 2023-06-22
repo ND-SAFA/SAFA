@@ -1,3 +1,5 @@
+from typing import Any
+
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 
@@ -12,7 +14,7 @@ def builder_method(func):
     return decorator
 
 
-class PromptBuilder:
+class RankingPromptBuilder:
     def __init__(self, question: str = None, query: str = None, format: str = None, body_title: str = DEFAULT_BODY_TITLE,
                  section_delimiter: str = "\n\n"):
         self.task = question
@@ -39,7 +41,7 @@ class PromptBuilder:
         self.format = format
 
     @builder_method
-    def with_artifact(self, artifact_name: str, artifact_body: str):
+    def with_artifact(self, artifact_name: Any, artifact_body: str):
         self.body += self.format_artifact(artifact_name, artifact_body)
 
     @builder_method
@@ -48,7 +50,7 @@ class PromptBuilder:
 
     def get(self):
         body = self.join_prompts([self.body_title, self.body], "\n\n")
-        items = [self.task, self.query, body, self.format]
+        items = [self.task + self.query, body, self.format]
         prompt = self.join_prompts(items, self.section_delimiter)
         return prompt
 
@@ -59,7 +61,7 @@ class PromptBuilder:
     @staticmethod
     def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n"):
         body = artifact_body.replace("\n\n", "\n")
-        return f"<id>{artifact_name}</id>\n<body>{body}</body>{separator}"
+        return f"<artifact><id>{artifact_name}</id><body>{body}</body></artifact>{separator}"
 
     @staticmethod
     def join_prompts(prompts, delimiter):

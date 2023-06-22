@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+import numpy as np
 from sklearn.metrics import average_precision_score
 
 from paper.pipeline.base import RankingStore, get_trace_id
@@ -34,6 +35,7 @@ def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[
         predictions = predictions[:n_items]
 
         ap_score = average_precision_score(labels, predictions)
+        ap_score = ap_score if not np.isnan(ap_score) else 0
         metrics[s_name] = {"ap": ap_score}
         ap_scores.append(ap_score)
     map_score = sum(ap_scores) / len(ap_scores)

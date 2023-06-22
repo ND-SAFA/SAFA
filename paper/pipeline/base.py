@@ -7,9 +7,15 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import NpEncoder
 
-DEFAULT_RANKING_QUESTION = "Rank the artifacts from most to least relevant to the source. " \
-                           "Provide the ranked artifacts as comma delimited list of artifact ids. " \
+DEFAULT_RANKING_QUESTION = "I am giving you a source " \
+                           "and a list of artifacts that may be related to it. " \
+                           "Each artifact consists of an id and a body. " \
+                           "Rank the artifact bodies from most to least relevant to the source. " \
+                           "Provide the ranking as comma delimited list of artifact ids " \
+                           "where the first element is most relevant to the source " \
+                           "and the last element is the least. " \
                            "\n\nSource: "
+
 DEFAULT_RANKING_FORMAT = None
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
@@ -55,6 +61,7 @@ class RankingStore:
     prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
     batch_response: Optional[GenerationResponse] = field(default=None, repr=False)
     processed_response: Optional[List[List[str]]] = field(default=None, repr=False)
+    source2targets: Dict = field(default_factory=dict)
 
     # Metrics
     map_instructions: Optional[List[Dict]] = field(default=None, repr=False)

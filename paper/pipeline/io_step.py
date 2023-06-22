@@ -20,7 +20,7 @@ def store_predictions(s: RankingStore, entries, on_entry: Callable = None):
     s.target_ids = list(target_ids)
 
 
-def read_predictions(s: RankingStore):
+def read_labels(s: RankingStore):
     project_reader = StructuredProjectReader(s.project_path)
     trace_dataset_creator = TraceDatasetCreator(project_reader)
     trace_dataset = trace_dataset_creator.create()

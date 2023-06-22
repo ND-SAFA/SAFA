@@ -287,7 +287,7 @@ export function createGeneratedMatrix(
   model?: GenerationModelSchema
 ): GeneratedMatrixSchema {
   return {
-    method: model?.baseModel || method,
+    method: model?.baseModel || method || undefined,
     model,
     artifactLevels: artifactLevels,
   };

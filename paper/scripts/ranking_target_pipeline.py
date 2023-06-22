@@ -2,8 +2,8 @@ import os.path
 import uuid
 
 from paper.pipeline.base import DatasetIdentifier, RankingPipeline
-from paper.pipeline.classification_step import add_precision
-from paper.pipeline.map_step import compute_map, create_map_instructions
+from paper.pipeline.classification_step import compute_precision
+from paper.pipeline.map_step import compute_map, create_metric_instructions
 from paper.pipeline.ranking_step import complete_ranking_prompts, create_ranking_prompts
 from paper.pipeline.response_process_step import process_ranking_prompts
 
@@ -20,8 +20,8 @@ if __name__ == "__main__":
     steps = [create_ranking_prompts,
              complete_ranking_prompts,
              process_ranking_prompts,
-             create_map_instructions,
+             create_metric_instructions,
              compute_map,
-             add_precision]
+             compute_precision]
     pipeline = RankingPipeline(dataset_id, steps, sorter="vsm")
     pipeline.run()

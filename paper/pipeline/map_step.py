@@ -8,8 +8,11 @@ from paper.pipeline.base import RankingStore, get_trace_id
 def compute_map(s: RankingStore):
     source_ids = s.source_ids
     map_instructions = s.map_instructions
-    metrics = {}
+    s.metrics = {}
+    metrics = calculate_map(s.metrics, map_instructions, source_ids)
 
+
+def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[str]) -> Dict:
     def create_increment_list(n_items):
         increment = 1 / (n_items - 1)  # Calculate the linear increment
         return [1 - (i * increment) for i in range(n_items)]  # Generate the list
@@ -35,16 +38,21 @@ def compute_map(s: RankingStore):
         ap_scores.append(ap_score)
     map_score = sum(ap_scores) / len(ap_scores)
     metrics["base"] = {"map": map_score}
-    s.metrics = metrics
+    return metrics
 
 
-def create_map_instructions(s: RankingStore):
+def create_metric_instructions(s: RankingStore):
     traced_ids = s.traced_ids
     source_ids = s.source_ids
     ranked_target_links = s.processed_response
 
+    map_instructions = calculate_map_instructions(ranked_target_links, source_ids, traced_ids)
+    s.map_instructions = map_instructions
+
+
+def calculate_map_instructions(predicted_target_links, source_ids, traced_ids):
     map_instructions: List[Dict] = []
-    for s_id, target_ranked_list in zip(source_ids, ranked_target_links):
+    for s_id, target_ranked_list in zip(source_ids, predicted_target_links):
         s_pos_indices = []
         for i, t_id in enumerate(target_ranked_list):
             trace_id = get_trace_id({"source": s_id, "target": t_id})
@@ -54,5 +62,4 @@ def create_map_instructions(s: RankingStore):
             "total": len(target_ranked_list),
             "indices": s_pos_indices
         })
-    s.ranked_predictions = ranked_target_links
-    s.map_instructions = map_instructions
+    return map_instructions

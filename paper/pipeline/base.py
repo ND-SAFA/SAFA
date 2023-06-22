@@ -54,7 +54,6 @@ class RankingStore:
     # Models
     prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
     batch_response: Optional[GenerationResponse] = field(default=None, repr=False)
-    ranked_predictions: Optional[List[List[str]]] = field(default=None, repr=False)  # list of ranked artifact ids per source artifact
     processed_response: Optional[List[List[str]]] = field(default=None, repr=False)
 
     # Metrics
@@ -74,7 +73,7 @@ class DatasetIdentifier:
 
 
 class RankingPipeline:
-    def __init__(self, dataset_id: DatasetIdentifier, steps: List[RankingStep], sorter: str,
+    def __init__(self, dataset_id: DatasetIdentifier, steps: List[RankingStep], sorter: str = None,
                  base_prompt: str = DEFAULT_RANKING_QUESTION,
                  export_dir: str = DEFAULT_EXPERIMENT_DIR):
         self.steps = steps

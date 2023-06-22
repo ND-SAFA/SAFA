@@ -1,10 +1,13 @@
 from paper.pipeline.base import RankingStore
 
 
-def add_precision(s: RankingStore):
-    n = 3
-    metrics = {}
-    for instructions in s.map_instructions:
+def compute_precision(s: RankingStore):
+    metrics = s.metrics["base"]
+    add_precision_to_metrics(metrics, s.map_instructions)
+
+
+def add_precision_to_metrics(metrics, map_instructions, n=3):
+    for instructions in map_instructions:
         total_links = instructions["total"]
         positive_indices = instructions["indices"]
 
@@ -14,4 +17,3 @@ def add_precision(s: RankingStore):
             fp = i - tp
             precision = tp / (tp + fp)
             metrics[f"Precision@{i}"] = precision
-    s.metrics["base"].update(metrics)

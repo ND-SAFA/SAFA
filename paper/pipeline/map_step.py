@@ -1,9 +1,8 @@
-import random
 from typing import Dict, List
 
 from sklearn.metrics import average_precision_score
 
-from paper.pipeline.base import RankingStore, get_trace_id, remove_file_extension
+from paper.pipeline.base import RankingStore, get_trace_id
 
 
 def compute_map(s: RankingStore):
@@ -39,31 +38,10 @@ def compute_map(s: RankingStore):
     s.metrics = metrics
 
 
-response_processing_steps = [lambda s: s.replace("ID:", ""), lambda s: s.split(",")]
-id_processing_steps = [remove_file_extension, lambda f: f.replace("ID:", ""), lambda f: f.strip()]
-
-
-def process_response(orig):
-    processed = orig
-    for s in response_processing_steps:
-        processed = s(processed)
-    return processed
-
-
-def process_artifact_ids(raw_artifact_ids):
-    response = []
-    for raw_artifact_id in raw_artifact_ids:
-        processed = raw_artifact_id
-        for s in id_processing_steps:
-            processed = s(processed)
-        response.append(processed)
-    return response
-
-
 def create_map_instructions(s: RankingStore):
     traced_ids = s.traced_ids
     source_ids = s.source_ids
-    ranked_target_links: List[List[str]] = process_ranked_artifacts(s.batch_response, s.target_ids)
+    ranked_target_links = s.processed_response
 
     map_instructions: List[Dict] = []
     for s_id, target_ranked_list in zip(source_ids, ranked_target_links):
@@ -78,18 +56,3 @@ def create_map_instructions(s: RankingStore):
         })
     s.ranked_predictions = ranked_target_links
     s.map_instructions = map_instructions
-
-
-def process_ranked_artifacts(batch_response, target_ids, add_missing=True) -> List[List[str]]:
-    target_ids = list(map(lambda f: remove_file_extension(f), target_ids))
-    ranked_target_links = []
-    for response in batch_response.batch_responses:
-        processed_response = process_response(response)
-        processed_artifact_ids = process_artifact_ids(processed_response)
-        ranked_target_links.append(processed_artifact_ids)
-    if add_missing:
-        for r_list in ranked_target_links:
-            missing_ids = [t_id for t_id in target_ids if t_id not in r_list]
-            random.shuffle(missing_ids)
-            r_list.extend(missing_ids)
-    return ranked_target_links

@@ -55,6 +55,7 @@ class RankingStore:
     prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
     batch_response: Optional[GenerationResponse] = field(default=None, repr=False)
     ranked_predictions: Optional[List[List[str]]] = field(default=None, repr=False)  # list of ranked artifact ids per source artifact
+    processed_response: Optional[List[List[str]]] = field(default=None, repr=False)
 
     # Metrics
     map_instructions: Optional[List[Dict]] = field(default=None, repr=False)

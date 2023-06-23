@@ -9,24 +9,28 @@ from tgen.data.summarizer.summarizer import Summarizer
 
 datasets = {
     "cm1": {
+        "chunker": SupportedChunker.NL,
         "type": "Low Level Requirements",
         "export_path": "cm1/targets.csv"
     },
     "drone-nl": {
+        "chunker": SupportedChunker.NL,
         "type": "Designs",
         "export_path": "drone-nl/targets.csv"
     },
     "Drone": {
+        "chunker": SupportedChunker.JAVA,
         "type": "Code",
         "export_path": "drone-pl/code.csv",
     },
     "itrust": {
+        "chunker": SupportedChunker.JAVA,
         "type": "Use Case",  # "Java Code",
         "export_path": "itrust/source_summarized.csv",
     }
 }
 if __name__ == "__main__":
-    dataset_name = "itrust"
+    dataset_name = "drone-pl"
     dataset_instructions = datasets[dataset_name]
     export_dir_name = dataset_instructions["export_path"]
     artifact_type_name = dataset_instructions["type"]

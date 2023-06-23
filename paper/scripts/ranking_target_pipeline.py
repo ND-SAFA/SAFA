@@ -11,7 +11,7 @@ from paper.pipeline.reasoning_step import ReasoningStep
 
 if __name__ == "__main__":
     EXPERIMENT_ID = str(uuid.uuid4())
-    DATASET_NAME = "drone-pl"
+    DATASET_NAME = "cm1"
     dataset_path = f"~/desktop/safa/datasets/paper/{DATASET_NAME}"
     dataset_path = os.path.expanduser(dataset_path)
 

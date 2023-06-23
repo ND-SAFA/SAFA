@@ -8,56 +8,17 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.util.file_util import FileUtil
 from tgen.util.json_util import NpEncoder
 
-# DEFAULT_RANKING_QUESTION = "I am giving you a source " \
-#                            "and a list of artifacts that may be related to it. " \
-#                            "Each artifact consists of an id and a body." \
-#                            "\n\nSource: "
-
-# DEFAULT_RANKING_QUESTION = "Find the artifacts related to the source below. " \
-#                            "Relevant artifacts include hierarchical decompositions, " \
-#                            "artifacts dependent on the same system capability, or just be closely related. " \
-#                            "Ignore levels of abstraction and focus on the general artifact functionality. " \
-#                            "\n\nSource: "
-# DEFAULT_RANKING_QUESTION = "You are an engineer on a drone system. " \
-#                            "You are given a source and a list of artifacts which describe the drone system. " \
-#                            "For each artifact, provide one reason why the artifact could be related to the source. " \
-#                            "Return your answers in a comma-separated list where each list item includes " \
-#                            "the artifact id in <id></id> " \
-#                            "and the reason that artifact might be related in <relationship></relationship>. \n\n" \
-#                            "Source: \n"
-# DEFAULT_RANKING_FORMAT = None
-# "You are an engineer on NASA’s Metric Data Program system. " \
-#
-# DEFAULT_RANKING_QUESTION = "You are linking high level requirements to lower level requirements for a software system. " \
-#                            "You are given a source, a high level requirement, and the list of lower level requirements. " \
-#                            "Rank all artifacts by their relevancy the source " \
-#                            "so that the first artifacts are the most related to the source." \
-#                            "\n\nSource: "
-# DEFAULT_RANKING_QUESTION = "You are linking high level requirements to lower level requirements for a software system. You are given a source, a high level requirement, and the list of lower level requirements. First, come up with the reason why the artifacts may be related to the source. Then, create a ranked list of artifact ids." \
-#                            "\n\nSource: "
-# "Traced artifacts include hierarchical decompositions, " \
-# "artifacts dependent on the same system capability, or just be closely related. " \
-REASONING_TAG = "reason"
 DEFAULT_REASONING_GOAL = " # Task\n\n" \
                          "For each artifact, reason whether the artifact is related to the source below and why." \
                          "\n\nSource:"
 DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. Enclose your answer in <relation>ID - Reason</relation>"
-
 DEFAULT_RANKING_GOAL = "# Task\n\nRank all related artifacts from most to least related to the source.\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
                                "Rank the artifact bodies from most to least relevant to the source. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element relates to the source the most and the last element does so the least. " \
                                "Enclose the list in <links></links>."
-# DEFAULT_RANKING_FORMAT = "Rank all artifact bodies from most to least relevant to the source. " \
-#                          "Provide the ranking as comma delimited list of artifact ids " \
-#                          "where the first element relates to the source the most" \
-#                          "and the last element does so the least. " \
-#                          "Enclose the list in <links></links>."
-# DEFAULT_RANKING_FORMAT = "Include a list of reasons why each artifact may be related to the source. Format the reasons as <id> - <reason>. Then, rank the artifact bodies from most to least relevant to the source. Provide the ranking as comma delimited list of artifact ids where the first element relates to the source the most and the last element does so the least. Enclose the list in <links></links>."
-# DEFAULT_RANKING_FORMAT = "Provide the comma delimited list of the remaining artifact ids." \
-#                          "These ids would only include artifacts that are in some way related to the source. " \
-#                          "Enclose the list in <links></links>. "
+
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 

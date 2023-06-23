@@ -11,7 +11,8 @@ from tgen.util.json_util import NpEncoder
 DEFAULT_REASONING_GOAL = " # Task\n\n" \
                          "For each artifact, reason whether the artifact is related to the source below and why." \
                          "\n\nSource:"
-DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. Enclose your answer in <relation>ID - Reason</relation>"
+DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. " \
+                                 "Enclose your answer in <relation>ID - Reason</relation>"
 DEFAULT_RANKING_GOAL = "# Task\n\nRank all related artifacts from most to least related to the source.\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
                                "Rank the artifact bodies from most to least relevant to the source. " \

@@ -7,7 +7,6 @@ from tgen.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILEN
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.jobs.components.job_result import JobResult
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.wandb.Wandb import Wandb
@@ -50,7 +49,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        self.update_output_path(output_dir)
+        # self.update_output_path(output_dir)
         job_runs = self._divide_jobs_into_runs()
 
         for jobs in job_runs:

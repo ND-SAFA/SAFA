@@ -33,14 +33,28 @@ from tgen.util.json_util import NpEncoder
 #                            "Rank all artifacts by their relevancy the source " \
 #                            "so that the first artifacts are the most related to the source." \
 #                            "\n\nSource: "
-DEFAULT_RANKING_QUESTION = "You are linking high level requirements to lower level requirements for a software system. You are given a source, a high level requirement, and the list of lower level requirements. First, come up with the reason why the artifacts may be related to the source. Then, create a ranked list of artifact ids." \
-                           "\n\nSource: "
+# DEFAULT_RANKING_QUESTION = "You are linking high level requirements to lower level requirements for a software system. You are given a source, a high level requirement, and the list of lower level requirements. First, come up with the reason why the artifacts may be related to the source. Then, create a ranked list of artifact ids." \
+#                            "\n\nSource: "
+# "Traced artifacts include hierarchical decompositions, " \
+# "artifacts dependent on the same system capability, or just be closely related. " \
+REASONING_TAG = "reason"
+DEFAULT_REASONING_GOAL = " # Task\n\n" \
+                         "For each artifact, reason whether the artifact is related to the source below and why." \
+                         "\n\nSource:"
+DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. Enclose your answer in <relation>ID - Reason</relation>"
+
+DEFAULT_RANKING_GOAL = "# Task\n\nRank all related artifacts from most to least related to the source.\n\nSource: "
+DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
+                               "Rank the artifact bodies from most to least relevant to the source. " \
+                               "Provide the ranking as comma delimited list of artifact ids where the " \
+                               "first element relates to the source the most and the last element does so the least. " \
+                               "Enclose the list in <links></links>."
 # DEFAULT_RANKING_FORMAT = "Rank all artifact bodies from most to least relevant to the source. " \
 #                          "Provide the ranking as comma delimited list of artifact ids " \
 #                          "where the first element relates to the source the most" \
 #                          "and the last element does so the least. " \
 #                          "Enclose the list in <links></links>."
-DEFAULT_RANKING_FORMAT = "Include a list of reasons why each artifact may be related to the source. Format the reasons as <id> - <reason>. Then, rank the artifact bodies from most to least relevant to the source. Provide the ranking as comma delimited list of artifact ids where the first element relates to the source the most and the last element does so the least. Enclose the list in <links></links>."
+# DEFAULT_RANKING_FORMAT = "Include a list of reasons why each artifact may be related to the source. Format the reasons as <id> - <reason>. Then, rank the artifact bodies from most to least relevant to the source. Provide the ranking as comma delimited list of artifact ids where the first element relates to the source the most and the last element does so the least. Enclose the list in <links></links>."
 # DEFAULT_RANKING_FORMAT = "Provide the comma delimited list of the remaining artifact ids." \
 #                          "These ids would only include artifacts that are in some way related to the source. " \
 #                          "Enclose the list in <links></links>. "
@@ -73,9 +87,23 @@ class RankingStore:
 
     # Instructions (optional)
     sorter: str = None  # The name of the sorter to use
-    prompt_question: str = DEFAULT_RANKING_QUESTION  # The prompt used to rank artifacts.
-    prompt_format: str = DEFAULT_RANKING_FORMAT
-    prompt_artifacts: List[str] = None
+
+    # Reasoning
+    reasoning_goal: str = DEFAULT_REASONING_GOAL  # The prompt used to rank artifacts.
+    reasoning_instructions: str = DEFAULT_REASONING_INSTRUCTIONS
+    reasoning_prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
+    reasoning_responses: Optional[GenerationResponse] = field(default=None, repr=False)
+
+    # Ranking
+    reasoning_prompts2source: Optional[Dict] = field(default_factory=dict)
+    ranking_responses: Optional[GenerationResponse] = field(default=None, repr=False)
+    ranking_prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
+    ranking_goal: str = DEFAULT_RANKING_GOAL
+    ranking_instructions: str = DEFAULT_RANKING_INSTRUCTIONS
+    processed_ranking_response: Optional[List[List[str]]] = field(default=None, repr=False)
+    source2reason: Dict = field(default_factory=dict)
+
+    # IO
     run_path: str = None  # path to predictions on dataset
     export_path: str = None
     experiment: bool = False
@@ -88,9 +116,6 @@ class RankingStore:
     trace_entries: Optional[List[Dict]] = field(default=None, repr=False)  # determines what links get included in source queries
 
     # Models
-    prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
-    batch_response: Optional[GenerationResponse] = field(default=None, repr=False)
-    processed_response: Optional[List[List[str]]] = field(default=None, repr=False)
     source2targets: Dict = field(default_factory=dict)
 
     # Jobs
@@ -110,11 +135,11 @@ class DatasetIdentifier:
 
 class RankingPipeline:
     def __init__(self, dataset_id: DatasetIdentifier, steps: List[RankingStep], sorter: str = None,
-                 base_prompt: str = DEFAULT_RANKING_QUESTION,
+                 base_prompt: str = DEFAULT_REASONING_GOAL,
                  export_dir: str = DEFAULT_EXPERIMENT_DIR):
         self.steps = steps
         self.store = RankingStore(project_path=dataset_id.dataset_path, run_path=dataset_id.run_path,
-                                  experiment_id=dataset_id.experiment_id, prompt_question=base_prompt, sorter=sorter)
+                                  experiment_id=dataset_id.experiment_id, reasoning_goal=base_prompt, sorter=sorter)
         self.dataset_export_dir = os.path.join(export_dir, dataset_id.dataset_name)
         self.export_path = os.path.join(self.dataset_export_dir, self.store.experiment_id)
         self.store.export_path = self.export_path
@@ -122,7 +147,7 @@ class RankingPipeline:
     def run(self):
         for step in self.steps:
             step(self.store)
-        self.export()
+            self.export()
 
     def export(self):
         print(json.dumps(self.store.map_instructions))

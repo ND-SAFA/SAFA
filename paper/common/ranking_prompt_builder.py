@@ -15,14 +15,15 @@ def builder_method(func):
 
 
 class RankingPromptBuilder:
-    def __init__(self, question: str = "", query: str = "", format: str = "", body_title: str = DEFAULT_BODY_TITLE,
+    def __init__(self, goal: str = "", query: str = "", instructions: str = "", body_title: str = DEFAULT_BODY_TITLE,
                  section_delimiter: str = "\n\n"):
-        self.task = question
+        self.goal = goal
         self.query = query
-        self.format = format
+        self.instructions = instructions
         self.section_delimiter = section_delimiter
         self.body_title = body_title
         self.body = ""
+        self.context = ""
 
     @builder_method
     def with_query(self, query: str):
@@ -30,7 +31,7 @@ class RankingPromptBuilder:
 
     @builder_method
     def with_task(self, task: str):
-        self.task = task
+        self.goal = task
 
     @builder_method
     def with_body_title(self, body_title: str):
@@ -38,7 +39,7 @@ class RankingPromptBuilder:
 
     @builder_method
     def with_format(self, format: str):
-        self.format = format
+        self.instructions = format
 
     @builder_method
     def with_artifact(self, artifact_name: Any, artifact_body: str):
@@ -48,9 +49,13 @@ class RankingPromptBuilder:
     def with_body(self, body: str):
         self.body = body
 
+    @builder_method
+    def with_context(self, context: str):
+        self.context = context
+
     def get(self):
         body = self.join_prompts([self.body_title, self.body], "\n\n")
-        items = [self.task + self.query, body, self.format]
+        items = [self.goal + self.query, body, self.context, self.instructions]
         prompt = self.join_prompts(items, self.section_delimiter)
         return prompt
 

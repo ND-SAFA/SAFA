@@ -1,9 +1,6 @@
 import random
 from typing import Callable, Dict, List
 
-from paper.common.completion_util import complete_prompts
-from paper.common.ranking_prompt_builder import RankingPromptBuilder
-from paper.pipeline.response_process_step import process_artifact_ids, process_response
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -23,7 +20,7 @@ def alphabetical_sorter(source_names, target_names, artifact_map) -> Dict[str, L
 
 def random_sorter(source_names, target_names, artifact_map) -> Dict[str, List[str]]:
     random.seed(42)
-    random.shuffle(target_names, )
+    random.shuffle(target_names)
     return {s: target_names for s in source_names}
 
 
@@ -44,9 +41,10 @@ def vsm_sorter(source_names, target_names, artifact_map) -> Dict[str, str]:
     unsorted_targets = {}
     for entry in prediction_entries:
         source = entry["source"]
+        target = entry["target"]
         if source not in unsorted_targets:
             unsorted_targets[source] = {}
-        unsorted_targets[source][entry["target"]] = entry["score"]
+        unsorted_targets[source][target] = entry["score"]
     sorted_targets = {source: sorted(targets2score, key=targets2score.get, reverse=True) for source, targets2score in
                       unsorted_targets.items()}
     return sorted_targets
@@ -57,28 +55,8 @@ DEFAULT_SORTING_PROMPT = "Rank the following artifacts from most to least " \
                          "Provide your answer as comma delimited list of artifact ids." \
                          "Enclose the list in <links></links>. "
 
-
-def claude_sorter(source_names: List[str], target_names, artifact_map) -> List[str]:
-    builder = RankingPromptBuilder()
-    builder.with_task(DEFAULT_SORTING_PROMPT)
-    for t_index, t_name in enumerate(target_names):
-        builder.with_artifact(t_index, artifact_map[t_name])
-    prompt = builder.get()
-    model = "claude-v1.3-100k"  # "claude-v1.3-100k", "claude-instant-v1-100k"
-    batch_response = complete_prompts([prompt], model=model, max_tokens=600)
-    processed_response = process_response(batch_response.batch_responses[0])  # string response into list
-    sorted_target_artifacts = process_artifact_ids(processed_response)  # processes each artifact id
-    sorted_target_artifacts = [target_names[int(i)] for i in sorted_target_artifacts]
-    source2target = {}
-
-    for s in source_names:
-        source2target[s] = sorted_target_artifacts
-    return source2target
-
-
 registered_sorters: Dict[str, GenericSorter] = {
     "alphabetical": alphabetical_sorter,
     "random": random_sorter,
-    "claude": claude_sorter,
     "vsm": vsm_sorter
 }

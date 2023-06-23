@@ -45,7 +45,7 @@ class TestPromptProjectReader(BaseTest):
         with open(self.PROJECT_PATH) as file:
             for line in file.readlines():
                 prompt_dict = json.loads(line)
-                prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.format(prompt_dict[PromptKeys.PROMPT.value]) \
+                prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.instructions(prompt_dict[PromptKeys.PROMPT.value]) \
                     .replace(os.linesep, "")
                 expected_prompts.append(prompt_dict)
         prompts_df[PromptKeys.PROMPT] = [row[PromptKeys.PROMPT].replace(os.linesep, "") for i, row in prompts_df.itertuples()]

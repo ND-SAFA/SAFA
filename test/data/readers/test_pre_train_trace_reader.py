@@ -37,7 +37,7 @@ class TestPreTrainingTraceReader(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
-        lines = [SUMMARY_FORMAT.format(line) for line in FileUtil.read_file(reader.data_file).split(os.linesep)]
+        lines = [SUMMARY_FORMAT.instructions(line) for line in FileUtil.read_file(reader.data_file).split(os.linesep)]
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
     @staticmethod

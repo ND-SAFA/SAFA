@@ -2,8 +2,8 @@ import os
 import random
 
 from paper.pipeline.base import RankingStore, create_artifact_map
-from paper.pipeline.ranking_step import create_trace_queries, extract_prompt_artifacts
 from paper.pipeline.sort_step import registered_sorters
+from paper.pipeline.utils import extract_prompt_artifacts
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 
@@ -49,3 +49,14 @@ def extract_related_target_artifacts(s: RankingStore):
     s.source2targets = source2targets
     s.all_target_ids = target_names
     s.source_ids = source_names
+
+
+def create_trace_queries(entries):
+    entry_map = {}
+    for entry in entries:
+        source = entry["source"]
+        target = entry["target"]
+        if source not in entry_map:
+            entry_map[source] = []
+        entry_map[source].append(target)
+    return entry_map

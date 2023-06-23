@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
+from paper.pipeline.utils import extract_prompt_artifacts
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -144,8 +145,10 @@ class VSMTrainer(AbstractTrainer):
         :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
         """
         source_target_pairs = dataset.get_source_target_pairs()
-        sources = [dataset.artifact_df.get_artifact(s_id) for s_id, _ in source_target_pairs]
-        targets = [dataset.artifact_df.get_artifact(t_id) for _, t_id in source_target_pairs]
+        source_ids, target_ids = extract_prompt_artifacts(dataset.artifact_df)
+        sources = [dataset.artifact_df.get_artifact(s_id) for s_id in source_ids]
+        targets = [dataset.artifact_df.get_artifact(t_id) for t_id in target_ids]
+
         raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources])
         raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets])
         return raw_sources, raw_targets, source_target_pairs

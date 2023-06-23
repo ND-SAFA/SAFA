@@ -46,7 +46,7 @@ def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[
 def create_metric_instructions(s: RankingStore):
     traced_ids = s.traced_ids
     source_ids = s.source_ids
-    ranked_target_links = s.processed_response
+    ranked_target_links = s.processed_ranking_response
 
     map_instructions = calculate_map_instructions(ranked_target_links, source_ids, traced_ids)
     s.map_instructions = map_instructions

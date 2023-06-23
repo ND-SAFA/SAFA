@@ -1,5 +1,4 @@
 import os.path
-import random
 import uuid
 
 from paper.pipeline.base import DatasetIdentifier, RankingPipeline, RankingStore, get_trace_id
@@ -51,7 +50,6 @@ def run_prediction_job(s: RankingStore):
     predicted_target_links = []
     for source in source_ids:
         targets = t_preds[source]
-        random.shuffle(targets)
         sorted_targets = sorted(targets, key=lambda d: d["score"], reverse=True)
         sorted_targets = list(map(lambda t: t["name"], sorted_targets))
         predicted_target_links.append(sorted_targets)

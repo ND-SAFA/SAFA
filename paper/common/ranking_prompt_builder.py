@@ -15,7 +15,7 @@ def builder_method(func):
 
 
 class RankingPromptBuilder:
-    def __init__(self, question: str = None, query: str = None, format: str = None, body_title: str = DEFAULT_BODY_TITLE,
+    def __init__(self, question: str = "", query: str = "", format: str = "", body_title: str = DEFAULT_BODY_TITLE,
                  section_delimiter: str = "\n\n"):
         self.task = question
         self.query = query

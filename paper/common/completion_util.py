@@ -8,7 +8,7 @@ def complete_prompts(prompts: List[str], max_tokens: int = 400, temperature: flo
     manager = AnthropicManager()
     params = {
         "prompt": [f"\n\nHuman: {p}\n\nAssistant:" for p in prompts],
-        "max_tokens_to_generate": max_tokens,
+        "max_tokens_to_sample": max_tokens,
         "temperature": temperature,
         **kwargs
     }

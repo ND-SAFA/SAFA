@@ -52,7 +52,7 @@ def create_ranking_prompts(s: RankingStore):
 def create_prompts(artifact_map, source_name, s: RankingStore):
     target_names = s.source2targets[source_name]
     query = artifact_map[source_name]
-    prompt_builder = RankingPromptBuilder(question=s.prompt_question, query=query, body_title="# Artifacts")
+    prompt_builder = RankingPromptBuilder(question=s.prompt_question, format=s.prompt_format, query=query, body_title="# Artifacts")
     for target_index, target_artifact_name in enumerate(target_names):
         prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name])
     prompt = prompt_builder.get()
@@ -60,5 +60,6 @@ def create_prompts(artifact_map, source_name, s: RankingStore):
 
 
 def complete_ranking_prompts(s: RankingStore):
-    batch_response = complete_prompts(s.prompts)
+    batch_response = complete_prompts(s.prompts, max_tokens=2000)
+    # batch_response = GenerationResponse(["<links>2,31,84,59,58,22,32,40</links>"] * len(s.prompts))
     s.batch_response = batch_response

@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from paper.pipeline.base import remove_file_extension
 from paper.pipeline.map_step import process_artifact_ids, process_response
 
 
@@ -15,9 +14,3 @@ class TestProcessingSteps(TestCase):
         response = process_artifact_ids(["1", "2.java"])
         self.assertEqual(response[0], "1")
         self.assertEqual(response[1], "2")
-
-    def test_remove_extension(self):
-        res = remove_file_extension("hey.java")
-        self.assertEqual(res, "hey")
-        res = remove_file_extension("hey")
-        self.assertEqual(res, "hey")

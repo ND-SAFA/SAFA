@@ -8,13 +8,21 @@ from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 
 datasets = {
+    "cm1": {
+        "type": "Low Level Requirements",
+        "export_path": "cm1/targets.csv"
+    },
+    "drone-nl": {
+        "type": "Designs",
+        "export_path": "drone-nl/targets.csv"
+    },
     "Drone": {
         "type": "Code",
         "export_path": "drone-pl/code.csv",
     },
     "itrust": {
-        "type": "Java Code",
-        "export_path": "itrust/code.csv",
+        "type": "Use Case",  # "Java Code",
+        "export_path": "itrust/source_summarized.csv",
     }
 }
 if __name__ == "__main__":
@@ -24,7 +32,7 @@ if __name__ == "__main__":
     artifact_type_name = dataset_instructions["type"]
 
     export_path = os.path.expanduser(os.path.join("~/desktop/safa/datasets/paper", export_dir_name))
-    data_path = os.path.expanduser("~/desktop/safa/datasets/open-source")
+    data_path = os.path.expanduser("~/desktop/safa/datasets/paper")
 
     dataset_path = os.path.join(data_path, dataset_name)
     project_reader = StructuredProjectReader(dataset_path)
@@ -35,7 +43,7 @@ if __name__ == "__main__":
     code_list = list(code_df[ArtifactKeys.CONTENT.value])
 
     summarizer = Summarizer()
-    chunker_types = [SupportedChunker.JAVA for i in range(len(code_list))]
+    chunker_types = [SupportedChunker.NL for i in range(len(code_list))]
     summarized_list = summarizer.summarize_bulk(code_list, chunker_types=chunker_types)
 
     summarized_df = pd.DataFrame()

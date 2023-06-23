@@ -9,10 +9,10 @@ from paper.pipeline.ranking_step import complete_ranking_prompts, create_ranking
 from paper.pipeline.response_process_step import process_ranking_prompts
 
 if __name__ == "__main__":
-    EXPERIMENT_ID = "0be4cc9b-fe95-4a8e-a9bb-9ac0d34434ec"
+    EXPERIMENT_ID = "c3442bd7-4d4a-4891-827b-a91b0dc1e799"
     DATASET_NAME = "cm1"
 
-    run_path = f"~/desktop/safa/experiments/paper/results/{DATASET_NAME}/original/experiment_0/step_0/{EXPERIMENT_ID}/output.json"
+    run_path = f"~/desktop/safa/experiments/rankings/{DATASET_NAME}/{EXPERIMENT_ID}/output.json"
     run_path = os.path.expanduser(run_path)
 
     dataset_path = f"~/desktop/safa/datasets/paper/{DATASET_NAME}"

@@ -1,10 +1,15 @@
 import random
 from typing import List
 
-from paper.pipeline.base import RankingStore, remove_file_extension
+from paper.pipeline.base import RankingStore
+from tgen.util.llm_response_util import LLMResponseUtil
 
-RESPONSE_PROCESSING_STEPS = [lambda s: s.replace("ID:", ""), lambda s: s.split(",")]
-ID_PROCESSING_STEPS = [remove_file_extension, lambda f: f.replace("ID:", ""), lambda f: f.strip()]
+RESPONSE_PROCESSING_STEPS = [
+    lambda r: LLMResponseUtil.parse(r, "links"),
+    lambda s: s.replace("ID:", ""),
+    lambda s: s.split(",")
+]
+ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
 
 def process_ranking_prompts(s: RankingStore):
@@ -13,9 +18,8 @@ def process_ranking_prompts(s: RankingStore):
 
 def process_ranked_artifacts(s: RankingStore, add_missing=True) -> List[List[str]]:
     batch_response = s.batch_response
-    target_ids = s.target_ids
+    target_ids = s.all_target_ids
 
-    target_ids = list(map(lambda f: remove_file_extension(f), target_ids))
     ranked_target_links = []
     for response, source_name in zip(batch_response.batch_responses, s.source_ids):
         processed_response = process_response(response)  # string response into list
@@ -33,7 +37,7 @@ def process_ranked_artifacts(s: RankingStore, add_missing=True) -> List[List[str
 
 def translate_indices(processed_artifact_ids: List[str], related_targets):
     processed_artifact_ids = list(map(lambda i: int(i), processed_artifact_ids))
-    processed_artifact_ids = list(filter(lambda i: i < len(processed_artifact_ids), processed_artifact_ids))
+    processed_artifact_ids = list(filter(lambda i: i < len(related_targets), processed_artifact_ids))
     processed_artifact_ids = list(map(lambda i: related_targets[i], processed_artifact_ids))
     return processed_artifact_ids
 

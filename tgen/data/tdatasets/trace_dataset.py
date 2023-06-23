@@ -47,12 +47,13 @@ class TraceDataset(iDataset):
         self.__assert_dataframe_types(artifact_df, trace_df, layer_df)
         self.layer_df = layer_df
         self.artifact_df = artifact_df
-        self.trace_df = trace_df
         if not pos_link_ids or not neg_link_ids:
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(trace_df)
         self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
+        trace_df = TraceDataFrame(trace_df.sample(frac=1))
         self.trace_matrix = TraceMatrix(trace_df, randomize=randomize)
+        self.trace_df = trace_df
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
         """
@@ -180,7 +181,8 @@ class TraceDataset(iDataset):
         link_counts = Counter(self._pos_link_ids + self._neg_link_ids)
         link_ids = []
         for id_ in self.trace_df.index:
-            link_ids.extend([id_ * link_counts[id_]])
+            aug_trace_ids = [id_ for i in range(link_counts[id_])]
+            link_ids.extend(aug_trace_ids)
         return link_ids
 
     def get_ordered_links(self) -> List[EnumDict]:

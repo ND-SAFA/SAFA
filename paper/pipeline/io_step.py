@@ -1,3 +1,4 @@
+import random
 from typing import Callable
 
 from paper.pipeline.base import RankingStore, get_trace_id
@@ -17,7 +18,7 @@ def store_predictions(s: RankingStore, entries, on_entry: Callable = None):
             on_entry(entry)
         target_ids.add(entry["target"])
     s.traced_ids = traced_ids
-    s.target_ids = list(target_ids)
+    s.all_target_ids = list(target_ids)
 
 
 def read_labels(s: RankingStore):
@@ -33,12 +34,10 @@ def read_labels(s: RankingStore):
             "label": row["label"]
         }
         entries.append(entry)
-    s.trace_entries = entries
     store_predictions(s, entries)
 
 
 def read_positive_predictions(s: RankingStore):
-    dataset_path = s.run_path
     prediction_entries = JsonUtil.read_json_file(s.run_path)["body"]["prediction_entries"]
     positive_entries = []
 
@@ -46,5 +45,6 @@ def read_positive_predictions(s: RankingStore):
         if entry["score"] >= 0.5:
             positive_entries.append(entry)
 
+    random.shuffle(prediction_entries)
     store_predictions(s, prediction_entries, on_entry)
     s.trace_entries = positive_entries

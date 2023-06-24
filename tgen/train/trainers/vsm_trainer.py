@@ -144,10 +144,13 @@ class VSMTrainer(AbstractTrainer):
         :param dataset: The dataset to use for sources and targets
         :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
         """
-        source_target_pairs = dataset.get_source_target_pairs()
         source_ids, target_ids = extract_prompt_artifacts(dataset.artifact_df)
         sources = [dataset.artifact_df.get_artifact(s_id) for s_id in source_ids]
         targets = [dataset.artifact_df.get_artifact(t_id) for t_id in target_ids]
+        source_target_pairs = []
+        for s_id in source_ids:
+            for t_id in target_ids:
+                source_target_pairs.append((s_id, t_id))
 
         raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources])
         raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets])

@@ -69,6 +69,7 @@ class RankingStep(iPipeline):
             response_list = RankingStep.convert_response_to_list(prompt_response)  # string response into list
             artifact_indices = RankingStep.parse_artifact_indices(response_list)  # processes each artifact id
             artifact_ids = RankingStep.translate_indices_to_ids(artifact_indices, related_targets)
+            artifact_ids = RankingStep.remove_duplicate_ids(artifact_ids)
             ranked_target_links[source_index].extend(artifact_ids)
 
         if add_missing:
@@ -80,6 +81,7 @@ class RankingStep(iPipeline):
 
     @staticmethod
     def translate_indices_to_ids(processed_artifact_ids: List[str], related_targets):
+        processed_artifact_ids = list(filter(lambda i: len(i) > 0, processed_artifact_ids))
         processed_artifact_ids = list(map(lambda i: int(i), processed_artifact_ids))
         processed_artifact_ids = list(filter(lambda i: i < len(related_targets), processed_artifact_ids))
         processed_artifact_ids = list(map(lambda i: related_targets[i], processed_artifact_ids))
@@ -101,3 +103,13 @@ class RankingStep(iPipeline):
         for s in RESPONSE_PROCESSING_STEPS:
             processed = s(processed)
         return processed
+
+    @staticmethod
+    def remove_duplicate_ids(artifact_ids):
+        new_list = []
+        seen = set()
+        for artifact_id in artifact_ids:
+            if artifact_id not in seen:
+                new_list.append(artifact_id)
+                seen.add(artifact_id)
+        return new_list

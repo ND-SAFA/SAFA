@@ -69,7 +69,7 @@ class LLMClustering(iClustering):
         logger.info(f"Getting features for clusters.")
         prompt = SupportedPrompts.FUNCTIONALITIES.value.instructions(target_artifact_type=target_artifact_type)
         res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, prompt)
-        features: List[Tag] = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, is_nested=True)
+        features: List[Tag] = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, many=True)
         return [str(functionality.contents[0]) for functionality in features]
 
     @staticmethod
@@ -168,7 +168,7 @@ class LLMClustering(iClustering):
         :param artifact_ids: The ids of all artifacts
         :return: Mapping of cluster name to the list of artifacts in the cluster
         """
-        groups = LLMResponseUtil.parse(res, LLMClustering.CLUSTER_TAG, is_nested=True)
+        groups = LLMResponseUtil.parse(res, LLMClustering.CLUSTER_TAG, many=True)
         clusters = {}
         for group in groups:
             name, artifacts = LLMClustering._get_cluster_name_and_artifacts(group, artifact_ids)

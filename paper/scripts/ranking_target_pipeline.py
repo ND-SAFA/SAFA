@@ -11,12 +11,11 @@ from paper.pipeline.reasoning_step import ReasoningStep
 
 if __name__ == "__main__":
     EXPERIMENT_ID = str(uuid.uuid4())
-    DATASET_NAME = "drone-nl"
+    DATASET_NAME = "cm1"
     dataset_path = f"~/desktop/safa/datasets/paper/{DATASET_NAME}"
     dataset_path = os.path.expanduser(dataset_path)
 
     dataset_id = DatasetIdentifier(dataset_path=dataset_path, experiment_id=EXPERIMENT_ID, dataset_name=DATASET_NAME)
-
     steps = [read_labels,
              extract_related_target_artifacts,  # reads the targets associated with run
              ReasoningStep(),

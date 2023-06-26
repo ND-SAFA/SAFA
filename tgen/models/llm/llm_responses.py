@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from typing import Dict, List, Union
+from typing import List, Union
 
 
 @dataclass
@@ -16,7 +16,7 @@ class ClassificationResponse:
     """
     The response for a batch of classification request.
     """
-    batch_label_probs: List[Dict[str, float]]
+    batch_responses: List[str]
 
 
 SupportedLLMResponses = Union[ClassificationResponse, GenerationResponse]

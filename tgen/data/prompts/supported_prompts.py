@@ -1,12 +1,23 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
+DEFAULT_CLASSIFICATION_PROMPT = "You are tasked to trace all relevant documentation of a software system. " \
+                                "Answer the following questions about the artifacts below while ignoring levels of abstraction and " \
+                                "focusing on the functionality of the artifacts within the system.\n" \
+                                "- Describe the relationship between (1) and (2) in the system? " \
+                                "Enclose your answer in <relationship></relationship>.\n" \
+                                "- How similar are (1) and (2)? " \
+                                "Provide a floating point number between 0 and 1, with 1 meaning they are extremely related. " \
+                                "Enclose your answer in <similarity></similarity>.\n" \
+                                "- Based on these reasons, is there a direct traceability link between (1) and (2)? " \
+                                "Answer should be 'yes' or 'no' enclosed in <label></label>.\n"
+
 
 class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = Prompt("Is the functionality of (1) related to (2)? Answer 'yes' or 'no'.\n")
+    CLASSIFICATION = Prompt(DEFAULT_CLASSIFICATION_PROMPT)
     CODE_SUMMARY = Prompt("Provide a few sentences describing the high-level usage of the code below. "
                           "Do not focus on implementation details and assume your audience works on this system."
                           "The summary should be enclosed in the tags <summary></summary>:\n '{target_content}'")

@@ -5,19 +5,18 @@
         {
           "object_type": "LLM",
           "task": "PREDICT",
-          "trainer_args": {
-            "object_type": "ANTHROPIC",
-            "model": "claude-instant-v1"
-          },
           "llm_manager": {
-            "object_type": "ANTHROPIC"
+            "object_type": "ANTHROPIC",
+            "llm_args": {
+              "model": "claude-instant-1-100k"
+            }
           },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "CSV",
-                "project_path": "~/desktop/safa/datasets/safa/exported/safa_eval.csv"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/my_mip/task_1/task1_answer"
               }
             }
           }

@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List, Union
 
 from openai.api_resources.fine_tune import FineTune
@@ -19,6 +20,7 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.uncased_dict import UncasedDict
 
@@ -124,6 +126,11 @@ class LLMTrainer(AbstractTrainer):
         """
         return TracePredictionOutput(predictions=[r.strip() for r in responses])  #
 
+    @staticmethod
+    def strip_non_digits_and_periods(string):
+        pattern = r'[^0-9.]'
+        return re.sub(pattern, '', string)
+
     def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset):
         """
         Creates the output for a classification
@@ -131,7 +138,17 @@ class LLMTrainer(AbstractTrainer):
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
+        classifications = []
+        for r in res.batch_responses:
+            label = LLMResponseUtil.parse(r, "label").lower()
+            classifications.append(label)
+
+        scores = []
+        for r in res.batch_responses:
+            score_str = LLMResponseUtil.parse(r, "similarity").lower()
+            score_str = LLMTrainer.strip_non_digits_and_periods(score_str)
+            scores.append(float(score_str))
+        # scores = list(map(lambda label_probs: self._get_score(label_probs), batch_probs))
         trace_dataset = dataset.trace_dataset
         output = TracePredictionOutput(predictions=scores)
 

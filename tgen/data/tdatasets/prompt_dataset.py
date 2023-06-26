@@ -180,9 +180,17 @@ class PromptDataset(iDataset):
         :param prompt_creator_params: Additional params to give the prompt creator
         :return: The prompt entry
         """
-        source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else EMPTY_STRING
-        entry = prompt_creator.create(target_content=target_artifact[ArtifactKeys.CONTENT], source_content=source_content,
-                                      **prompt_creator_params)
+
+        def format_artifact(artifact):
+            if artifact is None:
+                return EMPTY_STRING
+            content = artifact[ArtifactKeys.CONTENT]
+            title = artifact[ArtifactKeys.ID]
+            return f"{title}: {content}"
+
+        source_content = format_artifact(source_artifact)
+        target_content = format_artifact(target_artifact)
+        entry = prompt_creator.create(target_content=target_content, source_content=source_content, **prompt_creator_params)
         if not summarizer:
             return entry
 

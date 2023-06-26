@@ -120,8 +120,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse([r["completion"] for r in res])
         if task == LLMCompletionType.CLASSIFICATION:
-            results = [AnthropicManager._get_log_prob(r["completion"]) for r in res]
-            return ClassificationResponse(results)
+            return ClassificationResponse([r["completion"] for r in res])
         else:
             raise ValueError(f"Response is not supported by anthropic manager: {task}")
 

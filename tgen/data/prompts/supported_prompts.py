@@ -1,23 +1,47 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
-DEFAULT_CLASSIFICATION_PROMPT = "You are tasked to trace all relevant documentation of a software system. " \
-                                "Answer the following questions about the artifacts below while ignoring levels of abstraction and " \
-                                "focusing on the functionality of the artifacts within the system.\n" \
-                                "- Describe the relationship between (1) and (2) in the system? " \
-                                "Enclose your answer in <relationship></relationship>.\n" \
-                                "- How similar are (1) and (2)? " \
-                                "Provide a floating point number between 0 and 1, with 1 meaning they are extremely related. " \
-                                "Enclose your answer in <similarity></similarity>.\n" \
-                                "- Based on these reasons, is there a direct traceability link between (1) and (2)? " \
-                                "Answer should be 'yes' or 'no' enclosed in <label></label>.\n"
+SOURCE_COMPONENT_LABEL = "source_component"
+TARGET_COMPONENT_LABEL = "target_component"
+
+SCORE_LABEL = "related-score"
+RELATED_LABEL = "related"
+UNRELATED_LABEL = "unrelated"
+RELATIONSHIP_LABEL = "relationship"
+CLASSIFICATION_LABEL = "label"
+DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
+                                       "Your task is to trace software artifacts of this system. "
+                                       "\n- In 10 words, describe the function of the sub-system containing (2)? "
+                                       f"Enclose your answer in <{SOURCE_COMPONENT_LABEL}></{SOURCE_COMPONENT_LABEL}>."
+
+                                       "\n- In 10 words, describe the function of the sub-system containing (1)? "
+                                       f"Enclose your answer in <{TARGET_COMPONENT_LABEL}></{TARGET_COMPONENT_LABEL}>."
+
+                                       "\n- In 10 words, describe how (1) and (2) might interact within the system? "
+                                       f"Enclose your answer in <{RELATIONSHIP_LABEL}></{RELATIONSHIP_LABEL}>."
+
+                                       "\n- In 10 words, describe why the responsibilities of (1) and (2) might be related. "
+                                       f"Enclose your answer in <{RELATED_LABEL}></{RELATED_LABEL}>."
+
+                                       "\n- In 10 words, describe why the responsibilities of (1) and (2) are different. "
+                                       f"Enclose your answer in <{UNRELATED_LABEL}></{UNRELATED_LABEL}>. "
+
+                                       "\n- Is there a direct traceability link between (1) and (2)? "
+                                       f"Answer should be 'yes' or 'no' enclosed in <{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
+
+                                       "\nProvide a floating point number between 0 and 1 describing the strength of the traceability link. "
+                                       "A score between 0.75 and 1.0 means (1) and (2) describe similar responsibilities. "
+                                       "A score between 0.5 and 0.7 means (1) and (2) describe interfacing responsibilities. "
+                                       "A score between 0.2 and 0.45 means there is an indirect relationship between (1) and (2). "
+                                       "A score between 0 and 0.2 means there is no relationship between (1) and (2). "
+                                       f"Enclose your answer in <{SCORE_LABEL}></{SCORE_LABEL}>.\n")
 
 
 class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = Prompt(DEFAULT_CLASSIFICATION_PROMPT)
+    CLASSIFICATION = DEFAULT_CLASSIFICATION_PROMPT
     CODE_SUMMARY = Prompt("Provide a few sentences describing the high-level usage of the code below. "
                           "Do not focus on implementation details and assume your audience works on this system."
                           "The summary should be enclosed in the tags <summary></summary>:\n '{target_content}'")

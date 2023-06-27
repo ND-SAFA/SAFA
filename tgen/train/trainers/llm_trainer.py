@@ -8,6 +8,10 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, RELATED_LABEL, RELATIONSHIP_LABEL, SCORE_LABEL, \
+    SOURCE_COMPONENT_LABEL, \
+    TARGET_COMPONENT_LABEL, \
+    UNRELATED_LABEL
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -138,18 +142,41 @@ class LLMTrainer(AbstractTrainer):
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        classifications = []
-        for r in res.batch_responses:
-            label = LLMResponseUtil.parse(r, "label").lower()
-            classifications.append(label)
+        trace_dataset = dataset.trace_dataset
+        trace_df = trace_dataset.trace_df
+        prediction_entries = []
 
         scores = []
-        for r in res.batch_responses:
-            score_str = LLMResponseUtil.parse(r, "similarity").lower()
+        for i, r in enumerate(res.batch_responses):
+            source_summary = LLMResponseUtil.parse(r, SOURCE_COMPONENT_LABEL)
+            target_summary = LLMResponseUtil.parse(r, TARGET_COMPONENT_LABEL)
+            related_desc = LLMResponseUtil.parse(r, RELATED_LABEL)
+            unrelated_desc = LLMResponseUtil.parse(r, UNRELATED_LABEL)
+            relationship_desc = LLMResponseUtil.parse(r, RELATIONSHIP_LABEL)
+            classification = LLMResponseUtil.parse(r, CLASSIFICATION_LABEL).lower()
+            score_str = LLMResponseUtil.parse(r, SCORE_LABEL).lower()
             score_str = LLMTrainer.strip_non_digits_and_periods(score_str)
-            scores.append(float(score_str))
-        # scores = list(map(lambda label_probs: self._get_score(label_probs), batch_probs))
-        trace_dataset = dataset.trace_dataset
+            try:
+                score = float(score_str)
+            except:
+                logger.info("Processing link with missing score.")
+                score = 1 if classification == "yes" else 0
+            entry = trace_df.iloc[i]
+            scores.append(score)
+            entry = {
+                "source": entry["source"],
+                "target": entry["target"],
+                "label": entry["label"],
+                "source_summary": source_summary,
+                "target_summary": target_summary,
+                "score": score,
+                "similar": related_desc,
+                "different": unrelated_desc,
+                "relationship": relationship_desc,
+                "classification": classification
+            }
+            prediction_entries.append(entry)
+
         output = TracePredictionOutput(predictions=scores)
 
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
@@ -159,7 +186,7 @@ class LLMTrainer(AbstractTrainer):
             if output.metrics:
                 logger.log_with_title(f"Metrics", repr(output.metrics))
             output.label_ids = metrics_manager.trace_matrix.labels
-            output.prediction_entries = metrics_manager.get_trace_predictions()
+            output.prediction_entries = prediction_entries
 
         return output
 

@@ -43,6 +43,18 @@ class MapMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
+
+        def print_pos_link_indices() -> None:
+            zipped_list = list(zip(references, predictions))
+            sorted_list = sorted(zipped_list, key=lambda x: x[1], reverse=True)
+            sorted_labels, sorted_predictions = zip(*sorted_list)
+            pos_link_indices = []
+            for i, label in enumerate(sorted_labels):
+                if label == 1:
+                    pos_link_indices.append(i)
+            print("Indices:", pos_link_indices)
+
+        print_pos_link_indices()
         map_score = trace_matrix.calculate_query_metric(average_precision_score, default_value=0)
         ap_score = average_precision_score(references, predictions)
         return {

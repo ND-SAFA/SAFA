@@ -21,7 +21,7 @@ class LLMResponseUtil:
         try:
             assert len(tags) > 0, f"Missing expected tag {tag_name}"
             content = tags[0].contents[0] if not is_nested else tags
-        except AssertionError:
+        except (AssertionError, IndexError):
             logger.exception(f"Unable to parse {res}")
             content = res if not is_nested else []
         return content

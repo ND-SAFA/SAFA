@@ -9,9 +9,10 @@ UNRELATED_LABEL = "unrelated"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
 
-A_CATEGORY = "Are the artifacts exactly the same or was one derived directly from the other? If so, select A."
-B_CATEGORY = "Will changes to one artifact very likely require changes to the other? " \
-             "If a big change must occur, select B. If small or indirect changes must occur, select C."
+A_CATEGORY = "Will changes to one artifact require large changes to the other? " \
+             "If a big change must occur, select A. If small or medium changes must occur, continue."
+B_CATEGORY = "Will changes to one artifact require some changes to the other? " \
+             "If confident changes will occur, select B. Otherwise, select C."
 C_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select C if linkage is unclear."
 D_CATEGORY = "Do minor relationships exist but artifacts are largely standalone? Select D for weak, tangential links."
 E_CATEGORY = "Are the artifacts completely separate with no relationship? Select E only if fully independent."

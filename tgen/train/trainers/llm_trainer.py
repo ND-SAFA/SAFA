@@ -1,6 +1,8 @@
+import json
 import re
 from typing import Dict, List, Union
 
+import pandas as pd
 from openai.api_resources.fine_tune import FineTune
 from scipy.special import softmax
 
@@ -8,7 +10,7 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, RELATED_LABEL, RELATIONSHIP_LABEL, SCORE_LABEL, \
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
     SOURCE_COMPONENT_LABEL, \
     TARGET_COMPONENT_LABEL, \
     UNRELATED_LABEL
@@ -145,40 +147,64 @@ class LLMTrainer(AbstractTrainer):
         trace_dataset = dataset.trace_dataset
         trace_df = trace_dataset.trace_df
         prediction_entries = []
+        classification_scores = {
+            "A": 0.9,
+            "B": 0.7,
+            "C": 0.5,
+            "D": 0.3,
+            "E": 0.1,
+            "F": 0
+        }
+
+        def get(text, label):
+            if label in text:
+                return LLMResponseUtil.parse(text, label)
+            return None
 
         scores = []
+        classifications = []
+        class2correct = {}
         for i, r in enumerate(res.batch_responses):
-            source_summary = LLMResponseUtil.parse(r, SOURCE_COMPONENT_LABEL)
-            target_summary = LLMResponseUtil.parse(r, TARGET_COMPONENT_LABEL)
-            related_desc = LLMResponseUtil.parse(r, RELATED_LABEL)
-            unrelated_desc = LLMResponseUtil.parse(r, UNRELATED_LABEL)
-            relationship_desc = LLMResponseUtil.parse(r, RELATIONSHIP_LABEL)
-            classification = LLMResponseUtil.parse(r, CLASSIFICATION_LABEL).lower()
-            score_str = LLMResponseUtil.parse(r, SCORE_LABEL).lower()
+            source_summary = get(r, SOURCE_COMPONENT_LABEL)
+            target_summary = get(r, TARGET_COMPONENT_LABEL)
+            related_desc = get(r, RELATED_LABEL)
+            unrelated_desc = get(r, UNRELATED_LABEL)
+            classification = get(r, CLASSIFICATION_LABEL).upper().strip()
+            score_justification = get(r, JUSTIFICATION)
+            score_str = get(r, SCORE_LABEL).lower()
             score_str = LLMTrainer.strip_non_digits_and_periods(score_str)
             try:
                 score = float(score_str)
             except:
                 logger.info("Processing link with missing score.")
-                score = 1 if classification == "yes" else 0
+                score = classification_scores[classification]
             entry = trace_df.iloc[i]
+            label = entry["label"]
+            predicted_label = 1 if score >= 0.5 else 0
+            correct_label = "correct" if label == predicted_label else "wrong"
+            if classification not in class2correct:
+                class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
+            class2correct[classification][label][correct_label] += 1
             scores.append(score)
+            classifications.append(classification)
             entry = {
                 "source": entry["source"],
                 "target": entry["target"],
-                "label": entry["label"],
-                "source_summary": source_summary,
-                "target_summary": target_summary,
+                "label": label,
+                "classification": classification,
                 "score": score,
-                "similar": related_desc,
+                "justification": score_justification,
+                "related": related_desc,
                 "different": unrelated_desc,
-                "relationship": relationship_desc,
-                "classification": classification
+                "source_summary": source_summary,
+                "target_summary": target_summary
             }
             prediction_entries.append(entry)
-
+        print("Classifications:\n", pd.Series(classifications).value_counts())
+        print("Metrics:")
+        print(json.dumps(class2correct, indent=4))
         output = TracePredictionOutput(predictions=scores)
-
+        prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)

@@ -1,39 +1,56 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
-SOURCE_COMPONENT_LABEL = "source_component"
-TARGET_COMPONENT_LABEL = "target_component"
-
+SOURCE_COMPONENT_LABEL = "subsystem_one"
+TARGET_COMPONENT_LABEL = "subsystem_two"
 SCORE_LABEL = "related-score"
 RELATED_LABEL = "related"
 UNRELATED_LABEL = "unrelated"
-RELATIONSHIP_LABEL = "relationship"
-CLASSIFICATION_LABEL = "label"
+CLASSIFICATION_LABEL = "classification"
+JUSTIFICATION = "justification"
+
+A_CATEGORY = "Are the artifacts exactly the same or was one derived directly from the other? If so, select A."
+B_CATEGORY = "Will changes to one artifact very likely require changes to the other? " \
+             "If a big change must occur, select B. If small or indirect changes must occur, select C."
+C_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select C if linkage is unclear."
+D_CATEGORY = "Do minor relationships exist but artifacts are largely standalone? Select D for weak, tangential links."
+E_CATEGORY = "Are the artifacts completely separate with no relationship? Select E only if fully independent."
+
 DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
                                        "Your task is to trace software artifacts of this system. "
-                                       "\n- In 10 words, describe the function of the sub-system containing (2)? "
-                                       f"Enclose your answer in <{SOURCE_COMPONENT_LABEL}></{SOURCE_COMPONENT_LABEL}>."
 
                                        "\n- In 10 words, describe the function of the sub-system containing (1)? "
+                                       f"Enclose your answer in <{SOURCE_COMPONENT_LABEL}></{SOURCE_COMPONENT_LABEL}>."
+
+                                       "\n- In 10 words, describe the function of the sub-system containing (2)? "
                                        f"Enclose your answer in <{TARGET_COMPONENT_LABEL}></{TARGET_COMPONENT_LABEL}>."
 
-                                       "\n- In 10 words, describe how (1) and (2) might interact within the system? "
-                                       f"Enclose your answer in <{RELATIONSHIP_LABEL}></{RELATIONSHIP_LABEL}>."
-
-                                       "\n- In 10 words, describe why the responsibilities of (1) and (2) might be related. "
+                                       "\n- Describe all the ways that (1) and (2) are dependent on each other. "
                                        f"Enclose your answer in <{RELATED_LABEL}></{RELATED_LABEL}>."
 
-                                       "\n- In 10 words, describe why the responsibilities of (1) and (2) are different. "
-                                       f"Enclose your answer in <{UNRELATED_LABEL}></{UNRELATED_LABEL}>. "
+                                       "\n- Describe all the ways that (1) and (2) are independent on each other. "
+                                       f"Enclose your answer in <{UNRELATED_LABEL}></{UNRELATED_LABEL}>."
 
-                                       "\n- Is there a direct traceability link between (1) and (2)? "
-                                       f"Answer should be 'yes' or 'no' enclosed in <{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
+                                       "\n- Classify (1) and (2) into one of the following:"
+                                       f"\nA) {A_CATEGORY}"
+                                       f"\nB) {B_CATEGORY}"
+                                       f"\nC) {C_CATEGORY}"
+                                       f"\nD) {D_CATEGORY}"
+                                       f"\nE) {E_CATEGORY}"
+                                       "\nF) The two artifacts have opposite or incompatible purposes, functionality or effects."
+                                       f"\nEnclose your answer in<{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
 
-                                       "\nProvide a floating point number between 0 and 1 describing the strength of the traceability link. "
-                                       "A score between 0.75 and 1.0 means (1) and (2) describe similar responsibilities. "
-                                       "A score between 0.5 and 0.7 means (1) and (2) describe interfacing responsibilities. "
-                                       "A score between 0.2 and 0.45 means there is an indirect relationship between (1) and (2). "
-                                       "A score between 0 and 0.2 means there is no relationship between (1) and (2). "
+                                       "\n- Provide a detailed reasoning of the classification using your answers as references. "
+                                       f"Enclose your answer in <{JUSTIFICATION}></{JUSTIFICATION}>."
+
+                                       "\n- Rate the strength of the artifacts with a floating point number between 0 and 1. "
+                                       "Category A should receive scores between (0.9, 1.0), "
+                                       "Category B should receive scores between (0.6, 0.9), "
+                                       "Category C should receive scores between (0.4, 0.6), "
+                                       "Category D should receive scores between (0.2, 0.4), "
+                                       "Category E should receive scores between (0.0, 0.2), "
+                                       "Category F should receive a score of 0."
+                                       "For each category, place rating close to their upper or lower bounds. "
                                        f"Enclose your answer in <{SCORE_LABEL}></{SCORE_LABEL}>.\n")
 
 

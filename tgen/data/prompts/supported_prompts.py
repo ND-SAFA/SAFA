@@ -9,12 +9,13 @@ UNRELATED_LABEL = "unrelated"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
 
-A_CATEGORY = "Will changes to one artifact require large changes to the other? " \
-             "If a big change must occur, select A. If small or medium changes must occur, continue."
-B_CATEGORY = "Will changes to one artifact require some changes to the other? " \
-             "If confident changes will occur, select B. Otherwise, select C."
-C_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select C if linkage is unclear."
-D_CATEGORY = "Do minor relationships exist but artifacts are largely standalone? Select D for weak, tangential links."
+A_CATEGORY = "Is there a direct traceability link between the artifacts? " \
+             "If so, select A."
+B_CATEGORY = "Will changes to one artifact largely impact the other? " \
+             "If confident of magnitude, select B. Otherwise, select C."
+C_CATEGORY = "Will changes to one artifact require some changes to the other? " \
+             "If so, select B."
+D_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select D if linkage is unclear."
 E_CATEGORY = "Are the artifacts completely separate with no relationship? Select E only if fully independent."
 CLASSIFICATION_SCORES = {
     "A": 0.9,
@@ -52,8 +53,8 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a
                                        f"Enclose your answer in <{JUSTIFICATION}></{JUSTIFICATION}>."
 
                                        "\n- Rate the strength of the artifacts with a floating point number between 0 and 1. "
-                                       "Category A should receive scores between (0.9, 1.0), "
-                                       "Category B should receive scores between (0.6, 0.9), "
+                                       "Category A should receive scores between (0.8, 1.0), "
+                                       "Category B should receive scores between (0.6, 0.8), "
                                        "Category C should receive scores between (0.4, 0.6), "
                                        "Category D should receive scores between (0.2, 0.4), "
                                        "Category E should receive scores between (0.0, 0.2), "

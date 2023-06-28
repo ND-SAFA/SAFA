@@ -23,8 +23,11 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.dict_util import DictUtil
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
+
+DISPLAY_LABELS = ["label", "score", "justification", "source", "target"]
 
 
 class LLMTrainer(AbstractTrainer):
@@ -145,13 +148,13 @@ class LLMTrainer(AbstractTrainer):
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
             entry = LLMResponseUtil.extract_labels(r, {
+                SCORE_LABEL: "score",
                 CLASSIFICATION_LABEL: "classification",
                 JUSTIFICATION: "justification",
                 SOURCE_COMPONENT_LABEL: "source_subsystem",
                 TARGET_COMPONENT_LABEL: "target_subsystem",
                 RELATED_LABEL: "similarity",
-                UNRELATED_LABEL: "difference",
-                SCORE_LABEL: "score"
+                UNRELATED_LABEL: "difference"
             })
             entry["classification"] = entry["classification"].upper().strip()
             entry["score"] = LLMResponseUtil.strip_non_digits_and_periods(entry["score"].lower())
@@ -167,7 +170,7 @@ class LLMTrainer(AbstractTrainer):
             entry["label"] = trace_row["label"]
 
             self.update_classification_metrics(class2correct, correct_label, entry, label)
-
+            entry = DictUtil.order(entry, DISPLAY_LABELS)
             scores.append(score)
             classifications.append(entry["classification"])
             prediction_entries.append(entry)
@@ -180,7 +183,7 @@ class LLMTrainer(AbstractTrainer):
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
                 logger.log_with_title(f"Metrics", repr(output.metrics))
-                logger.info(json.dumps(class2correct, indent=4))
+                logger.info(json.dumps(class2correct, indent=1))
             output.label_ids = metrics_manager.trace_matrix.labels
 
         return output

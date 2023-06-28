@@ -1,4 +1,5 @@
 import re
+from typing import Dict, List, Union
 from uuid import UUID
 
 
@@ -14,7 +15,22 @@ class Prompt(str):
         """
         self.value = value
 
-    def format(self, *args: object, **kwargs: object) -> str:
+    def set_tag(self, tag: Union[str, List[str]]) -> "Prompt":
+        """
+        Sets the tag name for a prompt
+        :param tag: The name of the tag used in the prompt
+        :return: Self (for single line creation because unable to pass in tag on init)
+        """
+        self.tag = tag
+        return self
+
+    def build_response(self) -> str:
+        """
+        Create the way the model should respond.
+        """
+        raise NotImplementedError()
+
+    def format(self, *args: object, **kwargs: object) -> "Prompt":
         """
         Overrides string format to allow the formatting of only selective fields
         :param args: Ordered params to format the prompt with

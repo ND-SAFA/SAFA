@@ -118,7 +118,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: A task-specific response.
         """
         texts = [r["completion"] for r in res]
-        if task in [LLMCompletionType.GENERATION, LLMCompletionType.CLASSIFICATION]:
+        if task == LLMCompletionType.GENERATION:
             return GenerationResponse(texts)
         if task == LLMCompletionType.CLASSIFICATION:
             classification_items = [ClassificationItemResponse(t) for t in texts]

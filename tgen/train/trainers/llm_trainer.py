@@ -173,7 +173,7 @@ class LLMTrainer(AbstractTrainer):
             prediction_entries.append(entry)
 
         prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
-        output = TracePredictionOutput(predictions=scores, prediction_entries=prediction_entries)
+        output = TracePredictionOutput(prediction_entries=prediction_entries)
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)

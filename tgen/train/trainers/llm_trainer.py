@@ -1,10 +1,9 @@
 import json
 import re
-from typing import Dict, List, Union
+from typing import List, Union
 
 import pandas as pd
 from openai.api_resources.fine_tune import FineTune
-from scipy.special import softmax
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -28,7 +27,6 @@ from tgen.train.trace_output.trace_prediction_output import TracePredictionOutpu
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.uncased_dict import UncasedDict
 
 
 class LLMTrainer(AbstractTrainer):
@@ -204,8 +202,8 @@ class LLMTrainer(AbstractTrainer):
         print("Classifications:\n", pd.Series(classifications).value_counts())
         print("Metrics:")
         print(json.dumps(class2correct, indent=4))
-        output = TracePredictionOutput(predictions=scores)
         prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
+        output = TracePredictionOutput(predictions=scores, prediction_entries=prediction_entries)
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
@@ -213,37 +211,5 @@ class LLMTrainer(AbstractTrainer):
             if output.metrics:
                 logger.log_with_title(f"Metrics", repr(output.metrics))
             output.label_ids = metrics_manager.trace_matrix.labels
-            output.prediction_entries = prediction_entries
 
         return output
-
-    def _get_score(self, probs: Dict) -> float:
-        """
-        Gets the score from the predicted completions
-        :param probs: The probabilities of each top completion
-        :return: The softmax score from the predicted completions
-        """
-        assert isinstance(self.prompt_creator,
-                          ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
-        if len(probs) == 0:
-            return 0.5
-
-        probs = UncasedDict(probs)
-        neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
-        pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
-
-        neg_str = neg_str.strip()
-        pos_str = pos_str.strip()
-
-        if pos_str in probs and neg_str in probs:
-            v0 = probs.get(neg_str, 0)
-            v1 = probs.get(pos_str, 0)
-            prob_v = [v0, v1]
-            score = softmax(prob_v)[1]
-        elif pos_str in probs:
-            score = 1
-        elif neg_str in probs:
-            score = 0
-        else:
-            score = 0.5
-        return score

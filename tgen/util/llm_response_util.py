@@ -1,3 +1,4 @@
+import re
 from typing import Dict, List, Union
 
 from bs4 import BeautifulSoup, Tag
@@ -39,3 +40,13 @@ class LLMResponseUtil:
             prop_value = LLMResponseUtil.parse(r, tag)
             props[prop] = prop_value
         return props
+
+    @staticmethod
+    def strip_non_digits_and_periods(string: str):
+        """
+        Removes all characters except digits and periods.
+        :param string: The str to strip.
+        :return: The stripped string.
+        """
+        pattern = r'[^0-9.]'
+        return re.sub(pattern, '', string)

@@ -1,5 +1,4 @@
 import json
-import re
 from typing import List, Union
 
 from openai.api_resources.fine_tune import FineTune
@@ -129,11 +128,6 @@ class LLMTrainer(AbstractTrainer):
         """
         return TracePredictionOutput(predictions=[r.strip() for r in responses])  #
 
-    @staticmethod
-    def strip_non_digits_and_periods(string):
-        pattern = r'[^0-9.]'
-        return re.sub(pattern, '', string)
-
     def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset):
         """
         Creates the output for a classification
@@ -144,11 +138,6 @@ class LLMTrainer(AbstractTrainer):
         trace_dataset = dataset.trace_dataset
         trace_df = trace_dataset.trace_df
         prediction_entries = []
-
-        def get(text, label):
-            if label in text:
-                return LLMResponseUtil.parse(text, label)
-            return None
 
         scores = []
         classifications = []
@@ -165,7 +154,7 @@ class LLMTrainer(AbstractTrainer):
                 SCORE_LABEL: "score"
             })
             entry["classification"] = entry["classification"].upper().strip()
-            entry["score"] = LLMTrainer.strip_non_digits_and_periods(entry["score"].lower())
+            entry["score"] = LLMResponseUtil.strip_non_digits_and_periods(entry["score"].lower())
 
             score = self.extract_score(entry)
             trace_row = trace_df.iloc[i]

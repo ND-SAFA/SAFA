@@ -1,21 +1,40 @@
+from string import ascii_uppercase
 from typing import List
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.util.override import overrides
 
 
 class QuestionnairePrompt(Prompt):
     """
-    Contains a list of questions
+    Contains a list of questions for the model to answer
     """
 
-    def __init__(self, question_prompts: List[QuestionPrompt], value: str):
-        super().__init__(value)
-        self.question_prompts = question_prompts
-
-    def build(self, question_prompts: List[QuestionPrompt]):
+    def __init__(self, question_prompts: List[QuestionPrompt], instructions: str = "", enumeration_chars: List[str] = ascii_uppercase):
         """
+        Initializes the questionairre with the instructions and the questions that will make up the prompt
+        :param question_prompts: The list of question prompts to include in the questionairre
+        :param instructions: Any instructions necessary with the questionairre
+        :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
+        """
+        self.question_prompts = question_prompts
+        self.enumeration_chars = enumeration_chars
+        super().__init__(instructions, include_expected_response=False)
+
+    @overrides(Prompt)
+    def _build(self) -> str:
+        """
+        Constructs the prompt in the following format:
+        [Instructions]
         A) Question 1
         B) ...
         C) Question n
+        :return: The formatted prompt
         """
+        question_format = "{}) {}"
+        formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question)
+                                             for i, question in enumerate(self.question_prompts)])
+        instructions = f"{self.value}{NEW_LINE}" if self.value else ""
+        return f"{instructions}{formatted_questions}"

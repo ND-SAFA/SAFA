@@ -32,4 +32,4 @@ class GenerationPromptCreator(AbstractPromptCreator):
         :return: Dictionary containing the prompt and completion
         """
 
-        return self.generate_base(self.base_prompt.format(target_content=target_content, **kwargs), source_content)
+        return self.generate_base(self.base_prompt.format_value(target_content=target_content, **kwargs), source_content)

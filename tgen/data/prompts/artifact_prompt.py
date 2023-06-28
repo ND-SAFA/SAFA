@@ -1,25 +1,81 @@
+from enum import StrEnum, auto
+from typing import Union
+
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.prompts.prompt import Prompt
+from tgen.util.enum_util import EnumDict
+from tgen.util.override import overrides
 
 
 class ArtifactPrompt(Prompt):
+    """
+    Responsible for formatting and parsing of presenting a artifact in a prompt
+    """
 
-    def build_as_xml(self):
+    class BuildMethod(StrEnum):
         """
+        The method to build the prompt (determines prompt format)
+        """
+        XML = auto()
+        BASE = auto()
+
+    def __init__(self, build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
+        """
+        Constructor for making a prompt from an artifact
+        :param build_method: The method to build the prompt (determines prompt format)
+        :param include_id: If True, includes the id of the artifact
+        """
+        self.build_method = build_method
+        self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
+                              self.BuildMethod.BASE: self._build_as_base}
+        self.include_id = include_id
+        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False)
+
+    @overrides(Prompt)
+    def _build(self, artifact: EnumDict, **kwargs) -> str:
+        """
+        Builds the artifact prompt using the given build method
+        :param artifact: The dictionary containing the attributes representing an artifact
+        :param kwargs: Ignored
+        :return: The formatted prompt
+        """
+        if self.build_method in self.build_methods:
+            return self.build_methods[self.build_method](artifact_id=artifact[ArtifactKeys.ID],
+                                                         artifact_body=artifact[ArtifactKeys.CONTENT],
+                                                         include_id=self.include_id)
+        else:
+            raise NameError("Unknown Build Method")
+
+    @staticmethod
+    def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:
+        """
+        Formats the artifact as follows:
         <artifact>
-            <id>ID</id>
+            <id>ID</id> (if include_id)
             <body>BODY</body>
         </artifact>
+        :param artifact_id: The id of the artifact
+        :param artifact_body: The body of the artifact
+        :param include_id: If True, includes the id of the artifact
+        :return: The formatted prompt
         """
-        raise NotImplementedError()
+        formatted_id = ArtifactPrompt.create_xml(tag_name="id", tag_content=artifact_id)
+        formatted_content = ArtifactPrompt.create_xml(tag_name="body", tag_content=artifact_body)
+        content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
+        formatted_artifact = ArtifactPrompt.create_xml(tag_name="artifact",
+                                                       tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
+        return formatted_artifact
 
-    def build_without_id(self):
+    @staticmethod
+    def _build_as_base(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:
         """
-        [BODY]
+        Formats the artifact as follows: [ID]: [BODY] if include id else just [BODY]
+        :param artifact_id: The id of the artifact
+        :param artifact_body: The body of the artifact
+        :param include_id: If True, includes the id of the artifact
+        :return: The formatted prompt
         """
-        raise NotImplementedError()
-
-    def build_with_id(self):
-        """
-        [ID]: [BODY]
-        """
-        raise NotImplementedError()
+        if include_id:
+            return f"{artifact_id}: {artifact_body}"
+        return artifact_body

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 
 from bs4 import BeautifulSoup, Tag
 
@@ -25,3 +25,17 @@ class LLMResponseUtil:
             logger.exception(f"Unable to parse {res}")
             content = res if not is_nested else []
         return content
+
+    @staticmethod
+    def extract_labels(r: str, labels2props: Dict) -> Dict:
+        """
+        Extracts XML labels from response.
+        :param r: The text response.
+        :param labels2props: Dictionary mapping XML property name to export prop name.
+        :return: Dictionary of prop names to values.
+        """
+        props = {}
+        for tag, prop in labels2props.items():
+            prop_value = LLMResponseUtil.parse(r, tag)
+            props[prop] = prop_value
+        return props

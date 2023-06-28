@@ -15,7 +15,14 @@ B_CATEGORY = "Will changes to one artifact very likely require changes to the ot
 C_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select C if linkage is unclear."
 D_CATEGORY = "Do minor relationships exist but artifacts are largely standalone? Select D for weak, tangential links."
 E_CATEGORY = "Are the artifacts completely separate with no relationship? Select E only if fully independent."
-
+CLASSIFICATION_SCORES = {
+    "A": 0.9,
+    "B": 0.7,
+    "C": 0.5,
+    "D": 0.3,
+    "E": 0.1,
+    "F": 0
+}
 DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
                                        "Your task is to trace software artifacts of this system. "
 

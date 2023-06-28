@@ -2,14 +2,13 @@ import json
 import re
 from typing import List, Union
 
-import pandas as pd
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
     SOURCE_COMPONENT_LABEL, \
     TARGET_COMPONENT_LABEL, \
     UNRELATED_LABEL
@@ -145,14 +144,6 @@ class LLMTrainer(AbstractTrainer):
         trace_dataset = dataset.trace_dataset
         trace_df = trace_dataset.trace_df
         prediction_entries = []
-        classification_scores = {
-            "A": 0.9,
-            "B": 0.7,
-            "C": 0.5,
-            "D": 0.3,
-            "E": 0.1,
-            "F": 0
-        }
 
         def get(text, label):
             if label in text:
@@ -164,44 +155,34 @@ class LLMTrainer(AbstractTrainer):
         class2correct = {}
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
-            source_summary = get(r, SOURCE_COMPONENT_LABEL)
-            target_summary = get(r, TARGET_COMPONENT_LABEL)
-            related_desc = get(r, RELATED_LABEL)
-            unrelated_desc = get(r, UNRELATED_LABEL)
-            classification = get(r, CLASSIFICATION_LABEL).upper().strip()
-            score_justification = get(r, JUSTIFICATION)
-            score_str = get(r, SCORE_LABEL).lower()
-            score_str = LLMTrainer.strip_non_digits_and_periods(score_str)
-            try:
-                score = float(score_str)
-            except:
-                logger.info("Processing link with missing score.")
-                score = classification_scores[classification]
-            entry = trace_df.iloc[i]
-            label = entry["label"]
+            entry = LLMResponseUtil.extract_labels(r, {
+                CLASSIFICATION_LABEL: "classification",
+                JUSTIFICATION: "justification",
+                SOURCE_COMPONENT_LABEL: "source_subsystem",
+                TARGET_COMPONENT_LABEL: "target_subsystem",
+                RELATED_LABEL: "similarity",
+                UNRELATED_LABEL: "difference",
+                SCORE_LABEL: "score"
+            })
+            entry["classification"] = entry["classification"].upper().strip()
+            entry["score"] = LLMTrainer.strip_non_digits_and_periods(entry["score"].lower())
+
+            score = self.extract_score(entry)
+            trace_row = trace_df.iloc[i]
+            label = trace_row["label"]
             predicted_label = 1 if score >= 0.5 else 0
             correct_label = "correct" if label == predicted_label else "wrong"
-            if classification not in class2correct:
-                class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
-            class2correct[classification][label][correct_label] += 1
+
+            entry["source"] = trace_row["source"]
+            entry["target"] = trace_row["target"]
+            entry["label"] = trace_row["label"]
+
+            self.update_classification_metrics(class2correct, correct_label, entry, label)
+
             scores.append(score)
-            classifications.append(classification)
-            entry = {
-                "source": entry["source"],
-                "target": entry["target"],
-                "label": label,
-                "classification": classification,
-                "score": score,
-                "justification": score_justification,
-                "related": related_desc,
-                "different": unrelated_desc,
-                "source_summary": source_summary,
-                "target_summary": target_summary
-            }
+            classifications.append(entry["classification"])
             prediction_entries.append(entry)
-        print("Classifications:\n", pd.Series(classifications).value_counts())
-        print("Metrics:")
-        print(json.dumps(class2correct, indent=4))
+
         prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
         output = TracePredictionOutput(predictions=scores, prediction_entries=prediction_entries)
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
@@ -210,6 +191,36 @@ class LLMTrainer(AbstractTrainer):
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
                 logger.log_with_title(f"Metrics", repr(output.metrics))
+                logger.info(json.dumps(class2correct, indent=4))
             output.label_ids = metrics_manager.trace_matrix.labels
 
         return output
+
+    @staticmethod
+    def extract_score(entry):
+        """
+        Extracts the score from the classification entry response.
+        :param entry: Entry containing score or classification, to extract score from.
+        :return: The final score as a float.
+        """
+        try:
+            score = float(entry["score"])
+        except:
+            logger.info("Processing link with missing score.")
+            score = CLASSIFICATION_SCORES[entry["classification"]]
+        return score
+
+    @staticmethod
+    def update_classification_metrics(class2correct, correct_label, entry, label) -> None:
+        """
+        Updates the classification metrics on the categories of traces.
+        :param class2correct: The current metrics on the classes.
+        :param correct_label: The correct label of the entry.
+        :param entry: The
+        :param label:
+        :return:
+        """
+        classification = entry["classification"]
+        if classification not in class2correct:
+            class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
+        class2correct[classification][label][correct_label] += 1

@@ -1,6 +1,6 @@
 import os.path
 
-from api.endpoints.base.views.endpoint import async_endpoint
+from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.completion.completion_serializer import CompletionPayload, CompletionSerializer
 from api.utils.model_util import ModelUtil
 from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
@@ -40,7 +40,7 @@ def complete_prompt(model: str, prompt: str, llm_manager: AbstractLLMManager, **
     return model_response
 
 
-@async_endpoint(CompletionSerializer)
+@endpoint(CompletionSerializer)
 def perform_completion(prediction_payload: CompletionPayload):
     """
     Endpoint for performing completion of prompt.

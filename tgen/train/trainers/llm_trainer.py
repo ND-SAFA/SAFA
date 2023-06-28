@@ -164,7 +164,8 @@ class LLMTrainer(AbstractTrainer):
         scores = []
         classifications = []
         class2correct = {}
-        for i, r in enumerate(res.batch_responses):
+        for i, classification_item in enumerate(res.batch_responses):
+            r = classification_item.text
             source_summary = get(r, SOURCE_COMPONENT_LABEL)
             target_summary = get(r, TARGET_COMPONENT_LABEL)
             related_desc = get(r, RELATED_LABEL)

@@ -10,7 +10,7 @@ from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
 from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, \
     CONFIDENCE_LABEL, \
-    CURRENT_LABELS, REVERSE_CATEGORIES
+    CURRENT_LABELS, DISPLAY_LABELS, REVERSE_CATEGORIES
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -26,8 +26,6 @@ from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.dict_util import DictUtil
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-
-DISPLAY_LABELS = ["label", "score", "justification", "source", "target"]
 
 
 class LLMTrainer(AbstractTrainer):

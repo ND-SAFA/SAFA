@@ -5,13 +5,16 @@ CONFIDENCE_LABEL = "confidence"
 INTERSECTION_LABEL = "intersection"
 INTERSECTION_SCORE = "intersection_score"
 CLASSIFICATION_LABEL = "classification"
-JUSTIFICATION = "justification"
+CLASSIFICATION_JUSTIFICATION = "justification"
 CHANGE_ANALYSIS = "change_analysis"
 CHANGE_SCORE = "change_score"
 FEATURE = "feature_intersection"
 
-CURRENT_LABELS = [CONFIDENCE_LABEL, INTERSECTION_LABEL, INTERSECTION_SCORE, CLASSIFICATION_LABEL, JUSTIFICATION, CHANGE_ANALYSIS,
+CURRENT_LABELS = [CONFIDENCE_LABEL, INTERSECTION_LABEL, INTERSECTION_SCORE, CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFICATION,
+                  CHANGE_ANALYSIS,
                   CHANGE_SCORE, FEATURE]
+DISPLAY_LABELS = ["label", "score", CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFICATION, FEATURE,
+                  INTERSECTION_LABEL, INTERSECTION_SCORE, CHANGE_ANALYSIS, CHANGE_SCORE, "source", "target"]
 
 A_CATEGORY = "Do the artifacts work under the same feature or sub-system? " \
              "If yes, select A. If no, proceed to next question. "
@@ -64,7 +67,7 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        f"\nEnclose your answer in<{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
 
                                        "\n- Provide a detailed reasoning of the classification using your answers as references. "
-                                       f"Enclose your answer in <{JUSTIFICATION}></{JUSTIFICATION}>."
+                                       f"Enclose your answer in <{CLASSIFICATION_JUSTIFICATION}></{CLASSIFICATION_JUSTIFICATION}>."
 
                                        "\n- Rate your confidence that the artifacts belong to the selected category. "
                                        "Provide a floating point number between 0 and 1. "

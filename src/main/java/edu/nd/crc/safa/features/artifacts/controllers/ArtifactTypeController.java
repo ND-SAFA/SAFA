@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.artifacts.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,15 +13,16 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,33 +39,69 @@ public class ArtifactTypeController extends BaseController {
     }
 
     /**
-     * Returns list of artifact types in project.
+     * Creates given artifact type entity on specified project.
      *
-     * @param projectId The id of the project whose types are returned.
-     * @return List of artifact types.
-     * @throws SafaError Throws error if user does not have viewing permission on project.
+     * @param projectId    The id of the project whose type is created for.
+     * @param artifactType The artifact type to create.
+     * @return The updated artifact type with id.
+     * @throws SafaError Throws error if user does not have edit permissions on project.
      */
-    @GetMapping(AppRoutes.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
-    public List<TypeAppEntity> getProjectArtifactTypes(@PathVariable UUID projectId) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.serviceProvider.getTypeService().getAppEntities(project);
+    @PostMapping(AppRoutes.ArtifactType.CREATE_ARTIFACT_TYPE)
+    public TypeAppEntity createArtifactType(@PathVariable UUID projectId,
+                                            @RequestBody ArtifactType artifactType) throws SafaError {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
+
+        Optional<ArtifactType> originalType = this.serviceProvider.getArtifactTypeRepository()
+            .findByProjectAndNameIgnoreCase(project, artifactType.getName());
+
+        if (originalType.isPresent()) {
+            throw new SafaError("Type exists: " + artifactType.getName());
+        }
+
+        // Don't trust values sent to us
+        artifactType.setProject(project);
+        artifactType.setTypeId(null);
+
+        this.serviceProvider.getArtifactTypeRepository().save(artifactType);
+
+        notifyTypeUpdate(project, artifactType);
+
+        return new TypeAppEntity(artifactType);
     }
 
     /**
-     * Creates or updates given artifact type entity on specified project.
+     * Updates given artifact type entity on specified project.
      *
-     * @param projectId    The id of the project whose type is created / updated for.
-     * @param artifactType The artifact type to create or update.
-     * @return The updated artifact type with id if being created.
+     * @param projectId    The id of the project whose type is updated for.
+     * @param artifactTypeName The type we're updating
+     * @param artifactType The value for the update.
+     * @return The updated artifact type.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
-    @PostMapping(AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
-    public TypeAppEntity createOrUpdateArtifactType(@PathVariable UUID projectId,
-                                                    @RequestBody ArtifactType artifactType) throws SafaError {
+    @PutMapping(AppRoutes.ArtifactType.UPDATE_ARTIFACT_TYPE)
+    public TypeAppEntity updateArtifactType(@PathVariable UUID projectId, @PathVariable String artifactTypeName,
+                                            @RequestBody ArtifactType artifactType) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-        artifactType.setProject(project);
+
+        Optional<ArtifactType> originalType = this.serviceProvider.getArtifactTypeRepository()
+            .findByProjectAndNameIgnoreCase(project, artifactTypeName);
+
+        if (originalType.isEmpty()) {
+            throw new SafaItemNotFoundError(artifactTypeName);
+        }
+
+        // Don't allow editing the type or project
+        artifactType.setTypeId(originalType.get().getTypeId());
+        artifactType.setProject(originalType.get().getProject());
+
         this.serviceProvider.getArtifactTypeRepository().save(artifactType);
 
+        notifyTypeUpdate(project, artifactType);
+
+        return new TypeAppEntity(artifactType);
+    }
+
+    private void notifyTypeUpdate(Project project, ArtifactType artifactType) {
         // Step - Calculate affected artifact ids
         List<UUID> artifactIds = this.serviceProvider
             .getArtifactRepository()
@@ -77,10 +115,9 @@ public class ArtifactTypeController extends BaseController {
             .getNotificationService()
             .broadcastChange(
                 EntityChangeBuilder
-                    .create(projectId)
+                    .create(project.getProjectId())
                     .withTypeUpdate(artifactType.getTypeId())
                     .withArtifactsUpdate(artifactIds));
-        return new TypeAppEntity(artifactType);
     }
 
     /**

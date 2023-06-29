@@ -5,9 +5,8 @@ from unittest import mock
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
@@ -27,9 +26,10 @@ class TestOpenAiTrainer(BaseTest):
                                              mock_fine_tune_create: mock.MagicMock = None):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create
-        prompt_creator = ClassificationPromptCreator()
+        prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
+        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[prompt])
         for dataset_creator in self.get_all_dataset_creators().values():
-            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_creator=prompt_creator)
+            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
 
     @mock.patch("openai.FineTune.create")
@@ -38,9 +38,10 @@ class TestOpenAiTrainer(BaseTest):
                                               mock_fine_tune_create: mock.MagicMock = None):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create_classification_metrics
-        prompt_creator = ClassificationPromptCreator()
+        prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
+        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[prompt])
         for type_, dataset_creator in self.get_all_dataset_creators().items():
-            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL], prompt_creator=prompt_creator)
+            trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL], prompt_builder=prompt_builder)
             res = trainer.perform_training()
 
     @mock.patch("openai.FineTune.create")
@@ -57,13 +58,14 @@ class TestOpenAiTrainer(BaseTest):
         mock_completion_create.side_effect = self.fake_completion_create
         dataset_creators = self.get_all_dataset_creators()
         dataset_creators.pop("id")
-        for creator in [ClassificationPromptCreator(), GenerationPromptCreator()]:
+        classification_prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
+        classification_prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[classification_prompt])
+        for i, creator in enumerate([classification_prompt_builder, GenerationPromptCreator()]):
             for type_, dataset_creator in dataset_creators.items():
-                trainer: LLMTrainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_creator=creator)
+                trainer: LLMTrainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=creator)
                 res = trainer.perform_prediction()
                 self.assertGreater(len(res.predictions), 1)
-                if (type_ == "dataset" or type_ == "trace") and isinstance(trainer.prompt_creator,
-                                                                           ClassificationPromptCreator):
+                if (type_ == "dataset" or type_ == "trace") and i == 0: #classification
                     self.assertIsNotNone(res.label_ids)
                     self.assertIsNotNone(res.prediction_entries)
                     self.assertIsNotNone(res.metrics)
@@ -119,8 +121,8 @@ class TestOpenAiTrainer(BaseTest):
 
     @staticmethod
     def get_llm_trainer(dataset_creator: AbstractDatasetCreator, roles: List[DatasetRole],
-                        prompt_creator: AbstractPromptCreator, **params) -> LLMTrainer:
+                        prompt_builder: PromptBuilder, **params) -> LLMTrainer:
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
         llm_manager = OpenAIManager(OpenAIArgs())
         return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager,
-                          prompt_creator=prompt_creator, llm_manager=llm_manager)
+                          prompt_builder=prompt_builder, llm_manager=llm_manager)

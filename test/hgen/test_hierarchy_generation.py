@@ -10,14 +10,14 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
@@ -196,10 +196,11 @@ class TestHierarchyGeneration(BaseTest):
 
     @staticmethod
     def get_tgen_trainer(dataset_creator):
-        prompt_creator = ClassificationPromptCreator()
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
         llm_manager = OpenAIManager(llm_args=OpenAIArgs(metrics=[]))
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager, prompt_creator=prompt_creator)
+        prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
+        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts=[prompt])
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager, prompt_builder=prompt_builder)
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):

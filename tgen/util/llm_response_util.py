@@ -28,13 +28,15 @@ class LLMResponseUtil:
         return content
 
     @staticmethod
-    def extract_labels(r: str, labels2props: Dict) -> Dict:
+    def extract_labels(r: str, labels2props: Union[Dict, List]) -> Dict:
         """
         Extracts XML labels from response.
         :param r: The text response.
         :param labels2props: Dictionary mapping XML property name to export prop name.
         :return: Dictionary of prop names to values.
         """
+        if isinstance(labels2props, list):
+            labels2props = {label: label for label in labels2props}
         props = {}
         for tag, prop in labels2props.items():
             prop_value = LLMResponseUtil.parse(r, tag)

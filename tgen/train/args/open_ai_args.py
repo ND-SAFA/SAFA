@@ -59,8 +59,8 @@ class OpenAIArgs(AbstractLLMArgs):
         :return: Parameters with customizations added.
         """
         if instructions.get("include_classification_metrics", None):
-            assert "prompt_creator" in instructions, "Expected prompt_creator to be defined when including classification metrics."
-            prompt_creator = instructions["prompt_creator"]
+            assert "prompt_builder" in instructions, "Expected prompt_creator to be defined when including classification metrics."
+            prompt_creator = instructions["prompt_builder"]
             assert hasattr(prompt_creator, "pos_class"), "Expected prompt creator to define `pos_class`"
             pos_class = getattr(prompt_creator, "pos_class")
             params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)

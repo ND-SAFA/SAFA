@@ -10,7 +10,7 @@ from tgen.util.llm_response_util import LLMResponseUtil
 
 class PromptBuilder:
 
-    def __init__(self, prompt_args: PromptArgs, prompts: List[Prompt], base_completion: str = None):
+    def __init__(self, prompt_args: PromptArgs, prompts: List[Prompt]):
         """
         Constructs prompt creator with prompt arguments as configuration.
         :param prompt_args: The arguments customizing prompt generation.
@@ -18,17 +18,17 @@ class PromptBuilder:
         """
         self.args = prompt_args
         self.prompts = prompts
-        self.base_completion = base_completion
         self.requires_traces, self.requires_artifacts = self._check_requirements(self.prompts)
 
-    def build(self, **prompt_kwargs) -> EnumDict[str, str]:
+    def build(self, correct_completion: Any = EMPTY_STRING, **prompt_kwargs,) -> EnumDict[str, str]:
         """
         Generates the prompt and response
+        :param correct_completion: The correct completion that the model should produce
         :return: Dictionary containing the prompt and completion
         """
         base_prompt = NEW_LINE.join([prompt.build(**prompt_kwargs) for prompt in self.prompts])
         prompt = self.format_prompt_for_model(base_prompt)
-        completion = self.format_completion(self.base_completion)
+        completion = self.format_completion(correct_completion)
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
@@ -41,16 +41,16 @@ class PromptBuilder:
         :return: A dictionary mapping prompt id to its answers
         """
         tags = self._get_response_tag_to_prompt_indices()
-        labels = LLMResponseUtil.extract_labels(res, {t: t for t in tags})
-        responses = [None for i in range(len(self.prompts))]
-        for label, results in labels.items():
+        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys())) # TODO: Need to handle many responses possibility?
+        responses = [[None] * len(self.prompts)]
+        for label, response in tag2response.items():
             prompt_indices = tags[label]
             for i, p_i in enumerate(prompt_indices):
-                if i >= len(results):
+                if i >= len(response):
                     e = AssertionError(f"Received too few responses for {label}")
                     responses[p_i] = self.prompts[p_i].parse_response_on_failure("", e)
                 else:
-                    responses[p_i] = self.prompts[p_i].parse_response(results[i])
+                    responses[p_i] = self.prompts[p_i].parse_response(response[i])
         return {prompt.id: responses[i] for i, prompt in enumerate(self.prompts)}
 
     def _get_response_tag_to_prompt_indices(self) -> Dict[str, List[int]]:

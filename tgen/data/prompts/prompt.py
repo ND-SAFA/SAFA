@@ -6,6 +6,7 @@ from typing import Any
 from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.prompt_util import PromptUtil
 
 
 class Prompt(ABC):
@@ -79,23 +80,13 @@ class Prompt(ABC):
                 updated_args.append('{%s}' % field)
         self.value = self.value.format(*updated_args, **kwargs)
 
-    @staticmethod
-    def create_xml(tag_name: str, tag_content: str = EMPTY_STRING) -> str:
-        """
-        Creates xml as follows: <[tag_name]>tag_content</[tag_name]>
-        :param tag_name: The name of the tag
-        :param tag_content: The content inside of the tag
-        :return: The formatted xml
-        """
-        return f"<{tag_name}>{tag_content}</{tag_name}>"
-
     def _build_response_instructions(self) -> str:
         """
         Create the instructions for how the model should respond.
         :return: Formatted instructions for the response expected from the model
         """
         assert self.response_tag is not None, "Requires a response tag to be set in order to create instructions for model response"
-        return self.response_instructions.format(self.create_xml(tag_name=self.response_tag))
+        return self.response_instructions.format(PromptUtil.create_xml(tag_name=self.response_tag))
 
     def _build(self, **kwargs) -> str:
         """

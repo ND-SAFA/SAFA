@@ -44,7 +44,7 @@ class MultiArtifactPrompt(Prompt):
         if self.build_method in self.build_methods:
             return self.build_methods[self.build_method](artifacts, include_ids=self.include_ids)
         else:
-            raise NameError("Unknown Build Method")
+            raise NameError(f"Unknown Build Method: {self.build_method}")
 
     @staticmethod
     def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False) -> str:
@@ -58,7 +58,7 @@ class MultiArtifactPrompt(Prompt):
         """
         numbered_format = "{}. {}"
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i, artifact_prompt.build(artifact=artifact)) for i, artifact in artifacts]
+        formatted_artifacts = [numbered_format.format(i, artifact_prompt.build(artifact=artifact)) for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod

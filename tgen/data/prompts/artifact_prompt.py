@@ -6,6 +6,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.prompts.prompt import Prompt
 from tgen.util.enum_util import EnumDict
 from tgen.util.override import overrides
+from tgen.util.prompt_util import PromptUtil
 
 
 class ArtifactPrompt(Prompt):
@@ -45,7 +46,7 @@ class ArtifactPrompt(Prompt):
                                                          artifact_body=artifact[ArtifactKeys.CONTENT],
                                                          include_id=self.include_id)
         else:
-            raise NameError("Unknown Build Method")
+            raise NameError(f"Unknown Build Method: {self.build_method}")
 
     @staticmethod
     def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:
@@ -60,10 +61,10 @@ class ArtifactPrompt(Prompt):
         :param include_id: If True, includes the id of the artifact
         :return: The formatted prompt
         """
-        formatted_id = ArtifactPrompt.create_xml(tag_name="id", tag_content=artifact_id)
-        formatted_content = ArtifactPrompt.create_xml(tag_name="body", tag_content=artifact_body)
+        formatted_id = PromptUtil.create_xml(tag_name="id", tag_content=artifact_id)
+        formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body)
         content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
-        formatted_artifact = ArtifactPrompt.create_xml(tag_name="artifact",
+        formatted_artifact = PromptUtil.create_xml(tag_name="artifact",
                                                        tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
 

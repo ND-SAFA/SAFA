@@ -16,12 +16,11 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import org.json.JSONObject;
 
 public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
-    String editTypePath = AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE;
     ArtifactType artifactType = new ArtifactType(project, Constants.name);
 
     protected UUID createEntity() throws Exception {
         JSONObject createdType = SafaRequest
-            .withRoute(editTypePath)
+            .withRoute(AppRoutes.ArtifactType.CREATE_ARTIFACT_TYPE)
             .withProject(project)
             .postWithJsonObject(artifactType);
         UUID typeId = UUID.fromString(createdType.getString("typeId"));
@@ -41,9 +40,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     protected void updateEntity() throws Exception {
         artifactType.setIcon(Constants.newIconName);
         SafaRequest
-            .withRoute(editTypePath)
+            .withRoute(AppRoutes.ArtifactType.UPDATE_ARTIFACT_TYPE)
             .withProject(project)
-            .postWithJsonObject(artifactType);
+            .withArtifactType(artifactType.getName())
+            .putWithJsonObject(artifactType);
     }
 
     protected void verifyUpdatedEntity(TypeAppEntity retrievedEntity) {

@@ -31,7 +31,7 @@ public class AppRoutes {
     public static class ArtifactType {
         public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
         public static final String CREATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
-        public static final String UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES + "/{artifactTypeName}";
+        public static final String UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES + "/{artifactType}";
         public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
     }
 

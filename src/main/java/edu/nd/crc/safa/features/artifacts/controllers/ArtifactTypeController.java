@@ -73,32 +73,32 @@ public class ArtifactTypeController extends BaseController {
      * Updates given artifact type entity on specified project.
      *
      * @param projectId    The id of the project whose type is updated for.
-     * @param artifactTypeName The type we're updating
-     * @param artifactType The value for the update.
+     * @param artifactType The type we're updating
+     * @param artifactTypeObj The value for the update.
      * @return The updated artifact type.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
     @PutMapping(AppRoutes.ArtifactType.UPDATE_ARTIFACT_TYPE)
-    public TypeAppEntity updateArtifactType(@PathVariable UUID projectId, @PathVariable String artifactTypeName,
-                                            @RequestBody ArtifactType artifactType) throws SafaError {
+    public TypeAppEntity updateArtifactType(@PathVariable UUID projectId, @PathVariable String artifactType,
+                                            @RequestBody ArtifactType artifactTypeObj) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
 
         Optional<ArtifactType> originalType = this.serviceProvider.getArtifactTypeRepository()
-            .findByProjectAndNameIgnoreCase(project, artifactTypeName);
+            .findByProjectAndNameIgnoreCase(project, artifactType);
 
         if (originalType.isEmpty()) {
-            throw new SafaItemNotFoundError(artifactTypeName);
+            throw new SafaItemNotFoundError(artifactType);
         }
 
         // Don't allow editing the type or project
-        artifactType.setTypeId(originalType.get().getTypeId());
-        artifactType.setProject(originalType.get().getProject());
+        artifactTypeObj.setTypeId(originalType.get().getTypeId());
+        artifactTypeObj.setProject(originalType.get().getProject());
 
-        this.serviceProvider.getArtifactTypeRepository().save(artifactType);
+        this.serviceProvider.getArtifactTypeRepository().save(artifactTypeObj);
 
-        notifyTypeUpdate(project, artifactType);
+        notifyTypeUpdate(project, artifactTypeObj);
 
-        return new TypeAppEntity(artifactType);
+        return new TypeAppEntity(artifactTypeObj);
     }
 
     private void notifyTypeUpdate(Project project, ArtifactType artifactType) {

@@ -8,7 +8,7 @@ CLASSIFICATION_LABEL = "classification"
 CLASSIFICATION_JUSTIFICATION = "justification"
 CHANGE_ANALYSIS = "change_analysis"
 CHANGE_SCORE = "change_score"
-FEATURE = "feature_intersection"
+FEATURE = "feature"
 
 CURRENT_LABELS = [CONFIDENCE_LABEL, INTERSECTION_LABEL, INTERSECTION_SCORE, CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFICATION,
                   CHANGE_ANALYSIS,
@@ -42,21 +42,21 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        "# Questions\n"
 
                                        "\n- Do the artifacts work under the same feature or sub-system? "
-                                       f"Enclose your answer in <{FEATURE}></{FEATURE}>."
+                                       f"Enclose your answer inside of <{FEATURE}></{FEATURE}>."
 
                                        "\n- What is the intersection between the responsibilities of (1) and (2). "
-                                       f"Enclose your answer in <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
+                                       f"Enclose your answer inside of <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
 
                                        "\n- Provide a score between 0 and 1 evaluating the amount of intersection between (1) and (2). "
                                        "Higher scores correspond to more intersection. "
-                                       f"Enclose your answer in <{INTERSECTION_SCORE}></{INTERSECTION_SCORE}>"
+                                       f"Enclose your answer inside of <{INTERSECTION_SCORE}></{INTERSECTION_SCORE}>"
 
                                        "\n- Analyze the likely effect of changes made to one artifact on the other. "
-                                       f"Enclose your answer in <{CHANGE_ANALYSIS}></{CHANGE_ANALYSIS}>."
+                                       f"Enclose your answer inside of <{CHANGE_ANALYSIS}></{CHANGE_ANALYSIS}>."
 
                                        "\n- Provide a score between 0 and 1 evaluating how likely changes would propagate between (1) and (2). "
                                        "Higher scores correspond with likely propagation. "
-                                       f"Enclose your answer in <{CHANGE_SCORE}></{CHANGE_SCORE}>"
+                                       f"Enclose your answer inside of <{CHANGE_SCORE}></{CHANGE_SCORE}>"
 
                                        "\n- Analyze the relationship between (1) and (2) and select the first category that is true. "
                                        f"\nA) {A_CATEGORY}"
@@ -64,10 +64,10 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        f"\nC) {C_CATEGORY}"
                                        f"\nD) {D_CATEGORY}"
                                        f"\nE) {E_CATEGORY}"
-                                       f"\nEnclose your answer in<{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
+                                       f"\nEnclose your answer inside of <{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
 
                                        "\n- Provide a detailed reasoning of the classification using your answers as references. "
-                                       f"Enclose your answer in <{CLASSIFICATION_JUSTIFICATION}></{CLASSIFICATION_JUSTIFICATION}>."
+                                       f"Enclose your answer inside of <{CLASSIFICATION_JUSTIFICATION}></{CLASSIFICATION_JUSTIFICATION}>."
 
                                        "\n- Rate your confidence that the artifacts belong to the selected category. "
                                        "Provide a floating point number between 0 and 1. "
@@ -75,7 +75,7 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        "selected category based on the factors above. Mid or lower range scores indicate less "
                                        "certainty or a weaker relationship for that category. Consider adjacent categories when "
                                        "unsure if a link belongs in the selected class. "
-                                       f"Enclose your answer in <{CONFIDENCE_LABEL}></{CONFIDENCE_LABEL}>.\n"
+                                       f"Enclose your answer inside of <{CONFIDENCE_LABEL}></{CONFIDENCE_LABEL}>.\n"
                                        "# Artifacts\n")
 
 

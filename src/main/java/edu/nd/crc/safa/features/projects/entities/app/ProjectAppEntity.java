@@ -93,6 +93,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributes = new ArrayList<>();
         this.attributeLayouts = new ArrayList<>();
         this.subtrees = new HashMap<>();
+        this.traceMatrices = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -108,7 +109,8 @@ public class ProjectAppEntity implements IAppEntity {
                             List<ModelAppEntity> models,
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts,
-                            Map<UUID, SubtreeAppEntity> subtrees) {
+                            Map<UUID, SubtreeAppEntity> subtrees,
+                            List<TraceMatrixAppEntity> traceMatrices) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
         this.name = project.getName();
@@ -127,6 +129,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributes = attributes;
         this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;
+        this.traceMatrices = traceMatrices;
     }
 
     public ProjectAppEntity(ProjectCommit projectCommit) {

@@ -25,6 +25,7 @@ import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.projects.graph.TimCalculator;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
@@ -93,7 +94,8 @@ public class ProjectRetrievalService {
         String currentDocumentId = this.currentDocumentService.getCurrentDocumentId(user);
 
         // Artifact types
-        List<TypeAppEntity> artifactTypes = this.typeService.getAppEntities(projectVersion, user);
+        List<TypeAppEntity> artifactTypes = this.typeService
+            .getAppEntitiesWithCounts(projectVersion, user, entities.getArtifacts());
 
         // Version errors
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
@@ -116,7 +118,9 @@ public class ProjectRetrievalService {
         ProjectGraph graph = new ProjectGraph(entities);
         Map<UUID, SubtreeAppEntity> subtrees = graph.getSubtreeInfo();
 
-        ProjectAppEntity project = new ProjectAppEntity(
+        List<TraceMatrixAppEntity> traceMatrices = TimCalculator.getTimInfo(entities);
+
+        return new ProjectAppEntity(
             projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
@@ -130,11 +134,8 @@ public class ProjectRetrievalService {
             models,
             attributes,
             attributeLayouts,
-            subtrees);
-
-        TimCalculator.attachTimInfo(project);
-
-        return project;
+            subtrees,
+            traceMatrices);
     }
 
     /**

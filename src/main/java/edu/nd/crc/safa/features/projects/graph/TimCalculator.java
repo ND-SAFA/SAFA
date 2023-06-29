@@ -1,49 +1,32 @@
 package edu.nd.crc.safa.features.projects.graph;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.projects.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
 
 import org.javatuples.Pair;
 
 public class TimCalculator {
 
     /**
-     * Attach trace matrix info to a project. This will count all artifacts of a given type
-     * and update the type counts, as well as calculate the trace matrix values and attach
-     * them to the project.
+     * Get trace matrix info for a project
      *
-     * @param project The project to add TIM info to.
+     * @param entities The entities in the project
+     * @return Trace matrix info indicating what types trace to what other types
      */
-    public static void attachTimInfo(ProjectAppEntity project) {
+    public static List<TraceMatrixAppEntity> getTimInfo(ProjectEntities entities) {
         TimGenerationDataStructures data = new TimGenerationDataStructures();
-        handleTypes(data, project.getArtifactTypes());
-        handleArtifacts(data, project.getArtifacts());
-        handleTraces(data, project.getTraces());
-        project.setTraceMatrices(List.copyOf(data.timTraces.values()));
-    }
-
-    /**
-     * Puts type entities into a map to make them easier to work with.
-     *
-     * @param data The data objects we need for our calculations
-     * @param artifactTypes The types in the project
-     */
-    private static void handleTypes(TimGenerationDataStructures data, List<TypeAppEntity> artifactTypes) {
-        for (TypeAppEntity type : artifactTypes) {
-            data.typeEntities.put(type.getName(), type);
-        }
+        handleArtifacts(data, entities.getArtifacts());
+        handleTraces(data, entities.getTraces());
+        return List.copyOf(data.timTraces.values());
     }
 
     /**
@@ -60,11 +43,6 @@ public class TimCalculator {
             String sourceType = sourceArtifact.getType();
             String targetType = targetArtifact.getType();
 
-            if (!data.typeTraces.containsKey(sourceType)) {
-                data.typeTraces.put(sourceType, new HashSet<>());
-            }
-            data.typeTraces.get(sourceType).add(targetType);
-
             Pair<String, String> typePair = new Pair<>(sourceType, targetType);
             ensureDefaultTraceEntity(data, typePair);
             TraceMatrixAppEntity timTrace = data.timTraces.get(typePair);
@@ -73,7 +51,7 @@ public class TimCalculator {
     }
 
     /**
-     * For each artifact, update the count of this artifact's type
+     * For each artifact, add it to our UUID -> artifact map
      *
      * @param data The data objects we need for our calculations
      * @param artifacts The list of artifacts in the project
@@ -81,9 +59,6 @@ public class TimCalculator {
     private static void handleArtifacts(TimGenerationDataStructures data, List<ArtifactAppEntity> artifacts) {
         for (ArtifactAppEntity artifact : artifacts) {
             data.uuidToArtifact.put(artifact.getId(), artifact);
-            String type = artifact.getType();
-            TypeAppEntity typeEntity = data.typeEntities.get(type);
-            typeEntity.setCount(typeEntity.getCount() + 1);
         }
     }
 
@@ -120,8 +95,6 @@ public class TimCalculator {
 
     private static class TimGenerationDataStructures {
         public Map<UUID, ArtifactAppEntity> uuidToArtifact = new HashMap<>();
-        public Map<String, Set<String>> typeTraces = new HashMap<>();
-        public Map<String, TypeAppEntity> typeEntities = new HashMap<>();
         public Map<Pair<String, String>, TraceMatrixAppEntity> timTraces = new HashMap<>();
     }
 }

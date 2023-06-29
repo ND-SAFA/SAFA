@@ -15,20 +15,26 @@ public class TypeAppEntity implements IAppEntity {
     /**
      * ID of artifact type.
      */
-    UUID typeId;
+    private UUID typeId;
+
     /**
      * Name of artifact type .
      */
-    String name;
+    private String name;
+
     /**
      * Icon representing artifact type.
      */
-    String icon;
+    private String icon;
+
+    private String color;
+    private int count;
 
     public TypeAppEntity(ArtifactType artifactType) {
         this.typeId = artifactType.getTypeId();
         this.name = artifactType.getName();
         this.icon = artifactType.getIcon();
+        this.color = "color" + (int)(Math.random() * 10);  //TODO make colors not random
     }
 
     @Override

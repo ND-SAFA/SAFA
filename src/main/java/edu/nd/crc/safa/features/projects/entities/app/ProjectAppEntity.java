@@ -76,6 +76,8 @@ public class ProjectAppEntity implements IAppEntity {
 
     private Map<UUID, SubtreeAppEntity> subtrees;
 
+    private List<TraceMatrixAppEntity> traceMatrices;
+
     public ProjectAppEntity() {
         this.name = "";
         this.description = "";

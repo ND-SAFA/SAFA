@@ -8,7 +8,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.matrices.services.TraceMatrixService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
@@ -33,10 +32,6 @@ public class TraceLinkVersionRepositoryImpl
     TraceLinkRepository traceLinkRepository;
     @Autowired
     ArtifactRepository artifactRepository;
-    @Autowired
-    TraceMatrixRepository traceMatrixRepository;
-    @Autowired
-    TraceMatrixService traceMatrixService;
 
     @Override
     public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {
@@ -143,9 +138,6 @@ public class TraceLinkVersionRepositoryImpl
         Artifact sourceArtifact = assertAndFindArtifact(project, newTrace.getSourceName());
         Artifact targetArtifact = assertAndFindArtifact(project, newTrace.getTargetName());
         TraceLink traceLink = new TraceLink(sourceArtifact, targetArtifact);
-        traceMatrixService.assertOrCreateTraceMatrix(project,
-            sourceArtifact.getType(),
-            targetArtifact.getType());
         this.traceLinkRepository.save(traceLink);
 
         return traceLink;

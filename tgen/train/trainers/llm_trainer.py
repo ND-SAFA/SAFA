@@ -210,5 +210,5 @@ class LLMTrainer(AbstractTrainer):
         """
         classification = entry["classification"]
         if classification not in class2correct:
-            class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
-        class2correct[classification][label][correct_label] += 1
+            class2correct[classification] = {c: 0 for c in [0, 1]}
+        class2correct[classification][label] += 1

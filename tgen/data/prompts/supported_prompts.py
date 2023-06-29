@@ -7,14 +7,20 @@ UNRELATED_LABEL = "unrelated"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
 
-A_CATEGORY = "Does one artifact belong to belong to the functionality of the other?" \
-             "If so, select A."
-B_CATEGORY = "Will changes to one artifact largely impact the other? " \
-             "If confident of magnitude, select B. Otherwise, select C."
-C_CATEGORY = "Will changes to one artifact require some changes to the other? " \
-             "If so, select B."
-D_CATEGORY = "Are the artifacts related but changes may or may not propagate? Select D if linkage is unclear."
-E_CATEGORY = "Are the artifacts completely separate with no relationship? Select E only if fully independent."
+A_CATEGORY = "Do the two artifacts have a highly close or interdependent traceability relationship? " \
+             "For example, were they derived from related precursors or provide similar, linked functionality? " \
+             "If yes, select A. If no, proceed to next question. "
+B_CATEGORY = "Do the artifacts have a tightly coupled relationship " \
+             "where changes to one would require changes to the other? " \
+             "If yes, select B. Remember that if there is a direct traceability link between them, select A. " \
+             "If unsure or no, proceed to next question."
+C_CATEGORY = "Are the artifacts only loosely related at a high level, " \
+             "where changes are unclear or uncertain to propagate? " \
+             "If yes, select C. If no or unsure, proceed to next question"
+D_CATEGORY = "Do the artifacts share any minor properties, interfaces or other characteristics? " \
+             "If yes, select D. If no, proceed to next question. "
+E_CATEGORY = "Are there any discernable relationships or connections between the two artifacts? " \
+             "If yes, return to previous questions to re-assess categories. If no, select E."
 CLASSIFICATION_SCORES = {
     "A": 0.9,
     "B": 0.7,

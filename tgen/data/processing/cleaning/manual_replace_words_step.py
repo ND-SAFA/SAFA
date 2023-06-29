@@ -26,6 +26,6 @@ class ManualReplaceWordsStep(AbstractDataProcessingStep):
         """
         new_word_list = []
         for word in word_list:
-            replacement = self.word_replace_mappings[word] if word in self.word_replace_mappings else word
+            replacement = self.word_replace_mappings[word.lower()] if word.lower() in self.word_replace_mappings else word
             new_word_list.append(replacement)
         return new_word_list

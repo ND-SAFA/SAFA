@@ -1,11 +1,11 @@
 import string
 from enum import Enum
-
 from typing import Set
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, MAX_TOKENS_BUFFER, TOKENS_2_WORDS_CONVERSION, OPEN_AI_MODEL_DEFAULT
-from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 import tiktoken
+
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, TOKENS_2_WORDS_CONVERSION
+from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 
 
 class ModelTokenLimits(Enum):
@@ -55,7 +55,7 @@ class ModelTokenLimits(Enum):
         :return: The token limit
         """
         token_limit = ModelTokenLimits.DEFAULT
-        model_name = RemoveUnwantedCharsStep(string.punctuation).run([model_name]).pop().upper()
+        model_name = RemoveUnwantedCharsStep(list(string.punctuation)).run([model_name]).pop().upper()
         try:
             token_limit = ModelTokenLimits[model_name.upper()]
         except KeyError:

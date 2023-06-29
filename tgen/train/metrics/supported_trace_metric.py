@@ -13,6 +13,8 @@ from tgen.train.metrics.map_metric import MapMetric
 from tgen.train.metrics.pos_link_indices import PositiveLinkIndices
 from tgen.train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
 from tgen.train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
+from tgen.train.metrics.precision_metric import ClassificationMetrics
+from tgen.train.metrics.specificity_metric import SpecificityMetric
 from tgen.util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"
@@ -24,11 +26,13 @@ class SupportedTraceMetric(SupportedEnum):
     """
     LAG = LagMetric
     MAP = MapMetric
+    CLASSIFICATION = ClassificationMetrics
+    PRECISION_AT_K = PrecisionAtKMetric
     POS_INDICES = PositiveLinkIndices
-    PRECISION = PrecisionAtKMetric
     PRECISION_AT_RECALL = PrecisionAtRecallMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
+    SPECIFICITY = SpecificityMetric
     F = FMetric
 
     @staticmethod

@@ -95,6 +95,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
+            # prompt_params = {'model': 'claude-instant-v1-100k', 'temperature': 0.0, 'max_tokens_to_sample': 1,
+            #                  'prompt': "\n\nHuman: Below are software artifacts from the same project. Ignoring the abstraction levels of the artifacts, are (1) and (2) part of the same feature? Answer 'yes' or 'no'.\n\n1. UAV type specification assignment The VehicleCore shall associate a {{{{UAV_TYPE}}}} for each UAV defining its basic attributes\n\n2. UAV type specification assignment Each Virtual and Physical drone is associated with a predefined {{{{UAV_TYPE}}}} defining its basic attributes.\n\nAssistant:"}
             try:
                 prompt_response = AnthropicManager.Client.completion(**prompt_params)
             except Exception as e:

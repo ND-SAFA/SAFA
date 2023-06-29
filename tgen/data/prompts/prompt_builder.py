@@ -1,10 +1,11 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.util.enum_util import EnumDict
+from tgen.util.llm_response_util import LLMResponseUtil
 
 
 class PromptBuilder:
@@ -32,6 +33,39 @@ class PromptBuilder:
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
         })
+
+    def parse_responses(self, res: str) -> List[Any]:
+        """
+        Extracts the answers from the model response
+        :param res: The model response
+        :return: A list of answers corresponding to each prompt
+        """
+        tags = self._get_response_tag_to_prompt_indices()
+        labels = LLMResponseUtil.extract_labels(res, {t: t for t in tags})
+        responses = [None for i in range(len(self.prompts))]
+        for label, results in labels.items():
+            prompt_indices = tags[label]
+            for i, p_i in enumerate(prompt_indices):
+                if i >= len(results):
+                    e = AssertionError(f"Received too few responses for {label}")
+                    responses[p_i] = self.prompts[p_i].parse_response_on_failure("", e)
+                else:
+                    responses[p_i] = self.prompts[p_i].parse_response(results[i])
+        return responses
+
+    def _get_response_tag_to_prompt_indices(self) -> Dict[str, List[int]]:
+        """
+        Gets the response tag for each prompt and maps it to the corresponding indices of the prompt
+        :return: A mapping of tag to prompt indices
+        """
+        tags = {}
+        for i, prompt in enumerate(self.prompts):
+            tag = prompt.response_tag
+            if tag:
+                if tag not in tags:
+                    tags[tag] = []
+                tags[tag].append(i)
+        return tags
 
     def format_prompt_for_model(self, base_prompt: str) -> str:
         """

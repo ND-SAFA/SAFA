@@ -1,7 +1,10 @@
 import re
 from abc import ABC, abstractmethod
+from typing import Any
 
 from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.util.logging.logger_manager import logger
 
 
 class Prompt(ABC):
@@ -11,18 +14,22 @@ class Prompt(ABC):
     RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
     def __init__(self, value: str, response_tag: str = None, include_expected_response: bool = True,
-                 requires_traces: bool = False, requires_artifacts: bool = False):
+                 requires_traces: bool = False, requires_artifacts: bool = False, response_instructions: str = RESPONSE_FORMAT):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
         :param response_tag: The name of the tag the model is expected to enclose its response in
         :param include_expected_response: If True, includes the instructions for how the model should respond in the prompt
+        :param requires_traces: True if prompt requires trace link
+        :param requires_artifacts: True if prompt requires artifacts
+        :param response_instructions: The format instructions for the response desired from model
         """
         self.value = value
         self.response_tag = response_tag
         self.include_expected_response = include_expected_response
         self.requires_traces = requires_traces
         self.requires_artifacts = requires_artifacts
+        self.response_instructions = response_instructions
 
     def build(self, **kwargs) -> str:
         """
@@ -32,9 +39,26 @@ class Prompt(ABC):
         """
         prompt = self._build(**kwargs)
         if self.include_expected_response:
-            expected_response = self._build_expected_response()
+            expected_response = self._build_response_instructions()
             prompt = f"{prompt}{NEW_LINE}{expected_response}"
         return prompt
+
+    def parse_response(self, response: str) -> Any:
+        """
+        Used to fulfill api, may be overridden in child classes
+        :param response: The model response
+        :return: The response unchanged
+        """
+        return response
+
+    def parse_response_on_failure(self, response: str, e: Exception) -> Any:
+        """
+        Parses the response if it fails in some way, may be overridden in child classes
+        :param response: The model response
+        :return: Default value
+        """
+        logger.warning(f"Unexpected response for {self.value} because {e}.")
+        return None
 
     def format_value(self, *args: object, **kwargs: object) -> None:
         """
@@ -62,17 +86,17 @@ class Prompt(ABC):
         """
         return f"<{tag_name}>{tag_content}</{tag_name}>"
 
-    def _build_expected_response(self) -> str:
+    def _build_response_instructions(self) -> str:
         """
-        Create the way the model should respond.
+        Create the instructions for how the model should respond.
         :return: Formatted instructions for the response expected from the model
         """
         assert self.response_tag is not None, "Requires a response tag to be set in order to create instructions for model response"
-        return self.RESPONSE_FORMAT.format(self.create_xml(tag_name=self.response_tag))
+        return self.response_instructions.format(self.create_xml(tag_name=self.response_tag))
 
     def _build(self, **kwargs) -> str:
         """
-        Specific method of building for a prompt (returns original value by default)
+        Used to fulfill api, specific method of building for a prompt may be defined in child classes
         :param kwargs: Any additional arguments for the prompt
         :return: The formatted prompt
         """

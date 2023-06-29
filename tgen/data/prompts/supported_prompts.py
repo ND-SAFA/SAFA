@@ -18,11 +18,10 @@ DISPLAY_LABELS = ["label", "score", CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFI
 
 A_CATEGORY = "Do the artifacts work under the same feature or sub-system? " \
              "If yes, select A. If no, proceed to next question. "
-B_CATEGORY = "Do the artifact work under different features but have a tightly coupled relationship " \
-             "where changes to one would require changes to the other? " \
+B_CATEGORY = "Do the artifacts work under different features, but changes to one would require changes to the other? " \
              "If yes, select B. If unsure or no, proceed to next question."
-C_CATEGORY = "Are the artifacts related at a high level, but changes may or may not propagate? " \
-             "If yes, select C. If no or unsure, proceed to next question"
+C_CATEGORY = "Do the artifacts work under different features, but are coupled in some way? " \
+             "If yes, select B. If unsure or no, proceed to next question."
 D_CATEGORY = "Do the artifacts share any minor properties, interfaces or other characteristics? " \
              "If yes, select D. If no, proceed to next question. "
 E_CATEGORY = "Are there any discernible relationships or connections between the two artifacts? " \

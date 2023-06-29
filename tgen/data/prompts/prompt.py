@@ -1,4 +1,5 @@
 import re
+import uuid
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -13,18 +14,20 @@ class Prompt(ABC):
     """
     RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
-    def __init__(self, value: str, response_tag: str = None, include_expected_response: bool = True,
+    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None, include_expected_response: bool = True,
                  requires_traces: bool = False, requires_artifacts: bool = False, response_instructions: str = RESPONSE_FORMAT):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
         :param response_tag: The name of the tag the model is expected to enclose its response in
+        :param prompt_id: Specify specific id for the prompt
         :param include_expected_response: If True, includes the instructions for how the model should respond in the prompt
         :param requires_traces: True if prompt requires trace link
         :param requires_artifacts: True if prompt requires artifacts
         :param response_instructions: The format instructions for the response desired from model
         """
         self.value = value
+        self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
         self.response_tag = response_tag
         self.include_expected_response = include_expected_response
         self.requires_traces = requires_traces

@@ -34,11 +34,11 @@ class PromptBuilder:
             PromptKeys.COMPLETION: completion
         })
 
-    def parse_responses(self, res: str) -> List[Any]:
+    def parse_responses(self, res: str) -> Dict[str, Any]:
         """
         Extracts the answers from the model response
         :param res: The model response
-        :return: A list of answers corresponding to each prompt
+        :return: A dictionary mapping prompt id to its answers
         """
         tags = self._get_response_tag_to_prompt_indices()
         labels = LLMResponseUtil.extract_labels(res, {t: t for t in tags})
@@ -51,7 +51,7 @@ class PromptBuilder:
                     responses[p_i] = self.prompts[p_i].parse_response_on_failure("", e)
                 else:
                     responses[p_i] = self.prompts[p_i].parse_response(results[i])
-        return responses
+        return {prompt.id: responses[i] for i, prompt in enumerate(self.prompts)}
 
     def _get_response_tag_to_prompt_indices(self) -> Dict[str, List[int]]:
         """

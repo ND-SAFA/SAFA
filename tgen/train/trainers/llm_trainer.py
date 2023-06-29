@@ -7,7 +7,9 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, PURPOSE_ONE, PURPOSE_TWO, \
+    RELATED_LABEL, \
+    SCORE_LABEL, \
     UNRELATED_LABEL
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -150,7 +152,9 @@ class LLMTrainer(AbstractTrainer):
                 CLASSIFICATION_LABEL: "classification",
                 JUSTIFICATION: "justification",
                 RELATED_LABEL: "similarity",
-                UNRELATED_LABEL: "difference"
+                UNRELATED_LABEL: "difference",
+                PURPOSE_ONE: PURPOSE_ONE,
+                PURPOSE_TWO: PURPOSE_TWO
             })
             entry["classification"] = entry["classification"].upper().strip()
             entry["score"] = LLMResponseUtil.strip_non_digits_and_periods(entry["score"].lower())

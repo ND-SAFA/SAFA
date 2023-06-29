@@ -2,24 +2,25 @@ from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
 SCORE_LABEL = "related-score"
-RELATED_LABEL = "dependencies"
+RELATED_LABEL = "intersection"
 UNRELATED_LABEL = "unrelated"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
+PURPOSE_ONE = "purpose_one"
+PURPOSE_TWO = "purpose_two"
 
 A_CATEGORY = "Do the two artifacts have a highly close or interdependent traceability relationship? " \
              "For example, were they derived from related precursors or provide similar, linked functionality? " \
              "If yes, select A. If no, proceed to next question. "
 B_CATEGORY = "Do the artifacts have a tightly coupled relationship " \
              "where changes to one would require changes to the other? " \
-             "If yes, select B. Remember that if there is a direct traceability link between them, select A. " \
-             "If unsure or no, proceed to next question."
+             "If yes, select B. If unsure or no, proceed to next question."
 C_CATEGORY = "Are the artifacts only loosely related at a high level, " \
              "where changes are unclear or uncertain to propagate? " \
              "If yes, select C. If no or unsure, proceed to next question"
 D_CATEGORY = "Do the artifacts share any minor properties, interfaces or other characteristics? " \
              "If yes, select D. If no, proceed to next question. "
-E_CATEGORY = "Are there any discernable relationships or connections between the two artifacts? " \
+E_CATEGORY = "Are there any discernible relationships or connections between the two artifacts? " \
              "If yes, return to previous questions to re-assess categories. If no, select E."
 CLASSIFICATION_SCORES = {
     "A": 0.9,
@@ -32,10 +33,16 @@ CLASSIFICATION_SCORES = {
 DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
                                        "Your task is to trace software artifacts of this system. "
 
-                                       "\n- Describe all the ways that (1) and (2) are dependent on each other. "
+                                       "\n- Provide a detailed sentence describing the core responsibilities of (1). "
+                                       f"Enclose your answer in <{PURPOSE_ONE}></{PURPOSE_ONE}>"
+
+                                       "\n- Provide a detailed sentence describing the core responsibilities of (2). "
+                                       f"Enclose your answer in <{PURPOSE_TWO}></{PURPOSE_TWO}>"
+
+                                       "\n- Describe the intersection between the responsibilities of (1) and (2). "
                                        f"Enclose your answer in <{RELATED_LABEL}></{RELATED_LABEL}>."
 
-                                       "\n- Describe all the ways that (1) and (2) are independent on each other. "
+                                       "\n- Describe all the ways that (1) and (2) are independent of each other. "
                                        f"Enclose your answer in <{UNRELATED_LABEL}></{UNRELATED_LABEL}>."
 
                                        "\n- Classify (1) and (2) into one of the following:"

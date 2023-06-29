@@ -20,7 +20,7 @@ class MultiArtifactPrompt(Prompt):
         XML = auto()
         NUMBERED = auto()
 
-    def __init__(self, build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True):
+    def __init__(self, build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True, requires_trace_link: bool = False):
         """
         Constructor for making a prompt from many artifacts
         :param build_method: The method to build the prompt (determines prompt format)
@@ -30,7 +30,8 @@ class MultiArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
-        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False)
+        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False,
+                         requires_traces=requires_trace_link, requires_artifacts=not requires_trace_link)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:

@@ -5,8 +5,7 @@ from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
     SOURCE_COMPONENT_LABEL, \
     TARGET_COMPONENT_LABEL, \
@@ -32,13 +31,16 @@ class LLMTrainer(AbstractTrainer):
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 llm_manager: AbstractLLMManager, summarizer: Summarizer = None, **kwargs):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_builder: PromptBuilder,
+                 llm_manager: AbstractLLMManager, summarizer: Summarizer = None,
+                 completion_type: LLMCompletionType = LLMCompletionType.GENERATION,
+                 **kwargs):
         """
         Initializes the trainer with the necessary arguments for training and prediction
         :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_creator: Creates the prompts for trace link prediction.
+        :param prompt_builder: Creates the prompts for trace link prediction.
         :param summarizer: The summarizer to use for shortening artifacts over the token limit.
+        :param completion_type: The type of completion (either generation or completion)
         :param kwargs: Ignored.
         """
         if summarizer is None:
@@ -48,7 +50,8 @@ class LLMTrainer(AbstractTrainer):
         super().__init__(trainer_dataset_manager, trainer_args=llm_manager.llm_args)
         self.llm_manager = llm_manager
         self.summarizer = summarizer
-        self.prompt_creator = prompt_creator
+        self.prompt_builder = prompt_builder
+        self.completion_type = completion_type
 
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
@@ -57,18 +60,18 @@ class LLMTrainer(AbstractTrainer):
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(self.llm_manager,
-                                                             prompt_creator=self.prompt_creator,
+                                                             prompt_builder=self.prompt_builder,
                                                              summarizer=self.summarizer)
         custom_params = {}
         instructions = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         if include_classification_metrics:
             instructions["include_classification_metrics"] = True
-            instructions["prompt_creator"] = self.prompt_creator
+            instructions["prompt_creator"] = self.prompt_builder
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             custom_params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 self.llm_manager,
-                prompt_creator=self.prompt_creator,
+                prompt_builder=self.prompt_builder,
                 summarizer=self.summarizer)
 
         res = self.llm_manager.make_fine_tune_request(completion_type=completion_type, training_file=training_file_id,
@@ -85,12 +88,10 @@ class LLMTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.prompt_creator)
+        prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_builder=self.prompt_builder)
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
-        task = LLMCompletionType.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) \
-            else LLMCompletionType.GENERATION
-        res = self.llm_manager.make_completion_request(completion_type=task,
+        res = self.llm_manager.make_completion_request(completion_type=completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
 
         if isinstance(res, ClassificationResponse):

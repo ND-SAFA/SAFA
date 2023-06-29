@@ -10,7 +10,8 @@ class Prompt(ABC):
     """
     RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
-    def __init__(self, value: str, response_tag: str = None, include_expected_response: bool = True):
+    def __init__(self, value: str, response_tag: str = None, include_expected_response: bool = True,
+                 requires_traces: bool = False, requires_artifacts: bool = False):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
@@ -20,6 +21,8 @@ class Prompt(ABC):
         self.value = value
         self.response_tag = response_tag
         self.include_expected_response = include_expected_response
+        self.requires_traces = requires_traces
+        self.requires_artifacts = requires_artifacts
 
     def build(self, **kwargs) -> str:
         """

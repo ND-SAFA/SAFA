@@ -30,7 +30,7 @@ class ArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.BASE: self._build_as_base}
         self.include_id = include_id
-        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False)
+        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False, requires_artifacts=True)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:

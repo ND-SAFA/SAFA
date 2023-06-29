@@ -1,18 +1,15 @@
 import os
 import uuid
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pandas as pd
 from tqdm import tqdm
-
-from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.idataset import iDataset
@@ -59,13 +56,13 @@ class PromptDataset(iDataset):
         """
         raise NotImplementedError("A prompt dataset for hugging face is currently not supported")
 
-    def to_trainer_dataset(self, prompts_generator: AbstractPromptCreator) -> pd.DataFrame:
+    def to_trainer_dataset(self, prompt_builder: PromptBuilder) -> pd.DataFrame:
         """
-        Converts data to that used by Huggingface (HF) trainer.
-        :param prompts_generator: The model generator determining architecture and feature function for trace links.
-        :return: A data used by the HF trainer.
+        Converts data to that used by the trainer.
+        :param prompt_builder: The prompt generator
+        :return: A data used by the trainer.
         """
-        return self.get_prompts_dataframe(prompts_generator)
+        return self.get_prompts_dataframe(prompt_builder)
 
     def to_dataframe(self) -> pd.DataFrame:
         """
@@ -98,16 +95,17 @@ class PromptDataset(iDataset):
         prompt_df.to_json(export_path, orient='records', lines=True)
         return export_path, should_delete
 
-    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_creator: AbstractPromptCreator = None,
+    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_builder: PromptBuilder = None,
                             summarizer: Summarizer = None) -> str:
         """
         Gets the project file id used by open_ai
-        :param prompt_creator: The generator of prompts for the dataset
+        :param llm_manager: The manager of the model that will use the prompts dataset
+        :param prompt_builder: The generator of prompts for the dataset
         :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: The project file id used by open_ai
         """
         if not self.project_file_id:
-            prompt_df = self.get_prompts_dataframe(prompt_creator, summarizer)
+            prompt_df = self.get_prompts_dataframe(prompt_builder, summarizer)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
@@ -115,27 +113,27 @@ class PromptDataset(iDataset):
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompts_dataframe(self, prompt_creator: AbstractPromptCreator = None, summarizer: Summarizer = None) -> PromptDataFrame:
+    def get_prompts_dataframe(self, prompt_builder: PromptBuilder = None, summarizer: Summarizer = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
-        :param prompt_creator: The generator of prompts for the dataset
+        :param prompt_builder: The generator of prompts for the dataset
         :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: The prompt dataframe containing prompts and completions
         """
         if self.prompt_df is None:
-            assert prompt_creator is not None, "Must provide prompt generator to create prompt dataset for trainer"
+            assert prompt_builder is not None, "Must provide prompt generator to create prompt dataset for trainer"
             assert self._has_trace_data(), "Either artifacts dataframe or trace dataset" \
                                            " to generate dataframe."
-            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_creator, summarizer) \
-                if self.trace_dataset and isinstance(prompt_creator, ClassificationPromptCreator) else \
-                self._generate_prompts_dataframe_from_artifacts(prompt_creator, summarizer)
+            self.prompt_df = self._generate_prompts_dataframe_from_traces(prompt_builder, summarizer) \
+                if self.trace_dataset and prompt_builder.requires_traces else \
+                self._generate_prompts_dataframe_from_artifacts(prompt_builder, summarizer)
         return self.prompt_df
 
-    def _generate_prompts_dataframe_from_traces(self, prompt_creator: AbstractPromptCreator,
+    def _generate_prompts_dataframe_from_traces(self, prompt_builder: PromptBuilder,
                                                 summarizer: Summarizer = None) -> pd.DataFrame:
         """
         Converts trace links in to prompt format for generation model.
-        :param prompt_creator: The generator of prompts for the dataset
+        :param prompt_builder: The generator of prompts for the dataset
         :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: A prompts based dataset.
         """
@@ -146,58 +144,44 @@ class PromptDataset(iDataset):
             if i % self.__SAVE_AFTER_N == 0:
                 PromptDataFrame(entries).to_csv(save_path)
             source, target = self.trace_dataset.get_link_source_target_artifact(link_id=i)
-            entry = self._get_prompt_entry(source_artifact=source, target_artifact=target,
-                                           label=row[TraceKeys.LABEL], prompt_creator=prompt_creator,
-                                           summarizer=summarizer, artifact_id=target[ArtifactKeys.ID])
+            entry = self._get_prompt_entry(artifacts=[source, target],
+                                           label=row[TraceKeys.LABEL],
+                                           prompt_builder=prompt_builder,
+                                           summarizer=summarizer)
             entries.append(entry)
         FileUtil.delete_file_safely(save_path)
         return PromptDataFrame(entries)
 
-    def _generate_prompts_dataframe_from_artifacts(self, prompt_creator: AbstractPromptCreator,
+    def _generate_prompts_dataframe_from_artifacts(self, prompt_builder: PromptBuilder,
                                                    summarizer: Summarizer = None) -> pd.DataFrame:
         """
         Converts artifacts in to prompt format for generation model.
-        :param prompt_creator: The generator of prompts for the dataset
+        :param prompt_builder: The generator of prompts for the dataset
         :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: A prompts based dataset.
         """
         entries = []
         for id_, artifact in tqdm(self.artifact_df.itertuples(), total=len(self.artifact_df),
                                   desc="Generating prompts dataframe from artifacts"):
-            entry = self._get_prompt_entry(target_artifact=artifact, source_artifact=None, prompt_creator=prompt_creator,
-                                           summarizer=summarizer, artifact_id=id_)
+            entry = self._get_prompt_entry(artifact=artifact, prompt_builder=prompt_builder,
+                                           summarizer=summarizer)
             entries.append(entry)
         return PromptDataFrame(entries)
 
-    def _get_prompt_entry(self, target_artifact: EnumDict, prompt_creator: AbstractPromptCreator, source_artifact: EnumDict = None,
-                          summarizer: Summarizer = None, **prompt_creator_params) -> Optional[EnumDict]:
+    def _get_prompt_entry(self, prompt_builder: PromptBuilder, summarizer: Summarizer = None, **prompt_kwargs) -> Optional[EnumDict]:
         """
         Creates a prompt entry using the given creator and summarizing if the prompt exceeds the token limit and a summarizer is given
-        :param source_content: The content of the source artifact
-        :param target_content: The content of the target artifact
-        :param prompt_creator: The creator used to generate the prompt
+        :param prompt_builder: The creator used to generate the prompt
         :param summarizer: The summarizer responsible for shortening prompts if they exceed the token limit
-        :param prompt_creator_params: Additional params to give the prompt creator
+        :param prompt_kwargs: Additional params to give the prompt creator
         :return: The prompt entry
         """
-
-        source_content = PromptDataset.format_artifact(source_artifact)
-        target_content = PromptDataset.format_artifact(target_artifact)
-        entry = prompt_creator.create(target_content=target_content, source_content=source_content, **prompt_creator_params)
+        entry = prompt_builder.build(**prompt_kwargs)
         if not summarizer:
             return entry
 
-        # Ensure prompt fits in token limit
-        for i in range(self.__MAX_SUMMARIZATIONS):
-            if not summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-                break
-            force_create_new_summarization = i > 0
-            if source_artifact:
-                source_content = self._get_artifact_summarization(source_artifact, summarizer, force_create_new_summarization)
-            target_content = self._get_artifact_summarization(target_artifact, summarizer, force_create_new_summarization)
-            entry = prompt_creator.create(target_content, source_content, **prompt_creator_params)
         if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-            # Since summarization failed, just cut off anything that exceeds the limit
+            # just cut off anything that exceeds the limit
             chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit, token_limit=summarizer.token_limit)
             entry[PromptKeys.PROMPT] = chunker.chunk(entry[PromptKeys.PROMPT])[0]
         return entry
@@ -235,16 +219,3 @@ class PromptDataset(iDataset):
         if hasattr(self.trace_dataset, item):
             return getattr(self.trace_dataset, item)
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
-
-    @staticmethod
-    def format_artifact(artifact: Dict):
-        """
-        Formats the artifact as a string containing both title and content.
-        :param artifact: The artifact to format.
-        :return: The formatted string.
-        """
-        if artifact is None:
-            return EMPTY_STRING
-        content = artifact[ArtifactKeys.CONTENT]
-        title = artifact[ArtifactKeys.ID]
-        return f"{title}: {content}"

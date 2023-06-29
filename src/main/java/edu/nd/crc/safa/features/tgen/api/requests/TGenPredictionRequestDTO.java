@@ -12,10 +12,6 @@ import lombok.Data;
 @Data
 public class TGenPredictionRequestDTO {
     /**
-     * Path to model weights.
-     */
-    String model;
-    /**
      * Dataset containing artifacts to predict trace links against.
      */
     TGenDataset dataset;
@@ -25,8 +21,7 @@ public class TGenPredictionRequestDTO {
     @Nullable
     String prompt;
 
-    public TGenPredictionRequestDTO(String model, TGenDataset dataset, String prompt) {
-        this.model = model;
+    public TGenPredictionRequestDTO(TGenDataset dataset, String prompt) {
         this.dataset = dataset;
         this.prompt = prompt;
     }

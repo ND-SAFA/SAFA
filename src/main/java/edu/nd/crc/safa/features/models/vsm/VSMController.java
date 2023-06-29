@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.tgen.method.vsm;
+package edu.nd.crc.safa.features.models.vsm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,8 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.generator.TraceLinkConstructor;
@@ -21,13 +22,6 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 public class VSMController implements ITraceGenerationController {
     private Map<String, Double> idf;
 
-    @Override
-    public List<TraceAppEntity> generateLinksWithState(String statePath,
-                                                       TracingPayload tracingPayload) {
-        //Note, VSM has not state (yet).
-        return generateLinksWithBaselineState(tracingPayload);
-    }
-
     /**
      * Generates set of trace links between source and target pairs of artifacts using the
      * vector-space model
@@ -36,7 +30,7 @@ public class VSMController implements ITraceGenerationController {
      * @return List of trace links.
      */
     @Override
-    public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
+    public List<TraceAppEntity> generateLinks(TracingPayload tracingPayload, JobLogger jobLogger) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
         for (ArtifactLevel artifactLevel : tracingPayload.getArtifactLevels()) {
             Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(artifactLevel.getSources());
@@ -53,13 +47,12 @@ public class VSMController implements ITraceGenerationController {
     private <K, L> List<L> generateLinksFromTokens(Map<K, Collection<String>> sTokens,
                                                    Map<K, Collection<String>> tTokens,
                                                    TraceLinkConstructor<K, L> traceLinkConstructor) {
-        VSMController vsm = new VSMController();
-        vsm.buildIndex(tTokens.values());
+        this.buildIndex(tTokens.values());
 
         List<L> generatedLS = new ArrayList<>();
         for (Map.Entry<K, Collection<String>> source : sTokens.entrySet()) {
             for (Map.Entry<K, Collection<String>> target : tTokens.entrySet()) {
-                double score = vsm.getSimilarityScore(source.getValue(), target.getValue());
+                double score = this.getSimilarityScore(source.getValue(), target.getValue());
                 if (score > ProjectVariables.TRACE_THRESHOLD) {
                     L value = traceLinkConstructor.createTraceLink(source.getKey(), target.getKey(), score);
                     generatedLS.add(value);

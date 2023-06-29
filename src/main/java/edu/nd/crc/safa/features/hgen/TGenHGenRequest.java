@@ -29,9 +29,4 @@ public class TGenHGenRequest {
      */
     @Nullable
     List<List<String>> clusters;
-    /**
-     * The model to use for HGEN.
-     */
-    @Nullable
-    String model;
 }

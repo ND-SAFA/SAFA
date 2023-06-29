@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
+import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 @Scope("singleton")
 public class TraceGenerationService {
     private static final String DELIMITER = "*";
+    ITraceGenerationController traceGenerationController;
 
     /**
      * Retrieves artifacts associated with the source and target types defined in the tracing request.
@@ -45,8 +46,6 @@ public class TraceGenerationService {
             artifactLevels.add(artifactLevel);
         }
         return new TracingPayload(
-            tracingRequest.getMethod(),
-            tracingRequest.getModel(),
             artifactLevels
         );
     }
@@ -62,8 +61,7 @@ public class TraceGenerationService {
     }
 
     public List<TraceAppEntity> generateLinksWithMethod(TracingPayload tracingPayload) {
-        ITraceGenerationController generationMethod = tracingPayload.getMethod().createController();
-        return new ArrayList<>(generationMethod.generateLinksWithBaselineState(tracingPayload));
+        return new ArrayList<>(traceGenerationController.generateLinks(tracingPayload, null));
     }
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,

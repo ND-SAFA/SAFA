@@ -97,7 +97,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             if (trace.generateLinks()) {
                 String generationMethod = trace.getGenerationMethod();
                 BaseGenerationModels baseGenerationModels = BaseGenerationModels.getModel(generationMethod);
-                traceGenerationRequest.addTracingRequest(baseGenerationModels, null, source, target);
+                traceGenerationRequest.addTracingRequest(baseGenerationModels, source, target);
             }
 
             if (trace.hasFilename()) {

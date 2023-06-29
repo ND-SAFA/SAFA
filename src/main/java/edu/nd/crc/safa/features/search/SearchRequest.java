@@ -6,8 +6,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-
 import lombok.Data;
 
 @Data
@@ -51,24 +49,8 @@ public class SearchRequest {
     @Nullable
     List<String> relatedTypes = new ArrayList<>();
     /**
-     * The model to predict links with. Defaults to current best model.
-     */
-    @Nullable
-    String model;
-    /**
      * The prompt used to decide whether two artifacts should be traced.
      */
     @Nullable
     String tracingPrompt;
-
-    /**
-     * @return Returns the base model associated with request.
-     */
-    public BaseGenerationModels getModel() {
-        if (this.model == null) {
-            return BaseGenerationModels.getDefault();
-        }
-        UUID modelId = UUID.fromString(this.model);
-        return BaseGenerationModels.getModelById(modelId);
-    }
 }

@@ -12,12 +12,12 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.CommitService;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.summary.TGenSummaryArtifactType;
 import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -36,6 +36,7 @@ public class HGenService {
     ArtifactService artifactService;
     CommitService commitService;
     SafaUserService safaUserService;
+    SafaRequestBuilder safaRequestBuilder;
 
     /**
      * Generates artifacts for each cluster defined.
@@ -45,13 +46,12 @@ public class HGenService {
      * @return List of generated artifacts.
      */
     public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
-        BaseGenerationModels baseModel = request.getModel();
         String targetType = request.getTargetType();
-        TGen controller = baseModel.createTGenController();
+        TGen controller = new TGen(safaRequestBuilder);
+        
         List<ArtifactAppEntity> sourceArtifacts = artifactService.getAppEntities(projectVersion);
         List<TGenSummaryArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
-        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetType, request.getClusters(),
-            baseModel.name());
+        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetType, request.getClusters());
         TGenHGenResponse response = controller.generateHierarchy(tgenRequest);
         ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, response.getDataset(), targetType);
         projectCommit.setCommitVersion(projectVersion);

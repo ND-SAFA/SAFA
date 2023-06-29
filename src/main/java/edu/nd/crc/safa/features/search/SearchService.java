@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
@@ -18,7 +19,6 @@ import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.api.responses.TGenTraceGenerationResponse;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +33,7 @@ public class SearchService {
     private static final String PROMPT_KEY = "PROMPT";
     private static final double THRESHOLD = 0.5;
     ProjectRetrievalService projectRetrievalService;
+    SafaRequestBuilder safaRequestBuilder;
 
     /**
      * Searches for artifacts in search types that match the given prompt.
@@ -41,16 +42,14 @@ public class SearchService {
      * @param prompt           The prompt to match artifacts against.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
-     * @param model            The base model to use for searching.
      * @return Ids of matched artifacts.
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
-                                              List<String> searchTypes, String tracingPrompt,
-                                              BaseGenerationModels model) {
+                                              List<String> searchTypes, String tracingPrompt) {
         Map<String, String> sourceLayer = new HashMap<>();
         sourceLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
+        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt);
     }
 
     /**
@@ -60,21 +59,19 @@ public class SearchService {
      * @param artifactIds      The ids of the artifacts to use as queries.
      * @param searchTypes      The types of artifacts to match against.
      * @param tracingPrompt    The prompt used to determine if two artifacts are linked.
-     * @param model            The base model to use for searching.
      * @return List of matched artifacts.
      */
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
                                                 List<UUID> artifactIds,
                                                 List<String> searchTypes,
-                                                String tracingPrompt,
-                                                BaseGenerationModels model) {
+                                                String tracingPrompt) {
         Map<UUID, ArtifactAppEntity> artifactIdMap = ProjectDataStructures.createArtifactMap(
             projectAppEntity.getArtifacts());
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(
             convertArtifactMapToLayer(sourceLayer),
-            convertArtifactMapToLayer(targetLayer), tracingPrompt, model);
+            convertArtifactMapToLayer(targetLayer), tracingPrompt);
     }
 
     /**
@@ -83,18 +80,16 @@ public class SearchService {
      * @param sourceLayer   Source artifacts mapping id to body.
      * @param targetLayer   Target artifacts mapping id to body.
      * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
-     * @param model         The model to use for searching.
      * @return Target Artifact IDs that matched source artifacts.
      */
     public SearchResponse searchSourceLayer(Map<String, String> sourceLayer,
                                             Map<String, String> targetLayer,
-                                            String tracingPrompt,
-                                            BaseGenerationModels model) {
+                                            String tracingPrompt) {
 
         TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
-        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(model.getStatePath(), dataset, tracingPrompt);
-        TGen controller = model.createTGenController();
-        TGenTraceGenerationResponse response = controller.generateLinks(payload);
+        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset, tracingPrompt);
+        TGen tgen = new TGen(this.safaRequestBuilder);
+        TGenTraceGenerationResponse response = tgen.sendTraceLinkRequest(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
             .map(TGenTraceGenerationResponse.PredictedLink::getTarget)

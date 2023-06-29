@@ -110,7 +110,6 @@ public enum BaseGenerationModels {
         return new ModelAppEntity(BaseGenerationModels.GPT);
     }
 
-
     @Override
     public String toString() {
         return this.name();

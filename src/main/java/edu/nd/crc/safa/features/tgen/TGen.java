@@ -117,6 +117,7 @@ public class TGen implements ITraceGenerationController {
      * Generates links through TGEN.
      *
      * @param payload The payload to send TGEN.
+     * @param logger  The logger used to store trace link logs.
      * @return TGEN's response.
      */
     public TGenTraceGenerationResponse sendTraceLinkRequest(TGenPredictionRequestDTO payload, JobLogger logger) {
@@ -132,7 +133,6 @@ public class TGen implements ITraceGenerationController {
             return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
         }
     }
-
 
     /**
      * Submits job to TGen and polls status until job is completed or has failed.

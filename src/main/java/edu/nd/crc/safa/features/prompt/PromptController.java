@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.tgen.TGen;
 
@@ -25,12 +26,14 @@ public class PromptController extends BaseController {
     /**
      * Completes the prompt for given model
      *
-     * @param request The request payload defining prompt and model.
+     * @param request            The request payload defining prompt and model.
+     * @param safaRequestBuilder The request builder used for sending prompt requtest to TGEN.
      * @return The completion.
      */
     @PostMapping(AppRoutes.Prompts.COMPLETE)
     public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request,
-                                             @Autowired TGen controller) {
+                                             @Autowired SafaRequestBuilder safaRequestBuilder) {
+        TGen controller = new TGen(safaRequestBuilder);
         return controller.generatePrompt(request);
     }
 }

@@ -7,10 +7,13 @@ INTERSECTION_SCORE = "intersection_score"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
 CHANGE_ANALYSIS = "change_analysis"
+CHANGE_SCORE = "change_score"
+FEATURE = "feature_intersection"
 
-A_CATEGORY = "Do the two artifacts have interdependent relationship that is essential to the " \
-             "primary functionality of at least one artifact? " \
-             "For example, were they derived from related precursors or provide similar, linked functionality? " \
+CURRENT_LABELS = [CONFIDENCE_LABEL, INTERSECTION_LABEL, INTERSECTION_SCORE, CLASSIFICATION_LABEL, JUSTIFICATION, CHANGE_ANALYSIS,
+                  CHANGE_SCORE, FEATURE]
+
+A_CATEGORY = "Do the artifacts work under the same feature or sub-system? " \
              "If yes, select A. If no, proceed to next question. "
 B_CATEGORY = "Do the artifacts have a tightly coupled relationship " \
              "where changes to one would require changes to the other? " \
@@ -35,17 +38,24 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        "to determine which are related."
                                        "# Questions\n"
 
-                                       "\n- Describe the intersection between the responsibilities of (1) and (2). "
+                                       "\n- Do the artifacts work under the same feature or sub-system? "
+                                       f"Enclose your answer in <{FEATURE}></{FEATURE}>."
+
+                                       "\n- What is the intersection between the responsibilities of (1) and (2). "
                                        f"Enclose your answer in <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
 
-                                       "\n- Provide a score between 0 and 1 justifying the intersection of your answer. "
+                                       "\n- Provide a score between 0 and 1 evaluating the amount of intersection between (1) and (2). "
                                        "Higher scores correspond to more intersection. "
                                        f"Enclose your answer in <{INTERSECTION_SCORE}></{INTERSECTION_SCORE}>"
 
                                        "\n- Analyze the likely effect of changes made to one artifact on the other. "
                                        f"Enclose your answer in <{CHANGE_ANALYSIS}></{CHANGE_ANALYSIS}>."
 
-                                       "\n- Classify the relationship between (1) and (2) into one of the following:"
+                                       "\n- Provide a score between 0 and 1 evaluating how likely changes would propagate between (1) and (2). "
+                                       "Higher scores correspond with likely propagation. "
+                                       f"Enclose your answer in <{CHANGE_SCORE}></{CHANGE_SCORE}>"
+
+                                       "\n- Analyze the relationship between (1) and (2) and select the first category that is true. "
                                        f"\nA) {A_CATEGORY}"
                                        f"\nB) {B_CATEGORY}"
                                        f"\nC) {C_CATEGORY}"

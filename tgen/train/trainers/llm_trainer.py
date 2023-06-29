@@ -1,4 +1,5 @@
 import json
+import random
 from typing import List, Union
 
 from openai.api_resources.fine_tune import FineTune
@@ -7,9 +8,9 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.supported_prompts import CHANGE_ANALYSIS, CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CONFIDENCE_LABEL, \
-    INTERSECTION_LABEL, \
-    INTERSECTION_SCORE, JUSTIFICATION, REVERSE_CATEGORIES
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, \
+    CONFIDENCE_LABEL, \
+    CURRENT_LABELS, REVERSE_CATEGORIES
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -146,14 +147,7 @@ class LLMTrainer(AbstractTrainer):
         class2correct = {}
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
-            entry = LLMResponseUtil.extract_labels(r, {
-                CONFIDENCE_LABEL: CONFIDENCE_LABEL,
-                CLASSIFICATION_LABEL: CLASSIFICATION_LABEL,
-                JUSTIFICATION: JUSTIFICATION,
-                INTERSECTION_LABEL: INTERSECTION_LABEL,
-                INTERSECTION_SCORE: INTERSECTION_SCORE,
-                CHANGE_ANALYSIS: CHANGE_ANALYSIS
-            })
+            entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
             entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
             entry[CONFIDENCE_LABEL] = LLMResponseUtil.strip_non_digits_and_periods(entry[CONFIDENCE_LABEL].lower())
             entry[CONFIDENCE_LABEL] = float(entry[CONFIDENCE_LABEL])
@@ -175,6 +169,7 @@ class LLMTrainer(AbstractTrainer):
             classifications.append(entry["classification"])
             prediction_entries.append(entry)
 
+        random.shuffle(prediction_entries)
         prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
         output = TracePredictionOutput(prediction_entries=prediction_entries)
         if trace_dataset is not None and len(trace_dataset.trace_df) > 0:

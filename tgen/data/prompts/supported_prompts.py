@@ -1,15 +1,13 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
-SOURCE_COMPONENT_LABEL = "subsystem_one"
-TARGET_COMPONENT_LABEL = "subsystem_two"
 SCORE_LABEL = "related-score"
-RELATED_LABEL = "related"
+RELATED_LABEL = "dependencies"
 UNRELATED_LABEL = "unrelated"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
 
-A_CATEGORY = "Is there a direct traceability link between the artifacts? " \
+A_CATEGORY = "Does one artifact belong to belong to the functionality of the other?" \
              "If so, select A."
 B_CATEGORY = "Will changes to one artifact largely impact the other? " \
              "If confident of magnitude, select B. Otherwise, select C."
@@ -27,12 +25,6 @@ CLASSIFICATION_SCORES = {
 }
 DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
                                        "Your task is to trace software artifacts of this system. "
-
-                                       "\n- In 10 words, describe the function of the sub-system containing (1)? "
-                                       f"Enclose your answer in <{SOURCE_COMPONENT_LABEL}></{SOURCE_COMPONENT_LABEL}>."
-
-                                       "\n- In 10 words, describe the function of the sub-system containing (2)? "
-                                       f"Enclose your answer in <{TARGET_COMPONENT_LABEL}></{TARGET_COMPONENT_LABEL}>."
 
                                        "\n- Describe all the ways that (1) and (2) are dependent on each other. "
                                        f"Enclose your answer in <{RELATED_LABEL}></{RELATED_LABEL}>."

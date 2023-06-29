@@ -7,10 +7,9 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, PURPOSE_ONE, PURPOSE_TWO, \
-    RELATED_LABEL, \
-    SCORE_LABEL, \
-    UNRELATED_LABEL
+from tgen.data.prompts.supported_prompts import CHANGE_ANALYSIS, CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CONFIDENCE_LABEL, \
+    INTERSECTION_LABEL, \
+    INTERSECTION_SCORE, JUSTIFICATION, REVERSE_CATEGORIES
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -148,16 +147,16 @@ class LLMTrainer(AbstractTrainer):
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
             entry = LLMResponseUtil.extract_labels(r, {
-                SCORE_LABEL: "score",
-                CLASSIFICATION_LABEL: "classification",
-                JUSTIFICATION: "justification",
-                RELATED_LABEL: "similarity",
-                UNRELATED_LABEL: "difference",
-                PURPOSE_ONE: PURPOSE_ONE,
-                PURPOSE_TWO: PURPOSE_TWO
+                CONFIDENCE_LABEL: CONFIDENCE_LABEL,
+                CLASSIFICATION_LABEL: CLASSIFICATION_LABEL,
+                JUSTIFICATION: JUSTIFICATION,
+                INTERSECTION_LABEL: INTERSECTION_LABEL,
+                INTERSECTION_SCORE: INTERSECTION_SCORE,
+                CHANGE_ANALYSIS: CHANGE_ANALYSIS
             })
-            entry["classification"] = entry["classification"].upper().strip()
-            entry["score"] = LLMResponseUtil.strip_non_digits_and_periods(entry["score"].lower())
+            entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
+            entry[CONFIDENCE_LABEL] = LLMResponseUtil.strip_non_digits_and_periods(entry[CONFIDENCE_LABEL].lower())
+            entry[CONFIDENCE_LABEL] = float(entry[CONFIDENCE_LABEL])
 
             score = self.extract_score(entry)
             trace_row = trace_df.iloc[i]
@@ -165,6 +164,7 @@ class LLMTrainer(AbstractTrainer):
             predicted_label = 1 if score >= 0.5 else 0
             correct_label = "correct" if label == predicted_label else "wrong"
 
+            entry["score"] = score
             entry["source"] = trace_row["source"]
             entry["target"] = trace_row["target"]
             entry["label"] = trace_row["label"]
@@ -195,11 +195,19 @@ class LLMTrainer(AbstractTrainer):
         :param entry: Entry containing score or classification, to extract score from.
         :return: The final score as a float.
         """
+        classification = entry["classification"]
+        lower_bound, upper_bound = CLASSIFICATION_SCORES[classification]
+        score_range = upper_bound - lower_bound
         try:
-            score = float(entry["score"])
+            score = float(entry["confidence"])
+            if classification in REVERSE_CATEGORIES:
+                score = upper_bound - (score * score_range)
+            else:
+                score = (score * score_range) + lower_bound
         except:
+            score = lower_bound
             logger.info("Processing link with missing score.")
-            score = CLASSIFICATION_SCORES[entry["classification"]]
+
         return score
 
     @staticmethod

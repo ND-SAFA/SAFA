@@ -1,15 +1,15 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
-SCORE_LABEL = "related-score"
-RELATED_LABEL = "intersection"
-UNRELATED_LABEL = "unrelated"
+CONFIDENCE_LABEL = "confidence"
+INTERSECTION_LABEL = "intersection"
+INTERSECTION_SCORE = "intersection_score"
 CLASSIFICATION_LABEL = "classification"
 JUSTIFICATION = "justification"
-PURPOSE_ONE = "purpose_one"
-PURPOSE_TWO = "purpose_two"
+CHANGE_ANALYSIS = "change_analysis"
 
-A_CATEGORY = "Do the two artifacts have a highly close or interdependent traceability relationship? " \
+A_CATEGORY = "Do the two artifacts have interdependent relationship that is essential to the " \
+             "primary functionality of at least one artifact? " \
              "For example, were they derived from related precursors or provide similar, linked functionality? " \
              "If yes, select A. If no, proceed to next question. "
 B_CATEGORY = "Do the artifacts have a tightly coupled relationship " \
@@ -22,50 +22,48 @@ D_CATEGORY = "Do the artifacts share any minor properties, interfaces or other c
              "If yes, select D. If no, proceed to next question. "
 E_CATEGORY = "Are there any discernible relationships or connections between the two artifacts? " \
              "If yes, return to previous questions to re-assess categories. If no, select E."
+REVERSE_CATEGORIES = ["E"]
 CLASSIFICATION_SCORES = {
-    "A": 0.9,
-    "B": 0.7,
-    "C": 0.5,
-    "D": 0.3,
-    "E": 0.1,
-    "F": 0
+    "A": [0.9, 1],
+    "B": [0.7, 0.9],
+    "C": [0.5, 0.7],
+    "D": [0.3, 0.5],
+    "E": [0.0, 0.3],
 }
-DEFAULT_CLASSIFICATION_PROMPT = Prompt("You are a software engineer working on a software project. "
-                                       "Your task is to trace software artifacts of this system. "
-
-                                       "\n- Provide a detailed sentence describing the core responsibilities of (1). "
-                                       f"Enclose your answer in <{PURPOSE_ONE}></{PURPOSE_ONE}>"
-
-                                       "\n- Provide a detailed sentence describing the core responsibilities of (2). "
-                                       f"Enclose your answer in <{PURPOSE_TWO}></{PURPOSE_TWO}>"
+DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engineer working on a software project. "
+                                       "Your task is to analyze the relationships between project artifacts "
+                                       "to determine which are related."
+                                       "# Questions\n"
 
                                        "\n- Describe the intersection between the responsibilities of (1) and (2). "
-                                       f"Enclose your answer in <{RELATED_LABEL}></{RELATED_LABEL}>."
+                                       f"Enclose your answer in <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
 
-                                       "\n- Describe all the ways that (1) and (2) are independent of each other. "
-                                       f"Enclose your answer in <{UNRELATED_LABEL}></{UNRELATED_LABEL}>."
+                                       "\n- Provide a score between 0 and 1 justifying the intersection of your answer. "
+                                       "Higher scores correspond to more intersection. "
+                                       f"Enclose your answer in <{INTERSECTION_SCORE}></{INTERSECTION_SCORE}>"
 
-                                       "\n- Classify (1) and (2) into one of the following:"
+                                       "\n- Analyze the likely effect of changes made to one artifact on the other. "
+                                       f"Enclose your answer in <{CHANGE_ANALYSIS}></{CHANGE_ANALYSIS}>."
+
+                                       "\n- Classify the relationship between (1) and (2) into one of the following:"
                                        f"\nA) {A_CATEGORY}"
                                        f"\nB) {B_CATEGORY}"
                                        f"\nC) {C_CATEGORY}"
                                        f"\nD) {D_CATEGORY}"
                                        f"\nE) {E_CATEGORY}"
-                                       "\nF) The two artifacts have opposite or incompatible purposes, functionality or effects."
                                        f"\nEnclose your answer in<{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
 
                                        "\n- Provide a detailed reasoning of the classification using your answers as references. "
                                        f"Enclose your answer in <{JUSTIFICATION}></{JUSTIFICATION}>."
 
-                                       "\n- Rate the strength of the artifacts with a floating point number between 0 and 1. "
-                                       "Category A should receive scores between (0.8, 1.0), "
-                                       "Category B should receive scores between (0.6, 0.8), "
-                                       "Category C should receive scores between (0.4, 0.6), "
-                                       "Category D should receive scores between (0.2, 0.4), "
-                                       "Category E should receive scores between (0.0, 0.2), "
-                                       "Category F should receive a score of 0."
-                                       "For each category, place rating close to their upper or lower bounds. "
-                                       f"Enclose your answer in <{SCORE_LABEL}></{SCORE_LABEL}>.\n")
+                                       "\n- Rate your confidence that the artifacts belong to the selected category. "
+                                       "Provide a floating point number between 0 and 1. "
+                                       "Higher scores should be given only when confident the relationship clearly belongs in the "
+                                       "selected category based on the factors above. Mid or lower range scores indicate less "
+                                       "certainty or a weaker relationship for that category. Consider adjacent categories when "
+                                       "unsure if a link belongs in the selected class. "
+                                       f"Enclose your answer in <{CONFIDENCE_LABEL}></{CONFIDENCE_LABEL}>.\n"
+                                       "# Artifacts\n")
 
 
 class SupportedPrompts(SupportedEnum):

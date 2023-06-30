@@ -36,9 +36,10 @@ CLASSIFICATION_SCORES = {
 }
 DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engineer working on a software project. "
                                        "Your task is to analyze the relationships between project artifacts "
-                                       "to determine which are related."
-                                       "# Questions\n"
+                                       "to determine which are related. Answer the questions about the pair "
+                                       "of artifacts (1) and (2).\n"
 
+                                       "# Questions\n"
                                        "\n- Describe whether the artifacts work under the same feature or sub-system? "
                                        f"Enclose your answer inside of <{FEATURE}></{FEATURE}>."
 

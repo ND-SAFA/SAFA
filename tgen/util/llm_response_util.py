@@ -21,7 +21,12 @@ class LLMResponseUtil:
 
         try:
             assert len(tags) > 0, f"Missing expected tag {tag_name}"
-            content = tags[0].contents[0] if not many else tags
+            if many:
+                return tags
+            selected_tag = tags[0]
+            if len(selected_tag.contents) == 0:
+                return ""
+            return selected_tag.contents[0]
         except (AssertionError, IndexError):
             logger.exception(f"Unable to parse tag {tag_name} in:\n{res}")
             content = res if not many else []

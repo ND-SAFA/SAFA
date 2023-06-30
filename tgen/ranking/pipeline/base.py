@@ -13,11 +13,11 @@ DEFAULT_REASONING_GOAL = " # Task\n\n" \
                          "\n\nSource:"
 DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. " \
                                  "Enclose your answer in <relation>ID - Reason</relation>"
-DEFAULT_RANKING_GOAL = "# Task\n\nRank all related artifacts from most to least related to the source.\n\nSource: "
+DEFAULT_RANKING_GOAL = "# Task\n\nFind and rank all related artifacts from most to least related to the source.\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
-                               "A. Find the artifacts most relevant to the functionality of source. " \
-                               "Provide a comma delimited list of artifact ids enclosed in <related></related>." \
-                               "B. Then, rank their artifact bodies from most to least relevant. " \
+                               "A. Remove any non-essential artifacts unrelated to the functionality of the source." \
+                               "Provide a comma delimited list of relevant artifact ids enclosed in <relevant></relevant>." \
+                               "B. Then, rank the relevant artifacts from most to least relevant to the source. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element relates to the source the most and the last element does so the least. " \
                                "Enclose the list in <links></links>."

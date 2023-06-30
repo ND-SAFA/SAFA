@@ -7,6 +7,7 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.state.llm_trainer_state import LLMTrainerState
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -52,12 +53,12 @@ class LLMJob(AbstractTrainerJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = LLMTrainer(trainer_args=self.trainer_args,
+            self._trainer = LLMTrainer(LLMTrainerState(trainer_args=self.trainer_args,
                                        trainer_dataset_manager=self.trainer_dataset_manager,
                                        prompt_builder=self.prompt_builder,
                                        llm_manager=self.llm_manager,
                                        completion_type=self.completion_type,
-                                       **kwargs)
+                                       **kwargs))
         return self._trainer
 
     @overrides(AbstractTrainerJob)

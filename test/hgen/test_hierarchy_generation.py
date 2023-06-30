@@ -22,6 +22,7 @@ from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
+from tgen.state.llm_trainer_state import LLMTrainerState
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import fake_anthropic_completion
@@ -219,8 +220,8 @@ class TestHierarchyGeneration(BaseTest):
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
         prompt2 = MultiArtifactPrompt(include_ids=False, requires_trace_link=True)
         prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts=[prompt, prompt2])
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager,
-                          prompt_builder=prompt_builder, completion_type=LLMCompletionType.CLASSIFICATION)
+        return LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager,
+                                          prompt_builder=prompt_builder, completion_type=LLMCompletionType.CLASSIFICATION))
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):

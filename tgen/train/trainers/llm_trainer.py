@@ -1,23 +1,21 @@
 import json
-from typing import List, Union
+from typing import List, Union, Any
 
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
     SOURCE_COMPONENT_LABEL, \
     TARGET_COMPONENT_LABEL, \
     UNRELATED_LABEL
-from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.state.llm_trainer_state import LLMTrainerState
+from tgen.state.state_manager import StateManager
 from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
@@ -31,27 +29,14 @@ class LLMTrainer(AbstractTrainer):
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_builder: PromptBuilder,
-                 llm_manager: AbstractLLMManager, summarizer: Summarizer = None,
-                 completion_type: LLMCompletionType = LLMCompletionType.GENERATION,
-                 **kwargs):
+    def __init__(self, initial_state: LLMTrainerState):
         """
         Initializes the trainer with the necessary arguments for training and prediction
-        :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_builder: Creates the prompts for trace link prediction.
-        :param summarizer: The summarizer to use for shortening artifacts over the token limit.
-        :param completion_type: The type of completion (either generation or completion)
-        :param kwargs: Ignored.
+        :param initial_state: The current state of the trainer to use
         """
-        if summarizer is None:
-            summarizer = Summarizer(llm_manager, model_for_token_limit=llm_manager.llm_args.model,
-                                    code_or_exceeds_limit_only=False,
-                                    max_tokens_for_token_limit=llm_manager.llm_args.get_max_tokens())
-        super().__init__(trainer_dataset_manager, trainer_args=llm_manager.llm_args)
-        self.llm_manager = llm_manager
-        self.summarizer = summarizer
-        self.prompt_builder = prompt_builder
-        self.completion_type = completion_type
+        super().__init__(initial_state.trainer_dataset_manager, trainer_args=initial_state.llm_manager.llm_args)
+        self.initial_state = initial_state
+        self.state_manager = StateManager(self.initial_state)
 
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
@@ -214,3 +199,14 @@ class LLMTrainer(AbstractTrainer):
         if classification not in class2correct:
             class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
         class2correct[classification][label][correct_label] += 1
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Gets an item from its state since it does not exist in trainer
+        :param item: The name of the item to get
+        :return: The item
+        """
+        try:
+            return self.state_manager.get(item)
+        except AttributeError:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")

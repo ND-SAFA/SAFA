@@ -23,6 +23,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.state.llm_trainer_state import LLMTrainerState
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -107,12 +108,12 @@ class HierarchyGenerator(BaseObject):
         logger.info(f"\nGenerating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         example = self._get_example_of_target_type()
         prompt_builder = PromptBuilder(prompt_args=self.args.hgen_llm_manager.prompt_args,
-                                        prompts=self.BASE_PROMPT.value)
+                                       prompts=self.BASE_PROMPT.value)
         prompt_builder.format_prompts_with_var(artifact_type=self.args.target_type, example=example)
-        hgen_trainer = LLMTrainer(llm_manager=self.args.hgen_llm_manager,
-                                  trainer_dataset_manager=hgen_dataset_manager,
-                                  prompt_builder=prompt_builder,
-                                  completion_type=LLMCompletionType.GENERATION)
+        hgen_trainer = LLMTrainer(LLMTrainerState(llm_manager=self.args.hgen_llm_manager,
+                                                  trainer_dataset_manager=hgen_dataset_manager,
+                                                  prompt_builder=prompt_builder,
+                                                  completion_type=LLMCompletionType.GENERATION))
         if export_path:
             self._update_trainer_args(hgen_trainer, export_path)
         artifact_generations = hgen_trainer.perform_prediction().predictions
@@ -300,7 +301,7 @@ class HierarchyGenerator(BaseObject):
         logger.info("Getting example of target type.")
         example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value
         example_prompt = PromptBuilder(prompt_args=self.args.llm_manager_for_example.prompt_args,
-                                        prompts=example_prompt_format).build(artifact_type=self.args.target_type)[PromptKeys.PROMPT]
+                                       prompts=example_prompt_format).build(artifact_type=self.args.target_type)[PromptKeys.PROMPT]
         args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
         res = self.args.llm_manager_for_example.make_completion_request(prompt=example_prompt,
                                                                         completion_type=LLMCompletionType.GENERATION,

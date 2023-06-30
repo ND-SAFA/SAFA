@@ -106,3 +106,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: the link id
         """
         return hash(str(hash(source_id)) + "-" + str(hash(target_id)))
+
+    def get_n_positive(self) -> int:
+        label_counts = self[TraceKeys.LABEL].value_counts()
+        return label_counts[1].index[0]

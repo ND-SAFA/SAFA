@@ -293,6 +293,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
 
-        # n_total = len(trace_dataset)
-        # n_negative = n_total - n_positive
-        # logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")
+        n_total = len(trace_dataset)
+        n_positive = trace_dataset.trace_df.get_n_positive()
+        n_negative = n_total - n_positive
+        logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")

@@ -42,7 +42,7 @@ DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engine
                                        "\n- Describe whether the artifacts work under the same feature or sub-system? "
                                        f"Enclose your answer inside of <{FEATURE}></{FEATURE}>."
 
-                                       "\n- What is the intersection between the responsibilities of (1) and (2). "
+                                       "\n- Describe the intersection between the responsibilities of (1) and (2). "
                                        f"Enclose your answer inside of <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
 
                                        "\n- Provide a score between 0 and 1 evaluating the amount of intersection between (1) and (2). "

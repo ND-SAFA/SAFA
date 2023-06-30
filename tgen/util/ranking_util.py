@@ -74,12 +74,17 @@ class RankingUtil:
     def calculate_ranking_metrics(dataset: TraceDataset, predicted_entries: List[TracePredictionEntry]):
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
+            all_link_ids = list(dataset.trace_df.index)
             link_ids = [TraceDataFrame.generate_link_id(entry["source"], entry["target"]) for entry in predicted_entries]
-            scores = [entry["score"] for entry in predicted_entries]
-            trace_df = dataset.trace_df.filter_by_index(link_ids)
+            missing_ids = list(set(all_link_ids).difference(set(link_ids)))
+            ordered_link_ids = link_ids + missing_ids
 
-            metrics_manager = MetricsManager(trace_df, predicted_similarities=scores, link_ids=link_ids)
+            scores = [entry["score"] for entry in predicted_entries]
+            missing_scores = [0 for i in missing_ids]
+            all_scores = scores + missing_scores
+
+            metrics_manager = MetricsManager(dataset.trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
             metric_names = list(SupportedTraceMetric.get_keys())
             metrics = metrics_manager.eval(metric_names)
-            logger.log_with_title("Metrics", json.dumps(metrics, indent=4))
+            logger.log_with_title("Ranking Metrics", json.dumps(metrics))
             return metrics

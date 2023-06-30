@@ -23,7 +23,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.state.llm_trainer_state import LLMTrainerState
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.train.trainers.trainer_task import TrainerTask

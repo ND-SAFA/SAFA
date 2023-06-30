@@ -14,7 +14,7 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.state.llm_trainer_state import LLMTrainerState
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject

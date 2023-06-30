@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Optional, Any
 
-from tgen.state.state import State
+from tgen.util.state.state.state import State
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
 

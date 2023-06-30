@@ -14,8 +14,8 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.state.llm_trainer_state import LLMTrainerState
-from tgen.state.state_manager import StateManager
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
+from tgen.util.state.state.state_manager import StateManager
 from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput

@@ -22,7 +22,7 @@ from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.state.llm_trainer_state import LLMTrainerState
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import fake_anthropic_completion

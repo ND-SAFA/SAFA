@@ -4,6 +4,7 @@ from typing import List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
@@ -170,7 +171,7 @@ class LLMTrainer(AbstractTrainer):
         random.shuffle(prediction_entries)
         prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
         output = TracePredictionOutput(prediction_entries=prediction_entries)
-        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
+        if trace_dataset is not None and len(trace_dataset.trace_df[TraceKeys.LABEL].unique()) == 2:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)

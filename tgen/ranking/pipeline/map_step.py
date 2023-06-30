@@ -4,19 +4,14 @@ import numpy as np
 from sklearn.metrics import average_precision_score
 
 from tgen.ranking.pipeline.base import RankingStore, get_trace_id
+from tgen.util.ranking_util import RankingUtil
 
 
 def compute_map(s: RankingStore):
-    source_ids = s.source_ids
+    source_ids = s.parent_ids
     map_instructions = s.map_instructions
     s.metrics = {}
     metrics = calculate_map(s.metrics, map_instructions, source_ids)
-
-
-def create_increment_list(n: int, max_score=1.0, min_score=0.0):
-    increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
-    descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
-    return descending_list
 
 
 def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[str]) -> Dict:
@@ -33,7 +28,7 @@ def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[
         labels = create_label_list(positive_indices)
 
         # Predictions
-        predictions = create_increment_list(n_items)
+        predictions = RankingUtil.create_increment_list(n_items)
         predictions = predictions[:n_items]
 
         ap_score = average_precision_score(labels, predictions)
@@ -47,7 +42,7 @@ def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[
 
 def create_metric_instructions(s: RankingStore):
     traced_ids = s.traced_ids
-    source_ids = s.source_ids
+    source_ids = s.parent_ids
     ranked_target_links = s.processed_ranking_response
 
     map_instructions = calculate_map_instructions(ranked_target_links, source_ids, traced_ids)

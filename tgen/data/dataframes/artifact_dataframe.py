@@ -46,3 +46,11 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The artifact if one is found with the specified params, else None
         """
         return self.get_row(artifact_id)
+
+    def filter_by_type(self, type_name: str):
+        """
+        Returns data frame with artifacts of given type.
+        :param type_name: The type to filter by.
+        :return: Artifacts in data frame of given type.
+        """
+        return self.filter_by_row(lambda r: r[ArtifactKeys.LAYER_ID.value] == type_name)

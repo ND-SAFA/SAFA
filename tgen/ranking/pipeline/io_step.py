@@ -1,8 +1,6 @@
 import random
 from typing import Callable
 
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.ranking.pipeline.base import RankingStore, get_trace_id
 from tgen.util.json_util import JsonUtil
 
@@ -19,22 +17,6 @@ def store_predictions(s: RankingStore, entries, on_entry: Callable = None):
         target_ids.add(entry["target"])
     s.traced_ids = traced_ids
     s.all_target_ids = list(target_ids)
-
-
-def read_labels(s: RankingStore):
-    project_reader = StructuredProjectReader(s.project_path)
-    trace_dataset_creator = TraceDatasetCreator(project_reader)
-    trace_dataset = trace_dataset_creator.create()
-
-    entries = []
-    for i, row in trace_dataset.trace_df.iterrows():
-        entry = {
-            "source": row["source"],
-            "target": row["target"],
-            "label": row["label"]
-        }
-        entries.append(entry)
-    store_predictions(s, entries)
 
 
 def read_positive_predictions(s: RankingStore):

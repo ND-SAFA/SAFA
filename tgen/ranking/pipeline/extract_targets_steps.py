@@ -46,9 +46,9 @@ def extract_related_target_artifacts(s: RankingStore):
         source2targets = create_trace_queries(s.trace_entries)
         source_names = list(source2targets.keys())
     s.artifact_map = artifact_map
-    s.source2targets = source2targets
+    s.parent2children = source2targets
     s.all_target_ids = target_names
-    s.source_ids = source_names
+    s.parent_ids = source_names
 
 
 def create_trace_queries(entries):

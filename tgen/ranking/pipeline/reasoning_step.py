@@ -18,7 +18,7 @@ class ReasoningStep(iPipeline):
     @staticmethod
     def create_reasoning_prompt(s: RankingStore):
         artifact_map = s.artifact_map
-        source_names = s.source_ids
+        source_names = s.parent_ids
 
         prompts = []
         for s_name in source_names:
@@ -39,7 +39,7 @@ class ReasoningStep(iPipeline):
     @staticmethod
     def process_reasoning_prompts(s: RankingStore):
         responses = s.reasoning_responses
-        source2reasons = {s: "" for s in s.source_ids}
+        source2reasons = {s: "" for s in s.parent_ids}
         for prompt_index, prompt_response in enumerate(responses.batch_responses):
             source_name = s.reasoning_prompts2source[prompt_index]
             source2reasons[source_name] += prompt_response + "\n"
@@ -57,7 +57,7 @@ class ReasoningStep(iPipeline):
     @staticmethod
     def create_batched_reasoning_prompts(artifact_map, source_name, s: RankingStore):
         source_body = artifact_map[source_name]
-        target_names = s.source2targets[source_name]
+        target_names = s.parent2children[source_name]
         batches = ListUtil.batch(target_names, MAX_ARTIFACTS_PER_PROMPT)
         prompts = []
         target_index = 0

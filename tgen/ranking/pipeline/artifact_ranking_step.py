@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import Dict, List
 
 from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
@@ -15,7 +15,7 @@ RESPONSE_PROCESSING_STEPS = [
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
 
-class RankingStep(iPipeline):
+class ArtifactRankingStep(iPipeline):
     def __init__(self):
         steps = [self.create_ranking_prompts, self.complete_ranking_prompts, self.process_ranking_prompts]
         super().__init__(steps)
@@ -23,18 +23,18 @@ class RankingStep(iPipeline):
     @staticmethod
     def create_ranking_prompts(s: RankingStore):
         artifact_map = s.artifact_map
-        source_names = s.source_ids
+        parent_names = s.parent_ids
 
         prompts = []
-        for s_name in source_names:
-            prompt = RankingStep.create_prompts(artifact_map, s_name, s)
+        for p_name in parent_names:
+            prompt = ArtifactRankingStep.create_prompts(artifact_map, p_name, s)
             prompts.append(prompt)
 
         s.ranking_prompts = prompts
 
     @staticmethod
-    def create_prompts(artifact_map, source_name, s: RankingStore):
-        target_names = s.source2targets[source_name]
+    def create_prompts(artifact_map: Dict[str, str], source_name: str, s: RankingStore):
+        target_names = s.parent2children[source_name]
         source_body = artifact_map[source_name]
         prompt_builder = RankingPromptBuilder(goal=s.ranking_goal,
                                               instructions=s.ranking_instructions,
@@ -54,21 +54,21 @@ class RankingStep(iPipeline):
 
     @staticmethod
     def process_ranking_prompts(s: RankingStore):
-        s.processed_ranking_response: List[List[str]] = RankingStep.process_ranked_artifacts(s)
+        s.processed_ranking_response: List[List[str]] = ArtifactRankingStep.process_ranked_artifacts(s)
 
     @staticmethod
     def process_ranked_artifacts(s: RankingStore, add_missing=False) -> List[List[str]]:
         batch_response = s.ranking_responses
 
-        ranked_target_links = [[] for _ in range(len(s.source_ids))]
-        for source_name, prompt_response in zip(s.source_ids, batch_response.batch_responses):
-            source_index = s.source_ids.index(source_name)
-            related_targets = s.source2targets[source_name]
+        ranked_target_links = [[] for _ in range(len(s.parent_ids))]
+        for source_name, prompt_response in zip(s.parent_ids, batch_response.batch_responses):
+            source_index = s.parent_ids.index(source_name)
+            related_targets = s.parent2children[source_name]
 
-            response_list = RankingStep.convert_response_to_list(prompt_response)  # string response into list
-            artifact_indices = RankingStep.parse_artifact_indices(response_list)  # processes each artifact id
-            artifact_ids = RankingStep.translate_indices_to_ids(artifact_indices, related_targets)
-            artifact_ids = RankingStep.remove_duplicate_ids(artifact_ids)
+            response_list = ArtifactRankingStep.convert_response_to_list(prompt_response)  # string response into list
+            artifact_indices = ArtifactRankingStep.parse_artifact_indices(response_list)  # processes each artifact id
+            artifact_ids = ArtifactRankingStep.translate_indices_to_ids(artifact_indices, related_targets)
+            artifact_ids = ArtifactRankingStep.remove_duplicate_ids(artifact_ids)
             ranked_target_links[source_index].extend(artifact_ids)
 
         if add_missing:

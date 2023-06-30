@@ -15,8 +15,9 @@ DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide wh
                                  "Enclose your answer in <relation>ID - Reason</relation>"
 DEFAULT_RANKING_GOAL = "# Task\n\nRank all related artifacts from most to least related to the source.\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
-                               "Find the relevant artifacts to the source. " \
-                               "Then, rank their artifact bodies from most to least relevant. " \
+                               "1. Find the artifacts relevant to the source. " \
+                               "Provide a comma delimited list of artifact ids enclosed in <related></related>." \
+                               "2. Then, rank their artifact bodies from most to least relevant. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element relates to the source the most and the last element does so the least. " \
                                "Enclose the list in <links></links>."
@@ -73,13 +74,13 @@ class RankingStore:
 
     # Project
     artifact_map: Dict = field(default=None, repr=False)  # map of artifact name to body
-    source_ids: Optional[List[str]] = field(default=None, repr=False)  # enumerates order of prompts
+    parent_ids: Optional[List[str]] = field(default=None, repr=False)  # enumerates order of prompts
     traced_ids: Optional[List[str]] = field(default=None, repr=False)  # determines label of model responses
     all_target_ids: Optional[List[str]] = field(default=None, repr=False)  # helps find missing artifact ids in model responses
     trace_entries: Optional[List[Dict]] = field(default=None, repr=False)  # determines what links get included in source queries
 
     # Models
-    source2targets: Dict = field(default_factory=dict)
+    parent2children: Dict = field(default_factory=dict)
 
     # Jobs
     job_result: Optional[JobResult] = None

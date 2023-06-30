@@ -32,10 +32,11 @@ public class TypeAppEntity implements IAppEntity {
     private int count;
 
     public TypeAppEntity(ArtifactType artifactType) {
-        this.typeId = artifactType.getTypeId();
+        this.typeId = artifactType.getId();
         this.name = artifactType.getName();
         this.icon = artifactType.getIcon();
-        this.color = "color" + (int)(Math.random() * 10);  //TODO make colors not random
+        this.color = artifactType.getColor();
+        this.count = artifactType.getCount();
     }
 
     @Override

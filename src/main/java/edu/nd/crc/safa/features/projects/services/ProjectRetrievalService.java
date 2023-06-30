@@ -94,8 +94,7 @@ public class ProjectRetrievalService {
         String currentDocumentId = this.currentDocumentService.getCurrentDocumentId(user);
 
         // Artifact types
-        List<TypeAppEntity> artifactTypes = this.typeService
-            .getAppEntitiesWithCounts(projectVersion, user, entities.getArtifacts());
+        List<TypeAppEntity> artifactTypes = this.typeService.getAppEntities(projectVersion, user);
 
         // Version errors
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);

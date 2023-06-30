@@ -24,7 +24,7 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
             .withProject(project)
             .postWithJsonObject(artifactType);
         UUID typeId = UUID.fromString(createdType.getString("typeId"));
-        artifactType.setTypeId(typeId);
+        artifactType.setId(typeId);
         return typeId;
     }
 

@@ -1,12 +1,9 @@
 package edu.nd.crc.safa.features.types.services;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
@@ -37,32 +34,6 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());
-    }
-
-    public List<TypeAppEntity> getAppEntitiesWithCounts(Project project, List<ArtifactAppEntity> artifacts) {
-        List<TypeAppEntity> types = getAppEntities(project);
-        addCounts(types, artifacts);
-        return types;
-    }
-
-    public List<TypeAppEntity> getAppEntitiesWithCounts(ProjectVersion projectVersion, SafaUser user,
-                                                        List<ArtifactAppEntity> artifacts) {
-        List<TypeAppEntity> types = getAppEntities(projectVersion, user);
-        addCounts(types, artifacts);
-        return types;
-    }
-
-    private void addCounts(List<TypeAppEntity> types, List<ArtifactAppEntity> artifacts) {
-        Map<String, TypeAppEntity> typeEntities = new HashMap<>();
-        for (TypeAppEntity type : types) {
-            typeEntities.put(type.getName(), type);
-        }
-
-        for (ArtifactAppEntity artifact : artifacts) {
-            String type = artifact.getType();
-            TypeAppEntity typeEntity = typeEntities.get(type);
-            typeEntity.setCount(typeEntity.getCount() + 1);
-        }
     }
 
     /**

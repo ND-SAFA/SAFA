@@ -41,8 +41,8 @@ public class ArtifactType implements Serializable {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
-    @Column(name = "type_id")
-    UUID typeId;
+    @Column(name = "id")
+    private UUID id;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,18 +51,26 @@ public class ArtifactType implements Serializable {
         nullable = false
     )
     @JsonIgnore
-    Project project;
+    private Project project;
 
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
 
     @Column(name = "icon", nullable = false)
-    String icon;
+    private String icon;
+
+    @Column(name = "color", nullable = false)
+    private String color;
+
+    @Column(name = "count", nullable = false)
+    private int count;
 
     public ArtifactType(Project project, String name) {
         this.project = project;
         this.name = name;
         this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
+        this.color = "color" + (int)(Math.random() * 10);  //TODO do we want a random color to start?
+        this.count = 0;
     }
 
     @Override

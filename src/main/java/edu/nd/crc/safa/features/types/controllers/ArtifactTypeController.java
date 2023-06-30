@@ -60,7 +60,7 @@ public class ArtifactTypeController extends BaseController {
 
         // Don't trust values sent to us
         artifactType.setProject(project);
-        artifactType.setTypeId(null);
+        artifactType.setId(null);
 
         this.serviceProvider.getArtifactTypeRepository().save(artifactType);
 
@@ -91,7 +91,7 @@ public class ArtifactTypeController extends BaseController {
         }
 
         // Don't allow editing the type or project
-        artifactTypeObj.setTypeId(originalType.get().getTypeId());
+        artifactTypeObj.setId(originalType.get().getId());
         artifactTypeObj.setProject(originalType.get().getProject());
 
         this.serviceProvider.getArtifactTypeRepository().save(artifactTypeObj);
@@ -116,7 +116,7 @@ public class ArtifactTypeController extends BaseController {
             .broadcastChange(
                 EntityChangeBuilder
                     .create(project.getProjectId())
-                    .withTypeUpdate(artifactType.getTypeId())
+                    .withTypeUpdate(artifactType.getId())
                     .withArtifactsUpdate(artifactIds));
     }
 
@@ -138,7 +138,7 @@ public class ArtifactTypeController extends BaseController {
             .broadcastChange(
                 EntityChangeBuilder
                     .create(artifactType.getProject().getProjectId())
-                    .withTypeDelete(artifactType.getTypeId())
+                    .withTypeDelete(artifactType.getId())
                     .withUpdateLayout());
     }
 }

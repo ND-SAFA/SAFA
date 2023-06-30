@@ -57,9 +57,8 @@ class RankingStep(iPipeline):
         s.processed_ranking_response: List[List[str]] = RankingStep.process_ranked_artifacts(s)
 
     @staticmethod
-    def process_ranked_artifacts(s: RankingStore, add_missing=True) -> List[List[str]]:
+    def process_ranked_artifacts(s: RankingStore, add_missing=False) -> List[List[str]]:
         batch_response = s.ranking_responses
-        target_ids = s.all_target_ids
 
         ranked_target_links = [[] for _ in range(len(s.source_ids))]
         for source_name, prompt_response in zip(s.source_ids, batch_response.batch_responses):
@@ -73,6 +72,7 @@ class RankingStep(iPipeline):
             ranked_target_links[source_index].extend(artifact_ids)
 
         if add_missing:
+            target_ids = s.all_target_ids
             for r_list in ranked_target_links:
                 missing_ids = [t_id for t_id in target_ids if t_id not in r_list]
                 random.shuffle(missing_ids)

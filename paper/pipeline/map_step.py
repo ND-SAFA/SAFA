@@ -13,11 +13,13 @@ def compute_map(s: RankingStore):
     metrics = calculate_map(s.metrics, map_instructions, source_ids)
 
 
-def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[str]) -> Dict:
-    def create_increment_list(n_items):
-        increment = 1 / (n_items - 1)  # Calculate the linear increment
-        return [1 - (i * increment) for i in range(n_items)]  # Generate the list
+def create_increment_list(n: int, max_score=1.0, min_score=0.0):
+    increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
+    descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
+    return descending_list
 
+
+def calculate_map(metrics: Dict, map_instructions: List[Dict], source_ids: List[str]) -> Dict:
     def create_label_list(label_indices):
         l_list = [0] * n_items
         for pos_index in label_indices:

@@ -40,8 +40,8 @@ def create_artifact_map(a_df):
 @dataclass
 class RankingStore:
     # Instructions
-    project_path: str  # path to original dataset
-    experiment_id: str  # The UUID of the run on the dataset.
+    project_path: str = None  # path to original dataset
+    experiment_id: str = None  # The UUID of the run on the dataset.
 
     # Metrics
     map_instructions: Optional[List[Dict]] = field(default=None, repr=False)

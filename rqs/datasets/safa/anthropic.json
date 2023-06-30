@@ -3,14 +3,7 @@
     {
       "jobs": [
         {
-          "object_type": "LLM",
-          "task": "PREDICT",
-          "llm_manager": {
-            "object_type": "ANTHROPIC",
-            "llm_args": {
-              "model": "claude-instant-1-100k"
-            }
-          },
+          "object_type": "TRACE",
           "trainer_dataset_manager": {
             "eval_dataset_creator": {
               "object_type": "TRACE",

@@ -5,8 +5,6 @@ from paper.pipeline.classification_step import compute_precision
 from paper.pipeline.extract_targets_steps import extract_related_target_artifacts
 from paper.pipeline.io_step import read_positive_predictions
 from paper.pipeline.map_step import compute_map, create_metric_instructions
-from paper.pipeline.ranking_step import complete_ranking_prompts, create_ranking_prompts
-from paper.pipeline.response_process_step import process_ranking_prompts
 
 if __name__ == "__main__":
     EXPERIMENT_ID = "c3442bd7-4d4a-4891-827b-a91b0dc1e799"

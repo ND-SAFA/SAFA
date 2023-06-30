@@ -10,6 +10,7 @@ from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
 from tgen.jobs.paper_job import PaperJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.jobs.trainer_jobs.tracing_job import TracingJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.util.supported_enum import SupportedEnum
 
@@ -25,6 +26,7 @@ class SupportedJobType(SupportedEnum):
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
     LLM = LLMJob
+    TRACE = TracingJob
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob

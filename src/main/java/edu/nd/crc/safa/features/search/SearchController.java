@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.search;
 
-import java.util.List;
 import java.util.UUID;
 import javax.management.InvalidAttributeValueException;
 import javax.validation.Valid;
@@ -47,8 +46,7 @@ public class SearchController extends BaseController {
                     throw new InvalidAttributeValueException("Expected prompt to contain non-empty string.");
                 }
                 response = this.serviceProvider.getSearchService().performPromptSearch(projectAppEntity,
-                    request.getPrompt(), request.getSearchTypes(), request.getTracingPrompt());
-                filterResponses(response, request.getMaxResults());
+                    request.getPrompt(), request.getSearchTypes(), request.getMaxResults());
                 this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;
@@ -61,8 +59,7 @@ public class SearchController extends BaseController {
                     return new SearchResponse();
                 }
                 response = this.serviceProvider.getSearchService().performArtifactSearch(projectAppEntity,
-                    request.getArtifactIds(), request.getSearchTypes(), request.getTracingPrompt());
-                filterResponses(response, request.getMaxResults());
+                    request.getArtifactIds(), request.getSearchTypes(), request.getMaxResults());
                 this.serviceProvider.getSearchService().addRelatedTypes(projectAppEntity, response,
                     request.getRelatedTypes());
                 return response;
@@ -78,13 +75,5 @@ public class SearchController extends BaseController {
             default:
                 throw new RuntimeException("Search mode is not implemented:" + request.mode.name());
         }
-    }
-
-    public void filterResponses(SearchResponse searchResponse, int maxResults) {
-        List<UUID> artifactIdSubset = searchResponse.getArtifactIds().subList(0, maxResults);
-        List<String> artifactBodiesSubset = searchResponse.getArtifactBodies().subList(0, maxResults);
-
-        searchResponse.setArtifactIds(artifactIdSubset);
-        searchResponse.setArtifactBodies(artifactBodiesSubset);
     }
 }

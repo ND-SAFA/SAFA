@@ -294,6 +294,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
 
         n_total = len(trace_dataset)
-        n_positive = trace_dataset.trace_df.get_n_positive()
-        n_negative = n_total - n_positive
+        n_positive = trace_dataset.trace_df.get_label_count(1)
+        n_negative = trace_dataset.trace_df.get_label_count(0)
         logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")

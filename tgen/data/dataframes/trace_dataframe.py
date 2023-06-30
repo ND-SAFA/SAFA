@@ -107,6 +107,10 @@ class TraceDataFrame(AbstractProjectDataFrame):
         """
         return hash(str(hash(source_id)) + "-" + str(hash(target_id)))
 
-    def get_n_positive(self) -> int:
+    def get_label_count(self, label: int = 1) -> int:
+        """
+        :return: Returns the number of true positives in data frame.
+        """
         label_counts = self[TraceKeys.LABEL].value_counts()
-        return label_counts[1].index[0]
+        n_label = label_counts[label]
+        return n_label

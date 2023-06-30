@@ -107,8 +107,8 @@ class HierarchyGenerator(BaseObject):
         logger.info(f"\nGenerating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         example = self._get_example_of_target_type()
         prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_llm_manager.prompt_args,
-                                                 base_prompt=self.BASE_PROMPT.value.instructions(artifact_type=self.args.target_type,
-                                                                                                 example=example))
+                                                 base_prompt=self.BASE_PROMPT.value.format(artifact_type=self.args.target_type,
+                                                                                           example=example))
         hgen_trainer = LLMTrainer(llm_manager=self.args.hgen_llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
                                   prompt_creator=prompt_creator)
@@ -297,7 +297,7 @@ class HierarchyGenerator(BaseObject):
         :return: An example of the target artifact
         """
         logger.info("Getting example of target type.")
-        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value.instructions(artifact_type=self.args.target_type)
+        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value.format(artifact_type=self.args.target_type)
         example_prompt = GenerationPromptCreator(prompt_args=self.args.llm_manager_for_example.prompt_args,
                                                  base_prompt=example_prompt_format).create('')[PromptKeys.PROMPT]
         args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)

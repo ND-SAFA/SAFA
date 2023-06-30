@@ -67,7 +67,7 @@ class LLMClustering(iClustering):
         :return: The list of feature
         """
         logger.info(f"Getting features for clusters.")
-        prompt = SupportedPrompts.FUNCTIONALITIES.value.instructions(target_artifact_type=target_artifact_type)
+        prompt = SupportedPrompts.FUNCTIONALITIES.value.format(target_artifact_type=target_artifact_type)
         res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, prompt)
         features: List[Tag] = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, many=True)
         return [str(functionality.contents[0]) for functionality in features]
@@ -108,7 +108,7 @@ class LLMClustering(iClustering):
                 logger.info(f"\nRe-clustering a group with more than {LLMClustering.CLUSTER_MAX} artifacts")
                 artifact2cluster = clusters.pop(cluster_name)
                 artifact_content = [artifact_df.get_artifact(id_)[ArtifactKeys.CONTENT] for id_ in artifact2cluster]
-                prompt = SupportedPrompts.RE_CLUSTER_FEATURE.value.instructions(feature=cluster_name)
+                prompt = SupportedPrompts.RE_CLUSTER_FEATURE.value.format(feature=cluster_name)
                 clusters.update(LLMClustering._get_clusters(artifact2cluster, artifact_content, target_artifact_type,
                                                             llm_manager, features=list(clusters.keys()),
                                                             base_prompt=prompt))

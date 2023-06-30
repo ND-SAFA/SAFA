@@ -127,11 +127,17 @@ public class TGen implements ITraceGenerationController {
         if (candidates <= Defaults.CANDIDATE_THRESHOLD) {
             predictEndpoint = getEndpoint("predict-sync");
             return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
-
         } else {
             predictEndpoint = getEndpoint("predict");
             return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
         }
+    }
+
+    public TGenTraceGenerationResponse performSearch(TGenPredictionRequestDTO payload, JobLogger logger) {
+        int candidates = payload.getDataset().getNumOfCandidates();
+        log(logger, String.format("Number of candidates: %s", candidates));
+        String predictEndpoint = getEndpoint("predict-sync");
+        return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
     }
 
     /**
@@ -263,7 +269,7 @@ public class TGen implements ITraceGenerationController {
         TGenDataset dataset = new TGenDataset(
             createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
             createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
-        return new TGenPredictionRequestDTO(dataset, null);
+        return new TGenPredictionRequestDTO(dataset);
     }
 
     /**

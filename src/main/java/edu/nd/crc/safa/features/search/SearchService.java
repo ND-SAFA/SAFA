@@ -41,15 +41,16 @@ public class SearchService {
      * @param projectAppEntity The project containing artifacts to search.
      * @param prompt           The prompt to match artifacts against.
      * @param searchTypes      The types of artifacts to match against.
-     * @param tracingPrompt    The prompt used to determine if artifacts are related to prompt.
+     * @param n                The top n matches to return.
      * @return Ids of matched artifacts.
      */
     public SearchResponse performPromptSearch(ProjectAppEntity projectAppEntity, String prompt,
-                                              List<String> searchTypes, String tracingPrompt) {
-        Map<String, String> sourceLayer = new HashMap<>();
-        sourceLayer.put(PROMPT_KEY, prompt);
-        Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
-        return searchSourceLayer(sourceLayer, convertArtifactMapToLayer(targetLayer), tracingPrompt);
+                                              List<String> searchTypes, int n) {
+        Map<String, String> promptLayer = new HashMap<>();
+        promptLayer.put(PROMPT_KEY, prompt);
+        Map<UUID, String> artifactMap = constructTargetLayer(projectAppEntity, searchTypes);
+        Map<String, String> artifactLayer = convertArtifactMapToLayer(artifactMap);
+        return searchSourceLayer(artifactLayer, promptLayer, n);
     }
 
     /**
@@ -58,46 +59,45 @@ public class SearchService {
      * @param projectAppEntity The project containing artifacts to search.
      * @param artifactIds      The ids of the artifacts to use as queries.
      * @param searchTypes      The types of artifacts to match against.
-     * @param tracingPrompt    The prompt used to determine if two artifacts are linked.
      * @return List of matched artifacts.
      */
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,
                                                 List<UUID> artifactIds,
-                                                List<String> searchTypes,
-                                                String tracingPrompt) {
+                                                List<String> searchTypes, int n) {
         Map<UUID, ArtifactAppEntity> artifactIdMap = ProjectDataStructures.createArtifactMap(
             projectAppEntity.getArtifacts());
         Map<UUID, String> sourceLayer = createArtifactLayerFromIds(artifactIds, artifactIdMap);
         Map<UUID, String> targetLayer = constructTargetLayer(projectAppEntity, searchTypes);
         return searchSourceLayer(
             convertArtifactMapToLayer(sourceLayer),
-            convertArtifactMapToLayer(targetLayer), tracingPrompt);
+            convertArtifactMapToLayer(targetLayer), n);
     }
 
     /**
      * Performs a search between source and target artifacts using TGEN tracing.
      *
-     * @param sourceLayer   Source artifacts mapping id to body.
-     * @param targetLayer   Target artifacts mapping id to body.
-     * @param tracingPrompt The prompt used to determine if two artifacts should be traced.
+     * @param promptLayer   Source artifacts mapping id to body.
+     * @param artifactLayer Target artifacts mapping id to body.
+     * @param n             The top n matches to return.
      * @return Target Artifact IDs that matched source artifacts.
      */
-    public SearchResponse searchSourceLayer(Map<String, String> sourceLayer,
-                                            Map<String, String> targetLayer,
-                                            String tracingPrompt) {
+    public SearchResponse searchSourceLayer(Map<String, String> promptLayer,
+                                            Map<String, String> artifactLayer, int n) {
 
-        TGenDataset dataset = new TGenDataset(List.of(sourceLayer), List.of(targetLayer));
-        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset, tracingPrompt);
+        TGenDataset dataset = new TGenDataset(List.of(artifactLayer), List.of(promptLayer));
+        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
         TGen tgen = new TGen(this.safaRequestBuilder);
-        TGenTraceGenerationResponse response = tgen.sendTraceLinkRequest(payload, null);
+        TGenTraceGenerationResponse response = tgen.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenTraceGenerationResponse.PredictedLink::getTarget)
-            .filter(t -> !sourceLayer.containsKey(t))
+            .map(TGenTraceGenerationResponse.PredictedLink::getSource)
             .map(UUID::fromString)
             .collect(Collectors.toList());
-        List<String> matchedArtifactBodies =
-            matchedArtifactIds.stream().map(UUID::toString).map(targetLayer::get).collect(Collectors.toList());
+        matchedArtifactIds = matchedArtifactIds.subList(0, n);
+        List<String> matchedArtifactBodies = matchedArtifactIds
+            .stream().map(UUID::toString)
+            .map(artifactLayer::get)
+            .collect(Collectors.toList());
         return new SearchResponse(matchedArtifactIds, matchedArtifactBodies);
     }
 

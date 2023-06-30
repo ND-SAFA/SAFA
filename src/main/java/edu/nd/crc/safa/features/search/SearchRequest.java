@@ -48,9 +48,4 @@ public class SearchRequest {
      */
     @Nullable
     List<String> relatedTypes = new ArrayList<>();
-    /**
-     * The prompt used to decide whether two artifacts should be traced.
-     */
-    @Nullable
-    String tracingPrompt;
 }

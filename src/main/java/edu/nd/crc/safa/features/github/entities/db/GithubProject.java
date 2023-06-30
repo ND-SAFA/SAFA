@@ -14,7 +14,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

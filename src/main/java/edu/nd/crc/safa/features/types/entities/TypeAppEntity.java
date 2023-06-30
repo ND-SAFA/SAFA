@@ -1,8 +1,9 @@
-package edu.nd.crc.safa.features.types;
+package edu.nd.crc.safa.features.types.entities;
 
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
 import lombok.Data;
 

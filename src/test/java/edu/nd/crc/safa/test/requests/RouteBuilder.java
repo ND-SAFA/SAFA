@@ -10,8 +10,8 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**

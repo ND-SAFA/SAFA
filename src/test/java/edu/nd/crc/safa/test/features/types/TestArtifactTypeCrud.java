@@ -7,9 +7,9 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.types.ArtifactType;
-import edu.nd.crc.safa.features.types.TypeAppEntity;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 

@@ -36,4 +36,4 @@ class TestPreTrainProjectReader(BaseTest):
         training_examples = pre_train_reader.read_project()
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         for i, example in enumerate(training_examples):
-            self.assertEqual(SUMMARY_FORMAT.instructions(expected_lines[i]), example)
+            self.assertEqual(SUMMARY_FORMAT.format(expected_lines[i]), example)

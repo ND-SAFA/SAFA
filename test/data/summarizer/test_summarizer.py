@@ -26,7 +26,7 @@ class TestSummarizer(BaseTest):
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
         prompts = [summarizer.nl_prompt_creator.create(chunk)[PromptKeys.PROMPT] for chunk in self.CHUNKS]
         summary = summarizer._summarize_chunks(llm_manager, prompts)[0]
-        expected_summary = "".join(SUMMARY_FORMAT.instructions(chunk) for chunk in self.CHUNKS)
+        expected_summary = "".join(SUMMARY_FORMAT.format(chunk) for chunk in self.CHUNKS)
         self.assertEqual(summary, expected_summary)
 
     @mock.patch("openai.Completion.create")
@@ -39,7 +39,7 @@ class TestSummarizer(BaseTest):
         summarizer = Summarizer(llm_manager, model_for_token_limit=model_name, code_or_exceeds_limit_only=False)
         content = " ".join(self.CHUNKS)
         summaries = summarizer.summarize_single(content=content)
-        self.assertEqual(summaries, SUMMARY_FORMAT.instructions(content))
+        self.assertEqual(summaries, SUMMARY_FORMAT.format(content))
 
         # use path to file
         path_to_file = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
@@ -47,8 +47,8 @@ class TestSummarizer(BaseTest):
         summaries = summarizer.summarize_single(content, chunker_type=SupportedChunker.PY)
         summaries = self._remove_irrelevant_chars(summaries)
         expected_chunks = PythonChunker(model_name, summarizer.token_limit).chunk(FileUtil.read_file(path_to_file))
-        summarized_chunks = [SUMMARY_FORMAT.instructions(chunk) for chunk in expected_chunks]
-        summarized_chunks = [SUMMARY_FORMAT.instructions(chunk) for chunk in
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
                              NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
         summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
         self.assertEqual("".join(summarized_chunks), summaries)
@@ -77,10 +77,10 @@ class TestSummarizer(BaseTest):
         python_file_contents = FileUtil.read_file(os.path.join(TEST_DATA_DIR, "chunker/test_python.py"))
         contents = [" ".join(self.CHUNKS), python_file_contents]
         summaries = summarizer.summarize_bulk(contents=contents, chunker_types=[SupportedChunker.NL, SupportedChunker.PY])
-        self.assertEqual(summaries[0], SUMMARY_FORMAT.instructions(contents[0]))
+        self.assertEqual(summaries[0], SUMMARY_FORMAT.format(contents[0]))
         expected_chunks = PythonChunker(model_name, summarizer.token_limit).chunk(python_file_contents)
-        summarized_chunks = [SUMMARY_FORMAT.instructions(chunk) for chunk in expected_chunks]
-        summarized_chunks = [SUMMARY_FORMAT.instructions(chunk) for chunk in
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
+        summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
                              NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
         summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
         self.assertEqual("".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
@@ -93,9 +93,9 @@ class TestSummarizer(BaseTest):
         long_text = "This is a text is over the token limit"
         short_text = "short text"
         summaries = summarizer.summarize_bulk(contents=[long_text, short_text])
-        expected_summary = "".join([SUMMARY_FORMAT.instructions(chunk)
+        expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
                                     for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)])
-        expected_summary = "".join([SUMMARY_FORMAT.instructions(chunk)
+        expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
                                     for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(expected_summary)])
         self.assertEqual(summaries[0], expected_summary)
         self.assertEqual(summaries[1], short_text)  # shouldn't have summarized

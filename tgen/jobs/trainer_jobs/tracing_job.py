@@ -16,6 +16,7 @@ from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.util.logging.logger_manager import logger
 
 
 class TracingJob(LLMJob):
@@ -60,8 +61,7 @@ class TracingJob(LLMJob):
         metrics_manager = MetricsManager(trace_df, predicted_similarities=scores, link_ids=link_ids)
         metric_names = list(SupportedTraceMetric.get_keys())
         metrics = metrics_manager.eval(metric_names)
-        print("Metrics")
-        print(metrics)
+        logger.log_with_title("Metrics", metrics)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)
 

@@ -33,6 +33,15 @@ class PromptBuilder:
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
         })
+    
+    def format_prompts_with_var(self, **kwargs) -> None:
+        """
+        Formats all prompts that have missing values (identified by '{$var_name$}') that are provided in the kwargs
+        :param kwargs: Contains var_name to value mappings to format the prompts with
+        :return: None
+        """
+        for prompt in self.prompts:
+            prompt.format_value(**kwargs)
 
     def parse_responses(self, res: str) -> Dict[str, Any]:
         """
@@ -41,7 +50,7 @@ class PromptBuilder:
         :return: A dictionary mapping prompt id to its answers
         """
         tags = self._get_response_tag_to_prompt_indices()
-        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys())) # TODO: Need to handle many responses possibility?
+        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys())) 
         responses = [[None] * len(self.prompts)]
         for label, response in tag2response.items():
             prompt_indices = tags[label]

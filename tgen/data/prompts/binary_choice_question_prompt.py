@@ -1,9 +1,6 @@
-from enum import StrEnum, auto
-from typing import Dict, Callable, List
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from typing import Callable, List
 from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.util.override import overrides
 
 
 class BinaryChoiceQuestionPrompt(QuestionPrompt):

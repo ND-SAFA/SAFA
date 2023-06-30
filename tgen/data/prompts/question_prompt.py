@@ -25,8 +25,7 @@ class QuestionPrompt(Prompt):
         self.expected_responses = expected_responses
         self.expected_response_type = expected_response_type
         self.default_factory = default_factory
-        super().__init__(value=question, response_tag=response_tag, include_expected_response=True,
-                         response_instructions=response_instructions)
+        super().__init__(value=question, response_tag=response_tag, response_instructions=response_instructions)
 
     @overrides(Prompt)
     def parse_response(self, response: Any) -> Any:

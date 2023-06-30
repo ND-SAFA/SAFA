@@ -1,4 +1,4 @@
-from enum import StrEnum, auto
+from enum import auto, Enum
 from typing import Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -14,7 +14,7 @@ class ArtifactPrompt(Prompt):
     Responsible for formatting and parsing of presenting a artifact in a prompt
     """
 
-    class BuildMethod(StrEnum):
+    class BuildMethod(Enum):
         """
         The method to build the prompt (determines prompt format)
         """
@@ -31,7 +31,7 @@ class ArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.BASE: self._build_as_base}
         self.include_id = include_id
-        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False, requires_artifacts=True)
+        super().__init__(value=EMPTY_STRING, response_tag=None, requires_artifacts=True)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:
@@ -42,7 +42,7 @@ class ArtifactPrompt(Prompt):
         :return: The formatted prompt
         """
         if self.build_method in self.build_methods:
-            return self.build_methods[self.build_method](artifact_id=artifact[ArtifactKeys.ID],
+            return self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID, EMPTY_STRING),
                                                          artifact_body=artifact[ArtifactKeys.CONTENT],
                                                          include_id=self.include_id)
         else:

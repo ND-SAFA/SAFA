@@ -1,28 +1,25 @@
 import re
 import uuid
-from abc import ABC, abstractmethod
 from typing import Any
 
-from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.util.logging.logger_manager import logger
 from tgen.util.prompt_util import PromptUtil
 
 
-class Prompt(ABC):
+class Prompt:
     """
     Represents a prompt with special formatting that allows delaying the formatting of certain fields
     """
     RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
-    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None, include_expected_response: bool = True,
+    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None,
                  requires_traces: bool = False, requires_artifacts: bool = False, response_instructions: str = RESPONSE_FORMAT):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
         :param response_tag: The name of the tag the model is expected to enclose its response in
         :param prompt_id: Specify specific id for the prompt
-        :param include_expected_response: If True, includes the instructions for how the model should respond in the prompt
         :param requires_traces: True if prompt requires trace link
         :param requires_artifacts: True if prompt requires artifacts
         :param response_instructions: The format instructions for the response desired from model
@@ -30,7 +27,7 @@ class Prompt(ABC):
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
         self.response_tag = response_tag
-        self.include_expected_response = include_expected_response
+        self.include_expected_response = response_tag is not None
         self.requires_traces = requires_traces
         self.requires_artifacts = requires_artifacts
         self.response_instructions = response_instructions
@@ -59,6 +56,7 @@ class Prompt(ABC):
         """
         Parses the response if it fails in some way, may be overridden in child classes
         :param response: The model response
+        :param e: The exception causing the failure
         :return: Default value
         """
         logger.warning(f"Unexpected response for {self.value} because {e}.")
@@ -93,5 +91,13 @@ class Prompt(ABC):
         Used to fulfill api, specific method of building for a prompt may be defined in child classes
         :param kwargs: Any additional arguments for the prompt
         :return: The formatted prompt
+        """
+        self.format_value(**kwargs)
+        return self.value
+
+    def __repr__(self) -> str:
+        """
+        Represents the prompt as a string
+        :return: Represents the prompt as a string
         """
         return self.value

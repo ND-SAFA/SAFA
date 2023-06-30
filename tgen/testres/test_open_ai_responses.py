@@ -2,6 +2,8 @@ from copy import deepcopy
 
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.util.attr_dict import AttrDict
 
 FINE_TUNE_REQUEST = AttrDict({
@@ -104,7 +106,15 @@ def fake_open_ai_completion(prompt, **args):
         if f"<{t}>" in prompt[0]:
             tag = t
             break
-    tokens = ["\'".join(p.split('\'')[1:-1]) for p in prompt]
+    for prompt_suffix in [AnthropicManager.prompt_args.prompt_suffix, OpenAIManager.prompt_args.prompt_suffix]:
+        success = False
+        for p in prompt:
+            if p.endswith(prompt_suffix):
+                success = True
+        if success:
+            prompt = ["".join(p.rsplit(prompt_suffix, 1)) for p in prompt]
+            break
+    tokens = [p.replace("\n", "").split(f"</{tag}>")[-1] for p in prompt]
     choices = [deepcopy(choice) for _ in tokens]
     for i, c in enumerate(choices):
         c['text'] = c['text'].format(tokens[i])

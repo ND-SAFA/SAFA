@@ -1,8 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.train.args.open_ai_args import OpenAIArgs
 
@@ -47,8 +47,8 @@ if __name__ == "__main__":
         dataset_creator_for_sources = None
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=PromptDatasetCreator(
             project_reader=ArtifactProjectReader(project_path=project_path), summarizer=summarizer))
-        tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, prompt_creator=ClassificationPromptCreator(),
-                                  llm_manager=tgen_llm_manager)
+        tgen_trainer = LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, prompt_builder=PromptBuilder(), #TODO make prompts
+                                  llm_manager=tgen_llm_manager, completion_type=LLMCompletionType.CLASSIFICATION)
 
     args = HGenArgs(
                     source_layer_id="Code", tgen_trainer=tgen_trainer,

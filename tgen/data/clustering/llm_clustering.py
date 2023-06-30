@@ -9,8 +9,8 @@ from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER
 from tgen.data.clustering.iclustering import Clusters, iClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
 from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -67,15 +67,16 @@ class LLMClustering(iClustering):
         :return: The list of feature
         """
         logger.info(f"Getting features for clusters.")
-        prompt = SupportedPrompts.FUNCTIONALITIES.value.format(target_artifact_type=target_artifact_type)
-        res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, prompt)
+        base_prompt = SupportedPrompts.FUNCTIONALITIES.value
+        res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, base_prompt,
+                                          target_artifact_type=target_artifact_type)
         features: List[Tag] = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, is_nested=True)
         return [str(functionality.contents[0]) for functionality in features]
 
     @staticmethod
     def _get_clusters(artifact_ids: List[str], artifact_content: List[str], target_artifact_type: str,
                       llm_manager: AbstractLLMManager, features: Union[List[str], str],
-                      base_prompt: Union[SupportedPrompts, Prompt] = SupportedPrompts.CLUSTER_FROM_FEATURES) -> Clusters:
+                      prompts: List[Prompt] = SupportedPrompts.CLUSTER_FROM_FEATURES.value, **prompt_args) -> Clusters:
         """
         Gets clusters of the given artifacts using the llm manager
         :param artifact_ids: Ids of all artifacts to cluster
@@ -85,10 +86,8 @@ class LLMClustering(iClustering):
         :param features: Functionalities to cluster by
         :return: The clusters
         """
-        if isinstance(base_prompt, SupportedPrompts):
-            base_prompt = base_prompt.value
-        prompt = base_prompt.format(features=features, target_artifact_type=target_artifact_type)
-        res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, prompt)
+        res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, prompts,
+                                          features=features, target_artifact_type=target_artifact_type, **prompt_args)
         clusters = LLMClustering._get_clusters_from_response(res, artifact_ids)
         return clusters
 
@@ -108,10 +107,10 @@ class LLMClustering(iClustering):
                 logger.info(f"\nRe-clustering a group with more than {LLMClustering.CLUSTER_MAX} artifacts")
                 artifact2cluster = clusters.pop(cluster_name)
                 artifact_content = [artifact_df.get_artifact(id_)[ArtifactKeys.CONTENT] for id_ in artifact2cluster]
-                prompt = SupportedPrompts.RE_CLUSTER_FEATURE.value.format(feature=cluster_name)
+                prompt = SupportedPrompts.RE_CLUSTER_FEATURE.value
                 clusters.update(LLMClustering._get_clusters(artifact2cluster, artifact_content, target_artifact_type,
                                                             llm_manager, features=list(clusters.keys()),
-                                                            base_prompt=prompt))
+                                                            prompts=prompt, feature=cluster_name))
         return clusters
 
     @staticmethod
@@ -143,7 +142,7 @@ class LLMClustering(iClustering):
 
     @staticmethod
     def _get_response(artifact_ids: List[str], artifact_content: List[str], llm_manager: AbstractLLMManager,
-                      prompt: Union[SupportedPrompts, str]) -> str:
+                      prompts: List[Prompt], **prompt_args) -> str:
         """
         Gets the response for a given prompt from the LLM
         :param artifact_ids: List of artifact ids to use in prompt
@@ -153,8 +152,9 @@ class LLMClustering(iClustering):
         :return: The response from the LLM
         """
         contents = [LLMClustering.format_artifact_content(i, artifact_ids[i], content) for i, content in enumerate(artifact_content)]
-        prompt_creator = GenerationPromptCreator(llm_manager.prompt_args, prompt)
-        prompt = prompt_creator.create(NEW_LINE.join(contents))[PromptKeys.PROMPT]
+        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts)
+        prompt = prompt_builder.build(artifacts=[{ArtifactKeys.CONTENT: content} for content in contents], **prompt_args)[
+            PromptKeys.PROMPT]
         LLMClustering._set_max_tokens(llm_manager, prompt)
         params = llm_manager.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
         res = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION, prompt=prompt, **params)

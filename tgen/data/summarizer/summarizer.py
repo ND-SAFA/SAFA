@@ -7,8 +7,10 @@ from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_default_llm_manager
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
@@ -43,12 +45,12 @@ class Summarizer(BaseObject):
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.prompt_args = self.llm_manager.prompt_args
-        self.code_prompt_creator = GenerationPromptCreator(
+        self.code_prompt_builder = PromptBuilder(
             prompt_args=self.prompt_args,
-            base_prompt=code_base_prompt)
-        self.nl_prompt_creator = GenerationPromptCreator(
+            prompts=code_base_prompt.value)
+        self.nl_prompt_builder = PromptBuilder(
             prompt_args=self.prompt_args,
-            base_prompt=nl_base_prompt)
+            prompts=nl_base_prompt.value)
 
     def summarize_bulk(self, contents: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None) -> List[str]:
         """
@@ -144,7 +146,7 @@ class Summarizer(BaseObject):
         all_prompts = list(itertools.chain.from_iterable(prompts))
         res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
                                                                       prompt=all_prompts)
-        batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG).strip() for r in res.batch_responses] \
+        batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG)[0].strip() for r in res.batch_responses] \
             if res else [EMPTY_STRING]
         summaries = []
         start_index = 0
@@ -170,8 +172,8 @@ class Summarizer(BaseObject):
         chunks = chunker.chunk(content=content, id_=id_)
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return []  # skip summarizing content below token limit unless code
-        prompt_creator = self.nl_prompt_creator if chunker_type == SupportedChunker.NL else self.code_prompt_creator
-        return [prompt_creator.create(target_content=chunk)[PromptKeys.PROMPT.value] for chunk in chunks]
+        prompt_builder = self.nl_prompt_builder if chunker_type == SupportedChunker.NL else self.code_prompt_builder
+        return [prompt_builder.build(artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
     def _summarize_selective(self, contents, indices2summarize, prompts_for_summaries):
         """

@@ -3,14 +3,15 @@ import uuid
 from copy import deepcopy
 from unittest import mock
 
-from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -19,6 +20,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -29,6 +31,7 @@ from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.enum_util import EnumDict
+from tgen.util.llm_response_util import LLMResponseUtil
 
 
 def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):
@@ -44,6 +47,15 @@ def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteri
 class TestHierarchyGeneration(BaseTest):
     LAYER_ID = str(uuid.uuid4())
     TARGET_TYPE = "user_story"
+    FAKE_CLASSIFICATION_OUTPUT = {
+        "classification": "A",
+        "justification": "Something",
+        "source_subsystem": "source_subsystem",
+        "target_subsystem": "target_subsystem",
+        "similarity": "0.8",
+        "difference": "difference",
+        "score": "0.9",
+    }
 
     class FakeDatasetCreator:
 
@@ -55,7 +67,11 @@ class TestHierarchyGeneration(BaseTest):
     @mock.patch.object(ClusterDatasetCreator, "get_clusters")
     @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=fake_anthropic_completion)
     @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)
-    def test_run(self, mock_completion_open_ai: mock.MagicMock, mock_completion_anthr: mock.MagicMock, mock_cluster: mock.MagicMock):
+    @mock.patch.object(LLMResponseUtil, "extract_labels")
+    def test_run(self, llm_response_mock: mock.MagicMock, mock_completion_open_ai: mock.MagicMock,
+                 mock_completion_anthr: mock.MagicMock, mock_cluster: mock.MagicMock):
+        llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
+
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
                             self.get_dataset_creator_with_trace_dataset_creator(),
                             self.FakeDatasetCreator()]
@@ -134,7 +150,9 @@ class TestHierarchyGeneration(BaseTest):
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
     @mock.patch("openai.Completion.create")
-    def test_create_linked_dataset_for_intra_level_artifacts(self, mock_completion: mock.MagicMock):
+    @mock.patch.object(LLMResponseUtil, "extract_labels")
+    def test_create_linked_dataset_for_intra_level_artifacts(self, llm_response_mock: mock.MagicMock, mock_completion: mock.MagicMock):
+        llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
         mock_completion.side_effect = fake_open_ai_completion
         artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
@@ -143,7 +161,7 @@ class TestHierarchyGeneration(BaseTest):
         linked_dataset = hgen._create_linked_dataset_for_intra_level_artifacts(artifact_df, export_path=TEST_OUTPUT_DIR).trace_dataset
         self.verify_single_layer_dataset(linked_dataset, artifact_df, layer_id)
         for label in list(linked_dataset.trace_df[TraceKeys.LABEL]):
-            self.assertLess(label - 0.4012, 0.1)
+            self.assertLess(label - 0.9, 0.1)
 
     def test_save_dataset_checkpoint(self):
         dataset = PromptDatasetCreator(project_reader=PromptTestProject.get_project_reader()).create()
@@ -199,8 +217,10 @@ class TestHierarchyGeneration(BaseTest):
         trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(dataset_creator)
         llm_manager = OpenAIManager(llm_args=OpenAIArgs(metrics=[]))
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts=[prompt])
-        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager, prompt_builder=prompt_builder)
+        prompt2 = MultiArtifactPrompt(include_ids=False, requires_trace_link=True)
+        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts=[prompt, prompt2])
+        return LLMTrainer(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager,
+                          prompt_builder=prompt_builder, completion_type=LLMCompletionType.CLASSIFICATION)
 
     @staticmethod
     def get_trainer_dataset_manager(dataset_creator: PromptDatasetCreator):

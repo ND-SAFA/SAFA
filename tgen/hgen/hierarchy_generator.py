@@ -16,7 +16,7 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -37,7 +37,7 @@ class HierarchyGenerator(BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
-    BASE_PROMPT = SupportedPrompts.ARTIFACT_GENERATION
+    BASE_PROMPT = SupportedPrompts.UAV_SYSTEM_REQUIREMENT
     GENERATION_TAG = "doc"
 
     def __init__(self, args: HGenArgs):
@@ -106,12 +106,12 @@ class HierarchyGenerator(BaseObject):
         """
         logger.info(f"\nGenerating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
         example = self._get_example_of_target_type()
-        prompt_creator = GenerationPromptCreator(prompt_args=self.args.hgen_llm_manager.prompt_args,
-                                                 base_prompt=self.BASE_PROMPT.value.format_value(artifact_type=self.args.target_type,
-                                                                                                 example=example))
+        prompt_builder = PromptBuilder(prompt_args=self.args.hgen_llm_manager.prompt_args,
+                                        prompts=self.BASE_PROMPT.value)
+        prompt_builder.format_prompts_with_var(artifact_type=self.args.target_type, example=example)
         hgen_trainer = LLMTrainer(llm_manager=self.args.hgen_llm_manager,
                                   trainer_dataset_manager=hgen_dataset_manager,
-                                  prompt_builder=prompt_creator,
+                                  prompt_builder=prompt_builder,
                                   completion_type=LLMCompletionType.GENERATION)
         if export_path:
             self._update_trainer_args(hgen_trainer, export_path)
@@ -169,7 +169,7 @@ class HierarchyGenerator(BaseObject):
         :param generation: The response from the LLM for the artifact content
         :return: The new artifact content
         """
-        return LLMResponseUtil.parse(generation, HierarchyGenerator.GENERATION_TAG)
+        return LLMResponseUtil.parse(generation, HierarchyGenerator.GENERATION_TAG)[0]
 
     @staticmethod
     def _create_trace_df_with_generated_artifacts(hgen_trace_df: TraceDataFrame, artifact_df: ArtifactDataFrame,
@@ -208,7 +208,7 @@ class HierarchyGenerator(BaseObject):
         single_layer_dataset = self._create_dataset_with_single_layer(artifacts_df, self.args.source_layer_id)
         prediction_entries = self.args.tgen_trainer.perform_prediction(dataset=single_layer_dataset).prediction_entries
         for entry in prediction_entries:
-            entry[TraceKeys.LABEL.value] = entry.pop("score")  # replace score with label to use scores as soft labels
+            entry[TraceKeys.LABEL.value] = float(entry["score"])  # replace score with label to use scores as soft labels
         trace_df = TraceDataFrame(prediction_entries)
         trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
                                                                layer_mapping_df=single_layer_dataset.layer_df)
@@ -298,9 +298,9 @@ class HierarchyGenerator(BaseObject):
         :return: An example of the target artifact
         """
         logger.info("Getting example of target type.")
-        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value.format_value(artifact_type=self.args.target_type)
-        example_prompt = GenerationPromptCreator(prompt_args=self.args.llm_manager_for_example.prompt_args,
-                                                 base_prompt=example_prompt_format).create('')[PromptKeys.PROMPT]
+        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value
+        example_prompt = PromptBuilder(prompt_args=self.args.llm_manager_for_example.prompt_args,
+                                        prompts=example_prompt_format).build(artifact_type=self.args.target_type)[PromptKeys.PROMPT]
         args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
         res = self.args.llm_manager_for_example.make_completion_request(prompt=example_prompt,
                                                                         completion_type=LLMCompletionType.GENERATION,

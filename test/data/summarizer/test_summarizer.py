@@ -5,6 +5,7 @@ from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_B
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
@@ -24,7 +25,7 @@ class TestSummarizer(BaseTest):
         mock_completion.side_effect = fake_open_ai_completion
         llm_manager = OpenAIManager(OpenAIArgs())
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
-        prompts = [summarizer.nl_prompt_creator.create(chunk)[PromptKeys.PROMPT] for chunk in self.CHUNKS]
+        prompts = [summarizer.code_prompt_builder.build(artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT] for chunk in self.CHUNKS]
         summary = summarizer._summarize_chunks(llm_manager, prompts)[0]
         expected_summary = "".join(SUMMARY_FORMAT.format(chunk) for chunk in self.CHUNKS)
         self.assertEqual(summary, expected_summary)
@@ -83,7 +84,7 @@ class TestSummarizer(BaseTest):
         summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
                              NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
         summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
-        self.assertEqual( "".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
+        self.assertEqual("".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
 
         # set code_or_exceeds_limit_only to TRUE this time
         llm_manager = OpenAIManager(OpenAIArgs())
@@ -110,13 +111,14 @@ class TestSummarizer(BaseTest):
 
         long_text = "This is a text is over the token limit"
         prompts = summarizer._create_summarization_prompts(long_text)
-        expected_prompts = [summarizer.nl_prompt_creator.create(chunk)[PromptKeys.PROMPT]
+        expected_prompts = [summarizer.nl_prompt_builder.build(artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT]
                             for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)]
         self.assertListEqual(prompts, expected_prompts)
 
         python_code = "x = 1"
         prompts = summarizer._create_summarization_prompts(python_code, chunker_type=SupportedChunker.PY)
-        self.assertEqual(prompts, [summarizer.code_prompt_creator.create(python_code)[PromptKeys.PROMPT]])
+        self.assertEqual(prompts,
+                         [summarizer.code_prompt_builder.build(artifact={ArtifactKeys.CONTENT: python_code})[PromptKeys.PROMPT]])
 
         short_text = "short text"
         summarizer.code_or_above_limit_only = False

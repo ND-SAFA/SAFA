@@ -1,4 +1,4 @@
-from enum import StrEnum, auto
+from enum import auto, Enum
 from typing import List
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -13,7 +13,7 @@ class MultiArtifactPrompt(Prompt):
     Responsible for formatting and parsing of presenting many artifacts in a prompt
     """
 
-    class BuildMethod(StrEnum):
+    class BuildMethod(Enum):
         """
         The method to build the prompt (determines prompt format)
         """
@@ -30,8 +30,8 @@ class MultiArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
-        super().__init__(value=EMPTY_STRING, response_tag=None, include_expected_response=False,
-                         requires_traces=requires_trace_link, requires_artifacts=not requires_trace_link)
+        super().__init__(value=EMPTY_STRING, response_tag=None, requires_traces=requires_trace_link,
+                         requires_artifacts=not requires_trace_link)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:

@@ -5,9 +5,11 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -26,7 +28,10 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader)
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(GenerationPromptCreator())
+        prompt = QuestionPrompt("Tell me about this artifact:")
+        artifact_prompt = ArtifactPrompt(include_id=False)
+        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt, artifact_prompt])
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder)
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
     def test_project_reader_artifact_with_summarizer(self):
@@ -46,9 +51,11 @@ class TestPromptDatasetCreator(BaseTest):
     def test_trace_dataset_creator(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator)
-        trace_df = TraceDatasetCreator(PromptTestProject.SAFA_PROJECT.get_project_reader()).create().trace_df
-        prompt_creator = ClassificationPromptCreator()
-        self.verify_dataset_creator(dataset_creator, prompt_creator=prompt_creator, trace_df=trace_df)
+        trace_df = dataset_creator.trace_dataset_creator.create().trace_df
+        prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
+        prompt2 = MultiArtifactPrompt(requires_trace_link=True)
+        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[prompt, prompt2])
+        self.verify_dataset_creator(dataset_creator, prompt_builder=prompt_builder, trace_df=trace_df)
 
     def test_trace_dataset_creator_with_summarizer(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
@@ -74,9 +81,13 @@ class TestPromptDatasetCreator(BaseTest):
         self.assertEqual(trace_dataset.project_file_id, "id")
 
     def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame, use_targets_only: bool = False,
-                               prompt_creator: AbstractPromptCreator = GenerationPromptCreator()):
+                               prompt_builder: PromptBuilder = None):
+        if prompt_builder is None:
+            prompt1 = QuestionPrompt("Tell me about this artifact:")
+            prompt2 = MultiArtifactPrompt(requires_trace_link=True)
+            prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt1, prompt2])
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_creator)
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder)
         if not use_targets_only:
             PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
         else:

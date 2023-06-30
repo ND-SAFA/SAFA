@@ -21,10 +21,10 @@ class QuestionnairePrompt(Prompt):
         """
         self.question_prompts = question_prompts
         self.enumeration_chars = enumeration_chars
-        super().__init__(instructions, include_expected_response=False)
+        super().__init__(instructions)
 
     @overrides(Prompt)
-    def _build(self) -> str:
+    def _build(self, **kwargs) -> str:
         """
         Constructs the prompt in the following format:
         [Instructions]
@@ -33,6 +33,7 @@ class QuestionnairePrompt(Prompt):
         C) Question n
         :return: The formatted prompt
         """
+        self.format_value(**kwargs)
         question_format = "{}) {}"
         formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question)
                                              for i, question in enumerate(self.question_prompts)])

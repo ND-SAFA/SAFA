@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from paper.pipeline.response_process_step import process_ranked_artifacts
 from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.ranking import process_ranked_artifacts
 
 
 class TestProcessingRankingPrompts(TestCase):

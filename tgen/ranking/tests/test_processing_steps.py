@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from paper.pipeline.map_step import process_artifact_ids, process_response
+from tgen.ranking.pipeline.map_step import process_artifact_ids, process_response
 
 
 class TestProcessingSteps(TestCase):

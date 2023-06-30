@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from paper.common.ranking_prompt_builder import RankingPromptBuilder
+from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 
 
 class TestPromptBuilder(TestCase):

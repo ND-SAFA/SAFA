@@ -1,11 +1,11 @@
 import os
 import random
 
-from paper.pipeline.base import RankingStore, create_artifact_map
-from paper.pipeline.sort_step import registered_sorters
-from paper.pipeline.utils import extract_prompt_artifacts
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.ranking.pipeline.base import RankingStore, create_artifact_map
+from tgen.ranking.pipeline.sort_step import registered_sorters
+from tgen.ranking.pipeline.utils import extract_prompt_artifacts
 
 
 def extract_related_target_artifacts(s: RankingStore):

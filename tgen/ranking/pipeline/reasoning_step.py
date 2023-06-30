@@ -1,7 +1,8 @@
-from paper.common.completion_util import complete_prompts
-from paper.common.ranking_prompt_builder import RankingPromptBuilder
-from paper.pipeline.base import RankingStore
-from paper.pipeline.ipipeline import iPipeline
+from tgen.ranking.common.completion_util import complete_prompts
+from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
+from tgen.ranking.pipeline.base import RankingStore
+from tgen.ranking.pipeline.ipipeline import iPipeline
+
 from tgen.util.list_util import ListUtil
 
 MAX_ARTIFACTS_PER_PROMPT = 60

@@ -2,15 +2,15 @@ from typing import Dict, List, Union
 
 import pandas as pd
 
-from paper.pipeline.base import RankingStore
-from paper.pipeline.map_step import create_increment_list
-from paper.pipeline.ranking_step import RankingStep
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.ranking.pipeline.base import RankingStore
+from tgen.ranking.pipeline.map_step import create_increment_list
+from tgen.ranking.pipeline.ranking_step import RankingStep
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput

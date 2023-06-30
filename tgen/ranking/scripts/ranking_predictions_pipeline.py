@@ -1,10 +1,10 @@
 import os.path
 
-from paper.pipeline.base import DatasetIdentifier, RankingPipeline
-from paper.pipeline.classification_step import compute_precision
-from paper.pipeline.extract_targets_steps import extract_related_target_artifacts
-from paper.pipeline.io_step import read_positive_predictions
-from paper.pipeline.map_step import compute_map, create_metric_instructions
+from tgen.ranking.pipeline.base import DatasetIdentifier, RankingPipeline
+from tgen.ranking.pipeline.classification_step import compute_precision
+from tgen.ranking.pipeline.extract_targets_steps import extract_related_target_artifacts
+from tgen.ranking.pipeline.io_step import read_positive_predictions
+from tgen.ranking.pipeline.map_step import compute_map, create_metric_instructions
 
 if __name__ == "__main__":
     EXPERIMENT_ID = "c3442bd7-4d4a-4891-827b-a91b0dc1e799"

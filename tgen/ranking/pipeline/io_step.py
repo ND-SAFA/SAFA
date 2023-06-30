@@ -1,9 +1,9 @@
 import random
 from typing import Callable
 
-from paper.pipeline.base import RankingStore, get_trace_id
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.ranking.pipeline.base import RankingStore, get_trace_id
 from tgen.util.json_util import JsonUtil
 
 

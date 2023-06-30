@@ -1,13 +1,13 @@
 import os.path
 import uuid
 
-from paper.pipeline.base import DatasetIdentifier, RankingPipeline
-from paper.pipeline.classification_step import compute_precision
-from paper.pipeline.extract_targets_steps import extract_related_target_artifacts
-from paper.pipeline.io_step import read_labels
-from paper.pipeline.map_step import compute_map, create_metric_instructions
-from paper.pipeline.ranking_step import RankingStep
-from paper.pipeline.reasoning_step import ReasoningStep
+from tgen.ranking.pipeline.base import DatasetIdentifier, RankingPipeline
+from tgen.ranking.pipeline.classification_step import compute_precision
+from tgen.ranking.pipeline.extract_targets_steps import extract_related_target_artifacts
+from tgen.ranking.pipeline.io_step import read_labels
+from tgen.ranking.pipeline.map_step import compute_map, create_metric_instructions
+from tgen.ranking.pipeline.ranking_step import RankingStep
+from tgen.ranking.pipeline.reasoning_step import ReasoningStep
 
 if __name__ == "__main__":
     EXPERIMENT_ID = str(uuid.uuid4())

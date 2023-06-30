@@ -9,7 +9,6 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
-from paper.pipeline.utils import extract_prompt_artifacts
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -17,6 +16,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.ranking.pipeline.utils import extract_prompt_artifacts
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.stage_eval import Metrics

@@ -1,4 +1,4 @@
-from paper.pipeline.base import RankingStore
+from tgen.ranking.pipeline.base import RankingStore
 
 
 def compute_precision(s: RankingStore):

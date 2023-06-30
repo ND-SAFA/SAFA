@@ -1,6 +1,6 @@
 from typing import Callable, List
 
-from paper.pipeline.base import RankingStore
+from tgen.ranking.pipeline.base import RankingStore
 
 
 class iPipeline:

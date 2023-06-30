@@ -1,10 +1,10 @@
 import random
 from typing import List
 
-from paper.common.completion_util import complete_prompts
-from paper.common.ranking_prompt_builder import RankingPromptBuilder
-from paper.pipeline.base import RankingStore
-from paper.pipeline.ipipeline import iPipeline
+from tgen.ranking.common.completion_util import complete_prompts
+from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
+from tgen.ranking.pipeline.base import RankingStore
+from tgen.ranking.pipeline.ipipeline import iPipeline
 from tgen.util.llm_response_util import LLMResponseUtil
 
 RESPONSE_PROCESSING_STEPS = [

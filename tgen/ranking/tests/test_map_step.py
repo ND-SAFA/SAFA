@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from paper.pipeline.classification_step import add_precision_to_metrics
-from paper.pipeline.map_step import calculate_map, calculate_map_instructions
+from tgen.ranking.pipeline.classification_step import add_precision_to_metrics
+from tgen.ranking.pipeline.map_step import calculate_map, calculate_map_instructions
 
 
 class TestMapStep(TestCase):

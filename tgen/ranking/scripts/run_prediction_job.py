@@ -1,15 +1,15 @@
 import os.path
 import uuid
 
-from paper.pipeline.base import DatasetIdentifier, RankingPipeline, RankingStore, get_trace_id
-from paper.pipeline.classification_step import compute_precision
-from paper.pipeline.map_step import calculate_map_instructions, compute_map
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.ranking.pipeline.base import DatasetIdentifier, RankingPipeline, RankingStore, get_trace_id
+from tgen.ranking.pipeline.classification_step import compute_precision
+from tgen.ranking.pipeline.map_step import calculate_map_instructions, compute_map
 from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.status import Status

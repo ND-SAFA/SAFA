@@ -3,7 +3,7 @@ from typing import Dict, List
 import numpy as np
 from sklearn.metrics import average_precision_score
 
-from paper.pipeline.base import RankingStore, get_trace_id
+from tgen.ranking.pipeline.base import RankingStore, get_trace_id
 
 
 def compute_map(s: RankingStore):

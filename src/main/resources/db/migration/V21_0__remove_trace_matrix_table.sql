@@ -1,1 +1,0 @@
-DROP TABLE trace_matrix;

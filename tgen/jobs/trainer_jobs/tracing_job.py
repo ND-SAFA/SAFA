@@ -4,6 +4,8 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -13,7 +15,9 @@ from tgen.util.ranking_util import RankingUtil
 
 class TracingJob(LLMJob):
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL):
-        super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT)
+        llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
+        llm_manager = AnthropicManager(llm_args=llm_args)
+        super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT, llm_manager=llm_manager)
         self.dataset_role = dataset_role
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:

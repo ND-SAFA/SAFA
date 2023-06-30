@@ -49,7 +49,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        # self.update_output_path(output_dir)
+        self.update_output_path(output_dir)
         job_runs = self._divide_jobs_into_runs()
 
         for jobs in job_runs:
@@ -185,6 +185,7 @@ class ExperimentStep(BaseObject):
                 model_path = os.path.join(job_base_path, "models")
                 setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                setattr(job.job_args, "output_dir", model_path)
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
                     setattr(job.trainer_dataset_manager, "output_dir", output_dir)

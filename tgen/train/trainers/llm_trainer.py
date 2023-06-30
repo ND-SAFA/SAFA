@@ -176,8 +176,8 @@ class LLMTrainer(AbstractTrainer):
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
-                logger.log_with_title(f"Metrics", repr(output.metrics))
-                logger.info(json.dumps(class2correct, indent=1))
+                logger.log_with_title("Candidate Metrics", repr(output.metrics))
+                logger.log_with_title("Class Counts", json.dumps(class2correct))
             output.label_ids = metrics_manager.trace_matrix.labels
 
         return output

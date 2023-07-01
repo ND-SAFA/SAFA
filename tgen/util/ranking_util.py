@@ -24,8 +24,8 @@ class RankingUtil:
             parent2children_sorted = {}
             for parent_id in parent_ids:
                 children_ids = parent2children[parent_id]
-                parent2children = sorter([parent_id], children_ids, artifact_map)
-                sorted_children_ids = parent2children[parent_id]
+                parent_map = sorter([parent_id], children_ids, artifact_map)
+                sorted_children_ids = parent_map[parent_id]
                 parent2children_sorted[parent_id] = sorted_children_ids
             parent2children = parent2children_sorted
 

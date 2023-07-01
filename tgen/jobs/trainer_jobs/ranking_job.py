@@ -17,7 +17,7 @@ class RankingJob(LLMJob):
                  sorter: str = "vsm"):
         super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT)
         self.dataset_role = dataset_role
-        self.sorter = registered_sorters[sorter]
+        self.sorter = sorter
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         dataset: TraceDataset = self.trainer_dataset_manager[self.dataset_role]
@@ -26,8 +26,8 @@ class RankingJob(LLMJob):
         # TODO: Deal with multi-layer
         parent_type, child_type = dataset.artifact_df.get_parent_child_types()
 
-        parent_ids = list(dataset.artifact_df.filter_by_type(parent_type).index)
-        children_ids = list(dataset.artifact_df.filter_by_type(child_type).index)
+        parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
+        children_ids = list(dataset.artifact_df.get_type(child_type).index)
         parent2children = {p_id: children_ids for p_id in parent_ids}
 
         predicted_entries = self.get_ranking_entries(parent_ids, parent2children, artifact_map)
@@ -39,7 +39,8 @@ class RankingJob(LLMJob):
     def get_ranking_entries(self, parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str]) -> List[
         TracePredictionEntry]:
         predicted_entries = []
-        batched_ranked_children = RankingUtil.rank_children(parent_ids, parent2children, artifact_map, sorter=self.sorter)
+        sorting_function = registered_sorters[self.sorter]
+        batched_ranked_children = RankingUtil.rank_children(parent_ids, parent2children, artifact_map, sorter=sorting_function)
 
         for i, ranked_children in enumerate(batched_ranked_children):
             parent_id = parent_ids[i]

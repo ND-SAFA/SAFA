@@ -24,12 +24,16 @@ def random_sorter(source_names, target_names, artifact_map) -> Dict[str, List[st
     return {s: target_names for s in source_names}
 
 
-def vsm_sorter(source_names, target_names, artifact_map) -> Dict[str, str]:
-    artifact_df = ArtifactDataFrame({ArtifactKeys.ID: source_names + target_names,
-                                     ArtifactKeys.CONTENT: list(artifact_map.values()),
-                                     ArtifactKeys.LAYER_ID: ["source" for source in source_names] +
-                                                            ["target" for target in target_names]})
-    layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: ["source"], LayerKeys.TARGET_TYPE: ["target"]})
+def vsm_sorter(parent_names: List[str], child_names: List[str], artifact_map: Dict[str, str]) -> Dict[str, str]:
+    parent_tag_name = "target"
+    child_tag_name = "source"
+    artifact_names = parent_names + child_names
+    artifact_map = [artifact_map[a_name] for a_name in artifact_names]
+    artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_names,
+                                     ArtifactKeys.CONTENT: artifact_map,
+                                     ArtifactKeys.LAYER_ID: [parent_tag_name for source in parent_names] +
+                                                            [child_tag_name for target in child_names]})
+    layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [child_tag_name], LayerKeys.TARGET_TYPE: [parent_tag_name]})
     dataset_creator = TraceDatasetCreator(FakeProjectReader(artifact_df=artifact_df, layer_df=layer_df))
 
     trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=dataset_creator)
@@ -40,8 +44,8 @@ def vsm_sorter(source_names, target_names, artifact_map) -> Dict[str, str]:
     prediction_entries = vsm_result.prediction_output.prediction_entries
     unsorted_targets = {}
     for entry in prediction_entries:
-        source = entry["source"]
-        target = entry["target"]
+        source = entry[parent_tag_name]
+        target = entry[child_tag_name]
         if source not in unsorted_targets:
             unsorted_targets[source] = {}
         unsorted_targets[source][target] = entry["score"]

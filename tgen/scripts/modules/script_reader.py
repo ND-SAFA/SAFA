@@ -66,9 +66,6 @@ class ScriptOutputReader:
         Prints the validation metrics of experiment.
         :return: None
         """
-        logger.log_with_title("Validation Results", "")
-        val_df = self._get_val_df()
-        self.print_results(val_df, self.metric_names, self.display_metrics)
 
     def upload_to_s3(self) -> None:
         """
@@ -86,26 +83,12 @@ class ScriptOutputReader:
         Returns the results for validation and test sets.
         :return: Tuple of dataframe with former for validation and latter for test.
         """
-        val_entries = []
-        eval_entries = []
         job_paths = self.read_experiment_jobs(self.experiment_path)
         for job_path in job_paths:
             output_path = os.path.join(job_path, OUTPUT_FILENAME)
             if not os.path.exists(output_path):
                 continue
             job_result = JobResult.from_dict(JsonUtil.read_json_file(output_path))
-            base_entry = {k: v for k, v in job_result.experimental_vars.items() if
-                          k not in self.experiment_vars_ignore}
-            validation_metrics = self.read_validation_entries(job_result.body, self.metric_names, base_entry=base_entry)
-            val_entries.extend(validation_metrics)
-            eval_metric_entry = self.read_eval_entry(job_result.body, self.metric_names, base_entry=base_entry)
-            if eval_metric_entry:
-                eval_entries.append(eval_metric_entry)
-        self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
-        if self.export:
-            self.val_df.to_csv(self.val_output_path, index=False)
-            self.eval_df.to_csv(self.eval_output_path, index=False)
-        return self.val_df, self.eval_df
 
     def _get_eval_df(self) -> pd.DataFrame:
         """

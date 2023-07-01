@@ -47,7 +47,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_row(artifact_id)
 
-    def filter_by_type(self, type_name: str):
+    def get_type(self, type_name: str):
         """
         Returns data frame with artifacts of given type.
         :param type_name: The type to filter by.

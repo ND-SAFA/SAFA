@@ -181,8 +181,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         for _, row in layer_mapping_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            source_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == source_type].index
-            target_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == target_type].index
+
+            source_artifact_ids = artifact_df.get_type(source_type).index
+            target_artifact_ids = artifact_df.get_type(target_type).index
             assert len(source_artifact_ids) > 0, f"Expected at least one source artifact of type {source_type}"
             assert len(target_artifact_ids) > 0, f"Expected at least one target artifact of type {target_type}"
 

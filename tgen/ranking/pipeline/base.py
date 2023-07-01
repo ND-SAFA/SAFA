@@ -13,15 +13,19 @@ DEFAULT_REASONING_GOAL = " # Task\n\n" \
                          "\n\nSource:"
 DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. " \
                                  "Enclose your answer in <relation>ID - Reason</relation>"
-DEFAULT_RANKING_GOAL = "# Task\n\nFind and rank all related artifacts from most to least related to the source.\n\nSource: "
-DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n\n" \
-                               "A. Find the artifacts that are related to functionality of the source. " \
-                               "If unsure about an artifact, choose to include it. " \
-                               "Provide the ranking as comma delimited list of artifact ids enclosed in <selected></selected>." \
-                               "B. Rank the selected artifacts from most to least relevant to the source functionality. " \
+DEFAULT_RANKING_GOAL = "# Task\n\n" \
+                       "You are a software engineer on a software system. You are tasked with linking all related documentation. " \
+                       "Below is a source query followed by the software artifacts in the system." \
+                       "Find and rank all related artifacts from most to least related to the source.\n\nSource: "
+DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
+                               "\nA. Provide a detailed summary of the system's core purpose. " \
+                               "Enclose your answer within <summary></summary>." \
+                               "\nB. Then, rank the artifacts from most to least critical" \
+                               " to the source's functionality within the context of the system. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
-                               "first element relates to the source the most and the last element does so the least. " \
-                               "Enclose the list in <links></links>."
+                               "first element is the most related the functionality of the source " \
+                               "while the last element is the least related. " \
+                               "Omit any artifacts unrelated the source. Enclose the list in <links></links>."
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 

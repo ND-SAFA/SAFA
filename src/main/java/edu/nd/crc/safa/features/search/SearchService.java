@@ -59,6 +59,7 @@ public class SearchService {
      * @param projectAppEntity The project containing artifacts to search.
      * @param artifactIds      The ids of the artifacts to use as queries.
      * @param searchTypes      The types of artifacts to match against.
+     * @param n                The number of entries to return.
      * @return List of matched artifacts.
      */
     public SearchResponse performArtifactSearch(ProjectAppEntity projectAppEntity,

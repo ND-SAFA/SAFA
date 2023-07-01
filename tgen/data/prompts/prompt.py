@@ -13,23 +13,18 @@ class Prompt:
     """
     RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
-    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None,
-                 requires_traces: bool = False, requires_artifacts: bool = False, response_instructions: str = RESPONSE_FORMAT):
+    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None, response_instructions: str = RESPONSE_FORMAT):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
         :param response_tag: The name of the tag the model is expected to enclose its response in
         :param prompt_id: Specify specific id for the prompt
-        :param requires_traces: True if prompt requires trace link
-        :param requires_artifacts: True if prompt requires artifacts
         :param response_instructions: The format instructions for the response desired from model
         """
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
         self.response_tag = response_tag
         self.include_expected_response = response_tag is not None
-        self.requires_traces = requires_traces
-        self.requires_artifacts = requires_artifacts
         self.response_instructions = response_instructions
 
     def build(self, **kwargs) -> str:
@@ -76,7 +71,8 @@ class Prompt:
                 kwargs[field] = '{%s}' % field
             if args and i >= len(args):
                 updated_args.append('{%s}' % field)
-        self.value = self.value.format(*updated_args, **kwargs)
+        if args or kwargs:
+            self.value = self.value.format(*updated_args, **kwargs)
 
     def _build_response_instructions(self) -> str:
         """

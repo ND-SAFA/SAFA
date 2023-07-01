@@ -153,7 +153,7 @@ class LLMClustering(iClustering):
         """
         contents = [LLMClustering.format_artifact_content(i, artifact_ids[i], content) for i, content in enumerate(artifact_content)]
         prompt_builder = PromptBuilder(prompts)
-        prompt = prompt_builder.build(prompt_args=llm_manager.prompt_args ,
+        prompt = prompt_builder.build(model_format_args=llm_manager.prompt_args,
                                       artifacts=[{ArtifactKeys.CONTENT: content} for content in contents], **prompt_args)[
             PromptKeys.PROMPT]
         LLMClustering._set_max_tokens(llm_manager, prompt)

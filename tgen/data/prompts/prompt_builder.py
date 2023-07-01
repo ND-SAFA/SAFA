@@ -1,9 +1,12 @@
-from typing import List, Tuple, Any, Dict
+from typing import List, Any, Dict
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.data.prompts.prompt_config import PromptConfig
 from tgen.util.enum_util import EnumDict
 from tgen.util.llm_response_util import LLMResponseUtil
 
@@ -15,32 +18,88 @@ class PromptBuilder:
         Constructs prompt creator with prompt arguments as configuration.
         :param prompts: The list of prompts to use to build the final prompt
         """
-        self.prompts = prompts
-        self.requires_traces, self.requires_artifacts = self._check_requirements(self.prompts)
+        self._prompts = prompts
+        self._create_config()
 
-    def build(self, prompt_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs,) -> EnumDict[str, str]:
+    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs, ) -> EnumDict[str, str]:
         """
         Generates the prompt and response
+        :param model_format_args: Defines the formatting specific to the model
         :param correct_completion: The correct completion that the model should produce
         :return: Dictionary containing the prompt and completion
         """
-        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self._prompts]
         base_prompt = NEW_LINE.join(built_prompts)
-        prompt = self._format_prompt_for_model(base_prompt, prompt_args=prompt_args)
-        completion = self._format_completion(correct_completion, prompt_args=prompt_args)
+        prompt = self._format_prompt_for_model(base_prompt, prompt_args=model_format_args)
+        completion = self._format_completion(correct_completion, prompt_args=model_format_args)
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
         })
-    
+
+    def add_prompt(self, prompt: Prompt, i: int = None) -> None:
+        """
+        Adds a prompt at the given index (appens to end by defailt
+        :param prompt: The prompt to add
+        :param i: The index to insert the prompt
+        :return: None
+        """
+        if i is None or i == len(self._prompts):
+            self._prompts.append(prompt)
+        else:
+            self._prompts.insert(i, prompt)
+        self._create_config()
+
     def format_prompts_with_var(self, **kwargs) -> None:
         """
         Formats all prompts that have missing values (identified by '{$var_name$}') that are provided in the kwargs
         :param kwargs: Contains var_name to value mappings to format the prompts with
         :return: None
         """
-        for prompt in self.prompts:
+        for prompt in self._prompts:
             prompt.format_value(**kwargs)
+
+    def remove_prompt(self, i: int = None, prompt_id: str = None) -> None:
+        """
+        Removes the prompt at the given index or removes the prompt with the given id
+        :param i: The index of the prompt to remove
+        :param prompt_id: The id of the prompt to remove
+        :return: None
+        """
+        if prompt_id is not None:
+            i = self.find_prompt_by_id(prompt_id)
+            if i < 0:
+                i = None
+        if i is not None:
+            self._prompts.pop(i)
+            self._create_config()
+
+    def find_prompt_by_id(self, prompt_id: str) -> int:
+        """
+        Finds a prompt by its id and returns the index
+        :param prompt_id: The id of the prompt to find
+        :return: The index of the prompt if it exists, else -1
+        """
+        for i, prompt in enumerate(self._prompts):
+            if prompt.id == prompt_id:
+                return i
+        return -1
+
+    def get_prompt_by_id(self, prompt_id: str) -> Prompt:
+        """
+        Finds a prompt by its id
+        :param prompt_id: The id of the prompt to find
+        :return: The prompt if it exists, else None
+        """
+        i = self.find_prompt_by_id(prompt_id)
+        return self._prompts[i] if i >= 0 else None
+
+    def get_all_prompts(self) -> List[Prompt]:
+        """
+        Gets all prompts
+        :return: The list of prompts
+        """
+        return self._prompts
 
     def parse_responses(self, res: str) -> Dict[str, Any]:
         """
@@ -49,17 +108,17 @@ class PromptBuilder:
         :return: A dictionary mapping prompt id to its answers
         """
         tags = self._get_response_tag_to_prompt_indices()
-        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys())) 
-        responses = [[None] * len(self.prompts)]
+        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys()))
+        responses = [[None] * len(self._prompts)]
         for label, response in tag2response.items():
             prompt_indices = tags[label]
             for i, p_i in enumerate(prompt_indices):
                 if i >= len(response):
                     e = AssertionError(f"Received too few responses for {label}")
-                    responses[p_i] = self.prompts[p_i].parse_response_on_failure("", e)
+                    responses[p_i] = self._prompts[p_i].parse_response_on_failure("", e)
                 else:
-                    responses[p_i] = self.prompts[p_i].parse_response(response[i])
-        return {prompt.id: responses[i] for i, prompt in enumerate(self.prompts)}
+                    responses[p_i] = self._prompts[p_i].parse_response(response[i])
+        return {prompt.id: responses[i] for i, prompt in enumerate(self._prompts)}
 
     def _get_response_tag_to_prompt_indices(self) -> Dict[str, List[int]]:
         """
@@ -67,13 +126,27 @@ class PromptBuilder:
         :return: A mapping of tag to prompt indices
         """
         tags = {}
-        for i, prompt in enumerate(self.prompts):
+        for i, prompt in enumerate(self._prompts):
             tag = prompt.response_tag
             if tag:
                 if tag not in tags:
                     tags[tag] = []
                 tags[tag].append(i)
         return tags
+
+    def _create_config(self) -> PromptConfig:
+        """
+        Creates a config for the given prompts
+        :return: The configuration for the prompt builder
+        """
+        self.config = PromptConfig(False, False, False)
+        for prompt in self._prompts:
+            if isinstance(prompt, MultiArtifactPrompt):
+                self.config.requires_trace_per_prompt = prompt.type == MultiArtifactPrompt.DataType.TRACES
+                self.config.requires_all_artifacts = prompt.type == MultiArtifactPrompt.DataType.ARTIFACT
+            elif isinstance(prompt, ArtifactPrompt):
+                self.config.requires_artifact_per_prompt = True
+        return self.config
 
     @staticmethod
     def _format_prompt_for_model(base_prompt: str, prompt_args: PromptArgs) -> str:
@@ -96,17 +169,3 @@ class PromptBuilder:
         if not base_completion:
             return EMPTY_STRING
         return f"{prompt_args.completion_prefix}{base_completion}{prompt_args.completion_suffix}"
-
-    @staticmethod
-    def _check_requirements(prompts: List[Prompt]) -> Tuple[bool, bool]:
-        """
-        Determines if traces or artifacts are needed for prompt
-        :return: Tuple containing a bool representing if traces are required and bool for artifacts requirement
-        """
-        requires_traces, requires_artifacts = False, False
-        for prompt in prompts:
-            if prompt.requires_traces:
-                requires_traces = True
-            if prompt.requires_artifacts:
-                requires_artifacts = True
-        return requires_traces, requires_artifacts

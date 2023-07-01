@@ -171,8 +171,8 @@ class Summarizer(BaseObject):
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return []  # skip summarizing content below token limit unless code
         prompt_builder = self.nl_prompt_builder if chunker_type == SupportedChunker.NL else self.code_prompt_builder
-        return [prompt_builder.build(prompt_args=self.llm_manager.prompt_args,
-                artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
+        return [prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
+                                     artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
     def _summarize_selective(self, contents, indices2summarize, prompts_for_summaries):
         """

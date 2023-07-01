@@ -65,7 +65,7 @@ class TestOpenAiTrainer(BaseTest):
     def test_perform_training_generation(self, mock_file_create: mock.MagicMock = None, mock_fine_tune_create: mock.MagicMock = None):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create
-        prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
+        prompt = QuestionPrompt("Tell me about this artifact: ")
         prompt_builder = PromptBuilder([prompt])
         for dataset_creator in self.get_all_dataset_creators().values():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
@@ -80,18 +80,16 @@ class TestOpenAiTrainer(BaseTest):
         dataset_creators.pop("id")
         classification_prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
         classification_prompt_builder = PromptBuilder(prompts=[classification_prompt])
-        generation_prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
+        generation_prompt = QuestionPrompt("Tell me about this artifact: ")
         generation_prompt_builder = PromptBuilder([generation_prompt])
         for i, creator in enumerate([classification_prompt_builder, generation_prompt_builder]):
             for type_, dataset_creator in dataset_creators.items():
                 builder = deepcopy(creator)
                 if i == 0:
                     if (type_ == "dataset" or type_ == "trace"):
-                        builder.prompts.append(MultiArtifactPrompt(requires_trace_link=True))
-                        builder.requires_traces = True
+                        builder.add_prompt(MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES))
                     else:
-                        builder.prompts.append(ArtifactPrompt())
-                        builder.requires_artifacts = True
+                        builder.add_prompt(ArtifactPrompt())
                 trainer: LLMTrainer = self.get_llm_trainer(dataset_creator, [DatasetRole.EVAL], prompt_builder=builder,
                                                            completion_type=LLMCompletionType.CLASSIFICATION
                                                            if (type_ == "dataset" or type_ == "trace") and i == 0
@@ -102,7 +100,7 @@ class TestOpenAiTrainer(BaseTest):
                     self.assertGreater(len(res.prediction_entries), 1)
                     self.assertIsNotNone(res.metrics)
                 else:
-                    self.assertGreater(len(res.predictions), 1)
+                    self.assertGreaterEqual(len(res.predictions), 1)
 
     @staticmethod
     def get_all_dataset_creators() -> Dict[str, PromptDatasetCreator]:

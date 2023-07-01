@@ -53,7 +53,7 @@ class TestPromptDatasetCreator(BaseTest):
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator)
         trace_df = dataset_creator.trace_dataset_creator.create().trace_df
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        prompt2 = MultiArtifactPrompt(requires_trace_link=True)
+        prompt2 = MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)
         prompt_builder = PromptBuilder(prompts=[prompt, prompt2])
         self.verify_dataset_creator(dataset_creator, prompt_builder=prompt_builder, trace_df=trace_df)
 
@@ -84,7 +84,7 @@ class TestPromptDatasetCreator(BaseTest):
                                prompt_builder: PromptBuilder = None):
         if prompt_builder is None:
             prompt1 = QuestionPrompt("Tell me about this artifact:")
-            prompt2 = MultiArtifactPrompt(requires_trace_link=True)
+            prompt2 = MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)
             prompt_builder = PromptBuilder( [prompt1, prompt2])
         prompt_dataset = dataset_creator.create()
         prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args,)

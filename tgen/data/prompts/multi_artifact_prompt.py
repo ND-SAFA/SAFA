@@ -20,7 +20,12 @@ class MultiArtifactPrompt(Prompt):
         XML = auto()
         NUMBERED = auto()
 
-    def __init__(self, build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True, requires_trace_link: bool = False):
+    class DataType(Enum):
+        TRACES = auto()
+        ARTIFACT = auto()
+
+    def __init__(self, build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
+                 data_type: DataType = DataType.ARTIFACT):
         """
         Constructor for making a prompt from many artifacts
         :param build_method: The method to build the prompt (determines prompt format)
@@ -30,8 +35,8 @@ class MultiArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
-        super().__init__(value=EMPTY_STRING, response_tag=None, requires_traces=requires_trace_link,
-                         requires_artifacts=not requires_trace_link)
+        self.type = data_type
+        super().__init__(value=EMPTY_STRING, response_tag=None)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
@@ -76,3 +81,15 @@ class MultiArtifactPrompt(Prompt):
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
         formatted_artifacts = [artifact_prompt.build(artifact=artifact) for artifact in artifacts]
         raise NEW_LINE.join(formatted_artifacts)
+
+    def __repr__(self) -> str:
+        """
+        Returns a representation of the artifact prompt as a string
+        :return: The artifact promtp as a string
+        """
+        if self.build_method.XML:
+            return "<artifact>{artifact}<artifact> <artifact>{artifact}<artifact> ..."
+        elif self.build_method.NUMBERED:
+            return "1. {artifact1} " \
+                   "2. {artifact2} ..."
+

@@ -121,7 +121,7 @@ class TestSummarizer(BaseTest):
         prompts = summarizer._create_summarization_prompts(python_code, chunker_type=SupportedChunker.PY)
         self.assertEqual(prompts,
                          [summarizer.code_prompt_builder.build(artifact={ArtifactKeys.CONTENT: python_code},
-                                                               prompt_args=OpenAIManager.prompt_args)[PromptKeys.PROMPT]])
+                                                               model_format_args=OpenAIManager.prompt_args)[PromptKeys.PROMPT]])
 
         short_text = "short text"
         summarizer.code_or_above_limit_only = False

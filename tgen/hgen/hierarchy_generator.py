@@ -299,7 +299,7 @@ class HierarchyGenerator(BaseObject):
         """
         logger.info("Getting example of target type.")
         example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value
-        example_prompt = PromptBuilder(prompts=example_prompt_format).build(prompt_args=self.args.llm_manager_for_example.prompt_args,
+        example_prompt = PromptBuilder(prompts=example_prompt_format).build(model_format_args=self.args.llm_manager_for_example.prompt_args,
                                                                             artifact_type=self.args.target_type)[PromptKeys.PROMPT]
         args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
         res = self.args.llm_manager_for_example.make_completion_request(prompt=example_prompt,

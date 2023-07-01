@@ -58,18 +58,19 @@ class TestPromptDataset(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
         prompt_builder = PromptBuilder([prompt])
-        prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(prompt_builder,
-                                                                                        prompt_args=llm_manager.prompt_args,
-                                                                                        summarizer=Summarizer(llm_manager))
+        prompts_df = PromptDataFrame(artifact_prompt_dataset._generate_prompts_entries_from_artifact_per_prompt(prompt_builder,
+                                                                                                                prompt_args=llm_manager.prompt_args,
+                                                                                                                summarizer=Summarizer(
+                                                                                                                    llm_manager)))
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
                 self.assertLessEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()
-        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(prompt_builder,
-                                                                                   prompt_args=llm_manager.prompt_args,
-                                                                                   summarizer=Summarizer(llm_manager))
+        prompts_df = traces_prompt_dataset._generate_prompts_entries_from_traces(prompt_builder,
+                                                                                 prompt_args=llm_manager.prompt_args,
+                                                                                 summarizer=Summarizer(llm_manager))
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
 
     def test_to_dataframe(self):

@@ -31,7 +31,7 @@ class ArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.BASE: self._build_as_base}
         self.include_id = include_id
-        super().__init__(value=EMPTY_STRING, response_tag=None, requires_artifacts=True)
+        super().__init__(value=EMPTY_STRING, response_tag=None)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:
@@ -65,7 +65,7 @@ class ArtifactPrompt(Prompt):
         formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body)
         content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
         formatted_artifact = PromptUtil.create_xml(tag_name="artifact",
-                                                       tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
+                                                   tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
 
     @staticmethod
@@ -80,3 +80,13 @@ class ArtifactPrompt(Prompt):
         if include_id:
             return f"{artifact_id}: {artifact_body}"
         return artifact_body
+
+    def __repr__(self) -> str:
+        """
+        Returns a representation of the artifact prompt as a string
+        :return: The artifact promtp as a string
+        """
+        if self.build_method.XML:
+            return "<artifact>{artifact}<artifact>"
+        else:
+            return "{artifact}"

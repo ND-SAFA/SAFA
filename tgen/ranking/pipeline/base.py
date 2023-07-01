@@ -25,7 +25,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related the functionality of the source " \
                                "while the last element is the least related. " \
-                               "Omit any artifacts unrelated the source. Enclose the list in <links></links>."
+                               "Omit any artifacts unrelated the source, if you are confident. Enclose the list in <links></links>."
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 

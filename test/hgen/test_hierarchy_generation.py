@@ -219,7 +219,7 @@ class TestHierarchyGeneration(BaseTest):
         llm_manager = OpenAIManager(llm_args=OpenAIArgs(metrics=[]))
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
         prompt2 = MultiArtifactPrompt(include_ids=False, requires_trace_link=True)
-        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts=[prompt, prompt2])
+        prompt_builder = PromptBuilder( prompts=[prompt, prompt2])
         return LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager,
                                           prompt_builder=prompt_builder, completion_type=LLMCompletionType.CLASSIFICATION))
 

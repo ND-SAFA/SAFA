@@ -152,8 +152,9 @@ class LLMClustering(iClustering):
         :return: The response from the LLM
         """
         contents = [LLMClustering.format_artifact_content(i, artifact_ids[i], content) for i, content in enumerate(artifact_content)]
-        prompt_builder = PromptBuilder(llm_manager.prompt_args, prompts)
-        prompt = prompt_builder.build(artifacts=[{ArtifactKeys.CONTENT: content} for content in contents], **prompt_args)[
+        prompt_builder = PromptBuilder(prompts)
+        prompt = prompt_builder.build(prompt_args=llm_manager.prompt_args ,
+                                      artifacts=[{ArtifactKeys.CONTENT: content} for content in contents], **prompt_args)[
             PromptKeys.PROMPT]
         LLMClustering._set_max_tokens(llm_manager, prompt)
         params = llm_manager.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)

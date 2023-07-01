@@ -57,16 +57,19 @@ class TestPromptDataset(BaseTest):
         artifact_prompt_dataset = self.get_dataset_with_artifact_df()
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt])
+        prompt_builder = PromptBuilder([prompt])
         prompts_df = artifact_prompt_dataset._generate_prompts_dataframe_from_artifacts(prompt_builder,
-                                                                                        Summarizer(llm_manager))
+                                                                                        prompt_args=llm_manager.prompt_args,
+                                                                                        summarizer=Summarizer(llm_manager))
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
                 self.assertLessEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()
-        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(prompt_builder, Summarizer(llm_manager))
+        prompts_df = traces_prompt_dataset._generate_prompts_dataframe_from_traces(prompt_builder,
+                                                                                   prompt_args=llm_manager.prompt_args,
+                                                                                   summarizer=Summarizer(llm_manager))
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
 
     def test_to_dataframe(self):
@@ -82,11 +85,11 @@ class TestPromptDataset(BaseTest):
         openai_file_create_mock.return_value = TestResponse()
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt])
+        prompt_builder = PromptBuilder([prompt])
         outputs = self.all_datasets_test(
             lambda dataset: dataset.get_project_file_id(
                 llm_manager,
-                prompt_builder=  prompt_builder if dataset._has_trace_data else None),
+                prompt_builder=prompt_builder if dataset._has_trace_data else None),
         )
         dataset = self.get_dataset_with_prompt_df()
         dataset.data_export_path = TEST_OUTPUT_DIR
@@ -102,9 +105,9 @@ class TestPromptDataset(BaseTest):
     def test_export_and_get_dataframe(self):
         prompt = QuestionPrompt("Tell me about this artifact: ")
         prompt2 = ArtifactPrompt(include_id=False)
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt, prompt2])
+        prompt_builder = PromptBuilder([prompt, prompt2])
         outputs = self.all_datasets_test(
-            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder),
+            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder, OpenAIManager.prompt_args),
                                                             TEST_OUTPUT_DIR),
             ["id"]
         )

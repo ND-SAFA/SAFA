@@ -46,10 +46,8 @@ class Summarizer(BaseObject):
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.prompt_args = self.llm_manager.prompt_args
         self.code_prompt_builder = PromptBuilder(
-            prompt_args=self.prompt_args,
             prompts=code_base_prompt.value)
         self.nl_prompt_builder = PromptBuilder(
-            prompt_args=self.prompt_args,
             prompts=nl_base_prompt.value)
 
     def summarize_bulk(self, contents: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None) -> List[str]:
@@ -173,7 +171,8 @@ class Summarizer(BaseObject):
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return []  # skip summarizing content below token limit unless code
         prompt_builder = self.nl_prompt_builder if chunker_type == SupportedChunker.NL else self.code_prompt_builder
-        return [prompt_builder.build(artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
+        return [prompt_builder.build(prompt_args=self.llm_manager.prompt_args,
+                artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
     def _summarize_selective(self, contents, indices2summarize, prompts_for_summaries):
         """

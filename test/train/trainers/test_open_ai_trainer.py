@@ -43,7 +43,7 @@ class TestOpenAiTrainer(BaseTest):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[prompt])
+        prompt_builder = PromptBuilder(prompts=[prompt])
         for dataset_creator in self.get_all_dataset_creators().values():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
@@ -55,7 +55,7 @@ class TestOpenAiTrainer(BaseTest):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create_classification_metrics
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, prompts=[prompt])
+        prompt_builder = PromptBuilder( prompts=[prompt])
         for type_, dataset_creator in self.get_all_dataset_creators().items():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL], prompt_builder=prompt_builder)
             res = trainer.perform_training()
@@ -66,7 +66,7 @@ class TestOpenAiTrainer(BaseTest):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
-        prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [prompt])
+        prompt_builder = PromptBuilder([prompt])
         for dataset_creator in self.get_all_dataset_creators().values():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
@@ -79,10 +79,9 @@ class TestOpenAiTrainer(BaseTest):
         dataset_creators = self.get_all_dataset_creators()
         dataset_creators.pop("id")
         classification_prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        classification_prompt_builder = PromptBuilder(OpenAIManager.prompt_args,
-                                                      prompts=[classification_prompt])
+        classification_prompt_builder = PromptBuilder(prompts=[classification_prompt])
         generation_prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
-        generation_prompt_builder = PromptBuilder(OpenAIManager.prompt_args, [generation_prompt])
+        generation_prompt_builder = PromptBuilder([generation_prompt])
         for i, creator in enumerate([classification_prompt_builder, generation_prompt_builder]):
             for type_, dataset_creator in dataset_creators.items():
                 builder = deepcopy(creator)

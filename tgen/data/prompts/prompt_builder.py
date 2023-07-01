@@ -10,25 +10,24 @@ from tgen.util.llm_response_util import LLMResponseUtil
 
 class PromptBuilder:
 
-    def __init__(self, prompt_args: PromptArgs, prompts: List[Prompt]):
+    def __init__(self, prompts: List[Prompt]):
         """
         Constructs prompt creator with prompt arguments as configuration.
-        :param prompt_args: The arguments customizing prompt generation.
         :param prompts: The list of prompts to use to build the final prompt
         """
-        self.args = prompt_args
         self.prompts = prompts
         self.requires_traces, self.requires_artifacts = self._check_requirements(self.prompts)
 
-    def build(self, correct_completion: Any = EMPTY_STRING, **prompt_kwargs,) -> EnumDict[str, str]:
+    def build(self, prompt_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs,) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param correct_completion: The correct completion that the model should produce
         :return: Dictionary containing the prompt and completion
         """
-        base_prompt = NEW_LINE.join([prompt.build(**prompt_kwargs) for prompt in self.prompts])
-        prompt = self.format_prompt_for_model(base_prompt)
-        completion = self.format_completion(correct_completion)
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
+        base_prompt = NEW_LINE.join(built_prompts)
+        prompt = self._format_prompt_for_model(base_prompt, prompt_args=prompt_args)
+        completion = self._format_completion(correct_completion, prompt_args=prompt_args)
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion
@@ -76,23 +75,27 @@ class PromptBuilder:
                 tags[tag].append(i)
         return tags
 
-    def format_prompt_for_model(self, base_prompt: str) -> str:
+    @staticmethod
+    def _format_prompt_for_model(base_prompt: str, prompt_args: PromptArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
+        :param prompt_args: The arguments for properly formatting the prompt
         :return: The formatted prompt
         """
-        return f"{self.args.prompt_prefix}{base_prompt}{self.args.prompt_suffix}"
+        return f"{prompt_args.prompt_prefix}{base_prompt}{prompt_args.prompt_suffix}"
 
-    def format_completion(self, base_completion: str) -> str:
+    @staticmethod
+    def _format_completion(base_completion: str, prompt_args: PromptArgs) -> str:
         """
         Formats the completion with expected prefix + suffix tokens
         :param base_completion: The base completion
+        :param prompt_args: The arguments for properly formatting the prompt
         :return: The formatted completion
         """
         if not base_completion:
             return EMPTY_STRING
-        return f"{self.args.completion_prefix}{base_completion}{self.args.completion_suffix}"
+        return f"{prompt_args.completion_prefix}{base_completion}{prompt_args.completion_suffix}"
 
     @staticmethod
     def _check_requirements(prompts: List[Prompt]) -> Tuple[bool, bool]:

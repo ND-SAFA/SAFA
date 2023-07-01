@@ -21,7 +21,6 @@ class PredictionSerializer(AbstractSerializer):
     Serializes prediction payload.
     """
     KEY = "definition"
-    model = serializers.CharField(max_length=512, help_text="The LLM used for prediction.")
     dataset = DatasetSerializer(help_text="The dataset to predict on.")
     prompt = serializers.CharField(max_length=512, required=False, allow_null=True,
                                    help_text="Custom prompt deciding what tracing means.")

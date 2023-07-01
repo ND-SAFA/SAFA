@@ -40,5 +40,4 @@ class SummarizeSerializer(AbstractSerializer):
 
     artifacts = serializers.ListSerializer(child=SummaryArtifactSerializer(help_text="Artifact information for summarization."),
                                            help_text="Map of artifact IDs to bodies.")
-    model = serializers.CharField(max_length=512, required=False, help_text="The LLM used for summarization.")
     prompt = serializers.CharField(max_length=512, required=False, help_text="The prompt to use for summarizing artifact.")

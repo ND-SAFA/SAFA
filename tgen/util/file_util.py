@@ -37,7 +37,7 @@ class FileUtil:
         :param file_path: Path of the file to read.
         :return: The content of the file.
         """
-        with open(file_path, encoding="latin-1") as file:
+        with open(file_path) as file:
             return file.read()
 
     @staticmethod

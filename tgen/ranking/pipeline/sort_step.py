@@ -1,4 +1,3 @@
-import random
 from typing import Callable, Dict, List
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -10,29 +9,26 @@ from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.util.status import Status
 
-GenericSorter = Callable[[List[str], List[str], Dict], List[str]]  # source names, target names, artifact map -> sorted target names
+GenericSorter = Callable[
+    [List[str], List[str], Dict], Dict[str, str]]  # source names, target names, artifact map -> sorted target names
 
 
-def alphabetical_sorter(source_names, target_names, artifact_map) -> Dict[str, List[str]]:
-    target_names.sort()
-    return {s: target_names for s in source_names}
-
-
-def random_sorter(source_names, target_names, artifact_map) -> Dict[str, List[str]]:
-    random.seed(42)
-    random.shuffle(target_names)
-    return {s: target_names for s in source_names}
-
-
-def vsm_sorter(parent_names: List[str], child_names: List[str], artifact_map: Dict[str, str]) -> Dict[str, str]:
+def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str]) -> Dict[str, str]:
+    """
+    Ranks children artifacts from most to least similar to the parent.
+    :param parent_ids: The parent ids.
+    :param child_ids: The child ids to rank.
+    :param artifact_map: The map of artifact ids to body.
+    :return:
+    """
     parent_tag_name = "target"
     child_tag_name = "source"
-    artifact_names = parent_names + child_names
+    artifact_names = parent_ids + child_ids
     artifact_map = [artifact_map[a_name] for a_name in artifact_names]
     artifact_df = ArtifactDataFrame({ArtifactKeys.ID: artifact_names,
                                      ArtifactKeys.CONTENT: artifact_map,
-                                     ArtifactKeys.LAYER_ID: [parent_tag_name for source in parent_names] +
-                                                            [child_tag_name for target in child_names]})
+                                     ArtifactKeys.LAYER_ID: [parent_tag_name for source in parent_ids] +
+                                                            [child_tag_name for target in child_ids]})
     layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [child_tag_name], LayerKeys.TARGET_TYPE: [parent_tag_name]})
     dataset_creator = TraceDatasetCreator(FakeProjectReader(artifact_df=artifact_df, layer_df=layer_df))
 
@@ -54,13 +50,6 @@ def vsm_sorter(parent_names: List[str], child_names: List[str], artifact_map: Di
     return sorted_targets
 
 
-DEFAULT_SORTING_PROMPT = "Rank the following artifacts from most to least " \
-                         "important to the overall system functionality. " \
-                         "Provide your answer as comma delimited list of artifact ids." \
-                         "Enclose the list in <links></links>. "
-
 registered_sorters: Dict[str, GenericSorter] = {
-    "alphabetical": alphabetical_sorter,
-    "random": random_sorter,
     "vsm": vsm_sorter
 }

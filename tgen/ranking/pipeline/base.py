@@ -20,12 +20,14 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "\nA. Provide a detailed summary of the system's core purpose. " \
                                "Enclose your answer within <summary></summary>." \
-                               "\nB. Then, rank the artifacts from most to least critical" \
+                               "B. Select the artifacts related to the functionality of the source. " \
+                               "Provide your answer as a list of artifact ids enclosed in <related></related>." \
+                               "\nC. Then, rank the selected artifacts from most to least related" \
                                " to the source's functionality within the context of the system. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related the functionality of the source " \
                                "while the last element is the least related. " \
-                               "Omit any artifacts that are likely unrelated the source. Enclose the list in <links></links>."
+                               "Enclose the list in <links></links>."
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 

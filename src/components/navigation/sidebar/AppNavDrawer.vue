@@ -6,7 +6,6 @@
     :breakpoint="0"
     :width="260"
     :mini="!sidebarOpen"
-    :style="style"
   >
     <flex-box
       v-if="sidebarOpen"
@@ -16,11 +15,11 @@
       y="3"
       class="nav-sidebar-header-open"
     >
-      <safa-icon />
+      <safa-icon clickable :hidden="!sidebarOpen" @click="handleLogoClick" />
       <icon-button
         icon="nav-toggle"
         tooltip="Close sidebar"
-        :color="darkMode ? 'secondary' : 'primary'"
+        color="primary"
         data-cy="button-sidebar-close"
         @click="sidebarOpen = false"
       />
@@ -36,7 +35,7 @@
       <icon-button
         icon="nav-toggle"
         tooltip="Open sidebar"
-        :color="darkMode ? 'secondary' : 'primary'"
+        color="primary"
         data-cy="button-sidebar-open"
         :rotate="180"
         @click="sidebarOpen = true"
@@ -59,18 +58,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import { ThemeColors } from "@/util";
-import { appStore, useScreen, useTheme } from "@/hooks";
+import { appStore, useScreen } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
-const { darkMode } = useTheme();
 const { smallWindow } = useScreen();
-
-const style = computed(() =>
-  darkMode.value ? `background-color: ${ThemeColors.darkGrey}` : ""
-);
 
 const sidebarOpen = computed({
   get(): boolean {
@@ -80,6 +74,13 @@ const sidebarOpen = computed({
     appStore.toggleAppPanel();
   },
 });
+
+/**
+ * Navigates to the home page when the logo is clicked.
+ */
+function handleLogoClick(): void {
+  navigateTo(Routes.HOME);
+}
 
 onMounted(() => {
   if (!smallWindow) return;

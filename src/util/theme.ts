@@ -1,47 +1,89 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
+  DeltaType,
   JobStatus,
   ThemeColor,
 } from "@/types";
 
+export enum Colors {
+  white = "#FFFFFF",
+  black = "#1E1E1E",
+
+  greyDarkest = "#272727",
+  greyDark = "#333",
+  grey = "#36405A",
+  greyLight = "#94969e",
+  greyLightest = "#F0F5FF",
+
+  green = "#00AD69",
+  greenLight = "#6CD8A9",
+  greenLightest = "#A9F6D5",
+  greenDark = "#188958",
+
+  blue = "#5975B8",
+  blueLight = "#729FCF",
+  blueLightest = "#B0D6FF",
+  blueDark = "#204184",
+
+  red = "#E11F26",
+  redLight = "#E27171",
+  redLightest = "#FFA5A5",
+  redDark = "#AF001E",
+
+  orange = "#F5B53F",
+  orangeLight = "#FFD592",
+  orangeDark = "#DD8300",
+
+  brownLight = "#DCBA82",
+  brownDark = "#CD9291",
+
+  gradient1 = "#9EF01A",
+  gradient2 = "#77D241",
+  gradient3 = "#4FB468",
+  gradient4 = "#28958F",
+  gradient5 = "#0077B6",
+}
+
 /**
  * Defines all colors in the theme.
  */
-export enum ThemeColors {
-  primary = "#5975B8",
-  primaryDark = "#729FCF",
-  secondary = "#F5B53F",
-  accent = "#FFD592",
-  error = "#E11F26",
+export const ThemeColors = {
+  primary: Colors.blue,
+  primaryDark: Colors.blueLight,
+  secondary: Colors.orange,
+  accent: Colors.orangeLight,
+  error: Colors.red,
 
-  white = "#FFFFFF", // Text
-  black = "#1E1E1E", // Text
-  darkGrey = "#272727", // Backgrounds
+  whiteBg: Colors.white,
+  lightBg: Colors.greyLightest,
+  lightText: Colors.grey,
+  lightSelected: Colors.greyLightest,
 
-  textLight = "#36405A",
-  textDark = "#FFF",
-  backgroundLight = "#F0F5FF",
-  backgroundDark = "#333",
-  selectedLight = "#EEE",
-  selectedDark = "#EEE",
+  blackBg: Colors.black,
+  darkBg: Colors.greyDark,
+  darkText: Colors.white,
+  darkSelected: Colors.greyLightest,
 
-  added = "#00AD69", // Text
-  addedLight = "#6CD8A9", // Backgrounds
-  addedDark = "#188958", // Borders
+  added: Colors.green,
+  addedBg: Colors.greenLightest,
+  addedBd: Colors.greenDark,
 
-  modified = "#5975B8", // Text
-  modifiedLight = "#8DA5D3", // Backgrounds
-  modifiedDark = "#204184", // Borders
+  modified: Colors.blue,
+  modifiedBg: Colors.blueLightest,
+  modifiedBd: Colors.blueDark,
 
-  removed = "#E11F26", // Text
-  removedLight = "#E27171", // Backgrounds
-  removedDark = "#AF001E", // Borders
+  removed: Colors.red,
+  removedBg: Colors.redLightest,
+  removedBd: Colors.redDark,
 
-  warning = "#F5B53F", // Text
-  warningLight = "#FFD592", // Backgrounds
-  warningDark = "#DD8300", // Borders
-}
+  warning: Colors.orange,
+  warningBg: Colors.orangeLight,
+  warningBd: Colors.orangeDark,
+
+  nodeDefault: Colors.brownDark,
+  nodeGenerated: Colors.brownLight,
+};
 
 /**
  * The colors used in light mode.
@@ -56,14 +98,22 @@ export const lightPalette: Record<string, string> = {
   negative: ThemeColors.error,
   positive: ThemeColors.added,
 
-  text: ThemeColors.textLight,
-  neutral: ThemeColors.white,
-  background: ThemeColors.backgroundLight,
-  selected: ThemeColors.selectedLight,
+  text: ThemeColors.lightText,
+  neutral: ThemeColors.whiteBg,
+  background: ThemeColors.lightBg,
+  selected: ThemeColors.lightSelected,
 
-  addedLight: ThemeColors.addedLight,
-  modifiedLight: ThemeColors.modifiedLight,
-  removedLight: ThemeColors.removedLight,
+  added: ThemeColors.added,
+  addedBg: ThemeColors.addedBg,
+  modified: ThemeColors.modified,
+  modifiedBg: ThemeColors.modifiedBg,
+  removed: ThemeColors.removed,
+  removedBg: ThemeColors.removedBg,
+  flagged: ThemeColors.warningBd,
+  flaggedBg: ThemeColors.warningBg,
+
+  nodeDefault: ThemeColors.nodeDefault,
+  nodeGenerated: ThemeColors.nodeGenerated,
 };
 
 /**
@@ -79,60 +129,53 @@ export const darkPalette: Record<string, string> = {
   negative: ThemeColors.error,
   positive: ThemeColors.added,
 
-  text: ThemeColors.textDark,
-  neutral: ThemeColors.black,
-  background: ThemeColors.backgroundDark,
-  selected: ThemeColors.selectedDark,
+  text: ThemeColors.darkText,
+  neutral: ThemeColors.blackBg,
+  background: ThemeColors.darkBg,
+  selected: ThemeColors.darkSelected,
 
-  addedLight: ThemeColors.addedLight,
-  modifiedLight: ThemeColors.modifiedLight,
-  removedLight: ThemeColors.removedLight,
+  added: ThemeColors.added,
+  addedBg: ThemeColors.addedBg,
+  modified: ThemeColors.modified,
+  modifiedBg: ThemeColors.modifiedBg,
+  removed: ThemeColors.removed,
+  removedBg: ThemeColors.removedBg,
+
+  nodeDefault: ThemeColors.nodeDefault,
+  nodeGenerated: ThemeColors.nodeGenerated,
+};
+
+const typeColorMap: Record<string, string> = {
+  "": Colors.blue,
 };
 
 /**
- * Returns the background color for the given state.
- * @param state - The state to get the color for.
- * @param dark - Whether the app is in dark mode.
+ * Returns the color for the given type.
+ * @param type - The type to get the color for.
  * @return The color.
  */
-export function getBackgroundColor(
-  state: ArtifactDeltaState | ApprovalType | string,
-  dark: boolean
-): string {
-  switch (state) {
-    case ApprovalType.APPROVED:
-      return ThemeColors.added;
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.addedLight;
-    case ApprovalType.UNREVIEWED:
-      return ThemeColors.modified;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.modifiedLight;
-    case ApprovalType.DECLINED:
-      return ThemeColors.removed;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.removedLight;
-    default:
-      return dark ? ThemeColors.backgroundDark : ThemeColors.backgroundLight;
-  }
-}
+export function getTypeColor(type = ""): string {
+  if (!typeColorMap[type]) {
+    const remainingColors = [
+      // Colors.blueLight,
+      // Colors.greenLight,
+      // Colors.orange,
+      // Colors.orangeDark,
+      // Colors.red,
+      Colors.gradient1,
+      Colors.gradient2,
+      Colors.gradient3,
+      Colors.gradient4,
+      Colors.gradient5,
+    ].filter((color) => !Object.values(typeColorMap).includes(color));
 
-/**
- * Returns the border color for the given state.
- * @param state - The state to get the color for.
- * @return The color.
- */
-export function getBorderColor(state?: ArtifactDeltaState | string): string {
-  switch (state) {
-    case ArtifactDeltaState.ADDED:
-      return ThemeColors.addedDark;
-    case ArtifactDeltaState.MODIFIED:
-      return ThemeColors.modifiedDark;
-    case ArtifactDeltaState.REMOVED:
-      return ThemeColors.removedDark;
-    default:
-      return ThemeColors.modifiedLight;
+    typeColorMap[type] =
+      remainingColors.length === 0
+        ? Colors.blue
+        : remainingColors[Math.floor(Math.random() * remainingColors.length)];
   }
+
+  return typeColorMap[type];
 }
 
 /**
@@ -141,7 +184,7 @@ export function getBorderColor(state?: ArtifactDeltaState | string): string {
  * @return The color.
  */
 export function getScoreColor(score: number | string): ThemeColor {
-  const [ints, decimals] = String(score).split(".");
+  const [ints, decimals = "0"] = String(score).split(".");
   const tenths = decimals[0];
 
   if (ints === "1" || ["8", "9"].includes(tenths)) {
@@ -159,17 +202,20 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | string
+  state: ApprovalType | ArtifactDeltaState | DeltaType | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case "added":
       return "positive";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case "modified":
       return "primary";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case "removed":
       return "negative";
     default:
       return "";

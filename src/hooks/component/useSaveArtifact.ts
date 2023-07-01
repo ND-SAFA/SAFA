@@ -39,6 +39,12 @@ export const useSaveArtifact = defineStore("saveArtifact", {
       return selectionStore.selectedArtifact?.name !== this.editedArtifact.name;
     },
     /**
+     * @return Whether the base artifact has a summary.
+     */
+    hasSummary(): boolean {
+      return !!selectionStore.selectedArtifact?.summary;
+    },
+    /**
      * @return Whether the artifact type is for an FTA node.
      */
     isFTA(): boolean {
@@ -92,6 +98,9 @@ export const useSaveArtifact = defineStore("saveArtifact", {
         ? false
         : "This name is already used, please select another.";
     },
+    /**
+     * @return Whether the artifact is valid and can be saved.
+     */
     canSave(): boolean {
       const { logicType, safetyCaseType, type, body } = this.editedArtifact;
 

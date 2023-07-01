@@ -28,8 +28,18 @@ describe("Job Submission", () => {
   });
 
   describe("I can delete a logged job", () => {
-    it("Deletes a project from the list", () => {
+    it.only("Deletes a project from the list", () => {
+      cy.waitForJobLoad();
+
       cy.clickButton(DataCy.jobDeleteButton);
+
+      cy.withinTableRows(
+        DataCy.jobTable,
+        (tr) => {
+          tr.should("have.length", 1);
+        },
+        false
+      );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

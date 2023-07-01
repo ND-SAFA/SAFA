@@ -44,6 +44,7 @@ export type DetailsOpenState =
   | "document"
   | "displayArtifact"
   | "displayArtifactBody"
+  | "generateArtifact"
   | "saveArtifact"
   | "displayTrace"
   | "saveTrace"

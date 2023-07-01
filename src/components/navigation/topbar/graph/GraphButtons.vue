@@ -1,9 +1,10 @@
 <template>
   <flex-box v-if="!isDisabled">
+    <separator vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
       :key="definition.label"
-      color="accent"
+      color="primary"
       :tooltip="definition.label"
       :icon="definition.icon"
       :data-cy="definition.dataCy"
@@ -24,8 +25,8 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { layoutStore } from "@/hooks";
-import { handleRegenerateLayout } from "@/api";
+import { IconVariant } from "@/types";
+import { layoutApiStore, layoutStore } from "@/hooks";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
@@ -33,29 +34,32 @@ const viewButtons = [
   {
     handler: () => cyZoomIn(),
     label: "Zoom In",
-    icon: "graph-zoom-in",
+    icon: "graph-zoom-in" as IconVariant,
+    dataCy: "button-nav-graph-zoom-in",
   },
   {
     handler: () => cyZoomOut(),
     label: "Zoom Out",
-    icon: "graph-zoom-out",
+    icon: "graph-zoom-out" as IconVariant,
+    dataCy: "button-nav-graph-zoom-out",
   },
   {
     handler: () => cyCenterNodes(true),
     label: "Center Graph",
-    icon: "graph-center",
+    icon: "graph-center" as IconVariant,
     dataCy: "button-nav-graph-center",
   },
   {
     handler: () => {
       if (layoutStore.isTreeMode) {
-        handleRegenerateLayout({});
+        layoutApiStore.handleRegenerate();
       } else {
         layoutStore.resetLayout();
       }
     },
     label: "Regenerate Layout",
-    icon: "graph-refresh",
+    icon: "graph-refresh" as IconVariant,
+    dataCy: "button-nav-graph-refresh",
   },
 ];
 

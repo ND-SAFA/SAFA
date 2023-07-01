@@ -1,13 +1,5 @@
 <template>
-  <text-button
-    outlined
-    block
-    :color="color"
-    class="q-mb-sm"
-    @click="emit('click')"
-  >
-    <typography ellipsis :value="name" :color="color" />
-  </text-button>
+  <list-item clickable :title="props.name" @click="emit('click')" />
 </template>
 
 <script lang="ts">
@@ -20,9 +12,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { DeltaType, ThemeColor } from "@/types";
-import { TextButton, Typography } from "@/components/common";
+import { DeltaType } from "@/types";
+import { ListItem } from "@/components/common";
 
 const props = defineProps<{
   /**
@@ -38,17 +29,4 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "click"): void;
 }>();
-
-const color = computed<ThemeColor>(() => {
-  switch (props.deltaType) {
-    case "added":
-      return "positive";
-    case "modified":
-      return "primary";
-    case "removed":
-      return "negative";
-    default:
-      return "black";
-  }
-});
 </script>

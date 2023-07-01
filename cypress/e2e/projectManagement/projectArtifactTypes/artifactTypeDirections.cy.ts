@@ -30,12 +30,25 @@ describe("Artifact Type Directions", () => {
   });
 
   describe("I can remove a rule on what types of artifacts a trace link is allowed between", () => {
-    it("Can create a link after removing the rule blocking it", () => {
-      cy.createNewTraceLink("F5", "D9")
-        .getCy(DataCy.traceSaveSubmitButton)
-        .should("be.disabled");
+    it.only("Can create a link after removing the rule blocking it", () => {
+      cy.clickButton(DataCy.artifactFabToggle).clickButton(
+        DataCy.artifactFabCreateTrace
+      );
 
-      // Delete the first link direction
+      cy.inputText(DataCy.traceSaveSourceInput, `F5{downArrow}{enter}`);
+
+      // Show hidden types.
+      cy.clickButton(DataCy.traceSaveTargetInput)
+        .getCy("button-filter-type")
+        .filter(":visible")
+        .filter(".nav-mode-selected")
+        .each(($el) => $el.click());
+
+      cy.inputText(DataCy.traceSaveTargetInput, `D9{downArrow}{enter}{esc}`);
+
+      cy.getCy(DataCy.traceSaveSubmitButton).should("be.disabled");
+
+      // Delete the first link direction.
       cy.clickButton(DataCy.traceSaveDirectionsPanel);
 
       cy.getCy(DataCy.traceSaveDirectionsChip).each((el) => {

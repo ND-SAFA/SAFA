@@ -4,7 +4,7 @@
       <icon-button
         v-if="definition.handler"
         :key="definition.label"
-        :color="color"
+        :color="props.color"
         :tooltip="definition.label"
         :icon="definition.icon"
         :disabled="definition.isDisabled"
@@ -26,36 +26,25 @@ export default {
 
 <script setup lang="ts">
 import { computed, withDefaults } from "vue";
-import { ThemeColor } from "@/types";
-import { commitStore } from "@/hooks";
-import { redoCommit, undoCommit } from "@/api";
+import { ColorProps } from "@/types";
+import { commitApiStore, commitStore } from "@/hooks";
 import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
 
-withDefaults(
-  defineProps<{
-    /**
-     * The color to render the component with.
-     */
-    color?: ThemeColor;
-  }>(),
-  {
-    color: "accent",
-  }
-);
+const props = withDefaults(defineProps<ColorProps>(), {
+  color: "primary",
+});
 
 const buttons = computed(() => [
   {
-    handler: () => {
-      undoCommit().then();
-    },
+    handler: () => commitApiStore.handleUndo(),
     label: "Undo",
     icon: "undo",
     isDisabled: !commitStore.canUndo,
     dataCy: "button-nav-undo",
   },
   {
-    handler: () => redoCommit().then(),
+    handler: () => commitApiStore.handleRedo(),
     label: "Redo",
     icon: "redo",
     isDisabled: !commitStore.canRedo,

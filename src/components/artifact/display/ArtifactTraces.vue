@@ -1,5 +1,15 @@
 <template>
-  <div v-if="doDisplay">
+  <div>
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View Related Artifacts`"
+        icon="view-tree"
+        @click="handleViewNeighborhood"
+      />
+    </panel-card>
+
     <panel-card :title="parentTitle">
       <template #title-actions>
         <text-button
@@ -26,9 +36,12 @@
           <artifact-body-display display-title :artifact="parent" />
           <template #actions>
             <icon-button
+              outline
+              :flat="false"
               icon="trace"
               tooltip="View Trace Link"
               data-cy="button-selected-parent-link"
+              :class="getTraceLinkClassName(parent.name)"
               @click="handleTraceLinkClick(parent.name)"
             />
           </template>
@@ -68,9 +81,12 @@
           <artifact-body-display display-title :artifact="child" />
           <template #actions>
             <icon-button
+              outline
+              :flat="false"
               icon="trace"
               tooltip="View Trace Link"
               data-cy="button-selected-child-link"
+              :class="getTraceLinkClassName(child.name)"
               @click="handleTraceLinkClick(child.name)"
             />
           </template>
@@ -97,9 +113,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import {
   appStore,
   artifactStore,
+  documentStore,
   selectionStore,
   subtreeStore,
   traceStore,
@@ -118,22 +136,20 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 
 const parents = computed(() =>
   artifact.value
-    ? subtreeStore
+    ? (subtreeStore
         .getParents(artifact.value.id)
         .map((id) => artifactStore.getArtifactById(id))
+        .filter((artifact) => !!artifact) as ArtifactSchema[])
     : []
 );
 
 const children = computed(() =>
   artifact.value
-    ? subtreeStore
+    ? (subtreeStore
         .getChildren(artifact.value.id)
         .map((id) => artifactStore.getArtifactById(id))
+        .filter((artifact) => !!artifact) as ArtifactSchema[])
     : []
-);
-
-const doDisplay = computed(
-  () => parents.value.length + children.value.length > 0
 );
 
 const parentTitle = computed(() =>
@@ -147,6 +163,43 @@ const childTitle = computed(() =>
     ? "1 Child Artifact"
     : `${children.value.length} Child Artifacts`
 );
+
+/**
+ * Determines the className of the link to a parent artifact.
+ * @param artifactName - The artifact to select the link to.
+ * @returns The className for the link.
+ */
+function getTraceLinkClassName(artifactName: string): string {
+  const relatedArtifact = artifactStore.getArtifactByName(artifactName);
+
+  if (!relatedArtifact || !artifact.value) return "trace-chip text-nodeDefault";
+
+  const traceLink = traceStore.getTraceLinkByArtifacts(
+    relatedArtifact.id,
+    artifact.value.id,
+    true
+  );
+
+  const base =
+    traceLink?.traceType === TraceType.GENERATED
+      ? "trace-chip-generated text-nodeGenerated "
+      : "trace-chip text-nodeDefault ";
+  const unreviewed =
+    traceLink?.approvalStatus === ApprovalType.UNREVIEWED
+      ? "trace-chip-unreviewed"
+      : "";
+
+  return base + unreviewed;
+}
+
+/**
+ * Opens a new view with this artifact and all artifacts it traces to.
+ */
+function handleViewNeighborhood(): void {
+  if (!artifact.value) return;
+
+  documentStore.addDocumentOfNeighborhood(artifact.value);
+}
 
 /**
  * Selects an artifact.

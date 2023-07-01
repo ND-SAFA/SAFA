@@ -65,62 +65,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { TableColumn, TableGroupRow, TableRow } from "@/types";
+import { GroupableTableProps, TableGroupRow, TableRow } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
 import GroupableTableRow from "./GroupableTableRow.vue";
 import GroupableTableHeader from "./GroupableTableHeader.vue";
 import DataTable from "./DataTable.vue";
 
-const props = defineProps<{
-  /**
-   * The columns to render in the table.
-   */
-  columns: TableColumn[];
-  /**
-   * The rows of the table.
-   */
-  rows: TableRow[];
-  /**
-   * The field on each row that is unique.
-   */
-  rowKey: string | ((row: TableRow) => string);
-  /**
-   * The name of an item.
-   */
-  itemName?: string;
-  /**
-   * Whether to display loading state.
-   */
-  loading?: boolean;
-  /**
-   * The default row key to group by.
-   */
-  defaultGroupBy?: string;
-  /**
-   * The default row keys to sort by.
-   */
-  defaultSortBy?: string;
-  /**
-   * The default sort direction.
-   */
-  defaultSortDesc?: boolean;
-  /**
-   * Determines whether a row should be visible.
-   */
-  filterRow?(row: TableRow): boolean;
-  /**
-   * Whether table rows can be expanded.
-   */
-  expandable?: boolean;
-  /**
-   * The ids of expanded rows.
-   */
-  expanded?: string[];
-  /**
-   * Any cells can be customized through the slot `body-cell-[name]`.
-   */
-  customCells?: string[];
-}>();
+const props = defineProps<GroupableTableProps>();
 
 const emit = defineEmits<{
   (e: "update:expanded", expanded: string[]): void;
@@ -160,6 +111,7 @@ const groupedRows = computed(() => {
   return Object.entries(rowsByGroup)
     .map(([$groupValue, rows]) => [
       {
+        id: `${groupBy.value}::${$groupValue}`,
         $groupValue,
         $groupBy: groupBy.value,
         $groupRows: rows.length,

@@ -57,13 +57,7 @@ export default {
 import { computed, ref } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
-import {
-  handleApproveLink,
-  handleDeclineLink,
-  handleDeleteLink,
-  handleUnreviewLink,
-} from "@/api";
+import { projectStore, sessionStore, traceApiStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
 const props = defineProps<{
@@ -78,6 +72,7 @@ const emit = defineEmits<{
   (e: "delete"): void;
 }>();
 
+// Loading state is kept local to allow for multiple trace approval rows to display at once.
 const approveLoading = ref(false);
 const declineLoading = ref(false);
 const unreviewLoading = ref(false);
@@ -93,7 +88,7 @@ const showUnreview = computed(() => linkStatus(props.trace).canBeReset());
  */
 function handleApprove() {
   approveLoading.value = true;
-  handleApproveLink(props.trace, {
+  traceApiStore.handleApprove(props.trace, {
     onSuccess: () => emit("approve"),
     onComplete: () => (approveLoading.value = false),
   });
@@ -104,7 +99,7 @@ function handleApprove() {
  */
 function handleDecline() {
   declineLoading.value = true;
-  handleDeclineLink(props.trace, {
+  traceApiStore.handleDecline(props.trace, {
     onSuccess: () => emit("decline"),
     onComplete: () => (declineLoading.value = false),
   });
@@ -115,7 +110,7 @@ function handleDecline() {
  */
 function handleUnreview() {
   unreviewLoading.value = true;
-  handleUnreviewLink(props.trace, {
+  traceApiStore.handleUnreview(props.trace, {
     onSuccess: () => emit("unreview"),
     onComplete: () => (unreviewLoading.value = false),
   });
@@ -125,7 +120,7 @@ function handleUnreview() {
  * Deletes the given link.
  */
 function handleDelete() {
-  handleDeleteLink(props.trace, {
+  traceApiStore.handleDelete(props.trace, {
     onSuccess: () => emit("delete"),
   });
 }

@@ -1,14 +1,5 @@
 <template>
   <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
-    <flex-box b="2">
-      <text-button
-        text
-        label="View In Tree"
-        icon="artifact"
-        @click="handleViewLevel"
-      />
-    </flex-box>
-
     <panel-card :title="artifactLevelName">
       <template #title-actions>
         <icon :id="iconId" size="md" color="primary" />
@@ -25,6 +16,24 @@
       <type-direction-input :artifact-level="artifactLevel" />
       <type-icon-input :artifact-level="artifactLevel" />
     </panel-card>
+
+    <panel-card>
+      <text-button
+        text
+        block
+        :label="`View ${artifactLevelName} Artifacts`"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
+      <text-button
+        text
+        block
+        color="primary"
+        label="Generate Parents"
+        icon="generateArtifacts"
+        @click="handleGenerateParents"
+      />
+    </panel-card>
   </details-panel>
 </template>
 
@@ -39,7 +48,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { layoutStore, selectionStore, typeOptionsStore } from "@/hooks";
+import {
+  appStore,
+  documentStore,
+  selectionStore,
+  typeOptionsStore,
+} from "@/hooks";
 import {
   PanelCard,
   Typography,
@@ -47,7 +61,6 @@ import {
   TypeIconInput,
   TextButton,
   Icon,
-  FlexBox,
   DetailsPanel,
 } from "@/components/common";
 
@@ -70,6 +83,15 @@ const iconId = computed(() =>
 function handleViewLevel(): void {
   if (!artifactLevel.value) return;
 
-  layoutStore.viewTreeTypes([artifactLevel.value.name]);
+  documentStore.addDocumentOfTypes([artifactLevel.value.name]);
+}
+
+/**
+ * Opens the generate artifact panel.
+ */
+function handleGenerateParents(): void {
+  if (!artifactLevel.value) return;
+
+  appStore.openDetailsPanel("generateArtifact");
 }
 </script>

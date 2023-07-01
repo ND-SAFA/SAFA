@@ -7,13 +7,13 @@
             <artifact-type-input
               v-model="matrix.source"
               show-count
-              label="Source Type"
+              label="Child Type"
               class="q-mr-md width-50"
             />
             <artifact-type-input
               v-model="matrix.target"
               show-count
-              label="Target Type"
+              label="Parent Type"
               class="width-50"
             />
           </flex-box>
@@ -83,8 +83,9 @@ const model = useVModel(props, "modelValue");
  * @param matrix - The matrix to get details for.
  */
 function getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
-  const sources = artifactStore.getArtifactsByType[matrix.source] || [];
-  const targets = artifactStore.getArtifactsByType[matrix.target] || [];
+  const artifactsByType = artifactStore.allArtifactsByType;
+  const sources = artifactsByType[matrix.source] || [];
+  const targets = artifactsByType[matrix.target] || [];
   const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
     "manual",
   ]);

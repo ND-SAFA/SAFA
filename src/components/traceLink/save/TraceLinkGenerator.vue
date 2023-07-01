@@ -5,13 +5,12 @@
       b="4"
       value="Select which sets of artifact types that you would like to generate links between."
     />
-    <custom-model-input v-model="model" />
     <trace-matrix-creator v-model="matrices" />
     <text-button
       block
       label="Generate Trace Links"
       :disabled="!isValid"
-      :loading="loading"
+      :loading="traceGenerationApiStore.loading"
       color="primary"
       data-cy="button-trace-generate"
       class="q-mt-md"
@@ -31,9 +30,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
-import { handleGenerateLinks } from "@/api";
-import { Typography, CustomModelInput, TextButton } from "@/components/common";
+import { ArtifactLevelSchema, ModelType } from "@/types";
+import { traceGenerationApiStore } from "@/hooks";
+import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "../save";
 
 const props = defineProps<{
@@ -48,10 +47,8 @@ const createEmptyArtifactLevel = (): ArtifactLevelSchema[] => [
   { source: "", target: "" },
 ];
 
-const loading = ref(false);
 const isValid = ref(false);
-const method = ref<ModelType | undefined>();
-const model = ref<GenerationModelSchema | undefined>();
+const method = ref<ModelType>();
 const matrices = ref(createEmptyArtifactLevel());
 
 const areMatricesValid = computed(() =>
@@ -60,18 +57,12 @@ const areMatricesValid = computed(() =>
     .reduce((acc: boolean, cur: boolean) => acc && cur, true)
 );
 
-const isEverythingValid = computed(
-  () => !!model.value && areMatricesValid.value
-);
-
 /**
  * Resets this component's data.
  */
 function handleReset(): void {
-  loading.value = false;
   isValid.value = false;
   method.value = undefined;
-  model.value = undefined;
   matrices.value = createEmptyArtifactLevel();
 }
 
@@ -79,11 +70,7 @@ function handleReset(): void {
  * Attempts to generate the selected trace links.
  */
 function handleSubmit(): void {
-  if (!model.value) return;
-
-  loading.value = true;
-
-  handleGenerateLinks(undefined, model.value, matrices.value, {
+  traceGenerationApiStore.handleGenerate(undefined, matrices.value, {
     onComplete: () => {
       emit("submit");
       handleReset();
@@ -103,15 +90,8 @@ watch(
 watch(
   () => matrices.value,
   () => {
-    isValid.value = isEverythingValid.value;
+    isValid.value = areMatricesValid.value;
   },
   { deep: true }
-);
-
-watch(
-  () => model.value,
-  () => {
-    isValid.value = isEverythingValid.value;
-  }
 );
 </script>

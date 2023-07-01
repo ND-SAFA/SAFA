@@ -4,8 +4,9 @@ import {
   Routes,
   simpleProjectFilesMap,
   testProject,
-  validUser,
 } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
 
 Cypress.Commands.add("initEmptyProject", () => {
   cy.dbResetJobs().dbResetProjects();
@@ -46,6 +47,9 @@ Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
     .projectSelectorContinue("project")
     .projectSelectorContinue("version")
     .locationShouldEqual(Routes.ARTIFACT);
+
+  cy.getCy(DataCy.appLoading).should("not.exist");
+  cy.clickButton(DataCy.navTreeButton);
 
   cy.waitForProjectLoad(waitForComplete);
 });

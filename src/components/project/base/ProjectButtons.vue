@@ -1,12 +1,19 @@
 <template>
   <flex-box v-if="doDisplay" wrap t="2" class="settings-buttons">
-    <text-button
-      text
-      label="Download"
-      icon="download"
-      data-cy="button-settings-download"
-      @click="handleDownload"
-    />
+    <q-btn-group flat>
+      <text-button
+        text
+        label="Download"
+        icon="download"
+        data-cy="button-settings-download"
+        @click="handleDownload"
+      />
+      <q-btn-dropdown auto-close dense>
+        <text-button text label="CSV" @click="handleDownload" />
+        <text-button text label="JSON" @click="handleDownload('json')" />
+      </q-btn-dropdown>
+    </q-btn-group>
+    <separator vertical />
     <text-button
       text
       label="Edit"
@@ -46,8 +53,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
-import { handleDownloadProjectCSV } from "@/api";
+import {
+  identifierSaveStore,
+  projectApiStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -76,7 +87,7 @@ function handleDelete(): void {
 /**
  * Downloads project files
  */
-function handleDownload(): void {
-  handleDownloadProjectCSV();
+function handleDownload(fileType: "csv" | "json" = "csv"): void {
+  projectApiStore.handleDownload(fileType);
 }
 </script>

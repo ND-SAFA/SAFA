@@ -19,18 +19,14 @@
         :trace="traceLink"
         :faded="isTraceLinkFaded(traceLink)"
       />
-      <trace-link
-        v-for="traceLink in subtreeLinks"
-        :key="traceLink.traceLinkId"
-        :trace="traceLink"
-      />
     </template>
     <template v-else #elements>
       <tim-node
-        v-for="level in tim.artifacts"
+        v-for="level in Object.values(tim.artifacts)"
         :key="level.typeId"
         :count="level.count"
         :artifact-type="level.name"
+        :icon="level.icon"
       />
       <tim-link
         v-for="matrix in tim.traces"
@@ -55,7 +51,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch, ref, computed, onMounted } from "vue";
+import { watch, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { TraceLinkSchema } from "@/types";
 import {
@@ -75,7 +71,6 @@ import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";
 
 const currentRoute = useRoute();
-const artifactsInView = ref<string[]>([]);
 
 const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
@@ -86,7 +81,6 @@ const nodesInView = computed(() => selectionStore.artifactsInView);
 const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces
 );
-const subtreeLinks = computed(() => subtreeStore.subtreeLinks);
 const hiddenSubtreeIds = computed(() => subtreeStore.hiddenSubtreeNodes);
 
 const tim = computed(() => typeOptionsStore.tim);
@@ -107,7 +101,7 @@ const className = computed(() => {
  * @return Whether to fade.
  */
 function isArtifactFaded(id: string): boolean {
-  return !artifactsInView.value.includes(id);
+  return !nodesInView.value.includes(id);
 }
 
 /**
@@ -126,13 +120,12 @@ function isArtifactHidden(id: string): boolean {
  */
 function isTraceLinkFaded(link: TraceLinkSchema): boolean {
   return (
-    !artifactsInView.value.includes(link.targetId) ||
-    !artifactsInView.value.includes(link.sourceId)
+    !nodesInView.value.includes(link.targetId) ||
+    !nodesInView.value.includes(link.sourceId)
   );
 }
 
 onMounted(() => {
-  artifactsInView.value = nodesInView.value;
   layoutStore.resetLayout();
 });
 
@@ -143,13 +136,6 @@ watch(
     if (currentRoute.path !== Routes.ARTIFACT) return;
 
     layoutStore.resetLayout();
-  }
-);
-
-watch(
-  () => nodesInView.value,
-  () => {
-    artifactsInView.value = nodesInView.value;
   }
 );
 

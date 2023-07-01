@@ -25,13 +25,9 @@
       icon="view-table"
       @click="handleTableView"
     />
-    <text-button
+    <delta-mode-button
       v-bind="buttonProps(options.delta)"
-      :disabled="isDeltaDisabled"
       :hide-label="smallWindow"
-      label="Delta"
-      data-cy="button-nav-delta"
-      icon="view-delta"
       @click="handleDeltaView"
     />
   </q-btn-group>
@@ -57,6 +53,7 @@ import {
   useScreen,
 } from "@/hooks";
 import { TextButton } from "@/components/common";
+import DeltaModeButton from "./DeltaModeButton.vue";
 
 const options = {
   tim: GraphMode.tim,
@@ -70,7 +67,6 @@ const { smallWindow } = useScreen();
 const value = ref<GraphMode[]>([]);
 
 const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
-const isDeltaDisabled = computed(() => layoutStore.mode === GraphMode.tim);
 
 /**
  * Returns props for a mode button.
@@ -82,7 +78,8 @@ function buttonProps(option: GraphMode) {
   return {
     text: !selected,
     outlined: selected,
-    color: selected ? "secondary" : "accent",
+    color: "primary",
+    class: selected ? "nav-mode-selected" : "",
   };
 }
 
@@ -128,11 +125,18 @@ function handleTableView(): void {
  * Opens delta view.
  */
 function handleDeltaView(): void {
+  if (!deltaStore.inDeltaView) return;
+
   appStore.openDetailsPanel("delta");
   updateValue();
 }
 
 onMounted(() => updateValue());
+
+watch(
+  () => layoutStore.mode,
+  () => updateValue()
+);
 
 watch(
   () => deltaStore.inDeltaView,
@@ -141,11 +145,6 @@ watch(
 
 watch(
   () => isTreeDisabled.value,
-  () => updateValue()
-);
-
-watch(
-  () => isDeltaDisabled.value,
   () => updateValue()
 );
 </script>

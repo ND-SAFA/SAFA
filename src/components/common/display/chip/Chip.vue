@@ -1,12 +1,13 @@
 <template>
   <q-chip
     :class="props.class"
-    :outline="props.outline"
-    :color="props.color"
+    :outline="props.outlined"
+    :color="chipColor"
     :data-cy="props.dataCy"
-    :style="props.style"
+    :style="chipStyle"
     :clickable="props.clickable"
     :removable="removable"
+    :dense="props.dense"
     @click="emit('click')"
     @remove="emit('remove')"
   >
@@ -25,43 +26,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ThemeColor } from "@/types";
+import { computed } from "vue";
+import { ChipProps } from "@/types";
 import { Typography } from "../content";
 
-const props = defineProps<{
-  /**
-   * A chip label to display.
-   */
-  label?: string;
-  /**
-   * The class names for the chip.
-   */
-  class?: string;
-  /**
-   * The css style of the chip.
-   */
-  style?: string;
-  /**
-   * Whether the chip is outlined.
-   */
-  outline?: boolean;
-  /**
-   * Whether the chip is clickable.
-   */
-  clickable?: boolean;
-  /**
-   * Whether the chip is removable. Displays a remove icon button.
-   */
-  removable?: boolean;
-  /**
-   * The color of the chip
-   */
-  color?: ThemeColor;
-  /**
-   * A testing selector to set on the chip.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<ChipProps>();
 
 const emit = defineEmits<{
   /**
@@ -75,4 +44,24 @@ const emit = defineEmits<{
    */
   (e: "remove"): void;
 }>();
+
+const chipColor = computed(() => {
+  if (props.color?.includes("#")) {
+    return "";
+  } else if (props.color) {
+    return props.color;
+  } else {
+    return "";
+  }
+});
+
+const chipStyle = computed(() => {
+  if (props.style) {
+    return props.style;
+  } else if (props.color?.includes("#")) {
+    return `color: ${props.color}; border-color: ${props.color} !important`;
+  } else {
+    return "";
+  }
+});
 </script>

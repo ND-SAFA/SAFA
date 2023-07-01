@@ -8,7 +8,7 @@
         value="Welcome to SAFA!"
       />
 
-      <div v-if="!isCreated">
+      <div v-if="!sessionApiStore.createdAccount">
         <typography
           el="p"
           value="There are just a few key pieces of info we need to set up your account."
@@ -16,7 +16,7 @@
         <text-input
           v-model="email"
           label="Email"
-          :error-message="isError && 'Unable to create an account'"
+          :error-message="sessionApiStore.createErrorMessage"
           data-cy="input-new-email"
         />
         <password-input v-model="password" data-cy="input-new-password" />
@@ -32,7 +32,7 @@
 
     <template #actions>
       <text-button
-        v-if="!isCreated"
+        v-if="!sessionApiStore.createdAccount"
         color="primary"
         label="Create"
         :disabled="password.length === 0"
@@ -68,8 +68,8 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
-import { createUser } from "@/api";
 import {
   CardPage,
   PasswordInput,
@@ -80,9 +80,6 @@ import {
 
 const email = ref("");
 const password = ref("");
-const isError = ref(false);
-const isLoading = ref(false);
-const isCreated = ref(false);
 
 /**
  * Navigates to the login page.
@@ -95,17 +92,9 @@ function handleLogin() {
  * Attempts to create a new account.
  */
 function handleCreateAccount() {
-  isLoading.value = true;
-
-  createUser({
+  sessionApiStore.handleCreateAccount({
     email: email.value,
     password: password.value,
-  })
-    .then(() => {
-      isError.value = false;
-      isCreated.value = true;
-    })
-    .catch(() => (isError.value = true))
-    .finally(() => (isLoading.value = false));
+  });
 }
 </script>

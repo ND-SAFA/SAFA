@@ -10,6 +10,7 @@ import {
   ProjectSelectorView,
   ProjectSettingsView,
   ResetPasswordView,
+  SearchView,
   TracePredictionView,
   UploadStatusView,
 } from "@/views";
@@ -30,6 +31,7 @@ export enum Routes {
   TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
+  SEARCH = "/search",
 }
 
 /**
@@ -125,6 +127,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
     component: ProjectSettingsView,
+    meta: {
+      requiresProject: true,
+    },
+  },
+  {
+    path: Routes.SEARCH,
+    name: "Project Search",
+    component: SearchView,
     meta: {
       requiresProject: true,
     },

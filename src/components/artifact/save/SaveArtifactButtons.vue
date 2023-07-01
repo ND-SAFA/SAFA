@@ -3,6 +3,7 @@
     <text-button
       v-if="isUpdate"
       text
+      :loading="artifactApiStore.deleteLoading"
       label="Delete"
       icon="delete"
       data-cy="button-artifact-delete"
@@ -10,7 +11,7 @@
     />
     <q-space />
     <text-button
-      :loading="loading"
+      :loading="artifactApiStore.saveLoading"
       :disabled="!canSave"
       label="Save"
       icon="save"
@@ -30,12 +31,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
-import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
+import { computed } from "vue";
+import {
+  appStore,
+  artifactApiStore,
+  artifactSaveStore,
+  selectionStore,
+} from "@/hooks";
 import { TextButton, FlexBox } from "@/components/common";
-
-const loading = ref(false);
 
 const canSave = computed(() => artifactSaveStore.canSave);
 const isUpdate = computed(() => artifactSaveStore.isUpdate);
@@ -47,7 +50,7 @@ function handleDelete(): void {
   const artifact = selectionStore.selectedArtifact;
   if (!artifact) return;
 
-  handleDeleteArtifact(artifact, {
+  artifactApiStore.handleDelete(artifact, {
     onSuccess: () => appStore.closeSidePanels(),
   });
 }
@@ -56,15 +59,12 @@ function handleDelete(): void {
  * Attempts to save the artifact.
  */
 function handleSubmit(): void {
-  loading.value = true;
-
-  handleSaveArtifact(
+  artifactApiStore.handleSave(
     artifactSaveStore.finalizedArtifact,
     artifactSaveStore.isUpdate,
     artifactSaveStore.parentArtifact,
     {
       onSuccess: () => appStore.openDetailsPanel("displayArtifact"),
-      onComplete: () => (loading.value = false),
     }
   );
 }

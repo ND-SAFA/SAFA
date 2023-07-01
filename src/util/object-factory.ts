@@ -1,6 +1,6 @@
 import {
   ArtifactSchema,
-  Commit,
+  CommitSchema,
   ConfirmationType,
   ConfirmDialogueMessage,
   DocumentSchema,
@@ -9,7 +9,7 @@ import {
   IdentifierSchema,
   MessageType,
   ModelType,
-  ProjectDelta,
+  VersionDeltaSchema,
   ProjectSchema,
   SafetyCaseType,
   SessionSchema,
@@ -20,6 +20,8 @@ import {
   AttributeSchema,
   AttributeType,
   AttributeLayoutSchema,
+  ArtifactLevelSchema,
+  GeneratedMatrixSchema,
 } from "@/types";
 
 /**
@@ -90,9 +92,11 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
     traces: project?.traces || [],
     projectVersion: project?.projectVersion,
     artifactTypes: project?.artifactTypes || [],
+    typeDirections: project?.typeDirections || {},
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
+    subtrees: project?.subtrees || {},
     models: project?.models || [],
     attributes: project?.attributes || [],
     attributeLayouts: project?.attributeLayouts || [],
@@ -102,7 +106,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
 /**
  * @return An empty project delta.
  */
-export function createProjectDelta(): ProjectDelta {
+export function createProjectDelta(): VersionDeltaSchema {
   return {
     artifacts: {
       added: {},
@@ -187,7 +191,7 @@ export function createArtifactOfType(
 /**
  * @returns An empty commit.
  */
-export function createCommit(version: VersionSchema): Commit {
+export function createCommit(version: VersionSchema): CommitSchema {
   return {
     commitVersion: version,
     artifacts: {
@@ -266,5 +270,25 @@ export function createAttributeLayout(
     name: layout?.name || "",
     artifactTypes: layout?.artifactTypes || [],
     positions: layout?.positions?.map((pos) => ({ ...pos })) || [],
+  };
+}
+
+/**
+ * Creates a generated trace matrix defined over many artifact levels for
+ * some tracing method or custom model.
+ *
+ * @param artifactLevels - The artifact levels to train on.
+ * @param method - If a baseline method is used, this defines that method.
+ * @param model - If a custom model is used,
+ */
+export function createGeneratedMatrix(
+  artifactLevels: ArtifactLevelSchema[],
+  method?: ModelType,
+  model?: GenerationModelSchema
+): GeneratedMatrixSchema {
+  return {
+    method: model?.baseModel || method || undefined,
+    model,
+    artifactLevels: artifactLevels,
   };
 }

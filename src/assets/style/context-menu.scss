@@ -15,8 +15,8 @@ $graph-border-radius: 8px;
   height: fit-content;
 
   > button:hover {
-    color: black;
-    background-color: $color-selected;
+    color: $color-primary;
+    background-color: $color-neutral;
   }
 
   > .cy-context-menus-cxt-menuitem {

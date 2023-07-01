@@ -1,9 +1,4 @@
-import {
-  CyPromise,
-  IGraphLayout,
-  InternalTraceType,
-  LayoutPayload,
-} from "@/types";
+import { CyPromise, IGraphLayout, LayoutPayload } from "@/types";
 import { selectionStore } from "@/hooks";
 import { applyAutoMoveEvents } from "@/cytoscape/hooks";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
@@ -188,7 +183,6 @@ export function cySetDisplay(
     cy.edges()
       .filter(
         (e) =>
-          e.data().type !== InternalTraceType.SUBTREE &&
           artifactIds.includes(e.target().data().id) &&
           artifactIds.includes(e.source().data().id)
       )

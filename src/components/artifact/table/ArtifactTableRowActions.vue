@@ -1,6 +1,20 @@
 <template>
   <flex-box>
     <icon-button
+      icon="trace"
+      :rotate="-90"
+      :tooltip="`Add Parent To '${artifact.name}'`"
+      data-cy="button-artifact-parent-icon"
+      @click="handleLinkParent"
+    />
+    <icon-button
+      icon="trace"
+      :rotate="90"
+      :tooltip="`Add Child To '${artifact.name}'`"
+      data-cy="button-artifact-child-icon"
+      @click="handleLinkChild"
+    />
+    <icon-button
       icon="edit"
       :tooltip="`Edit '${artifact.name}'`"
       data-cy="button-artifact-edit-icon"
@@ -8,6 +22,7 @@
     />
     <icon-button
       icon="delete"
+      :loading="artifactApiStore.deleteLoading"
       :tooltip="`Delete '${artifact.name}'`"
       data-cy="button-artifact-delete-icon"
       @click="handleDelete"
@@ -26,8 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { ArtifactSchema } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
-import { handleDeleteArtifact } from "@/api";
+import { appStore, artifactApiStore, selectionStore } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
 const props = defineProps<{
@@ -48,6 +62,26 @@ function handleEdit() {
  * Opens the delete artifact window.
  */
 function handleDelete() {
-  handleDeleteArtifact(props.artifact, {});
+  artifactApiStore.handleDelete(props.artifact);
+}
+
+/**
+ * Opens the create trace link panel with this artifact as the child.
+ */
+function handleLinkParent(): void {
+  appStore.openTraceCreatorTo({
+    type: "source",
+    artifactId: props.artifact.id,
+  });
+}
+
+/**
+ * Opens the create trace link panel with this artifact as the parent.
+ */
+function handleLinkChild(): void {
+  appStore.openTraceCreatorTo({
+    type: "target",
+    artifactId: props.artifact.id,
+  });
 }
 </script>

@@ -19,7 +19,7 @@
       <slot :name="idx + 1" />
     </q-step>
 
-    <template v-if="!props.minimal" #navigation>
+    <template v-if="!props.hideActions" #navigation>
       <q-stepper-navigation class="q-mt-sm">
         <slot name="actions" />
         <flex-box full-width align="end">
@@ -57,31 +57,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { StepperStep } from "@/types";
+import { StepperProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { TextButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * The current 1-based step number.
-   */
-  modelValue: number;
-  /**
-   * The steps to render.
-   * A slot will be created for each step, named by their 1-based index.
-   */
-  steps: StepperStep[];
-  /**
-   * Whether to render the stepper content in a condensed format.
-   */
-  minimal?: boolean;
-  /**
-   * If true, the label text will be made as dense as possible.
-   * Useful when displaying long lists of steps
-   */
-  denseLabels?: boolean;
-}>();
+const props = defineProps<StepperProps>();
 
 const emit = defineEmits<{
   (e: "submit"): void;

@@ -10,7 +10,7 @@
       addable
       :deletable="isAdmin"
       :editable="isAdmin"
-      :loading="loading"
+      :loading="memberApiStore.loading"
       @row:add="modalOpen = true"
       @row:edit="handleEdit"
       @row:delete="handleDelete"
@@ -48,13 +48,17 @@ export default {
 import { computed, ref } from "vue";
 import { MembershipSchema, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
-import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
-import { handleDeleteMember, handleGetMembers } from "@/api";
+import {
+  logStore,
+  memberApiStore,
+  membersStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
-const editedMember = ref<MembershipSchema | undefined>();
-const loading = ref(false);
+const editedMember = ref<MembershipSchema>();
 const modalOpen = ref(false);
 
 const project = computed(() => projectStore.project);
@@ -75,9 +79,7 @@ const ownerCount = computed(
 async function handleRefresh(): Promise<void> {
   if (project.value.projectId === "") return;
 
-  loading.value = true;
-
-  handleGetMembers().then(() => (loading.value = false));
+  await memberApiStore.handleReload();
 }
 
 /**
@@ -97,7 +99,7 @@ function handleDelete(member: MembershipSchema): void {
   if (member.role === ProjectRole.OWNER && ownerCount.value === 1) {
     logStore.onInfo("You cannot remove the only owner of this project.");
   } else {
-    handleDeleteMember(member);
+    memberApiStore.handleDelete(member);
   }
 }
 </script>

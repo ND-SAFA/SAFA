@@ -58,6 +58,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-account-circle";
     case "search":
       return "mdi-magnify";
+    case "generate":
+      return "mdi-creation";
+    case "generateArtifacts":
+      return "mdi-folder-multiple-plus-outline";
     case "notification":
       return "mdi-bell-outline";
     case "share":
@@ -136,6 +140,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-link-box";
     case "nav-settings":
       return "mdi-cog-box";
+    case "filter-open":
+      return "mdi-filter-menu-outline";
+    case "filter-close":
+      return "mdi-filter-minus-outline";
     case "group-open":
       return "mdi-chevron-up";
     case "group-open-all":

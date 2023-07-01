@@ -6,7 +6,13 @@ import {
   TimNodeCytoElementData,
   TraceCytoElementData,
 } from "@/types";
-import { appStore, layoutStore, selectionStore, traceStore } from "@/hooks";
+import {
+  appStore,
+  documentStore,
+  layoutStore,
+  selectionStore,
+  traceStore,
+} from "@/hooks";
 import {
   ARTIFACT_EDGE_SELECTOR,
   ARTIFACT_NODE_SELECTOR,
@@ -28,10 +34,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
     action(cy: CytoCore, event: EventObject) {
       const artifact = event.target.data() as ArtifactCytoElementData;
 
-      cy.nodes()
-        .filter((n) => n.data().id === artifact.id)
-        .layout(layoutStore.layoutOptions)
-        .run();
+      cy.getElementById(artifact.id).layout(layoutStore.layoutOptions).run();
 
       if (artifact.id === selectionStore.selectedArtifact?.id) {
         selectionStore.selectArtifact(artifact.id);
@@ -64,7 +67,14 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
 
       if (!artifact.id) return;
 
-      selectionStore.selectArtifact(artifact.id);
+      if (selectionStore.selectedArtifactId !== artifact.id) {
+        selectionStore.selectArtifact(artifact.id);
+      } else {
+        documentStore.addDocumentOfNeighborhood({
+          id: artifact.id,
+          name: artifact.artifactName,
+        });
+      }
     },
   },
   selectAllArtifacts: {
@@ -95,7 +105,13 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
 
       if (!artifactLevel.artifactType) return;
 
-      selectionStore.selectArtifactLevel(artifactLevel.artifactType);
+      if (
+        selectionStore.selectedArtifactLevelType !== artifactLevel.artifactType
+      ) {
+        selectionStore.selectArtifactLevel(artifactLevel.artifactType);
+      } else {
+        documentStore.addDocumentOfTypes([artifactLevel.artifactType]);
+      }
     },
   },
   selectTimEdge: {
@@ -106,10 +122,20 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
 
       if (!artifactLevel.source || !artifactLevel.target) return;
 
-      selectionStore.selectTraceMatrix(
-        artifactLevel.target,
-        artifactLevel.source
-      );
+      if (
+        selectionStore.selectedTraceMatrixTypes[0] !== artifactLevel.target ||
+        selectionStore.selectedTraceMatrixTypes[1] !== artifactLevel.source
+      ) {
+        selectionStore.selectTraceMatrix(
+          artifactLevel.target,
+          artifactLevel.source
+        );
+      } else {
+        documentStore.addDocumentOfTypes([
+          artifactLevel.targetType,
+          artifactLevel.sourceType,
+        ]);
+      }
     },
   },
 };

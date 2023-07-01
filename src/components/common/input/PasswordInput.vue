@@ -31,28 +31,13 @@ export default {
 
 <script setup lang="ts">
 import { withDefaults, ref, computed } from "vue";
+import { PasswordInputProps } from "@/types";
 import { useVModel } from "@/hooks";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The model value.
-     */
-    modelValue: string;
-    /**
-     * An error message to display, if one exists.
-     */
-    errorMessage?: string | false;
-    /**
-     * The label to display.
-     */
-    label?: string;
-  }>(),
-  {
-    label: "Password",
-    errorMessage: "",
-  }
-);
+const props = withDefaults(defineProps<PasswordInputProps>(), {
+  label: "Password",
+  errorMessage: "",
+});
 
 const emit = defineEmits<{
   /**

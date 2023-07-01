@@ -1,5 +1,9 @@
 <template>
-  <expansion-item :model-value="itemFields.length > 0" :label="title">
+  <expansion-item
+    :model-value="itemFields.length > 0"
+    :label="title"
+    :class="className"
+  >
     <artifact-delta-button
       v-for="{ name, id } in itemFields"
       :key="name"
@@ -23,12 +27,12 @@ export default {
 import { computed } from "vue";
 import {
   ArtifactSchema,
-  EntityModification,
+  EntityModificationSchema,
   TraceLinkSchema,
   DeltaType,
   SelectOption,
 } from "@/types";
-import { capitalize } from "@/util";
+import { capitalize, getEnumColor } from "@/util";
 import { ExpansionItem } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
@@ -42,7 +46,7 @@ const props = defineProps<{
    */
   items: Record<
     string,
-    ArtifactSchema | EntityModification<ArtifactSchema> | TraceLinkSchema
+    ArtifactSchema | EntityModificationSchema<ArtifactSchema> | TraceLinkSchema
   >;
   /**
    *  If true, items will be interpreted as traces instead of artifacts.
@@ -59,6 +63,10 @@ const title = computed(
   () => `${itemCount.value} ${capitalize(props.deltaType)}`
 );
 
+const className = computed(
+  () => `rounded q-mb-sm bd-${getEnumColor(props.deltaType)}`
+);
+
 const itemFields = computed<SelectOption[]>(() => {
   const items = Object.values(props.items);
 
@@ -71,7 +79,7 @@ const itemFields = computed<SelectOption[]>(() => {
     );
   } else {
     return props.deltaType === "modified"
-      ? (items as EntityModification<ArtifactSchema>[]).map(
+      ? (items as EntityModificationSchema<ArtifactSchema>[]).map(
           ({ after: { id, name } }) => ({ id, name })
         )
       : (items as ArtifactSchema[]).map(({ id, name }) => ({ id, name }));

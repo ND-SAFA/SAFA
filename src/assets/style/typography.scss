@@ -17,6 +17,14 @@ h1, h2, h3, h4, h6, h6 {
   margin-bottom: 4px;
 }
 
+pre {
+  margin: 0;
+
+  code {
+    padding: 0;
+  }
+}
+
 .text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -63,14 +71,26 @@ h1, h2, h3, h4, h6, h6 {
 }
 
 .artifact-display {
-  max-width: 500px;
+  max-width: 600px;
 }
 
-.trace-matrix-chip {
+.trace-chip {
   border-width: 2px;
   border-style: solid;
 
-  &-unreviewed {
-    border-style: dashed;
+  &:before { border: none !important; }
+
+  &-generated {
+    border-width: 1px;
   }
+
+  &-unreviewed {
+    border-style: dashed !important;
+
+    &:before { border: none !important; }
+  }
+}
+
+.clickable {
+  cursor: pointer;
 }

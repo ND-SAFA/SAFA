@@ -28,7 +28,9 @@
       data-cy="text-selected-body"
     />
 
-    <attribute-list-display :artifact="artifact" />
+    <artifact-summary />
+
+    <attribute-list-display v-if="!!artifact" :artifact="artifact" />
   </panel-card>
 </template>
 
@@ -43,7 +45,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ReservedArtifactType } from "@/types";
+import { isCodeArtifact } from "@/util";
 import { selectionStore } from "@/hooks";
 import {
   Typography,
@@ -53,12 +55,13 @@ import {
   AttributeListDisplay,
   Separator,
 } from "@/components/common";
+import ArtifactSummary from "./ArtifactSummary.vue";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 const name = computed(() => artifact.value?.name || "");
 const type = computed(() => artifact.value?.type || "");
 const body = computed(() => artifact.value?.body.trim() || "");
 const variant = computed(() =>
-  type?.value === ReservedArtifactType.github ? "code" : "expandable"
+  isCodeArtifact(artifact.value?.name || "") ? "code" : "expandable"
 );
 </script>

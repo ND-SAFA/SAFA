@@ -7,13 +7,23 @@
     :options-dark="darkMode"
     options-selected-class="primary"
     :options="options"
+    :disable="disabled"
     label="View"
     class="nav-input nav-document"
     option-label="name"
-    option-value="documentId"
+    option-value="name"
     color="accent"
     data-cy="button-document-select-open"
   >
+    <template v-if="canSave()" #append>
+      <icon-button
+        small
+        tooltip="Save View"
+        icon="save"
+        data-cy="button-document-select-save"
+        @click="handleSave"
+      />
+    </template>
     <template #option="{ opt, itemProps }">
       <list-item
         v-bind="itemProps"
@@ -22,14 +32,25 @@
         :data-cy-name="opt.name"
       >
         <template #actions>
-          <icon-button
-            v-if="canEdit(opt.name)"
-            v-close-popup
-            icon="more"
-            :tooltip="`Edit ${opt.name}`"
-            data-cy="button-document-select-edit"
-            @click="handleEditOpen(opt)"
-          />
+          <flex-box justify="end">
+            <icon-button
+              v-if="canSave(opt)"
+              small
+              :tooltip="`Save ${opt.name}`"
+              icon="save"
+              data-cy="button-document-select-save"
+              @click="handleSave"
+            />
+            <icon-button
+              v-if="canEdit(opt.name)"
+              v-close-popup
+              small
+              icon="more"
+              :tooltip="`Edit ${opt.name}`"
+              data-cy="button-document-select-edit"
+              @click="handleEditOpen(opt)"
+            />
+          </flex-box>
         </template>
       </list-item>
     </template>
@@ -62,14 +83,15 @@ import { computed } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
+  deltaStore,
+  documentApiStore,
   documentSaveStore,
   documentStore,
   projectStore,
   sessionStore,
   useTheme,
 } from "@/hooks";
-import { handleSwitchDocuments } from "@/api";
-import { IconButton, TextButton, ListItem } from "@/components/common";
+import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
 
 const { darkMode } = useTheme();
 
@@ -80,9 +102,22 @@ const document = computed({
     return documentStore.currentDocument;
   },
   set(document) {
-    handleSwitchDocuments(document);
+    documentApiStore.handleSwitch(document);
   },
 });
+
+const disabled = computed(() => deltaStore.inDeltaView);
+
+console.log(disabled.value);
+
+/**
+ * Returns whether a document can be saved.
+ * @param doc - The document to check.
+ * @return Whether saving is allowed.
+ */
+function canSave(doc = document.value): boolean {
+  return doc.name !== "Default" && !doc.documentId;
+}
 
 /**
  * Returns whether a document can be edited.
@@ -107,5 +142,12 @@ function handleCreateOpen(): void {
 function handleEditOpen(document: DocumentSchema): void {
   documentSaveStore.baseDocument = document;
   appStore.openDetailsPanel("document");
+}
+
+/**
+ * Saves a new document.
+ */
+function handleSave(): void {
+  documentApiStore.handleCreatePreset(document.value);
 }
 </script>

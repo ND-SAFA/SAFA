@@ -1,14 +1,30 @@
 /**
  * The base URL for the project
  */
-export const baseURL = process.env.VUE_APP_API_ENDPOINT;
+export const BASE_URL = process.env.VUE_APP_API_ENDPOINT;
 
 if (!process.env.VUE_APP_API_ENDPOINT) {
   console.error("API Endpoint environment variable not defined.");
 }
 
 /**
- * Enumerates all of the possible endpoint paths.
+ * The number of times to attempt to reconnect to server
+ * if connection is lost.
+ */
+export const MAX_RECONNECT_ATTEMPTS = 20;
+/**
+ * The amount of time to
+ */
+export const RECONNECT_WAIT_TIME = 5000;
+/**
+ * Returns a WebSocket url resolving function. Use only after all modules
+ * have been loaded.
+ * @constructor
+ */
+export const WEBSOCKET_URL = (): string => `${BASE_URL}/websocket`;
+
+/**
+ * Enumerates all possible endpoint paths.
  */
 export enum Endpoint {
   // Accounts
@@ -52,9 +68,9 @@ export enum Endpoint {
   githubCreateCredentials = "accounts/github/credentials/:accessCode",
   githubEditCredentials = "accounts/github/credentials",
   githubValidateCredentials = "accounts/github/credentials/check",
-  githubGetProjects = "projects/github",
-  githubCreateProject = "projects/import/github/:repositoryName",
-  githubSyncProject = "projects/versions/:versionId/import/github/:repositoryName",
+  githubGetProjects = "integrations/github/repos",
+  githubCreateProject = "projects/import/github/:owner/:repositoryName",
+  githubSyncProject = "projects/versions/:versionId/import/github/:owner/:repositoryName",
 
   // Commits
   commit = "projects/versions/:versionId/commit",
@@ -127,6 +143,15 @@ export enum Endpoint {
 
   // Files
   getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
+
+  // Search
+  search = "search/:versionId",
+
+  // Generation
+
+  summarize = "summarize",
+  prompt = "prompt",
+  generateArtifacts = "hgen/:versionId",
 }
 
 /**

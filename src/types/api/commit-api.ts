@@ -4,7 +4,7 @@ import { ArtifactSchema, VersionSchema, TraceLinkSchema } from "@/types";
  * Represents a single commit containing one or more changes to
  * either artifacts or trace links
  */
-export interface Commit {
+export interface CommitSchema {
   /**
    * The version this commit is being made on.
    */
@@ -12,11 +12,11 @@ export interface Commit {
   /**
    * The changes occurring to the project artifacts.
    */
-  artifacts: EntityCommit<ArtifactSchema>;
+  artifacts: EntityCommitSchema<ArtifactSchema>;
   /**
    * The changes occurring to project traces.
    */
-  traces: EntityCommit<TraceLinkSchema>;
+  traces: EntityCommitSchema<TraceLinkSchema>;
   /**
    * If false, errors will be silent.
    */
@@ -26,17 +26,17 @@ export interface Commit {
 /**
  * Encapsulates the changes for a generic type of project entity.
  */
-export interface EntityCommit<T> {
+export interface EntityCommitSchema<Entity> {
   /**
    * The entities that were added.
    */
-  added: T[];
+  added: Entity[];
   /**
    * The entities that were removed
    */
-  removed: T[];
+  removed: Entity[];
   /**
    * The entities that were modified.
    */
-  modified: T[];
+  modified: Entity[];
 }

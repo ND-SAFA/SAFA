@@ -12,9 +12,17 @@ $color-neutral: var(--q-neutral);
 $color-background: var(--q-background);
 $color-selected: var(--q-selected);
 
-$color-added: var(--q-addedLight);
-$color-modified: var(--q-modifiedLight);
-$color-removed: var(--q-removedLight);
+$color-added: var(--q-added);
+$color-added-bg: var(--q-addedBg);
+$color-modified: var(--q-modified);
+$color-modified-bg: var(--q-modifiedBg);
+$color-removed: var(--q-removed);
+$color-removed-bg: var(--q-removedBg);
+$color-flagged: var(--q-flagged);
+$color-flagged-bg: var(--q-flaggedBg);
+
+$color-node-default: var(--q-nodeDefault);
+$color-node-generated: var(--q-nodeGenerated);
 
 // Background Palette Tags
 
@@ -56,4 +64,12 @@ $color-removed: var(--q-removedLight);
 
 .text-text {
   color: $color-text !important;
+}
+
+.text-nodeDefault {
+  color: $color-node-default !important;
+}
+
+.text-nodeGenerated {
+  color: $color-node-generated !important;
 }

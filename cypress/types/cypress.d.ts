@@ -91,6 +91,16 @@ declare namespace Cypress {
      */
     dbDeleteUser(email: string, password: string): Chainable<void>;
 
+    /**
+     * Generates all the users that are needed for the tests.
+     */
+    dbGenerateUsers(): Chainable<void>;
+
+    /**
+     * Deletes all the created users after test run.
+     */
+    dbDeleteGeneratedUsers(): Chainable<void>;
+
     // Should Commands
 
     /**
@@ -452,6 +462,11 @@ declare namespace Cypress {
     centerGraph(): Chainable<void>;
 
     /**
+     * Enables basic search when in artifact view.
+     */
+    enableBasicSearch(): Chainable<void>;
+
+    /**
      * Selects an artifact on the graph.
      *
      * @param name - The artifact name to select.
@@ -463,7 +478,7 @@ declare namespace Cypress {
     /**
      * Switches to table view.
      */
-    switchToTableView(tab?: "artifact" | "trace"): Chainable<void>;
+    switchToTableView(tab?: "artifact" | "trace" | "approval"): Chainable<void>;
 
     /**
      * Sorts the artifact and trace matrix tables.
@@ -532,11 +547,6 @@ declare namespace Cypress {
     createDocument(props: DocumentFields, save?: boolean): Chainable<void>;
 
     // Trace Approval
-
-    /**
-     * Navigates to the trace approval page.
-     */
-    openTraceApproval(): Chainable<void>;
 
     /**
      * Sorts the trace approval table.

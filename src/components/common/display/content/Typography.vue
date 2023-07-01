@@ -1,22 +1,24 @@
 <template>
-  <div v-if="isExpandable" class="width-100">
-    <div v-if="isExpanded" :class="className + ' text-white-space-normal'">
+  <div v-if="expandable" class="width-100">
+    <div v-if="expanded" :class="className + ' text-white-space-normal'">
       {{ value }}
     </div>
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
-      {{ isExpanded ? "See Less" : "See More" }}
+    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
+      {{ expanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre v-if="isExpanded" :class="className">{{ value }}</pre>
-    <div v-else :class="className + ' text-ellipsis text-expanded'">
-      {{ value }}
+    <pre v-if="expanded" v-highlightjs :class="className">
+      <code>{{value}}</code>
+    </pre>
+    <div v-else :class="className + ' text-grey-8'">
+      Code is hidden to save space.
     </div>
-    <q-btn flat size="sm" @click.stop="isExpanded = !isExpanded">
-      {{ isExpanded ? "See Less" : "See More" }}
+    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
+      {{ expanded ? "See Less" : "See More" }}
     </q-btn>
   </div>
   <span v-else-if="el === 'span'" :class="className">
@@ -37,6 +39,9 @@
   <h3 v-else-if="el === 'h3'" :class="className">
     {{ value }}
   </h3>
+  <a v-else-if="el === 'a'" :class="className" :href="value">
+    {{ value }}
+  </a>
 </template>
 
 <script lang="ts">
@@ -49,129 +54,26 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, computed, withDefaults } from "vue";
-import {
-  ElementType,
-  SizeType,
-  TextAlignType,
-  TextType,
-  ThemeColor,
-} from "@/types";
+import { ref, computed, withDefaults, watch } from "vue";
+import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The text value to display.
-     */
-    value?: string | number;
-    /**
-     * Whether to truncate text with an ellipsis.
-     */
-    ellipsis?: boolean;
-
-    /**
-     * Whether to inherit color from the parent element.
-     */
-    inheritColor?: boolean;
-    /**
-     * Whether to color this text as an error.
-     */
-    error?: boolean;
-    /**
-     * Renders the text with a faded color.
-     */
-    secondary?: boolean;
-    /**
-     * The color to render the component with.
-     */
-    color?: ThemeColor;
-
-    /**
-     * Bolds the text.
-     */
-    bold?: boolean;
-    /**
-     * Sets the text to wrap.
-     */
-    wrap?: boolean;
-
-    /**
-     * The variant of text to render.
-     * @default `body`
-     */
-    variant?: TextType;
-    /**
-     * The element to render the text on.
-     * @default `span`
-     */
-    el?: ElementType;
-    /**
-     * How to align the text.
-     * @default `left`
-     */
-    align?: TextAlignType;
-
-    /**
-     * For expandable variants, whether the content defaults to expanded.
-     */
-    defaultExpanded?: boolean;
-
-    /**
-     * Renders a smaller component.
-     */
-    small?: boolean;
-    /**
-     * Renders a larger component.
-     */
-    large?: boolean;
-
-    /**
-     * The x margin.
-     */
-    x?: SizeType;
-    /**
-     * The y margin.
-     */
-    y?: SizeType;
-    /**
-     * The left margin.
-     */
-    l?: SizeType;
-    /**
-     * The right margin.
-     */
-    r?: SizeType;
-    /**
-     * The top margin.
-     */
-    t?: SizeType;
-    /**
-     * The bottom margin.
-     */
-    b?: SizeType;
-
-    /**
-     * The classnames to include on this component.
-     */
-    class?: string;
-  }>(),
-  {
-    value: "",
-    classes: undefined,
-    color: undefined,
-    variant: "body",
-    el: "span",
-    align: "left",
-    x: "",
-    y: "",
-    l: "",
-    r: "",
-    t: "",
-    b: "",
-    class: "",
-  }
-);
+const props = withDefaults(defineProps<TypographyProps>(), {
+  value: "",
+  classes: undefined,
+  color: undefined,
+  variant: "body",
+  el: "span",
+  align: "left",
+  x: "",
+  y: "",
+  l: "",
+  r: "",
+  t: "",
+  b: "",
+  class: "",
+  collapseLength: 500,
+});
 
 const { darkMode } = useTheme();
 
@@ -183,6 +85,7 @@ const className = useMargins(props, () => [
   [props.variant === "caption", "text-caption text-grey-8"],
   [props.variant === "code", "text-body1"],
   [props.variant === "body" || props.variant === "expandable", "text-body1"],
+  [props.el === "a", "text-primary"],
   ["align", `text-${props.align}`],
   [!!props.color && !darkMode.value, `text-${props.color}`],
   ["inheritColor", "inherit-color"],
@@ -196,9 +99,26 @@ const className = useMargins(props, () => [
   ["class", props.class],
 ]);
 
-const isExpanded = ref(
-  props.defaultExpanded && String(props.value).length < 500
+const expanded = ref(
+  props.defaultExpanded &&
+    (props.collapseLength === 0 ||
+      String(props.value).length < props.collapseLength)
 );
 
-const isExpandable = computed(() => props.variant === "expandable");
+const expandable = computed(() => props.variant === "expandable");
+
+/**
+ * Collapse the text if it changes and is too long.
+ */
+watch(
+  () => [props.value, props.variant],
+  () => {
+    if (
+      props.collapseLength === 0 ||
+      String(props.value).length < props.collapseLength
+    )
+      return;
+    expanded.value = false;
+  }
+);
 </script>

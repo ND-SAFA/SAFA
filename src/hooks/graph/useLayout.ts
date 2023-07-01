@@ -24,7 +24,6 @@ import { pinia } from "@/plugins";
 import { appStore } from "@/hooks/core";
 import selectionStore from "@/hooks/graph/useSelection";
 import subtreeStore from "@/hooks/project/useSubtree";
-import deltaStore from "@/hooks/project/useDelta";
 
 /**
  * This module handles the layout positions of the graph.
@@ -123,12 +122,16 @@ export const useLayout = defineStore("layout", {
     },
     /**
      * Resets the graph layout of the artifact tree.
+     * Generates a new layout if in TIM view, or if no positions are set.
      */
     setArtifactTreeLayout(): void {
       const layout = new ArtifactGraphLayout();
       const payload = { layout, cyPromise: artifactTreeCyPromise };
+      const generateLayout =
+        this.mode === GraphMode.tim ||
+        Object.keys(this.artifactPositions).length === 0;
 
-      this.setGraphLayout(payload, this.mode === GraphMode.tim);
+      this.setGraphLayout(payload, generateLayout);
     },
     /**
      * Resets the graph layout of the TIM tree.
@@ -148,7 +151,6 @@ export const useLayout = defineStore("layout", {
       disableDrawMode();
       subtreeStore.resetHiddenNodes();
       selectionStore.clearSelections();
-      deltaStore.clear();
       appStore.closeSidePanels();
 
       // Wait for graph to render.

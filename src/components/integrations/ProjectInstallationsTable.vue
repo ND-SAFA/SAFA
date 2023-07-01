@@ -44,8 +44,7 @@ export default {
 import { computed, ref } from "vue";
 import { InstallationSchema } from "@/types";
 import { installationsColumns } from "@/util";
-import { integrationsStore } from "@/hooks";
-import { handleSyncInstallation } from "@/api";
+import { integrationsApiStore } from "@/hooks";
 import {
   Modal,
   TextButton,
@@ -55,19 +54,14 @@ import {
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 const modalOpen = ref(false);
-const loading = ref(false);
 
-const rows = computed(() => integrationsStore.installations);
+const rows = computed(() => integrationsApiStore.installations);
 
 /**
  * Syncs the current project with the selected installation's data.
  * @param installation - THe installation to sync.
  */
 function handleSync(installation: InstallationSchema): void {
-  loading.value = true;
-
-  handleSyncInstallation(installation, {
-    onComplete: () => (loading.value = false),
-  });
+  integrationsApiStore.handleSync(installation);
 }
 </script>

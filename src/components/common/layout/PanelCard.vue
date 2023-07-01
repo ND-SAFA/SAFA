@@ -45,7 +45,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, useSlots, withDefaults } from "vue";
-import { IconVariant, ThemeColor } from "@/types";
+import { PanelCardProps } from "@/types";
 import {
   Typography,
   Icon,
@@ -53,42 +53,14 @@ import {
   FlexBox,
 } from "@/components/common/display";
 
-const props = withDefaults(
-  defineProps<{
-    /**
-     * The color for the card border.
-     */
-    color?: ThemeColor;
-    /**
-     * A title to render on the card.
-     */
-    title?: string;
-    /**
-     * A subtitle title to render on the card.
-     */
-    subtitle?: string;
-    /**
-     * An icon to display before the title.
-     */
-    icon?: IconVariant;
-    /**
-     * The panel's classes.
-     */
-    class?: string;
-    /**
-     * The panel's container's classes.
-     */
-    containerClass?: string;
-  }>(),
-  {
-    color: "primary",
-    title: undefined,
-    subtitle: undefined,
-    icon: undefined,
-    class: "",
-    containerClass: "",
-  }
-);
+const props = withDefaults(defineProps<PanelCardProps>(), {
+  color: "primary",
+  title: undefined,
+  subtitle: undefined,
+  icon: undefined,
+  class: "",
+  containerClass: "",
+});
 
 const slots = useSlots();
 

@@ -21,16 +21,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { ErrorModalProps } from "@/types";
 import { appStore } from "@/hooks";
 import { List, ListItem } from "@/components/common/display";
 import Modal from "./Modal.vue";
 
-const props = defineProps<{
-  /**
-   * The errors to display.
-   */
-  errors: string[];
-}>();
+const props = defineProps<ErrorModalProps>();
 
 const open = computed(() => appStore.isErrorDisplayOpen);
 

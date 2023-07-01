@@ -11,6 +11,11 @@ export enum CreatorTabTypes {
   import = "import",
 }
 
+export enum LoaderTabTypes {
+  load = "load",
+  uploads = "uploads",
+}
+
 /**
  * Represents a panel for uploading files in the project creator.
  */
@@ -32,6 +37,6 @@ export interface CreatorFilePanel {
   // Traces
   toType?: string;
   isGenerated: boolean;
-  generateMethod: ModelType;
+  generateMethod?: ModelType;
   traces?: TraceLinkSchema[];
 }

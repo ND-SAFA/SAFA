@@ -30,6 +30,7 @@ import { useTheme } from "@/hooks";
 import { SafaIcon } from "@/components/common/display";
 
 const { darkMode } = useTheme();
+
 const className = computed(() =>
   darkMode.value
     ? "bg-neutral full-height row items-center justify-center"

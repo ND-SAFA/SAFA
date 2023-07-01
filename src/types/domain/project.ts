@@ -9,6 +9,8 @@ import {
   WarningSchema,
   AttributeSchema,
   AttributeLayoutSchema,
+  ArtifactTypeDirections,
+  SubtreeMapSchema,
 } from "@/types";
 
 /**
@@ -87,6 +89,10 @@ export interface ProjectSchema extends IdentifierSchema {
    * The artifact types present in the project.
    */
   artifactTypes: ArtifactTypeSchema[];
+  /**
+   * The directions of allowed links between artifact types.
+   */
+  typeDirections: ArtifactTypeDirections;
 
   /**
    * The current document id.
@@ -106,6 +112,10 @@ export interface ProjectSchema extends IdentifierSchema {
    * Map of artifact ids to their position in the default graph.
    */
   layout: LayoutPositionsSchema;
+  /**
+   * Map of artifact ids to their subtree information.
+   */
+  subtrees: SubtreeMapSchema;
 
   /**
    * List of trained project models.

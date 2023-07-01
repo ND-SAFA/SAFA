@@ -28,6 +28,12 @@ export const useSaveAttribute = (id: string) =>
         return !!this.baseAttribute;
       },
       /**
+       * @return Whether this attribute can be edited.
+       */
+      isReadOnly(): boolean {
+        return this.baseAttribute?.key.startsWith("~") || false;
+      },
+      /**
        * @return The data type of this attribute.
        */
       type(): AttributeType {
@@ -69,13 +75,22 @@ export const useSaveAttribute = (id: string) =>
           : "The maximum length of this value.";
       },
       /**
+       * @return The error message for the key.
+       */
+      keyError(): string {
+        return this.editedAttribute.key.startsWith("~")
+          ? "Key cannot start with ~"
+          : "";
+      },
+      /**
        * @return Whether this attribute can be saved.
        */
       canSave(): boolean {
         return (
           !!this.editedAttribute.key &&
           !!this.editedAttribute.label &&
-          !!this.editedAttribute.type
+          !!this.editedAttribute.type &&
+          !this.keyError
         );
       },
     },

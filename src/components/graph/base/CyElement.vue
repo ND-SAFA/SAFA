@@ -71,6 +71,8 @@ watch(
 watch(
   () => props.definition.position,
   (position: Position | null = null) => {
+    if (!position) return;
+
     const ele = instance.value?.getElementById(id.value);
 
     ele?.position(JSON.parse(JSON.stringify(position)));

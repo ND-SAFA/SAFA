@@ -7,7 +7,8 @@
     :multiple="!!multiple"
     :options="options"
     :hint="hint"
-    :error-message="errorMessage"
+    :error-message="errorMessage || undefined"
+    :dense="props.dense"
     use-input
     new-value-mode="add-unique"
     input-debounce="0"
@@ -15,7 +16,12 @@
     @popup-hide="emit('blur')"
   >
     <template #selected-item="{ opt }">
-      <attribute-chip v-if="!!opt" artifact-type :value="opt" />
+      <attribute-chip
+        v-if="!!opt"
+        artifact-type
+        :value="opt"
+        :dense="props.dense"
+      />
       <typography v-if="optionCount > 0" l="1" :value="optionCountDisplay" />
     </template>
   </q-select>
@@ -32,25 +38,16 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch, withDefaults } from "vue";
+import { ArtifactTypeInputProps } from "@/types";
 import { artifactStore, typeOptionsStore, useVModel } from "@/hooks";
 import { AttributeChip, Typography } from "@/components/common/display";
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string[] | string | null;
-    multiple?: boolean;
-    label?: string;
-    hint?: string;
-    errorMessage?: string;
-    showCount?: boolean;
-  }>(),
-  {
-    label: "Artifact Types",
-    multiple: false,
-    hint: undefined,
-    errorMessage: undefined,
-  }
-);
+const props = withDefaults(defineProps<ArtifactTypeInputProps>(), {
+  label: "Artifact Types",
+  multiple: false,
+  hint: undefined,
+  errorMessage: undefined,
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string[] | string | null): void;
@@ -63,7 +60,7 @@ const options = ref(typeOptionsStore.artifactTypes);
 
 const optionCount = computed(() =>
   props.showCount && typeof model.value === "string"
-    ? artifactStore.getArtifactsByType[model.value]?.length || 0
+    ? artifactStore.allArtifactsByType[model.value]?.length || 0
     : 0
 );
 

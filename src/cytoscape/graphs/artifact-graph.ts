@@ -16,6 +16,7 @@ import {
   edgeStyles,
   nodeStyles,
   USE_MOTION_BLUR,
+  ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
 
 /**
@@ -28,6 +29,7 @@ export const artifactTreeGraph: CytoCoreGraph = {
     motionBlur: USE_MOTION_BLUR,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
     boxSelectionEnabled: true,
+    wheelSensitivity: ZOOM_INCREMENT,
   },
   saveCy: artifactTreeResolveCy,
   plugins: [

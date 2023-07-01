@@ -5,7 +5,10 @@
       variant="caption"
       :value="attribute.label"
     />
-    <div v-if="arrayValue.length > 0">
+    <p v-if="isLink">
+      <typography el="a" :value="displayValue" />
+    </p>
+    <div v-else-if="arrayValue.length > 0">
       <attribute-chip v-for="value in arrayValue" :key="value" :value="value" />
     </div>
     <typography v-else el="p" :value="displayValue" />
@@ -23,28 +26,18 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { AttributeCollectionSchema, AttributeSchema } from "@/types";
+import { AttributeDisplayProps } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
 import { Typography } from "../content";
 import { AttributeChip } from "../chip";
 
-const props = defineProps<{
-  /**
-   * The collection of attribute values to display from.
-   */
-  values: AttributeCollectionSchema;
-  /**
-   * The attribute from the collection to display.
-   */
-  attribute: AttributeSchema;
-  /**
-   * If true, the attribute name will be displayed above the value.
-   */
-  showName?: boolean;
-}>();
+const props = defineProps<AttributeDisplayProps>();
 
 const dataCy = computed(() => `text-attribute-${props.attribute.key}`);
+const isLink = computed(() =>
+  String(props.values[props.attribute.key]).includes("://")
+);
 
 /**
  * The display values for an array attribute.

@@ -28,18 +28,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TimArtifactLevelSchema } from "@/types";
+import { ArtifactLevelInputProps } from "@/types";
 import { allTypeIcons } from "@/util";
-import { projectStore, sessionStore } from "@/hooks";
-import { handleSaveArtifactTypeIcon } from "@/api";
+import { artifactTypeApiStore, projectStore, sessionStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * The artifact level to display and allow editing of.
-   */
-  artifactLevel: TimArtifactLevelSchema;
-}>();
+const props = defineProps<ArtifactLevelInputProps>();
 
 const iconOptions = allTypeIcons.map((icon) => ({
   icon,
@@ -58,7 +52,10 @@ const icon = computed({
   set(iconId: string) {
     props.artifactLevel.iconIndex = allTypeIcons.indexOf(iconId);
 
-    handleSaveArtifactTypeIcon({ ...props.artifactLevel, icon: iconId });
+    artifactTypeApiStore.handleSaveIcon({
+      ...props.artifactLevel,
+      icon: iconId,
+    });
   },
 });
 </script>

@@ -2,19 +2,25 @@
   <details-panel
     panel="saveTrace"
     data-cy="panel-trace-save"
-    @open="handleOpen"
+    @open="traceSaveStore.resetTrace"
   >
     <panel-card>
       <artifact-input
-        v-model="sourceArtifactId"
-        label="Source Artifact"
-        data-cy="button-trace-save-source"
+        v-model="traceSaveStore.targetIds"
+        multiple
+        label="Parent Artifacts"
+        :hidden-artifact-ids="traceSaveStore.hiddenTargetIds"
+        :default-hidden-types="traceSaveStore.defaultHiddenTargetTypes"
+        data-cy="button-trace-save-target"
       />
       <artifact-input
-        v-model="targetArtifactId"
-        label="Target Artifact"
+        v-model="traceSaveStore.sourceIds"
+        multiple
+        label="Child Artifacts"
         class="q-my-md"
-        data-cy="button-trace-save-target"
+        :hidden-artifact-ids="traceSaveStore.hiddenSourceIds"
+        :default-hidden-types="traceSaveStore.defaultHiddenSourceTypes"
+        data-cy="button-trace-save-source"
       />
 
       <expansion-item
@@ -29,10 +35,11 @@
       </expansion-item>
 
       <typography
+        v-if="!loading"
         el="p"
         color="negative"
         class="q-my-md"
-        :value="errorMessage"
+        :value="traceSaveStore.errorMessage"
       />
 
       <template #actions>
@@ -41,7 +48,8 @@
             label="Create"
             icon="save"
             color="primary"
-            :disabled="!canSave"
+            :disabled="!traceSaveStore.canSave"
+            :loading="loading"
             data-cy="button-trace-save"
             @click="handleSubmit"
           />
@@ -61,9 +69,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
-import { handleCreateLink } from "@/api";
+import { computed, ref, watch } from "vue";
+import {
+  appStore,
+  traceApiStore,
+  traceSaveStore,
+  typeOptionsStore,
+} from "@/hooks";
 import {
   Typography,
   ArtifactInput,
@@ -75,67 +87,28 @@ import {
   DetailsPanel,
 } from "@/components/common";
 
-const sourceArtifactId = ref("");
-const targetArtifactId = ref("");
-
-const sourceArtifact = computed(() =>
-  artifactStore.getArtifactById(sourceArtifactId.value)
-);
-const targetArtifact = computed(() =>
-  artifactStore.getArtifactById(targetArtifactId.value)
-);
-
-const errorMessage = computed(() => {
-  if (!sourceArtifact.value || !targetArtifact.value) return "";
-
-  const isLinkAllowed = traceStore.isLinkAllowed(
-    sourceArtifact.value,
-    targetArtifact.value
-  );
-
-  return isLinkAllowed === true
-    ? ""
-    : isLinkAllowed || "Cannot create a trace link.";
-});
-
-const canSave = computed(
-  () =>
-    !!sourceArtifactId.value &&
-    !!targetArtifactId.value &&
-    errorMessage.value === ""
-);
+const loading = ref(false);
 
 const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
-
-/**
- * Resets the panel state.
- */
-function handleOpen(): void {
-  const openState = appStore.isTraceCreatorOpen;
-
-  sourceArtifactId.value = "";
-  targetArtifactId.value = "";
-
-  if (typeof openState !== "object") return;
-
-  if (openState.type === "source") {
-    sourceArtifactId.value = openState.artifactId;
-  } else if (openState.type === "target") {
-    targetArtifactId.value = openState.artifactId;
-  } else {
-    sourceArtifactId.value = openState.sourceId;
-    targetArtifactId.value = openState.targetId;
-  }
-}
 
 /**
  * Creates a trace link from the given artifacts.
  */
 async function handleSubmit(): Promise<void> {
-  if (!sourceArtifact.value || !targetArtifact.value) return;
+  loading.value = true;
 
-  await handleCreateLink(sourceArtifact.value, targetArtifact.value);
+  await traceApiStore.handleCreateAll();
 
+  loading.value = false;
   appStore.closeSidePanels();
 }
+
+watch(
+  () => appStore.isTraceCreatorOpen,
+  (open) => {
+    if (!open) return;
+
+    traceSaveStore.resetTrace();
+  }
+);
 </script>

@@ -71,8 +71,7 @@ export default {
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import { AttributeSchema, AttributeLayoutSchema } from "@/types";
-import { attributeLayoutSaveStore } from "@/hooks";
-import { handleDeleteAttributeLayout, handleSaveAttributeLayout } from "@/api";
+import { attributeApiStore, attributeLayoutSaveStore } from "@/hooks";
 import {
   AttributeGrid,
   ArtifactTypeInput,
@@ -98,16 +97,20 @@ const store = ref(attributeLayoutSaveStore(props.layout?.id || ""));
  * Saves an attribute layout.
  */
 function handleSave() {
-  handleSaveAttributeLayout(store.value.editedLayout, store.value.isUpdate, {
-    onSuccess: ({ id }) => emit("save", id),
-  });
+  attributeApiStore.handleSaveAttributeLayout(
+    store.value.editedLayout,
+    store.value.isUpdate,
+    {
+      onSuccess: ({ id }) => emit("save", id),
+    }
+  );
 }
 
 /**
  * Deletes an attribute layout.
  */
 function handleDeleteLayout() {
-  handleDeleteAttributeLayout(store.value.editedLayout, {});
+  attributeApiStore.handleDeleteAttributeLayout(store.value.editedLayout);
 }
 
 /**

@@ -19,39 +19,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IconVariant, ThemeColor } from "@/types";
+import { IconDisplayProps } from "@/types";
 import { getIcon } from "@/util";
 
-const props = defineProps<{
-  /**
-   * The icon variant to render.
-   */
-  variant?: IconVariant;
-  /**
-   * The id of an icon, if not rendering a preset variant.
-   */
-  id?: string;
-  /**
-   * The size of the icon.
-   */
-  size?: "sm" | "md" | "lg";
-  /**
-   * How much to rotate the icon (in degrees).
-   */
-  rotate?: number;
-  /**
-   * The color to render the component with.
-   */
-  color?: ThemeColor;
-  /**
-   * The  style to include on the component.
-   */
-  style?: string;
-  /**
-   * The data-cy attribute to include on the component.
-   */
-  dataCy?: string;
-}>();
+const props = defineProps<IconDisplayProps>();
 
 const iconId = computed(() => {
   if (props.id) {
@@ -62,7 +33,9 @@ const iconId = computed(() => {
 });
 
 const iconColor = computed(() => {
-  if (props.color) {
+  if (props.color?.includes("#")) {
+    return "";
+  } else if (props.color) {
     return props.color;
   }
 
@@ -87,6 +60,8 @@ const iconStyle = computed(() => {
     return props.style;
   } else if (props.rotate) {
     return `transform: rotate(${props.rotate}deg)`;
+  } else if (props.color?.includes("#")) {
+    return `color: ${props.color}`;
   } else {
     return "";
   }

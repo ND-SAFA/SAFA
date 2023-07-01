@@ -4,8 +4,9 @@ import {
   simpleProjectFilesMap,
   testFileMap,
   testProject,
-  validUser,
 } from "@/fixtures";
+
+const validUser = Cypress.env("validUser");
 
 describe("Standard Project Creation", () => {
   beforeEach(() => {

@@ -33,7 +33,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { handleDeleteAccount } from "@/api";
+import { sessionApiStore } from "@/hooks";
 import {
   PasswordInput,
   Typography,
@@ -47,6 +47,6 @@ const password = ref("");
  * Handles account deletion.
  */
 function handleSubmit(): void {
-  handleDeleteAccount(password.value);
+  sessionApiStore.handleDeleteAccount(password.value);
 }
 </script>

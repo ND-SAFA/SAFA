@@ -7,7 +7,7 @@
     <password-input
       v-model="oldPassword"
       label="Current Password"
-      :errors="errorText"
+      :errors="sessionApiStore.passwordErrorMessage"
       data-cy="input-current-password"
     />
     <password-input
@@ -38,7 +38,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { handleChangePassword } from "@/api";
+import { sessionApiStore } from "@/hooks";
 import {
   PasswordInput,
   Typography,
@@ -48,18 +48,14 @@ import {
 
 const oldPassword = ref("");
 const newPassword = ref("");
-const error = ref(false);
 
-const errorText = computed(() => error.value && "Incorrect password");
 const isDisabled = computed(() => !oldPassword.value || !newPassword.value);
 
 /**
  * Handles a password edit.
  */
 function handleEditPassword(): void {
-  error.value = false;
-
-  handleChangePassword(
+  sessionApiStore.handleChangePassword(
     {
       oldPassword: oldPassword.value,
       newPassword: newPassword.value,
@@ -69,7 +65,6 @@ function handleEditPassword(): void {
         oldPassword.value = "";
         newPassword.value = "";
       },
-      onError: () => (error.value = true),
     }
   );
 }

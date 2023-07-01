@@ -11,13 +11,13 @@
       <chip
         v-for="type in allowedTypes"
         :key="type"
-        outline
+        outlined
         :removable="allowEditing"
         :label="getTypeLabel(type)"
         data-cy="chip-type-direction"
         @remove="handleDelete(type)"
       />
-      <chip v-if="allowedTypes.length === 0" outline label="Any Type" />
+      <chip v-if="allowedTypes.length === 0" outlined label="Any Type" />
     </div>
   </div>
 </template>
@@ -33,17 +33,16 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TimArtifactLevelSchema } from "@/types";
-import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
-import { handleRemoveDirection } from "@/api";
+import { ArtifactLevelInputProps } from "@/types";
+import {
+  projectStore,
+  sessionStore,
+  traceMatrixApiStore,
+  typeOptionsStore,
+} from "@/hooks";
 import { Typography, Chip } from "@/components/common/display";
 
-const props = defineProps<{
-  /**
-   * The artifact level to display and allow editing of.
-   */
-  artifactLevel: TimArtifactLevelSchema;
-}>();
+const props = defineProps<ArtifactLevelInputProps>();
 
 const allowEditing = computed(() =>
   sessionStore.isEditor(projectStore.project)
@@ -65,6 +64,6 @@ function getTypeLabel(type: string) {
  * @param removedType - The type to remove.
  */
 function handleDelete(removedType: string) {
-  handleRemoveDirection(props.artifactLevel, removedType);
+  traceMatrixApiStore.handleDeleteDirection(props.artifactLevel, removedType);
 }
 </script>

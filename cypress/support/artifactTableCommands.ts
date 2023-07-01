@@ -5,6 +5,8 @@ Cypress.Commands.add("switchToTableView", (tab) => {
 
   if (tab === "trace") {
     cy.switchTab("Trace Links");
+  } else if (tab === "approval") {
+    cy.switchTab("Trace Approval");
   }
 });
 

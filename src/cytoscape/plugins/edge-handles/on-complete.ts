@@ -1,7 +1,12 @@
 import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 
-import { ArtifactCytoElementData, CytoCore } from "@/types";
-import { handleCreateLink } from "@/api";
+import {
+  ArtifactCytoElementData,
+  CytoCore,
+  GraphMode,
+  TimNodeCytoElementData,
+} from "@/types";
+import { traceApiStore, traceMatrixApiStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape/plugins";
 
 /**
@@ -20,12 +25,22 @@ export function onArtifactTreeEdgeComplete(
   targetNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
-  const sourceData: ArtifactCytoElementData = sourceNode.data();
-  const targetData: ArtifactCytoElementData = targetNode.data();
-
   disableDrawMode();
 
   addedEdge.remove();
 
-  handleCreateLink(sourceData, targetData);
+  if (sourceNode.data()?.graph === GraphMode.tree) {
+    const sourceData: ArtifactCytoElementData = sourceNode.data();
+    const targetData: ArtifactCytoElementData = targetNode.data();
+
+    traceApiStore.handleCreate(sourceData, targetData);
+  } else {
+    const sourceData: TimNodeCytoElementData = sourceNode.data();
+    const targetData: TimNodeCytoElementData = targetNode.data();
+
+    traceMatrixApiStore.handleCreate(
+      sourceData.artifactType,
+      targetData.artifactType
+    );
+  }
 }

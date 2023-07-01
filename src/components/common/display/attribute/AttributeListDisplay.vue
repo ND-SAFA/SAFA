@@ -21,17 +21,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { AttributeListProps } from "@/types";
 import { attributesStore } from "@/hooks";
 import AttributeGrid from "./AttributeGrid.vue";
 import AttributeDisplay from "./AttributeDisplay.vue";
 
-const props = defineProps<{
-  /**
-   * The artifact to display the custom attributes of.
-   */
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<AttributeListProps>();
 
 const attributes = computed(() => props.artifact.attributes || {});
 

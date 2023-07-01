@@ -8,10 +8,13 @@
         value="Reset Password"
       />
 
-      <div v-if="!isSubmitted">
+      <div v-if="!sessionApiStore.passwordSubmitted">
         <typography b="2" el="p" value="Please enter a new password." />
 
-        <password-input v-model="password" :errors="errors" />
+        <password-input
+          v-model="password"
+          :error-message="sessionApiStore.passwordErrorMessage"
+        />
       </div>
 
       <typography
@@ -23,11 +26,11 @@
 
     <template #actions>
       <text-button
-        v-if="!isSubmitted"
+        v-if="!sessionApiStore.passwordSubmitted"
         color="primary"
         label="Update Password"
         :disabled="password.length === 0"
-        :loading="isLoading"
+        :loading="sessionApiStore.loading"
         @click="handleReset"
       />
 
@@ -54,28 +57,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
+import { sessionApiStore } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
-import { updatePassword } from "@/api";
 import { CardPage, PasswordInput, Typography, TextButton } from "@/components";
 
 const token = ref("");
 const password = ref("");
-const isError = ref(false);
-const isLoading = ref(false);
-const isSubmitted = ref(false);
-
-const errors = computed(() =>
-  isError.value ? ["Unable to reset your password."] : []
-);
-
-onMounted(() => {
-  const loadedToken = getParam(QueryParams.PW_RESET);
-
-  if (!loadedToken) return;
-
-  token.value = String(loadedToken);
-});
 
 /**
  * Navigates to the login page.
@@ -88,17 +76,17 @@ function handleLogin() {
  * Attempts to reset a user's password.
  */
 function handleReset() {
-  isLoading.value = true;
-
-  updatePassword({
-    newPassword: password.value,
-    resetToken: token.value,
-  })
-    .then(() => {
-      isSubmitted.value = true;
-      isError.value = false;
-    })
-    .catch(() => (isError.value = true))
-    .finally(() => (isLoading.value = false));
+  sessionApiStore.handlePasswordUpdate(password.value, token.value);
 }
+
+/**
+ * Loads the password reset token on mount.
+ */
+onMounted(() => {
+  const loadedToken = getParam(QueryParams.PW_RESET);
+
+  if (!loadedToken) return;
+
+  token.value = String(loadedToken);
+});
 </script>

@@ -25,13 +25,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { handleLogout } from "@/api";
+import { sessionApiStore } from "@/hooks";
 import { PrivatePage, MyAccount, TextButton } from "@/components";
 
 /**
  * Logs out back to the login page.
  */
 function handleLogoutClick() {
-  handleLogout(true);
+  sessionApiStore.handleLogout(true);
 }
 </script>

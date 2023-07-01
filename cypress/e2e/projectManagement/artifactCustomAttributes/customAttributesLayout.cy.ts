@@ -8,7 +8,9 @@ describe("Custom Attributes Layout", () => {
     cy.clickButton(DataCy.navSettingsButton).switchTab("Custom Attributes");
 
     // Create a custom attribute and layout.
-    cy.createCustomAttribute(customAttribute).createCustomLayout(customLayout);
+    cy.createCustomAttribute(customAttribute)
+      .createCustomLayout(customLayout)
+      .wait(1000); // Wait to switch to the new layout tab.
   });
 
   describe("I can add a new attribute layout", () => {

@@ -1,7 +1,6 @@
 import { APIOptions } from "@/types";
-import { logStore } from "@/hooks";
-import { baseURL } from "@/api";
-import { handleLogout } from "@/api/handlers";
+import { LOGOUT_ERROR } from "@/util";
+import { BASE_URL } from "@/api";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -21,7 +20,7 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   { setJsonContentType = true, parseResponse = true, arrayBuffer = false } = {}
 ): Promise<T> {
-  const res = await fetch(`${baseURL}/${relativeUrl}`, {
+  const res = await fetch(`${BASE_URL}/${relativeUrl}`, {
     ...options,
     credentials: "include",
     headers: setJsonContentType
@@ -38,24 +37,17 @@ export default async function authHttpClient<T>(
 
   const content = await res.text();
 
-  if (res.status === 403) {
-    const message = "Session has timed out. Please log back in.";
-
-    await handleLogout();
-
-    logStore.onWarning(message);
-    throw Error(message);
-  } else if (res.status === 204 || content === "" || content === "created") {
-    // TODO: is this legacy code even necessary?
-    return {} as T;
+  if (res.status === 403 && !relativeUrl.includes("credentials")) {
+    // Log out of the app if credentials expire.
+    // Ensure that we don't log out if the expired credential status is for an integration.
+    throw Error(LOGOUT_ERROR);
   } else if (!parseResponse) {
     return content as unknown as T;
   }
 
-  const data = JSON.parse(content);
+  const data = content ? JSON.parse(content) : undefined;
 
   if (!res.ok) {
-    logStore.onDevError(data.error);
     throw Error(data.error);
   } else {
     return data;

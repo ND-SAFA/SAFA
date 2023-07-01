@@ -4,7 +4,7 @@
 
 <script lang="ts">
 /**
- * Displays link between two artifact layers.
+ * Displays trace link edges between artifact types.
  */
 export default {
   name: "TimLink",
@@ -33,6 +33,8 @@ const definition = computed<TimEdgeCytoElement>(() => ({
     graph: GraphMode.tim,
     id: getTraceId(props.sourceType, props.targetType).replace(/ /g, ""),
     // Reversed to show arrow toward parent.
+    sourceType: props.targetType,
+    targetType: props.sourceType,
     source: props.targetType.replace(/ /g, ""),
     target: props.sourceType.replace(/ /g, ""),
     count: props.count,

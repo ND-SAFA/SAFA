@@ -15,10 +15,3 @@ export interface ArtifactTypeSchema {
    */
   icon: string;
 }
-
-/**
- * Enumerates any specific artifact types that are handled differently.
- */
-export enum ReservedArtifactType {
-  github = "GitHub File",
-}

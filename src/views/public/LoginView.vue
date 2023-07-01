@@ -4,7 +4,7 @@
       <text-input
         v-model="email"
         label="Email"
-        :error-message="isError && 'Invalid username or password'"
+        :error-message="sessionApiStore.loginErrorMessage"
         data-cy="input-email"
         @enter="handleSubmit"
       />
@@ -16,7 +16,7 @@
         color="primary"
         label="Login"
         :disabled="password.length === 0"
-        :loading="isLoading"
+        :loading="sessionApiStore.loading"
         class="login-button"
         data-cy="button-login"
         @click="handleSubmit"
@@ -60,8 +60,8 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
-import { handleLogin } from "@/api";
 import {
   CardPage,
   PasswordInput,
@@ -72,8 +72,6 @@ import {
 
 const email = ref("");
 const password = ref("");
-const isError = ref(false);
-const isLoading = ref(false);
 
 /**
  * Navigate to the sign-up page.
@@ -93,14 +91,9 @@ function handleForgotPassword() {
  * Attempts to log the user in.
  */
 function handleSubmit() {
-  isLoading.value = true;
-
-  handleLogin({
+  sessionApiStore.handleLogin({
     email: email.value,
     password: password.value,
-  })
-    .then(() => (isError.value = false))
-    .catch(() => (isError.value = true))
-    .finally(() => (isLoading.value = false));
+  });
 }
 </script>

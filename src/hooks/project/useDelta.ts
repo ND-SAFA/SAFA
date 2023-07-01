@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 
 import {
+  ApprovalType,
   ArtifactDeltaState,
   ArtifactSchema,
-  EntityModification,
-  ProjectDelta,
+  EntityModificationSchema,
+  GraphMode,
+  VersionDeltaSchema,
   TraceLinkSchema,
   VersionSchema,
 } from "@/types";
@@ -51,7 +53,10 @@ export const useDelta = defineStore("delta", {
     /**
      * @return A collection of all modified artifacts.
      */
-    modifiedArtifacts(): Record<string, EntityModification<ArtifactSchema>> {
+    modifiedArtifacts(): Record<
+      string,
+      EntityModificationSchema<ArtifactSchema>
+    > {
       return this.projectDelta.artifacts.modified;
     },
     /**
@@ -74,6 +79,13 @@ export const useDelta = defineStore("delta", {
      * @param isDeltaViewEnabled - Whether to enable this view.
      */
     setIsDeltaViewEnabled(isDeltaViewEnabled: boolean): void {
+      if (this.inDeltaView && !isDeltaViewEnabled) {
+        layoutStore.mode = GraphMode.tim;
+        this.afterVersion = undefined;
+      } else {
+        appStore.closeSidePanels();
+      }
+
       this.inDeltaView = isDeltaViewEnabled;
 
       disableDrawMode();
@@ -83,36 +95,58 @@ export const useDelta = defineStore("delta", {
      */
     clear(): void {
       this.setIsDeltaViewEnabled(false);
-      appStore.closeSidePanels();
       this.$reset();
-    },
-    /**
-     * Removes delta artifacts and traces from the current project.
-     */
-    removeDeltaAdditions(): void {
-      artifactStore.deleteArtifacts(Object.values(this.addedArtifacts));
-      traceStore.deleteTraceLinks(Object.values(this.addedTraces));
     },
     /**
      * Sets the current artifact deltas.
      *
      * @param payload - All artifact deltas.
+     * @param afterVersion - The version that artifact deltas have been made to.
      */
-    async setDeltaPayload(payload: ProjectDelta): Promise<void> {
-      this.removeDeltaAdditions();
+    async setDeltaPayload(
+      payload: VersionDeltaSchema,
+      afterVersion?: VersionSchema
+    ): Promise<void> {
       this.projectDelta = payload;
+      this.afterVersion = afterVersion;
 
-      artifactStore.addOrUpdateArtifacts([
+      const artifacts = [
         ...Object.values(payload.artifacts.added),
+        ...Object.values(payload.artifacts.modified).map(({ after }) => after),
         ...Object.values(payload.artifacts.removed),
-      ]);
-      traceStore.addOrUpdateTraceLinks([
+      ];
+
+      const removedTraces = Object.values(payload.traces.removed);
+      const traces = [
         ...Object.values(payload.traces.added),
-        ...Object.values(payload.traces.removed),
-      ]);
-      await subtreeStore.restoreHiddenNodesAfter(async () =>
-        layoutStore.setArtifactTreeLayout()
-      );
+        ...Object.values(payload.traces.modified).map(({ after }) => after),
+        ...removedTraces,
+      ];
+
+      // Add all updated artifacts and traces to the store.
+      artifactStore.addOrUpdateArtifacts(artifacts);
+      traceStore.addOrUpdateTraceLinks(traces);
+
+      // Add removed traces back into the subtree.
+      removedTraces.forEach((trace) => subtreeStore.addTraceSubtree(trace));
+
+      // Switch the current artifact store to only show artifacts in the delta.
+      artifactStore.initializeArtifacts({
+        currentArtifactIds: artifacts
+          .map(({ id }) => [
+            id,
+            // Add all neighbors of the artifact to the list of artifacts to show.
+            ...(subtreeStore.subtreeMap[id]?.neighbors || []),
+          ])
+          .reduce((acc, cur) => [...acc, ...cur], []),
+      });
+
+      // Switch to tree view and generate the graph layout for the unique set of delta artifacts.
+      await subtreeStore.restoreHiddenNodesAfter(async () => {
+        layoutStore.mode = GraphMode.tree;
+        await layoutStore.updatePositions({});
+        layoutStore.setArtifactTreeLayout();
+      });
       this.setIsDeltaViewEnabled(true);
     },
     /**
@@ -149,7 +183,14 @@ export const useDelta = defineStore("delta", {
       } else if (id in this.projectDelta.traces.added) {
         return ArtifactDeltaState.ADDED;
       } else if (id in this.projectDelta.traces.modified) {
-        return ArtifactDeltaState.MODIFIED;
+        if (
+          this.projectDelta.traces.modified[id].after.approvalStatus ===
+          ApprovalType.DECLINED
+        ) {
+          return ArtifactDeltaState.REMOVED;
+        } else {
+          return ArtifactDeltaState.MODIFIED;
+        }
       } else if (id in this.projectDelta.traces.removed) {
         return ArtifactDeltaState.REMOVED;
       } else {

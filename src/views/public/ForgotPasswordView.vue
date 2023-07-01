@@ -8,7 +8,7 @@
         value="Forgot Password"
       />
 
-      <div v-if="!isSubmitted">
+      <div v-if="!sessionApiStore.passwordSubmitted">
         <typography
           el="p"
           b="2"
@@ -18,7 +18,7 @@
         <text-input
           v-model="email"
           label="Email"
-          :error-message="isError && 'Unable to reset password'"
+          :error-message="sessionApiStore.passwordErrorMessage"
         />
       </div>
 
@@ -32,11 +32,11 @@
 
     <template #actions>
       <text-button
-        v-if="!isSubmitted"
+        v-if="!sessionApiStore.passwordSubmitted"
         color="primary"
         label="Reset Password"
         :disabled="email.length === 0"
-        :loading="isLoading"
+        :loading="sessionApiStore.loading"
         @click="handleReset"
       />
 
@@ -64,14 +64,11 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
-import { createPasswordReset } from "@/api";
 import { CardPage, Typography, TextButton, TextInput } from "@/components";
 
 const email = ref("");
-const isError = ref(false);
-const isLoading = ref(false);
-const isSubmitted = ref(false);
 
 /**
  * Navigates to the login page.
@@ -84,16 +81,6 @@ function handleLogin() {
  * Sends a password reset email.
  */
 function handleReset() {
-  isLoading.value = true;
-
-  createPasswordReset({
-    email: email.value,
-  })
-    .then(() => {
-      isSubmitted.value = true;
-      isError.value = false;
-    })
-    .catch(() => (isError.value = true))
-    .finally(() => (isLoading.value = false));
+  sessionApiStore.handlePasswordReset(email.value);
 }
 </script>

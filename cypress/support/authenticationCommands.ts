@@ -12,10 +12,6 @@ Cypress.Commands.add("loginToPage", (email, password, route, query = {}) => {
       ? "?" + new URLSearchParams(query).toString()
       : "";
 
-  console.log(route);
-  console.log(queryString);
-  console.log(route + queryString);
-
   cy.visit(route + queryString)
     .login(email, password)
     .locationShouldEqual(route);

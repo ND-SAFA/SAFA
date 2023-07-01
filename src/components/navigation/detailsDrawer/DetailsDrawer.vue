@@ -7,7 +7,7 @@
     :width="width"
     class="bg-background"
   >
-    <div class="q-pa-sm q-mb-md full-height bg-background">
+    <div class="q-pa-sm q-mb-md bg-background">
       <flex-box justify="between" align="center">
         <typography color="primary" variant="subtitle" :value="title" />
         <icon-button
@@ -28,6 +28,7 @@
       <generate-trace-link-panel />
       <artifact-level-panel />
       <trace-matrix-panel />
+      <artifact-generation-panel />
     </div>
   </q-drawer>
 </template>
@@ -63,6 +64,7 @@ import {
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
+import { ArtifactGenerationPanel } from "@/components/hgen";
 
 const openState = computed(() => appStore.isDetailsPanelOpen);
 const drawerOpen = computed(() => typeof openState.value === "string");
@@ -79,6 +81,8 @@ const title = computed(() => {
       return "Artifact Body";
     case "saveArtifact":
       return "Save Artifact";
+    case "generateArtifact":
+      return "Generate Artifacts";
     case "displayTrace":
       return "Trace Link";
     case "saveTrace":
@@ -98,12 +102,14 @@ const width = computed(() => {
   if (openState.value === "displayTrace") {
     return 500;
   } else if (
-    openState.value === "displayArtifactBody" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"
   ) {
     return 600;
-  } else if (openState.value === "generateTrace") {
+  } else if (
+    openState.value === "displayArtifactBody" ||
+    openState.value === "generateTrace"
+  ) {
     return 800;
   } else {
     return 400;

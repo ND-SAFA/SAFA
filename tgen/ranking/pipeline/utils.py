@@ -1,7 +1,6 @@
 import pandas as pd
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.util.ranking_util import RankingUtil
 
 
 def extract_prompt_artifacts(artifact_df: pd.DataFrame):
@@ -11,7 +10,7 @@ def extract_prompt_artifacts(artifact_df: pd.DataFrame):
     :param n_sources: The number of artifacts in the source type.
     :return:
     """
-    source_type_name, target_type_name = RankingUtil.get_parent_child_types(artifact_df)
+    source_type_name, target_type_name = artifact_df.get_parent_child_types(artifact_df)
     source_df = artifact_df[artifact_df[ArtifactKeys.LAYER_ID.value] == source_type_name]
     target_df = artifact_df[artifact_df[ArtifactKeys.LAYER_ID.value] == target_type_name]
 

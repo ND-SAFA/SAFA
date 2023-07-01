@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
@@ -42,8 +42,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.allowed_missing_sources = allowed_missing_sources
         self.allowed_missing_targets = allowed_missing_targets
         self.allowed_orphans = allowed_orphans
-        self.artifact_df = None
-        self.trace_df = None
+        self.artifact_df: Optional[ArtifactDataFrame] = None
+        self.trace_df: Optional[TraceDataFrame] = None
         self.layer_mapping_df = None
         self.project_reader = project_reader
         self.remove_orphans = remove_orphans
@@ -125,7 +125,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        if len(self.trace_df[self.trace_df[TraceKeys.LABEL] == 0]) < 1:
+        if self.trace_df.get_label_count(0) < 1:
             self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
         trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)

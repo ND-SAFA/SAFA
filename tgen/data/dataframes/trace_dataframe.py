@@ -112,5 +112,5 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: Returns the number of true positives in data frame.
         """
         label_counts = self[TraceKeys.LABEL].value_counts()
-        n_label = label_counts[label]
+        n_label = label_counts.get(label, 0)
         return n_label

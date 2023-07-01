@@ -3,11 +3,8 @@ from typing import List, Optional
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.train.trainers.trainer_task import TrainerTask

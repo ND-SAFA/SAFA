@@ -7,7 +7,6 @@ from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.model_jobs.create_model_job import CreateModelJob
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
-from tgen.jobs.paper_job import PaperJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
@@ -17,7 +16,6 @@ from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedJobType(SupportedEnum):
-    PAPER = PaperJob
     HUGGING_FACE = HuggingFaceJob
     HGEN = BaseHGenJob
     MULTI_LAYER_HGEN = MultiLayerHGenJob

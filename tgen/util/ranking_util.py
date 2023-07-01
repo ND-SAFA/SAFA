@@ -1,11 +1,11 @@
 import json
 from typing import Dict, List
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
 from tgen.ranking.pipeline.base import RankingStore
+from tgen.ranking.pipeline.sort_step import GenericSorter
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -18,7 +18,17 @@ class RankingUtil:
     """
 
     @staticmethod
-    def rank_children(parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str]):
+    def rank_children(parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str],
+                      sorter: GenericSorter = None):
+        if sorter:
+            parent2children_sorted = {}
+            for parent_id in parent_ids:
+                children_ids = parent2children[parent_id]
+                parent2children = sorter([parent_id], children_ids, artifact_map)
+                sorted_children_ids = parent2children[parent_id]
+                parent2children_sorted[parent_id] = sorted_children_ids
+            parent2children = parent2children_sorted
+
         ranking_store = RankingStore()
         ranking_store.artifact_map = artifact_map
         ranking_store.parent_ids = parent_ids  # flip flop because in study source = target
@@ -27,22 +37,6 @@ class RankingUtil:
         ranking_step(ranking_store)
         batched_ranked_children = ranking_store.processed_ranking_response
         return batched_ranked_children
-
-    @staticmethod
-    def get_parent_child_types(artifact_df: ArtifactDataFrame):
-        """
-        Returns the artifacts types of the parent and child artifacts.
-        :param artifact_df: The data frame of artifacts.
-        :return: Parent type and child type.
-        """
-
-        counts_df = artifact_df[ArtifactKeys.LAYER_ID].value_counts()
-        if len(counts_df) > 2:
-            raise NotImplementedError("Multi-layer tracing is under construction.")
-        n_sources = min(counts_df)
-        parent_type = counts_df[counts_df == n_sources].index[0]
-        child_type = counts_df[counts_df != n_sources].index[0]
-        return parent_type, child_type
 
     @staticmethod
     def parse_ranking_response(parent_id: str, ranked_children_ids: List[str], children_entries: List[TracePredictionEntry] = None):

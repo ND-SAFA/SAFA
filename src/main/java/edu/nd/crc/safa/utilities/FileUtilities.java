@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
+    public static final String URL_SEP = "/";
 
     public static CSVParser readCSVFile(String pathToFile) throws IOException {
         File csvData = new File(pathToFile);
@@ -121,7 +123,7 @@ public class FileUtilities {
         }
         return result;
     }
-    
+
     /**
      * Extracts files in given zip bytearray as a string.
      *
@@ -197,6 +199,16 @@ public class FileUtilities {
     }
 
     /**
+     * Creates a URL by combining given parts.
+     *
+     * @param directories Directories that once joined create path.
+     * @return String representing built path.
+     */
+    public static String buildUrl(String... directories) {
+        return String.join(URL_SEP, directories);
+    }
+
+    /**
      * Deletes file or folder located at given path
      *
      * @param path path to a file or directory which to delete
@@ -233,5 +245,22 @@ public class FileUtilities {
         }
 
         FileUtils.cleanDirectory(myDir);
+    }
+
+    /**
+     * Reads a file that is located in the classpath (i.e. in the resources folder)
+     * and returns the contents of the file as a string.
+     *
+     * @param path Path to the file (relative to the resources folder).
+     * @return The contents of the file.
+     * @throws IOException If the file could not be read.
+     */
+    public static String readClasspathFile(String path) throws IOException {
+        ClassLoader classLoader = FileUtilities.class.getClassLoader();
+
+        try (InputStream in = classLoader.getResourceAsStream(path)) {
+            assert in != null;
+            return new String(in.readAllBytes());
+        }
     }
 }

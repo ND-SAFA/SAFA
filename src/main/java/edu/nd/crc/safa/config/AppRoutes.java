@@ -87,6 +87,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class HGen {
+        public static final String GENERATE = "/hgen/{versionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Models {
         public static final String MODEL_ROOT = "/models";
         public static final String MODEL_ROOT_BY_ID = Projects.BY_ID + MODEL_ROOT;
@@ -137,6 +142,11 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Prompts {
+        public static final String COMPLETE = "/prompt";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
@@ -161,9 +171,6 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Installations {
             public static final String BY_PROJECT = Projects.ROOT + "/installations/by-project/{id}";
-            public static final String GITHUB_BY_IMPORTED =
-                Projects.ROOT + "/installations/by-github-repositories/{ids}";
-            public static final String JIRA_BY_IMPORTED = Projects.ROOT + "/installations/by-jira-projects/{ids}";
         }
     }
 
@@ -213,22 +220,20 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Github {
-        public static final String RETRIEVE_GITHUB_REPOSITORIES = Projects.ROOT + "/github";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Credentials {
             public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
-            public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
             public static final String DELETE = Accounts.PREFIX + "/github/credentials";
             public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
-            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{owner}/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = UPDATE;
             private static final String ROOT = Projects.ROOT + "/import";
-            public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
+            public static final String BY_NAME = Import.ROOT + "/github/{owner}/{repositoryName}";
         }
     }
 
@@ -258,7 +263,33 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Search {
+        public static final String SEARCH = "/search/{versionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Summarize {
+        public static final String SUMMARIZE_ARTIFACTS = "/summarize";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Layout {
         public static final String REGENERATE_LAYOUT = Versions.BY_ID + "/layout";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Integrations {
+        public static final String ROOT = "/integrations";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Github {
+            public static final String ROOT = Integrations.ROOT + "/github";
+
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Repos {
+                public static final String ROOT = Github.ROOT + "/repos";
+                public static final String BY_OWNER_AND_NAME = ROOT + "/{owner}/{repositoryName}";
+            }
+        }
     }
 }

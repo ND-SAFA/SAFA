@@ -73,7 +73,7 @@ public class FileDownloadService {
                 List<TraceAppEntity> traces = type2TraceMap.getTracesBetweenTypes(sourceType, targetType);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile, traces);
                 TimTraceDefinition traceFileIdentifier
-                    = new TimTraceDefinition(sourceType, targetType, fileName, false);
+                    = new TimTraceDefinition(sourceType, targetType, fileName, false, null);
                 traceFiles.add(traceFileIdentifier);
                 traceFile.export(traceFileOutput);
 
@@ -84,9 +84,9 @@ public class FileDownloadService {
     }
 
     private List<TimArtifactDefinition> writeArtifactFiles(String fileType,
-                                                            Project project,
-                                                            ProjectEntities projectEntityMaps,
-                                                            List<File> projectFiles) throws Exception {
+                                                           Project project,
+                                                           ProjectEntities projectEntityMaps,
+                                                           List<File> projectFiles) throws Exception {
         List<TimArtifactDefinition> artifactFiles = new ArrayList<>();
         for (String artifactType : projectEntityMaps.getArtifactTypes()) {
             String fileName = String.format("%s.%s", artifactType, fileType);

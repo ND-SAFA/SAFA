@@ -5,20 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
-import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TGen;
+import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.summary.SummaryService;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -42,6 +44,10 @@ public class GenerateLinksJob extends CommitJob {
      * The entities to generate links for.
      */
     ProjectAppEntity projectAppEntity;
+    /**
+     * The project version to commit summaries and generated links to.
+     */
+    ProjectVersion projectVersion;
 
     public GenerateLinksJob(JobDbEntity jobDbEntity,
                             ServiceProvider serviceProvider,
@@ -52,6 +58,7 @@ public class GenerateLinksJob extends CommitJob {
         this.traceGenerationRequest = traceGenerationRequest;
         this.generatedTraces = new ArrayList<>();
         this.user = user;
+        this.projectVersion = projectCommit.getCommitVersion();
     }
 
     /**
@@ -72,30 +79,32 @@ public class GenerateLinksJob extends CommitJob {
     public void retrieveTrainingArtifacts() {
         this.projectAppEntity = this.serviceProvider
             .getProjectRetrievalService()
-            .getProjectAppEntity(user, traceGenerationRequest.getProjectVersion());
+            .getProjectAppEntity(user, this.projectVersion);
     }
 
-    @IJobStep(value = "Generating links", position = 2)
+    @IJobStep(value = "Summarizing code artifacts.", position = 2)
+    public void createArtifactSummaries() {
+        SummaryService summaryService = this.serviceProvider.getSummaryService();
+        List<ArtifactAppEntity> codeArtifacts =
+            summaryService.summarizeCodeArtifacts(this.projectAppEntity.getArtifacts());
+        CommitService commitService = this.serviceProvider.getCommitService();
+        ProjectCommit projectCommit = new ProjectCommit();
+        projectCommit.setCommitVersion(this.projectVersion);
+        projectCommit.addArtifacts(ModificationType.MODIFIED, codeArtifacts);
+        commitService.performCommit(projectCommit, this.user);
+    }
+
+    @IJobStep(value = "Generating links", position = 3)
     public void generateLinks(JobLogger logger) {
         ProjectCommit projectCommit = getProjectCommit();
 
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
-            logger.log("Running tracing request:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
-                tracingRequest.getModel(), tracingRequest.getMethod(),
-                tracingRequest.getArtifactLevels());
+            logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
             TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-            if (tracingPayload.getModel() == null) {
-                this.generatedTraces = new ArrayList<>();
-                this.generatedTraces.addAll(this.serviceProvider
-                    .getTraceGenerationService()
-                    .generateLinksWithMethod(tracingPayload));
-            } else {
-                ModelAppEntity model = tracingPayload.getModel();
-                TGen bertModel = model.getBaseModel().createTGenController();
-                String statePath = model.getStatePath();
-                this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
-            }
+
+            ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
+            this.generatedTraces = controller.generateLinks(tracingPayload, this.getDbLogger());
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

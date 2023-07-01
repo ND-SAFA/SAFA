@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.common;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
@@ -9,6 +11,9 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.utilities.ExecutorDelegate;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
 import lombok.AllArgsConstructor;
@@ -23,11 +28,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestController
 @AllArgsConstructor
 public abstract class BaseController {
+
+    private static final long DEFAULT_REQUEST_TIMEOUT = 5000L;
 
     protected final ResourceBuilder resourceBuilder;
     protected final ServiceProvider serviceProvider;
@@ -109,5 +117,71 @@ public abstract class BaseController {
         } else {
             return objectName + message;
         }
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @param <T> The desired output type.
+     * @return A deferred result that will perform the request.
+     */
+    protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request) {
+        return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @return A deferred result that will perform the request.
+     */
+    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request) {
+        return makeDeferredRequest(request, BaseController.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @param timeout The timeout for the request.
+     * @return A deferred result that will perform the request.
+     */
+    protected DeferredResult<Void> makeDeferredRequest(Consumer<SafaUser> request, long timeout) {
+        ExecutorDelegate executorDelegate = serviceProvider.getExecutorDelegate();
+        SafaUserService safaUserService = serviceProvider.getSafaUserService();
+
+        DeferredResult<Void> output = executorDelegate.createOutput(timeout);
+
+        SafaUser user = safaUserService.getCurrentUser();
+        executorDelegate.submit(output, () -> {
+            request.accept(user);
+        });
+
+        return output;
+    }
+
+    /**
+     * Perform a deferred request which will make the request in the background.
+     *
+     * @param request The request to make.
+     * @param timeout The timeout for the request.
+     * @param <T> The desired output type.
+     * @return A deferred result that will perform the request.
+     */
+    protected <T> DeferredResult<T> makeDeferredRequest(Function<SafaUser, T> request, long timeout) {
+
+        ExecutorDelegate executorDelegate = serviceProvider.getExecutorDelegate();
+        SafaUserService safaUserService = serviceProvider.getSafaUserService();
+
+        DeferredResult<T> output = executorDelegate.createOutput(timeout);
+
+        SafaUser user = safaUserService.getCurrentUser();
+        executorDelegate.submit(output, () -> {
+            T result = request.apply(user);
+            output.setResult(result);
+        });
+
+        return output;
     }
 }

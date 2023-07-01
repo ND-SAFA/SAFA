@@ -1,14 +1,10 @@
 package edu.nd.crc.safa.features.github.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryBranchDTO;
-import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
@@ -31,45 +27,6 @@ public interface GithubConnectionService {
     GithubSelfResponseDTO getSelf(GithubAccessCredentials credentials);
 
     /**
-     * Get new credentials based on old ones
-     *
-     * @param credentials The credentials to refresh.
-     * @return Refreshed credentials.
-     */
-    GithubRefreshTokenDTO refreshAccessToken(GithubAccessCredentials credentials);
-
-    /**
-     * @param credentials User credentials
-     * @return A list of available user repositories
-     */
-    List<GithubRepositoryDTO> getUserRepositories(GithubAccessCredentials credentials);
-
-    /**
-     * @param credentials User credentials
-     * @param name        Repository name
-     * @return Requested user repository
-     */
-    GithubRepositoryDTO getUserRepository(GithubAccessCredentials credentials, String name);
-
-    /**
-     * @param credentials    User credentials
-     * @param repositoryName Repository name
-     * @return A list of available branches for the given repository
-     */
-    List<GithubRepositoryBranchDTO> getRepositoryBranches(GithubAccessCredentials credentials,
-                                                          String repositoryName);
-
-    /**
-     * @param credentials      User credentials
-     * @param repositoryName   Repository name
-     * @param repositoryBranch Repository branch
-     * @return The requested branch info for the given repository
-     */
-    GithubRepositoryBranchDTO getRepositoryBranch(GithubAccessCredentials credentials,
-                                                  String repositoryName,
-                                                  String repositoryBranch);
-
-    /**
      * @param credentials    User credentials
      * @param repositoryName Repository name
      * @param commitSha      Commit checkpoint
@@ -83,11 +40,13 @@ public interface GithubConnectionService {
      * @param credentials    User credentials
      * @param repositoryName Repository name
      * @param baseCommitSha  Commit checkpoint
-     * @return Diff between the base commit and the master HEAD
+     * @param branchName     Branch name
+     * @return Diff between the base commit and named branch.
      */
     GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
                                                                String repositoryName,
-                                                               String baseCommitSha);
+                                                               String baseCommitSha,
+                                                               String branchName);
 
     /**
      * @param credentials User credentials

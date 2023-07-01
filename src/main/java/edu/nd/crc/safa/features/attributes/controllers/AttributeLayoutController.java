@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,7 +47,8 @@ public class AttributeLayoutController extends BaseController {
     public AttributeLayoutAppEntity createLayout(@PathVariable UUID projectId,
                                                  @RequestBody AttributeLayoutAppEntity layout) {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-        AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(layout, project, true);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(user, layout, project, true);
         return attributeLayoutService.appEntityFromAttributeLayout(savedLayout);
     }
 
@@ -71,7 +73,8 @@ public class AttributeLayoutController extends BaseController {
             throw new SafaError("Cannot change layout ID");
         }
 
-        AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(layout, project, false);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        AttributeLayout savedLayout = attributeLayoutService.saveLayoutEntity(user, layout, project, false);
         return attributeLayoutService.appEntityFromAttributeLayout(savedLayout);
     }
 
@@ -84,7 +87,8 @@ public class AttributeLayoutController extends BaseController {
     @DeleteMapping(AppRoutes.AttributeLayout.BY_ID)
     public void deleteLayout(@PathVariable UUID projectId, @PathVariable UUID id) {
         this.resourceBuilder.fetchProject(projectId).withEditProject();
-        attributeLayoutService.deleteLayoutById(id);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        attributeLayoutService.deleteLayoutById(user, id);
     }
 
     /**

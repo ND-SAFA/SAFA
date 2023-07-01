@@ -14,6 +14,8 @@ public class GithubIdentifier {
 
     private ProjectVersion projectVersion;
 
+    private String repositoryOwner;
+
     private String repositoryName;
 
 }

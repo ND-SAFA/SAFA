@@ -32,8 +32,8 @@ public class VersionService {
         ProjectVersion projectVersion = getCurrentVersion(project);
         ProjectVersion newVersion = new ProjectVersion(project,
             projectVersion.getMajorVersion() + 1,
-            1,
-            1);
+            0,
+            0);
         this.projectVersionRepository.save(newVersion);
         return newVersion;
     }
@@ -43,7 +43,7 @@ public class VersionService {
         ProjectVersion newVersion = new ProjectVersion(project,
             projectVersion.getMajorVersion(),
             projectVersion.getMinorVersion() + 1,
-            1);
+            0);
         this.projectVersionRepository.save(newVersion);
         return newVersion;
     }
@@ -75,7 +75,7 @@ public class VersionService {
     }
 
     public ProjectVersion createInitialProjectVersion(Project project) {
-        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
+        ProjectVersion projectVersion = new ProjectVersion(project, 1, 0, 0);
         this.projectVersionRepository.save(projectVersion);
         projectVersion.setProject(project);
         return projectVersion;

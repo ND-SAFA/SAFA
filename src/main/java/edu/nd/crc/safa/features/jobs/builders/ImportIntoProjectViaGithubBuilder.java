@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.jobs.builders;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectImportJob;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -13,8 +14,9 @@ public class ImportIntoProjectViaGithubBuilder extends CreateProjectViaGithubBui
 
     public ImportIntoProjectViaGithubBuilder(ServiceProvider serviceProvider,
                                              GithubIdentifier githubIdentifier,
+                                             GithubImportDTO githubImportDTO,
                                              SafaUser user) {
-        super(serviceProvider, githubIdentifier, user);
+        super(serviceProvider, githubIdentifier, githubImportDTO, user);
 
         if (githubIdentifier.getProjectVersion() == null) {
             throw new IllegalArgumentException(
@@ -27,8 +29,9 @@ public class ImportIntoProjectViaGithubBuilder extends CreateProjectViaGithubBui
         return new GithubProjectImportJob(
             jobDbEntity,
             serviceProvider,
-            this.githubIdentifier,
-            this.user
+            githubIdentifier,
+            githubImportDTO,
+            user
         );
     }
 }

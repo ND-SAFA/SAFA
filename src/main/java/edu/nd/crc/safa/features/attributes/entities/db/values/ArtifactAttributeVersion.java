@@ -6,11 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeStorageType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 
 import lombok.Getter;
@@ -44,7 +44,8 @@ public class ArtifactAttributeVersion {
     @JoinColumn(name = "attribute_id", nullable = false)
     private CustomAttribute attribute;
 
-    public CustomAttributeStorageType getValueType() {
-        return attribute.getType().getStorageType();
-    }
+    @Lob
+    @Column(name = "attribute_value", columnDefinition = "mediumtext", nullable = false)
+    private String value;
+
 }

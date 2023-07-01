@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
 public class DbEntityBuilder extends AbstractBuilder {
 
     static final int MAJOR_VERSION = 1;
-    static final int MINOR_VERSION = 1;
+    static final int MINOR_VERSION = 0;
     static DbEntityBuilder instance;
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
@@ -123,7 +123,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
         this.customAttributeRepository.deleteAll();
-        this.revisionNumber = 1;
+        this.revisionNumber = 0;
     }
 
     @AfterEach
@@ -338,7 +338,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         TraceLinkVersion traceLinkVersion = (new TraceLinkVersion())
             .withProjectVersion(projectVersion)
             .withTraceLink(traceLink)
-            .withModificationType(ModificationType.REMOVED)
+            .withModificationType(ModificationType.ADDED)
             .withManualTraceType();
         traceLinkVersion.setApprovalStatus(ApprovalStatus.APPROVED);
         this.traceLinkVersionRepository.save(traceLinkVersion);

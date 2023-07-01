@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.flatfiles.parser.tim;
 
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,9 @@ public class TimTraceDefinition {
 
     private Boolean generateLinks;
 
+    private String generationMethod;
+
+    @JsonIgnore
     public boolean isValid() {
         return sourceType != null
             && targetType != null

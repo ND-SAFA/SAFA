@@ -1,0 +1,51 @@
+query($after:String!) {
+    viewer {
+        repositories(first: 100, after: $after) {
+            edges {
+                node {
+                    id
+                    name
+                    owner {
+                        login
+                    }
+                    isPrivate
+                    url
+                    description
+                    visibility
+                    createdAt
+                    primaryLanguage {
+                        name
+                    }
+                    defaultBranchRef {
+                        name
+                        target {
+                            ... on Commit {
+                                oid
+                            }
+                        }
+                    }
+                    refs(refPrefix: "refs/heads/", first: 1) {
+                        edges {
+                            node {
+                                name
+                                target {
+                                    ... on Commit {
+                                        oid
+                                    }
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
+                    }
+                }
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}

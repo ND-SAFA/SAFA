@@ -16,6 +16,7 @@ Options:
             commands.
       -e    Specify the environment (local, dev, or prod). If not specified,
             it defaults to local.
+      -f    Specifies an environment file to source before commands.
 
 Commands:
       build    Build the backend with Gradle
@@ -51,6 +52,11 @@ function build {
 
 function run {
   setGoogleCredentials
+  if [ -z "$my_var" ]; then
+    echo "Running with environment: $2"
+    source $2
+  fi
+
   java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
   return $?
 }
@@ -63,16 +69,18 @@ function checkReturn {
 
 # Parse arguments
 TEST=true
-ENVIRONMENT=local
+ENV_PROPERTIES=local
+ENV_FILE=""
 BUILD=false
 RUN=false
 while [ $OPTIND -le "$#" ]; do
-  if getopts ':hnte:' option; then
+  if getopts ':hntef:' option; then
     case $option in
       h) help;;
       n) TEST=false;;
       t) TEST=true;;
-      e) ENVIRONMENT="$OPTARG";;
+      e) ENV_PROPERTIES="$OPTARG";;
+      f) ENV_FILE="$OPTARG";;
       :) echo -e "option requires an argument."; help 1;;
       ?) echo -e "Invalid command option."; help 1;;
     esac
@@ -89,11 +97,11 @@ while [ $OPTIND -le "$#" ]; do
 done
 
 # Check that the environment is valid and translate the name
-case $ENVIRONMENT in
-  local) ENVIRONMENT=dev;;
-  dev) ENVIRONMENT=safa-dev;;
-  prod) ENVIRONMENT=safa-prod;;
-  *) echo -e "Unknown environment $ENVIRONMENT"; help 1;;
+case $ENV_PROPERTIES in
+  local) ENV_PROPERTIES=dev;;
+  dev) ENV_PROPERTIES=safa-dev;;
+  prod) ENV_PROPERTIES=safa-prod;;
+  *) echo -e "Unknown environment $ENV_PROPERTIES"; help 1;;
 esac
 
 # Check the user gave us something to do
@@ -108,6 +116,6 @@ if $BUILD; then
 fi
 
 if $RUN; then
-  run $ENVIRONMENT
+  run $ENV_PROPERTIES $ENV_FILE
   checkReturn $?
 fi

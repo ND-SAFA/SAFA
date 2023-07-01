@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.LogManager;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
@@ -50,11 +51,11 @@ import org.springframework.security.core.Authentication;
 @Getter
 @Setter
 public abstract class AbstractJob implements Job {
-
-    private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
+    private static final java.util.logging.Logger rootLogger = LogManager.getLogManager().getLogger("");
     /**
      * The job identifying information that is being performed.
      */
+    private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
     protected JobDbEntity jobDbEntity;
     /**
      * Service used to send job updates.
@@ -99,6 +100,7 @@ public abstract class AbstractJob implements Job {
                 executeJobStep(stepImplementation, nSteps);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             success = false;
             notifyJobFailed(e);
         } finally {
@@ -361,7 +363,7 @@ public abstract class AbstractJob implements Job {
     @ForOverride
     protected void jobFailed(Exception error) throws Exception {
     }
-    
+
     @Override
     @NonNull
     public String getName() {

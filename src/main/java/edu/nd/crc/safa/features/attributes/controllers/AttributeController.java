@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.common.BaseController;
@@ -67,6 +68,10 @@ public class AttributeController extends BaseController  {
             throw new SafaError("Attribute key cannot be blank");
         }
 
+        if (ReservedAttributes.isReservedAttribute(appEntity.getKey())) {
+            throw new SafaError("Key is reserved for internal use");
+        }
+
         attributeService.saveEntity(appEntity, project, true);
 
         return getProjectAttribute(projectId, appEntity.getKey());
@@ -122,6 +127,10 @@ public class AttributeController extends BaseController  {
             throw new SafaError("Cannot change attribute key.");
         }
 
+        if (ReservedAttributes.isReservedAttribute(appEntity.getKey())) {
+            throw new SafaError("Cannot modify reserved attribute");
+        }
+
         attributeService.saveEntity(appEntity, project, false);
 
         return getProjectAttribute(projectId, key);
@@ -142,6 +151,10 @@ public class AttributeController extends BaseController  {
 
         if (key.isBlank()) {
             throw new SafaError("Attribute key cannot be blank");
+        }
+
+        if (ReservedAttributes.isReservedAttribute(key)) {
+            throw new SafaError("Cannot delete reserved attribute");
         }
 
         attributeService.deleteByProjectAndKeyname(project, key);

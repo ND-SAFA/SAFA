@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.models.entities;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +30,12 @@ public class ModelAppEntity implements IAppEntity {
      * The base model for generating trace links.
      */
     BaseGenerationModels baseModel;
+
+    public ModelAppEntity(BaseGenerationModels model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.baseModel = model;
+    }
 
     /**
      * @param baseGenerationModel The base model whose state is returned.

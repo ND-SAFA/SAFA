@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS github_access_credentials
     access_token_expiration_date  datetime     NULL,
     refresh_token_expiration_date datetime     NULL,
     github_handler                VARCHAR(255) NULL,
-    FOREIGN KEY (user_id) REFERENCES safa_user (user_id)
+    CONSTRAINT github_access_credentials_ibfk_1 FOREIGN KEY (user_id) REFERENCES safa_user (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS github_project

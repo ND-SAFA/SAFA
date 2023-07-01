@@ -7,15 +7,33 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.common.ProjectEntities;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
+
+import lombok.AllArgsConstructor;
 
 /**
  * Responsible for applying a set of rules to a set of artifacts and links between them
  * generating warnings if the rules are not met.
  */
 public class TreeVerifier {
+
+    public static final Retrievers<ArtifactVersion, TraceLink> dbEntityRetrievers = new Retrievers<>(
+        a -> a.getArtifact().getArtifactId(),
+        ArtifactVersion::getTypeName,
+        t -> t.getSourceArtifact().getArtifactId(),
+        t -> t.getTargetArtifact().getArtifactId()
+    );
+
+    public static final Retrievers<ArtifactAppEntity, TraceAppEntity> appEntityRetrievers = new Retrievers<>(
+        ArtifactAppEntity::getId,
+        ArtifactAppEntity::getType,
+        TraceAppEntity::getSourceId,
+        TraceAppEntity::getTargetId
+    );
 
     /**
      * Applies given list of rules to tree formed by given artifacts connected via trace links.
@@ -28,7 +46,41 @@ public class TreeVerifier {
     public final Map<UUID, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
                                                               List<TraceLink> traceLinks,
                                                               List<ParserRule> rulesToApply) {
+        return findRuleViolations(artifactBodies, traceLinks, rulesToApply, dbEntityRetrievers);
+    }
+
+    /**
+     * Applies given list of rules to tree formed by given artifacts connected via trace links.
+     *
+     * @param projectEntities - The entities of the graph
+     * @param rulesToApply    - The list of rules to apply to the artifact tree
+     * @return A mapping between artifact Ids and the list of rules it violated
+     */
+    public final Map<UUID, List<RuleName>> findRuleViolations(ProjectEntities projectEntities,
+                                                              List<ParserRule> rulesToApply) {
+        List<ArtifactAppEntity> artifactBodies = projectEntities.getArtifacts();
+        List<TraceAppEntity> traceLinks = projectEntities.getTraces();
+
+        return findRuleViolations(artifactBodies, traceLinks, rulesToApply, appEntityRetrievers);
+    }
+
+    /**
+     * Applies given list of rules to tree formed by given artifacts connected via trace links.
+     *
+     * @param artifactBodies - The nodes of the graph
+     * @param traceLinks     - The traceLinks (links) connecting the nodes (artifacts)
+     * @param rulesToApply   - The list of rules to apply to the artifact tree
+     * @param retrievers     - Used to resolve the differences between types
+     * @return A mapping between artifact Ids and the list of rules it violated
+     */
+    private <A, T> Map<UUID, List<RuleName>> findRuleViolations(List<A> artifactBodies,
+                                                                List<T> traceLinks,
+                                                                List<ParserRule> rulesToApply,
+                                                                Retrievers<A, T> retrievers) {
         Map<UUID, List<RuleName>> results = new HashMap<>();
+
+        Map<UUID, A> idToArtifact = new HashMap<>();
+        artifactBodies.forEach(a -> idToArtifact.put(retrievers.idRetriever.apply(a), a));
 
         artifactBodies.forEach(artifactBody -> {
 
@@ -39,8 +91,11 @@ public class TreeVerifier {
                     Optional<Function> ruleFunctionQuery = rule.parseFunction();
                     if (ruleFunctionQuery.isPresent()) {
                         Function ruleFunction = ruleFunctionQuery.get();
-                        if (artifactBody.getTypeName().equalsIgnoreCase(ruleFunction.targetArtifactType)) {
-                            boolean isSatisfied = isRuleSatisfied(ruleFunction, artifactBody.getArtifact(), traceLinks);
+                        String type = retrievers.typeRetriever.apply(artifactBody);
+
+                        if (type.equalsIgnoreCase(ruleFunction.targetArtifactType)) {
+                            boolean isSatisfied = isRuleSatisfied(ruleFunction, artifactBody, traceLinks,
+                                idToArtifact, retrievers);
                             rule.setFunctionResult(isSatisfied);
                         } else {
                             rule.setFunctionResult(true);
@@ -57,7 +112,7 @@ public class TreeVerifier {
                 }
             }
             if (!artifactWarnings.isEmpty()) {
-                UUID artifactId = artifactBody.getArtifact().getArtifactId();
+                UUID artifactId = retrievers.idRetriever.apply(artifactBody);
                 results.put(artifactId, artifactWarnings);
             }
         });
@@ -65,44 +120,42 @@ public class TreeVerifier {
         return results;
     }
 
-    private boolean isRuleSatisfied(final Function ruleToApply,
-                                    Artifact targetArtifact,
-                                    final List<TraceLink> traceLinks) {
+    private <A, T> boolean isRuleSatisfied(final Function ruleToApply, A targetArtifact, final List<T> traceLinks,
+                                           final Map<UUID, A> idToArtifact, Retrievers<A, T> retrievers) {
+        UUID artifactId = retrievers.idRetriever.apply(targetArtifact);
+
         switch (ruleToApply.artifactRelationship) {
             case BIDIRECTIONAL_LINK:
-                return satisfiesLinkCountRule(ruleToApply, targetArtifact, traceLinks);
+                return satisfiesLinkCountRule(ruleToApply, artifactId, traceLinks, idToArtifact, retrievers);
             case CHILD:
-                return satisfiesChildCountRule(ruleToApply, targetArtifact.getName(), traceLinks);
+                return satisfiesChildCountRule(ruleToApply, artifactId, traceLinks, idToArtifact, retrievers);
             case SIBLING:
-                return handleSiblingFunction(ruleToApply, targetArtifact.getName(), traceLinks);
+                return handleSiblingFunction(ruleToApply, artifactId, traceLinks, idToArtifact, retrievers);
             default:
                 return true;
         }
 
     }
 
-    public boolean satisfiesLinkCountRule(final Function rule,
-                                          final Artifact artifact,
-                                          final List<TraceLink> traceLinks) {
+    public <A, T> boolean satisfiesLinkCountRule(final Function rule, final UUID artifactId, final List<T> traceLinks,
+                                                 final Map<UUID, A> idToArtifact, Retrievers<A, T> retrievers) {
+
         long childCount = traceLinks
             .stream()
             // Get all traceLinks where we are the source or target
             .filter(t -> {
-                String typeName = artifact.getType().getName();
-                String artifactName = artifact.getName();
-                String otherType;
-                if (typeName.equalsIgnoreCase(rule.sourceArtifactType)) {
-                    otherType = rule.targetArtifactType;
-                } else if (typeName.equalsIgnoreCase(rule.targetArtifactType)) {
-                    otherType = rule.sourceArtifactType;
-                } else {
-                    return false;
-                }
+                A sourceEntity = idToArtifact.get(retrievers.sourceIdRetriever.apply(t));
+                A targetEntity = idToArtifact.get(retrievers.targetIdRetriever.apply(t));
 
-                if (t.isSourceName(artifactName)) {
-                    return t.getTargetType().getName().equalsIgnoreCase(otherType);
-                } else if (t.isTargetName(artifactName)) {
-                    return t.getSourceType().getName().equalsIgnoreCase(otherType);
+                UUID sourceId = retrievers.idRetriever.apply(sourceEntity);
+                UUID targetId = retrievers.idRetriever.apply(targetEntity);
+
+                if (sourceId.equals(artifactId) || targetId.equals(artifactId)) {
+                    String sourceType = retrievers.typeRetriever.apply(sourceEntity);
+                    String targetType = retrievers.typeRetriever.apply(targetEntity);
+
+                    return rule.sourceArtifactType.equalsIgnoreCase(sourceType)
+                        && rule.targetArtifactType.equalsIgnoreCase(targetType);
                 } else {
                     return false;
                 }
@@ -111,35 +164,46 @@ public class TreeVerifier {
         return matchesRuleCount(rule, childCount);
     }
 
-    public boolean satisfiesChildCountRule(final Function childCountRule,
-                                           final String targetArtifact,
-                                           final List<TraceLink> traceLinks) {
+    public <A, T> boolean satisfiesChildCountRule(final Function childCountRule, final UUID targetArtifactId,
+                                                  final List<T> traceLinks, final Map<UUID, A> idToArtifact,
+                                                  Retrievers<A, T> retrievers) {
         long childCount = traceLinks
             .stream()
             // Get all traceLinks where we are the source
-            .filter(link -> link
-                .isTargetName(targetArtifact))
+            .filter(link -> retrievers.targetIdRetriever.apply(link).equals(targetArtifactId))
             // Get all traceLinks where the target matches the required target type
-            .filter(link -> link
-                .getSourceType()
-                .getName()
-                .equalsIgnoreCase(childCountRule.sourceArtifactType))
+            .filter(link -> {
+                A artifact = idToArtifact.get(retrievers.sourceIdRetriever.apply(link));
+                String type = retrievers.typeRetriever.apply(artifact);
+                return type.equalsIgnoreCase(childCountRule.sourceArtifactType);
+            })
             .count();
         return matchesRuleCount(childCountRule, childCount);
     }
 
-    public boolean handleSiblingFunction(final Function r,
-                                         final String artifactName,
-                                         final List<TraceLink> traceLinks) {
+    public <A, T> boolean handleSiblingFunction(final Function r, final UUID artifactId, final List<T> traceLinks,
+                                                final Map<UUID, A> idToArtifact, Retrievers<A, T> retrievers) {
+
         Long siblingCountAsTarget = traceLinks
             .stream()
-            .filter(t -> t.getTargetName().equals(artifactName)) // Get traceLinks that finish with this node
-            .filter(t -> t.getSourceType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            // Get traceLinks that finish with this node
+            .filter(t -> retrievers.targetIdRetriever.apply(t).equals(artifactId))
+            .filter(t -> {
+                A artifact = idToArtifact.get(retrievers.sourceIdRetriever.apply(t));
+                String type = retrievers.typeRetriever.apply(artifact);
+                return type.equalsIgnoreCase(r.sourceArtifactType);
+            })
             .count();
+
         Long siblingCountAsSource = traceLinks
             .stream()
-            .filter(t -> t.getSourceName().equals(artifactName)) // Get traceLinks that finish with this node
-            .filter(t -> t.getTargetType().toString().equalsIgnoreCase(r.sourceArtifactType))
+            // Get traceLinks that finish with this node
+            .filter(t -> retrievers.sourceIdRetriever.apply(t).equals(artifactId))
+            .filter(t -> {
+                A artifact = idToArtifact.get(retrievers.targetIdRetriever.apply(t));
+                String type = retrievers.typeRetriever.apply(artifact);
+                return type.equalsIgnoreCase(r.sourceArtifactType);
+            })
             .count();
         long siblingCount = siblingCountAsTarget + siblingCountAsSource;
 
@@ -157,5 +221,13 @@ public class TreeVerifier {
             default:
         }
         return true;
+    }
+
+    @AllArgsConstructor
+    private static class Retrievers<A, T> {
+        public java.util.function.Function<A, UUID> idRetriever;
+        public java.util.function.Function<A, String> typeRetriever;
+        public java.util.function.Function<T, UUID> sourceIdRetriever;
+        public java.util.function.Function<T, UUID> targetIdRetriever;
     }
 }

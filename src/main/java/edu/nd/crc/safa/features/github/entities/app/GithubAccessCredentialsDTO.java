@@ -31,24 +31,6 @@ public class GithubAccessCredentialsDTO {
     @JsonProperty("client_id")
     private String clientId;
 
-    /**
-     * Refresh token
-     */
-    @JsonProperty("refresh_token")
-    private String refreshToken;
-
-    /**
-     * In how many minutes the access token will expire
-     */
-    @JsonProperty("expires_in")
-    private Integer accessTokenExpiration;
-
-    /**
-     * In how many minutes the refresh token will expire
-     */
-    @JsonProperty("refresh_token_expires_in")
-    private Integer refreshTokenExpiration;
-
     private String error;
 
     @JsonProperty("error_description")
@@ -67,9 +49,6 @@ public class GithubAccessCredentialsDTO {
         entity.setAccessToken(this.getAccessToken());
         entity.setClientId(this.getClientId());
         entity.setClientSecret(this.getClientSecret());
-        entity.setRefreshToken(this.getRefreshToken());
-        entity.setAccessTokenExpiration(this.getAccessTokenExpiration());
-        entity.setRefreshTokenExpiration(this.getRefreshTokenExpiration());
 
         return entity;
     }

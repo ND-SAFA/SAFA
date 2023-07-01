@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -10,14 +10,17 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +34,9 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     public GithubProjectUpdateJob(JobDbEntity jobDbEntity,
                                   ServiceProvider serviceProvider,
                                   GithubIdentifier githubIdentifier,
+                                  GithubImportDTO githubImportDTO,
                                   SafaUser user) {
-        super(jobDbEntity, serviceProvider, githubIdentifier, user);
+        super(jobDbEntity, serviceProvider, githubIdentifier, githubImportDTO, user);
         setProjectCommit(new ProjectCommit(githubIdentifier.getProjectVersion(), false));
         getSkipSteps().add(CREATE_PROJECT_STEP_NUM);
     }
@@ -41,39 +45,58 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
     protected GithubProject getGithubProjectMapping(Project project) {
         GithubProjectRepository repository = this.serviceProvider.getGithubProjectRepository();
 
-        this.githubProject = repository.findByProjectAndRepositoryName(
+        this.githubProject = repository.findByProjectAndOwnerAndRepositoryName(
             project,
+            this.githubIdentifier.getRepositoryOwner(),
             this.githubIdentifier.getRepositoryName()
         ).orElseThrow(() -> new SafaError("Linked project not found"));
+
+        applyImportSettings(project, this.githubProject);
+
         return this.githubProject;
     }
 
     @Override
-    protected List<ArtifactAppEntity> getArtifacts() {
+    protected String getDefaultTypeName() {
+        return this.githubProject.getArtifactType().getName();
+    }
+
+    @Override
+    protected List<ArtifactAppEntity> getArtifacts(JobLogger logger) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         GithubCommitDiffResponseDTO diffResponseDTO = connectionService.getDiffBetweenOldCommitAndHead(
             credentials,
             githubProject.getRepositoryName(),
-            githubProject.getLastCommitSha()
+            githubProject.getLastCommitSha(),
+            githubProject.getBranch()
         );
 
         log.info("Retrieving diff");
         for (GithubCommitDiffResponseDTO.GithubFileDiffDTO diff : diffResponseDTO.getFiles()) {
+
+            String path = diff.getFilename();
+            if (shouldSkipFile(path)) {
+                logger.log("%s will not be imported due to inclusion/exclusion criteria.", path);
+                continue;
+            }
+            logger.log("Importing %s.", path);
+
             log.info(diff.toString());
-            String name = diff.getFilename();
             String type = diff.getStatus().name();
             String summary = diff.getSha();
             String body = diff.getBlobUrl();
 
+            Map<String, JsonNode> attributes = getAttributes(path);
+
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,
                 type,
-                name,
+                path,
                 summary,
                 body,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                attributes
             );
 
             artifacts.add(artifact);

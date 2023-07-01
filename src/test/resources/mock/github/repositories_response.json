@@ -1,0 +1,61 @@
+{
+  "data": {
+    "viewer": {
+      "repositories": {
+        "edges": [
+          {
+            "node": {
+              "id": "MDEwOlJlcG9zaXRvcnkzODQxMDU3OTk=",
+              "name": "bend",
+              "owner": {
+                "login": "ND-SAFA"
+              },
+              "isPrivate": true,
+              "url": "https://github.com/ND-SAFA/bend",
+              "description": "API for SAFA app.",
+              "visibility": "PRIVATE",
+              "createdAt": "2021-07-08T11:45:39Z",
+              "primaryLanguage": {
+                "name": "Java"
+              },
+              "defaultBranchRef": {
+                "name": "development",
+                "target": {
+                  "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+                }
+              },
+              "refs": {
+                "edges": [
+                  {
+                    "node": {
+                      "name": "development",
+                      "target": {
+                        "oid": "35074add7110a77706f3deaa05a94328d91b9494"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "production",
+                      "target": {
+                        "oid": "78cdf2a2a1f17a71c12c540161ce568d465189ac"
+                      }
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": true,
+                  "endCursor": "Ng"
+                }
+              }
+            }
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": true,
+          "endCursor": "no idea what this cursor looks like"
+        }
+      }
+    }
+  }
+}

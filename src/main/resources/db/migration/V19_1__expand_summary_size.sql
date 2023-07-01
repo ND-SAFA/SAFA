@@ -1,0 +1,2 @@
+ALTER TABLE artifact_body
+    MODIFY COLUMN summary VARCHAR(8224) NOT NULL;

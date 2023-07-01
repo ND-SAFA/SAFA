@@ -1,12 +1,88 @@
 from tgen.data.prompts.prompt import ArtGenPrompt, Prompt
 from tgen.util.supported_enum import SupportedEnum
 
+CONFIDENCE_LABEL = "confidence"
+INTERSECTION_LABEL = "intersection"
+INTERSECTION_SCORE = "intersection_score"
+CLASSIFICATION_LABEL = "classification"
+CLASSIFICATION_JUSTIFICATION = "justification"
+CHANGE_ANALYSIS = "change_analysis"
+CHANGE_SCORE = "change_score"
+FEATURE = "feature"
+
+CURRENT_LABELS = [CONFIDENCE_LABEL, INTERSECTION_LABEL, INTERSECTION_SCORE, CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFICATION,
+                  CHANGE_ANALYSIS,
+                  CHANGE_SCORE, FEATURE]
+DISPLAY_LABELS = ["label", "score", CLASSIFICATION_LABEL, CLASSIFICATION_JUSTIFICATION, FEATURE,
+                  INTERSECTION_LABEL, INTERSECTION_SCORE, CHANGE_ANALYSIS, CHANGE_SCORE, "source", "target"]
+
+A_CATEGORY = "Do the artifacts work under the same feature or sub-system? " \
+             "If yes, select A. If no, proceed to next question. "
+B_CATEGORY = "Do the artifacts work under different features, but changes to one would require changes to the other? " \
+             "If yes, select B. If unsure or no, proceed to next question."
+C_CATEGORY = "Do the artifacts work under different features, but are coupled in some way? " \
+             "If yes, select B. If unsure or no, proceed to next question."
+D_CATEGORY = "Do the artifacts share any minor properties, interfaces or other characteristics? " \
+             "If yes, select D. If no, proceed to next question. "
+E_CATEGORY = "Are there any discernible relationships or connections between the two artifacts? " \
+             "If yes, return to previous questions to re-assess categories. If no, select E."
+REVERSE_CATEGORIES = ["E"]
+CLASSIFICATION_SCORES = {
+    "A": [0.9, 1],
+    "B": [0.7, 0.9],
+    "C": [0.5, 0.7],
+    "D": [0.3, 0.5],
+    "E": [0.0, 0.3],
+}
+DEFAULT_CLASSIFICATION_PROMPT = Prompt("# Task\nYou are a senior software engineer working on a software project. "
+                                       "Your task is to analyze the relationships between project artifacts "
+                                       "to determine which are related. Answer the questions about the pair "
+                                       "of artifacts (1) and (2).\n"
+
+                                       "# Questions\n"
+                                       "\n- Describe whether the artifacts work under the same feature or sub-system? "
+                                       f"Enclose your answer inside of <{FEATURE}></{FEATURE}>."
+
+                                       "\n- Describe the intersection between the responsibilities of (1) and (2). "
+                                       f"Enclose your answer inside of <{INTERSECTION_LABEL}></{INTERSECTION_LABEL}>."
+
+                                       "\n- Provide a score between 0 and 1 evaluating the amount of intersection between (1) and (2). "
+                                       "Higher scores correspond to more intersection. "
+                                       f"Enclose your answer inside of <{INTERSECTION_SCORE}></{INTERSECTION_SCORE}>"
+
+                                       "\n- Analyze the likely effect of changes made to one artifact on the other. "
+                                       f"Enclose your answer inside of <{CHANGE_ANALYSIS}></{CHANGE_ANALYSIS}>."
+
+                                       "\n- Provide a score between 0 and 1 evaluating how likely changes would propagate between (1) and (2). "
+                                       "Higher scores correspond with likely propagation. "
+                                       f"Enclose your answer inside of <{CHANGE_SCORE}></{CHANGE_SCORE}>"
+
+                                       "\n- Analyze the relationship between (1) and (2) and select the first category that is true. "
+                                       f"\nA) {A_CATEGORY}"
+                                       f"\nB) {B_CATEGORY}"
+                                       f"\nC) {C_CATEGORY}"
+                                       f"\nD) {D_CATEGORY}"
+                                       f"\nE) {E_CATEGORY}"
+                                       f"\nEnclose your answer inside of <{CLASSIFICATION_LABEL}></{CLASSIFICATION_LABEL}>."
+
+                                       "\n- Provide a detailed reasoning of the classification using your answers as references. "
+                                       f"Enclose your answer inside of <{CLASSIFICATION_JUSTIFICATION}></{CLASSIFICATION_JUSTIFICATION}>."
+
+                                       "\n- Rate your confidence that the artifacts belong to the selected category. "
+                                       "Provide a floating point number between 0 and 1. "
+                                       "Higher scores should be given only when confident the relationship clearly belongs in the "
+                                       "selected category based on the factors above. Mid or lower range scores indicate less "
+                                       "certainty or a weaker relationship for that category. Consider adjacent categories when "
+                                       "unsure if a link belongs in the selected class. "
+                                       f"Enclose your answer inside of <{CONFIDENCE_LABEL}></{CONFIDENCE_LABEL}>.\n"
+                                       "# Artifacts\n")
+
 
 class SupportedPrompts(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    CLASSIFICATION = Prompt("Is the functionality of (1) related to (2)? Answer 'yes' or 'no'.\n")
+    CLASSIFICATION = DEFAULT_CLASSIFICATION_PROMPT
     CODE_SUMMARY = Prompt("Provide a few sentences describing the high-level usage of the code below. "
                           "Do not focus on implementation details and assume your audience works on this system."
                           "The summary should be enclosed in the tags <summary></summary>:\n '{target_content}'")

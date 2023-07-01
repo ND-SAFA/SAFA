@@ -1,12 +1,17 @@
-from typing import Dict, List, Union
+import json
+import random
+from typing import List, Union
 
 from openai.api_resources.fine_tune import FineTune
-from scipy.special import softmax
 
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
 from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, \
+    CONFIDENCE_LABEL, \
+    CURRENT_LABELS, DISPLAY_LABELS, REVERSE_CATEGORIES
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -19,8 +24,9 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.dict_util import DictUtil
+from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.uncased_dict import UncasedDict
 
 
 class LLMTrainer(AbstractTrainer):
@@ -131,48 +137,84 @@ class LLMTrainer(AbstractTrainer):
         :param dataset: The dataset being predicted on
         :return: The classification output
         """
-        scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
-        output = TracePredictionOutput(predictions=scores)
+        trace_df = trace_dataset.trace_df
+        prediction_entries = []
 
-        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
+        scores = []
+        classifications = []
+        class2correct = {}
+        for i, classification_item in enumerate(res.batch_responses):
+            r = classification_item.text
+            entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
+            entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
+            entry[CONFIDENCE_LABEL] = LLMResponseUtil.strip_non_digits_and_periods(entry[CONFIDENCE_LABEL].lower())
+            entry[CONFIDENCE_LABEL] = float(entry[CONFIDENCE_LABEL])
+
+            score = self.extract_score(entry)
+            trace_row = trace_df.iloc[i]
+            label = trace_row["label"]
+            predicted_label = 1 if score >= 0.5 else 0
+            correct_label = "correct" if label == predicted_label else "wrong"
+
+            entry["score"] = score
+            entry["source"] = trace_row["source"]
+            entry["target"] = trace_row["target"]
+            entry["label"] = trace_row["label"]
+
+            self.update_classification_metrics(class2correct, correct_label, entry, label)
+            entry = DictUtil.order(entry, DISPLAY_LABELS)
+            scores.append(score)
+            classifications.append(entry["classification"])
+            prediction_entries.append(entry)
+
+        random.shuffle(prediction_entries)
+        prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
+        output = TracePredictionOutput(prediction_entries=prediction_entries)
+        if trace_dataset is not None and len(trace_dataset.trace_df[TraceKeys.LABEL].unique()) == 2:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
-                logger.log_with_title(f"Metrics", repr(output.metrics))
+                logger.log_with_title("Candidate Metrics", repr(output.metrics))
+                logger.log_with_title("Class Counts", json.dumps(class2correct))
             output.label_ids = metrics_manager.trace_matrix.labels
-            output.prediction_entries = metrics_manager.get_trace_predictions()
 
         return output
 
-    def _get_score(self, probs: Dict) -> float:
+    @staticmethod
+    def extract_score(entry):
         """
-        Gets the score from the predicted completions
-        :param probs: The probabilities of each top completion
-        :return: The softmax score from the predicted completions
+        Extracts the score from the classification entry response.
+        :param entry: Entry containing score or classification, to extract score from.
+        :return: The final score as a float.
         """
-        assert isinstance(self.prompt_creator,
-                          ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
-        if len(probs) == 0:
-            return 0.5
+        classification = entry["classification"]
+        lower_bound, upper_bound = CLASSIFICATION_SCORES[classification]
+        score_range = upper_bound - lower_bound
+        try:
+            score = float(entry["confidence"])
+            if classification in REVERSE_CATEGORIES:
+                score = upper_bound - (score * score_range)
+            else:
+                score = (score * score_range) + lower_bound
+        except:
+            score = lower_bound
+            logger.info("Processing link with missing score.")
 
-        probs = UncasedDict(probs)
-        neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
-        pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
-
-        neg_str = neg_str.strip()
-        pos_str = pos_str.strip()
-
-        if pos_str in probs and neg_str in probs:
-            v0 = probs.get(neg_str, 0)
-            v1 = probs.get(pos_str, 0)
-            prob_v = [v0, v1]
-            score = softmax(prob_v)[1]
-        elif pos_str in probs:
-            score = 1
-        elif neg_str in probs:
-            score = 0
-        else:
-            score = 0.5
         return score
+
+    @staticmethod
+    def update_classification_metrics(class2correct, correct_label, entry, label) -> None:
+        """
+        Updates the classification metrics on the categories of traces.
+        :param class2correct: The current metrics on the classes.
+        :param correct_label: The correct label of the entry.
+        :param entry: The
+        :param label:
+        :return:
+        """
+        classification = entry["classification"]
+        if classification not in class2correct:
+            class2correct[classification] = {c: 0 for c in [0, 1]}
+        class2correct[classification][label] += 1

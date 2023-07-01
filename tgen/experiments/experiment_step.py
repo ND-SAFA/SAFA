@@ -7,7 +7,6 @@ from tgen.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILEN
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.jobs.components.job_result import JobResult
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.wandb.Wandb import Wandb
@@ -186,6 +185,7 @@ class ExperimentStep(BaseObject):
                 model_path = os.path.join(job_base_path, "models")
                 setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                setattr(job.job_args, "output_dir", model_path)
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
                     setattr(job.trainer_dataset_manager, "output_dir", output_dir)

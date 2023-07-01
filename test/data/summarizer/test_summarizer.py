@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker
@@ -83,7 +83,7 @@ class TestSummarizer(BaseTest):
         summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in
                              NaturalLanguageChunker(model_name, summarizer.token_limit).chunk("".join(summarized_chunks))]
         summarized_chunks = [self._remove_irrelevant_chars(chunk) for chunk in summarized_chunks]
-        self.assertEqual( "".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
+        self.assertEqual("".join(summarized_chunks), self._remove_irrelevant_chars(summaries[1]))
 
         # set code_or_exceeds_limit_only to TRUE this time
         llm_manager = OpenAIManager(OpenAIArgs())

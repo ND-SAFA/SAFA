@@ -1,4 +1,5 @@
 import os
+import shutil
 import threading
 import traceback
 import uuid
@@ -55,7 +56,12 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result.body = traceback.format_exc()
             self.result.status = Status.FAILURE
         if self.save_job_output and self.job_args.output_dir:
+            logger.info(f"Saving job output: {self.job_args.output_dir}")
             self.save(self.job_args.output_dir)
+            dir_name = os.path.dirname(self.job_args.output_dir)
+            destination = os.path.join(dir_name, str(uuid.uuid4()))
+            shutil.copytree(self.job_args.output_dir, destination)
+            logger.info(f"Job saved at: {destination}")
             wandb.finish()
         self.cleanup()
         return self.result

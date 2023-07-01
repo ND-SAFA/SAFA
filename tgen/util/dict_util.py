@@ -22,3 +22,17 @@ class DictUtil:
             before_keys = link_keys[i - 1]
             after_keys = link_keys[i]
             assert before_keys == after_keys, f"Expected {before_keys} to be equal to {after_keys}."
+
+    @staticmethod
+    def order(obj: Dict, properties: List[str]) -> Dict:
+        """
+        Sets the properties in dictionaries to come before the others.
+        :param obj: The object to order.
+        :param properties: The properties in the desired order.
+        :return: Dictionary with new properties set in desired order.
+        """
+        defined = set(properties)
+        obj_props = set(obj.keys())
+        missing = obj_props.difference(defined)
+        properties = properties + list(missing)
+        return {k: obj[k] for k in properties}

@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 from tqdm import tqdm
@@ -180,9 +180,10 @@ class PromptDataset(iDataset):
         :param prompt_creator_params: Additional params to give the prompt creator
         :return: The prompt entry
         """
-        source_content = source_artifact[ArtifactKeys.CONTENT] if source_artifact else EMPTY_STRING
-        entry = prompt_creator.create(target_content=target_artifact[ArtifactKeys.CONTENT], source_content=source_content,
-                                      **prompt_creator_params)
+
+        source_content = PromptDataset.format_artifact(source_artifact)
+        target_content = PromptDataset.format_artifact(target_artifact)
+        entry = prompt_creator.create(target_content=target_content, source_content=source_content, **prompt_creator_params)
         if not summarizer:
             return entry
 
@@ -234,3 +235,16 @@ class PromptDataset(iDataset):
         if hasattr(self.trace_dataset, item):
             return getattr(self.trace_dataset, item)
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+
+    @staticmethod
+    def format_artifact(artifact: Dict):
+        """
+        Formats the artifact as a string containing both title and content.
+        :param artifact: The artifact to format.
+        :return: The formatted string.
+        """
+        if artifact is None:
+            return EMPTY_STRING
+        content = artifact[ArtifactKeys.CONTENT]
+        title = artifact[ArtifactKeys.ID]
+        return f"{title}: {content}"

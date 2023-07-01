@@ -6,7 +6,7 @@ from openai.openai_object import OpenAIObject
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
-from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.util.list_util import ListUtil
@@ -70,7 +70,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(0.5)  # trying to avoid rate limit
+            time.sleep(60)  # trying to avoid rate limit
         return res
 
     @staticmethod
@@ -82,10 +82,13 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param params: The parameters to the API.
         :return: A response for the supported types.
         """
+        text_responses = [choice.text.strip() for choice in res.choices]
         if task == LLMCompletionType.GENERATION:
-            return GenerationResponse([choice.text.strip() for choice in res.choices])
+            return GenerationResponse(text_responses)
         elif task == LLMCompletionType.CLASSIFICATION:
-            return ClassificationResponse([r.logprobs.top_logprobs[0] for r in res.choices])
+            probs = [r.logprobs.top_logprobs[0] for r in res.choices]
+            classification_items = [ClassificationItemResponse(t, probs=p) for t, p in zip(text_responses, probs)]
+            return ClassificationResponse(classification_items)
         else:
             raise NotImplementedError(f"No handler for {task.name} is implemented")
 

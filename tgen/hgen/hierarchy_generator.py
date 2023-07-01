@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from typing import Any, List, Union, Type
+from typing import Any, List, Type, Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator

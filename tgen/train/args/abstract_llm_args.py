@@ -43,8 +43,7 @@ class AbstractLLMArgs(BaseObject, ABC):
         assert task in self.expected_task_params, f"Unknown task {task.value}." \
                                                   f" Must choose from {self.expected_task_params.keys()}"
         params = {}
-        if completion_type == LLMCompletionType.CLASSIFICATION:
-            self.set_max_tokens(1)
+
         for task_type in [task, completion_type]:
             params = self._add_params_for_task(task_type, params)
             params = self._add_library_params(task_type, params, instructions=instructions)

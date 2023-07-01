@@ -17,4 +17,3 @@ class HGenSerializer(AbstractSerializer):
             help_text="Artifact IDs belonging to cluster."),
         help_text="List of clusters.", required=False, allow_null=True)
     targetType = serializers.CharField(max_length=1028, help_text="The type of artifacts to generate.")
-    model = serializers.CharField(max_length=512, required=False, help_text="Deprecated and ignored.")

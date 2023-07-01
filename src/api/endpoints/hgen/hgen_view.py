@@ -11,6 +11,9 @@ def perform_hgen(payload):
     :param payload: The request containing cluster of artifacts to summarize.
     :return: The generated artifact(s).
     """
+    print("PAYLOAD")
+    print(payload)
+    print("\n\n")
     target_type = payload["targetType"]
     artifacts = payload["artifacts"]
     clusters = payload.get("clusters", None)

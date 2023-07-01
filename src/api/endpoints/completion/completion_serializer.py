@@ -19,7 +19,6 @@ class CompletionSerializer(AbstractSerializer):
     """
     Serialized the generation payload
     """
-    model = serializers.CharField(max_length=10000, help_text="The model to use for completing prompt.")
     prompt = serializers.CharField(max_length=10000, trim_whitespace=False, help_text="Prompt for LLM to answer.")
 
     def create(self, validated_data: Dict) -> Dict[str, Variable]:

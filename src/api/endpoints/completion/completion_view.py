@@ -47,7 +47,7 @@ def perform_completion(prediction_payload: CompletionPayload):
     :param prediction_payload: The completion request.
     :return: Completion response.
     """
-    llm_name = prediction_payload["model"].lower()
+    llm_name = "anthropic"
     prompt: str = prediction_payload["prompt"]
     model, llm_manager = ModelUtil.get_model_manager(llm_name)
     completion = complete_prompt(model, prompt, llm_manager)

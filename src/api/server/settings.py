@@ -24,6 +24,8 @@ TGEN_PATH = os.path.join(REPO_PATH, "tgen")
 sys.path.append(TGEN_PATH)
 sys.path.append(API_PATH)
 
+print("PATHS ADDED:", [TGEN_PATH, API_PATH])
+
 from pathlib import Path
 
 from dotenv import load_dotenv

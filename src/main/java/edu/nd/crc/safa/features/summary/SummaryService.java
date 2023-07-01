@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
  * Provides API for summarizing content.
  */
+@AllArgsConstructor
 @Service
 public class SummaryService {
+    SafaRequestBuilder safaRequestBuilder;
+
     /**
      * Generates summarize for artifacts.
      *
@@ -23,7 +28,6 @@ public class SummaryService {
      */
     public List<String> generateSummaries(SummarizeRequestDTO request) {
         BaseGenerationModels baseModel = request.getModel();
-        TGen controller = baseModel.createTGenController();
         List<TGenSummaryArtifact> artifacts = new ArrayList<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
             if (artifact.getId() == null) { // For non-artifacts, ad-hoc id is created for them.
@@ -33,8 +37,9 @@ public class SummaryService {
             artifact.setType(artifactType);
             artifacts.add(artifact);
         }
+        TGen tgen = new TGen(safaRequestBuilder);
         TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts, request.getModel());
-        TGenSummaryResponse response = controller.generateSummaries(tgenRequest);
+        TGenSummaryResponse response = tgen.generateSummaries(tgenRequest);
 
         List<String> summaries = new ArrayList<>();
         for (TGenSummaryArtifact artifact : response.getArtifacts().values()) {

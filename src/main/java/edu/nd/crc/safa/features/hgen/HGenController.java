@@ -7,8 +7,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +33,6 @@ public class HGenController extends BaseController {
     @PostMapping(AppRoutes.HGen.GENERATE)
     public ProjectCommit generateHierarchy(@PathVariable UUID versionId,
                                            @RequestBody HGenRequestDTO request) {
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.serviceProvider.getHGenService().generateHierarchy(projectVersion, request);
+        throw new NotImplementedException("HGEN is under construction. Feature will return soon.");
     }
 }

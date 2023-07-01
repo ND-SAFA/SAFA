@@ -38,6 +38,7 @@ import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.models.services.ModelService;
@@ -109,6 +110,7 @@ public class ServiceProvider {
     private final AttributeValueService attributeValueService;
     private final AttributeLayoutService attributeLayoutService;
     //Traces
+    private final ITraceGenerationController traceGenerationController;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;

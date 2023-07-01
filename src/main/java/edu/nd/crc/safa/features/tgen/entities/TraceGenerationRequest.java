@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
 
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,13 +33,10 @@ public class TraceGenerationRequest {
     }
 
     public void addTracingRequest(BaseGenerationModels method,
-                                  ModelAppEntity model,
                                   String source,
                                   String target) {
         ArtifactLevelRequest artifactLevelRequest = new ArtifactLevelRequest(source, target);
         TracingRequest tracingRequest = new TracingRequest(
-            method,
-            model,
             new ArrayList<>(List.of(artifactLevelRequest))
         );
         this.requests.add(tracingRequest);

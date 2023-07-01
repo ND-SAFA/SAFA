@@ -14,10 +14,9 @@ import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.summary.SummaryService;
-import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
@@ -100,23 +99,12 @@ public class GenerateLinksJob extends CommitJob {
         ProjectCommit projectCommit = getProjectCommit();
 
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
-            logger.log("Running tracing request:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
-                tracingRequest.getModel(), tracingRequest.getMethod(),
-                tracingRequest.getArtifactLevels());
+            logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
             TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-            if (tracingPayload.getModel() == null) {
-                this.generatedTraces = new ArrayList<>();
-                this.generatedTraces.addAll(this.serviceProvider
-                    .getTraceGenerationService()
-                    .generateLinksWithMethod(tracingPayload));
-            } else {
-                ModelAppEntity model = tracingPayload.getModel();
-                TGen bertModel = model.getBaseModel().createTGenController();
-                bertModel.setLogger(this.getDbLogger());
-                String statePath = model.getStatePath();
-                this.generatedTraces = bertModel.generateLinksWithState(statePath, tracingPayload);
-            }
+
+            ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
+            this.generatedTraces = controller.generateLinks(tracingPayload, this.getDbLogger());
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

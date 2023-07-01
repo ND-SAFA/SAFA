@@ -7,10 +7,6 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceGenerationController;
-import edu.nd.crc.safa.features.models.tgen.method.vsm.VSMController;
-import edu.nd.crc.safa.features.tgen.TGen;
-import edu.nd.crc.safa.features.tgen.method.BertMethodIdentifier;
 
 import lombok.Getter;
 
@@ -112,26 +108,6 @@ public enum BaseGenerationModels {
      */
     public static ModelAppEntity getDefaultModel() {
         return new ModelAppEntity(BaseGenerationModels.GPT);
-    }
-
-    /**
-     * @return TGen controller for base generation method.
-     */
-    public TGen createTGenController() {
-        BertMethodIdentifier bertId = new BertMethodIdentifier(this.toString(), this.getStatePath());
-        return new TGen(bertId);
-    }
-
-    /**
-     * Constructs a trace link generation controller for the base generation method.
-     *
-     * @return Trace link generation controller.
-     */
-    public ITraceGenerationController createController() {
-        if (this == BaseGenerationModels.VSM) {
-            return new VSMController();
-        }
-        return this.createTGenController();
     }
 
     @Override

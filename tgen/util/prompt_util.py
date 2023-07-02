@@ -1,3 +1,5 @@
+from typing import Any
+
 from tgen.constants.deliminator_constants import EMPTY_STRING
 
 
@@ -15,3 +17,4 @@ class PromptUtil:
         :return: The formatted xml
         """
         return f"<{tag_name}>{tag_content}</{tag_name}>"
+

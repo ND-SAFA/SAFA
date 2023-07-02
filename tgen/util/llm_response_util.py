@@ -22,7 +22,7 @@ class LLMResponseUtil:
 
         try:
             assert len(tags) > 0, f"Missing expected tag {tag_name}"
-            content = [tag.contents[0] for tag in tags] if not is_nested else tags
+            content = [tag.contents[0] for tag in tags] if not is_nested else [LLMResponseUtil._parse_children(tag) for tag in tags]
         except (AssertionError, IndexError):
             error = f"Unable to parse {res}"
             logger.exception(error)
@@ -30,6 +30,19 @@ class LLMResponseUtil:
                 raise Exception(error)
             content = [res] if not is_nested else []
         return content
+
+    @staticmethod
+    def _parse_children(tag: Tag) -> Dict[str]:
+        """
+        Parses all children tags in the given tag
+        :param tag: The parent tag
+        :return: The children of the tag
+        """
+        children = {}
+        for child in tag.children:
+            if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
+                children[child.name] = child.contents[0]
+        return children
 
     @staticmethod
     def extract_labels(r: str, labels2props: Union[Dict, List]) -> Dict:

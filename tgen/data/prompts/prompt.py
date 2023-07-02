@@ -1,30 +1,27 @@
-import re
 import uuid
-from typing import Any
 
 from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.util.logging.logger_manager import logger
-from tgen.util.prompt_util import PromptUtil
+from tgen.data.prompts.prompt_response_manager import RESPONSE_FORMAT, PromptResponseManager
+from tgen.util.str_util import StrUtil
 
 
 class Prompt:
     """
     Represents a prompt with special formatting that allows delaying the formatting of certain fields
     """
-    RESPONSE_FORMAT = "Enclose your answer inside of {}"
 
-    def __init__(self, value: str, response_tag: str = None, prompt_id: str = None, response_instructions: str = RESPONSE_FORMAT):
+    def __init__(self, value: str, response_manager: PromptResponseManager = None,
+                 prompt_id: str = None, response_instructions: str = RESPONSE_FORMAT):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
-        :param response_tag: The name of the tag the model is expected to enclose its response in
+        :param response_manager: Handles creating response instructions and parsing response
         :param prompt_id: Specify specific id for the prompt
         :param response_instructions: The format instructions for the response desired from model
         """
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
-        self.response_tag = response_tag
-        self.include_expected_response = response_tag is not None
+        self.response_manager = response_manager
         self.response_instructions = response_instructions
 
     def build(self, **kwargs) -> str:
@@ -34,28 +31,10 @@ class Prompt:
         :return: The formatted prompt + instructions for the response expected from the model
         """
         prompt = self._build(**kwargs)
-        if self.include_expected_response:
-            expected_response = self._build_response_instructions()
+        if self.response_manager:
+            expected_response = self.response_manager.format_response_instructions()
             prompt = f"{prompt}{NEW_LINE}{expected_response}"
         return prompt
-
-    def parse_response(self, response: str) -> Any:
-        """
-        Used to fulfill api, may be overridden in child classes
-        :param response: The model response
-        :return: The response unchanged
-        """
-        return response
-
-    def parse_response_on_failure(self, response: str, e: Exception) -> Any:
-        """
-        Parses the response if it fails in some way, may be overridden in child classes
-        :param response: The model response
-        :param e: The exception causing the failure
-        :return: Default value
-        """
-        logger.warning(f"Unexpected response for {self.value} because {e}.")
-        return None
 
     def format_value(self, *args: object, **kwargs: object) -> None:
         """
@@ -64,23 +43,7 @@ class Prompt:
         :param kwargs: Key, value pairs to format the prompt with
         :return: None
         """
-        formatting_fields = re.findall(r'\{(\w*)\}', self.value)
-        updated_args = [arg for arg in args]
-        for i, field in enumerate(formatting_fields):
-            if kwargs and field not in kwargs:
-                kwargs[field] = '{%s}' % field
-            if args and i >= len(args):
-                updated_args.append('{%s}' % field)
-        if args or kwargs:
-            self.value = self.value.format(*updated_args, **kwargs)
-
-    def _build_response_instructions(self) -> str:
-        """
-        Create the instructions for how the model should respond.
-        :return: Formatted instructions for the response expected from the model
-        """
-        assert self.response_tag is not None, "Requires a response tag to be set in order to create instructions for model response"
-        return self.response_instructions.format(PromptUtil.create_xml(tag_name=self.response_tag))
+        self.value = StrUtil.format_selective(*args, **kwargs)
 
     def _build(self, **kwargs) -> str:
         """

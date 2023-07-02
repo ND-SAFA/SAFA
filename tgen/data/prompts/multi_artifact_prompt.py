@@ -36,7 +36,7 @@ class MultiArtifactPrompt(Prompt):
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
         self.type = data_type
-        super().__init__(value=EMPTY_STRING, response_tag=None)
+        super().__init__(value=EMPTY_STRING)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:

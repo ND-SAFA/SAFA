@@ -9,7 +9,7 @@ class QuestionPrompt(Prompt):
     Represents a Prompt that asks the model a question
     """
 
-    def __init__(self, question: str, response_manager: PromptResponseManager):
+    def __init__(self, question: str, response_manager: PromptResponseManager = None):
         """
         Initializes the prompt with the question that the model should answer
         :param question: The question the model should answer

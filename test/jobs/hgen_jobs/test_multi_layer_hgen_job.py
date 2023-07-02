@@ -66,7 +66,7 @@ class TestMultiLayerHGenJob(BaseJobTest):
                 as_source = dataset.layer_df.filter_by_row(lambda row: row[LayerKeys.SOURCE_TYPE.value] == layer
                                                                        and row[LayerKeys.TARGET_TYPE.value] == layers[i + 1])
                 self.assertGreater(len(as_source), 0)
-        self.assertEquals(n_expected_links, len(dataset.trace_df))
+        self.assertEqual(n_expected_links, len(dataset.trace_df))
 
     def _get_job(self):
         starting_hgen_job = GenerateArtifactsJob(self.project.ARTIFACTS, "user_story", hgen_llm_manager=OpenAIManager(),

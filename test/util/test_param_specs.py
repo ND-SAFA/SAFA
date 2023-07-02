@@ -16,7 +16,7 @@ class TestParamSpecs(BaseTest):
     def test_construction(self):
         self.assertIn("a", self.class_specs.param_names)
         self.assertIn("a", self.class_specs.required_params)
-        self.assertEquals(self.class_specs.param_types["a"], int)
+        self.assertEqual(self.class_specs.param_types["a"], int)
         self.assertFalse(self.class_specs.has_kwargs)
 
     def test_missing_param(self):

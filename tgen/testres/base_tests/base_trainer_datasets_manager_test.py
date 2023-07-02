@@ -21,5 +21,5 @@ class BaseTrainerDatasetsManagerTest(BaseTraceTest):
             self.assertTrue(isinstance(datasets_container[dataset_role], TraceDataset))
         if include_pretrain:
             self.assertIn(DatasetRole.PRE_TRAIN, datasets_container)
-        self.assertEquals(len(datasets_container[DatasetRole.TRAIN].pos_link_ids),
+        self.assertEqual(len(datasets_container[DatasetRole.TRAIN].pos_link_ids),
                           len(datasets_container[DatasetRole.TRAIN].neg_link_ids))

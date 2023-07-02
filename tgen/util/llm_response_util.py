@@ -9,7 +9,7 @@ from tgen.util.logging.logger_manager import logger
 class LLMResponseUtil:
 
     @staticmethod
-    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False) -> Union[List[str], List[Tag]]:
+    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False) -> List[Union[str, Dict]]:
         """
         Parses the LLM response for the given html tags
         :param res: The LLM response
@@ -32,7 +32,7 @@ class LLMResponseUtil:
         return content
 
     @staticmethod
-    def _parse_children(tag: Tag) -> Dict[str]:
+    def _parse_children(tag: Tag) -> Dict[str, str]:
         """
         Parses all children tags in the given tag
         :param tag: The parent tag

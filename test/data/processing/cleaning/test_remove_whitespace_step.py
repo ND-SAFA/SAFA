@@ -9,7 +9,7 @@ class TestRemoveWhitespaceStep(BaseTest):
         expected_result = "This sentence has a lot of extra whitespace".split()
         step = self.get_test_step()
         result = step.run(test_word_list)
-        self.assertEquals(expected_result, result)
+        self.assertEqual(expected_result, result)
 
     def get_test_step(self):
         return RemoveWhiteSpaceStep()

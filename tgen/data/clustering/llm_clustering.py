@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional, Union, Dict
 
 import bs4
 from bs4.element import Tag
@@ -70,8 +70,8 @@ class LLMClustering(iClustering):
         base_prompt = SupportedPrompts.FUNCTIONALITIES.value
         res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, base_prompt,
                                           target_artifact_type=target_artifact_type)
-        features: List[Tag] = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, is_nested=True)
-        return [str(functionality.contents[0]) for functionality in features]
+        features = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, is_nested=False)
+        return features
 
     @staticmethod
     def _get_clusters(artifact_ids: List[str], artifact_content: List[str], target_artifact_type: str,
@@ -178,7 +178,7 @@ class LLMClustering(iClustering):
         return clusters
 
     @staticmethod
-    def _get_cluster_name_and_artifacts(group: bs4.Tag, artifact_ids: List[str]) -> Tuple[str, List[str]]:
+    def _get_cluster_name_and_artifacts(group: Dict, artifact_ids: List[str]) -> Tuple[str, List[str]]:
         """
         Gets the name of the cluster and the artifacts associated with it
         :param group: The group tag containing cluster information
@@ -186,12 +186,11 @@ class LLMClustering(iClustering):
         :return: The name of the cluster and the artifacts associated with it
         """
         name, artifacts = '', []  # defaults
-        for child in group.children:
-            if isinstance(child, bs4.Tag) and child.contents is not None and len(child.contents) > 0:
-                if child.name == LLMClustering.FUNCTIONALITY_TAG:
-                    name = child.contents[0]
-                if child.name == LLMClustering.CLUSTER_ARTIFACTS_TAG:
-                    artifacts = [LLMClustering._get_artifact_id_by_num(num, artifact_ids) for num in child.contents[0].split(COMMA)]
+        for child_name, child_content in group.items():
+            if child_name == LLMClustering.FUNCTIONALITY_TAG:
+                name = child_content
+            if child_name == LLMClustering.CLUSTER_ARTIFACTS_TAG:
+                artifacts = [LLMClustering._get_artifact_id_by_num(num, artifact_ids) for num in child_content.split(COMMA)]
         return name.strip(), [artifact for artifact in artifacts if artifact is not None]
 
     @staticmethod

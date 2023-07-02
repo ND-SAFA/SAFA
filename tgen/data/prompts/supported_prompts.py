@@ -1,6 +1,7 @@
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.util.supported_enum import SupportedEnum
 
 SOURCE_COMPONENT_LABEL = "subsystem_one"
@@ -70,10 +71,11 @@ class SupportedPrompts(SupportedEnum):
     CLASSIFICATION = DEFAULT_CLASSIFICATION_PROMPT
     CODE_SUMMARY = [Prompt("Provide a few sentences describing the high-level usage of the code below. "
                            "Do not focus on implementation details and assume your audience works on this system",
-                           response_tag="summary"), ArtifactPrompt(include_id=False)]
+                           PromptResponseManager(response_tag="summary")), ArtifactPrompt(include_id=False)]
 
-    NL_SUMMARY = [Prompt("Summarize the following, focusing on the high-level usage.\n", response_tag="summary"),
-                  ArtifactPrompt(include_id=False)]
+    NL_SUMMARY = [
+        Prompt("Summarize the following, focusing on the high-level usage.\n", PromptResponseManager(response_tag="summary")),
+        ArtifactPrompt(include_id=False)]
 
     UAV_SYSTEM_REQUIREMENT = [Prompt("Given a summary of python code, write a system-level requirement\n "
                                      "The requirements should reference physical world entities related to the UAV systems, "
@@ -82,7 +84,8 @@ class SupportedPrompts(SupportedEnum):
     FUNCTIONALITIES = [Prompt("I am giving you a numbered list of artifact descriptions for a software system. "
                               "Describe the functionalities of the system that would be "
                               "important for grouping related artifacts belonging to a single {target_artifact_type}. "
-                              "Focus on aspects that are unique to this system but remain high-level.", response_tag="feature"),
+                              "Focus on aspects that are unique to this system but remain high-level.",
+                              PromptResponseManager(response_tag="feature")),
                        MultiArtifactPrompt(include_ids=False)]
     RE_CLUSTER_FEATURE = [Prompt("I am giving you a numbered list of software artifact descriptions relating to {feature}. "
                                  "Determine sub features that would divide the artifacts into groups "
@@ -91,7 +94,8 @@ class SupportedPrompts(SupportedEnum):
                                  "Focus on aspects that are unique to this system but remain high-level. "
                                  "Group the artifacts by these sub features "
                                  "where each group has at least 2 artifacts and no more than 10 artifacts. "
-                                 "Artifacts should belong to at least 1 group. ", response_tag="group"),
+                                 "Artifacts should belong to at least 1 group. ",
+                                 PromptResponseManager(response_tag={"group": ["feature", "artifact"]})),
                           MultiArtifactPrompt(include_ids=False)]
     CLUSTER_FROM_FEATURES = [Prompt("I am giving you a list of features for creating {target_artifact_type}s "
                                     "and a numbered list of software artifact descriptions. "
@@ -103,6 +107,7 @@ class SupportedPrompts(SupportedEnum):
                                     "If the feature is too broad, you may replace it with sub features. "
                                     "Groups must contain at least 2 artifacts and at most 10 artifacts "
                                     "and all artifacts should belong to at least one group.  "
-                                    "Focus on aspects that are unique to this system but remain high-level. ", response_tag="group"),
+                                    "Focus on aspects that are unique to this system but remain high-level. ",
+                                    PromptResponseManager(response_tag="group")),
                              MultiArtifactPrompt(include_ids=False)]
-    ARTIFACT_EXAMPLE = [Prompt("Write a single example of a {artifact_type} body.", response_tag="example")]
+    ARTIFACT_EXAMPLE = [Prompt("Write a single example of a {artifact_type} body.", PromptResponseManager(response_tag="example"))]

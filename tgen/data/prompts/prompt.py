@@ -43,7 +43,7 @@ class Prompt:
         :param kwargs: Key, value pairs to format the prompt with
         :return: None
         """
-        self.value = StrUtil.format_selective(*args, **kwargs)
+        self.value = StrUtil.format_selective(self.value, *args, **kwargs)
 
     def _build(self, **kwargs) -> str:
         """

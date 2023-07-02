@@ -13,7 +13,7 @@ class TestLLMResponseUtil(BaseTest):
         good_response_nested = "<outer><inner>This is a good response</inner></outer>"
         outer = LLMResponseUtil.parse(res=good_response_nested, tag_name="outer", is_nested=True)
         self.assertSize(1, outer)
-        self.assertIsInstance(outer[0], Tag)
+        self.assertIn("inner", outer[0])
 
         expected_response = "This is a good response"
         self.assertEqual(expected_response, LLMResponseUtil.parse(res=f"<tag>{expected_response}</tag>", tag_name="tag",

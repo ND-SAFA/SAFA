@@ -46,11 +46,11 @@ class BaseJobTest(BaseTraceTest, ABC):
         if job_result.status == Status.FAILURE:
             failure_msg = job_result.body
             self.fail(failure_msg)
-        self.assertEquals(job_result.status, Status.SUCCESS)
+        self.assertEqual(job_result.status, Status.SUCCESS)
         self._assert_success(job, job_result)
 
     def assert_output_on_failure(self, job_output: JobResult):
-        self.assertEquals(job_output.status, Status.FAILURE)
+        self.assertEqual(job_output.status, Status.FAILURE)
 
     @abstractmethod
     def _assert_success(self, job: AbstractJob, job_result: JobResult):

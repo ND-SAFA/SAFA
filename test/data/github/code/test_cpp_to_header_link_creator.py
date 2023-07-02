@@ -19,31 +19,31 @@ class TestCppHeaderLinkCreator(BaseTest):
 
     def test_split_base_path_and_filename(self):
         base_path, filename = CPPToHeaderLinkCreator._split_base_path_and_filename(os.path.join(self.SOURCE_PATH, "file.cpp"))
-        self.assertEquals(base_path, self.SOURCE_PATH)
-        self.assertEquals(filename, "file")
+        self.assertEqual(base_path, self.SOURCE_PATH)
+        self.assertEqual(filename, "file")
 
     def test_get_cpp_file_path_parts(self):
         module_path, code_path, filename = CPPToHeaderLinkCreator._get_cpp_file_path_parts(os.path.join(self.SOURCE_PATH, "file.cpp"))
-        self.assertEquals(module_path, self.DIR_PATH + "/")
-        self.assertEquals(filename, "file")
+        self.assertEqual(module_path, self.DIR_PATH + "/")
+        self.assertEqual(filename, "file")
 
     def test_find_header_file(self):
         hpp_file = self.CPP_FILES[0].replace("cpp", "hpp")
         hpp_file = CPPToHeaderLinkCreator._find_header_file(self.DIR_PATH, hpp_file)
-        self.assertEquals(hpp_file, os.path.join(self.HEADER_PATH, hpp_file))
+        self.assertEqual(hpp_file, os.path.join(self.HEADER_PATH, hpp_file))
 
     def test_get_header_path(self):
         cpp_file = self.CPP_FILES[0]
         hpp_file = cpp_file.replace("cpp", "hpp")
         hpp_file_found = CPPToHeaderLinkCreator._get_header_path(os.path.join(self.SOURCE_PATH, cpp_file))
-        self.assertEquals(hpp_file_found, os.path.join(self.HEADER_PATH, hpp_file))
+        self.assertEqual(hpp_file_found, os.path.join(self.HEADER_PATH, hpp_file))
 
     def test_create_links(self):
         link_creator = self.get_cpp_to_header_link_creator()
         artifacts, links = link_creator.create_links()
         linked_files = set(self.CPP_FILES).difference(self.UNLINKED_FILES)
-        self.assertEquals(len(links), len(linked_files))
-        self.assertEquals(len(artifacts), 2*len(linked_files))
+        self.assertEqual(len(links), len(linked_files))
+        self.assertEqual(len(artifacts), 2*len(linked_files))
         for file in linked_files:
             cpp_file_path = os.path.join("source", file)
             hpp_file_path = os.path.join("include", "iceoryx_platform", file.replace("cpp", "hpp"))

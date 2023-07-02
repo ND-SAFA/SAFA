@@ -26,8 +26,8 @@ class TestTracePredictionOutput(BaseTest):
         result1 = self.get_prediction_output(precision_at_k=0.8)
         result2 = self.get_prediction_output(precision_at_k=0.3)
         metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION.name)
-        self.assertEquals(metric1, 0.8)
-        self.assertEquals(metric2, 0.3)
+        self.assertEqual(metric1, 0.8)
+        self.assertEqual(metric2, 0.3)
 
     def get_prediction_output(self, results_dict=None, precision_at_k=0.8):
         if results_dict is None:

@@ -61,7 +61,7 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         with open(self.get_project_path()) as file:
             expected_artifacts = file.readlines()
-        self.assertEquals(len(expected_artifacts), len(artifacts_df.index))
-        self.assertEquals(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
+        self.assertEqual(len(expected_artifacts), len(artifacts_df.index))
+        self.assertEqual(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
         for i, row in artifacts_df.itertuples():
             self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT].strip(), msg="Item {} failed.".format(i))

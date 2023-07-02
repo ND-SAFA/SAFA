@@ -25,7 +25,7 @@ class TestTraceDatasetSplitter(BaseSplitTest):
         model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
         trainer_dataset = splits[DatasetRole.TRAIN].to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
+        self.assertEqual(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
 
     def get_expected_train_dataset_size(self, resample_rate=BaseTraceTest.RESAMPLE_RATE,
                                         validation_percentage=BaseTraceTest.VAlIDATION_PERCENTAGE):

@@ -25,12 +25,18 @@ from api.endpoints.hgen.hgen_view import perform_hgen
 from api.endpoints.jobs.result_view import get_result, get_status
 from api.endpoints.predict.predict_view import perform_prediction, perform_search
 from api.endpoints.summarize.summarize_view import perform_summarization
+from tgen.ranking.test import test_ranking_version
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
 
 def homePageView(request):
     return HttpResponse(HOME_PAGE_CONTENT)
+
+
+def test(request):
+    test_response = test_ranking_version()
+    return HttpResponse(test_response)
 
 
 schema_view = get_schema_view(
@@ -55,5 +61,6 @@ urlpatterns = [
     path('summarize/', perform_summarization),
     path('hgen/', perform_hgen),
     path('status/', get_status),
-    path('results/', get_result)
+    path('results/', get_result),
+    path('test/', test_ranking_version)
 ]

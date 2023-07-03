@@ -13,11 +13,14 @@ from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
 from tgen.jobs.trainer_jobs.tracing_job import TracingJob
 from tgen.testres.definition_creator import DefinitionCreator
+from tgen.util.logging.logger_manager import logger
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
 
 def perform_tracing_job(dataset_definition: ApiDefinition, job: Union[Type[RankingJob], Type[TracingJob]]):
+    print("TRACING (with print)")
+    logger.info("TRACING (with logger)")
     dataset: ApiDefinition = DefinitionCreator.create(ApiDefinition, dataset_definition)
 
     api_id = uuid.uuid4()
@@ -30,19 +33,11 @@ def perform_tracing_job(dataset_definition: ApiDefinition, job: Union[Type[Ranki
     return {"predictions": prediction_result.prediction_entries}
 
 
-def search(prediction_payload: PredictionPayload):
+@async_endpoint(PredictionSerializer)
+def perform_prediction(prediction_payload: PredictionPayload):
     return perform_tracing_job(prediction_payload["dataset"], RankingJob)
 
 
-def trace(prediction_payload: PredictionPayload):
-    return perform_tracing_job(prediction_payload["dataset"], TracingJob)
-
-
-@async_endpoint(PredictionSerializer)
-def perform_prediction(prediction_payload: PredictionPayload):
-    return search(prediction_payload)
-
-
 @endpoint(PredictionSerializer)
-def perform_search(payload: PredictionPayload):
-    return search(payload)
+def perform_search(prediction_payload: PredictionPayload):
+    return perform_tracing_job(prediction_payload["dataset"], RankingJob)

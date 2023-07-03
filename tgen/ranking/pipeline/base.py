@@ -15,11 +15,7 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "Below is a source query followed by the software artifacts in the system." \
                        "Find and rank all related artifacts from most to least related to the source.\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "\nA. Provide a detailed summary of the system's core purpose. " \
-                               "Enclose your answer within <summary></summary>." \
-                               "B. Select the artifacts related to the functionality of the source. " \
-                               "Provide your answer as a list of artifact ids enclosed in <related></related>." \
-                               "\nC. Then, rank the selected artifacts from most to least related" \
+                               "Rank the artifacts from most to least related" \
                                " to the source's functionality within the context of the system. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related the functionality of the source " \

@@ -3,16 +3,15 @@ from typing import Dict, List, Union
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.pipeline.sort_step import registered_sorters
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.data_structure_util import DataStructureUtil
 from tgen.util.ranking_util import RankingUtil
 
 
-class RankingJob(LLMJob):
+class RankingJob(AbstractJob):
     """
     Uses large claude to rank all source artifacts.
     """
@@ -25,7 +24,8 @@ class RankingJob(LLMJob):
         :param dataset_role: The role to evaluate on.
         :param sorter: The sorting function to feed big claude with.
         """
-        super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT)
+        super().__init__()
+        self.trainer_dataset_manager = trainer_dataset_manager
         self.dataset_role = dataset_role
         self.sorter = sorter
 
@@ -67,4 +67,38 @@ class RankingJob(LLMJob):
         for parent_id, ranked_children in parent2rankings.items():
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
             predicted_entries.extend(target_predicted_entries)
-        return predicted_entries
+
+        selected_entries = RankingJob.select_predictions(predicted_entries)
+        return selected_entries
+
+    @staticmethod
+    def select_predictions(entries: List[TracePredictionEntry]):
+        children2entry = {}
+        for entry in entries:
+            child_id = entry["source"]
+            if child_id not in children2entry:
+                children2entry[child_id] = []
+            children2entry[child_id].append(entry)
+
+        predictions = []
+        HIGH_THRESHOLD = 0.9
+        HIGH_PARENT = 0.95
+        DELTA_THRESHOLD = 0.2
+        for child, entries in children2entry.items():
+
+            sorted_entries = sorted(entries, key=lambda e: e["score"], reverse=True)
+            top_parent = sorted_entries[0]
+            if top_parent["score"] >= HIGH_PARENT:
+                # If really high parent, select that one
+                selected_entries = [top_parent]
+            else:
+                selected_entries = [s for s in sorted_entries[:3] if s["score"] >= HIGH_THRESHOLD]
+
+            if len(selected_entries) == 0:
+                parent_one = sorted_entries[0]
+                parent_two = sorted_entries[1]
+                parent_delta = parent_one["score"] - parent_two["score"]
+                if parent_delta >= DELTA_THRESHOLD:
+                    selected_entries.append(parent_one)
+            predictions.extend(selected_entries)
+        return predictions

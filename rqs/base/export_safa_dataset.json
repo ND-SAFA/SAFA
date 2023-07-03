@@ -4,20 +4,17 @@
       "jobs": [
         {
           "object_type": "CREATE_DATASETS",
+          "export_path": "~/desktop/safa/datasets/Dronology",
+          "format_type": "SAFA",
           "job_args": {
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "HUB",
-                "name": "iceoryx_code2issue"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/open-source/drone"
               }
-            },
-            "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_type": "SPLIT_BY_LINK",
-              "validation_percentage": 0.5
             }
           }
         }

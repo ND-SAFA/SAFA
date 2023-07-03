@@ -68,37 +68,4 @@ class RankingJob(AbstractJob):
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
             predicted_entries.extend(target_predicted_entries)
 
-        selected_entries = RankingJob.select_predictions(predicted_entries)
-        return selected_entries
-
-    @staticmethod
-    def select_predictions(entries: List[TracePredictionEntry]):
-        children2entry = {}
-        for entry in entries:
-            child_id = entry["source"]
-            if child_id not in children2entry:
-                children2entry[child_id] = []
-            children2entry[child_id].append(entry)
-
-        predictions = []
-        HIGH_THRESHOLD = 0.9
-        HIGH_PARENT = 0.95
-        DELTA_THRESHOLD = 0.2
-        for child, entries in children2entry.items():
-
-            sorted_entries = sorted(entries, key=lambda e: e["score"], reverse=True)
-            top_parent = sorted_entries[0]
-            if top_parent["score"] >= HIGH_PARENT:
-                # If really high parent, select that one
-                selected_entries = [top_parent]
-            else:
-                selected_entries = [s for s in sorted_entries[:3] if s["score"] >= HIGH_THRESHOLD]
-
-            if len(selected_entries) == 0:
-                parent_one = sorted_entries[0]
-                parent_two = sorted_entries[1]
-                parent_delta = parent_one["score"] - parent_two["score"]
-                if parent_delta >= DELTA_THRESHOLD:
-                    selected_entries.append(parent_one)
-            predictions.extend(selected_entries)
-        return predictions
+        return predicted_entries

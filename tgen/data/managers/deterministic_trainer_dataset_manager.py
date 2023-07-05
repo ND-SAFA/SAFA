@@ -46,7 +46,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
         """
-        if self._datasets is None:
+        if not self._datasets:
             self._datasets, reloaded = self._create_datasets_from_creators_deterministic(self._dataset_creators)
             if not reloaded:
                 self._prepare_datasets(self.augmenter)

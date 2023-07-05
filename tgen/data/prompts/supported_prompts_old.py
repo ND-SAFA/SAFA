@@ -95,7 +95,8 @@ class SupportedPrompts(SupportedEnum):
                                  "Group the artifacts by these sub features "
                                  "where each group has at least 2 artifacts and no more than 10 artifacts. "
                                  "Artifacts should belong to at least 1 group. ",
-                                 PromptResponseManager(response_tag={"group": ["feature", "artifact"]})),
+                                 PromptResponseManager(response_tag={"group": ["feature", "artifact"]},
+                                                       response_instructions_format="Enclose your answer in {}")),
                           MultiArtifactPrompt(include_ids=False)]
     CLUSTER_FROM_FEATURES = [Prompt("I am giving you a list of features for creating {target_artifact_type}s "
                                     "and a numbered list of software artifact descriptions. "

@@ -93,7 +93,7 @@ class PromptResponseManager:
         """
         if not self.include_response_instructions:
             return EMPTY_STRING
-        args = [PromptUtil.create_xml(tag_name=self.response_tag)] if isinstance(self.response_tag, str) else []
+        args = [PromptUtil.create_xml(tag_name=tag) for tag in self.get_all_tag_ids()]
         kwargs = {id_: PromptUtil.create_xml(tag_name=tag) for id_, tag in self.id2tag.items()}
         return StrUtil.format_selective(self.response_instructions_format, *args, **kwargs)
 

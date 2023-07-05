@@ -8,7 +8,7 @@ class TestLLMResponseUtil(BaseTest):
 
     def test_parse(self):
         self.assertSize(0, LLMResponseUtil.parse(res="This is a bad response", tag_name="tag", is_nested=True))
-        self.assertEqual("This is a bad response", LLMResponseUtil.parse(res="This is a bad response", tag_name="tag", is_nested=False)[0])
+        self.assertSize(0, LLMResponseUtil.parse(res="This is a bad response", tag_name="tag", is_nested=False))
 
         good_response_nested = "<outer><inner>This is a good response</inner></outer>"
         outer = LLMResponseUtil.parse(res=good_response_nested, tag_name="outer", is_nested=True)

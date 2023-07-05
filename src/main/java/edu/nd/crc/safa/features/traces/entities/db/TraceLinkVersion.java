@@ -75,6 +75,9 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @Column(name = "score")
     double score;
 
+    @Column(name = "is_visible")
+    boolean isVisible = true;
+
     public TraceLinkVersion() {
         this.traceType = TraceType.GENERATED;
         this.approvalStatus = ApprovalStatus.UNREVIEWED;

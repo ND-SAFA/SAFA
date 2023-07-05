@@ -17,8 +17,6 @@ services:
     image: mysql:8.0
     hostname: mysql
     container_name: mysql-db
-    volumes:
-      - db_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: secret2
       MYSQL_USER: user

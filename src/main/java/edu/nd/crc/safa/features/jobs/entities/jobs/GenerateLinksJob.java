@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.summary.SummaryService;
+import edu.nd.crc.safa.features.tgen.LinkVisibilityService;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
@@ -104,7 +105,9 @@ public class GenerateLinksJob extends CommitJob {
             TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
-            this.generatedTraces = controller.generateLinks(tracingPayload, this.getDbLogger());
+            List<TraceAppEntity> tracePredictions = controller.generateLinks(tracingPayload, this.getDbLogger());
+            LinkVisibilityService.setLinksVisibility(tracePredictions);
+            this.generatedTraces = tracePredictions;
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

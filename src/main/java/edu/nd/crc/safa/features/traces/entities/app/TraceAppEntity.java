@@ -26,6 +26,7 @@ public class TraceAppEntity implements IAppEntity {
     ApprovalStatus approvalStatus;
     double score;
     TraceType traceType;
+    boolean isVisible = true;
 
     public TraceAppEntity(UUID traceLinkId,
                           String sourceName,
@@ -56,6 +57,7 @@ public class TraceAppEntity implements IAppEntity {
         this.setApprovalStatus(ApprovalStatus.UNREVIEWED);
         this.setScore(score);
         this.setTraceType(TraceType.GENERATED);
+        this.setVisible(false);
         return this;
     }
 

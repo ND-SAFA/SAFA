@@ -1,10 +1,10 @@
 import os
+import string
 import uuid
 from datetime import datetime
-from typing import Any, List, Union, Type
+from typing import Any, List, Union, Type, Dict, Tuple
 
-from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -14,32 +14,40 @@ from tgen.data.exporters.csv_exporter import CSVExporter
 from tgen.data.exporters.dataframe_exporter import DataFrameExporter
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
+from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
-from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 
 
 class HierarchyGenerator(BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
-    BASE_PROMPT = SupportedPrompts.UAV_SYSTEM_REQUIREMENT
-    GENERATION_TAG = "doc"
+    GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
+    """
+    <step> Review and refine the user stories. Look for any duplicates and determine if any user stories are missing. 
+    Get feedback from others if possible. </step>
+    """
 
     def __init__(self, args: HGenArgs):
         """
@@ -47,6 +55,8 @@ class HierarchyGenerator(BaseObject):
         :param args: The arguments required for the hierarchy generation
         """
         self.args = args
+        self.args.hgen_llm_manager.llm_args.model = "claude-v1.3"  # TODO default or set this elsewhere
+        self.args.hgen_llm_manager.llm_args.set_max_tokens(2000)
 
     def run(self) -> TraceDataset:
         """
@@ -55,190 +65,247 @@ class HierarchyGenerator(BaseObject):
         """
         export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
 
-        # Step 1: Create trace links on between artifacts of the given layer (may be reused if dataset_creator_for_sources provided)
-        if self.args.tgen_trainer:  # links need generated
-            dataset_with_sources = self._get_trace_dataset_with_sources_from_trainer(export_path)
-            source_layer_only_dataset = self._create_linked_dataset_for_intra_level_artifacts(
-                dataset_with_sources.artifact_df, export_path)
-        else:  # links pre-generated or not needed
-            dataset_with_sources = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
-                else self.args.dataset_for_sources
-            self.save_dataset_checkpoint(dataset_with_sources, export_path, filename="initial_dataset_with_sources")
-            source_layer_only_dataset = self._create_dataset_with_single_layer(dataset_with_sources.artifact_df,
-                                                                               self.args.source_layer_id,
-                                                                               dataset_with_sources.trace_dataset.trace_df
-                                                                               if dataset_with_sources.trace_dataset else None)
-        # Step 2: Create clusters of related artifacts
-        target_layer_id = self._get_target_layer_id(dataset_with_sources)
-        cluster_dataset_creator = ClusterDatasetCreator(prompt_dataset=source_layer_only_dataset,
-                                                        layer_id=target_layer_id,
-                                                        cluster_methods=self.args.clustering_method,
-                                                        manual_clusters=self.args.manual_clusters,
-                                                        summarizer=self.args.hgen_summarizer,
-                                                        **self.args.clustering_params)
+        original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
 
-        # Step 3: Create higher-level artifacts from Clusters
-        hgen_dataset_manager = TrainerDatasetManager(eval_dataset_creator=cluster_dataset_creator)
-        artifact_generations = self._generate_artifact_content(hgen_dataset_manager, export_path=export_path)
+        # questionnaire = self._construct_questionnaire_for_generation()
+        questionnaire = QuestionnairePrompt([QuestionPrompt("map", response_manager=PromptResponseManager(response_tag="map")),
+                                             QuestionPrompt("document",
+                                                            response_manager=PromptResponseManager(response_tag="document")),
+                                             QuestionPrompt("model", response_manager=PromptResponseManager(response_tag="model")),
+                                             QuestionPrompt("specify", response_manager=PromptResponseManager(response_tag="specify")),
+                                             QuestionPrompt("design-requirement",
+                                                            response_manager=PromptResponseManager(response_tag="design-requirement"))
+                                             ])
+        artifact_generation_content = self._generate_artifact_content(questionnaire, source_layer_only_dataset)
 
-        # Step 4: Create new dataset with created artifacts
-        return self._create_trace_dataset_with_generated_artifacts(artifact_generations,
-                                                                   hgen_dataset_manager[DatasetRole.EVAL],
-                                                                   dataset_with_sources, export_path=export_path)
+        return self._create_trace_dataset_with_generated_artifacts(artifact_generation_content,
+                                                                   source_layer_only_dataset,
+                                                                   original_dataset_complete,
+                                                                   export_path=export_path)
 
-    def _get_trace_dataset_with_sources_from_trainer(self, export_path: str) -> TraceDataset:
+    def _construct_questionnaire_for_generation(self) -> QuestionnairePrompt:
         """
-        Gets the trace dataset containing the source artifacts from the tgen trainer
-        :param export_path: The path to export the dataset to
-        :return: The dataset
+        Constructs a questionnaire prompt that is used to generate the new artifacts
+        :return: The questionnaire prompt that is used to generate the new artifacts
         """
-        self._update_trainer_args(self.args.tgen_trainer, export_path)
-        trace_dataset_with_sources = self.args.tgen_trainer.trainer_dataset_manager[DatasetRole.EVAL]
-        self.save_dataset_checkpoint(trace_dataset_with_sources, export_path, filename="initial_dataset_with_sources")
-        assert trace_dataset_with_sources.artifact_df is not None, "Artifacts are required for trace generation."
-        return trace_dataset_with_sources
+        instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
+        prompt_builder = PromptBuilder(prompts=[instructions_prompt])
+        prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
+        result = self._get_predictions(prompt_builder, PromptDataset())[0]
+        questions = self._construct_question_prompts_from_output(instructions_prompt, result)
+        # TODO save results
+        return QuestionnairePrompt(question_prompts=questions,
+                                   instructions=self.GENERATION_INSTRUCTIONS)
 
-    def _generate_artifact_content(self, hgen_dataset_manager: TrainerDatasetManager, export_path: str) -> List[str]:
+    def _construct_question_prompts_from_output(self, instructions_prompt: Prompt, result: Dict) -> List[QuestionPrompt]:
         """
-        Generates the content for the new artifacts using the given dataset
-        :param hgen_dataset_manager: Contains the dataset used to create
-        :param export_path: The path to export dataset checkpoints to
-        :return: The content for the generated artifacts
+        Constructs the question prompts from the model output
+        :param instructions_prompt: The instructions prompt used to produce model output
+        :param result: The model output
+        :return: The list of question prompts created from model output
         """
-        logger.info(f"\nGenerating content for {len(hgen_dataset_manager[DatasetRole.EVAL].artifact_df)} higher-level artifacts")
-        example = self._get_example_of_target_type()
-        prompt_builder = PromptBuilder(prompts=self.BASE_PROMPT.value)
-        prompt_builder.format_prompts_with_var(artifact_type=self.args.target_type, example=example)
-        hgen_trainer = LLMTrainer(LLMTrainerState(llm_manager=self.args.hgen_llm_manager,
-                                                  trainer_dataset_manager=hgen_dataset_manager,
-                                                  prompt_builder=prompt_builder,
-                                                  completion_type=LLMCompletionType.GENERATION))
-        if export_path:
-            self._update_trainer_args(hgen_trainer, export_path)
-        artifact_generations = hgen_trainer.perform_prediction().predictions
-        return artifact_generations
+        step_id, name_id, instructions_id, deliverable_id = instructions_prompt.response_manager.get_all_tag_ids()
+        steps = result[instructions_prompt.id][step_id]
+        questions = []
+        target_artifact_tag = "-".join(self.args.target_type.split()).lower()
+        for i, step in enumerate(steps):
+            if i == len(steps) - 1:
+                response_tag = target_artifact_tag
+                response_instructions_format = f"Output the {self.args.target_type}s in a comma-deliminated list enclosed in"
+            else:
+                response_tag = step[name_id][0].lower()
+                deliverable = step[deliverable_id][0]
+                deliverable = deliverable[:-1] if deliverable[-1] in string.punctuation else deliverable
+                response_instructions_format = f"Output {deliverable} enclosed in"
+            response_manager = PromptResponseManager(response_tag=response_tag,
+                                                     response_instructions_format=response_instructions_format + ' {}',
+                                                     formatter=lambda tag, val: [v for v in val.split(NEW_LINE) if v]
+                                                     if tag == target_artifact_tag else val)
+            question = QuestionPrompt(step[instructions_id][0], response_manager=response_manager)
+            questions.append(question)
+        return questions
+
+    def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset) \
+            -> List[str]:
+        """
+        Creates the content for the new artifacts
+        :param questionnaire: The questionnaire prompt given to the model to produce the generations
+        :param source_layer_only_dataset: The dataset containing only the source layer
+        :return: The generated artifact content
+        """
+        prompt_builder = self._get_prompt_builder_for_generation(questionnaire)
+        # generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset)
+        generation_predictions = [{'47496809-526e-4d98-94bd-ad558608c292': {}, 'f46f71b3-d9d0-497e-9132-b87e8686ec07': {},
+                                   '96c5bb77-b5d0-49b8-8fd6-c326e8a53a58': {'summary': [
+                                       ' \nThe system is a software engineering tool for managing versioned entities. It allows users to retrieve, commit, and calculate differences between versioned entities for a given project version. It handles grouping entity versions by ID, instantiating version entities from application entities, and retrieving various entities and information.\n']},
+                                   questionnaire.id: {'map': [
+                                       '\n- Version Control: Responsible for managing versions of entities. Allows committing changes to a project version, retrieving entities from a project version, deleting entities from a project version, and calculating deltas between project versions.\n- Project Management: Responsible for managing projects and project versions. Allows creating new project versions (major, minor, revision), deleting project versions, and retrieving project version information.\n- Traceability: Responsible for generating and managing trace links between artifacts. Allows generating trace links using various methods and models, retrieving trace links, and committing trace links to project versions.  \n- Artifact Management: Responsible for managing artifacts and artifact types. Allows creating, updating and deleting artifacts and artifact types.\n'],
+                                       'document': [
+                                           '\nVersion Control:\n- Inputs: Project version ID, list of entity changes\n- Outputs: Updated project version with committed changes\n- Data Stores: ProjectVersion, entities (artifacts, traces, etc.)\n- External Interfaces: Version repository (to save/retrieve versioned data)\n- Processing Logic: Commits changes to a project version by calling updateProjectAppEntity for each change type. Retrieves updated entities from the appropriate service and sets them on the ProjectAppEntity.\n'],
+                                       'model': [
+                                           '\n- Project: Has a name, description, members, types, artifacts, traces, documents, versions, and warnings\n- ProjectVersion: Has a major version, minor version, revision, project, entities, and errors \n- Artifact: Has an ID, name, summary, content, type, attributes, document type, and document IDs\n- TraceLink: Has an ID, source artifact, target artifact, type, approval status, and score\n- ArtifactType: Has an ID, name, and project\n- document: Has an ID, name, project, and artifacts\n'],
+                                       'specify': [
+                                           '\nVersion Repository Interface:\n- Purpose: Provides methods for managing versioned entities\n- Inputs: Project version ID, entities\n- Outputs: Versioned entities, deltas \n- Specifications: Must implement methods to retrieve entities from a project version, save entities to a project version, delete entities from a project version, and calculate deltas between project versions.\n'],
+                                       'design-requirement': [
+                                           '\nThe system shall allow users to manage projects, project versions, artifacts, traces, and documents\nThe system shall allow generating trace links between artifacts using various methods and models\nThe system shall allow committing changes to entities in a project version\nThe system shall allow calculating deltas between two project versions\nThe system shall allow retrieving information from the current project version\nThe system shall enforce data constraints and validation on entities\nThe system shall implement a version repository interface to manage versioned data\n']}}]
+        generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+        generated_artifact_content = generation_predictions[0][questionnaire.id][generated_artifacts_tag][0]
+        return [content for content in generated_artifact_content.split(NEW_LINE) if content]
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
-                                                       hgen_dataset: TraceDataset,
-                                                       original_sources_dataset: Union[PromptDataset, TraceDataset],
+                                                       source_layer_only_dataset: PromptDataset,
+                                                       original_dataset_complete: Union[PromptDataset, TraceDataset],
                                                        export_path: str) -> TraceDataset:
         """
         Creates a dataset with traces between the original lower-level artifacts and the newly generated upper-level artifacts
         :param artifact_generations: A list of generated artifact content
-        :param hgen_dataset: The dataset created from the clusters
-        :param original_sources_dataset: The original dataset used for trace generation
+        :param source_layer_only_dataset: The dataset containing only the source layer 
+        :param original_dataset_complete: The original dataset used for trace generation
         :param export_path: The path to export the dataset to
         :return: The dataset using the new generated artifacts
         """
-        original_artifact_df = original_sources_dataset.artifact_df
+        original_artifact_df = original_dataset_complete.artifact_df
 
-        original_trace_dataset = original_sources_dataset.trace_dataset if isinstance(original_sources_dataset,
-                                                                                      PromptDataset) else original_sources_dataset
+        original_trace_dataset = original_dataset_complete.trace_dataset if isinstance(original_dataset_complete,
+                                                                                       PromptDataset) else original_dataset_complete
         original_trace_df, original_layer_df = None, None
         if original_trace_dataset:
             original_trace_df = original_trace_dataset.trace_df
             original_layer_df = original_trace_dataset.layer_df
 
-        artifact_df = self._create_artifact_df_with_generated_artifacts(artifact_generations, hgen_dataset.artifact_df,
-                                                                        original_artifact_df)
-        layer_df = self._create_layer_df_with_generated_artifacts(hgen_dataset.layer_df, original_layer_df)
-        trace_df = self._create_trace_df_with_generated_artifacts(hgen_dataset.trace_df, artifact_df, original_trace_df)
-        dataset = TraceDataset(artifact_df, trace_df, layer_df)
+        target_layer_id = self._get_target_layer_id(original_dataset_complete)
+
+        new_artifact_df = self._create_artifact_df_with_generated_artifacts(artifact_generations, target_layer_id)
+        self.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
+
+        new_layer_df = self._create_layer_df_with_generated_artifacts(target_layer_id)
+        new_trace_df = self._create_trace_df_with_generated_artifacts(new_artifact_df, source_layer_only_dataset)
+        self.save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
+                                     export_path, filename="generated_dataset_checkpoint")
+
+        final_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
+        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
+                                                                   artifact_df=final_artifact_df, trace_df=new_trace_df)
+        final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
+        final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
+
+        dataset = TraceDataset(final_artifact_df, final_trace_df, final_layer_df)
+
         save_path = self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
         self.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         return dataset
 
-    @staticmethod
-    def _create_artifact_df_with_generated_artifacts(artifact_generations: List[str], hgen_artifacts_df: ArtifactDataFrame,
-                                                     orig_artifact_df: ArtifactDataFrame) -> ArtifactDataFrame:
+    def _create_artifact_df_with_generated_artifacts(self, artifact_generations: List[str],
+                                                     target_layer_id: str) -> ArtifactDataFrame:
         """
         Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
         :param artifact_generations: A list of generated artifact content
-        :param orig_artifact_df: The dataframe containing all original artifacts
-        :param hgen_artifacts_df: The dataframe containing artifacts created from the clusters
+        :param target_layer_id: The id for the layer with the new generated artifacts
         :return: The dataframe of generated artifacts
         """
-        artifact_content = [HierarchyGenerator._extract_generated_content(gen) for gen in artifact_generations]
-        hgen_artifacts_df[ArtifactKeys.CONTENT] = artifact_content
-        return ArtifactDataFrame.concat(orig_artifact_df, hgen_artifacts_df)
+        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(uuid.uuid4()) for _ in artifact_generations],
+                                             ArtifactKeys.CONTENT: artifact_generations,
+                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
+        try:
+            name_prompt = Prompt(f"Create a name for this {self.args.target_type}.", PromptResponseManager(response_tag="name"))
+            artifact_prompt = ArtifactPrompt(include_id=False)
+            prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
+            dataset = PromptDataset(artifact_df=new_artifact_df)
+            # names = self._get_predictions(prompt_builder, dataset, response_prompt_id=name_prompt.id,
+            #                               tag_for_response=name_prompt.response_manager.response_tag, return_first=True)
+            names = ['Project and Artifact Management System', 'Traceability Requirement', 'Commit Changes to Project Version',
+                     'Calculate Version Deltas', 'Retrieve Project Version Information', 'Data Validation and Constraints',
+                     'Version Repository Interface']
+            assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
+            new_artifact_df.index = names  # TODO ensure names are all unique
+        except Exception:
+            logger.exception("Unable to generate names for the artifacts")
+        return new_artifact_df
 
-    @staticmethod
-    def _extract_generated_content(generation: str) -> str:
-        """
-        Extracts the new artifact content from the LLM generation
-        :param generation: The response from the LLM for the artifact content
-        :return: The new artifact content
-        """
-        return LLMResponseUtil.parse(generation, HierarchyGenerator.GENERATION_TAG)[0]
-
-    @staticmethod
-    def _create_trace_df_with_generated_artifacts(hgen_trace_df: TraceDataFrame, artifact_df: ArtifactDataFrame,
-                                                  orig_trace_df: TraceDataFrame = None) -> TraceDataFrame:
+    def _create_trace_df_with_generated_artifacts(self, generated_artifact_df: ArtifactDataFrame,
+                                                  source_layer_only_dataset: PromptDataset) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
-        :param hgen_trace_df: The dataframe containing traces created from the clusters
-        :param orig_trace_df: A dataframe of the original trace links in the dataset
+        :param generated_artifact_df: The dataframe containing the generated artifacts
         :return: The dataframe containing new and old trace links
         """
-        trace_df = TraceDataFrame.concat(hgen_trace_df, orig_trace_df) if orig_trace_df is not None else hgen_trace_df
-        return trace_df.filter_by_row(lambda row: artifact_df.get_artifact(row[TraceKeys.SOURCE.value])[ArtifactKeys.LAYER_ID] !=
-                                                  artifact_df.get_artifact(row[TraceKeys.TARGET.value])[ArtifactKeys.LAYER_ID])
+        related_artifact_prompt: Prompt = SupportedPrompts.HGEN_RELATED_ARTIFACT.value
+        source_artifact_prompt = ArtifactPrompt(f"{self.args.source_type.upper()}:", include_id=False)
+        target_artifacts_prompt = MultiArtifactPrompt(f"{self.args.target_type.upper()}S:", include_ids=False,
+                                                      build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
+                                                      data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+        generated_artifacts = [generated_artifact_df.get_artifact(a_id) for a_id in generated_artifact_df.index]
+        target_artifacts_prompt_content = target_artifacts_prompt.build(artifacts=generated_artifacts)
+        target_artifacts_prompt = Prompt(target_artifacts_prompt_content)
+        prompt_builder = PromptBuilder([related_artifact_prompt,
+                                        source_artifact_prompt, target_artifacts_prompt])
+        prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
+        # artifact_numbers = self._get_predictions(prompt_builder, source_layer_only_dataset,
+        #                                          response_prompt_id=related_artifact_prompt.id,
+        #                                          tag_for_response=related_artifact_prompt.response_manager.response_tag,
+        #                                          return_first=True)
+        artifact_numbers = ['3', '3', '3', '3', '3', '3', '7', '7', '1', '5', '7', '5', '2', '1', '2', '2', '2', '7', '1', '7', '1', '7', '7', '1', '7', '1', '1', '2', '2', '1', '1', '1', '3', '1', '5', '1', '3', '7', '7', '1', '1', '7', '6', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '5', '5', '2', '5', '5']
+        artifact_numbers = [int(a) for a in artifact_numbers]
+        traces = {}
+        for i, row in enumerate(source_layer_only_dataset.artifact_df.itertuples()):
+            id_, artifact = row
+            if 0 < artifact_numbers[i] <= len(generated_artifacts):
+                linked_artifact = generated_artifacts[artifact_numbers[i] - 1]
+                link = EnumDict({TraceKeys.SOURCE: id_, TraceKeys.TARGET: linked_artifact[ArtifactKeys.ID], TraceKeys.LABEL: 1})
+                traces = DataFrameUtil.append(traces, link)
+        return TraceDataFrame(traces)
 
-    @staticmethod
-    def _create_layer_df_with_generated_artifacts(hgen_layer_df: LayerDataFrame,
-                                                  original_layer_df: LayerDataFrame = None) -> LayerDataFrame:
+    def _create_layer_df_with_generated_artifacts(self, target_layer_id: str) -> LayerDataFrame:
         """
         Creates a layer dataframe connecting the original lower-level artifacts with the newly generated upper-level artifacts
-        :param hgen_layer_df: The dataframe containing layers b/w artifacts and the clusters
-        :param original_layer_df: The dataframe containing the original layers for the dataset
+        :param target_layer_id: The id of the new target layer
         :return: The dataframe with the new layer ids added.
         """
-        layer_df = LayerDataFrame.concat(hgen_layer_df, original_layer_df) if original_layer_df is not None else hgen_layer_df
-        return layer_df.filter_by_row(lambda row: row[LayerKeys.SOURCE_TYPE.value] != row[LayerKeys.TARGET_TYPE.value])
+        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [self.args.source_layer_id], LayerKeys.TARGET_TYPE: [target_layer_id]})
+        return layer_df
 
-    def _create_linked_dataset_for_intra_level_artifacts(self, artifacts_df: ArtifactDataFrame, export_path: str) -> PromptDataset:
+    def _get_predictions(self, prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager: AbstractLLMManager = None,
+                         response_prompt_id: Prompt = None, tag_for_response: str = None, return_first: bool = False) -> List:
         """
-        Creates a trace dataset from predictions for trace links within the same layer
-        :param artifacts_df: Dataframe containing all source artifacts
-        :param export_path: The path to export the dataset to
-        :return: The dataset containing the trace link predictions
+        Gets the predictions for the given prompts on the given dataset
+        :param prompt_builder: Builds the prompts for the model
+        :param dataset: The dataset to use with the prompts
+        :param llm_manager: The LLM manager to use for predictions
+        :param response_prompt_id: The prompt id to extract from predictions
+        :param tag_for_response: The tag to extract from predictions
+        :return: The model predictions
         """
-        logger.info(f"Generating trace links between artifacts in the {self.args.source_layer_id} (source) layer")
-        single_layer_dataset = self._create_dataset_with_single_layer(artifacts_df, self.args.source_layer_id)
-        prediction_entries = self.args.tgen_trainer.perform_prediction(dataset=single_layer_dataset).prediction_entries
-        for entry in prediction_entries:
-            entry[TraceKeys.LABEL.value] = float(entry["score"])  # replace score with label to use scores as soft labels
-        trace_df = TraceDataFrame(prediction_entries)
-        trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
-                                                               layer_mapping_df=single_layer_dataset.layer_df)
-        dataset = TraceDataset(artifact_df=single_layer_dataset.artifact_df, trace_df=trace_df,
-                               layer_df=single_layer_dataset.layer_df)
-        self.save_dataset_checkpoint(dataset, export_path, "linked_source_layer_dataset")
-        return PromptDataset(trace_dataset=dataset)
+        dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        trainer = LLMTrainer(LLMTrainerState(llm_manager=self.args.hgen_llm_manager if not llm_manager else llm_manager,
+                                             trainer_dataset_manager=dataset_manager,
+                                             prompt_builder=prompt_builder,
+                                             completion_type=LLMCompletionType.GENERATION))
+        predictions = trainer.perform_prediction().predictions
+        if response_prompt_id:
+            predictions = [p[response_prompt_id] for p in predictions]
+            if tag_for_response:
+                predictions = [p[tag_for_response] for p in predictions]
+                if return_first:
+                    predictions = [p[0] for p in predictions]
+        return predictions
 
-    @staticmethod
-    def _create_dataset_with_single_layer(original_artifact_df: ArtifactDataFrame, layer_id: Any,
-                                          original_trace_df: TraceDataFrame = None) -> PromptDataset:
+    def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt) -> PromptBuilder:
         """
-        Creates a trace dataset for a single layer
-        :param original_artifact_df: A dataframe containing artifacts including those for the layer
-        :param layer_id: ID of the layer to construct a dataset for
-        :param original_trace_df: A dataframe containing intra layer traces for the layer
-        :return: The trace dataset
+        Gets the prompt builder used for the generations
+        :param questionnaire: The questionnaire prompt given to the model to produce the generations
+        :return: The prompt builder used for the generations
         """
-        layer_artifact_df = original_artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
-        if len(layer_artifact_df) == 0:
-            raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
-        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [layer_id],
-                                   LayerKeys.TARGET_TYPE: [layer_id]})
-        layer_trace_df = TraceDataFrame() if original_trace_df is None else \
-            TraceDataFrame(DataFrameUtil.filter_df_by_row(original_trace_df,
-                                                          lambda row: row[TraceKeys.SOURCE.value] in layer_artifact_df
-                                                                      and row[TraceKeys.TARGET.value] in layer_artifact_df))
-        trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=layer_artifact_df, trace_df=layer_trace_df,
-                                                               layer_mapping_df=layer_df)
-        return PromptDataset(trace_dataset=TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df))
+        artifact_prompt = MultiArtifactPrompt(prompt_start="{source_type}s:",
+                                              build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
+                                              include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+        artifact_prompt.format_value(source_type=self.args.source_type.capitalize())
+        summary_prompt = Prompt(f"{NEW_LINE} TASKS: {NEW_LINE} Write a short summary of the system.",
+                                PromptResponseManager(response_tag="summary"))
+        prompts = [SupportedPrompts.HGEN_GENERATION.value, artifact_prompt, summary_prompt, questionnaire]
+        prompt_builder = PromptBuilder(prompts)
+        prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
+        return prompt_builder
 
     @staticmethod
     def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None,
@@ -268,14 +335,52 @@ class HierarchyGenerator(BaseObject):
         logger.info(f"Dataset checkpoint saved to {full_export_path} ")
         return full_export_path
 
-    def _get_target_layer_id(self, dataset_with_sources: PromptDataset) -> str:
+    def _get_source_datasets_for_generation(self, export_path: str = EMPTY_STRING) -> Tuple[PromptDataset, PromptDataset]:
+        """
+        Gets the original source datasets used for the generation
+        :param export_path: The path to export checkpoints to
+        :return: The original dataset and a dataset with only the source layer
+        """
+        original_dataset_complete = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
+            else self.args.dataset_for_sources
+        self.save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
+        source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
+                                                                           self.args.source_layer_id,
+                                                                           original_dataset_complete.trace_dataset.trace_df
+                                                                           if original_dataset_complete.trace_dataset else None)
+        return original_dataset_complete, source_layer_only_dataset
+
+    @staticmethod
+    def _create_dataset_with_single_layer(original_artifact_df: ArtifactDataFrame, layer_id: Any,
+                                          original_trace_df: TraceDataFrame = None) -> PromptDataset:
+        """
+        Creates a trace dataset for a single layer
+        :param original_artifact_df: A dataframe containing artifacts including those for the layer
+        :param layer_id: ID of the layer to construct a dataset for
+        :param original_trace_df: A dataframe containing intra layer traces for the layer
+        :return: The trace dataset
+        """
+        layer_artifact_df = original_artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
+        if len(layer_artifact_df) == 0:
+            raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
+        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [layer_id],
+                                   LayerKeys.TARGET_TYPE: [layer_id]})
+        layer_trace_df = TraceDataFrame() if original_trace_df is None else \
+            TraceDataFrame(DataFrameUtil.filter_df_by_row(original_trace_df,
+                                                          lambda row: row[TraceKeys.SOURCE.value] in layer_artifact_df
+                                                                      and row[TraceKeys.TARGET.value] in layer_artifact_df))
+        trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=layer_artifact_df, trace_df=layer_trace_df,
+                                                               layer_mapping_df=layer_df)
+        return PromptDataset(trace_dataset=TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df))
+
+    def _get_target_layer_id(self, original_dataset_complete: PromptDataset) -> str:
         """
         Gets the id of the new target layer
-        :param dataset_with_sources: The dataset containing source artifacts
+        :param original_dataset_complete: The dataset containing source artifacts
         :return: The id of the new target layer
         """
         layer_id = self.args.target_type
-        if self.args.target_type in dataset_with_sources.artifact_df[ArtifactKeys.LAYER_ID].values:
+        if self.args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
             layer_id = f"{layer_id}_{uuid.uuid4()}"
         return layer_id
 
@@ -291,19 +396,3 @@ class HierarchyGenerator(BaseObject):
             trainer.trainer_args.output_dir = export_path
         if hasattr(trainer.trainer_args, "metrics"):
             trainer.trainer_args.metrics = []
-
-    def _get_example_of_target_type(self) -> str:
-        """
-        Gets an example of the target artifact to use in the generation prompt for theLLM
-        :return: An example of the target artifact
-        """
-        logger.info("Getting example of target type.")
-        example_prompt_format = SupportedPrompts.ARTIFACT_EXAMPLE.value
-        example_prompt = PromptBuilder(prompts=example_prompt_format).build(model_format_args=self.args.llm_manager_for_example.prompt_args,
-                                                                            artifact_type=self.args.target_type)[PromptKeys.PROMPT]
-        args = self.args.llm_manager_for_example.llm_args.to_params(TrainerTask.PREDICT, LLMCompletionType.GENERATION)
-        res = self.args.llm_manager_for_example.make_completion_request(prompt=example_prompt,
-                                                                        completion_type=LLMCompletionType.GENERATION,
-                                                                        **args)
-        example = LLMResponseUtil.parse(res.batch_responses[0], "example")
-        return example

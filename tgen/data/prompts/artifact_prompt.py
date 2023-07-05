@@ -21,7 +21,8 @@ class ArtifactPrompt(Prompt):
         XML = auto()
         BASE = auto()
 
-    def __init__(self, build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
+    def __init__(self, prompt_start: str = EMPTY_STRING,
+                 build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
         """
         Constructor for making a prompt from an artifact
         :param build_method: The method to build the prompt (determines prompt format)
@@ -31,7 +32,7 @@ class ArtifactPrompt(Prompt):
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.BASE: self._build_as_base}
         self.include_id = include_id
-        super().__init__(value=EMPTY_STRING)
+        super().__init__(value=prompt_start)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:
@@ -41,10 +42,12 @@ class ArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
+        prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            return self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID, EMPTY_STRING),
-                                                         artifact_body=artifact[ArtifactKeys.CONTENT],
-                                                         include_id=self.include_id)
+            artifact = self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID, EMPTY_STRING),
+                                                             artifact_body=artifact[ArtifactKeys.CONTENT],
+                                                             include_id=self.include_id)
+            return f"{prompt}{artifact}"
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 

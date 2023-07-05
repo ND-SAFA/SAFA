@@ -26,8 +26,8 @@ class SelectQuestionPrompt(QuestionPrompt):
         category_names = list(categories.keys())
         question = f"{question}{NEW_LINE}" if question else EMPTY_STRING
         response_manager = PromptResponseManager(response_tag=self.RESPONSE_TAG, response_instructions_format=self.RESPONSE_FORMAT,
-                                                 expected_responses={self.RESPONSE_TAG: category_names},
-                                                 expected_response_type={self.RESPONSE_TAG: type(category_names[0])},
+                                                 expected_responses=category_names,
+                                                 expected_response_type=type(category_names[0]),
                                                  default_factory=default_factory)
         super().__init__(f"{question}{self.INSTRUCTIONS}",
                          response_manager=response_manager)

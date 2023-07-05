@@ -15,7 +15,7 @@ class PromptResponseManager:
     """
     :param response_tag: The tag that the model uses to enclose its answer
     """
-    response_tag: Union[str, dict]
+    response_tag: Union[str, dict, list] = EMPTY_STRING
     """
     :param response_instructions_format: The format of the instructions included in prompt to tell the model how to respond
     """
@@ -32,11 +32,11 @@ class PromptResponseManager:
     """
     :param expected_response_type: A dictionary mapping the tag id to the expected response type for that tag
     """
-    expected_response_type: Dict[str, Type] = field(default_factory=dict)
+    expected_response_type: Union[Type, Dict[str, Type]] = field(default_factory=dict)
     """
     :param expected_responses: A dictionary mapping the tag id to the expected responses for that tag
     """
-    expected_responses: Dict = field(default_factory=dict)
+    expected_responses: Union[List, Dict[str, List]] = field(default_factory=dict)
     """
     :param formatter: A method that takes in the tag id and returns the correct format for the associated response
     """
@@ -46,19 +46,45 @@ class PromptResponseManager:
     """
     default_factory: Callable = None
 
+    """
+    Create reverse lookup for tags to their ids after init
+    """
+    _tag2id: Dict[str, str] = field(init=False, default_factory=dict)
+    """
+    A list of all response tags in the order they are provided . 
+     If parent, children, they are returned in the order:
+     p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
+    """
+    _all_tag_ids: List[str] = field(init=False, default_factory=list)
+
     def __post_init__(self) -> None:
         """
         Converts input to the correct format after init
         :return: None
         """
-        if not self.id2tag:
+        if self.response_tag:
+            all_tags = []
             if isinstance(self.response_tag, str):
-                self.id2tag[self.response_tag] = self.response_tag
+                all_tags.append(self.response_tag)
+            elif isinstance(self.response_tag, list):
+                all_tags.extend(self.response_tag)
             else:
                 for tag, children in self.response_tag.items():
-                    self.id2tag[tag] = tag
-                    for child in children:
-                        self.id2tag[child] = child
+                    all_tags.append(tag)
+                    all_tags.extend(children)
+            if not self.id2tag:
+                self.id2tag = {tag: tag for tag in all_tags}
+            self._tag2id = {tag: id_ for id_, tag in self.id2tag.items()}
+            self._all_tag_ids = [self._tag2id[tag] for tag in all_tags]
+
+    def get_all_tag_ids(self) -> List[str]:
+        """
+        Gets all the response tag ids in the order they are provided .
+        If parent, children, they are returned in the order:
+        p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
+        :return: All the response tag ids in the order they are provided
+        """
+        return self._all_tag_ids
 
     def format_response_instructions(self) -> str:
         """
@@ -77,25 +103,45 @@ class PromptResponseManager:
         :param response: The model response
         :return: The response unchanged
         """
+        if not self.response_tag:
+            return {}
         output = {}
         if isinstance(self.response_tag, dict):
             for parent in self.response_tag.keys():
-                output[parent] = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=False)
+                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=False)
+                values = [{self._tag2id.get(c_id, c_id): c_val for c_id, c_val in val.items()} for val in values]
+                output[self._tag2id[parent]] = values
         else:
-            output[self.response_tag] = LLMResponseUtil.parse(response, self.response_tag, is_nested=False, raise_exception=False)
-        return output
+            tags = [self.response_tag] if not isinstance(self.response_tag, list) else self.response_tag
+            for tag in tags:
+                tag_id = self._tag2id[tag]
+                output[tag_id] = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=False)
+        formatted_output = self._format_response(output)
+        return formatted_output
 
-    def parse_response_on_failure(self, tag_id: str, e: Exception) -> Any:
+    def get_expected_response_type(self, tag: str) -> Type:
         """
-        Parses the response if it fails in some way, may be overridden in child classes
-        :param tag_id: The id of the tag that failed
-        :param e: The exception causing the failure
-        :return: Default value
+        Gets the expected response type for a tag
+        :param tag: The id of the tag
+        :return:
         """
-        logger.warning(f"Unexpected response for {tag_id}: {e}.")
-        if self.default_factory:
-            return self.default_factory()
-        return None
+        if isinstance(self.expected_response_type, dict):
+            if tag in self.expected_response_type:
+                return self.expected_response_type[tag]
+        else:
+            return self.expected_response_type
+
+    def get_expected_responses(self, tag: str) -> List:
+        """
+        Gets the expected responses for a tag
+        :param tag: the id of the tag
+        :return: The expected responses
+        """
+        if isinstance(self.expected_responses, dict):
+            if tag in self.expected_responses:
+                return self.expected_responses[tag]
+        else:
+            return self.expected_responses
 
     def _format_response(self, output: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -104,19 +150,39 @@ class PromptResponseManager:
         :return: A mapping of tag id to the formatted output value
         """
         formatted = {}
-        for tag, val in output.items():
-            if isinstance(val, dict):
-                formatted[tag] = self._format_response(val)
-            else:
-                try:
-                    formatted_val = val
-                    if tag in self.expected_response_type:
-                        formatted_val = self.expected_response_type[tag](formatted_val)
-                    if self.formatter:
-                        formatted_val = self.formatter(tag, formatted_val)
-                    if tag in self.expected_responses:
-                        assert formatted_val in self.expected_responses[tag]
-                    formatted[tag] = formatted_val
-                except (TypeError, AssertionError) as e:
-                    formatted[tag] = self.parse_response_on_failure(tag, e)
+        for tag, values in output.items():
+            if not isinstance(values, list):
+                values = [values]
+            formatted_values = []
+            for val in values:
+                formatted_val = val
+                if isinstance(val, dict):
+                    formatted_val = self._format_response(val)
+                else:
+                    try:
+                        expected_response_type = self.get_expected_response_type(tag)
+                        if expected_response_type:
+                            formatted_val = expected_response_type(formatted_val)
+                        if self.formatter:
+                            formatted_val = self.formatter(tag, formatted_val)
+                        expected_response = self.get_expected_responses(tag)
+                        if expected_response:
+                            assert formatted_val in self.expected_responses[tag]
+                    except (TypeError, AssertionError) as e:
+                        formatted_val = self._format_on_failure(tag, formatted_val, e)
+                formatted_values.append(formatted_val)
+            formatted[tag] = formatted_values
         return formatted
+
+    def _format_on_failure(self, tag_id: str, val: Any, e: Exception) -> Any:
+        """
+        Parses the response if it fails in some way, may be overridden in child classes
+        :param tag_id: The id of the tag that failed
+        :param e: The exception causing the failure
+        :return: Default value
+        """
+        logger.warning(f"Unexpected response for {tag_id}: {e}.")
+        if self.default_factory:
+            return self.default_factory(tag_id, val)
+        return val
+

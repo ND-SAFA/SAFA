@@ -10,19 +10,16 @@ class Prompt:
     Represents a prompt with special formatting that allows delaying the formatting of certain fields
     """
 
-    def __init__(self, value: str, response_manager: PromptResponseManager = None,
-                 prompt_id: str = None, response_instructions: str = RESPONSE_FORMAT):
+    def __init__(self, value: str, response_manager: PromptResponseManager = None, prompt_id: str = None):
         """
         Initialize with the value of the prompt
         :param value: The value of the prompt
         :param response_manager: Handles creating response instructions and parsing response
         :param prompt_id: Specify specific id for the prompt
-        :param response_instructions: The format instructions for the response desired from model
         """
         self.value = value
         self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
-        self.response_manager = response_manager
-        self.response_instructions = response_instructions
+        self.response_manager = response_manager if response_manager else PromptResponseManager(include_response_instructions=False)
 
     def build(self, **kwargs) -> str:
         """
@@ -31,8 +28,8 @@ class Prompt:
         :return: The formatted prompt + instructions for the response expected from the model
         """
         prompt = self._build(**kwargs)
-        if self.response_manager:
-            expected_response = self.response_manager.format_response_instructions()
+        expected_response = self.response_manager.format_response_instructions()
+        if expected_response:
             prompt = f"{prompt}{NEW_LINE}{expected_response}"
         return prompt
 

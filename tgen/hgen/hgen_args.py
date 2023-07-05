@@ -25,6 +25,10 @@ class HGenArgs(BaseObject):
     """
     target_type: str
     """
+    The type of source artifacts for which higher-level artifacts will be generated
+    """
+    source_type: str = "code"
+    """
     The LLM manager to use to generate the new artifact content
     """
     hgen_llm_manager: AbstractLLMManager = field(default_factory=get_default_llm_manager)

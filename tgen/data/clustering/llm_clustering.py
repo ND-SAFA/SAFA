@@ -11,7 +11,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.supported_prompts_old import SupportedPrompts
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager

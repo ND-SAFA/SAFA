@@ -9,9 +9,8 @@ from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_D
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.supported_prompts_old import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -23,6 +22,7 @@ from tgen.util.logging.logger_manager import logger
 
 class Summarizer(BaseObject):
     """
+
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
     SUMMARY_TAG = "summary"

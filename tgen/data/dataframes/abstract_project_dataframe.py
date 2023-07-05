@@ -191,7 +191,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         duplicated_indices = set(self.index[is_duplicated])
         if len(duplicated_indices) > 0:
             logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
-        return self.__class__(self[~is_duplicated])
+        return self[~is_duplicated]
 
     @overrides(pd.DataFrame)
     def to_dict(self, orient: str = 'dict', into: Type = dict, index: bool = True) -> Dict:

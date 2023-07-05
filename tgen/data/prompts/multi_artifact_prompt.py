@@ -24,7 +24,8 @@ class MultiArtifactPrompt(Prompt):
         TRACES = auto()
         ARTIFACT = auto()
 
-    def __init__(self, build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
+    def __init__(self, prompt_start: str = EMPTY_STRING,
+                 build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
                  data_type: DataType = DataType.ARTIFACT):
         """
         Constructor for making a prompt from many artifacts
@@ -36,7 +37,7 @@ class MultiArtifactPrompt(Prompt):
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
         self.type = data_type
-        super().__init__(value=EMPTY_STRING)
+        super().__init__(value=prompt_start)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
@@ -46,8 +47,10 @@ class MultiArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
+        prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            return self.build_methods[self.build_method](artifacts, include_ids=self.include_ids)
+            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids)
+            return f"{prompt}{artifacts}"
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 
@@ -63,7 +66,8 @@ class MultiArtifactPrompt(Prompt):
         """
         numbered_format = "{}. {}"
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i, artifact_prompt.build(artifact=artifact)) for i, artifact in enumerate(artifacts)]
+        formatted_artifacts = [numbered_format.format(i+1, artifact_prompt.build(artifact=artifact))
+                               for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod

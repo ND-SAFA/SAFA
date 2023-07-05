@@ -28,7 +28,7 @@ class LLMResponseUtil:
             logger.exception(error)
             if raise_exception:
                 raise Exception(error)
-            content = [res] if not is_nested else []
+            content = []
         return content
 
     @staticmethod

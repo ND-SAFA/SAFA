@@ -12,7 +12,7 @@ class StrUtil:
         :param kwargs: Key, value pairs to format the prompt with
         :return: The formatted str
         """
-        if not args or not kwargs:
+        if not args and not kwargs:
             return string
         formatting_fields = re.findall(r'\{(\w*)\}', string)
         updated_args = [arg for arg in args]

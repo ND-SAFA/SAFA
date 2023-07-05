@@ -50,7 +50,7 @@ class TrainerDatasetManager(BaseObject):
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator,
                                   DatasetRole.EVAL: eval_dataset_creator}
-        self._datasets = None
+        self._datasets = {}
         self._hf_datasets = None
         self.augmenter = augmenter
 
@@ -106,7 +106,7 @@ class TrainerDatasetManager(BaseObject):
             assert role in trainer_dataset_manager._dataset_creators, f"Unknown dataset role {role}"
             assert isinstance(dataset, iDataset), f"Unexpected type of dataset {type(dataset)}"
             trainer_dataset_manager._datasets[role] = dataset
-        return TrainerDatasetManager
+        return trainer_dataset_manager
 
     @overrides(BaseObject)
     def use_values_from_object_for_undetermined(self, obj: "TrainerDatasetManager") -> None:
@@ -130,7 +130,7 @@ class TrainerDatasetManager(BaseObject):
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
         """
-        if self._datasets is None:
+        if not self._datasets:
             self._datasets = self._create_datasets_from_creators(self._dataset_creators)
             self._prepare_datasets(self.augmenter)
         return self._datasets

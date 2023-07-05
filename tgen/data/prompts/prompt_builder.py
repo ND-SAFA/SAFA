@@ -8,7 +8,6 @@ from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.prompt_config import PromptConfig
 from tgen.util.enum_util import EnumDict
-from tgen.util.llm_response_util import LLMResponseUtil
 
 
 class PromptBuilder:
@@ -107,32 +106,7 @@ class PromptBuilder:
         :param res: The model response
         :return: A dictionary mapping prompt id to its answers
         """
-        tags = self._get_response_tag_to_prompt_indices()
-        tag2response = LLMResponseUtil.extract_labels(res, list(tags.keys()))
-        responses = [[None] * len(self._prompts)]
-        for label, response in tag2response.items():
-            prompt_indices = tags[label]
-            for i, p_i in enumerate(prompt_indices):
-                if i >= len(response):
-                    e = AssertionError(f"Received too few responses for {label}")
-                    responses[p_i] = self._prompts[p_i].parse_response_on_failure("", e)
-                else:
-                    responses[p_i] = self._prompts[p_i].parse_response(response[i])
-        return {prompt.id: responses[i] for i, prompt in enumerate(self._prompts)}
-
-    def _get_response_tag_to_prompt_indices(self) -> Dict[str, List[int]]:
-        """
-        Gets the response tag for each prompt and maps it to the corresponding indices of the prompt
-        :return: A mapping of tag to prompt indices
-        """
-        tags = {}
-        for i, prompt in enumerate(self._prompts):
-            tag = prompt.response_tag
-            if tag:
-                if tag not in tags:
-                    tags[tag] = []
-                tags[tag].append(i)
-        return tags
+        return {prompt.id: prompt.response_manager.parse_response(res) for prompt in self._prompts}
 
     def _create_config(self) -> PromptConfig:
         """

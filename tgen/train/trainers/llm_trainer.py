@@ -4,7 +4,9 @@ from typing import List, Union, Any
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.supported_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, SCORE_LABEL, \
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, \
+    SCORE_LABEL, \
     SOURCE_COMPONENT_LABEL, \
     TARGET_COMPONENT_LABEL, \
     UNRELATED_LABEL
@@ -14,14 +16,14 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
-from tgen.util.state.state.state_manager import StateManager
 from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
+from tgen.util.state.state.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):
@@ -78,12 +80,12 @@ class LLMTrainer(AbstractTrainer):
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
         res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
-                                                       prompt=list(prompt_df[PromptKeys.PROMPT]))
+                                                       prompt=list(prompt_df[PromptKeys.PROMPT])[0])
 
         if isinstance(res, ClassificationResponse):
-            output = self._create_classification_output(res, dataset)
+            output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):
-            output = self._create_generation_output(res.batch_responses)
+            output = self._create_generation_output(res.batch_responses, self.prompt_builder)
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
@@ -107,19 +109,21 @@ class LLMTrainer(AbstractTrainer):
         return dataset
 
     @staticmethod
-    def _create_generation_output(responses: List[str]):
+    def _create_generation_output(responses: List[str], prompt_builder: PromptBuilder) -> TracePredictionOutput:
         """
         Creates the output for a generation
         :param responses: The response from the completion.
+        :param prompt_builder: The builder responsible for building the prompts
         :return: The generation output.
         """
-        return TracePredictionOutput(predictions=[r.strip() for r in responses])  #
+        return TracePredictionOutput(predictions=[prompt_builder.parse_responses(r) for r in responses])  #
 
-    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset):
+    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset, prompt_builder: PromptBuilder):
         """
         Creates the output for a classification
         :param res: The response from the completion
         :param dataset: The dataset being predicted on
+        :param prompt_builder: The builder responsible for building the prompts
         :return: The classification output
         """
         trace_dataset = dataset.trace_dataset

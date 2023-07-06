@@ -22,9 +22,22 @@ class QuestionnairePrompt(Prompt):
         """
         self.question_prompts = question_prompts
         self.enumeration_chars = enumeration_chars
-        response_manager = PromptResponseManager(response_tag=[prompt.response_manager.response_tag for prompt in self.question_prompts],
-                                                 include_response_instructions=False)
+        response_manager = PromptResponseManager(
+            response_tag=[prompt.response_manager.response_tag for prompt in self.question_prompts],
+            include_response_instructions=False)
         super().__init__(instructions, response_manager=response_manager)
+
+    @overrides(Prompt)
+    def format_value(self, *args: object, **kwargs: object) -> None:
+        """
+        Formats the value of all question prompts
+        :param args: Args for formatting
+        :param kwargs: Kwargs for formatting
+        :return: None
+        """
+        for prompt in self.question_prompts:
+            prompt.format_value(**kwargs)
+        return super().format_value(*args, **kwargs)
 
     @overrides(Prompt)
     def _build(self, **kwargs) -> str:

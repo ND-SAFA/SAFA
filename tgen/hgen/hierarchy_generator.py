@@ -77,8 +77,9 @@ class HierarchyGenerator(BaseObject):
                                                             response_manager=PromptResponseManager(response_tag="design-requirement"))
                                              ])
         artifact_generation_content = self._generate_artifact_content(questionnaire, source_layer_only_dataset)
+        refined_content = self._refine_generations(artifact_generation_content, source_layer_only_dataset)
 
-        return self._create_trace_dataset_with_generated_artifacts(artifact_generation_content,
+        return self._create_trace_dataset_with_generated_artifacts(refined_content,
                                                                    source_layer_only_dataset,
                                                                    original_dataset_complete,
                                                                    export_path=export_path)
@@ -151,6 +152,29 @@ class HierarchyGenerator(BaseObject):
         generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
         generated_artifact_content = generation_predictions[0][questionnaire.id][generated_artifacts_tag][0]
         return [content for content in generated_artifact_content.split(NEW_LINE) if content]
+
+    def _refine_generations(self, generated_artifact_content: List[str], source_layer_only_dataset: PromptDataset) -> List[str]:
+        """
+        Has the model refine the artifact generations
+        :param generated_artifact_content: The original generated content
+        :param source_layer_only_dataset: The dataset containing only the source layer
+        :return: A list of refined artifact content
+        """
+        questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
+        prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
+                                                                 SupportedPrompts.HGEN_REFINE_PROMPT)
+        target_prompt = MultiArtifactPrompt(prompt_start="{target_type}s:",
+                                            build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
+                                            include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+        target_prompt.format_value(target_type=self.args.target_type.upper())
+        target_prompt_content = target_prompt.build(artifacts=[{ArtifactKeys.CONTENT: c} for c in generated_artifact_content])
+        prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
+        generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+        refined_artifact_content = self._get_predictions(prompt_builder, source_layer_only_dataset,
+                                                               response_prompt_id=questionnaire.id,
+                                                               tag_for_response=generated_artifacts_tag,
+                                                               return_first=True)
+        return refined_artifact_content
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        source_layer_only_dataset: PromptDataset,
@@ -245,7 +269,9 @@ class HierarchyGenerator(BaseObject):
         #                                          response_prompt_id=related_artifact_prompt.id,
         #                                          tag_for_response=related_artifact_prompt.response_manager.response_tag,
         #                                          return_first=True)
-        artifact_numbers = ['3', '3', '3', '3', '3', '3', '7', '7', '1', '5', '7', '5', '2', '1', '2', '2', '2', '7', '1', '7', '1', '7', '7', '1', '7', '1', '1', '2', '2', '1', '1', '1', '3', '1', '5', '1', '3', '7', '7', '1', '1', '7', '6', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '5', '5', '2', '5', '5']
+        artifact_numbers = ['3', '3', '3', '3', '3', '3', '7', '7', '1', '5', '7', '5', '2', '1', '2', '2', '2', '7', '1', '7', '1',
+                            '7', '7', '1', '7', '1', '1', '2', '2', '1', '1', '1', '3', '1', '5', '1', '3', '7', '7', '1', '1', '7',
+                            '6', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '5', '5', '2', '5', '5']
         artifact_numbers = [int(a) for a in artifact_numbers]
         traces = {}
         for i, row in enumerate(source_layer_only_dataset.artifact_df.itertuples()):
@@ -266,7 +292,7 @@ class HierarchyGenerator(BaseObject):
         return layer_df
 
     def _get_predictions(self, prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager: AbstractLLMManager = None,
-                         response_prompt_id: Prompt = None, tag_for_response: str = None, return_first: bool = False) -> List:
+                         response_prompt_id: Prompt = None, tag_for_response: str = None, return_first: bool = False) -> Any:
         """
         Gets the predictions for the given prompts on the given dataset
         :param prompt_builder: Builds the prompts for the model
@@ -290,19 +316,21 @@ class HierarchyGenerator(BaseObject):
                     predictions = [p[0] for p in predictions]
         return predictions
 
-    def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt) -> PromptBuilder:
+    def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt,
+                                           base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION, ) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
         :param questionnaire: The questionnaire prompt given to the model to produce the generations
+        :param base_prompt: The main prompt that starts the prompt
         :return: The prompt builder used for the generations
         """
         artifact_prompt = MultiArtifactPrompt(prompt_start="{source_type}s:",
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-        artifact_prompt.format_value(source_type=self.args.source_type.capitalize())
-        summary_prompt = Prompt(f"{NEW_LINE} TASKS: {NEW_LINE} Write a short summary of the system.",
+        artifact_prompt.format_value(source_type=self.args.source_type.upper())
+        summary_prompt = Prompt(f"{NEW_LINE} TASKS: {NEW_LINE} First, write a short summary of the system.",
                                 PromptResponseManager(response_tag="summary"))
-        prompts = [SupportedPrompts.HGEN_GENERATION.value, artifact_prompt, summary_prompt, questionnaire]
+        prompts = [base_prompt.value, artifact_prompt, summary_prompt, questionnaire]
         prompt_builder = PromptBuilder(prompts)
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
         return prompt_builder

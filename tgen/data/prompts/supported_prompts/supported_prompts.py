@@ -2,7 +2,8 @@ from copy import deepcopy
 from types import DynamicClassAttribute
 
 from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.supported_prompts.hgen_prompts import INSTRUCTION_CREATION_PROMPT, RELATED_ARTIFACT_PROMPT, GENERATION_PROMPT
+from tgen.data.prompts.supported_prompts.hgen_prompts import INSTRUCTION_CREATION_PROMPT, RELATED_ARTIFACT_PROMPT, GENERATION_PROMPT, \
+    REFINE_PROMPT, REFINE_QUESTIONNAIRE
 from tgen.util.supported_enum import SupportedEnum
 
 
@@ -10,6 +11,8 @@ class SupportedPrompts(SupportedEnum):
     HGEN_INSTRUCTIONS = INSTRUCTION_CREATION_PROMPT
     HGEN_RELATED_ARTIFACT = RELATED_ARTIFACT_PROMPT
     HGEN_GENERATION = GENERATION_PROMPT
+    HGEN_REFINE_PROMPT = REFINE_PROMPT
+    HGEN_REFINE_QUESTIONNAIRE = REFINE_QUESTIONNAIRE
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

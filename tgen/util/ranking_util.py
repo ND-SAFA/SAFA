@@ -122,7 +122,7 @@ class RankingUtil:
             return metrics
 
     @staticmethod
-    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = 0.95,
+    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = 0.90,
                            min_threshold: float = 0.75) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.

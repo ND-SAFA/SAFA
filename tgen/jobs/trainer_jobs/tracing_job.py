@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.train.args.anthropic_args import AnthropicArgs
@@ -13,21 +14,25 @@ from tgen.util.data_structure_util import DataStructureUtil
 from tgen.util.ranking_util import RankingUtil
 
 
-class TracingJob(LLMJob):
+class TracingJob(AbstractJob):
     """
     Performs filtering with little claude before ranking with big claude.
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL,
+                 select_top_predictions: bool = True):
         """
         Constructs job for dataset at given role.
         :param trainer_dataset_manager: The manager containing all datasets.
         :param dataset_role: The role to predict links for.
         """
-        llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
-        llm_manager = AnthropicManager(llm_args=llm_args)
-        super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT, llm_manager=llm_manager)
+        super().__init__()
+        self.trainer_dataset_manager = trainer_dataset_manager
         self.dataset_role = dataset_role
+        self.llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
+        self.llm_manager = AnthropicManager(llm_args=self.llm_args)
+        self.dataset_role = dataset_role
+        self.select_top_predictions = select_top_predictions
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -39,7 +44,9 @@ class TracingJob(LLMJob):
         dataset: TraceDataset = self.trainer_dataset_manager[self.dataset_role]
         artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
 
-        prediction_output: TracePredictionOutput = super()._run(**kwargs)
+        base_tracing_job = LLMJob(self.trainer_dataset_manager, task=TrainerTask.PREDICT, llm_manager=self.llm_manager)
+        prediction_output: TracePredictionOutput = base_tracing_job.run().body
+
         entries = prediction_output.prediction_entries
         entries = [entry for entry in entries if entry["score"] >= THRESHOLD]
 
@@ -55,7 +62,8 @@ class TracingJob(LLMJob):
             target_entries = parent2entries[parent_id]
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_sources, target_entries)
             predicted_entries.extend(target_predicted_entries)
-        predicted_entries = RankingUtil.select_predictions(predicted_entries)
+        if self.select_top_predictions:
+            predicted_entries = RankingUtil.select_predictions(predicted_entries)
         RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)

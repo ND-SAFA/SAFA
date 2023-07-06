@@ -1,7 +1,6 @@
 from copy import deepcopy
 
-from tgen.data.summarizer.summarizer import Summarizer
-from tgen.hgen.hierarchy_generator import HierarchyGenerator
+from tgen.data.prompts.supported_prompts_old import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.util.attr_dict import AttrDict
@@ -100,7 +99,7 @@ SUMMARY_FORMAT = "Summary of {}"
 def fake_open_ai_completion(prompt, **args):
     choice = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0])
     choice["text"] = SUMMARY_FORMAT
-    tags = [HierarchyGenerator.GENERATION_TAG, Summarizer.SUMMARY_TAG]
+    tags = [SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag]
     tag = None
     for t in tags:
         if f"<{t}>" in prompt[0]:

@@ -15,22 +15,9 @@ import sys
 
 from kombu.serialization import register
 
-REPO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..")
-REPO_PATH = os.path.normpath(REPO_PATH)
-REPO_PATH = os.path.abspath(REPO_PATH)
+from .paths import load_paths
 
-API_PATH = os.path.join(REPO_PATH, "src")
-TGEN_PATH = os.path.join(REPO_PATH, "tgen")
-
-paths = list(set(sys.path))
-paths = [p for p in paths if "tgen" not in p.lower()]
-if TGEN_PATH not in paths:
-    paths.append(TGEN_PATH)
-if API_PATH not in paths:
-    paths.append(API_PATH)
-sys.path = paths
-
-print("PATHS:", sys.path)
+load_paths()
 
 from pathlib import Path
 

@@ -1,18 +1,19 @@
 #!/bin/bash
-
-# Check if container 'tgen' exists
-container_name="tgen"
-if docker ps -a --format '{{.Names}}' | grep -q "^$container_name$"; then
-    echo "Container $container_name exists. Deleting..."
-    docker stop $container_name
-    docker rm $container_name
+if [ $# -eq 0 ]; then
+  echo "Error: Container name is required."
+  echo "Usage: ./build.sh <container>"
+  exit 1
 fi
 
-# Re-build 'tgen' image
-echo "Re-building 'tgen' image..."
-docker build -t tgen .
+# Check if container 'tgen' exists
+container_name=${1}
+if docker ps -a --format '{{.Names}}' | grep -q "^$container_name$"; then
+    echo "Container $container_name exists. Deleting..."
+    docker compose stop $container_name # stop current
+    docker compose rm $container_name # delete old
+    docker compose build $container_name # Re-build new
+    exit -1;
+fi
 
-## Run the newly built image
-port=${1:-4000}
-echo "Running the newly built 'tgen' image..."
-docker run --name $container_name -p $port:80 --env-file .env $container_name
+echo "Starting $container_name ..."
+docker compose up $container_name

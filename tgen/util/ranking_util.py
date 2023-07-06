@@ -130,13 +130,7 @@ class RankingUtil:
         :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
         :return: List of selected predictions.
         """
-        children2entry = {}
-        for entry in trace_predictions:
-            child_id = entry["source"]
-            if child_id not in children2entry:
-                children2entry[child_id] = []
-            children2entry[child_id].append(entry)
-
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, "source")
         predictions = []
 
         for child, trace_predictions in children2entry.items():
@@ -148,3 +142,18 @@ class RankingUtil:
                 selected_entries.append(top_parent)
             predictions.extend(selected_entries)
         return predictions
+
+    @staticmethod
+    def group_trace_predictions(predictions: List[TracePredictionEntry], key_id: str):
+        """
+        Groups the predictions by the property given.
+        :param predictions: The predictions to group.
+        :return: Dictionary of keys in key_id and their associated entries.
+        """
+        children2entry = {}
+        for entry in predictions:
+            child_id = entry[key_id]
+            if child_id not in children2entry:
+                children2entry[child_id] = []
+            children2entry[child_id].append(entry)
+        return children2entry

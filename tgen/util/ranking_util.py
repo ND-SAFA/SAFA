@@ -106,7 +106,8 @@ class RankingUtil:
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
             all_link_ids = list(dataset.trace_df.index)
-            link_ids = [TraceDataFrame.generate_link_id(entry["source"], entry["target"]) for entry in ranking_entries]
+            link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for entry in
+                        ranking_entries]
             missing_ids = list(set(all_link_ids).difference(set(link_ids)))
             ordered_link_ids = link_ids + missing_ids
 

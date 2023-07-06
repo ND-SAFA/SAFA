@@ -1,5 +1,6 @@
 from typing import Dict, List, Union
 
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -16,17 +17,14 @@ class RankingJob(AbstractJob):
     Uses large claude to rank all source artifacts.
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL,
-                 sorter: str = "vsm", select_top_predictions: bool = True):
+    def __init__(self, dataset_creator: AbstractDatasetCreator, sorter: str = "vsm", select_top_predictions: bool = True):
         """
         Uses dataset defined by role to sort and rank with big claude.
-        :param trainer_dataset_manager: The manager of the dataset.
-        :param dataset_role: The role to evaluate on.
+        :param dataset_creator: Creates the dataset to rank.
         :param sorter: The sorting function to feed big claude with.
         """
         super().__init__()
-        self.trainer_dataset_manager = trainer_dataset_manager
-        self.dataset_role = dataset_role
+        self.dataset_creator = dataset_creator
         self.sorter = sorter
         self.select_top_predictions = select_top_predictions
 
@@ -36,7 +34,9 @@ class RankingJob(AbstractJob):
         :param kwargs: Additional keyword arguments.
         :return:
         """
-        dataset: TraceDataset = self.trainer_dataset_manager[self.dataset_role]
+        dataset_role = DatasetRole.EVAL
+        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
+        dataset: TraceDataset = trainer_dataset_manager[dataset_role]
         artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
 
         # TODO: Deal with multi-layer

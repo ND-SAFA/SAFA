@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union, Callable, Type
+from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
@@ -177,7 +177,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     def filter_by_index(self, index_to_filter: List) -> "AbstractProjectDataFrame":
         """
         Returns a copy of the dataframe with filter applied to rows
-        :param index_to_filter: The list of indices to filter out
+        :param index_to_filter: The list of indices to keep.
         :return: A copy of the dataframe with filter applied to rows
         """
         return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))

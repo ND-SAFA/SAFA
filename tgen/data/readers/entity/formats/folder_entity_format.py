@@ -39,17 +39,19 @@ class FolderEntityFormat(AbstractEntityFormat):
         return []
 
     @staticmethod
-    def read_folder(path: str, exclude: List[str] = None, exclude_ext: List[str] = None, **kwargs) -> pd.DataFrame:
+    def read_folder(path: str, exclude: List[str] = None, exclude_ext: List[str] = None, with_extension: bool = True,
+                    **kwargs) -> pd.DataFrame:
         """
         Creates artifact for each file in folder path.
         :param path: Path to folder containing artifact files.
         :param exclude: The files to exclude in folder path.
         :param exclude_ext: list of file extensions to exclude
+        :param with_extension: Whether to include file extension in artifact ids.
         :return: DataFrame containing artifact ids and tokens.
         """
         exclude = EXCLUDED_FILES if exclude is None else exclude + EXCLUDED_FILES
         files_in_path = FileUtil.get_file_list(path, exclude=exclude, exclude_ext=exclude_ext)
-        return FolderEntityFormat.read_files_as_artifacts(files_in_path, base_path=path, **kwargs)
+        return FolderEntityFormat.read_files_as_artifacts(files_in_path, base_path=path, with_extension=with_extension, **kwargs)
 
     @staticmethod
     def read_files_as_artifacts(file_paths: List[str], base_path: str, use_file_name: bool = True,

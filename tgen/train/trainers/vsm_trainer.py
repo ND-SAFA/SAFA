@@ -16,6 +16,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.ranking.pipeline.utils import extract_prompt_artifacts
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.stage_eval import Metrics
@@ -95,23 +96,27 @@ class VSMTrainer(AbstractTrainer):
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
         :return: The output from the prediction
         """
-        raw_sources, raw_targets, all_source_target_pairs = self.get_raw_sources_and_targets(eval_dataset)
-        set_source, set_target = self.create_term_frequency_matrices(raw_sources, raw_targets)
-        similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(set_source, set_target)
+        parent_artifacts, child_artifacts, parent_child_pairs = self.get_raw_sources_and_targets(eval_dataset)
+        parent_tf_matrix, child_tf_matrix = self.create_term_frequency_matrices(parent_artifacts, child_artifacts)
+        similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(parent_tf_matrix, child_tf_matrix)
         predictions, label_ids, source_target_pairs, link_ids = [], [], [], []
-        for i, pair in enumerate(all_source_target_pairs):
-            link_id = TraceDataFrame.generate_link_id(*pair)
+        for i, (parent_id, child_id) in enumerate(parent_child_pairs):
+            link_id = TraceDataFrame.generate_link_id(source_id=child_id, target_id=parent_id)
             if link_id not in eval_dataset.trace_df:  # source, target pair between layers that should not be linked
                 continue
-            row, col = divmod(i, len(raw_targets))
+            row, col = divmod(i, len(child_artifacts))
             predictions.append(similarity_matrix[row][col])
             label_ids.append(int(predictions[-1] > threshold))
             link_ids.append(link_id)
-            source_target_pairs.append(pair)
-        metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
-            if self.metrics else None
-        prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=metrics)
+            source_target_pairs.append((child_id, parent_id))  # source, target
+        prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=None)
         trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)
+
+        if eval_dataset.trace_df.get_label_count(1) > 0:
+            metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
+                if self.metrics else None
+            prediction_output.metrics = metrics
+            trace_prediction_output.metrics = metrics
         return trace_prediction_output
 
     def create_term_frequency_matrices(self, raw_sources: pd.Series, raw_targets: pd.Series) -> Tuple[csr_matrix, csr_matrix]:
@@ -143,12 +148,17 @@ class VSMTrainer(AbstractTrainer):
         :param dataset: The dataset to use for sources and targets
         :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
         """
-        source_target_pairs = dataset.get_source_target_pairs()
-        sources = [dataset.artifact_df.get_artifact(s_id) for s_id, _ in source_target_pairs]
-        targets = [dataset.artifact_df.get_artifact(t_id) for _, t_id in source_target_pairs]
-        raw_sources = pd.Series([source[ArtifactKeys.CONTENT] for source in sources])
-        raw_targets = pd.Series([target[ArtifactKeys.CONTENT] for target in targets])
-        return raw_sources, raw_targets, source_target_pairs
+        parent_ids, child_ids = extract_prompt_artifacts(dataset.artifact_df)
+        parent_artifacts = [dataset.artifact_df.get_artifact(s_id) for s_id in parent_ids]
+        child_artifacts = [dataset.artifact_df.get_artifact(t_id) for t_id in child_ids]
+        parent_child_pairs = []
+        for parent_id in parent_ids:
+            for child_id in child_ids:
+                parent_child_pairs.append((parent_id, child_id))
+
+        parent_bodies = pd.Series([artifact[ArtifactKeys.CONTENT] for artifact in parent_artifacts])
+        child_bodies = pd.Series([artifact[ArtifactKeys.CONTENT] for artifact in child_artifacts])
+        return parent_bodies, child_bodies, parent_child_pairs
 
     @staticmethod
     def eval(trace_df: TraceDataFrame, predictions: List[float], link_ids: List[int], metrics: List[str]) -> Metrics:

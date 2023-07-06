@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_BUFFER
+from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker

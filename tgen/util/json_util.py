@@ -149,5 +149,6 @@ class JsonUtil:
         """
         entry = {}
         for param in params:
-            entry[param] = source[param]
+            if param in source:
+                entry[param] = source[param]
         return entry

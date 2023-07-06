@@ -55,6 +55,7 @@ class TracingJob(LLMJob):
             target_entries = parent2entries[parent_id]
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_sources, target_entries)
             predicted_entries.extend(target_predicted_entries)
+        predicted_entries = RankingUtil.select_predictions(predicted_entries)
         RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)

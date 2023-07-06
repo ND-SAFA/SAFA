@@ -119,3 +119,32 @@ class RankingUtil:
             metrics = metrics_manager.eval(metric_names)
             logger.log_with_title("Ranking Metrics", json.dumps(metrics))
             return metrics
+
+    @staticmethod
+    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = 0.95,
+                           min_threshold: float = 0.75) -> List[TracePredictionEntry]:
+        """
+        Selects the top parents per child.
+        :param trace_predictions: The trace predictions.
+        :param parent_threshold: The minimum percentile for a child to be linked to a parent.
+        :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
+        :return: List of selected predictions.
+        """
+        children2entry = {}
+        for entry in trace_predictions:
+            child_id = entry["source"]
+            if child_id not in children2entry:
+                children2entry[child_id] = []
+            children2entry[child_id].append(entry)
+
+        predictions = []
+
+        for child, trace_predictions in children2entry.items():
+
+            sorted_entries = sorted(trace_predictions, key=lambda e: e["score"], reverse=True)
+            selected_entries = [s for s in sorted_entries if s["score"] >= parent_threshold]
+            top_parent = sorted_entries[0]
+            if len(selected_entries) == 0 and top_parent["score"] >= min_threshold:
+                selected_entries.append(top_parent)
+            predictions.extend(selected_entries)
+        return predictions

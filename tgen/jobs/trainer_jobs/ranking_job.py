@@ -17,7 +17,7 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL,
-                 sorter: str = "vsm"):
+                 sorter: str = "vsm", select_top_predictions: bool = True):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param trainer_dataset_manager: The manager of the dataset.
@@ -28,6 +28,7 @@ class RankingJob(AbstractJob):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.dataset_role = dataset_role
         self.sorter = sorter
+        self.select_top_predictions = select_top_predictions
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -46,7 +47,8 @@ class RankingJob(AbstractJob):
         parent2children = {p_id: children_ids for p_id in parent_ids}
 
         predicted_entries = self.get_ranking_entries(parent_ids, parent2children, artifact_map)
-
+        if self.select_top_predictions:
+            predicted_entries = RankingUtil.select_predictions(predicted_entries)
         RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)

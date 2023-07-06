@@ -5,22 +5,14 @@ from typing import Dict, List, Optional
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.llm_responses import GenerationResponse
 
-DEFAULT_REASONING_GOAL = " # Task\n\n" \
-                         "For each artifact, reason whether the artifact is related to the source below and why." \
-                         "\n\nSource:"
-DEFAULT_REASONING_INSTRUCTIONS = "# Instructions\n\nFor each artifact provide whether you think its related to the source and why. " \
-                                 "Enclose your answer in <relation>ID - Reason</relation>"
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
-                       "You are a software engineer on a software system. You are tasked with linking all related documentation. " \
+                       "You are a software engineer on a software system. " \
                        "Below is a source query followed by the software artifacts in the system." \
-                       "Find and rank all related artifacts from most to least related to the source.\n\nSource: "
+                       "Find and rank artifacts from most to least related to the operation of the source's functionality." \
+                       "\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "\nA. Provide a detailed summary of the system's core purpose. " \
-                               "Enclose your answer within <summary></summary>." \
-                               "B. Select the artifacts related to the functionality of the source. " \
-                               "Provide your answer as a list of artifact ids enclosed in <related></related>." \
-                               "\nC. Then, rank the selected artifacts from most to least related" \
-                               " to the source's functionality within the context of the system. " \
+                               "Rank the artifacts from most to least related" \
+                               " to the operation of the source's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related the functionality of the source " \
                                "while the last element is the least related. " \
@@ -43,8 +35,6 @@ class RankingStore:
     sorter: str = None  # The name of the sorter to use
 
     # Reasoning
-    reasoning_goal: str = DEFAULT_REASONING_GOAL  # The prompt used to rank artifacts.
-    reasoning_instructions: str = DEFAULT_REASONING_INSTRUCTIONS
     reasoning_prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
     reasoning_responses: Optional[GenerationResponse] = field(default=None, repr=False)
 

@@ -1,33 +1,32 @@
 from typing import Dict, List, Union
 
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.pipeline.sort_step import registered_sorters
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.data_structure_util import DataStructureUtil
 from tgen.util.ranking_util import RankingUtil
 
 
-class RankingJob(LLMJob):
+class RankingJob(AbstractJob):
     """
     Uses large claude to rank all source artifacts.
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL,
-                 sorter: str = "vsm"):
+    def __init__(self, dataset_creator: AbstractDatasetCreator, sorter: str = "vsm", select_top_predictions: bool = True):
         """
         Uses dataset defined by role to sort and rank with big claude.
-        :param trainer_dataset_manager: The manager of the dataset.
-        :param dataset_role: The role to evaluate on.
+        :param dataset_creator: Creates the dataset to rank.
         :param sorter: The sorting function to feed big claude with.
         """
-        super().__init__(trainer_dataset_manager, task=TrainerTask.PREDICT)
-        self.dataset_role = dataset_role
+        super().__init__()
+        self.dataset_creator = dataset_creator
         self.sorter = sorter
+        self.select_top_predictions = select_top_predictions
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -35,7 +34,9 @@ class RankingJob(LLMJob):
         :param kwargs: Additional keyword arguments.
         :return:
         """
-        dataset: TraceDataset = self.trainer_dataset_manager[self.dataset_role]
+        dataset_role = DatasetRole.EVAL
+        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
+        dataset: TraceDataset = trainer_dataset_manager[dataset_role]
         artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
 
         # TODO: Deal with multi-layer
@@ -46,7 +47,8 @@ class RankingJob(LLMJob):
         parent2children = {p_id: children_ids for p_id in parent_ids}
 
         predicted_entries = self.get_ranking_entries(parent_ids, parent2children, artifact_map)
-
+        if self.select_top_predictions:
+            predicted_entries = RankingUtil.select_predictions(predicted_entries)
         RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)
@@ -67,4 +69,5 @@ class RankingJob(LLMJob):
         for parent_id, ranked_children in parent2rankings.items():
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
             predicted_entries.extend(target_predicted_entries)
+
         return predicted_entries

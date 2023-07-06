@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List
 
+from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
@@ -106,7 +107,8 @@ class RankingUtil:
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
             all_link_ids = list(dataset.trace_df.index)
-            link_ids = [TraceDataFrame.generate_link_id(entry["source"], entry["target"]) for entry in ranking_entries]
+            link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for entry in
+                        ranking_entries]
             missing_ids = list(set(all_link_ids).difference(set(link_ids)))
             ordered_link_ids = link_ids + missing_ids
 
@@ -119,3 +121,41 @@ class RankingUtil:
             metrics = metrics_manager.eval(metric_names)
             logger.log_with_title("Ranking Metrics", json.dumps(metrics))
             return metrics
+
+    @staticmethod
+    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
+                           min_threshold: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD) -> List[TracePredictionEntry]:
+        """
+        Selects the top parents per child.
+        :param trace_predictions: The trace predictions.
+        :param parent_threshold: The minimum percentile for a child to be linked to a parent.
+        :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
+        :return: List of selected predictions.
+        """
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, "source")
+        predictions = []
+
+        for child, trace_predictions in children2entry.items():
+
+            sorted_entries = sorted(trace_predictions, key=lambda e: e["score"], reverse=True)
+            selected_entries = [s for s in sorted_entries if s["score"] >= parent_threshold]
+            top_parent = sorted_entries[0]
+            if len(selected_entries) == 0 and top_parent["score"] >= min_threshold:
+                selected_entries.append(top_parent)
+            predictions.extend(selected_entries)
+        return predictions
+
+    @staticmethod
+    def group_trace_predictions(predictions: List[TracePredictionEntry], key_id: str):
+        """
+        Groups the predictions by the property given.
+        :param predictions: The predictions to group.
+        :return: Dictionary of keys in key_id and their associated entries.
+        """
+        children2entry = {}
+        for entry in predictions:
+            child_id = entry[key_id]
+            if child_id not in children2entry:
+                children2entry[child_id] = []
+            children2entry[child_id].append(entry)
+        return children2entry

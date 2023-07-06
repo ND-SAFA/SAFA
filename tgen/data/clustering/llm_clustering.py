@@ -1,8 +1,5 @@
 from copy import deepcopy
-from typing import List, Tuple, Optional, Union, Dict
-
-import bs4
-from bs4.element import Tag
+from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER
@@ -169,7 +166,7 @@ class LLMClustering(iClustering):
         :param artifact_ids: The ids of all artifacts
         :return: Mapping of cluster name to the list of artifacts in the cluster
         """
-        groups = LLMResponseUtil.parse(res, LLMClustering.CLUSTER_TAG, many=True)
+        groups = LLMResponseUtil.parse(res, LLMClustering.CLUSTER_TAG, is_nested=True)
         clusters = {}
         for group in groups:
             name, artifacts = LLMClustering._get_cluster_name_and_artifacts(group, artifact_ids)

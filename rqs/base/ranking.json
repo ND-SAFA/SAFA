@@ -4,13 +4,11 @@
       "jobs": [
         {
           "object_type": "RANKING",
-          "trainer_dataset_manager": {
-            "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/my_mip/task1/task1_answer"
-              }
+          "dataset_creator": {
+            "object_type": "TRACE",
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "~/desktop/safa/datasets/my_mip/task1/task1_answer"
             }
           }
         }

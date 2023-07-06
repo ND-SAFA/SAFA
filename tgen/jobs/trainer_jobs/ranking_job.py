@@ -1,6 +1,7 @@
 from typing import Dict, List, Union
 
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -17,16 +18,21 @@ class RankingJob(AbstractJob):
     Uses large claude to rank all source artifacts.
     """
 
-    def __init__(self, dataset_creator: AbstractDatasetCreator, sorter: str = "vsm", select_top_predictions: bool = True):
+    def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
+                 sorter: str = "vsm", select_top_predictions: bool = True, ranking_args: Dict = None):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
+        :param artifact_df: DataFrame containing sources and targets.
         :param sorter: The sorting function to feed big claude with.
         """
+        assert dataset_creator is None or artifact_df is None, "Cannot define both dataset creator and artifact df."
         super().__init__()
         self.dataset_creator = dataset_creator
+        self.artifact_df = artifact_df
         self.sorter = sorter
         self.select_top_predictions = select_top_predictions
+        self.ranking_args = ranking_args if ranking_args else {}
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -34,26 +40,34 @@ class RankingJob(AbstractJob):
         :param kwargs: Additional keyword arguments.
         :return:
         """
-        dataset_role = DatasetRole.EVAL
-        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
-        dataset: TraceDataset = trainer_dataset_manager[dataset_role]
-        artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
+        dataset = None
+        if self.dataset_creator:
+            dataset_role = DatasetRole.EVAL
+            trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
+            dataset: TraceDataset = trainer_dataset_manager[dataset_role]
+            artifact_df = dataset.artifact_df
+        else:
+            artifact_df = self.artifact_df
+        artifact_map = DataStructureUtil.create_artifact_map(artifact_df)
 
         # TODO: Deal with multi-layer
-        parent_type, child_type = dataset.artifact_df.get_parent_child_types()
+        parent_type, child_type = artifact_df.get_parent_child_types()
 
-        parent_ids = list(dataset.artifact_df.get_type(parent_type).index)
-        children_ids = list(dataset.artifact_df.get_type(child_type).index)
+        parent_ids = list(artifact_df.get_type(parent_type).index)
+        children_ids = list(artifact_df.get_type(child_type).index)
         parent2children = {p_id: children_ids for p_id in parent_ids}
 
-        predicted_entries = self.get_ranking_entries(parent_ids, parent2children, artifact_map)
+        predicted_entries = self.creating_ranking_predictions(parent_ids, parent2children, artifact_map)
         if self.select_top_predictions:
-            predicted_entries = RankingUtil.select_predictions(predicted_entries)
-        RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
+            predicted_entries = RankingUtil.select_predictions(predicted_entries, **self.ranking_args)
+
+        if dataset is not None:
+            RankingUtil.calculate_ranking_metrics(dataset, predicted_entries)
 
         return TracePredictionOutput(prediction_entries=predicted_entries)
 
-    def get_ranking_entries(self, parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str]) -> List[
+    def creating_ranking_predictions(self, parent_ids: List[str], parent2children: Dict[str, List[str]],
+                                     artifact_map: Dict[str, str]) -> List[
         TracePredictionEntry]:
         """
         Performs ranking and parses the responses into children ids.

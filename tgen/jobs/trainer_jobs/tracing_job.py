@@ -54,7 +54,7 @@ class TracingJob(AbstractJob):
         prediction_output: TracePredictionOutput = base_tracing_job.run().body
 
         entries = prediction_output.prediction_entries
-        entries = [entry for entry in entries if entry["score"] >= self.prediction_threshold]
+        entries = [entry for entry in entries if entry[TraceKeys.SCORE.value] >= self.prediction_threshold]
 
         parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
         parent_ids = list(parent2entries.keys())
@@ -83,5 +83,6 @@ class TracingJob(AbstractJob):
         :return: Map of key value to entries after they have been sorted.
         """
         id2entries: Dict[str, List[Dict]] = RankingUtil.group_trace_predictions(predictions, artifact_key)
-        id2entries = {t_id: sorted(entries, key=lambda t: t["score"], reverse=True) for t_id, entries in id2entries.items()}
+        id2entries = {t_id: sorted(entries, key=lambda t: t[TraceKeys.SCORE.value], reverse=True) for t_id, entries in
+                      id2entries.items()}
         return id2entries

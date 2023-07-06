@@ -6,11 +6,12 @@ import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
 from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
-from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.models.single_layer.single_layer_model import SingleLayerModel, predict, train
@@ -111,7 +112,7 @@ class EnsembleExperiment(Experiment):
             job_output = JsonUtil.read_json_file(job_output_path)
             prediction_output = job_output["prediction_output"] if "prediction_output" in job_output else job_output
             job_entries.append(prediction_output["prediction_entries"])
-        job_predictions = [[entry["score"] for entry in job_entries] for job_entries in job_entries]
+        job_predictions = [[entry[TraceKeys.SCORE.value] for entry in job_entries] for job_entries in job_entries]
         return EnsembleExperiment.scale_predictions(job_predictions)
 
     @staticmethod

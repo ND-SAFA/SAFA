@@ -8,7 +8,7 @@ from tgen.ranking.pipeline.ipipeline import iPipeline
 from tgen.util.llm_response_util import LLMResponseUtil
 
 RESPONSE_PROCESSING_STEPS = [
-    lambda r: LLMResponseUtil.parse(r, "links"),
+    lambda r: LLMResponseUtil.parse(r, "links")[0],
     lambda s: s.replace("ID:", ""),
     lambda s: s.split(",")
 ]

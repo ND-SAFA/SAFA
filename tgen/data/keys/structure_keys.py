@@ -10,6 +10,7 @@ class StructuredKeys:
     class Trace(Enum):
         LINK_ID = "link_id"
         SOURCE = "source"
+        SCORE = "score"
         TARGET = "target"
         LABEL = "label"
 

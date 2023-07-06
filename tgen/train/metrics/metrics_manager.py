@@ -5,7 +5,7 @@ import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
 from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
@@ -78,8 +78,8 @@ class MetricsManager:
         for score, label, source_target_pair in zip(self.trace_matrix.scores, self.trace_matrix.labels, self.trace_matrix.entries):
             entry: TracePredictionEntry = {
                 **source_target_pair,
-                "score": score,
-                "label": label
+                TraceKeys.SCORE.value: score,
+                TraceKeys.LABEL.value: label
             }
             entries.append(entry)
         return entries

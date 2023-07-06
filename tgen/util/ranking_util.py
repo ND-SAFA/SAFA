@@ -20,13 +20,14 @@ class RankingUtil:
 
     @staticmethod
     def rank_children(parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str],
-                      sorter: GenericSorter = None) -> Dict[str, List[str]]:
+                      sorter: GenericSorter = None, max_children: int = 30) -> Dict[str, List[str]]:
         """
         Ranks children for each parent id.
         :param parent_ids: The parent artifact ids.
         :param parent2children: Map of parent to relevant children.
         :param artifact_map: Map of artifact id to body.
         :param sorter: Sorting function to prepare children with.
+        :param max_children: The maximum number of children to rank
         :return: Map of parent to ranked children.
         """
         if sorter:
@@ -34,7 +35,7 @@ class RankingUtil:
             for parent_id in parent_ids:
                 children_ids = parent2children[parent_id]
                 parent_map = sorter([parent_id], children_ids, artifact_map)
-                sorted_children_ids = parent_map[parent_id]
+                sorted_children_ids = parent_map[parent_id][:max_children]
                 parent2children_sorted[parent_id] = sorted_children_ids
             parent2children = parent2children_sorted
 
@@ -104,6 +105,8 @@ class RankingUtil:
         :param ranking_entries: The ranking predictions.
         :return:
         """
+        if dataset.trace_df is None:
+            return
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
             all_link_ids = list(dataset.trace_df.index)
@@ -132,15 +135,15 @@ class RankingUtil:
         :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
         :return: List of selected predictions.
         """
-        children2entry = RankingUtil.group_trace_predictions(trace_predictions, "source")
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
         predictions = []
 
         for child, trace_predictions in children2entry.items():
 
-            sorted_entries = sorted(trace_predictions, key=lambda e: e["score"], reverse=True)
-            selected_entries = [s for s in sorted_entries if s["score"] >= parent_threshold]
+            sorted_entries = sorted(trace_predictions, key=lambda e: e[TraceKeys.SCORE.value], reverse=True)
+            selected_entries = [s for s in sorted_entries if s[TraceKeys.SCORE.value] >= parent_threshold]
             top_parent = sorted_entries[0]
-            if len(selected_entries) == 0 and top_parent["score"] >= min_threshold:
+            if len(selected_entries) == 0 and top_parent[TraceKeys.SCORE.value] >= min_threshold:
                 selected_entries.append(top_parent)
             predictions.extend(selected_entries)
         return predictions

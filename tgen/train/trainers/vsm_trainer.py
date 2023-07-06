@@ -13,6 +13,11 @@ from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
+from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
+from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -34,18 +39,21 @@ class VSMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, vectorizer: CountVectorizer = TfidfVectorizer,
-                 metrics: List[str] = None):
+                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None):
         """
         Initializes trainer with the datasets used for training + eval
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
         :param vectorizer: vectorizer for assigning weights to words, must be one of sklearn.text.extraction
         :param metrics: A list of metric names to use for evaluation
         """
+        if steps is None:
+            steps = [RemoveNonAlphaCharsStep(), SeparateCamelCaseStep(), LemmatizeWordStep()]
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics
+        self.data_pipeline = DataCleaner(steps=steps)
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
@@ -127,6 +135,8 @@ class VSMTrainer(AbstractTrainer):
         :param raw_targets : The target documents whose matrix is the second element
         :return: CountMatrix for raw_sources and raw_targets, and also the trained model
         """
+        raw_sources = self.data_pipeline.run(list(raw_sources))
+        raw_targets = self.data_pipeline.run(list(raw_targets))
         set_source: csr_matrix = self.model.transform(raw_sources)
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target

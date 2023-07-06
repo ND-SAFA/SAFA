@@ -1,16 +1,12 @@
 import json
-from typing import List, Union, Any
+from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, \
-    SCORE_LABEL, \
-    SOURCE_COMPONENT_LABEL, \
-    TARGET_COMPONENT_LABEL, \
-    UNRELATED_LABEL
+from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -21,7 +17,6 @@ from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.util.dict_util import DictUtil
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.state.state.llm_trainer_state import LLMTrainerState
@@ -139,28 +134,24 @@ class LLMTrainer(AbstractTrainer):
             r = classification_item.text
             entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
             entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
-            entry[CONFIDENCE_LABEL] = LLMResponseUtil.strip_non_digits_and_periods(entry[CONFIDENCE_LABEL].lower())
-            entry[CONFIDENCE_LABEL] = float(entry[CONFIDENCE_LABEL])
 
             score = self.extract_score(entry)
             trace_row = trace_df.iloc[i]
-            label = trace_row["label"]
+            label = trace_row[TraceKeys.LABEL.value]
             predicted_label = 1 if score >= 0.5 else 0
             correct_label = "correct" if label == predicted_label else "wrong"
 
-            entry["score"] = score
-            entry["source"] = trace_row["source"]
-            entry["target"] = trace_row["target"]
-            entry["label"] = trace_row["label"]
+            entry[TraceKeys.SCORE.value] = score
+            entry[TraceKeys.SOURCE.value] = trace_row[TraceKeys.SOURCE.value]
+            entry[TraceKeys.TARGET.value] = trace_row[TraceKeys.TARGET.value]
+            entry[TraceKeys.LABEL.value] = trace_row[TraceKeys.LABEL.value]
 
             self.update_classification_metrics(class2correct, correct_label, entry, label)
-            entry = DictUtil.order(entry, DISPLAY_LABELS)
             scores.append(score)
             classifications.append(entry["classification"])
             prediction_entries.append(entry)
 
-        random.shuffle(prediction_entries)
-        prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
+        prediction_entries = sorted(prediction_entries, key=lambda p: p[TraceKeys.SCORE.value], reverse=True)
         output = TracePredictionOutput(prediction_entries=prediction_entries)
         if trace_dataset is not None and len(trace_dataset.trace_df[TraceKeys.LABEL].unique()) == 2:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,

@@ -3,6 +3,7 @@ from typing import Callable, Dict, List
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.fake_project_reader import FakeProjectReader
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
@@ -44,7 +45,7 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
         target = entry[child_tag_name]
         if source not in unsorted_targets:
             unsorted_targets[source] = {}
-        unsorted_targets[source][target] = entry["score"]
+        unsorted_targets[source][target] = entry[TraceKeys.SCORE.value]
     sorted_targets = {source: sorted(targets2score, key=targets2score.get, reverse=True) for source, targets2score in
                       unsorted_targets.items()}
     return sorted_targets

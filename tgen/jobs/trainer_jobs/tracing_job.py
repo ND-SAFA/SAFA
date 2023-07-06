@@ -1,11 +1,13 @@
 from typing import Dict, List, Union
 
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -20,20 +22,23 @@ class TracingJob(AbstractJob):
     Performs filtering with little claude before ranking with big claude.
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, dataset_role: DatasetRole = DatasetRole.EVAL,
-                 select_top_predictions: bool = True):
+    def __init__(self, dataset_creator: AbstractDatasetCreator, select_top_predictions: bool = True,
+                 filter_llm_manager: AbstractLLMManager = None, prediction_threshold: float = 0.5):
         """
         Constructs job for dataset at given role.
-        :param trainer_dataset_manager: The manager containing all datasets.
-        :param dataset_role: The role to predict links for.
+        :param dataset_creator: Creates the dataset to evaluate.
+        :param select_top_predictions: If true, selects the top predictions. Otherwise, all predictions are returned.
+        :param filter_llm_manager: The llm manager to classify trace links into buckets.
+        :param prediction_threshold: The threshold (in percentile) to apply to consider a prediction as positive.
         """
+        if filter_llm_manager is None:
+            llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
+            filter_llm_manager = AnthropicManager(llm_args=llm_args)
         super().__init__()
-        self.trainer_dataset_manager = trainer_dataset_manager
-        self.dataset_role = dataset_role
-        self.llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
-        self.llm_manager = AnthropicManager(llm_args=self.llm_args)
-        self.dataset_role = dataset_role
+        self.dataset_creator = dataset_creator
+        self.filter_llm_manager = filter_llm_manager
         self.select_top_predictions = select_top_predictions
+        self.prediction_threshold = prediction_threshold
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -41,15 +46,15 @@ class TracingJob(AbstractJob):
         :param kwargs: Any keyword arguments.
         :return: The trace output.
         """
-        THRESHOLD = 0.5
-        dataset: TraceDataset = self.trainer_dataset_manager[self.dataset_role]
+        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
+        dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
         artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
 
-        base_tracing_job = LLMJob(self.trainer_dataset_manager, task=TrainerTask.PREDICT, llm_manager=self.llm_manager)
+        base_tracing_job = LLMJob(trainer_dataset_manager, task=TrainerTask.PREDICT, llm_manager=self.filter_llm_manager)
         prediction_output: TracePredictionOutput = base_tracing_job.run().body
 
         entries = prediction_output.prediction_entries
-        entries = [entry for entry in entries if entry["score"] >= THRESHOLD]
+        entries = [entry for entry in entries if entry["score"] >= self.prediction_threshold]
 
         parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
         parent_ids = list(parent2entries.keys())
@@ -57,7 +62,6 @@ class TracingJob(AbstractJob):
                                                  parent2entries.items()}
 
         parent2rankings = RankingUtil.rank_children(parent_ids, parent2children, artifact_map)
-
         predicted_entries = []
 
         for parent_id, ranked_sources in parent2rankings.items():

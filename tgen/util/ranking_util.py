@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List
 
+from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
@@ -122,8 +123,8 @@ class RankingUtil:
             return metrics
 
     @staticmethod
-    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = 0.90,
-                           min_threshold: float = 0.75) -> List[TracePredictionEntry]:
+    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
+                           min_threshold: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.

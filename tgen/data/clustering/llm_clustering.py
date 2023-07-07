@@ -1,10 +1,7 @@
 from copy import deepcopy
-from typing import List, Tuple, Optional, Union, Dict
+from typing import Dict, List, Optional, Tuple, Union
 
-import bs4
-from bs4.element import Tag
-
-from tgen.constants.deliminator_constants import NEW_LINE, COMMA, EMPTY_STRING
+from tgen.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER
 from tgen.data.clustering.iclustering import Clusters, iClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -16,7 +13,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.token_limits import TokenLimitCalculator, ModelTokenLimits
+from tgen.models.llm.token_limits import ModelTokenLimits, TokenLimitCalculator
 from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.llm_response_util import LLMResponseUtil

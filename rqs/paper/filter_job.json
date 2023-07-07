@@ -1,0 +1,58 @@
+{
+  "output_dir": "~/desktop/safa/experiments/paper/test/cchit/filter",
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PAPER",
+          "task": "PREDICT",
+          "trace_link_filter": {
+            "rq_path": "~/desktop/safa/experiments/paper/test/cchit/original/experiment_0/step_0/43e5f362-e18c-42e1-8832-adacc5f743d8",
+            "comparison_function": "MIN"
+          },
+          "llm_manager": {
+            "object_type": "ANTHROPIC",
+            "llm_args": {
+              "model": "claude-v1.3",
+              "metrics": [
+                "classification",
+                "confusion_matrix",
+                "specificity",
+                "accuracy"
+              ]
+            }
+          },
+          "trainer_dataset_manager": {
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "allowed_orphans": -1,
+              "allowed_missing_sources": -1,
+              "allowed_missing_targets": -1,
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/paper/cchit/test"
+              },
+              "data_cleaner": {
+                "steps": [
+                  {
+                    "object_type": "REMOVE_UNWANTED_CHARS",
+                    "additional_unwanted_chars": {
+                      "{": "{{",
+                      "}": "}}"
+                    }
+                  },
+                  {
+                    "object_type": "REPLACE_WORDS",
+                    "word_replace_mappings": {
+                      "_VehicleCore_": "VehicleCore"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

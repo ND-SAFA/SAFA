@@ -6,12 +6,14 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 
 INSTRUCTION_CREATION_PROMPT = Prompt("Break the process of reverse engineering {target_type} from {source_type} into steps. "
-                                     "The steps should be generalized so that they would work on any software project. "
-                                     "Each step should include instructions on how to perform the step,"
-                                     " a description of the expected deliverable, and a one word unique name for the step. "
+                                     "The steps should be generalized so that they would work on any software project, "
+                                     "and the focus should be on extracting information specific to the system. "
+                                     "Each step should include instructions on how to perform the step, "
+                                     "a description of the expected deliverable, and a one word unique name for the step. "
                                      "The deliverable descriptions should indicate the type of information "
                                      "that would satisfy the step, rather than providing a specific example. "
-                                     "The final step should be the {target_type} creation. ",
+                                     "The final step should be the {target_type} creation "
+                                     "and include in the instructions how to proper format the {target_type}s. ",
                                      PromptResponseManager(response_tag={"step":
                                                                              ["name",
                                                                               "instructions",

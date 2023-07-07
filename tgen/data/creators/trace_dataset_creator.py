@@ -1,10 +1,10 @@
 from collections import Counter
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
 from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
+    NO_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
 from tgen.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -42,8 +42,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.allowed_missing_sources = allowed_missing_sources
         self.allowed_missing_targets = allowed_missing_targets
         self.allowed_orphans = allowed_orphans
-        self.artifact_df = None
-        self.trace_df = None
+        self.artifact_df: Optional[ArtifactDataFrame] = None
+        self.trace_df: Optional[TraceDataFrame] = None
         self.layer_mapping_df = None
         self.project_reader = project_reader
         self.remove_orphans = remove_orphans
@@ -125,7 +125,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        if len(self.trace_df[self.trace_df[TraceKeys.LABEL] == 0]) < 1:
+        if self.trace_df.get_label_count(0) < 1:
             self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
         trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)
@@ -149,7 +149,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Verifies that orphans lie below a certain threshold.
         :return: None
         """
-        if self.allowed_orphans == NO_ORPHAN_CHECK_VALUE:
+        if self.allowed_orphans == NO_CHECK_VALUE:
             return
         error_msg = f"Found too many orphan artifacts"
         default_msg = f"Number of orphan artifacts"
@@ -181,8 +181,11 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         for _, row in layer_mapping_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            source_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == source_type].index
-            target_artifact_ids = artifact_df[artifact_df[ArtifactKeys.LAYER_ID] == target_type].index
+
+            source_artifact_ids = artifact_df.get_type(source_type).index
+            target_artifact_ids = artifact_df.get_type(target_type).index
+            assert len(source_artifact_ids) > 0, f"Expected at least one source artifact of type {source_type}"
+            assert len(target_artifact_ids) > 0, f"Expected at least one target artifact of type {target_type}"
 
             def create_target_links(artifact_id) -> None:
                 """
@@ -243,6 +246,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param label: The label to group error with, if it exists.
         :return: None
         """
+        if max_missing_allowed == NO_CHECK_VALUE:
+            return
         error_msg = f"Found too many null references to {label} artifacts ({len(missing_artifact_ids)})"
         default_msg = f"No missing {label} artifacts."
         TraceDatasetCreator.assert_artifact_less_than(missing_artifact_ids, max_missing_allowed, error_msg, default_msg)
@@ -288,7 +293,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param trace_dataset: The trace dataset containing links.
         :return: None
         """
-        n_positive = len(trace_dataset.pos_link_ids)
+
         n_total = len(trace_dataset)
-        n_negative = n_total - n_positive
+        n_positive = trace_dataset.trace_df.get_label_count(1)
+        n_negative = trace_dataset.trace_df.get_label_count(0)
         logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")

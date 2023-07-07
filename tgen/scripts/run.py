@@ -18,6 +18,4 @@ if __name__ == "__main__":
     file_path = os.path.join(RQ_PATH, file_name)
     script_runner = ScriptRunner(file_path)
     script_runner.run()
-    script_runner.print_results()
-    script_runner.upload_results()
     sys.exit()

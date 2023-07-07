@@ -3,13 +3,14 @@ import re
 import string
 import uuid
 from datetime import datetime
-from typing import Any, List, Union, Type, Dict, Tuple
+from typing import Any, Dict, List, Tuple, Type, Union
 
 import bs4
 from yaml.constructor import SafeConstructor
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
+from tgen.constants.prediction_constants import HGEN_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -32,8 +33,10 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.jobs.trainer_jobs.ranking_job import RankingJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
@@ -72,7 +75,6 @@ class HierarchyGenerator(BaseObject):
         refined_content = self._refine_generations(artifact_generation_content, source_layer_only_dataset)
 
         return self._create_trace_dataset_with_generated_artifacts(refined_content,
-                                                                   source_layer_only_dataset,
                                                                    original_dataset_complete,
                                                                    export_path=export_path)
 
@@ -93,6 +95,7 @@ class HierarchyGenerator(BaseObject):
             SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
             questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
         else:
+            logger.info("Creating questionnaire prompt for generation\n")
             prompt_builder = PromptBuilder(prompts=[instructions_prompt])
             prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
             questionnaire_content = self._get_predictions(prompt_builder, PromptDataset(),
@@ -138,7 +141,8 @@ class HierarchyGenerator(BaseObject):
         :param source_layer_only_dataset: The dataset containing only the source layer
         :return: The generated artifact content
         """
-        prompt_builder = self._get_prompt_builder_for_generation(questionnaire)
+        logger.info(f"Generating {self.args.target_type}s\n")
+        prompt_builder = self._get_prompt_builder_for_generation(questionnaire, include_summary=True)
         generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
         generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
                                                        response_prompt_id=questionnaire.id,
@@ -154,6 +158,7 @@ class HierarchyGenerator(BaseObject):
         :param source_layer_only_dataset: The dataset containing only the source layer
         :return: A list of refined artifact content
         """
+        logger.info(f"Refining {len(generated_artifact_content)} {self.args.target_type}s\n")
         questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
         prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
                                                                  SupportedPrompts.HGEN_REFINE_PROMPT)
@@ -171,13 +176,11 @@ class HierarchyGenerator(BaseObject):
         return refined_artifact_content[0]
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
-                                                       source_layer_only_dataset: PromptDataset,
                                                        original_dataset_complete: Union[PromptDataset, TraceDataset],
                                                        export_path: str) -> TraceDataset:
         """
         Creates a dataset with traces between the original lower-level artifacts and the newly generated upper-level artifacts
         :param artifact_generations: A list of generated artifact content
-        :param source_layer_only_dataset: The dataset containing only the source layer 
         :param original_dataset_complete: The original dataset used for trace generation
         :param export_path: The path to export the dataset to
         :return: The dataset using the new generated artifacts
@@ -197,17 +200,17 @@ class HierarchyGenerator(BaseObject):
         self.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
 
         new_layer_df = self._create_layer_df_with_generated_artifacts(target_layer_id)
-        new_trace_df = self._create_trace_df_with_generated_artifacts(new_artifact_df, source_layer_only_dataset)
+        combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
+        new_trace_df = self._create_trace_df_with_generated_artifacts(combined_artifact_df)
         self.save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
                                      export_path, filename="generated_dataset_checkpoint")
 
-        final_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
         new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
-                                                                   artifact_df=final_artifact_df, trace_df=new_trace_df)
+                                                                   artifact_df=combined_artifact_df, trace_df=new_trace_df)
         final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
         final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
-        dataset = TraceDataset(final_artifact_df, final_trace_df, final_layer_df)
+        dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
 
         save_path = self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
         self.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
@@ -225,6 +228,7 @@ class HierarchyGenerator(BaseObject):
                                              ArtifactKeys.CONTENT: artifact_generations,
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
         try:
+            logger.info(f"Creating names for {len(new_artifact_df)} {self.args.target_type}\n")
             name_prompt = Prompt(f"Create a name for this {self.args.target_type}.", PromptResponseManager(response_tag="name"))
             artifact_prompt = ArtifactPrompt(include_id=False)
             prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
@@ -237,40 +241,24 @@ class HierarchyGenerator(BaseObject):
             logger.exception("Unable to generate names for the artifacts")
         return new_artifact_df
 
-    def _create_trace_df_with_generated_artifacts(self, generated_artifact_df: ArtifactDataFrame,
-                                                  source_layer_only_dataset: PromptDataset) -> TraceDataFrame:
+    def _create_trace_df_with_generated_artifacts(self, artifact_df: ArtifactDataFrame) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
-        :param generated_artifact_df: The dataframe containing the generated artifacts
         :return: The dataframe containing new and old trace links
         """
-        related_artifact_prompt: Prompt = SupportedPrompts.HGEN_RELATED_ARTIFACT.value
-        source_artifact_prompt = ArtifactPrompt(f"{self.args.source_type.upper()}:", include_id=False)
-        target_artifacts_prompt = MultiArtifactPrompt(f"{self.args.target_type.upper()}S:", include_ids=False,
-                                                      build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                                      data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-        generated_artifacts = [generated_artifact_df.get_artifact(a_id) for a_id in generated_artifact_df.index]
-        target_artifacts_prompt_content = target_artifacts_prompt.build(artifacts=generated_artifacts)
-        target_artifacts_prompt = Prompt(target_artifacts_prompt_content)
-        prompt_builder = PromptBuilder([related_artifact_prompt,
-                                        source_artifact_prompt, target_artifacts_prompt])
-        prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
-        # artifact_numbers = self._get_predictions(prompt_builder, source_layer_only_dataset,
-        #                                          response_prompt_id=related_artifact_prompt.id,
-        #                                          tag_for_response=related_artifact_prompt.response_manager.response_tag,
-        #                                          return_first=True)
-        artifact_numbers = ['3', '3', '3', '3', '3', '3', '7', '7', '1', '5', '7', '5', '2', '1', '2', '2', '2', '7', '1', '7', '1',
-                            '7', '7', '1', '7', '1', '1', '2', '2', '1', '1', '1', '3', '1', '5', '1', '3', '7', '7', '1', '1', '7',
-                            '6', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '5', '5', '2', '5', '5']
-        artifact_numbers = [int(a) for a in artifact_numbers]
+        logger.info(f"Predicting links between {self.args.target_type} and {self.args.source_layer_id}\n")
+        tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD})
+        trace_predictions: List[TracePredictionEntry] = tracing_job.run().body.prediction_entries
         traces = {}
-        for i, row in enumerate(source_layer_only_dataset.artifact_df.itertuples()):
-            id_, artifact = row
-            if 0 < artifact_numbers[i] <= len(generated_artifacts):
-                linked_artifact = generated_artifacts[artifact_numbers[i] - 1]
-                link = EnumDict({TraceKeys.SOURCE: id_, TraceKeys.TARGET: linked_artifact[ArtifactKeys.ID], TraceKeys.LABEL: 1})
-                traces = DataFrameUtil.append(traces, link)
+        for entry in trace_predictions:
+            link = EnumDict({
+                **entry,
+                TraceKeys.SOURCE: entry[TraceKeys.SOURCE.value],
+                TraceKeys.TARGET: entry[TraceKeys.TARGET.value],
+                TraceKeys.LABEL: 1
+            })
+            DataFrameUtil.append(traces, link)
         return TraceDataFrame(traces)
 
     def _create_layer_df_with_generated_artifacts(self, target_layer_id: str) -> LayerDataFrame:

@@ -19,7 +19,8 @@ class XmlEntityFormat(AbstractEntityFormat):
         :param summarizer: If provided, will summarize the artifact content
         :return: DataFrame of parsed entities.
         """
-        return pd.read_xml(data_path, **params)
+        xml_df = pd.read_xml(data_path, **params)
+        return xml_df
 
     @staticmethod
     def get_file_extensions() -> List[str]:

@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -29,7 +29,7 @@ class ApiExporter(AbstractDatasetExporter):
         :return: The ApiDefinition
         """
         dataset = self.get_dataset()
-        self.true_links = dataset.get_source_target_pairs(list(set(dataset.pos_link_ids)))
+        self.true_links = dataset.get_source_target_pairs(dataset.get_pos_link_ids())
         for link_id, link in dataset.trace_df.itertuples():
             self._add_2_layer(link[TraceKeys.SOURCE], self.source_layers)
             self._add_2_layer(link[TraceKeys.TARGET], self.target_layers)

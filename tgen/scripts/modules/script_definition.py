@@ -14,7 +14,7 @@ class ScriptDefinition:
     """
     LOGGING_DIR_PARAM = "logging_dir"
     OUTPUT_DIR_PARAM = "output_dir"
-    ENV_OUTPUT_PARMA = f"[{OUTPUT_PATH_PARAM}]"
+    ENV_OUTPUT_PARAM = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
     def read_experiment_definition(definition_path: str, env_replacements: List[str] = None) -> Dict:
@@ -46,7 +46,12 @@ class ScriptDefinition:
         :param script_name: The name of the script.
         :return: Script definition with output paths modifications.
         """
-        script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARMA, script_name)
+
+        if ScriptDefinition.OUTPUT_DIR_PARAM not in script_definition:
+            script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARAM, script_name)
+        else:
+            script_output_path = script_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
+        script_output_path = os.path.expanduser(script_output_path)
         script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
         script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(

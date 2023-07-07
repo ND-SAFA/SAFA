@@ -1,15 +1,13 @@
 import json
-from typing import List, Union, Any
+from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, JUSTIFICATION, RELATED_LABEL, \
-    SCORE_LABEL, \
-    SOURCE_COMPONENT_LABEL, \
-    TARGET_COMPONENT_LABEL, \
-    UNRELATED_LABEL
+from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -135,43 +133,34 @@ class LLMTrainer(AbstractTrainer):
         class2correct = {}
         for i, classification_item in enumerate(res.batch_responses):
             r = classification_item.text
-            entry = LLMResponseUtil.extract_labels(r, {
-                CLASSIFICATION_LABEL: "classification",
-                JUSTIFICATION: "justification",
-                SOURCE_COMPONENT_LABEL: "source_subsystem",
-                TARGET_COMPONENT_LABEL: "target_subsystem",
-                RELATED_LABEL: "similarity",
-                UNRELATED_LABEL: "difference",
-                SCORE_LABEL: "score"
-            })
-            entry["classification"] = entry["classification"].upper().strip()
-            entry["score"] = LLMResponseUtil.strip_non_digits_and_periods(entry["score"].lower())
+            entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
+            entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
 
             score = self.extract_score(entry)
             trace_row = trace_df.iloc[i]
-            label = trace_row["label"]
+            label = trace_row[TraceKeys.LABEL.value]
             predicted_label = 1 if score >= 0.5 else 0
             correct_label = "correct" if label == predicted_label else "wrong"
 
-            entry["source"] = trace_row["source"]
-            entry["target"] = trace_row["target"]
-            entry["label"] = trace_row["label"]
+            entry[StructuredKeys.SCORE] = score
+            entry[TraceKeys.SOURCE.value] = trace_row[TraceKeys.SOURCE.value]
+            entry[TraceKeys.TARGET.value] = trace_row[TraceKeys.TARGET.value]
+            entry[TraceKeys.LABEL.value] = trace_row[TraceKeys.LABEL.value]
 
             self.update_classification_metrics(class2correct, correct_label, entry, label)
-
             scores.append(score)
             classifications.append(entry["classification"])
             prediction_entries.append(entry)
 
-        prediction_entries = sorted(prediction_entries, key=lambda p: p["score"], reverse=True)
+        prediction_entries = sorted(prediction_entries, key=lambda p: p[TraceKeys.SCORE.value], reverse=True)
         output = TracePredictionOutput(prediction_entries=prediction_entries)
-        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
+        if trace_dataset is not None and len(trace_dataset.trace_df[TraceKeys.LABEL].unique()) == 2:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
-                logger.log_with_title(f"Metrics", repr(output.metrics))
-                logger.info(json.dumps(class2correct, indent=4))
+                logger.log_with_title("Candidate Metrics", repr(output.metrics))
+                logger.log_with_title("Class Counts", json.dumps(class2correct))
             output.label_ids = metrics_manager.trace_matrix.labels
 
         return output
@@ -183,11 +172,19 @@ class LLMTrainer(AbstractTrainer):
         :param entry: Entry containing score or classification, to extract score from.
         :return: The final score as a float.
         """
+        classification = entry["classification"]
+        lower_bound, upper_bound = CLASSIFICATION_SCORES[classification]
+        score_range = upper_bound - lower_bound
         try:
-            score = float(entry["score"])
+            score = float(entry["confidence"])
+            if classification in REVERSE_CATEGORIES:
+                score = upper_bound - (score * score_range)
+            else:
+                score = (score * score_range) + lower_bound
         except:
+            score = lower_bound
             logger.info("Processing link with missing score.")
-            score = CLASSIFICATION_SCORES[entry["classification"]]
+
         return score
 
     @staticmethod
@@ -202,8 +199,8 @@ class LLMTrainer(AbstractTrainer):
         """
         classification = entry["classification"]
         if classification not in class2correct:
-            class2correct[classification] = {c: {"correct": 0, "wrong": 0} for c in [0, 1]}
-        class2correct[classification][label][correct_label] += 1
+            class2correct[classification] = {c: 0 for c in [0, 1]}
+        class2correct[classification][label] += 1
 
     def __getattr__(self, item: str) -> Any:
         """

@@ -6,6 +6,15 @@ class StructuredKeys:
     """
     Keys used in the STRUCTURE project format.
     """
+    ARTIFACTS = "artifacts"
+    TRACES = "traces"
+    PARSER = "parser"
+    COLS = "cols"
+    PATH = "path"
+    CONVERSIONS = "conversions"
+    PARAMS = "params"
+    OVERRIDES = "overrides"
+    SCORE = "score"
 
     class Trace(Enum):
         LINK_ID = "link_id"
@@ -28,12 +37,3 @@ class StructuredKeys:
     class LayerMapping(Enum):
         SOURCE_TYPE = "source_type"
         TARGET_TYPE = "target_type"
-
-    ARTIFACTS = "artifacts"
-    TRACES = "traces"
-    PARSER = "parser"
-    COLS = "cols"
-    PATH = "path"
-    CONVERSIONS = "conversions"
-    PARAMS = "params"
-    OVERRIDES = "overrides"

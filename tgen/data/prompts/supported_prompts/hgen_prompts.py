@@ -1,7 +1,7 @@
 from token import COMMA
 
 from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 
@@ -12,8 +12,8 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Break the process of reverse engineering {
                                      "a description of the expected deliverable, and a one word unique name for the step. "
                                      "The deliverable descriptions should indicate the type of information "
                                      "that would satisfy the step, rather than providing a specific example. "
-                                     "The final step should be the {target_type} creation "
-                                     "and include in the instructions how to proper format the {target_type}s. ",
+                                     "Deliverables should be able to be accomplished with natural langauge alone. "
+                                     "The final step should be the {target_type} creation.",
                                      PromptResponseManager(response_tag={"step":
                                                                              ["name",
                                                                               "instructions",
@@ -27,7 +27,8 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Break the process of reverse engineering {
                                                                                         "a general description "
                                                                                         "of the expected deliverable "
                                                                                         "from the step enclosed in {deliverable},"
-                                                                                        "and the step name enclosed in {name}."))
+                                                                                        "and the step name enclosed in {name}.",
+                                                           required_tag_ids=REQUIRE_ALL_TAGS))
 RELATED_ARTIFACT_PROMPT = Prompt("You are given {target_type} and a list of numbered {source_type} that may be related. "
                                  "Select the {source_type} that would be traced to the {target_type} "
                                  "and output the numbers associated with the linked {source_type} in a comma deliminated list.",
@@ -79,6 +80,7 @@ REFINE_STEP6 = QuestionPrompt("Finally, Using all of the previous steps, review 
                               "Output a final revised set of {target_type}s for this system. "
                               "The final {target_type} should be specific, meaningful, "
                               "and capture all significant functionality in the system. ",
-                              response_manager=PromptResponseManager(response_tag="final-solution"))
+                              response_manager=PromptResponseManager(response_tag="final-solution",
+                                                                     required_tag_ids=REQUIRE_ALL_TAGS))
 REFINE_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[REFINE_STEP1, REFINE_STEP2, REFINE_STEP3,
                                                              REFINE_STEP4, REFINE_STEP5, REFINE_STEP6])

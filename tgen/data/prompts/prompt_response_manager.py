@@ -1,5 +1,6 @@
+import uuid
 from dataclasses import field, dataclass
-from typing import Union, Dict, Any, Callable, Type, List
+from typing import Union, Dict, Any, Callable, Type, List, Set
 
 import bs4
 
@@ -10,6 +11,7 @@ from tgen.util.prompt_util import PromptUtil
 from tgen.util.str_util import StrUtil
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
+REQUIRE_ALL_TAGS = str(uuid.uuid4())
 
 
 @dataclass
@@ -47,7 +49,10 @@ class PromptResponseManager:
     :param default_factory: A method that takes in the tag id and returns a default failure for it if the response parsing fails
     """
     default_factory: Callable = None
-
+    """
+    :param required_tag_ids: A set of the tag ids that will throw an exception if not include
+    """
+    required_tag_ids: Union[Set, str] = field(default_factory=set)
     """
     Create reverse lookup for tags to their ids after init
     """
@@ -78,6 +83,8 @@ class PromptResponseManager:
                 self.id2tag = {tag: tag for tag in all_tags}
             self._tag2id = {tag: id_ for id_, tag in self.id2tag.items()}
             self._all_tag_ids = [self._tag2id[tag] for tag in all_tags]
+        if self.required_tag_ids == REQUIRE_ALL_TAGS:
+            self.required_tag_ids = set(self._all_tag_ids)
 
     def get_all_tag_ids(self) -> List[str]:
         """
@@ -110,14 +117,14 @@ class PromptResponseManager:
         output = {}
         if isinstance(self.response_tag, dict):
             for parent in self.response_tag.keys():
-                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=False)
+                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
                 values = [{self._tag2id.get(c_id, c_id): c_val for c_id, c_val in val.items()} for val in values]
                 output[self._tag2id[parent]] = values
         else:
             tags = [self.response_tag] if not isinstance(self.response_tag, list) else self.response_tag
             for tag in tags:
                 tag_id = self._tag2id[tag]
-                output[tag_id] = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=False)
+                output[tag_id] = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids)
         formatted_output = self._format_response(output)
         return formatted_output
 
@@ -189,4 +196,3 @@ class PromptResponseManager:
         if self.default_factory:
             return self.default_factory(tag_id, val)
         return val
-

@@ -1,9 +1,6 @@
-from copy import deepcopy
 from typing import List
 
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -56,13 +53,10 @@ class MultiLayerHGenJob(AbstractJob):
         :return: The next hgen job
         """
         current_args = current_hgen_job.get_hgen_args()
-        if current_args.clustering_method != SupportedClusteringMethod.LLM:
-            logger.warn(f"{current_args.clustering_method} for higher level artifact generation is not currently supported. Using "
-                        f"{SupportedClusteringMethod.LLM.name} instead")
         new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
+                                                   source_type=current_args.target_type,
                                                    target_type=next_target_type,
-                                                   dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
-                                                   clustering_method=SupportedClusteringMethod.LLM, tgen_trainer=None)
+                                                   dataset_for_sources=PromptDataset(trace_dataset=generated_dataset))
         next_job = BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)
         next_job.result.experimental_vars = {"target_type": next_target_type}
         return next_job

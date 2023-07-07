@@ -2,7 +2,7 @@ from collections import Set
 from dataclasses import dataclass, field
 from typing import Union
 
-from tgen.constants.model_constants import get_default_llm_manager
+from tgen.constants.model_constants import get_efficient_default_llm_manager, get_best_default_llm_manager
 from tgen.data.clustering.iclustering import Clusters
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -31,11 +31,11 @@ class HGenArgs(BaseObject):
     """
     The LLM manager to use to generate the new artifact content
     """
-    hgen_llm_manager: AbstractLLMManager = field(default_factory=get_default_llm_manager)
+    hgen_llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
     """
     The trainer used to generate intra layer trace links between source artifacts
     """
-    tgen_trainer: AbstractTrainer = None
+    tgen_trainer: AbstractTrainer = field(default_factory=get_efficient_default_llm_manager)
     """
     Dataset creator used to make dataset containing source artifacts + links if tgen_trainer is not provide
     """

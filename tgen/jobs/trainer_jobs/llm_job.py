@@ -1,6 +1,6 @@
 from typing import Union
 
-from tgen.constants.model_constants import get_default_llm_manager
+from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.jobs.components.args.job_args import JobArgs
@@ -35,7 +35,7 @@ class LLMJob(AbstractTrainerJob):
         :param completion_type: The type of completion (prediction or generation)
         """
         if llm_manager is None:
-            llm_manager = get_default_llm_manager()
+            llm_manager = get_efficient_default_llm_manager()
         if trainer_args is None:
             trainer_args = llm_manager.llm_args
         super().__init__(model_manager=None, trainer_dataset_manager=trainer_dataset_manager,

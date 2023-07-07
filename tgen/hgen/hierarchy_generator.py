@@ -75,8 +75,8 @@ class HierarchyGenerator(BaseObject):
         export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
         questionnaire = self._construct_questionnaire_for_generation()
-        artifact_generation_content = self._generate_artifact_content(questionnaire, source_layer_only_dataset)
-        refined_content = self._refine_generations(artifact_generation_content, source_layer_only_dataset)
+        artifact_generation_content = self._generate_artifact_content(questionnaire, source_layer_only_dataset, export_path)
+        refined_content = self._refine_generations(artifact_generation_content, source_layer_only_dataset, export_path)
 
         return self._create_trace_dataset_with_generated_artifacts(refined_content,
                                                                    original_dataset_complete,
@@ -152,12 +152,13 @@ class HierarchyGenerator(BaseObject):
                                         f"{result[format_id][0]}", response_manager=response_manager))
         return questions
 
-    def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset) \
-            -> List[str]:
+    def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset,
+                                   export_path: str = None) -> List[str]:
         """
         Creates the content for the new artifacts
         :param questionnaire: The questionnaire prompt given to the model to produce the generations
         :param source_layer_only_dataset: The dataset containing only the source layer
+        :param export_path: The path to export predictions to
         :return: The generated artifact content
         """
         logger.info(f"Generating {self.args.target_type}s\n")
@@ -166,15 +167,18 @@ class HierarchyGenerator(BaseObject):
         generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
                                                        response_prompt_ids=questionnaire.id,
                                                        tags_for_response=generated_artifacts_tag,
-                                                       return_first=True)
+                                                       return_first=True,
+                                                       export_path=os.path.join(export_path, "artifact_gen_response.yaml"))
         generated_artifact_content = generation_predictions[0]
         return generated_artifact_content
 
-    def _refine_generations(self, generated_artifact_content: List[str], source_layer_only_dataset: PromptDataset) -> List[str]:
+    def _refine_generations(self, generated_artifact_content: List[str], source_layer_only_dataset: PromptDataset,
+                            export_path: str = None) -> List[str]:
         """
         Has the model refine the artifact generations
         :param generated_artifact_content: The original generated content
         :param source_layer_only_dataset: The dataset containing only the source layer
+        :param export_path: The path to export predictions to
         :return: A list of refined artifact content
         """
         try:
@@ -192,7 +196,8 @@ class HierarchyGenerator(BaseObject):
             refined_artifact_content = self._get_predictions(prompt_builder, source_layer_only_dataset,
                                                              response_prompt_ids=questionnaire.id,
                                                              tags_for_response=generated_artifacts_tag,
-                                                             return_first=True)[0]
+                                                             return_first=True,
+                                                             export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
         except Exception:
             logger.exception("Refining the artifact content failed. Using original content instead.")
             refined_artifact_content = generated_artifact_content
@@ -298,7 +303,7 @@ class HierarchyGenerator(BaseObject):
 
     def _get_predictions(self, prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager: AbstractLLMManager = None,
                          response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
-                         return_first: bool = False) -> Any:
+                         return_first: bool = False, export_path: str = None) -> Any:
         """
         Gets the predictions for the given prompts on the given dataset
         :param prompt_builder: Builds the prompts for the model
@@ -306,6 +311,7 @@ class HierarchyGenerator(BaseObject):
         :param llm_manager: The LLM manager to use for predictions
         :param response_prompt_ids: The prompt id to extract from predictions
         :param tags_for_response: The tag to extract from predictions
+        :param export_path: The path to export predictions to
         :return: The model predictions
         """
         dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
@@ -314,6 +320,8 @@ class HierarchyGenerator(BaseObject):
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
         predictions = trainer.perform_prediction().predictions
+        if export_path:
+            FileUtil.write_yaml(predictions, export_path)
         response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
         if response_prompt_ids:
             predictions = [DictUtil.combine_child_dicts(p, response_prompt_ids) for p in predictions]

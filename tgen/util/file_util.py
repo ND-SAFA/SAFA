@@ -2,7 +2,7 @@ import os
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Callable, Dict, IO, List, Tuple, Union
+from typing import Callable, Dict, IO, List, Tuple, Union, Any
 
 import yaml
 
@@ -281,7 +281,7 @@ class FileUtil:
             return yaml.safe_load(file)
 
     @staticmethod
-    def write_yaml(content: Union[str, Dict], output_file_path: str):
+    def write_yaml(content: Any, output_file_path: str):
         """
         Saves yaml to given file
         :param content: The content of the file to create.

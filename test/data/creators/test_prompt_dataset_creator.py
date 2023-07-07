@@ -2,7 +2,6 @@ from unittest import mock
 
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
@@ -30,8 +29,8 @@ class TestPromptDatasetCreator(BaseTest):
         prompt_dataset = dataset_creator.create()
         prompt = QuestionPrompt("Tell me about this artifact:")
         artifact_prompt = ArtifactPrompt(include_id=False)
-        prompt_builder = PromptBuilder( [prompt, artifact_prompt])
-        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args,)
+        prompt_builder = PromptBuilder([prompt, artifact_prompt])
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
     def test_project_reader_artifact_with_summarizer(self):
@@ -85,9 +84,9 @@ class TestPromptDatasetCreator(BaseTest):
         if prompt_builder is None:
             prompt1 = QuestionPrompt("Tell me about this artifact:")
             prompt2 = MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)
-            prompt_builder = PromptBuilder( [prompt1, prompt2])
+            prompt_builder = PromptBuilder([prompt1, prompt2])
         prompt_dataset = dataset_creator.create()
-        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args,)
+        prompts_df = prompt_dataset.get_prompts_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
         if not use_targets_only:
             PromptTestProject.verify_prompts_safa_project_traces_for_classification(self, prompts_df, trace_df)
         else:

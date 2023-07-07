@@ -8,7 +8,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts_old import SupportedPrompts
+from tgen.data.prompts.supported_prompts_old import SupportedPromptsOld
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
@@ -64,7 +64,7 @@ class LLMClustering(iClustering):
         :return: The list of feature
         """
         logger.info(f"Getting features for clusters.")
-        base_prompt = SupportedPrompts.FUNCTIONALITIES.value
+        base_prompt = SupportedPromptsOld.FUNCTIONALITIES.value
         res = LLMClustering._get_response(artifact_ids, artifact_content, llm_manager, base_prompt,
                                           target_artifact_type=target_artifact_type)
         features = LLMResponseUtil.parse(res, LLMClustering.FUNCTIONALITY_TAG, is_nested=False)
@@ -73,7 +73,7 @@ class LLMClustering(iClustering):
     @staticmethod
     def _get_clusters(artifact_ids: List[str], artifact_content: List[str], target_artifact_type: str,
                       llm_manager: AbstractLLMManager, features: Union[List[str], str],
-                      prompts: List[Prompt] = SupportedPrompts.CLUSTER_FROM_FEATURES.value, **prompt_args) -> Clusters:
+                      prompts: List[Prompt] = SupportedPromptsOld.CLUSTER_FROM_FEATURES.value, **prompt_args) -> Clusters:
         """
         Gets clusters of the given artifacts using the llm manager
         :param artifact_ids: Ids of all artifacts to cluster
@@ -104,7 +104,7 @@ class LLMClustering(iClustering):
                 logger.info(f"\nRe-clustering a group with more than {LLMClustering.CLUSTER_MAX} artifacts")
                 artifact2cluster = clusters.pop(cluster_name)
                 artifact_content = [artifact_df.get_artifact(id_)[ArtifactKeys.CONTENT] for id_ in artifact2cluster]
-                prompt = SupportedPrompts.RE_CLUSTER_FEATURE.value
+                prompt = SupportedPromptsOld.RE_CLUSTER_FEATURE.value
                 clusters.update(LLMClustering._get_clusters(artifact2cluster, artifact_content, target_artifact_type,
                                                             llm_manager, features=list(clusters.keys()),
                                                             prompts=prompt, feature=cluster_name))

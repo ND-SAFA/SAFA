@@ -1,5 +1,3 @@
-import time
-
 import openai
 from openai.openai_object import OpenAIObject
 
@@ -71,7 +69,6 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(60)  # trying to avoid rate limit
         return res
 
     @staticmethod

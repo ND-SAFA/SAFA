@@ -10,6 +10,7 @@ from tgen.ranking.pipeline.sort_step import GenericSorter
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.util.list_util import ListUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -82,20 +83,7 @@ class RankingUtil:
         :param min_score: The score of the last ranked artifact.
         :return: List of scores.
         """
-        return RankingUtil.create_increment_list(len(ranked_targets), min_score=min_score)
-
-    @staticmethod
-    def create_increment_list(n: int, max_score=1.0, min_score=0.0):
-        """
-        Creates a list with scores decreasing linearly from max to min score.
-        :param n: The length of the list.
-        :param max_score: The score of the first item.
-        :param min_score: The score of the last item.
-        :return: The list of scores.
-        """
-        increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
-        descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
-        return descending_list
+        return ListUtil.create_step_list(len(ranked_targets), min_score=min_score)
 
     @staticmethod
     def calculate_ranking_metrics(dataset: TraceDataset, ranking_entries: List[TracePredictionEntry]):

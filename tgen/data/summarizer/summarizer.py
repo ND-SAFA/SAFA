@@ -1,16 +1,17 @@
 import itertools
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 import pandas as pd
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_default_llm_manager
-from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts_old import SupportedPrompts
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.supported_prompts_old import SupportedPromptsOld
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -29,8 +30,8 @@ class Summarizer(BaseObject):
 
     def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = OPEN_AI_MODEL_DEFAULT,
                  max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
-                 nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
-                 code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
+                 nl_base_prompt: SupportedPromptsOld = SupportedPrompts.NL_SUMMARY,
+                 code_base_prompt: SupportedPromptsOld = SupportedPrompts.CODE_SUMMARY):
         """
         Initializes a summarizer for a specific model
         :param model_for_token_limit: name of the model that should be used to evaluate token_limit

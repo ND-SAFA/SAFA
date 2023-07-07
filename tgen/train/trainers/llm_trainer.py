@@ -6,7 +6,8 @@ from openai.api_resources.fine_tune import FineTune
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts_old import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, REVERSE_CATEGORIES
+from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
+    REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset

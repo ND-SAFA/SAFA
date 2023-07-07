@@ -4,14 +4,14 @@ from unittest import mock
 from unittest.mock import patch
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.tdatasets.data_key import DataKey
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.data.processing.augmentation.resample_step import ResampleStep
 from tgen.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.tdatasets.data_key import DataKey
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
@@ -52,12 +52,15 @@ class TestTraceDataset(BaseTraceTest):
         steps = [SimpleWordReplacementStep(0.5, 0.15), SourceTargetSwapStep()]
         step_ids = [step.extract_unique_id_from_step_id(step.get_id()) for step in steps]
         steps.append(ResampleStep(0.5))
-        n_expected = [(len(trace_dataset.neg_link_ids) - (2 * len(trace_dataset.pos_link_ids))) * .5,
-                      len(trace_dataset.pos_link_ids)]
+        n_negative = len(trace_dataset.get_neg_link_ids())
+        n_positive = len(trace_dataset.get_pos_link_ids())
+        n_expected = [(n_negative - (2 * n_positive)) * .5, n_positive]
         n_expected.append(n_expected[0])
         data_augmenter = DataAugmenter(steps)
         trace_dataset.augment_pos_links(data_augmenter)
-        self.assertEqual(len(trace_dataset.pos_link_ids), len(trace_dataset.neg_link_ids))
+        n_negative = len(trace_dataset.get_neg_link_ids())
+        n_positive = len(trace_dataset.get_pos_link_ids())
+        self.assertEqual(n_positive, n_negative)
 
         n_augmented_links = [0 for i in range(len(step_ids))]
         n_overlap = 0
@@ -67,7 +70,7 @@ class TestTraceDataset(BaseTraceTest):
             target_content = trace_dataset.artifact_df.get_artifact(target_id)[ArtifactKeys.CONTENT]
             for i, step_id in enumerate(step_ids):
                 if step_id in target_id:
-                    self.assertIn(link_id, trace_dataset.pos_link_ids)
+                    self.assertIn(link_id, trace_dataset.get_pos_link_ids())
                     self.assertIn(step_id, source_id)
                     n_augmented_links[i] += 1
                     if isinstance(steps[i], SimpleWordReplacementStep):
@@ -83,7 +86,7 @@ class TestTraceDataset(BaseTraceTest):
                             n_overlap += 1
         n_expected[1] += n_overlap
 
-        link_counts = Counter(trace_dataset.pos_link_ids)
+        link_counts = Counter(trace_dataset.get_pos_link_ids())
         n_resampled = 0
         for count in link_counts.values():
             n_resampled += count - 1
@@ -102,8 +105,8 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
         true_link_id = TraceDataFrame.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.trace_df.index)
-        self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
-        self.assertIn(true_link_id, trace_dataset.pos_link_ids)
+        self.assertNotIn(true_link_id, trace_dataset.get_neg_link_ids())
+        self.assertIn(true_link_id, trace_dataset.get_pos_link_ids())
         source, target = trace_dataset.get_link_source_target_artifact(true_link_id)
         self.assertEqual(source[ArtifactKeys.CONTENT], source_tokens)
         self.assertEqual(target[ArtifactKeys.CONTENT], target_tokens)
@@ -112,8 +115,8 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset.create_and_add_link(false_source_id, false_target_id, source_tokens, target_tokens, is_true_link=False)
         false_link_id = TraceDataFrame.generate_link_id(false_source_id, false_target_id)
         self.assertIn(false_link_id, trace_dataset.trace_df.index)
-        self.assertIn(false_link_id, trace_dataset.neg_link_ids)
-        self.assertNotIn(false_link_id, trace_dataset.pos_link_ids)
+        self.assertIn(false_link_id, trace_dataset.get_neg_link_ids())
+        self.assertNotIn(false_link_id, trace_dataset.get_pos_link_ids())
 
     def test_get_augmented_artifact_ids(self):
         trace_dataset = self.get_trace_dataset()
@@ -165,7 +168,7 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
         trace_dataset._create_links_from_augmentation(augmentation_results,
                                                       list(orig_links.index))
-        self.assertEqual(len(trace_dataset.pos_link_ids), 3 * len(orig_links))
+        self.assertEqual(len(trace_dataset.get_pos_link_ids()), 3 * len(orig_links))
         n_augmented_links = [0 for i in range(len(ids))]
         for index, link in trace_dataset.trace_df.itertuples():
             for i, id_ in enumerate(ids):
@@ -176,7 +179,7 @@ class TestTraceDataset(BaseTraceTest):
                     target_content = trace_dataset.artifact_df.get_artifact(target_id)[ArtifactKeys.CONTENT]
                     self.assertIn(id_, source_content)
                     self.assertIn(id_, target_content)
-                    self.assertIn(index, trace_dataset.pos_link_ids)
+                    self.assertIn(index, trace_dataset.get_pos_link_ids())
                     n_augmented_links[i] += 1
         for count in n_augmented_links:
             self.assertEqual(count, len(orig_links))
@@ -203,7 +206,7 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset.resize_pos_links(new_length, include_duplicates=True)
         trace_dataset.resize_neg_links(new_length, include_duplicates=True)
 
-        for link_ids in [trace_dataset.pos_link_ids, trace_dataset.neg_link_ids]:
+        for link_ids in [trace_dataset.get_pos_link_ids(), trace_dataset.get_neg_link_ids()]:
             self.assertEqual(new_length, len(link_ids))
 
     def test_resize_links_no_duplicates(self):
@@ -214,7 +217,7 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset.resize_pos_links(new_length, include_duplicates=False)
         trace_dataset.resize_neg_links(new_length, include_duplicates=False)
 
-        for link_ids in [trace_dataset.pos_link_ids, trace_dataset.neg_link_ids]:
+        for link_ids in [trace_dataset.get_pos_link_ids(), trace_dataset.get_neg_link_ids()]:
             self.assertEqual(new_length, len(link_ids))
             self.assertEqual(new_length, len(set(link_ids)))  # no duplicates
 
@@ -222,12 +225,12 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset_aug = self.get_trace_dataset()
         data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])
         trace_dataset_aug.prepare_for_training(data_augmenter)
-        aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
+        aug_links = {link_id for link_id in trace_dataset_aug.get_pos_link_ids() if
                      AbstractDataAugmentationStep.extract_unique_id_from_step_id(SimpleWordReplacementStep.get_id())
                      in trace_dataset_aug.trace_df.get_link(link_id)[TraceKeys.SOURCE]}
         self.assertEqual(len(aug_links), self.N_NEGATIVE - self.N_POSITIVE)
-        self.assertEqual(len(set(trace_dataset_aug.pos_link_ids)), self.N_POSITIVE + len(aug_links))
-        self.assertEqual(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
+        self.assertEqual(len(set(trace_dataset_aug.get_pos_link_ids())), self.N_POSITIVE + len(aug_links))
+        self.assertEqual(len(trace_dataset_aug.get_pos_link_ids()), len(trace_dataset_aug.get_neg_link_ids()))
 
     def test_get_feature_entry(self):
         trace_dataset = self.get_trace_dataset()
@@ -241,7 +244,8 @@ class TestTraceDataset(BaseTraceTest):
         self.assertIn(target[ArtifactKeys.CONTENT], feature_entry_siamese.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
-        feature_entry_single = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SINGLE, fake_method)
+        feature_entry_single = trace_dataset._get_feature_entry(test_link[TraceKeys.LINK_ID], ModelArchitectureType.SINGLE,
+                                                                fake_method)
         self.assertIn(FEATURE_VALUE.format(source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]),
                       feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)

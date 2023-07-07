@@ -11,6 +11,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
     """
     Contains the trace links found in a project
     """
+    COL_IGNORE = [TraceKeys.SCORE]
 
     def __init__(self, *args, **kwargs):
         """

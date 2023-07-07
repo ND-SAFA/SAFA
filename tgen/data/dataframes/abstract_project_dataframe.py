@@ -19,6 +19,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     Represents the config format for all data used by the huggingface trainer.
     """
     __COLS = None
+    COL_IGNORE = []
 
     def __init__(self, data=None, index: Axes = None, columns: Axes = None, dtype: Dtype = None, copy: bool = None):
         """
@@ -39,7 +40,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: A set containing the names of the columns in the dataframe
         """
         if cls.__COLS is None:
-            cls.__COLS = [e.value for e in cls.data_keys()]
+            cls.__COLS = [e.value for e in cls.data_keys() if e not in cls.COL_IGNORE]
         return cls.__COLS
 
     @classmethod

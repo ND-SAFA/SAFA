@@ -1,6 +1,6 @@
-from typing import Dict, Callable
+from typing import Callable, Dict
 
-from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.util.override import overrides
@@ -11,25 +11,33 @@ class SelectQuestionPrompt(QuestionPrompt):
     Represents a Prompt that asks the model to select one of a set of options.
     """
 
-    INSTRUCTIONS = "Select one of the following categories:"
-    RESPONSE_FORMAT = "Enclose the category inside of {}"
-    RESPONSE_TAG = "category"
+    DEFAULT_INSTRUCTIONS = "Select one of the following categories:"
+    DEFAULT_RESPONSE_FORMAT = "Enclose the category inside of {}"
+    DEFAULT_RESPONSE_TAG = "category"
 
-    def __init__(self, categories: Dict[str, str], question: str = EMPTY_STRING, default_factory: Callable = None):
+    def __init__(self, categories: Dict[str, str], question: str = EMPTY_STRING,
+                 instructions: str = DEFAULT_INSTRUCTIONS,
+                 response_format: str = DEFAULT_RESPONSE_FORMAT,
+                 response_tag: str = DEFAULT_RESPONSE_TAG,
+                 default_factory: Callable = None):
         """
         Initializes the prompt with the categories that a model can select
         :param categories: A dictionary mapping category name to its description
         :param question: The question being asked
         :param default_factory: Method to define a default if response is not as expected
         """
+        self.response_tag = response_tag
+        self.instructions = instructions
         self.categories = categories
+        self.response_format = response_format
         category_names = list(categories.keys())
         question = f"{question}{NEW_LINE}" if question else EMPTY_STRING
-        response_manager = PromptResponseManager(response_tag=self.RESPONSE_TAG, response_instructions_format=self.RESPONSE_FORMAT,
+        response_manager = PromptResponseManager(response_tag=self.response_tag,
+                                                 response_instructions_format=self.response_format,
                                                  expected_responses=category_names,
                                                  expected_response_type=type(category_names[0]),
                                                  default_factory=default_factory)
-        super().__init__(f"{question}{self.INSTRUCTIONS}",
+        super().__init__(f"{question}{self.instructions}",
                          response_manager=response_manager)
 
     @overrides(QuestionPrompt)
@@ -41,7 +49,8 @@ class SelectQuestionPrompt(QuestionPrompt):
         Category) Description
         :return: The formatted prompt
         """
-        categories_format = "{}) {}"
-        formatted_categories = NEW_LINE.join([categories_format.format(category, descr) for category, descr in self.categories])
+        categories_format = "\t{}) {}"
+        formatted_categories = NEW_LINE.join(
+            [categories_format.format(category, descr) for category, descr in self.categories.items()])
         formatted_question = f"{self.value}{NEW_LINE}{formatted_categories}"
         return formatted_question

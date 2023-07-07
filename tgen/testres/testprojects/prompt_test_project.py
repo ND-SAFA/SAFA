@@ -59,7 +59,7 @@ class PromptTestProject:
         return artifacts
 
     @staticmethod
-    def get_safa_artifact_id_to_content() -> Dict[Any, str]:
+    def get_artifact_map() -> Dict[Any, str]:
         """
         Gets all the artifacts from the safa project
         :return: A dictionary mapping artifact ids to their content
@@ -92,7 +92,7 @@ class PromptTestProject:
         :return:
         """
         test_case.assertEqual(len(trace_df), len(prompt_df), **params)
-        artifacts = PromptTestProject.get_safa_artifact_id_to_content()
+        artifacts = PromptTestProject.get_artifact_map()
         for i, (link_id, link) in enumerate(trace_df.itertuples()):
             prompt = prompt_df.get_row(i)[PromptKeys.PROMPT]
             source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
@@ -111,10 +111,13 @@ class PromptTestProject:
         :return:
         """
         test_case.assertEqual(len(trace_df), len(prompt_df), **params)
-        artifacts = PromptTestProject.get_safa_artifact_id_to_content()
-        for i, (id_, row) in enumerate(trace_df.itertuples()):
-            prompt = prompt_df.get_row(i)
-            test_case.assertIn(artifacts[row[TraceKeys.TARGET]], prompt[PromptKeys.PROMPT], **params)
+        artifact_map = PromptTestProject.get_artifact_map()
+        for i, (_, row) in enumerate(trace_df.itertuples()):
+            prompt_row = prompt_df.get_row(i)
+            parent_id = row[TraceKeys.TARGET]
+            artifact_content = artifact_map[parent_id]
+            prompt = prompt_row[PromptKeys.PROMPT]
+            test_case.assertIn(artifact_content, prompt, **params)
 
     @staticmethod
     def verify_prompts_safa_project_artifacts(test_case: BaseTest, prompt_df: PromptDataFrame, artifacts_df: ArtifactDataFrame,

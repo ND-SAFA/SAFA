@@ -54,7 +54,7 @@ class TestPromptDataset(BaseTest):
         token_limit_mock.return_value = token_limit + MAX_TOKENS_BUFFER + MAX_TOKENS_DEFAULT
         exceeds_token_limit_mock.side_effect = self.fake_exceeds_token_limit
         summarize_mock.side_effect = self.fake_summarize
-        artifact_prompt_dataset = self.get_dataset_with_artifact_df()
+        artifact_prompt_dataset = self.get_dataset_from_artifact_df()
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
         prompt_builder = PromptBuilder([prompt])
@@ -74,7 +74,7 @@ class TestPromptDataset(BaseTest):
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
 
     def test_to_dataframe(self):
-        outputs = self.all_datasets_test(
+        outputs = self.run_dataset_tests(
             lambda dataset: dataset.to_dataframe(),
             expected_exceptions=["id"]
         )
@@ -87,12 +87,12 @@ class TestPromptDataset(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
         prompt_builder = PromptBuilder([prompt])
-        outputs = self.all_datasets_test(
+        outputs = self.run_dataset_tests(
             lambda dataset: dataset.get_project_file_id(
                 llm_manager,
                 prompt_builder=prompt_builder if dataset._has_trace_data else None),
         )
-        dataset = self.get_dataset_with_prompt_df()
+        dataset = self.get_dataset_from_prompt_df()
         dataset.data_export_path = TEST_OUTPUT_DIR
         llm_manager = OpenAIManager(OpenAIArgs())
         outputs["with_output_path"] = dataset.get_project_file_id(llm_manager, prompt_builder)
@@ -107,12 +107,12 @@ class TestPromptDataset(BaseTest):
         prompt = QuestionPrompt("Tell me about this artifact: ")
         prompt2 = ArtifactPrompt(include_id=False)
         prompt_builder = PromptBuilder([prompt, prompt2])
-        outputs = self.all_datasets_test(
+        outputs = self.run_dataset_tests(
             lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder, OpenAIManager.prompt_args),
                                                             TEST_OUTPUT_DIR),
             ["id"]
         )
-        dataset = self.get_dataset_with_prompt_df()
+        dataset = self.get_dataset_from_prompt_df()
         outputs["with_filename"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder),
                                                                    os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
         outputs["no_output_path"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder))
@@ -120,7 +120,8 @@ class TestPromptDataset(BaseTest):
         for type_, output in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)
             export_path, should_delete = output
-            prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(export_path))
+            prompt_dataframe_json = JsonUtil.read_jsonl_file(export_path)
+            prompt_df = PromptDataFrame(prompt_dataframe_json)
             if type_ == "artifact":
                 PromptTestProject.verify_prompts_artifacts_project(self, prompt_df, msg=fail_msg)
             elif type_ == "dataset":
@@ -128,9 +129,12 @@ class TestPromptDataset(BaseTest):
                                                                         artifacts_df=expected_trace_dataset.artifact_df,
                                                                         msg=fail_msg, )
             else:
-                pos_links_df = TraceDataFrame(DataFrameUtil.filter_df_by_row(expected_trace_dataset.trace_df,
-                                                                             lambda row: row[TraceKeys.LABEL.value] == 1))
-                PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompt_df, trace_df=pos_links_df,
+                pos_links_df = DataFrameUtil.filter_df_by_row(expected_trace_dataset.trace_df,
+                                                              lambda row: row[TraceKeys.LABEL.value] == 1)
+                pos_links_df = TraceDataFrame(pos_links_df)
+                PromptTestProject.verify_prompts_safa_project_traces_for_generation(self,
+                                                                                    prompt_df,
+                                                                                    trace_df=pos_links_df,
                                                                                     msg=fail_msg)
             if type_ == "no_output_path":
                 self.assertTrue(should_delete, msg=fail_msg)
@@ -139,10 +143,10 @@ class TestPromptDataset(BaseTest):
                 self.assertFalse(should_delete, msg=fail_msg)
 
     @staticmethod
-    def all_datasets_test(func_to_test: Callable, expected_exceptions: List[str] = None):
+    def run_dataset_tests(func_to_test: Callable, expected_exceptions: List[str] = None):
         expected_exceptions = expected_exceptions if expected_exceptions else []
         return_vals = {}
-        for type_, dataset in TestPromptDataset.get_all_datasets().items():
+        for type_, dataset in TestPromptDataset.get_prompt_datasets().items():
             try:
                 return_vals[type_] = func_to_test(dataset)
             except Exception as e:
@@ -152,21 +156,21 @@ class TestPromptDataset(BaseTest):
         return return_vals
 
     @staticmethod
-    def get_all_datasets() -> Dict[str, PromptDataset]:
-        datasets = {"artifact": TestPromptDataset.get_dataset_with_artifact_df(),
-                    "prompt": TestPromptDataset.get_dataset_with_prompt_df(),
+    def get_prompt_datasets() -> Dict[str, PromptDataset]:
+        datasets = {"artifact": TestPromptDataset.get_dataset_from_artifact_df(),
+                    "prompt": TestPromptDataset.get_dataset_from_prompt_df(),
                     "dataset": TestPromptDataset.get_dataset_with_trace_dataset(),
                     "id": TestPromptDataset.get_dataset_with_project_file_id()}
         return datasets
 
     @staticmethod
-    def get_dataset_with_artifact_df():
+    def get_dataset_from_artifact_df():
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         artifacts_df = artifact_project_reader.read_project()
         return PromptDataset(artifact_df=artifacts_df)
 
     @staticmethod
-    def get_dataset_with_prompt_df():
+    def get_dataset_from_prompt_df():
         prompt_project_reader = PromptTestProject.get_project_reader()
         prompt_df = prompt_project_reader.read_project()
         return PromptDataset(prompt_df=prompt_df)

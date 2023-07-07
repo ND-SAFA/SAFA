@@ -21,6 +21,7 @@ class StructuredKeys:
         SOURCE = "source"
         TARGET = "target"
         LABEL = "label"
+        SCORE = "score"
 
         @staticmethod
         def get_cols() -> List["Trace"]:

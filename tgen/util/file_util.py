@@ -4,6 +4,8 @@ from copy import deepcopy
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Tuple, Union
 
+import yaml
+
 from tgen.constants.deliminator_constants import F_SLASH
 from tgen.util.json_util import JsonUtil
 
@@ -263,3 +265,23 @@ class FileUtil:
         """
         if os.path.exists(file_path):
             os.remove(file_path)
+
+    @staticmethod
+    def read_yaml(file_path: str) -> str:
+        """
+        Reads a yaml file at given path if exists.
+        :param file_path: Path of the file to read.
+        :return: The content of the file.
+        """
+        with open(file_path, 'r') as file:
+            return yaml.safe_load(file)
+
+    @staticmethod
+    def write_yaml(content: Union[str, Dict], output_file_path: str):
+        """
+        Saves yaml to given file
+        :param content: The content of the file to create.
+        :param output_file_path: The path to save the file to.
+        """
+        with open(output_file_path, 'w') as file:
+            yaml.dump(content, file)

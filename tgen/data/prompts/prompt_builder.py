@@ -106,7 +106,7 @@ class PromptBuilder:
         :param res: The model response
         :return: A dictionary mapping prompt id to its answers
         """
-        return {prompt.id: prompt.response_manager.parse_response(res) for prompt in self._prompts}
+        return {prompt.id: prompt.parse_response(res) for prompt in self._prompts}
 
     def _create_config(self) -> PromptConfig:
         """

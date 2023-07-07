@@ -1,10 +1,15 @@
 import os
+import re
 import string
 import uuid
 from datetime import datetime
 from typing import Any, List, Union, Type, Dict, Tuple
 
+import bs4
+from yaml.constructor import SafeConstructor
+
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -44,10 +49,7 @@ class HierarchyGenerator(BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
-    """
-    <step> Review and refine the user stories. Look for any duplicates and determine if any user stories are missing. 
-    Get feedback from others if possible. </step>
-    """
+    TASK_PREFACE = f"{NEW_LINE} TASKS: {NEW_LINE}"
 
     def __init__(self, args: HGenArgs):
         """
@@ -64,18 +66,8 @@ class HierarchyGenerator(BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
         export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
-
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
-
-        # questionnaire = self._construct_questionnaire_for_generation()
-        questionnaire = QuestionnairePrompt([QuestionPrompt("map", response_manager=PromptResponseManager(response_tag="map")),
-                                             QuestionPrompt("document",
-                                                            response_manager=PromptResponseManager(response_tag="document")),
-                                             QuestionPrompt("model", response_manager=PromptResponseManager(response_tag="model")),
-                                             QuestionPrompt("specify", response_manager=PromptResponseManager(response_tag="specify")),
-                                             QuestionPrompt("design-requirement",
-                                                            response_manager=PromptResponseManager(response_tag="design-requirement"))
-                                             ])
+        questionnaire = self._construct_questionnaire_for_generation()
         artifact_generation_content = self._generate_artifact_content(questionnaire, source_layer_only_dataset)
         refined_content = self._refine_generations(artifact_generation_content, source_layer_only_dataset)
 
@@ -89,12 +81,24 @@ class HierarchyGenerator(BaseObject):
         Constructs a questionnaire prompt that is used to generate the new artifacts
         :return: The questionnaire prompt that is used to generate the new artifacts
         """
+
+        def construct_tag_from_yaml(loader, node):
+            value = loader.construct_scalar(node)
+            return bs4.Tag(value)
+
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
-        prompt_builder = PromptBuilder(prompts=[instructions_prompt])
-        prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
-        result = self._get_predictions(prompt_builder, PromptDataset())[0]
-        questions = self._construct_question_prompts_from_output(instructions_prompt, result)
-        # TODO save results
+
+        questionnaire_prompt_path = self._get_path_to_generation_questionnaire_prompt(self._get_target_type_as_snake_case())
+        if os.path.exists(questionnaire_prompt_path):
+            SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
+            questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
+        else:
+            prompt_builder = PromptBuilder(prompts=[instructions_prompt])
+            prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
+            questionnaire_content = self._get_predictions(prompt_builder, PromptDataset(),
+                                                          response_prompt_id=instructions_prompt.id)[0]
+            FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
+        questions = self._construct_question_prompts_from_output(instructions_prompt, questionnaire_content)
         return QuestionnairePrompt(question_prompts=questions,
                                    instructions=self.GENERATION_INSTRUCTIONS)
 
@@ -106,9 +110,9 @@ class HierarchyGenerator(BaseObject):
         :return: The list of question prompts created from model output
         """
         step_id, name_id, instructions_id, deliverable_id = instructions_prompt.response_manager.get_all_tag_ids()
-        steps = result[instructions_prompt.id][step_id]
+        steps = result[step_id]
         questions = []
-        target_artifact_tag = "-".join(self.args.target_type.split()).lower()
+        target_artifact_tag = self._get_target_type_as_snake_case()
         for i, step in enumerate(steps):
             if i == len(steps) - 1:
                 response_tag = target_artifact_tag
@@ -135,23 +139,13 @@ class HierarchyGenerator(BaseObject):
         :return: The generated artifact content
         """
         prompt_builder = self._get_prompt_builder_for_generation(questionnaire)
-        # generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset)
-        generation_predictions = [{'47496809-526e-4d98-94bd-ad558608c292': {}, 'f46f71b3-d9d0-497e-9132-b87e8686ec07': {},
-                                   '96c5bb77-b5d0-49b8-8fd6-c326e8a53a58': {'summary': [
-                                       ' \nThe system is a software engineering tool for managing versioned entities. It allows users to retrieve, commit, and calculate differences between versioned entities for a given project version. It handles grouping entity versions by ID, instantiating version entities from application entities, and retrieving various entities and information.\n']},
-                                   questionnaire.id: {'map': [
-                                       '\n- Version Control: Responsible for managing versions of entities. Allows committing changes to a project version, retrieving entities from a project version, deleting entities from a project version, and calculating deltas between project versions.\n- Project Management: Responsible for managing projects and project versions. Allows creating new project versions (major, minor, revision), deleting project versions, and retrieving project version information.\n- Traceability: Responsible for generating and managing trace links between artifacts. Allows generating trace links using various methods and models, retrieving trace links, and committing trace links to project versions.  \n- Artifact Management: Responsible for managing artifacts and artifact types. Allows creating, updating and deleting artifacts and artifact types.\n'],
-                                       'document': [
-                                           '\nVersion Control:\n- Inputs: Project version ID, list of entity changes\n- Outputs: Updated project version with committed changes\n- Data Stores: ProjectVersion, entities (artifacts, traces, etc.)\n- External Interfaces: Version repository (to save/retrieve versioned data)\n- Processing Logic: Commits changes to a project version by calling updateProjectAppEntity for each change type. Retrieves updated entities from the appropriate service and sets them on the ProjectAppEntity.\n'],
-                                       'model': [
-                                           '\n- Project: Has a name, description, members, types, artifacts, traces, documents, versions, and warnings\n- ProjectVersion: Has a major version, minor version, revision, project, entities, and errors \n- Artifact: Has an ID, name, summary, content, type, attributes, document type, and document IDs\n- TraceLink: Has an ID, source artifact, target artifact, type, approval status, and score\n- ArtifactType: Has an ID, name, and project\n- document: Has an ID, name, project, and artifacts\n'],
-                                       'specify': [
-                                           '\nVersion Repository Interface:\n- Purpose: Provides methods for managing versioned entities\n- Inputs: Project version ID, entities\n- Outputs: Versioned entities, deltas \n- Specifications: Must implement methods to retrieve entities from a project version, save entities to a project version, delete entities from a project version, and calculate deltas between project versions.\n'],
-                                       'design-requirement': [
-                                           '\nThe system shall allow users to manage projects, project versions, artifacts, traces, and documents\nThe system shall allow generating trace links between artifacts using various methods and models\nThe system shall allow committing changes to entities in a project version\nThe system shall allow calculating deltas between two project versions\nThe system shall allow retrieving information from the current project version\nThe system shall enforce data constraints and validation on entities\nThe system shall implement a version repository interface to manage versioned data\n']}}]
         generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
-        generated_artifact_content = generation_predictions[0][questionnaire.id][generated_artifacts_tag][0]
-        return [content for content in generated_artifact_content.split(NEW_LINE) if content]
+        generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
+                                                       response_prompt_id=questionnaire.id,
+                                                       tag_for_response=generated_artifacts_tag,
+                                                       return_first=True)
+        generated_artifact_content = generation_predictions[0]
+        return generated_artifact_content
 
     def _refine_generations(self, generated_artifact_content: List[str], source_layer_only_dataset: PromptDataset) -> List[str]:
         """
@@ -163,7 +157,7 @@ class HierarchyGenerator(BaseObject):
         questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
         prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
                                                                  SupportedPrompts.HGEN_REFINE_PROMPT)
-        target_prompt = MultiArtifactPrompt(prompt_start="{target_type}s:",
+        target_prompt = MultiArtifactPrompt(prompt_start="{target_type}S:",
                                             build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                             include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
         target_prompt.format_value(target_type=self.args.target_type.upper())
@@ -171,10 +165,10 @@ class HierarchyGenerator(BaseObject):
         prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
         generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
         refined_artifact_content = self._get_predictions(prompt_builder, source_layer_only_dataset,
-                                                               response_prompt_id=questionnaire.id,
-                                                               tag_for_response=generated_artifacts_tag,
-                                                               return_first=True)
-        return refined_artifact_content
+                                                         response_prompt_id=questionnaire.id,
+                                                         tag_for_response=generated_artifacts_tag,
+                                                         return_first=True)
+        return refined_artifact_content[0]
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        source_layer_only_dataset: PromptDataset,
@@ -235,11 +229,8 @@ class HierarchyGenerator(BaseObject):
             artifact_prompt = ArtifactPrompt(include_id=False)
             prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
             dataset = PromptDataset(artifact_df=new_artifact_df)
-            # names = self._get_predictions(prompt_builder, dataset, response_prompt_id=name_prompt.id,
-            #                               tag_for_response=name_prompt.response_manager.response_tag, return_first=True)
-            names = ['Project and Artifact Management System', 'Traceability Requirement', 'Commit Changes to Project Version',
-                     'Calculate Version Deltas', 'Retrieve Project Version Information', 'Data Validation and Constraints',
-                     'Version Repository Interface']
+            names = self._get_predictions(prompt_builder, dataset, response_prompt_id=name_prompt.id,
+                                          tag_for_response=name_prompt.response_manager.response_tag, return_first=True)
             assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
             new_artifact_df.index = names  # TODO ensure names are all unique
         except Exception:
@@ -317,23 +308,74 @@ class HierarchyGenerator(BaseObject):
         return predictions
 
     def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt,
-                                           base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION, ) -> PromptBuilder:
+                                           base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
+                                           include_summary: bool = False) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
         :param questionnaire: The questionnaire prompt given to the model to produce the generations
         :param base_prompt: The main prompt that starts the prompt
+        :param include_summary: If True, instructions the model to create a summary of the system first
         :return: The prompt builder used for the generations
         """
-        artifact_prompt = MultiArtifactPrompt(prompt_start="{source_type}s:",
+        questionnaire.value = self.TASK_PREFACE + questionnaire.value
+        generation_step_response_manager = questionnaire.question_prompts[-1].response_manager
+        generation_step_response_manager.formatter = lambda tag, val: self._format_generated_artifact_content_from_response(val)
+
+        artifact_prompt = MultiArtifactPrompt(prompt_start="{source_type}S:",
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
         artifact_prompt.format_value(source_type=self.args.source_type.upper())
-        summary_prompt = Prompt(f"{NEW_LINE} TASKS: {NEW_LINE} First, write a short summary of the system.",
+        summary_prompt = Prompt("First, write a short summary of the system.",
                                 PromptResponseManager(response_tag="summary"))
-        prompts = [base_prompt.value, artifact_prompt, summary_prompt, questionnaire]
+        prompts = [base_prompt.value, artifact_prompt]
+        if include_summary:
+            prompts.append(summary_prompt)
+        prompts.append(questionnaire)
         prompt_builder = PromptBuilder(prompts)
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
         return prompt_builder
+
+    def _get_target_type_as_snake_case(self) -> str:
+        """
+        Converts the target type to snake case
+        :return: The target type as snake case
+        """
+        return "-".join(self.args.target_type.split()).lower()
+
+    @staticmethod
+    def _format_generated_artifact_content_from_response(res: str) -> List[str]:
+        """
+        Formats the generated artifact content from the model response into a list of the artifact content
+        :param res: The response from the model containing the generated artifact content
+        :return: The list of the generated artifact content
+        """
+        return [re.sub(r'^\d+\.\s', '', content).strip() for content in res.split(NEW_LINE) if content]
+
+    def _get_target_layer_id(self, original_dataset_complete: PromptDataset) -> str:
+        """
+        Gets the id of the new target layer
+        :param original_dataset_complete: The dataset containing source artifacts
+        :return: The id of the new target layer
+        """
+        layer_id = self.args.target_type
+        if self.args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
+            layer_id = f"{layer_id}_{uuid.uuid4()}"
+        return layer_id
+
+    def _get_source_datasets_for_generation(self, export_path: str = EMPTY_STRING) -> Tuple[PromptDataset, PromptDataset]:
+        """
+        Gets the original source datasets used for the generation
+        :param export_path: The path to export checkpoints to
+        :return: The original dataset and a dataset with only the source layer
+        """
+        original_dataset_complete = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
+            else self.args.dataset_for_sources
+        self.save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
+        source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
+                                                                           self.args.source_layer_id,
+                                                                           original_dataset_complete.trace_dataset.trace_df
+                                                                           if original_dataset_complete.trace_dataset else None)
+        return original_dataset_complete, source_layer_only_dataset
 
     @staticmethod
     def save_dataset_checkpoint(dataset: Union[TraceDataset, PromptDataset], export_path: str = None,
@@ -363,21 +405,6 @@ class HierarchyGenerator(BaseObject):
         logger.info(f"Dataset checkpoint saved to {full_export_path} ")
         return full_export_path
 
-    def _get_source_datasets_for_generation(self, export_path: str = EMPTY_STRING) -> Tuple[PromptDataset, PromptDataset]:
-        """
-        Gets the original source datasets used for the generation
-        :param export_path: The path to export checkpoints to
-        :return: The original dataset and a dataset with only the source layer
-        """
-        original_dataset_complete = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
-            else self.args.dataset_for_sources
-        self.save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
-        source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
-                                                                           self.args.source_layer_id,
-                                                                           original_dataset_complete.trace_dataset.trace_df
-                                                                           if original_dataset_complete.trace_dataset else None)
-        return original_dataset_complete, source_layer_only_dataset
-
     @staticmethod
     def _create_dataset_with_single_layer(original_artifact_df: ArtifactDataFrame, layer_id: Any,
                                           original_trace_df: TraceDataFrame = None) -> PromptDataset:
@@ -401,17 +428,6 @@ class HierarchyGenerator(BaseObject):
                                                                layer_mapping_df=layer_df)
         return PromptDataset(trace_dataset=TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df))
 
-    def _get_target_layer_id(self, original_dataset_complete: PromptDataset) -> str:
-        """
-        Gets the id of the new target layer
-        :param original_dataset_complete: The dataset containing source artifacts
-        :return: The id of the new target layer
-        """
-        layer_id = self.args.target_type
-        if self.args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
-            layer_id = f"{layer_id}_{uuid.uuid4()}"
-        return layer_id
-
     @staticmethod
     def _update_trainer_args(trainer: AbstractTrainer, export_path: str) -> None:
         """
@@ -424,3 +440,12 @@ class HierarchyGenerator(BaseObject):
             trainer.trainer_args.output_dir = export_path
         if hasattr(trainer.trainer_args, "metrics"):
             trainer.trainer_args.metrics = []
+
+    @staticmethod
+    def _get_path_to_generation_questionnaire_prompt(target_type: str) -> str:
+        """
+        Gets the path to the generation questionnaire prompts for a given target type
+        :param target_type: The target type being generated
+        :return: The path to the generation questionnaire prompts for a given target type
+        """
+        return os.path.join(GENERATION_QUESTIONNAIRE_PROMPTS_PATH, f"{target_type}.yaml")

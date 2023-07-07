@@ -1,5 +1,5 @@
 from string import ascii_uppercase
-from typing import List
+from typing import List, Dict, Any
 
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.prompt import Prompt
@@ -15,17 +15,14 @@ class QuestionnairePrompt(Prompt):
 
     def __init__(self, question_prompts: List[QuestionPrompt], instructions: str = "", enumeration_chars: List[str] = ascii_uppercase):
         """
-        Initializes the questionairre with the instructions and the questions that will make up the prompt
-        :param question_prompts: The list of question prompts to include in the questionairre
-        :param instructions: Any instructions necessary with the questionairre
+        Initializes the questionnaire with the instructions and the questions that will make up the prompt
+        :param question_prompts: The list of question prompts to include in the questionnaire
+        :param instructions: Any instructions necessary with the questionnaire
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         """
         self.question_prompts = question_prompts
         self.enumeration_chars = enumeration_chars
-        response_manager = PromptResponseManager(
-            response_tag=[prompt.response_manager.response_tag for prompt in self.question_prompts],
-            include_response_instructions=False)
-        super().__init__(instructions, response_manager=response_manager)
+        super().__init__(instructions)
 
     @overrides(Prompt)
     def format_value(self, *args: object, **kwargs: object) -> None:
@@ -38,6 +35,17 @@ class QuestionnairePrompt(Prompt):
         for prompt in self.question_prompts:
             prompt.format_value(**kwargs)
         return super().format_value(*args, **kwargs)
+
+    def parse_response(self, response: str) -> Dict[str, Any]:
+        """
+        Parses the response from the model in the expected format for the prompt
+        :param response: The model response
+        :return: The formatted response
+        """
+        parsed = self.response_manager.parse_response(response)
+        for prompt in self.question_prompts:
+            parsed.update(prompt.response_manager.parse_response(response))
+        return parsed
 
     @overrides(Prompt)
     def _build(self, **kwargs) -> str:

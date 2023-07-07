@@ -20,12 +20,12 @@ class TestTracePredictionOutput(BaseTest):
         result2 = self.get_prediction_output(precision_at_k=0.3)
         self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION_AT_K.name))
         self.assertFalse(result1._can_compare_with_metric(result2, None))
-        self.assertFalse(result1._can_compare_with_metric(result2, "precision_at_k"))
+        self.assertFalse(result1._can_compare_with_metric(result2, "precision"))
 
     def test_get_comparison_vals(self):
         result1 = self.get_prediction_output(precision_at_k=0.8)
         result2 = self.get_prediction_output(precision_at_k=0.3)
-        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION.name)
+        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION_AT_K.name)
         self.assertEqual(metric1, 0.8)
         self.assertEqual(metric2, 0.3)
 

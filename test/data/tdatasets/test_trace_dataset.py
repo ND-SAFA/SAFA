@@ -47,10 +47,8 @@ class TestTraceDataset(BaseTraceTest):
         get_word_pos_mock.return_value = "j"
 
         trace_dataset = self.get_trace_dataset()
-        trace_dataset.resize_neg_links(44)
 
         steps = [SimpleWordReplacementStep(0.5, 0.15), SourceTargetSwapStep()]
-        step_ids = [step.extract_unique_id_from_step_id(step.get_id()) for step in steps]
         steps.append(ResampleStep(0.5))
         n_negative = len(trace_dataset.get_neg_link_ids())
         n_positive = len(trace_dataset.get_pos_link_ids())
@@ -62,26 +60,26 @@ class TestTraceDataset(BaseTraceTest):
         n_positive = len(trace_dataset.get_pos_link_ids())
         self.assertEqual(n_positive, n_negative)
 
+        step_ids = [step.extract_unique_id_from_step_id(step.get_id()) for step in steps[:2]]
         n_augmented_links = [0 for i in range(len(step_ids))]
         n_overlap = 0
         for link_id, link in trace_dataset.trace_df.itertuples():
-            source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
-            source_content = trace_dataset.artifact_df.get_artifact(source_id)[ArtifactKeys.CONTENT]
-            target_content = trace_dataset.artifact_df.get_artifact(target_id)[ArtifactKeys.CONTENT]
+            child_id, parent_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
+            child_content = trace_dataset.artifact_df.get_artifact(child_id)[ArtifactKeys.CONTENT]
+            parent_content = trace_dataset.artifact_df.get_artifact(parent_id)[ArtifactKeys.CONTENT]
             for i, step_id in enumerate(step_ids):
-                if step_id in target_id:
-                    self.assertIn(link_id, trace_dataset.get_pos_link_ids())
-                    self.assertIn(step_id, source_id)
+                if step_id in parent_id:
+                    self.assertIn(step_id, child_id)
                     n_augmented_links[i] += 1
                     if isinstance(steps[i], SimpleWordReplacementStep):
-                        if replacement_word not in source_content \
-                                and replacement_word not in target_content:
+                        if replacement_word not in child_content \
+                                and replacement_word not in parent_content:
                             self.fail("Did not properly perform simple word replacement")
-                        self.assertIn("token", target_content)
+                        self.assertIn("token", parent_content)
                     elif isinstance(steps[i], SourceTargetSwapStep):
-                        self.assertIn("t_", source_content)
-                        if "s_" not in target_content:
-                            if replacement_word not in target_content:
+                        self.assertIn("t_", child_content)
+                        if "s_" not in parent_content:
+                            if replacement_word not in parent_content:
                                 self.fail("Did not properly perform source target swap")
                             n_overlap += 1
         n_expected[1] += n_overlap
@@ -206,8 +204,11 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset.resize_pos_links(new_length, include_duplicates=True)
         trace_dataset.resize_neg_links(new_length, include_duplicates=True)
 
-        for link_ids in [trace_dataset.get_pos_link_ids(), trace_dataset.get_neg_link_ids()]:
-            self.assertEqual(new_length, len(link_ids))
+        n_positive = len(trace_dataset.get_pos_link_ids())
+        n_negative = len(trace_dataset.get_neg_link_ids())
+
+        self.assertEqual(new_length, n_positive)
+        self.assertEqual(new_length, n_negative)
 
     def test_resize_links_no_duplicates(self):
         new_length = 2

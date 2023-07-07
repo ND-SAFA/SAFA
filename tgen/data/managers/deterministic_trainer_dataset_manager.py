@@ -48,8 +48,8 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         """
         if not self._datasets:
             self._datasets, reloaded = self._create_datasets_from_creators_deterministic(self._dataset_creators)
+            self._prepare_datasets(self.augmenter)
             if not reloaded:
-                self._prepare_datasets(self.augmenter)
                 self.export_dataset_splits(self.get_output_path(), SupportedDatasetExporter.CSV)
         return self._datasets
 

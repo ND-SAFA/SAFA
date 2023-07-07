@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Any, Optional, Tuple, List
+from typing import Any, List, Optional, Tuple
 
 import pandas as pd
 from tqdm import tqdm
@@ -62,7 +62,7 @@ class PromptDataset(iDataset):
         :param prompt_builder: The prompt generator
         :return: A data used by the trainer.
         """
-        return self.get_prompts_dataframe(prompt_builder)
+        return self.get_prompt_dataframe(prompt_builder)
 
     def to_dataframe(self) -> pd.DataFrame:
         """
@@ -73,8 +73,8 @@ class PromptDataset(iDataset):
             return self.trace_dataset.to_dataframe()
         elif self.artifact_df is not None:
             return self.artifact_df
-        elif self.get_prompts_dataframe() is not None:
-            return self.get_prompts_dataframe()
+        elif self.get_prompt_dataframe() is not None:
+            return self.get_prompt_dataframe()
 
     def export_prompt_dataframe(self, prompt_df: pd.DataFrame, export_path: str = None) -> Tuple[str, bool]:
         """
@@ -105,8 +105,8 @@ class PromptDataset(iDataset):
         :return: The project file id used by open_ai
         """
         if not self.project_file_id:
-            prompt_df = self.get_prompts_dataframe(prompt_builder=prompt_builder, prompt_args=llm_manager.prompt_args,
-                                                   summarizer=summarizer)
+            prompt_df = self.get_prompt_dataframe(prompt_builder=prompt_builder, prompt_args=llm_manager.prompt_args,
+                                                  summarizer=summarizer)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
             self.project_file_id = res.id
@@ -114,8 +114,8 @@ class PromptDataset(iDataset):
                 os.remove(export_path)
         return self.project_file_id
 
-    def get_prompts_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None,
-                              summarizer: Summarizer = None) -> PromptDataFrame:
+    def get_prompt_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None,
+                             summarizer: Summarizer = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_args: The arguments for properly formatting the prompt

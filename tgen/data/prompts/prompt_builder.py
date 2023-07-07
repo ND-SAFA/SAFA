@@ -1,4 +1,4 @@
-from typing import List, Any, Dict
+from typing import Any, Dict, List
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.keys.prompt_keys import PromptKeys
@@ -113,7 +113,9 @@ class PromptBuilder:
         Creates a config for the given prompts
         :return: The configuration for the prompt builder
         """
-        self.config = PromptConfig(False, False, False)
+        self.config = PromptConfig(requires_trace_per_prompt=False,
+                                   requires_artifact_per_prompt=False,
+                                   requires_all_artifacts=False)
         for prompt in self._prompts:
             if isinstance(prompt, MultiArtifactPrompt):
                 self.config.requires_trace_per_prompt = prompt.type == MultiArtifactPrompt.DataType.TRACES

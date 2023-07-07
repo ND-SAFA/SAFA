@@ -108,14 +108,14 @@ class TestPromptDataset(BaseTest):
         prompt2 = ArtifactPrompt(include_id=False)
         prompt_builder = PromptBuilder([prompt, prompt2])
         outputs = self.run_dataset_tests(
-            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder, OpenAIManager.prompt_args),
+            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder, OpenAIManager.prompt_args),
                                                             TEST_OUTPUT_DIR),
             ["id"]
         )
         dataset = self.get_dataset_from_prompt_df()
-        outputs["with_filename"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder),
+        outputs["with_filename"] = dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder),
                                                                    os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
-        outputs["no_output_path"] = dataset.export_prompt_dataframe(dataset.get_prompts_dataframe(prompt_builder))
+        outputs["no_output_path"] = dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder))
         expected_trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
         for type_, output in outputs.items():
             fail_msg = self.DATASET_FAIL_MSG.format(type_)

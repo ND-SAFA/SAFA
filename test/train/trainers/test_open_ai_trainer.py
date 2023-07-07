@@ -14,13 +14,13 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 
 Res = namedtuple("Res", ["id"])
 
@@ -55,7 +55,7 @@ class TestOpenAiTrainer(BaseTest):
         mock_file_create.return_value = Res(id="file_id")
         mock_fine_tune_create.side_effect = self.fake_fine_tune_create_classification_metrics
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
-        prompt_builder = PromptBuilder( prompts=[prompt])
+        prompt_builder = PromptBuilder(prompts=[prompt])
         for type_, dataset_creator in self.get_all_dataset_creators().items():
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN, DatasetRole.VAL], prompt_builder=prompt_builder)
             res = trainer.perform_training()
@@ -76,12 +76,15 @@ class TestOpenAiTrainer(BaseTest):
     def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock, mock_completion_create: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
         mock_completion_create.side_effect = self.fake_completion_create
+
         dataset_creators = self.get_all_dataset_creators()
         dataset_creators.pop("id")
+
         classification_prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
         classification_prompt_builder = PromptBuilder(prompts=[classification_prompt])
         generation_prompt = QuestionPrompt("Tell me about this artifact: ")
         generation_prompt_builder = PromptBuilder([generation_prompt])
+        
         for i, creator in enumerate([classification_prompt_builder, generation_prompt_builder]):
             for type_, dataset_creator in dataset_creators.items():
                 builder = deepcopy(creator)
@@ -157,4 +160,4 @@ class TestOpenAiTrainer(BaseTest):
         trainer_dataset_manager = TrainerDatasetManager.create_from_map({role: dataset_creator for role in roles})
         llm_manager = OpenAIManager(OpenAIArgs())
         return LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager,
-                          prompt_builder=prompt_builder, llm_manager=llm_manager, **params))
+                                          prompt_builder=prompt_builder, llm_manager=llm_manager, **params))

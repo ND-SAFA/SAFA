@@ -61,9 +61,11 @@ class TestHuggingFaceTrainer(BaseTraceTest):
     def test_eval(self):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         test_trace_trainer = self.get_custom_trace_trainer(metrics=self.TEST_METRICS_NAMES)
-        metrics_manager = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].trace_df,
-                                         test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].get_ordered_link_ids(),
-                                         output.labels)
+        trace_df = test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].trace_df
+        link_ids = test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].get_ordered_link_ids()
+        metrics_manager = MetricsManager(trace_df,
+                                         link_ids=link_ids,
+                                         trace_predictions=output.predictions)
         eval_metrics = metrics_manager.eval(self.TEST_METRICS_NAMES)
         self.assert_metrics(eval_metrics)
 

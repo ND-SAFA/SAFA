@@ -29,7 +29,7 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         datasets2 = dataset_container_manager_second.get_datasets()
         for dataset_role, dataset in datasets1.items():
             if dataset_role in expected_dataset_roles[1:]:
-                self.assertListEqual(sorted(dataset.pos_link_ids), sorted(datasets2[dataset_role].pos_link_ids))
+                self.assertListEqual(sorted(dataset.get_pos_link_ids()), sorted(datasets2[dataset_role].get_pos_link_ids()))
 
     def create_dataset_manager(self, keys: List[DatasetRole]):
         args = ObjectCreator.get_definition(TrainerDatasetManager)

@@ -4,7 +4,7 @@ import string
 import uuid
 from collections import Counter
 from datetime import datetime
-from typing import Any, Dict, List, Tuple, Type, Union, Set
+from typing import Any, Dict, List, Set, Tuple, Type, Union
 
 import bs4
 from yaml.constructor import SafeConstructor
@@ -134,7 +134,7 @@ class HierarchyGenerator(BaseObject):
         for i, step in enumerate(steps):
             if i == len(steps) - 1:
                 response_tag = f"{target_artifact_tag}-drafts"
-                response_instructions_format = f"Output the {self.args.target_type}s in a comma-deliminated list enclosed in"
+                response_instructions_format = f"Output a draft of the {self.args.target_type}s in a comma-deliminated list enclosed in"
             else:
                 response_tag = self._convert_spaces_to_dashes(step[name_id][0])
                 deliverable = step[deliverable_id][0]
@@ -147,9 +147,9 @@ class HierarchyGenerator(BaseObject):
         response_manager = PromptResponseManager(response_tag=f"{target_artifact_tag}s",
                                                  formatter=lambda tag, val: [v for v in val.split(NEW_LINE) if v],
                                                  required_tag_ids=REQUIRE_ALL_TAGS)
-        questions.append(QuestionPrompt(f"Finally, output the contents of the {self.args.target_type} "
-                                        f"in a comma deliminated list using the following format: "
-                                        f"{result[format_id][0]}", response_manager=response_manager))
+        questions.append(QuestionPrompt(f"Finally, output the unique set of {self.args.target_type}s that describe the system "
+                                        f"with minimal overlap in a comma deliminated list using the following format: "
+                                        f"\"{result[format_id][0]}\"", response_manager=response_manager))
         return questions
 
     def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset,
@@ -319,7 +319,12 @@ class HierarchyGenerator(BaseObject):
                                              trainer_dataset_manager=dataset_manager,
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
-        predictions = trainer.perform_prediction().predictions
+        if "artifact_gen_response" in export_path:
+            predictions = FileUtil.read_yaml("/Users/albertorodriguez/Projects/"
+                                             "SAFA/tgen/output/hgen/bend/0d055751-c6e8-4f2e-b2a8-99a297b83f58/artifact_gen_response.yaml")
+            response_prompt_ids = {"91b29679-f794-44d3-b001-8fa52c236576"}
+        else:
+            predictions = trainer.perform_prediction().predictions
         if export_path:
             FileUtil.write_yaml(predictions, export_path)
         response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
@@ -353,7 +358,10 @@ class HierarchyGenerator(BaseObject):
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
         artifact_prompt.format_value(source_type=self.args.source_type.upper())
-        summary_prompt = Prompt("First, write a short paragraph summarizing the system described by the code.",
+        summary_prompt = Prompt("First, focus on the functionality the system is providing its users. "
+                                "Write a short paragraph describing the high level "
+                                "features and how they operate to provide this functionality."
+                                "Your answer should be concise but comprehensive. ",
                                 PromptResponseManager(response_tag="summary"))
         prompts = [base_prompt.value, artifact_prompt]
         if include_summary:

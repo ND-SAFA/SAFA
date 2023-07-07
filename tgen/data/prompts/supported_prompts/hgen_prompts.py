@@ -35,7 +35,7 @@ RELATED_ARTIFACT_PROMPT = Prompt("You are given {target_type} and a list of numb
                                  response_manager=PromptResponseManager(response_tag="related-numbers",
                                                                         formatter=lambda _, val: [int(v) for v in val.split(COMMA)]))
 GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
-                           "{source_type}s from {target_type}s. You are given a numbered list of descriptions of the "
+                           "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
                            "{source_type}s in the system and you must complete each step below with the "
                            "end goal of producing the {target_type}s.")
 REFINE_PROMPT = Prompt("You are an engineer working on a software system "
@@ -69,13 +69,15 @@ REFINE_STEP4 = QuestionPrompt(
     "For example, remove any {target_type}s or details related to basic validation, security, scalability, etc. "
     "Output the updated list of {target_type}s which provide specific, meaningful information for this system.",
     response_manager=PromptResponseManager(response_tag="meaningful"))
-REFINE_STEP5 = QuestionPrompt("Next, if there are any redundant {target_type}s from the previous step, eliminate them. "
+REFINE_STEP6 = QuestionPrompt("Next, if there are any {target_type}s from the previous step, condense them. "
                               "Multiple {target_type}s describing the same functionality "
                               "or quality attribute can be consolidated into a single, more comprehensive artifact. "
                               "Output the remaining {target_type}s which provide unique and significant information "
-                              "as well as the consolidated version of any redundant {target_type}s. ",
+                              "as well as the consolidated version of any redundant {target_type}s. "
+                              "Apply a high-level, architectural perspective to identify redundant or overlapping {target_type}. "
+                              "Leverage context about the overall system and domain to make connections between related {target_type}.",
                               response_manager=PromptResponseManager(response_tag="consolidated"))
-REFINE_STEP6 = QuestionPrompt("Finally, Using all of the previous steps, review artifacts for consistency, clarity, and quality. "
+REFINE_STEP7 = QuestionPrompt("Finally, Using all of the previous steps, review artifacts for consistency, clarity, and quality. "
                               "Refine wording and remove any ambiguity. "
                               "Output a final revised set of {target_type}s for this system. "
                               "The final {target_type} should be specific, meaningful, "
@@ -83,4 +85,7 @@ REFINE_STEP6 = QuestionPrompt("Finally, Using all of the previous steps, review 
                               response_manager=PromptResponseManager(response_tag="final-solution",
                                                                      required_tag_ids=REQUIRE_ALL_TAGS))
 REFINE_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[REFINE_STEP1, REFINE_STEP2, REFINE_STEP3,
-                                                             REFINE_STEP4, REFINE_STEP5, REFINE_STEP6])
+                                                             REFINE_STEP4,
+                                                             # REFINE_STEP5,
+                                                             REFINE_STEP6,
+                                                             REFINE_STEP7])

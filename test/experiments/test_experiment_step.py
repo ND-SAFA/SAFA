@@ -32,8 +32,11 @@ class TestExperimentStep(BaseExperimentTest):
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
+        FileUtil.delete_dir(TEST_OUTPUT_DIR)
+        self.assertFalse(os.path.exists(TEST_OUTPUT_DIR))
         train_job_run_mock.side_effect = self.job_fake_run
         definition_mock.return_value = StructureProjectDefinition()
+
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)

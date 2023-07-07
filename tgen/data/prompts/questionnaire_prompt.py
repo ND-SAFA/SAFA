@@ -1,9 +1,9 @@
+from copy import deepcopy
 from string import ascii_uppercase
 from typing import List, Dict, Any
 
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.util.override import overrides
 
@@ -20,7 +20,7 @@ class QuestionnairePrompt(Prompt):
         :param instructions: Any instructions necessary with the questionnaire
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         """
-        self.question_prompts = question_prompts
+        self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
         super().__init__(instructions)
 

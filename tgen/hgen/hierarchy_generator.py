@@ -57,7 +57,7 @@ class HierarchyGenerator(BaseObject):
     """
     GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
     TASK_PREFACE = f"{NEW_LINE} TASKS: {NEW_LINE}"
-    RES_TOKENS_MIN = 20000
+    RES_TOKENS_MIN = 25000
 
     def __init__(self, args: HGenArgs):
         """
@@ -183,9 +183,9 @@ class HierarchyGenerator(BaseObject):
         """
         try:
             logger.info(f"Refining {len(generated_artifact_content)} {self.args.target_type}s\n")
-            questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
+            questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value
             prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
-                                                                     SupportedPrompts.HGEN_REFINE_PROMPT)
+                                                                     SupportedPrompts.HGEN_REFINE_PROMPT_CONTEXT)
             target_prompt = MultiArtifactPrompt(prompt_start="{target_type}S:",
                                                 build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                                 include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
@@ -197,7 +197,20 @@ class HierarchyGenerator(BaseObject):
                                                              response_prompt_ids=questionnaire.id,
                                                              tags_for_response=generated_artifacts_tag,
                                                              return_first=True,
-                                                             export_path=os.path.join(export_path, "gen_refinement_response.yaml"))[0]
+                                                             export_path=os.path.join(export_path, "gen_refinement_response1.yaml"))[0]
+
+            questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_ISOLATED.value
+            prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
+                                                                     SupportedPrompts.HGEN_REFINE_PROMPT_ISOLATED,
+                                                                     include_artifact=False)
+            target_prompt_content = target_prompt.build(artifacts=[{ArtifactKeys.CONTENT: c} for c in refined_artifact_content])
+            prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
+            generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+            refined_artifact_content = self._get_predictions(prompt_builder, PromptDataset(),
+                                                             response_prompt_ids=questionnaire.id,
+                                                             tags_for_response=generated_artifacts_tag,
+                                                             return_first=True,
+                                                             export_path=os.path.join(export_path, "gen_refinement_response2.yaml"))[0]
         except Exception:
             logger.exception("Refining the artifact content failed. Using original content instead.")
             refined_artifact_content = generated_artifact_content
@@ -320,8 +333,8 @@ class HierarchyGenerator(BaseObject):
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
         if "artifact_gen_response" in export_path:
-            predictions = FileUtil.read_yaml("/Users/albertorodriguez/Projects/"
-                                             "SAFA/tgen/output/hgen/bend/0d055751-c6e8-4f2e-b2a8-99a297b83f58/artifact_gen_response.yaml")
+            predictions = FileUtil.read_yaml(
+                "/home/kat/git-repos/safa/tgen/output/hgen/bend/2f8e5d34-f127-42dd-9cfe-ed6ad1d71618/artifact_gen_response.yaml")
             response_prompt_ids = {"91b29679-f794-44d3-b001-8fa52c236576"}
         else:
             predictions = trainer.perform_prediction().predictions
@@ -342,28 +355,32 @@ class HierarchyGenerator(BaseObject):
 
     def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt,
                                            base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
-                                           include_summary: bool = False) -> PromptBuilder:
+                                           include_summary: bool = False, include_artifact: bool = True) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
         :param questionnaire: The questionnaire prompt given to the model to produce the generations
         :param base_prompt: The main prompt that starts the prompt
         :param include_summary: If True, instructions the model to create a summary of the system first
+        :param include_summary: If True, includes a prompt for building the source artifacts
         :return: The prompt builder used for the generations
         """
+
         questionnaire.value = self.TASK_PREFACE + questionnaire.value
         generation_step_response_manager = questionnaire.question_prompts[-1].response_manager
         generation_step_response_manager.formatter = lambda tag, val: self._format_generated_artifact_content_from_response(val)
 
-        artifact_prompt = MultiArtifactPrompt(prompt_start="{source_type}S:",
+        artifact_prompt = MultiArtifactPrompt(prompt_start="{artifact_type}S:",
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-        artifact_prompt.format_value(source_type=self.args.source_type.upper())
+        artifact_prompt.format_value(artifact_type=self.args.source_type.upper())
         summary_prompt = Prompt("First, focus on the functionality the system is providing its users. "
                                 "Write a short paragraph describing the high level "
                                 "features and how they operate to provide this functionality."
                                 "Your answer should be concise but comprehensive. ",
                                 PromptResponseManager(response_tag="summary"))
-        prompts = [base_prompt.value, artifact_prompt]
+        prompts = [base_prompt.value]
+        if include_artifact:
+            prompts.append(artifact_prompt)
         if include_summary:
             prompts.append(summary_prompt)
         prompts.append(questionnaire)

@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
 from tgen.ranking.pipeline.base import RankingStore
@@ -128,10 +129,10 @@ class RankingUtil:
 
         for child, trace_predictions in children2entry.items():
 
-            sorted_entries = sorted(trace_predictions, key=lambda e: e[TraceKeys.SCORE.value], reverse=True)
-            selected_entries = [s for s in sorted_entries if s[TraceKeys.SCORE.value] >= parent_threshold]
+            sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
+            selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
             top_parent = sorted_entries[0]
-            if len(selected_entries) == 0 and top_parent[TraceKeys.SCORE.value] >= min_threshold:
+            if len(selected_entries) == 0 and top_parent[StructuredKeys.SCORE] >= min_threshold:
                 selected_entries.append(top_parent)
             predictions.extend(selected_entries)
         return predictions

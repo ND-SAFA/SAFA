@@ -83,6 +83,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Named parameters to anthropic API.
         :return: Anthropic's response to completion request.
         """
+        assert not IS_TEST, "No requests should be made while in test"
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         logger.info(f"Starting Anthropic batch: {params['model']}")
         prompts = params[AnthropicParams.PROMPT]

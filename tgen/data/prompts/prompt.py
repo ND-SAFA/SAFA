@@ -1,6 +1,8 @@
 import uuid
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from typing import Dict, Any
+
+from tgen.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.data.prompts.prompt_response_manager import RESPONSE_FORMAT, PromptResponseManager
 from tgen.util.str_util import StrUtil
 
@@ -30,7 +32,7 @@ class Prompt:
         prompt = self._build(**kwargs)
         expected_response = self.response_manager.format_response_instructions()
         if expected_response:
-            prompt = f"{prompt}{NEW_LINE}{expected_response}"
+            prompt = f"{prompt}{SPACE}{expected_response}"
         return prompt
 
     def format_value(self, *args: object, **kwargs: object) -> None:
@@ -41,6 +43,14 @@ class Prompt:
         :return: None
         """
         self.value = StrUtil.format_selective(self.value, *args, **kwargs)
+
+    def parse_response(self, response: str) -> Dict[str, Any]:
+        """
+        Parses the response from the model in the expected format for the prompt
+        :param response: The model response
+        :return: The formatted response
+        """
+        return self.response_manager.parse_response(response)
 
     def _build(self, **kwargs) -> str:
         """

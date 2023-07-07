@@ -1,0 +1,37 @@
+step:
+- deliverable:
+  - A high-level overview of the system architecture and functionality.
+  instructions:
+  - Analyze the code to identify the main components and functions of the system.
+    Group related components and functions together into logical modules. Document
+    the purpose and responsibilities of each module.
+  name:
+  - Module
+- deliverable:
+  - A description of the logical flow and purpose of each function and variable within
+    the modules.
+  instructions:
+  - Within each module, analyze the code to identify the inputs, outputs, and purpose
+    of each function. Document function signatures, parameters, and return values.
+    Identify any global variables used and their purpose.
+  name:
+  - Flow
+- deliverable:
+  - A high-level overview of how the modules and functions work together to achieve
+    the overall system functionality.
+  instructions:
+  - Analyze the relationships and interactions between modules and functions to understand
+    the overall program flow and logic.  Identify any dependencies or sequencing requirements
+    between modules and functions.
+  name:
+  - Logic
+- deliverable:
+  - A set of requirements describing what the system does to satisfy user and system
+    needs.
+  instructions:
+  - Review the information gathered in the previous steps. Identify and document the
+    key requirements, capabilities, and constraints of the system based on how the
+    code implements functionality. Organize the requirements by module and function
+    where applicable. Ensure each requirement is uniquely identified and testable.
+  name:
+  - Requirements

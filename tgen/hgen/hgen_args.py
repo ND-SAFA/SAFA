@@ -45,29 +45,9 @@ class HGenArgs(BaseObject):
     """
     dataset_for_sources: PromptDataset = None
     """
-    The method to use to cluster source artifacts. Hierarchy will be built from these clusters
-    """
-    clustering_method: Union[SupportedClusteringMethod, Set[SupportedClusteringMethod]] = SupportedClusteringMethod.LLM
-    """
-    Pre-created clusters to use
-    """
-    manual_clusters: Clusters = None
-    """
-    The method to use to cluster source artifacts. Hierarchy will be built from these clusters
-    """
-    clustering_params: dict = field(default_factory=dict)
-    """
     The path to save checkpoints to if desired
     """
     export_path: str = None
-    """
-    The LLM to use for generating the example artifact type
-    """
-    llm_manager_for_example: AbstractLLMManager = field(default_factory=AnthropicManager)
-    """
-    The LLM to use for generating the example artifact type
-    """
-    hgen_summarizer: Summarizer = field(default_factory=Summarizer)
 
     def __post_init__(self) -> None:
         """

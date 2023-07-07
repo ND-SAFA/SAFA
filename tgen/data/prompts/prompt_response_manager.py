@@ -1,6 +1,8 @@
 from dataclasses import field, dataclass
 from typing import Union, Dict, Any, Callable, Type, List
 
+import bs4
+
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
@@ -99,9 +101,9 @@ class PromptResponseManager:
 
     def parse_response(self, response: str) -> Dict[str, Any]:
         """
-        Used to fulfill api, may be overridden in child classes
+        Parses the response from the model in the expected format for the prompt
         :param response: The model response
-        :return: The response unchanged
+        :return: The formatted response
         """
         if not self.response_tag:
             return {}
@@ -160,6 +162,8 @@ class PromptResponseManager:
                     formatted_val = self._format_response(val)
                 else:
                     try:
+                        if isinstance(formatted_val, bs4.NavigableString):
+                            formatted_val = str(formatted_val)
                         expected_response_type = self.get_expected_response_type(tag)
                         if expected_response_type:
                             formatted_val = expected_response_type(formatted_val)

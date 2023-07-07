@@ -5,6 +5,7 @@ from openai.api_resources.fine_tune import FineTune
 
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
     REVERSE_CATEGORIES
@@ -142,7 +143,7 @@ class LLMTrainer(AbstractTrainer):
             predicted_label = 1 if score >= 0.5 else 0
             correct_label = "correct" if label == predicted_label else "wrong"
 
-            entry[TraceKeys.SCORE.value] = score
+            entry[StructuredKeys.SCORE] = score
             entry[TraceKeys.SOURCE.value] = trace_row[TraceKeys.SOURCE.value]
             entry[TraceKeys.TARGET.value] = trace_row[TraceKeys.TARGET.value]
             entry[TraceKeys.LABEL.value] = trace_row[TraceKeys.LABEL.value]

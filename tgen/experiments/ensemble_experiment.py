@@ -7,6 +7,7 @@ from sklearn.preprocessing import minmax_scale, scale
 
 from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
@@ -112,7 +113,7 @@ class EnsembleExperiment(Experiment):
             job_output = JsonUtil.read_json_file(job_output_path)
             prediction_output = job_output["prediction_output"] if "prediction_output" in job_output else job_output
             job_entries.append(prediction_output["prediction_entries"])
-        job_predictions = [[entry[TraceKeys.SCORE.value] for entry in job_entries] for job_entries in job_entries]
+        job_predictions = [[entry[StructuredKeys.SCORE] for entry in job_entries] for job_entries in job_entries]
         return EnsembleExperiment.scale_predictions(job_predictions)
 
     @staticmethod

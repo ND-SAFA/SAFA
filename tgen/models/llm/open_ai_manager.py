@@ -60,6 +60,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param params: Params necessary for request
         :return: The response from open  ai
         """
+        assert not IS_TEST, "No requests should be made while in test"
         prompt = params.get(OpenAIParams.PROMPT)
         batches = ListUtil.batch(prompt, n=OpenAIManager.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
         res = None

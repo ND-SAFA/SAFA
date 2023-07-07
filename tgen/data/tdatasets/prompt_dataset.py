@@ -123,7 +123,7 @@ class PromptDataset(iDataset):
         :param summarizer: If provided, summarizes prompts that exceed the token limit
         :return: The prompt dataframe containing prompts and completions
         """
-        if self.prompt_df is None:
+        if self.prompt_df is None or (prompt_builder and prompt_args):
             assert prompt_builder is not None and prompt_args is not None, \
                 "Must provide prompt generator to create prompt dataset for trainer"
             if prompt_builder.config.requires_trace_per_prompt:

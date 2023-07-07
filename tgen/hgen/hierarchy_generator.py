@@ -2,8 +2,9 @@ import os
 import re
 import string
 import uuid
+from collections import Counter
 from datetime import datetime
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import Any, Dict, List, Tuple, Type, Union, Set
 
 import bs4
 from yaml.constructor import SafeConstructor
@@ -11,6 +12,7 @@ from yaml.constructor import SafeConstructor
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.constants.prediction_constants import HGEN_TOP_PREDICTION_MIN_THRESHOLD
+from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -25,7 +27,7 @@ from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -36,11 +38,13 @@ from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.dict_util import DictUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
@@ -53,6 +57,7 @@ class HierarchyGenerator(BaseObject):
     """
     GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
     TASK_PREFACE = f"{NEW_LINE} TASKS: {NEW_LINE}"
+    RES_TOKENS_MIN = 20000
 
     def __init__(self, args: HGenArgs):
         """
@@ -60,8 +65,7 @@ class HierarchyGenerator(BaseObject):
         :param args: The arguments required for the hierarchy generation
         """
         self.args = args
-        self.args.hgen_llm_manager.llm_args.model = "claude-v1.3"  # TODO default or set this elsewhere
-        self.args.hgen_llm_manager.llm_args.set_max_tokens(2000)
+        self._set_max_tokens(self.args.hgen_llm_manager)
 
     def run(self) -> TraceDataset:
         """
@@ -89,48 +93,63 @@ class HierarchyGenerator(BaseObject):
             return bs4.Tag(value)
 
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
+        format_prompt: Prompt = Prompt("Finally, provide an example of the typical format for a {target_type}. "
+                                       "The format should be for only the body of the {target_type} and should exclude any title.",
+                                       response_manager=PromptResponseManager(response_tag="format",
+                                                                              required_tag_ids=REQUIRE_ALL_TAGS))
 
-        questionnaire_prompt_path = self._get_path_to_generation_questionnaire_prompt(self._get_target_type_as_snake_case())
+        questionnaire_prompt_path = self._get_path_to_generation_questionnaire_prompt(
+            self._convert_spaces_to_dashes(self.args.target_type))
         if os.path.exists(questionnaire_prompt_path):
             SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
             questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
         else:
             logger.info("Creating questionnaire prompt for generation\n")
-            prompt_builder = PromptBuilder(prompts=[instructions_prompt])
+            prompt_builder = PromptBuilder(prompts=[instructions_prompt, format_prompt])
             prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
             questionnaire_content = self._get_predictions(prompt_builder, PromptDataset(),
-                                                          response_prompt_id=instructions_prompt.id)[0]
+                                                          response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
             FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
-        questions = self._construct_question_prompts_from_output(instructions_prompt, questionnaire_content)
+        questions = self._construct_question_prompts_from_output(*instructions_prompt.response_manager.get_all_tag_ids(),
+                                                                 format_prompt.response_manager.response_tag,
+                                                                 questionnaire_content)
         return QuestionnairePrompt(question_prompts=questions,
                                    instructions=self.GENERATION_INSTRUCTIONS)
 
-    def _construct_question_prompts_from_output(self, instructions_prompt: Prompt, result: Dict) -> List[QuestionPrompt]:
+    def _construct_question_prompts_from_output(self, step_id: str, name_id: str, instructions_id: str, deliverable_id: str,
+                                                format_id: str, result: Dict) -> List[QuestionPrompt]:
         """
         Constructs the question prompts from the model output
-        :param instructions_prompt: The instructions prompt used to produce model output
+        :param step_id: The id of the tag for the step
+        :param name_id: The id of the tag for the step name
+        :param instructions_id: The id of the tag for the step id
+        :param deliverable_id: The id of the tag for the step deliverable
+        :param format_id: The id of the tag for the artifact format
         :param result: The model output
         :return: The list of question prompts created from model output
         """
-        step_id, name_id, instructions_id, deliverable_id = instructions_prompt.response_manager.get_all_tag_ids()
         steps = result[step_id]
         questions = []
-        target_artifact_tag = self._get_target_type_as_snake_case()
+        target_artifact_tag = self._convert_spaces_to_dashes(self.args.target_type)
         for i, step in enumerate(steps):
             if i == len(steps) - 1:
-                response_tag = target_artifact_tag
+                response_tag = f"{target_artifact_tag}-drafts"
                 response_instructions_format = f"Output the {self.args.target_type}s in a comma-deliminated list enclosed in"
             else:
-                response_tag = step[name_id][0].lower()
+                response_tag = self._convert_spaces_to_dashes(step[name_id][0])
                 deliverable = step[deliverable_id][0]
                 deliverable = deliverable[:-1] if deliverable[-1] in string.punctuation else deliverable
                 response_instructions_format = f"Output {deliverable} enclosed in"
             response_manager = PromptResponseManager(response_tag=response_tag,
-                                                     response_instructions_format=response_instructions_format + ' {}',
-                                                     formatter=lambda tag, val: [v for v in val.split(NEW_LINE) if v]
-                                                     if tag == target_artifact_tag else val)
+                                                     response_instructions_format=response_instructions_format + ' {}')
             question = QuestionPrompt(step[instructions_id][0], response_manager=response_manager)
             questions.append(question)
+        response_manager = PromptResponseManager(response_tag=f"{target_artifact_tag}s",
+                                                 formatter=lambda tag, val: [v for v in val.split(NEW_LINE) if v],
+                                                 required_tag_ids=REQUIRE_ALL_TAGS)
+        questions.append(QuestionPrompt(f"Finally, output the contents of the {self.args.target_type} "
+                                        f"in a comma deliminated list using the following format: "
+                                        f"{result[format_id][0]}", response_manager=response_manager))
         return questions
 
     def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset) \
@@ -145,8 +164,8 @@ class HierarchyGenerator(BaseObject):
         prompt_builder = self._get_prompt_builder_for_generation(questionnaire, include_summary=True)
         generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
         generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
-                                                       response_prompt_id=questionnaire.id,
-                                                       tag_for_response=generated_artifacts_tag,
+                                                       response_prompt_ids=questionnaire.id,
+                                                       tags_for_response=generated_artifacts_tag,
                                                        return_first=True)
         generated_artifact_content = generation_predictions[0]
         return generated_artifact_content
@@ -158,22 +177,26 @@ class HierarchyGenerator(BaseObject):
         :param source_layer_only_dataset: The dataset containing only the source layer
         :return: A list of refined artifact content
         """
-        logger.info(f"Refining {len(generated_artifact_content)} {self.args.target_type}s\n")
-        questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
-        prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
-                                                                 SupportedPrompts.HGEN_REFINE_PROMPT)
-        target_prompt = MultiArtifactPrompt(prompt_start="{target_type}S:",
-                                            build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                            include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-        target_prompt.format_value(target_type=self.args.target_type.upper())
-        target_prompt_content = target_prompt.build(artifacts=[{ArtifactKeys.CONTENT: c} for c in generated_artifact_content])
-        prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
-        generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
-        refined_artifact_content = self._get_predictions(prompt_builder, source_layer_only_dataset,
-                                                         response_prompt_id=questionnaire.id,
-                                                         tag_for_response=generated_artifacts_tag,
-                                                         return_first=True)
-        return refined_artifact_content[0]
+        try:
+            logger.info(f"Refining {len(generated_artifact_content)} {self.args.target_type}s\n")
+            questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
+            prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
+                                                                     SupportedPrompts.HGEN_REFINE_PROMPT)
+            target_prompt = MultiArtifactPrompt(prompt_start="{target_type}S:",
+                                                build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
+                                                include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+            target_prompt.format_value(target_type=self.args.target_type.upper())
+            target_prompt_content = target_prompt.build(artifacts=[{ArtifactKeys.CONTENT: c} for c in generated_artifact_content])
+            prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
+            generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+            refined_artifact_content = self._get_predictions(prompt_builder, source_layer_only_dataset,
+                                                             response_prompt_ids=questionnaire.id,
+                                                             tags_for_response=generated_artifacts_tag,
+                                                             return_first=True)[0]
+        except Exception:
+            logger.exception("Refining the artifact content failed. Using original content instead.")
+            refined_artifact_content = generated_artifact_content
+        return refined_artifact_content
 
     def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
                                                        original_dataset_complete: Union[PromptDataset, TraceDataset],
@@ -229,14 +252,17 @@ class HierarchyGenerator(BaseObject):
                                              ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
         try:
             logger.info(f"Creating names for {len(new_artifact_df)} {self.args.target_type}\n")
-            name_prompt = Prompt(f"Create a name for this {self.args.target_type}.", PromptResponseManager(response_tag="name"))
+            name_prompt = Prompt(f"Create a name for this {self.args.target_type}.",
+                                 PromptResponseManager(response_tag="name", required_tag_ids=REQUIRE_ALL_TAGS))
             artifact_prompt = ArtifactPrompt(include_id=False)
             prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
             dataset = PromptDataset(artifact_df=new_artifact_df)
-            names = self._get_predictions(prompt_builder, dataset, response_prompt_id=name_prompt.id,
-                                          tag_for_response=name_prompt.response_manager.response_tag, return_first=True)
+            names = self._get_predictions(prompt_builder, dataset, response_prompt_ids=name_prompt.id,
+                                          tags_for_response=name_prompt.response_manager.response_tag, return_first=True)
             assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
-            new_artifact_df.index = names  # TODO ensure names are all unique
+            duplicated_names = {name for name, count in Counter(names).items() if count > 1}
+            assert len(duplicated_names) < 1, "Found duplicate names"  # TODO handle this case in the future if this is a problem
+            new_artifact_df.index = names
         except Exception:
             logger.exception("Unable to generate names for the artifacts")
         return new_artifact_df
@@ -271,14 +297,15 @@ class HierarchyGenerator(BaseObject):
         return layer_df
 
     def _get_predictions(self, prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager: AbstractLLMManager = None,
-                         response_prompt_id: Prompt = None, tag_for_response: str = None, return_first: bool = False) -> Any:
+                         response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
+                         return_first: bool = False) -> Any:
         """
         Gets the predictions for the given prompts on the given dataset
         :param prompt_builder: Builds the prompts for the model
         :param dataset: The dataset to use with the prompts
         :param llm_manager: The LLM manager to use for predictions
-        :param response_prompt_id: The prompt id to extract from predictions
-        :param tag_for_response: The tag to extract from predictions
+        :param response_prompt_ids: The prompt id to extract from predictions
+        :param tags_for_response: The tag to extract from predictions
         :return: The model predictions
         """
         dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
@@ -287,12 +314,17 @@ class HierarchyGenerator(BaseObject):
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
         predictions = trainer.perform_prediction().predictions
-        if response_prompt_id:
-            predictions = [p[response_prompt_id] for p in predictions]
-            if tag_for_response:
-                predictions = [p[tag_for_response] for p in predictions]
+        response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
+        if response_prompt_ids:
+            predictions = [DictUtil.combine_child_dicts(p, response_prompt_ids) for p in predictions]
+            if tags_for_response:
+                predictions = [DictUtil.filter_dict_keys(p, keys2keep=tags_for_response) if isinstance(tags_for_response, set)
+                               else p[tags_for_response] for p in predictions]
                 if return_first:
-                    predictions = [p[0] for p in predictions]
+                    if isinstance(predictions[0], dict):
+                        predictions = [value[0] if isinstance(value, list) else value for p in predictions for key, value in p.items()]
+                    else:
+                        predictions = [p[0] for p in predictions]
         return predictions
 
     def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt,
@@ -313,7 +345,7 @@ class HierarchyGenerator(BaseObject):
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
         artifact_prompt.format_value(source_type=self.args.source_type.upper())
-        summary_prompt = Prompt("First, write a short summary of the system.",
+        summary_prompt = Prompt("First, write a short paragraph summarizing the system described by the code.",
                                 PromptResponseManager(response_tag="summary"))
         prompts = [base_prompt.value, artifact_prompt]
         if include_summary:
@@ -323,12 +355,13 @@ class HierarchyGenerator(BaseObject):
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
         return prompt_builder
 
-    def _get_target_type_as_snake_case(self) -> str:
+    @staticmethod
+    def _convert_spaces_to_dashes(str2convert) -> str:
         """
-        Converts the target type to snake case
-        :return: The target type as snake case
+        Converts the str to use dashes instead of spaces
+        :return: The str with dashes instead of spaces
         """
-        return "-".join(self.args.target_type.split()).lower()
+        return "-".join(str2convert.split()).lower()
 
     @staticmethod
     def _format_generated_artifact_content_from_response(res: str) -> List[str]:
@@ -437,3 +470,15 @@ class HierarchyGenerator(BaseObject):
         :return: The path to the generation questionnaire prompts for a given target type
         """
         return os.path.join(GENERATION_QUESTIONNAIRE_PROMPTS_PATH, f"{target_type}.yaml")
+
+    @staticmethod
+    def _set_max_tokens(llm_manager: AbstractLLMManager) -> int:
+        """
+        Tries to find the optimal number of tokens to set for the model's response
+        :param llm_manager: The LLM Manager being used for the clustering
+        :return: The max tokens that the model was set to
+        """
+        model_token_limit = ModelTokenLimits.get_token_limit_for_model(llm_manager.llm_args.model)
+        max_tokens = max(HierarchyGenerator.RES_TOKENS_MIN, int(model_token_limit * LLMClustering.PERC_TOKENS_FOR_RES))
+        llm_manager.llm_args.set_max_tokens(max_tokens)
+        return max_tokens

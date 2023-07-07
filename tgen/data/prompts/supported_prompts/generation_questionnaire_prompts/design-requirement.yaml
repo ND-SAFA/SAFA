@@ -1,37 +1,43 @@
+format:
+- 'The [module name] shall [description of responsibility and purpose]. It shall accept
+  [inputs] and produce [outputs]. It shall contain the following processing logic:
+  [description of algorithms, business rules, and processing steps].'
 step:
 - deliverable:
-  - A high-level overview of the system architecture and functionality.
+  - A high-level description of the modules that make up the system and their purposes.
   instructions:
-  - Analyze the code to identify the main components and functions of the system.
-    Group related components and functions together into logical modules. Document
-    the purpose and responsibilities of each module.
+  - Review the code and identify the major components and functions. Group related
+    components and functions together into logical modules. Describe the purpose and
+    responsibilities of each module.
   name:
-  - Module
+  - Module Identification
 - deliverable:
-  - A description of the logical flow and purpose of each function and variable within
-    the modules.
+  - A description of the data flow and interfaces between modules in the system.
   instructions:
-  - Within each module, analyze the code to identify the inputs, outputs, and purpose
-    of each function. Document function signatures, parameters, and return values.
-    Identify any global variables used and their purpose.
+  - For each module, identify the inputs, outputs, and data stores. Describe how data
+    flows between modules. Identify any external interfaces or data sources.
   name:
-  - Flow
+  - Data Flow Analysis
 - deliverable:
-  - A high-level overview of how the modules and functions work together to achieve
-    the overall system functionality.
+  - A description of the processing logic within each module of the system.
   instructions:
-  - Analyze the relationships and interactions between modules and functions to understand
-    the overall program flow and logic.  Identify any dependencies or sequencing requirements
-    between modules and functions.
+  - Analyze the logic within each module. Identify the key algorithms, business rules,
+    and processing steps. Describe the purpose and outcome of each step.
   name:
-  - Logic
+  - Logic Analysis
 - deliverable:
-  - A set of requirements describing what the system does to satisfy user and system
-    needs.
+  - A complete and coherent description of the system's architecture, data flow, processing
+    logic, and interfaces.
   instructions:
-  - Review the information gathered in the previous steps. Identify and document the
-    key requirements, capabilities, and constraints of the system based on how the
-    code implements functionality. Organize the requirements by module and function
-    where applicable. Ensure each requirement is uniquely identified and testable.
+  - Review the results of the previous steps. Identify any gaps or areas needing clarification.
+    Perform additional analysis or testing as needed to fill in missing information.
   name:
-  - Requirements
+  - Clarification and Validation
+- deliverable:
+  - A set of Design requirements that accurately capture the necessary details about
+    the system.
+  instructions:
+  - Translate the information gathered into formal Design requirements following the
+    specified format.
+  name:
+  - Design Requirement Creation

@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 import pandas as pd
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.constants.model_constants import get_default_llm_manager
+from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -40,7 +40,7 @@ class Summarizer(BaseObject):
         :param nl_base_prompt: The default prompt to use for summarization.
         :param code_base_prompt: The default summarization prompt to use for code.
         """
-        self.llm_manager = get_default_llm_manager() if llm_manager is None else llm_manager
+        self.llm_manager = get_efficient_default_llm_manager() if llm_manager is None else llm_manager
         self.model_for_token_limit = model_for_token_limit
         self.token_limit = TokenLimitCalculator.calculate_token_limit(self.model_for_token_limit, max_tokens_for_token_limit)
         self.args_for_summarizer_model = self.llm_manager.llm_args

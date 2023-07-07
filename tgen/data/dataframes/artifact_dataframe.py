@@ -61,12 +61,12 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: Parent type and child type.
         """
 
-        counts_df = self.get_type_counts()
-        if len(counts_df) > 2:
+        type2count = self.get_type_counts()
+        if len(type2count) > 2:
             raise NotImplementedError("Multi-layer tracing is under construction.")
-        n_sources = min(counts_df.values())
-        parent_type = counts_df[counts_df == n_sources].index[0]
-        child_type = counts_df[counts_df != n_sources].index[0]
+        n_parents = min(type2count.values())
+        parent_type = [t for t, c in type2count.items() if c == n_parents][0]
+        child_type = [t for t, c in type2count.items() if c != n_parents][0]
         return parent_type, child_type
 
     def get_type_counts(self) -> Dict[str, str]:

@@ -67,8 +67,7 @@ class RankingJob(AbstractJob):
         return TracePredictionOutput(prediction_entries=predicted_entries)
 
     def creating_ranking_predictions(self, parent_ids: List[str], parent2children: Dict[str, List[str]],
-                                     artifact_map: Dict[str, str]) -> List[
-        TracePredictionEntry]:
+                                     artifact_map: Dict[str, str]) -> List[TracePredictionEntry]:
         """
         Performs ranking and parses the responses into children ids.
         :param parent_ids: The parent artifact ids.

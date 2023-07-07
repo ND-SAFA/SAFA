@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from tgen.data.prompts.supported_prompts_old import SupportedPrompts
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.util.attr_dict import AttrDict

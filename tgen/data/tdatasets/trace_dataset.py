@@ -178,7 +178,9 @@ class TraceDataset(iDataset):
         Gets link ids in the order that they are given in the trainer dataset
         :return: a list of ordered link ids
         """
-        link_counts = Counter(self._pos_link_ids + self._neg_link_ids)
+        pos_link_ids = self.get_pos_link_ids()
+        neg_link_ids = self.get_neg_link_ids()
+        link_counts = Counter(pos_link_ids + neg_link_ids)
         link_ids = []
         for id_ in self.trace_df.index:
             aug_trace_ids = [id_ for i in range(link_counts[id_])]
@@ -241,25 +243,25 @@ class TraceDataset(iDataset):
                           if row[TraceKeys.LABEL] > TRACE_THRESHOLD])
         return G
 
-    def get_pos_link_ids(self, include_augmented_links: bool = False) -> List[int]:
+    def get_pos_link_ids(self, unique: bool = False) -> List[int]:
         """
         Gets the link ids that represents a positive link
-        :param include_augmented_links: If True, includes duplicates of the links from augmentation, else just unique ids
+        :param unique: If True, includes duplicates of the links from augmentation, else just unique ids
         :return: Link ids that are positive links
         """
-        if include_augmented_links:
-            return self._pos_link_ids
-        return self.get_link_ids_by_label(label=1)
+        if unique:
+            return self.get_link_ids_by_label(label=1)
+        return self._pos_link_ids
 
-    def get_neg_link_ids(self, include_augmented_links: bool = False) -> List[int]:
+    def get_neg_link_ids(self, unique: bool = False) -> List[int]:
         """
         Gets the link ids that represents a negative link
-        :param include_augmented_links: If True, includes duplicates of the links from augmentation, else just unique ids
+        :param unique: If True, returns set of unique negative links.
         :return: Link ids that are positive links
         """
-        if include_augmented_links:
-            return self._neg_link_ids
-        return self.get_link_ids_by_label(label=0)
+        if unique:
+            return self.get_link_ids_by_label(label=0)
+        return self._neg_link_ids
 
     def get_link_ids_by_label(self, label: int = 1) -> List[int]:
         """
@@ -344,6 +346,24 @@ class TraceDataset(iDataset):
         entry[DataKey.LABEL_KEY] = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
         return entry
 
+    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks pos trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self._pos_link_ids = self._resize_data(self._pos_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks neg trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self._neg_link_ids = self._resize_data(self._neg_link_ids, new_length, include_duplicates=include_duplicates)
+
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """
@@ -358,7 +378,8 @@ class TraceDataset(iDataset):
         include_duplicates = True if new_length > len(
             data) else include_duplicates  # must include duplicates to make a bigger data
         reduction_func = random.choices if include_duplicates else random.sample
-        return reduction_func(data, k=new_length)
+        reduced_data = reduction_func(data, k=new_length)
+        return reduced_data
 
     @staticmethod
     def _extract_feature_info(feature: Dict[str, any], prefix: str = EMPTY_STRING) -> Dict[str, any]:

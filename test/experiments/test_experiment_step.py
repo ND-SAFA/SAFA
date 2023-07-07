@@ -4,20 +4,19 @@ from unittest import mock
 from unittest.mock import patch
 
 from tgen.constants.deliminator_constants import PERIOD
-from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
-from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
-from tgen.testres.object_creator import ObjectCreator
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment_step import ExperimentStep
-from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
+from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
+from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.models.model_manager import ModelManager
+from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
+from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.trainer_task import TrainerTask
@@ -33,14 +32,18 @@ class TestExperimentStep(BaseExperimentTest):
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
+        FileUtil.delete_dir(TEST_OUTPUT_DIR)
+        self.assertFalse(os.path.exists(TEST_OUTPUT_DIR))
         train_job_run_mock.side_effect = self.job_fake_run
         definition_mock.return_value = StructureProjectDefinition()
+
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
         output = self._load_step_output()
         job_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
-        self.assertEqual(len(output["jobs"]), len(job_dirs))
+        n_jobs = len(output["jobs"])
+        self.assertEqual(n_jobs, len(job_dirs))
         self.assert_experimental_vars(experiment_step)
         self.assertEqual(output["status"], Status.SUCCESS.value)
         best_job = self.get_job_by_id(experiment_step, output["best_job"])

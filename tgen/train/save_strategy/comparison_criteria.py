@@ -20,4 +20,5 @@ class ComparisonCriterion(BaseObject):
         if isinstance(self.metrics, str):
             self.metrics = [self.metrics]
         if isinstance(self.comparison_function, str):
-            self.comparison_function = getattr(SupportedComparisonFunction, self.comparison_function.upper())
+            comparison_enum: SupportedComparisonFunction = getattr(SupportedComparisonFunction, self.comparison_function.upper())
+            self.comparison_function = comparison_enum.value

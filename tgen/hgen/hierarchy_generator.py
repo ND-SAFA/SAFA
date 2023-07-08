@@ -56,8 +56,8 @@ class HierarchyGenerator(BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
-    SUMMARY_INSTRUCTIONS = "First, write a in-depth paragraph describing the high level features the system provides its users. " \
-                           "Apply a high-level, architectural view of the system. Your answer should be as comprehensive as possible."
+    SUMMARY_INSTRUCTIONS = "First, write a in-depth summary describing the high level features the system provides its users. " \
+                           "Apply a high-level, user-level view of the system. Your answer should be as comprehensive as possible."
     TASK_PREFACE = f"{NEW_LINE} TASKS: {NEW_LINE}"
     RES_TOKENS_MIN = 25000
 
@@ -77,8 +77,10 @@ class HierarchyGenerator(BaseObject):
         export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
         questionnaire = self._construct_questionnaire_for_generation()
-        artifact_generation_content, summary = self._generate_artifact_content(questionnaire, source_layer_only_dataset, export_path)
-        refined_content = self._refine_generations(artifact_generation_content, summary, export_path)
+        artifact_generation_content, summary = self._generate_artifact_content(source_layer_only_dataset, export_path)
+        refined_content = self._refine_generations(artifact_generation_content, summary, questionnaire, export_path)
+        refined_content = self._refine_generations(refined_content, summary, SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value,
+                                                   export_path, attempt_no=2)
 
         return self._create_trace_dataset_with_generated_artifacts(refined_content,
                                                                    original_dataset_complete,
@@ -154,21 +156,25 @@ class HierarchyGenerator(BaseObject):
                                         f"\"{result[format_id][0]}\"", response_manager=response_manager))
         return questions
 
-    def _generate_artifact_content(self, questionnaire: QuestionnairePrompt, source_layer_only_dataset: PromptDataset,
+    def _generate_artifact_content(self, source_layer_only_dataset: PromptDataset,
                                    export_path: str = None) -> Tuple[List[str], str]:
         """
         Creates the content for the new artifacts
-        :param questionnaire: The questionnaire prompt given to the model to produce the generations
         :param source_layer_only_dataset: The dataset containing only the source layer
         :param export_path: The path to export predictions to
         :return: The generated artifact content
         """
         logger.info(f"Generating {self.args.target_type}s\n")
-        prompt_builder = self._get_prompt_builder_for_generation(questionnaire, include_summary=True)
-        summary_tag = prompt_builder.get_prompt(-2).response_manager.response_tag
-        generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+        task_prompt = Prompt("Reverse engineer as many {target_type}s as possible for the {source_type}. "
+                             "Output the {target_type}s in a comma deliminated list.",
+                             response_manager=PromptResponseManager(
+                                 response_tag=self._convert_spaces_to_dashes(self.args.target_type)))
+        prompt_builder = self._get_prompt_builder_for_generation(task_prompt, include_summary=True)
+        summary_prompt = prompt_builder.get_prompt(-2)
+        summary_tag = summary_prompt.response_manager.response_tag
+        generated_artifacts_tag = task_prompt.response_manager.response_tag
         generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
-                                                       response_prompt_ids=questionnaire.id,
+                                                       response_prompt_ids={task_prompt.id, summary_prompt.id},
                                                        tags_for_response={generated_artifacts_tag, summary_tag},
                                                        return_first=True,
                                                        export_path=os.path.join(export_path, "artifact_gen_response.yaml"))[0]
@@ -176,7 +182,8 @@ class HierarchyGenerator(BaseObject):
         summary = generation_predictions[summary_tag]
         return generated_artifact_content, summary
 
-    def _refine_generations(self, generated_artifact_content: List[str], summary: str, export_path: str = None) -> List[str]:
+    def _refine_generations(self, generated_artifact_content: List[str], summary: str, questionnaire: QuestionnairePrompt,
+                            export_path: str = None, attempt_no: int = 1) -> List[str]:
         """
         Has the model refine the artifact generations
         :param generated_artifact_content: The original generated content
@@ -186,7 +193,6 @@ class HierarchyGenerator(BaseObject):
         """
         try:
             logger.info(f"Refining {len(generated_artifact_content)} {self.args.target_type}s\n")
-            questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value
             prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
                                                                      SupportedPrompts.HGEN_REFINE_PROMPT_CONTEXT,
                                                                      artifact_type=self.args.target_type)
@@ -200,20 +206,8 @@ class HierarchyGenerator(BaseObject):
                                                              response_prompt_ids=questionnaire.id,
                                                              tags_for_response={generated_artifacts_tag},
                                                              return_first=True,
-                                                             export_path=os.path.join(export_path, "gen_refinement_response1.yaml"))[0]
-
-            # questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_ISOLATED.value
-            # prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
-            #                                                          SupportedPrompts.HGEN_REFINE_PROMPT_ISOLATED,
-            #                                                          include_artifact=False)
-            # target_prompt_content = target_prompt.build(artifacts=[{ArtifactKeys.CONTENT: c} for c in refined_artifact_content])
-            # prompt_builder.add_prompt(Prompt(target_prompt_content), 1)
-            # generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
-            # refined_artifact_content = self._get_predictions(prompt_builder,
-            #                                                  response_prompt_ids=questionnaire.id,
-            #                                                  tags_for_response=generated_artifacts_tag,
-            #                                                  return_first=True,
-            #                                                  export_path=os.path.join(export_path, "gen_refinement_response2.yaml"))[0]
+                                                             export_path=os.path.join(export_path,
+                                                                                      f"gen_refinement_response{attempt_no}.yaml"))[0]
         except Exception:
             logger.exception("Refining the artifact content failed. Using original content instead.")
             refined_artifact_content = generated_artifact_content
@@ -367,19 +361,18 @@ class HierarchyGenerator(BaseObject):
                         predictions = [p[0] for p in predictions]
         return predictions
 
-    def _get_prompt_builder_for_generation(self, questionnaire: QuestionnairePrompt,
+    def _get_prompt_builder_for_generation(self, tasks: Prompt,
                                            base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
                                            include_summary: bool = False, artifact_type: str = None) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
-        :param questionnaire: The questionnaire prompt given to the model to produce the generations
+        :param tasks: The questionnaire prompt given to the model to produce the generations
         :param base_prompt: The main prompt that starts the prompt
         :param include_summary: If True, instructions the model to create a summary of the system first
         :return: The prompt builder used for the generations
         """
-
-        questionnaire.value = self.TASK_PREFACE + questionnaire.value
-        generation_step_response_manager = questionnaire.question_prompts[-1].response_manager
+        generation_step_response_manager = tasks.question_prompts[-1].response_manager if isinstance(tasks, QuestionnairePrompt) \
+            else tasks.response_manager
         generation_step_response_manager.formatter = lambda tag, val: self._format_generated_artifact_content_from_response(val)
 
         artifact_prompt = MultiArtifactPrompt(prompt_start="{artifact_type}S:",
@@ -390,10 +383,13 @@ class HierarchyGenerator(BaseObject):
         prompts = [base_prompt.value, artifact_prompt]
 
         if include_summary:
-            summary_prompt = Prompt(self.SUMMARY_INSTRUCTIONS, response_manager=PromptResponseManager(response_tag="summary"))
+            summary_instructions = self.TASK_PREFACE + self.SUMMARY_INSTRUCTIONS
+            summary_prompt = Prompt(summary_instructions, response_manager=PromptResponseManager(response_tag="summary"))
             prompts.append(summary_prompt)
+        else:
+            tasks.value = self.TASK_PREFACE + tasks.value
 
-        prompts.append(questionnaire)
+        prompts.append(tasks)
         prompt_builder = PromptBuilder(prompts)
         prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
         return prompt_builder

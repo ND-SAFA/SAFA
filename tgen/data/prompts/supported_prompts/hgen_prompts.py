@@ -31,8 +31,7 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Break the process of reverse engineering {
 
 GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
-                           "{source_type}s in the system and you must complete each step below with the "
-                           "end goal of producing the {target_type}s.")
+                           "{source_type}s in the system: ")
 
 
 REFINE_PROMPT_CONTEXT = Prompt("You are an engineer working on a software system "

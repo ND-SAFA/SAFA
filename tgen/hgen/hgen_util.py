@@ -23,7 +23,7 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenArgs
+from tgen.hgen.hgen_args import HGenArgs, SUMMARY_INSTRUCTIONS, TASK_PREFACE
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -176,10 +176,11 @@ def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     task_preface = f"{NEW_LINE}{format_as_markdown('TASKS:')}"
     if summary_prompt:
-        summary_prompt.value = task_preface + summary_prompt.value
+        summary_instructions = TASK_PREFACE + SUMMARY_INSTRUCTIONS
+        summary_prompt = Prompt(summary_instructions, response_manager=PromptResponseManager(response_tag="summary"))
         prompts.append(summary_prompt)
     else:
-        questionnaire_prompt.value = task_preface + questionnaire_prompt.value
+        questionnaire_prompt.value = TASK_PREFACE + questionnaire_prompt.value
 
     prompts.append(questionnaire_prompt)
     prompt_builder = PromptBuilder(prompts)
@@ -204,3 +205,11 @@ def format_as_markdown(string: str, level: int = 1) -> str:
     :return: The string formatted as markdown
     """
     return f"{'#' * level} {string}"
+
+
+def _convert_spaces_to_dashes(str2convert) -> str:
+    """
+    Converts the str to use dashes instead of spaces
+    :return: The str with dashes instead of spaces
+    """
+    return "-".join(str2convert.split()).lower()

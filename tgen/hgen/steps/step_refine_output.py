@@ -1,6 +1,8 @@
 import os
+from typing import List
 
 from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -17,9 +19,23 @@ def refine_artifact_content(hgen_args: HGenArgs) -> None:
     generated_artifact_content = hgen_args.state.generated_artifact_content
     summary = hgen_args.state.summary
     export_path = hgen_args.state.export_path
+    refinement_questionnaire = hgen_args.state.refinement_questionnaire
+
+    generated_artifacts_tag, refined_artifact_content = perform_refinement(hgen_args,
+                                                                           generated_artifact_content,
+                                                                           refinement_questionnaire,
+                                                                           summary,
+                                                                           export_path)
+    hgen_args.state.refined_content = refined_artifact_content[generated_artifacts_tag]
+
+
+def perform_refinement(hgen_args: HGenArgs,
+                       generated_artifact_content: List[str],
+                       questionnaire: QuestionnairePrompt,
+                       summary: str,
+                       export_path: str):
     try:
         logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")
-        questionnaire = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value
         prompt_builder = _get_prompt_builder_for_generation(hgen_args,
                                                             questionnaire,
                                                             base_prompt=SupportedPrompts.HGEN_REFINE_PROMPT_CONTEXT,
@@ -43,4 +59,4 @@ def refine_artifact_content(hgen_args: HGenArgs) -> None:
     except Exception:
         logger.exception("Refining the artifact content failed. Using original content instead.")
         refined_artifact_content = generated_artifact_content
-    hgen_args.state.refined_content = refined_artifact_content[generated_artifacts_tag]
+    return generated_artifacts_tag, refined_artifact_content

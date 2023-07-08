@@ -5,6 +5,7 @@ from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -21,12 +22,25 @@ GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of 
 @dataclass
 class HGenState:
     export_path: str = None  # Path to output of current run
-    questionnaire: QuestionnairePrompt = None  # The questionnaire containing all the artifacts.
-    source_dataset: PromptDataset = None  # The dataset containing the original artifacts.
-    original_dataset: Union[PromptDataset, TraceDataset] = None
+    """
+    Step 1 - Artifact generation
+    """
     generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
     summary: str = None  # The summary of all the source artifacts.
+    generation_questionnaire: QuestionnairePrompt = None
+    """
+    Step 2 - Refine 1
+    """
+    refinement_number: int = 1  # The current refinement step
+    refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value  # The questionnaire containing all the artifacts.
     refined_content: List[str] = None  # The refined output.
+
+    """
+    Step 4 - Dataset Construction
+    """
+    source_dataset: PromptDataset = None  # The dataset containing the original artifacts.
+    original_dataset: Union[PromptDataset, TraceDataset] = None
+
     dataset: TraceDataset = None  # The final dataset with generated artifacts.
 
 
@@ -84,6 +98,9 @@ class HGenArgs(BaseObject):
     The persistent state of content of HGEN.
     """
     state: HGenState = HGenState()
+    """
+    Format of """
+    format_of_artifacts: str = None
 
     def __post_init__(self) -> None:
         """

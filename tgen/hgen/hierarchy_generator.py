@@ -1,12 +1,9 @@
 import os
 import re
 import uuid
-from collections import Counter
-from datetime import datetime
-from typing import Any, Dict, List, Set, Tuple, Type, Union
+from typing import Any, List, Tuple
 
 import bs4
-import pandas as pd
 from yaml.constructor import SafeConstructor
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
@@ -15,19 +12,17 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_util import save_dataset_checkpoint
-from tgen.hgen.steps.step_construct_questionnaire import construct_questionnaire
-from tgen.hgen.steps.step_create_dataset import create_hgen_dataset
-from tgen.hgen.steps.step_generate_artifact_content import generate_artifact_content
-from tgen.hgen.steps.step_refine_output import refine_artifact_content
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
+from tgen.util.file_util import FileUtil
 
 
 class HierarchyGenerator(BaseObject):
@@ -173,187 +168,6 @@ class HierarchyGenerator(BaseObject):
             refined_artifact_content = generated_artifact_content
         return refined_artifact_content
 
-    def _create_trace_dataset_with_generated_artifacts(self, artifact_generations: List[str],
-                                                       original_dataset_complete: Union[PromptDataset, TraceDataset],
-                                                       export_path: str) -> TraceDataset:
-        """
-        Creates a dataset with traces between the original lower-level artifacts and the newly generated upper-level artifacts
-        :param artifact_generations: A list of generated artifact content
-        :param original_dataset_complete: The original dataset used for trace generation
-        :param export_path: The path to export the dataset to
-        :return: The dataset using the new generated artifacts
-        """
-        original_artifact_df = original_dataset_complete.artifact_df
-
-        original_trace_dataset = original_dataset_complete.trace_dataset if isinstance(original_dataset_complete,
-                                                                                       PromptDataset) else original_dataset_complete
-        original_trace_df, original_layer_df = None, None
-        if original_trace_dataset:
-            original_trace_df = original_trace_dataset.trace_df
-            original_layer_df = original_trace_dataset.layer_df
-
-        target_layer_id = self._get_target_layer_id(original_dataset_complete)
-
-        new_artifact_df = self._create_artifact_df_with_generated_artifacts(artifact_generations, target_layer_id)
-        self.save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
-
-        new_layer_df = self._create_layer_df_with_generated_artifacts(target_layer_id)
-        combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
-        new_trace_df = self._create_trace_df_with_generated_artifacts(combined_artifact_df)
-        self.save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
-                                     export_path, filename="generated_dataset_checkpoint")
-
-        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
-                                                                   artifact_df=combined_artifact_df, trace_df=new_trace_df)
-        final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
-        final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
-
-        dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
-
-        save_path = self.save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
-        self.save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
-        return dataset
-
-    def _create_artifact_df_with_generated_artifacts(self, artifact_generations: List[str], target_layer_id: str,
-                                                     generate_names: bool = True) -> ArtifactDataFrame:
-        """
-        Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
-        :param artifact_generations: A list of generated artifact content
-        :param target_layer_id: The id for the layer with the new generated artifacts
-        :return: The dataframe of generated artifacts
-        """
-        new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(uuid.uuid4()) for _ in artifact_generations],
-                                             ArtifactKeys.CONTENT: artifact_generations,
-                                             ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
-        if generate_names:
-            try:
-                logger.info(f"Creating names for {len(new_artifact_df)} {self.args.target_type}\n")
-                name_prompt = Prompt(f"Create a name for this {self.args.target_type}.",
-                                     PromptResponseManager(response_tag="name", required_tag_ids=REQUIRE_ALL_TAGS))
-                artifact_prompt = ArtifactPrompt(include_id=False)
-                prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
-                dataset = PromptDataset(artifact_df=new_artifact_df)
-                names = self._get_predictions(prompt_builder, dataset, response_prompt_ids=name_prompt.id,
-                                              tags_for_response=name_prompt.response_manager.response_tag, return_first=True)
-                assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
-                duplicated_names = {name for name, count in Counter(names).items() if count > 1}
-                assert len(duplicated_names) < 1, "Found duplicate names"  # TODO handle this case in the future if this is a problem
-                new_artifact_df.index = names
-            except Exception:
-                logger.exception("Unable to generate names for the artifacts")
-        return new_artifact_df
-
-    def _create_trace_df_with_generated_artifacts(self, artifact_df: ArtifactDataFrame) -> TraceDataFrame:
-        """
-        Creates a dataframe of traces including the new trace links between the original lower-level artifacts
-        and the newly generated upper-level artifacts
-        :return: The dataframe containing new and old trace links
-        """
-        logger.info(f"Predicting links between {self.args.target_type} and {self.args.source_layer_id}\n")
-        tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD})
-        trace_predictions: List[TracePredictionEntry] = tracing_job.run().body.prediction_entries
-        traces = {}
-        for entry in trace_predictions:
-            link = EnumDict({
-                **entry,
-                TraceKeys.SOURCE: entry[TraceKeys.SOURCE.value],
-                TraceKeys.TARGET: entry[TraceKeys.TARGET.value],
-                TraceKeys.LABEL: 1
-            })
-            DataFrameUtil.append(traces, link)
-        return TraceDataFrame(traces)
-
-    def _create_layer_df_with_generated_artifacts(self, target_layer_id: str) -> LayerDataFrame:
-        """
-        Creates a layer dataframe connecting the original lower-level artifacts with the newly generated upper-level artifacts
-        :param target_layer_id: The id of the new target layer
-        :return: The dataframe with the new layer ids added.
-        """
-        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [self.args.source_layer_id], LayerKeys.TARGET_TYPE: [target_layer_id]})
-        return layer_df
-
-    def _get_predictions(self, prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager: AbstractLLMManager = None,
-                         response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
-                         return_first: bool = False, export_path: str = None) -> Any:
-        """
-        Gets the predictions for the given prompts on the given dataset
-        :param prompt_builder: Builds the prompts for the model
-        :param dataset: The dataset to use with the prompts
-        :param llm_manager: The LLM manager to use for predictions
-        :param response_prompt_ids: The prompt id to extract from predictions
-        :param tags_for_response: The tag to extract from predictions
-        :param export_path: The path to export predictions to
-        :return: The model predictions
-        """
-        dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
-        trainer = LLMTrainer(LLMTrainerState(llm_manager=self.args.hgen_llm_manager if not llm_manager else llm_manager,
-                                             trainer_dataset_manager=dataset_manager,
-                                             prompt_builder=prompt_builder,
-                                             completion_type=LLMCompletionType.GENERATION))
-
-        if "artifact_gen_response" in export_path:
-            print("Reading drafts")
-            predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/de88d5c2-672c-4349-a70d-77a5de8623a6/"
-                                             "artifact_gen_response.yaml")
-            response_prompt_ids = {"0667b783-7fbc-47b0-90eb-1252f9fa0f85", "e0c0bd4e-0169-426a-bce7-a19b144b82fe"}
-        elif "gen_refinement_response" in export_path:
-            predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/98d22e4e-2c95-41c4-9607-815fe157e6bf/"
-                                             "gen_refinement_response1.yaml")
-            response_prompt_ids = {"f0f67a8d-09d6-4a1d-95ff-fcb895346793"}
-        else:
-            predictions = trainer.perform_prediction().predictions
-
-        if export_path:
-            base_name, file_name = os.path.split(export_path)
-            self.save_dataset_checkpoint(predictions, export_path=base_name, filename=file_name)
-
-        response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
-        if response_prompt_ids:
-            predictions = [DictUtil.combine_child_dicts(p, response_prompt_ids) for p in predictions]
-            if tags_for_response:
-                predictions = [DictUtil.filter_dict_keys(p, keys2keep=tags_for_response) if isinstance(tags_for_response, set)
-                               else p[tags_for_response] for p in predictions]
-                if return_first:
-                    if isinstance(predictions[0], dict):
-                        predictions = [{key: value[0] if isinstance(value, list) else value for key, value in p.items()}
-                                       for p in predictions]
-                    else:
-                        predictions = [p[0] for p in predictions]
-        return predictions
-
-    def _get_prompt_builder_for_generation(self, tasks: Prompt,
-                                           base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
-                                           summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
-        """
-        Gets the prompt builder used for the generations
-        :param tasks: The questionnaire prompt given to the model to produce the generations
-        :param base_prompt: The main prompt that starts the prompt
-        :param summary_prompt: Instructions for the model to create a summary of the system first
-        :return: The prompt builder used for the generations
-        """
-        generation_step_response_manager = tasks.question_prompts[-1].response_manager if isinstance(tasks, QuestionnairePrompt) \
-            else tasks.response_manager
-        generation_step_response_manager.formatter = lambda tag, val: self._format_generated_artifact_content_from_response(val)
-
-        artifact_prompt = MultiArtifactPrompt(prompt_start=self._format_as_markdown("{artifact_type}S:"),
-                                              build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                              include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
-        artifact_type = self.args.source_type if not artifact_type else artifact_type
-        artifact_prompt.format_value(artifact_type=artifact_type.upper())
-        prompts = [base_prompt.value, artifact_prompt]
-
-        task_preface = f"{NEW_LINE}{self._format_as_markdown('TASKS:')}"
-        if summary_prompt:
-            summary_prompt.value = task_preface + summary_prompt.value
-            prompts.append(summary_prompt)
-        else:
-            tasks.value = task_preface + tasks.value
-
-        prompts.append(tasks)
-        prompt_builder = PromptBuilder(prompts)
-        prompt_builder.format_prompts_with_var(source_type=self.args.source_type, target_type=self.args.target_type)
-        return prompt_builder
-
     @staticmethod
     def _convert_spaces_to_dashes(str2convert) -> str:
         """
@@ -446,11 +260,3 @@ class HierarchyGenerator(BaseObject):
         return max_tokens
 
     @staticmethod
-    def _format_as_markdown(string: str, level: int = 1) -> str:
-        """
-        Formats the string as markdown header
-        :param string: The string to format
-        :param level: The level of the header
-        :return: The string formatted as markdown
-        """
-        return f"{'#' * level} {string}"

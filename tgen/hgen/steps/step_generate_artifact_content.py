@@ -23,12 +23,13 @@ def generate_artifact_content(hgen_args: HGenArgs) -> None:
     generation_predictions = get_predictions(prompt_builder,
                                              source_layer_only_dataset,
                                              hgen_args.hgen_llm_manager,
+                                             hgen_args.artifact_generation_tokens,
                                              response_prompt_ids=questionnaire.id,
                                              tags_for_response={generated_artifacts_tag, summary_tag},
                                              return_first=True,
                                              export_path=os.path.join(export_path, "artifact_gen_response.yaml"))[0]
     generated_artifact_content = generation_predictions[generated_artifacts_tag]
-    summary = generation_predictions[summary_tag]
+    summary = generation_predictions.get(summary_tag, None)
 
     hgen_args.state.generated_artifact_content = generated_artifact_content
     hgen_args.state.summary = summary

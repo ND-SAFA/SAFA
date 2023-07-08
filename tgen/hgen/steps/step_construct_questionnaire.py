@@ -48,6 +48,7 @@ def construct_questionnaire(hgen_args: HGenArgs) -> QuestionnairePrompt:
         questionnaire_content = get_predictions(prompt_builder,
                                                 PromptDataset(),
                                                 hgen_args.hgen_llm_manager,
+                                                hgen_args.questionnaire_tokens,
                                                 response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
         FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
     questions = _construct_question_prompts_from_output(hgen_args,

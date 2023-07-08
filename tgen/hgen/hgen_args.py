@@ -64,6 +64,22 @@ class HGenArgs(BaseObject):
     """
     export_dir: str = None
     """
+    Max tokens to use for generating questionnaire.
+    """
+    questionnaire_tokens = 3000
+    """
+    Max number of tokens to use for artifact generation.
+    """
+    artifact_generation_tokens = 2000
+    """
+    Max number of tokens to use for refinement.
+    """
+    refinement_tokens = 2000
+    """
+    Max number of tokens to use for generating artifact names.
+    """
+    artifact_name_tokens = 1000
+    """
     The persistent state of content of HGEN.
     """
     state: HGenState = HGenState()

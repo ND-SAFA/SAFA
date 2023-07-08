@@ -2,7 +2,7 @@ import os
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Counter, List, Set, Type, Union
+from typing import Any, Dict, List, Set, Type, Union
 
 import pandas as pd
 
@@ -24,6 +24,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, SUMMARY_INSTRUCTIONS, TASK_PREFACE
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.dict_util import DictUtil
@@ -63,9 +64,12 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
     return full_export_path
 
 
-def get_predictions(prompt_builder: PromptBuilder, dataset: PromptDataset, llm_manager,
+def get_predictions(prompt_builder: PromptBuilder,
+                    dataset: PromptDataset,
+                    llm_manager: AbstractLLMManager,
+                    max_tokens: int,
                     response_prompt_ids: Union[Set, str] = None, tags_for_response: Union[Set, str] = None,
-                    return_first: bool = False, export_path: str = None) -> Any:
+                    return_first: bool = False, export_path: str = None) -> Dict[str, str]:
     """
     Gets the predictions for the given prompts on the given dataset
     :param prompt_builder: Builds the prompts for the model
@@ -76,6 +80,7 @@ def get_predictions(prompt_builder: PromptBuilder, dataset: PromptDataset, llm_m
     :param export_path: The path to export predictions to
     :return: The model predictions
     """
+    llm_manager.llm_args.set_max_tokens(max_tokens)
     dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
     trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
                                          trainer_dataset_manager=dataset_manager,
@@ -125,12 +130,12 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
             names = get_predictions(prompt_builder,
                                     dataset,
                                     hgen_args.hgen_llm_manager,
+                                    hgen_args.artifact_name_tokens,
                                     response_prompt_ids=name_prompt.id,
                                     tags_for_response=name_prompt.response_manager.response_tag,
                                     return_first=True)
+            assert len(set(names)) == len(names), f"Found duplicates names: {names}"
             assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
-            duplicated_names = {name for name, count in Counter[names].items() if count > 1}
-            assert len(duplicated_names) < 1, "Found duplicate names"  # TODO handle this case in the future if this is a problem
             new_artifact_df.index = names
         except Exception:
             logger.exception("Unable to generate names for the artifacts")
@@ -155,7 +160,7 @@ def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     artifact_prompt = MultiArtifactPrompt(prompt_start="{artifact_type}S:",
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
-                                          include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
+                                          include_ids=True, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt.format_value(artifact_type=artifact_type.upper())
     prompts = [base_prompt.value, artifact_prompt]

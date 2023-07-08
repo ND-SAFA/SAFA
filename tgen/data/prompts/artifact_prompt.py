@@ -1,4 +1,4 @@
-from enum import auto, Enum
+from enum import Enum, auto
 from typing import Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -44,7 +44,7 @@ class ArtifactPrompt(Prompt):
         """
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            artifact = self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID, EMPTY_STRING),
+            artifact = self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID.value, EMPTY_STRING),
                                                              artifact_body=artifact[ArtifactKeys.CONTENT],
                                                              include_id=self.include_id)
             return f"{prompt}{artifact}"

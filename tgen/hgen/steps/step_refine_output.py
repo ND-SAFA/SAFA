@@ -29,10 +29,11 @@ def refine_artifact_content(hgen_args: HGenArgs) -> None:
                                                                 artifact_generations=generated_artifact_content,
                                                                 target_layer_id=hgen_args.target_type,
                                                                 generate_names=False)
-        generated_artifacts_tag = questionnaire.question_prompts[-1].response_manager.response_tag
+        generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
         refined_artifact_content = get_predictions(prompt_builder,
                                                    PromptDataset(artifact_df=artifacts),
                                                    hgen_args.hgen_llm_manager,
+                                                   hgen_args.refinement_tokens,
                                                    response_prompt_ids=questionnaire.id,
                                                    tags_for_response={generated_artifacts_tag},
                                                    return_first=True,
@@ -42,4 +43,4 @@ def refine_artifact_content(hgen_args: HGenArgs) -> None:
     except Exception:
         logger.exception("Refining the artifact content failed. Using original content instead.")
         refined_artifact_content = generated_artifact_content
-    hgen_args.state.refined_content = refined_artifact_content
+    hgen_args.state.refined_content = refined_artifact_content[generated_artifacts_tag]

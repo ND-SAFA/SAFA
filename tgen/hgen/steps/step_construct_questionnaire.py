@@ -13,6 +13,7 @@ from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, SUMMARY_INSTRUCTIONS
+from tgen.hgen.hgen_util import _convert_spaces_to_dashes, get_predictions
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 
@@ -28,7 +29,7 @@ def construct_questionnaire(hgen_args: HGenArgs) -> Tuple[QuestionnairePrompt, s
                                    "The format should be for only the body of the {target_type} and should exclude any title.",
                                    response_manager=PromptResponseManager(response_tag="format",
                                                                           required_tag_ids=REQUIRE_ALL_TAGS))  # TODO move this
-    questionnaire_content = _get_content_for_summary_prompt(format_prompt, instructions_prompt)
+    questionnaire_content = _get_content_for_summary_prompt(hgen_args, format_prompt, instructions_prompt)
     step_id, _, instructions_id, _ = instructions_prompt.response_manager.get_all_tag_ids()
     steps = questionnaire_content[step_id]
     questions = [QuestionPrompt(step[instructions_id][0]) for i, step in enumerate(steps) if i < len(steps) - 1]
@@ -40,7 +41,7 @@ def construct_questionnaire(hgen_args: HGenArgs) -> Tuple[QuestionnairePrompt, s
                                                                    response_manager=response_manager)
 
 
-def _get_content_for_summary_prompt(self, format_prompt: Prompt, instructions_prompt: Prompt):
+def _get_content_for_summary_prompt(hgen_args: HGenArgs, format_prompt: Prompt, instructions_prompt: Prompt):
     """
     Gets the content for the prompt to generate a summary of system
     :param
@@ -53,17 +54,17 @@ def _get_content_for_summary_prompt(self, format_prompt: Prompt, instructions_pr
         value = loader.construct_scalar(node)
         return bs4.Tag(value)
 
-    questionnaire_prompt_path = self._get_path_to_generation_questionnaire_prompt(
-        self._convert_spaces_to_dashes(self.args.target_type))
+    questionnaire_prompt_path = _get_path_to_generation_questionnaire_prompt(
+        _convert_spaces_to_dashes(hgen_args.target_type))
     if os.path.exists(questionnaire_prompt_path):
         SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
         questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
     else:
         logger.info("Creating questionnaire prompt for generation\n")
         prompt_builder = PromptBuilder(prompts=[instructions_prompt, format_prompt])
-        prompt_builder.format_prompts_with_var(target_type=self.args.target_type, source_type=self.args.source_type)
-        questionnaire_content = self._get_predictions(prompt_builder, PromptDataset(),
-                                                      response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
+        prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
+        questionnaire_content = get_predictions(prompt_builder, PromptDataset(),
+                                                response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
         FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
     return questionnaire_content
 

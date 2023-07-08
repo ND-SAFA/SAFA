@@ -23,7 +23,7 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenArgs, SUMMARY_INSTRUCTIONS, TASK_PREFACE
+from tgen.hgen.hgen_args import HGenArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -80,18 +80,19 @@ def get_predictions(prompt_builder: PromptBuilder,
     :param export_path: The path to export predictions to
     :return: The model predictions
     """
+    load = False
     llm_manager.llm_args.set_max_tokens(max_tokens)
     dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
     trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
                                          trainer_dataset_manager=dataset_manager,
                                          prompt_builder=prompt_builder,
                                          completion_type=LLMCompletionType.GENERATION))
-    if "artifact_gen_response" in export_path:
+    if export_path and "artifact_gen_response" in export_path and load:
         print("Reading drafts")
         predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/de88d5c2-672c-4349-a70d-77a5de8623a6/"
                                          "artifact_gen_response.yaml")
         response_prompt_ids = {"0667b783-7fbc-47b0-90eb-1252f9fa0f85", "e0c0bd4e-0169-426a-bce7-a19b144b82fe"}
-    elif "gen_refinement_response" in export_path:
+    elif export_path and "gen_refinement_response" in export_path and load:
         predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/98d22e4e-2c95-41c4-9607-815fe157e6bf/"
                                          "gen_refinement_response1.yaml")
         response_prompt_ids = {"f0f67a8d-09d6-4a1d-95ff-fcb895346793"}
@@ -152,19 +153,19 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
 
 
 def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
-                                       questionnaire_prompt: QuestionnairePrompt,
+                                       task_prompt: Union[QuestionnairePrompt, Prompt],
                                        base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
                                        summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
-    :param questionnaire_prompt: The questionnaire prompt given to the model to produce the generations
+    :param task_prompt: The questionnaire prompt given to the model to produce the generations
     :param base_prompt: The main prompt that starts the prompt
     :param summary_prompt: Instructions for the model to create a summary of the system first
     :return: The prompt builder used for the generations
     """
-    generation_step_response_manager = questionnaire_prompt.question_prompts[-1].response_manager if isinstance(questionnaire_prompt,
-                                                                                                                QuestionnairePrompt) \
-        else questionnaire_prompt.response_manager
+    generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
+                                                                                                       QuestionnairePrompt) \
+        else task_prompt.response_manager
     generation_step_response_manager.formatter = lambda tag, val: parse_generated_artifacts(val)
 
     artifact_prompt = MultiArtifactPrompt(prompt_start=format_as_markdown("{artifact_type}S:"),
@@ -176,13 +177,12 @@ def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     task_preface = f"{NEW_LINE}{format_as_markdown('TASKS:')}"
     if summary_prompt:
-        summary_instructions = TASK_PREFACE + SUMMARY_INSTRUCTIONS
-        summary_prompt = Prompt(summary_instructions, response_manager=PromptResponseManager(response_tag="summary"))
+        summary_prompt.value = task_preface + summary_prompt.value
         prompts.append(summary_prompt)
     else:
-        questionnaire_prompt.value = TASK_PREFACE + questionnaire_prompt.value
+        task_prompt.value = task_preface + task_prompt.value
 
-    prompts.append(questionnaire_prompt)
+    prompts.append(task_prompt)
     prompt_builder = PromptBuilder(prompts)
     prompt_builder.format_prompts_with_var(source_type=hgen_args.source_type, target_type=hgen_args.target_type)
     return prompt_builder

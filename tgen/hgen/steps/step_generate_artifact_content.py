@@ -28,10 +28,13 @@ def generate_artifact_content(hgen_args: HGenArgs) -> None:
 
                          )
     task_prompt.format_value(format=format_of_artifacts)
-    prompt_builder = _get_prompt_builder_for_generation(task_prompt, summary_prompt=summary_questionnaire)
+    prompt_builder = _get_prompt_builder_for_generation(hgen_args, task_prompt, summary_prompt=summary_questionnaire)
     summary_tag = summary_questionnaire.response_manager.response_tag
     generated_artifacts_tag = task_prompt.response_manager.response_tag
-    generation_predictions = get_predictions(prompt_builder, source_layer_only_dataset,
+    generation_predictions = get_predictions(prompt_builder,
+                                             source_layer_only_dataset,
+                                             hgen_args.hgen_llm_manager,
+                                             hgen_args.artifact_generation_tokens,
                                              response_prompt_ids={task_prompt.id, summary_questionnaire.id},
                                              tags_for_response={generated_artifacts_tag, summary_tag},
                                              return_first=True,

@@ -6,7 +6,7 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "export_path": "[OUTPUT_PATH]/hgen/bend",
+              "export_dir": "[OUTPUT_PATH]/hgen/bend",
               "source_layer_id": "Java",
               "target_type": "Design Requirement",
               "dataset_creator_for_sources": {

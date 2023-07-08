@@ -2,7 +2,7 @@ import os
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Callable, Dict, IO, List, Tuple, Union, Any
+from typing import Any, Callable, Dict, IO, List, Tuple, Union
 
 import yaml
 
@@ -271,7 +271,7 @@ class FileUtil:
             os.remove(file_path)
 
     @staticmethod
-    def read_yaml(file_path: str) -> str:
+    def read_yaml(file_path: str) -> Dict:
         """
         Reads a yaml file at given path if exists.
         :param file_path: Path of the file to read.

@@ -9,46 +9,25 @@ import bs4
 import pandas as pd
 from yaml.constructor import SafeConstructor
 
-from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
-from tgen.constants.prediction_constants import HGEN_TOP_PREDICTION_MIN_THRESHOLD
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from tgen.data.exporters.csv_exporter import CSVExporter
-from tgen.data.exporters.dataframe_exporter import DataFrameExporter
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
-from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
-from tgen.jobs.trainer_jobs.ranking_job import RankingJob
+from tgen.hgen.hgen_util import save_dataset_checkpoint
+from tgen.hgen.steps.step_complete_questionnaire import generate_artifact_content
+from tgen.hgen.steps.step_construct_questionnaire import construct_questionnaire
+from tgen.hgen.steps.step_create_dataset import create_hgen_dataset
+from tgen.hgen.steps.step_refine_output import refine_artifact_content
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.token_limits import ModelTokenLimits
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.base_object import BaseObject
 from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.dict_util import DictUtil
-from tgen.util.enum_util import EnumDict
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 
 
 class HierarchyGenerator(BaseObject):
@@ -73,7 +52,7 @@ class HierarchyGenerator(BaseObject):
         Runs the hierarchy generator to create a new trace dataset containing generated higher-level artifacts
         :return: Path to exported dataset of generated artifacts
         """
-        export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
+        export_path = os.path.join(self.args.export_dir, str(uuid.uuid4())) if self.args.export_dir else None
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
         summary_questionnaire, format_of_artifacts = self._construct_questionnaire_for_generation()
         artifact_generation_content, summary = self._generate_artifact_content(source_layer_only_dataset, summary_questionnaire,
@@ -81,9 +60,9 @@ class HierarchyGenerator(BaseObject):
         refined_content = self._refine_generations(artifact_generation_content, summary,
                                                    SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value, export_path)
 
-        return self._create_trace_dataset_with_generated_artifacts(refined_content,
-                                                                   original_dataset_complete,
-                                                                   export_path=export_path)
+        self.args.state.export_path = export_path
+        self.args.state.source_dataset = source_layer_only_dataset
+        self.args.state.original_dataset = original_dataset_complete
 
     def _construct_questionnaire_for_generation(self) -> Tuple[QuestionnairePrompt, str]:
         """
@@ -411,43 +390,12 @@ class HierarchyGenerator(BaseObject):
         """
         original_dataset_complete = self.args.dataset_creator_for_sources.create() if self.args.dataset_for_sources is None \
             else self.args.dataset_for_sources
-        self.save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
+        save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")
         source_layer_only_dataset = self._create_dataset_with_single_layer(original_dataset_complete.artifact_df,
                                                                            self.args.source_layer_id,
                                                                            original_dataset_complete.trace_dataset.trace_df
                                                                            if original_dataset_complete.trace_dataset else None)
         return original_dataset_complete, source_layer_only_dataset
-
-    @staticmethod
-    def save_dataset_checkpoint(dataset: Any, export_path: str = None,
-                                filename: str = None, exporter_class: Type[AbstractDatasetExporter] = None) -> str:
-        """
-        Exports the dataset to csv
-        :param dataset: The dataset to export
-        :param export_path: The base path to export to
-        :param filename: Name of the file to use when saving the dataset
-        :param exporter_class: Exporter class to specify if not using defaults
-        :return: The full export path
-        """
-        if not export_path:
-            return EMPTY_STRING
-        FileUtil.create_dir_safely(export_path)
-        current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
-        filename = current_time_string if not filename else filename
-        full_export_path = os.path.join(export_path, filename)
-        if not isinstance(dataset, TraceDataset) and not isinstance(dataset, pd.DataFrame):
-            FileUtil.write_yaml(dataset, full_export_path)
-        else:
-            if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
-                dataset = dataset.trace_dataset
-            if exporter_class is None:
-                exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
-            if issubclass(exporter_class, CSVExporter):
-                full_export_path += CSVKeys.EXT
-            exporter = exporter_class(export_path=full_export_path, dataset=dataset)
-            exporter.export()
-        logger.info(f"Dataset checkpoint saved to {full_export_path} ")
-        return full_export_path
 
     @staticmethod
     def _create_dataset_with_single_layer(original_artifact_df: ArtifactDataFrame, layer_id: Any,
@@ -484,15 +432,6 @@ class HierarchyGenerator(BaseObject):
             trainer.trainer_args.output_dir = export_path
         if hasattr(trainer.trainer_args, "metrics"):
             trainer.trainer_args.metrics = []
-
-    @staticmethod
-    def _get_path_to_generation_questionnaire_prompt(target_type: str) -> str:
-        """
-        Gets the path to the generation questionnaire prompts for a given target type
-        :param target_type: The target type being generated
-        :return: The path to the generation questionnaire prompts for a given target type
-        """
-        return os.path.join(GENERATION_QUESTIONNAIRE_PROMPTS_PATH, f"{target_type}.yaml")
 
     @staticmethod
     def _set_max_tokens(llm_manager: AbstractLLMManager) -> int:

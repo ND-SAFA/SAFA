@@ -11,8 +11,9 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 
-SUMMARY_INSTRUCTIONS = "First, write a in-depth paragraph describing the high level features the system provides its users. " \
-                       "Apply a high-level, architectural view of the system. Your answer should be as comprehensive as possible."
+SUMMARY_INSTRUCTIONS = "First, write a in-depth, comprehensive summary " \
+                       "describing the system by focusing on the high level features the system provides its users. " \
+                       "Consider the following in your response: "
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
 GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
 

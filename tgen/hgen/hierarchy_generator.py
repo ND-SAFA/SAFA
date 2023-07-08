@@ -19,9 +19,9 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_util import save_dataset_checkpoint
-from tgen.hgen.steps.step_complete_questionnaire import generate_artifact_content
 from tgen.hgen.steps.step_construct_questionnaire import construct_questionnaire
 from tgen.hgen.steps.step_create_dataset import create_hgen_dataset
+from tgen.hgen.steps.step_generate_artifact_content import generate_artifact_content
 from tgen.hgen.steps.step_refine_output import refine_artifact_content
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.token_limits import ModelTokenLimits

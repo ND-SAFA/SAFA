@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import string
@@ -332,13 +333,26 @@ class HierarchyGenerator(BaseObject):
                                              trainer_dataset_manager=dataset_manager,
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
+        response_prompt_ids = set()
         if "artifact_gen_response" in export_path:
-            predictions = FileUtil.read_yaml(
-                "/home/kat/git-repos/safa/tgen/output/hgen/bend/2f8e5d34-f127-42dd-9cfe-ed6ad1d71618/artifact_gen_response.yaml")
-            response_prompt_ids = {"91b29679-f794-44d3-b001-8fa52c236576"}
+            print("Reading drafts")
+            predictions = FileUtil.read_yaml("/Users/albertorodriguez/Projects/"
+                                             "SAFA/tgen/output/hgen/bend/0d055751-c6e8-4f2e-b2a8-99a297b83f58/artifact_gen_response.yaml")
+            response_prompt_ids.add("91b29679-f794-44d3-b001-8fa52c236576")
+        elif "refinement_response1" in export_path:
+            print("Reading refinement (context)")
+            predictions = FileUtil.read_yaml("/Users/albertorodriguez/Projects/"
+                                             "SAFA/tgen/output/hgen/bend/968db522-042f-4f6a-ab11-92c18a75e09e/gen_refinement_response1.yaml")
+            response_prompt_ids.add("8d56b068-0a8f-4c36-aa6b-9013c3eda3e0")
         else:
             predictions = trainer.perform_prediction().predictions
-        if export_path:
+            prediction = [v for v in predictions[0].values() if len(v) > 0]
+            print("Results")
+            print("Consolidated")
+            print(json.dumps(prediction[0], indent=4))
+            print("hi")
+
+        if not os.path.exists(export_path):
             FileUtil.write_yaml(predictions, export_path)
         response_prompt_ids = {response_prompt_ids} if isinstance(response_prompt_ids, str) else response_prompt_ids
         if response_prompt_ids:

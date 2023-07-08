@@ -67,29 +67,30 @@ REFINE_STEP4_CONTEXT = QuestionPrompt("For each {target_type} from the previous 
                                       "Output each {target_type}s, including any additional information that might be useful to it. "
                                       "Leave {target_type}s that already contain sufficient information untouched. ",
                                       response_manager=PromptResponseManager(response_tag="additional-info"))
-REFINE_PROMPT_ISOLATED = Prompt("You are an engineer working on a software system "
-                                "and you are are given a numbered list of {target_type}s. Your goal is to refine the {target_type}s "
-                                "to remove unnecessary details and condense overlapping {target_type}s. ")
-REFINE_STEP1_ISOLATED = QuestionPrompt(
-    "Review each {target_type} and eliminate any that represent generalized best practices "
-    "that a skilled engineer would apply anyway. "
-    "Additionally, remove any unnecessary details from the {target_type} that provide information "
-    "that is common knowledge to most engineers. "
-    "For example, remove any {target_type}s or details related to basic validation, security, scalability, etc. "
-    "Output the updated list of {target_type}s which provide specific, meaningful information for this system.",
-    response_manager=PromptResponseManager(response_tag="meaningful"))
-REFINE_STEP2_ISOLATED = QuestionPrompt("Next, condense the {target_type}s from a high-level, architectural perspective. "
-                                       "Multiple {target_type}s describing the same functionality "
-                                       "or quality attribute can be consolidated into a single, more comprehensive artifact. "
-                                       "Output the remaining {target_type}s which provide unique and significant information "
-                                       "as well as the consolidated version of any redundant {target_type}s. ",
-                                       response_manager=PromptResponseManager(response_tag="consolidated"))
+REFINE_PROMPT_ISOLATED = Prompt("You are an engineer working on a software system. "
+                                "You are are given a list of {target_type}s pertaining to that system.")
+# REFINE_STEP1_ISOLATED = QuestionPrompt(
+#     "Review each {target_type} and eliminate any that represent generalized best practices "
+#     "that a skilled engineer would apply anyway. "
+#     "Additionally, remove any unnecessary details from the {target_type} that provide information "
+#     "that is common knowledge to most engineers. "
+#     "For example, remove any {target_type}s or details related to basic validation, security, scalability, etc. "
+#     "Output the updated list of {target_type}s which provide specific, meaningful information for this system.",
+#     response_manager=PromptResponseManager(response_tag="meaningful"))
+REFINE_STEP2_ISOLATED = QuestionPrompt("Group the design requirements into the smallest set of high-level features that encompass "
+                                       "related functionality. Identify the minimal number of features such that each groups "
+                                       "together design requirements focused on a single, cohesive purpose in the system. "
+                                       "The features should represent distinct areas of functionality and abstraction in the "
+                                       "system design.",
+                                       response_manager=PromptResponseManager(response_tag="groups"))
 
-REFINE_STEP_FINAL = QuestionPrompt("Finally, Using all of the previous steps, review artifacts for consistency, clarity, and quality. "
-                                   "Refine wording and remove any ambiguity. "
-                                   "Output a final revised set of {target_type}s for this system. ",
+REFINE_STEP_FINAL = QuestionPrompt("Finally, provide a single top-level requirement for each feature, stating its overall purpose. "
+                                   "The requirements should convey the intent and functionality of each grouping.",
                                    response_manager=PromptResponseManager(response_tag="final-solution",
                                                                           required_tag_ids=REQUIRE_ALL_TAGS))
 REFINE_QUESTIONNAIRE_CONTEXT = QuestionnairePrompt(question_prompts=[REFINE_STEP1_CONTEXT, REFINE_STEP2_CONTEXT, REFINE_STEP3_CONTEXT,
                                                                      REFINE_STEP4_CONTEXT, REFINE_STEP_FINAL])
-REFINE_QUESTIONNAIRE_ISOLATED = QuestionnairePrompt(question_prompts=[REFINE_STEP1_ISOLATED, REFINE_STEP2_ISOLATED, REFINE_STEP_FINAL])
+REFINE_QUESTIONNAIRE_ISOLATED = QuestionnairePrompt(question_prompts=[
+    # REFINE_STEP1_ISOLATED,
+    REFINE_STEP2_ISOLATED,
+    REFINE_STEP_FINAL])

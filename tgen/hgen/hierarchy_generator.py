@@ -17,6 +17,10 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_util import save_dataset_checkpoint
+from tgen.hgen.steps.step_construct_questionnaire import construct_questionnaire
+from tgen.hgen.steps.step_create_dataset import create_hgen_dataset
+from tgen.hgen.steps.step_generate_artifact_content import generate_artifact_content
+from tgen.hgen.steps.step_refine_output import refine_artifact_content
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
@@ -49,15 +53,21 @@ class HierarchyGenerator(BaseObject):
         """
         export_path = os.path.join(self.args.export_dir, str(uuid.uuid4())) if self.args.export_dir else None
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
-        summary_questionnaire, format_of_artifacts = self._construct_questionnaire_for_generation()
-        artifact_generation_content, summary = self._generate_artifact_content(source_layer_only_dataset, summary_questionnaire,
-                                                                               format_of_artifacts, export_path)
-        refined_content = self._refine_generations(artifact_generation_content, summary,
-                                                   SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value, export_path)
 
         self.args.state.export_path = export_path
         self.args.state.source_dataset = source_layer_only_dataset
         self.args.state.original_dataset = original_dataset_complete
+
+        pipeline = [construct_questionnaire,
+                    generate_artifact_content,
+                    refine_artifact_content,
+                    create_hgen_dataset]
+        for step in pipeline:
+            step(hgen_args=self.args)
+
+        dataset = self.args.state.dataset
+        assert dataset is not None, f"Final dataset is not set."
+        return dataset
 
     def _construct_questionnaire_for_generation(self) -> Tuple[QuestionnairePrompt, str]:
         """

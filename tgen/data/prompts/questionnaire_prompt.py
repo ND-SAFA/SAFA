@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.util.override import overrides
 
@@ -13,16 +14,21 @@ class QuestionnairePrompt(Prompt):
     Contains a list of questions for the model to answer
     """
 
-    def __init__(self, question_prompts: List[QuestionPrompt], instructions: str = "", enumeration_chars: List[str] = ascii_uppercase):
+    def __init__(self, question_prompts: List[QuestionPrompt], instructions: str = "",
+                 response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt
         :param question_prompts: The list of question prompts to include in the questionnaire
         :param instructions: Any instructions necessary with the questionnaire
+        :param response_manager: Manages the responses from the prompt
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         """
         self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
-        super().__init__(instructions)
+        self.use_bullets_for_enumeration = len(self.enumeration_chars) < len(self.question_prompts)
+        if self.use_bullets_for_enumeration:
+            self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
+        super().__init__(instructions, response_manager=response_manager)
 
     @overrides(Prompt)
     def format_value(self, *args: object, **kwargs: object) -> None:
@@ -58,11 +64,11 @@ class QuestionnairePrompt(Prompt):
         :return: The formatted prompt
         """
         self.format_value(**kwargs)
-        question_format = "{}) {}"
+        question_format = "{}) {}" if not self.use_bullets_for_enumeration else "{} {}"
         formatted_questions = NEW_LINE.join([question_format.format(self.enumeration_chars[i], question.build())
                                              for i, question in enumerate(self.question_prompts)])
         instructions = f"{self.value}{NEW_LINE}" if self.value else ""
-        return f"{instructions}{formatted_questions}"
+        return f"{instructions}{formatted_questions}{NEW_LINE}"
 
     def __repr__(self) -> str:
         """

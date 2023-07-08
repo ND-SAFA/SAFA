@@ -45,7 +45,7 @@ REFINE_STEP1_CONTEXT = QuestionPrompt(
     "Output a new list of the {target_type} where {target_type} focused on the same functionality are grouped together. ",
     response_manager=PromptResponseManager(response_tag="groups"))
 REFINE_STEP2_CONTEXT = QuestionPrompt(
-    "Using your groupings and your knowledge of the system from the {source_type}, "
+    "Using your groupings and your knowledge of the system from the summary, "
     "identify if there is any missing functionality not captured in the {target_type}s. "
     "If so add new {target_type} to capture any gaps. "
     "Output the original groupings of {target_type} "
@@ -91,8 +91,8 @@ REFINE_STEP2_ISOLATED = QuestionPrompt("Group the design requirements into the s
                                        "system design.",
                                        response_manager=PromptResponseManager(response_tag="groups"))
 
-REFINE_STEP_FINAL = QuestionPrompt("Finally, provide a single top-level requirement for each feature, stating its overall purpose. "
-                                   "The requirements should convey the intent and functionality of each grouping.",
+REFINE_STEP_FINAL = QuestionPrompt("Finally, output the refined {target_type}s in a comma deliminated list. "
+                                   "{target_type}s should be in the same format as the original {target_types}s",
                                    response_manager=PromptResponseManager(response_tag="final-solution",
                                                                           required_tag_ids=REQUIRE_ALL_TAGS))
 REFINE_QUESTIONNAIRE_CONTEXT = QuestionnairePrompt(question_prompts=[REFINE_STEP1_CONTEXT, REFINE_STEP2_CONTEXT, REFINE_STEP3_CONTEXT,

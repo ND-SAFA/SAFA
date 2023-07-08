@@ -1,12 +1,12 @@
 import os
 import re
-import string
 import uuid
 from collections import Counter
 from datetime import datetime
 from typing import Any, Dict, List, Set, Tuple, Type, Union
-import pandas as pd
+
 import bs4
+import pandas as pd
 from yaml.constructor import SafeConstructor
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -55,10 +55,9 @@ class HierarchyGenerator(BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """
-    GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
-    SUMMARY_INSTRUCTIONS = "First, write a in-depth summary describing the high level features the system provides its users. " \
-                           "Apply a high-level, user-level view of the system. Your answer should be as comprehensive as possible."
-    TASK_PREFACE = f"{NEW_LINE} TASKS: {NEW_LINE}"
+    SUMMARY_INSTRUCTIONS = "First, write a in-depth, comprehensive summary " \
+                           "describing the system by focusing on the high level features the system provides its users. " \
+                           "Consider the following in your response: "
     RES_TOKENS_MIN = 25000
 
     def __init__(self, args: HGenArgs):
@@ -76,31 +75,50 @@ class HierarchyGenerator(BaseObject):
         """
         export_path = os.path.join(self.args.export_path, str(uuid.uuid4())) if self.args.export_path else None
         original_dataset_complete, source_layer_only_dataset = self._get_source_datasets_for_generation(export_path)
-        questionnaire = self._construct_questionnaire_for_generation()
-        artifact_generation_content, summary = self._generate_artifact_content(source_layer_only_dataset, export_path)
-        refined_content = self._refine_generations(artifact_generation_content, summary, questionnaire, export_path)
-        refined_content = self._refine_generations(refined_content, summary, SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value,
-                                                   export_path, attempt_no=2)
+        summary_questionnaire, format_of_artifacts = self._construct_questionnaire_for_generation()
+        artifact_generation_content, summary = self._generate_artifact_content(source_layer_only_dataset, summary_questionnaire,
+                                                                               format_of_artifacts, export_path)
+        refined_content = self._refine_generations(artifact_generation_content, summary,
+                                                   SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value, export_path)
 
         return self._create_trace_dataset_with_generated_artifacts(refined_content,
                                                                    original_dataset_complete,
                                                                    export_path=export_path)
 
-    def _construct_questionnaire_for_generation(self) -> QuestionnairePrompt:
+    def _construct_questionnaire_for_generation(self) -> Tuple[QuestionnairePrompt, str]:
         """
         Constructs a questionnaire prompt that is used to generate the new artifacts
         :return: The questionnaire prompt that is used to generate the new artifacts
         """
 
-        def construct_tag_from_yaml(loader, node):
-            value = loader.construct_scalar(node)
-            return bs4.Tag(value)
-
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
         format_prompt: Prompt = Prompt("Finally, provide an example of the typical format for a {target_type}. "
                                        "The format should be for only the body of the {target_type} and should exclude any title.",
                                        response_manager=PromptResponseManager(response_tag="format",
-                                                                              required_tag_ids=REQUIRE_ALL_TAGS))
+                                                                              required_tag_ids=REQUIRE_ALL_TAGS))  # TODO move this
+        questionnaire_content = self._get_content_for_summary_prompt(format_prompt, instructions_prompt)
+        step_id, _, instructions_id, _ = instructions_prompt.response_manager.get_all_tag_ids()
+        steps = questionnaire_content[step_id]
+        questions = [QuestionPrompt(step[instructions_id][0]) for i, step in enumerate(steps) if i < len(steps) - 1]
+        format_of_artifacts = questionnaire_content[format_prompt.response_manager.response_tag][0]
+        response_manager = PromptResponseManager(response_tag="summary")
+        return QuestionnairePrompt(question_prompts=questions,
+                                   enumeration_chars=["-"],
+                                   instructions=self.SUMMARY_INSTRUCTIONS,
+                                   response_manager=response_manager), format_of_artifacts
+
+    def _get_content_for_summary_prompt(self, format_prompt: Prompt, instructions_prompt: Prompt):
+        """
+        Gets the content for the prompt to generate a summary of system
+        :param
+        :param format_prompt: The prompt asking for a format for the artifact to be generated
+        :param instructions_prompt: The prompt to get instructions for the summary
+        :return: The generated content
+        """
+
+        def construct_tag_from_yaml(loader, node):
+            value = loader.construct_scalar(node)
+            return bs4.Tag(value)
 
         questionnaire_prompt_path = self._get_path_to_generation_questionnaire_prompt(
             self._convert_spaces_to_dashes(self.args.target_type))
@@ -114,50 +132,10 @@ class HierarchyGenerator(BaseObject):
             questionnaire_content = self._get_predictions(prompt_builder, PromptDataset(),
                                                           response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
             FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
-        questions = self._construct_question_prompts_from_output(*instructions_prompt.response_manager.get_all_tag_ids(),
-                                                                 format_prompt.response_manager.response_tag,
-                                                                 questionnaire_content)
-        return QuestionnairePrompt(question_prompts=questions,
-                                   instructions=self.GENERATION_INSTRUCTIONS)
+        return questionnaire_content
 
-    def _construct_question_prompts_from_output(self, step_id: str, name_id: str, instructions_id: str, deliverable_id: str,
-                                                format_id: str, result: Dict) -> List[QuestionPrompt]:
-        """
-        Constructs the question prompts from the model output
-        :param step_id: The id of the tag for the step
-        :param name_id: The id of the tag for the step name
-        :param instructions_id: The id of the tag for the step id
-        :param deliverable_id: The id of the tag for the step deliverable
-        :param format_id: The id of the tag for the artifact format
-        :param result: The model output
-        :return: The list of question prompts created from model output
-        """
-        steps = result[step_id]
-        questions = []
-        target_artifact_tag = self._convert_spaces_to_dashes(self.args.target_type)
-        for i, step in enumerate(steps):
-            if i == len(steps) - 1:
-                response_tag = f"{target_artifact_tag}-drafts"
-                response_instructions_format = f"Output a draft of the {self.args.target_type}s in a comma-deliminated list enclosed in"
-            else:
-                response_tag = self._convert_spaces_to_dashes(step[name_id][0])
-                deliverable = step[deliverable_id][0]
-                deliverable = deliverable[:-1] if deliverable[-1] in string.punctuation else deliverable
-                response_instructions_format = f"Output {deliverable} enclosed in"
-            response_manager = PromptResponseManager(response_tag=response_tag,
-                                                     response_instructions_format=response_instructions_format + ' {}')
-            question = QuestionPrompt(step[instructions_id][0], response_manager=response_manager)
-            questions.append(question)
-        response_manager = PromptResponseManager(response_tag=f"{target_artifact_tag}s",
-                                                 formatter=lambda tag, val: [v for v in val.split(NEW_LINE) if v],
-                                                 required_tag_ids=REQUIRE_ALL_TAGS)
-        questions.append(QuestionPrompt(f"Finally, output the unique set of {self.args.target_type}s that describe the system "
-                                        f"with minimal overlap in a comma deliminated list using the following format: "
-                                        f"\"{result[format_id][0]}\"", response_manager=response_manager))
-        return questions
-
-    def _generate_artifact_content(self, source_layer_only_dataset: PromptDataset,
-                                   export_path: str = None) -> Tuple[List[str], str]:
+    def _generate_artifact_content(self, source_layer_only_dataset: PromptDataset, summary_questionnaire: QuestionnairePrompt,
+                                   format_of_artifacts: str, export_path: str) -> Tuple[List[str], str]:
         """
         Creates the content for the new artifacts
         :param source_layer_only_dataset: The dataset containing only the source layer
@@ -165,16 +143,19 @@ class HierarchyGenerator(BaseObject):
         :return: The generated artifact content
         """
         logger.info(f"Generating {self.args.target_type}s\n")
-        task_prompt = Prompt("Reverse engineer as many {target_type}s as possible for the {source_type}. "
-                             "Output the {target_type}s in a comma deliminated list.",
+        task_prompt = Prompt("Then, reverse engineer as many {target_type}s as possible for the {source_type}. "
+                             "Each {target_type} should use the following format '{format}'. "
+                             "Enclose all {target_type}s in a comma deliminated list. ",
                              response_manager=PromptResponseManager(
-                                 response_tag=self._convert_spaces_to_dashes(self.args.target_type)))
-        prompt_builder = self._get_prompt_builder_for_generation(task_prompt, include_summary=True)
-        summary_prompt = prompt_builder.get_prompt(-2)
-        summary_tag = summary_prompt.response_manager.response_tag
+                                 response_tag=self._convert_spaces_to_dashes(self.args.target_type))
+
+                             )
+        task_prompt.format_value(format=format_of_artifacts)
+        prompt_builder = self._get_prompt_builder_for_generation(task_prompt, summary_prompt=summary_questionnaire)
+        summary_tag = summary_questionnaire.response_manager.response_tag
         generated_artifacts_tag = task_prompt.response_manager.response_tag
         generation_predictions = self._get_predictions(prompt_builder, source_layer_only_dataset,
-                                                       response_prompt_ids={task_prompt.id, summary_prompt.id},
+                                                       response_prompt_ids={task_prompt.id, summary_questionnaire.id},
                                                        tags_for_response={generated_artifacts_tag, summary_tag},
                                                        return_first=True,
                                                        export_path=os.path.join(export_path, "artifact_gen_response.yaml"))[0]
@@ -196,7 +177,7 @@ class HierarchyGenerator(BaseObject):
             prompt_builder = self._get_prompt_builder_for_generation(questionnaire,
                                                                      SupportedPrompts.HGEN_REFINE_PROMPT_CONTEXT,
                                                                      artifact_type=self.args.target_type)
-            prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
+            prompt_builder.add_prompt(Prompt(f"{NEW_LINE}{self._format_as_markdown('SUMMARY OF SYSTEM')}: {summary}"), 1)
             artifacts = self._create_artifact_df_with_generated_artifacts(artifact_generations=generated_artifact_content,
                                                                           target_layer_id=self.args.target_type,
                                                                           generate_names=False)
@@ -204,7 +185,7 @@ class HierarchyGenerator(BaseObject):
             refined_artifact_content = self._get_predictions(prompt_builder,
                                                              PromptDataset(artifact_df=artifacts),
                                                              response_prompt_ids=questionnaire.id,
-                                                             tags_for_response={generated_artifacts_tag},
+                                                             tags_for_response=generated_artifacts_tag,
                                                              return_first=True,
                                                              export_path=os.path.join(export_path,
                                                                                       f"gen_refinement_response{attempt_no}.yaml"))[0]
@@ -331,17 +312,17 @@ class HierarchyGenerator(BaseObject):
                                              prompt_builder=prompt_builder,
                                              completion_type=LLMCompletionType.GENERATION))
 
-        # if "artifact_gen_response" in export_path:
-        #     print("Reading drafts")
-        #     predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/ca2db2dd-0dbc-4ff3-ae09-5b6443494cd4/"
-        #                                      "artifact_gen_response.yaml")
-        #     response_prompt_ids = {"56d3ff95-13bf-459d-9fda-b77344d8f91c", "56d3ff95-13bf-459d-9fda-b77344d8f91c"}
-        # # elif "refinement_response1" in export_path:
-        # #     print("Reading refinement (context)")
-        # #     predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/b780c9d7-8a4c-4422-9a7d-3cf3b0304f84/"
-        # #                                      "gen_refinement_response1.yaml")
-        # #     response_prompt_ids.add("8d56b068-0a8f-4c36-aa6b-9013c3eda3e0")
-        predictions = trainer.perform_prediction().predictions
+        if "artifact_gen_response" in export_path:
+            print("Reading drafts")
+            predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/de88d5c2-672c-4349-a70d-77a5de8623a6/"
+                                             "artifact_gen_response.yaml")
+            response_prompt_ids = {"0667b783-7fbc-47b0-90eb-1252f9fa0f85", "e0c0bd4e-0169-426a-bce7-a19b144b82fe"}
+        elif "gen_refinement_response" in export_path:
+            predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/98d22e4e-2c95-41c4-9607-815fe157e6bf/"
+                                             "gen_refinement_response1.yaml")
+            response_prompt_ids = {"f0f67a8d-09d6-4a1d-95ff-fcb895346793"}
+        else:
+            predictions = trainer.perform_prediction().predictions
 
         if export_path:
             base_name, file_name = os.path.split(export_path)
@@ -363,31 +344,31 @@ class HierarchyGenerator(BaseObject):
 
     def _get_prompt_builder_for_generation(self, tasks: Prompt,
                                            base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
-                                           include_summary: bool = False, artifact_type: str = None) -> PromptBuilder:
+                                           summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
         """
         Gets the prompt builder used for the generations
         :param tasks: The questionnaire prompt given to the model to produce the generations
         :param base_prompt: The main prompt that starts the prompt
-        :param include_summary: If True, instructions the model to create a summary of the system first
+        :param summary_prompt: Instructions for the model to create a summary of the system first
         :return: The prompt builder used for the generations
         """
         generation_step_response_manager = tasks.question_prompts[-1].response_manager if isinstance(tasks, QuestionnairePrompt) \
             else tasks.response_manager
         generation_step_response_manager.formatter = lambda tag, val: self._format_generated_artifact_content_from_response(val)
 
-        artifact_prompt = MultiArtifactPrompt(prompt_start="{artifact_type}S:",
+        artifact_prompt = MultiArtifactPrompt(prompt_start=self._format_as_markdown("{artifact_type}S:"),
                                               build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                               include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
         artifact_type = self.args.source_type if not artifact_type else artifact_type
         artifact_prompt.format_value(artifact_type=artifact_type.upper())
         prompts = [base_prompt.value, artifact_prompt]
 
-        if include_summary:
-            summary_instructions = self.TASK_PREFACE + self.SUMMARY_INSTRUCTIONS
-            summary_prompt = Prompt(summary_instructions, response_manager=PromptResponseManager(response_tag="summary"))
+        task_preface = f"{NEW_LINE}{self._format_as_markdown('TASKS:')}"
+        if summary_prompt:
+            summary_prompt.value = task_preface + summary_prompt.value
             prompts.append(summary_prompt)
         else:
-            tasks.value = self.TASK_PREFACE + tasks.value
+            tasks.value = task_preface + tasks.value
 
         prompts.append(tasks)
         prompt_builder = PromptBuilder(prompts)
@@ -524,3 +505,13 @@ class HierarchyGenerator(BaseObject):
         max_tokens = max(HierarchyGenerator.RES_TOKENS_MIN, int(model_token_limit * LLMClustering.PERC_TOKENS_FOR_RES))
         llm_manager.llm_args.set_max_tokens(max_tokens)
         return max_tokens
+
+    @staticmethod
+    def _format_as_markdown(string: str, level: int = 1) -> str:
+        """
+        Formats the string as markdown header
+        :param string: The string to format
+        :param level: The level of the header
+        :return: The string formatted as markdown
+        """
+        return f"{'#' * level} {string}"

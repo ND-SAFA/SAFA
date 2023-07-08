@@ -84,6 +84,14 @@ class PromptBuilder:
                 return i
         return -1
 
+    def get_prompt(self, index: int) -> Prompt:
+        """
+        Gets the prompt by the index number
+        :param index: The index
+        :return: The prompt at the given index
+        """
+        return self._prompts[index]
+
     def get_prompt_by_id(self, prompt_id: str) -> Prompt:
         """
         Finds a prompt by its id
@@ -145,3 +153,10 @@ class PromptBuilder:
         if not base_completion:
             return EMPTY_STRING
         return f"{prompt_args.completion_prefix}{base_completion}{prompt_args.completion_suffix}"
+
+    def __len__(self) -> int:
+        """
+        Returns the number of prompts in the builder
+        :return: The number of prompts in the builder
+        """
+        return len(self._prompts)

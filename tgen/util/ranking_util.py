@@ -46,7 +46,7 @@ class RankingUtil:
         ranking_store.parent_ids = parent_ids  # flip flop because in study source = target
         ranking_store.parent2children = parent2children
         ranking_step = ArtifactRankingStep()
-        ranking_step(ranking_store)
+        ranking_step.run(ranking_store)
         batched_ranked_children = ranking_store.processed_ranking_response
         parent2rankings = {source: ranked_children for source, ranked_children in zip(parent_ids, batched_ranked_children)}
         return parent2rankings

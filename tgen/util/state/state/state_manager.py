@@ -1,17 +1,19 @@
 from copy import deepcopy
-from typing import Optional, Any
+from typing import Any, Generic, Optional, TypeVar
 
-from tgen.util.state.state.state import State
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
+from tgen.util.state.state.pipelinestate import PipelineState
+
+StateType = TypeVar("StateType", bound=PipelineState)
 
 
-class StateManager(BaseObject):
+class StateManager(BaseObject, Generic[StateType]):
     """
     Manages all states
     """
 
-    def __init__(self, state: State):
+    def __init__(self, state: StateType):
         """
         Initialize with current state
         :param state: The current state
@@ -30,7 +32,7 @@ class StateManager(BaseObject):
         new_state = self._current_state.__class__(**state_props)
         self.set_current_state(new_state)
 
-    def set_current_state(self, state: State) -> None:
+    def set_current_state(self, state: StateType) -> None:
         """
         Updates the current state to the given one
         :param state: The new current state
@@ -39,7 +41,7 @@ class StateManager(BaseObject):
         self.history.append(deepcopy(self._current_state))
         self._current_state = state
 
-    def reset_state_to_last(self) -> State:
+    def reset_state_to_last(self) -> StateType:
         """
         Resets the current state to be the last state
         :return: The current state (reset to be the last)
@@ -47,7 +49,7 @@ class StateManager(BaseObject):
         self._current_state = self.history.pop()
         return self._current_state
 
-    def get_previous_state(self, n_before: int = 1) -> Optional[State]:
+    def get_previous_state(self, n_before: int = 1) -> Optional[StateType]:
         """
         Gets a previous state
         :param n_before: The number of states before the current to get (i.e. the current state would be 0 before,
@@ -68,4 +70,3 @@ class StateManager(BaseObject):
         :return: The property from the current state
         """
         return getattr(self._current_state, prop_name)
-

@@ -8,4 +8,3 @@ class TestPromptBuilder(TestCase):
         builder = RankingPromptBuilder()
         builder.with_artifact("RE-8", "First artifact body.").with_task("Summarize this artifact.").with_body_title(None)
         prompt = builder.get()
-        print(prompt)

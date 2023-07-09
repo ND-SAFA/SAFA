@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Tuple, Dict
 
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -33,7 +33,16 @@ def perform_refinement(hgen_args: HGenArgs,
                        generated_artifact_content: List[str],
                        questionnaire: QuestionnairePrompt,
                        summary: str,
-                       export_path: str):
+                       export_path: str) -> Tuple[str, Dict]:
+    """
+    Performs the refinement of the original generated artifact content
+    :param hgen_args: The arguments for the hierarchy generation
+    :param generated_artifact_content: The content originally generated
+    :param questionnaire: The questionnaire containing the refinement steps
+    :param summary: The summary of the system
+    :param export_path: The path to export the checkpoint to
+    :return: The tag to retrieve the refinements and the refined content
+    """
     generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
     try:
         logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")

@@ -75,8 +75,10 @@ def get_predictions(prompt_builder: PromptBuilder,
     :param prompt_builder: Builds the prompts for the model
     :param dataset: The dataset to use with the prompts
     :param llm_manager: The LLM manager to use for predictions
+    :param max_tokens: The max tokens for the model
     :param response_prompt_ids: The prompt id to extract from predictions
     :param tags_for_response: The tag to extract from predictions
+    :param return_first: If True, returns the first item from each list of parsed tags (often there is only one per tag)
     :param export_path: The path to export predictions to
     :return: The model predictions
     """
@@ -88,14 +90,13 @@ def get_predictions(prompt_builder: PromptBuilder,
                                          prompt_builder=prompt_builder,
                                          completion_type=LLMCompletionType.GENERATION))
     if export_path and "artifact_gen_response" in export_path and load:
-        print("Reading drafts")
-        predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/de88d5c2-672c-4349-a70d-77a5de8623a6/"
+        predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/c6c75924-5e05-45dc-aa0e-df449842bd54/"
                                          "artifact_gen_response.yaml")
         response_prompt_ids = {"0667b783-7fbc-47b0-90eb-1252f9fa0f85", "e0c0bd4e-0169-426a-bce7-a19b144b82fe"}
-    elif export_path and "gen_refinement_response" in export_path and False:
-        predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/98d22e4e-2c95-41c4-9607-815fe157e6bf/"
+    elif export_path and "gen_refinement_response" in export_path and load:
+        predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/c6c75924-5e05-45dc-aa0e-df449842bd54/"
                                          "gen_refinement_response1.yaml")
-        response_prompt_ids = {"f0f67a8d-09d6-4a1d-95ff-fcb895346793"}
+        response_prompt_ids = {"b3832f3e-4b8e-43d4-971a-78f23d9d3402"}
     else:
         predictions = trainer.perform_prediction().predictions
 
@@ -122,8 +123,10 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
                                                 generate_names: bool = True) -> ArtifactDataFrame:
     """
     Creates a dataframe with new artifacts generated to fill in an upper level of the hierarchy
+    :param hgen_args: The arguments for the hierarchy generation
     :param artifact_generations: A list of generated artifact content
     :param target_layer_id: The id for the layer with the new generated artifacts
+    :param generate_names: If True, generates names for the new artifacts
     :return: The dataframe of generated artifacts
     """
     new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(uuid.uuid4()) for _ in artifact_generations],
@@ -194,7 +197,7 @@ def parse_generated_artifacts(res: str) -> List[str]:
     :param res: The response from the model containing the generated artifact content
     :return: The list of the generated artifact content
     """
-    return [re.sub(r'^\d+\.\s', '', content).strip() for content in res.split(NEW_LINE) if content]
+    return [re.sub(r'^\d+\.\s', '', content).strip() for content in res.split(NEW_LINE) if len(content) > 1]
 
 
 def format_as_markdown(string: str, level: int = 1) -> str:

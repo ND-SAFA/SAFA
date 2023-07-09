@@ -11,7 +11,7 @@ from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.util.dataframe_util import DataFrameUtil
 
 
-def initialize_datasets(hgen_args: HGenArgs) -> Tuple[PromptDataset, PromptDataset]:
+def initialize_datasets(hgen_args: HGenArgs) -> None:
     """
     Gets the original source datasets used for the generation
     :param hgen_args: The arguments and current state of HGEN.

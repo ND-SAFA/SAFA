@@ -62,3 +62,34 @@ class RefineArtifactContent(iStep[HGenArgs, HGenState]):
             logger.exception("Refining the artifact content failed. Using original content instead.")
             refined_artifact_content = generated_artifact_content
         return generated_artifacts_tag, refined_artifact_content
+def perform_refinement(hgen_args: HGenArgs,
+                       generated_artifact_content: List[str],
+                       questionnaire: QuestionnairePrompt,
+                       summary: str,
+                       export_path: str):
+    generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
+    try:
+        logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")
+        prompt_builder = _get_prompt_builder_for_generation(hgen_args,
+                                                            questionnaire,
+                                                            base_prompt=SupportedPrompts.HGEN_REFINE_PROMPT_CONTEXT,
+                                                            artifact_type=hgen_args.target_type)
+        prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
+        artifacts = create_artifact_df_from_generated_artifacts(hgen_args,
+                                                                artifact_generations=generated_artifact_content,
+                                                                target_layer_id=hgen_args.target_type,
+                                                                generate_names=False)
+        refined_artifact_content = get_predictions(prompt_builder,
+                                                   PromptDataset(artifact_df=artifacts),
+                                                   hgen_args.hgen_llm_manager,
+                                                   hgen_args.refinement_tokens,
+                                                   response_prompt_ids=questionnaire.id,
+                                                   tags_for_response={generated_artifacts_tag},
+                                                   return_first=True,
+                                                   export_path=os.path.join(export_path, "gen_refinement_response1.yaml"))[0]
+
+
+    except Exception:
+        logger.exception("Refining the artifact content failed. Using original content instead.")
+        refined_artifact_content = generated_artifact_content
+    return generated_artifacts_tag, refined_artifact_content

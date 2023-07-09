@@ -80,7 +80,7 @@ def get_predictions(prompt_builder: PromptBuilder,
     :param export_path: The path to export predictions to
     :return: The model predictions
     """
-    load = False
+    load = True
     llm_manager.llm_args.set_max_tokens(max_tokens)
     dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
     trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
@@ -92,7 +92,7 @@ def get_predictions(prompt_builder: PromptBuilder,
         predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/de88d5c2-672c-4349-a70d-77a5de8623a6/"
                                          "artifact_gen_response.yaml")
         response_prompt_ids = {"0667b783-7fbc-47b0-90eb-1252f9fa0f85", "e0c0bd4e-0169-426a-bce7-a19b144b82fe"}
-    elif export_path and "gen_refinement_response" in export_path and load:
+    elif export_path and "gen_refinement_response" in export_path and False:
         predictions = FileUtil.read_yaml("/home/kat/git-repos/safa/tgen/output/hgen/bend/98d22e4e-2c95-41c4-9607-815fe157e6bf/"
                                          "gen_refinement_response1.yaml")
         response_prompt_ids = {"f0f67a8d-09d6-4a1d-95ff-fcb895346793"}
@@ -175,7 +175,7 @@ def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
     artifact_prompt.format_value(artifact_type=artifact_type.upper())
     prompts = [base_prompt.value, artifact_prompt]
 
-    task_preface = f"{NEW_LINE}{format_as_markdown('TASKS:')}"
+    task_preface = f"{NEW_LINE}{format_as_markdown('TASKS:')}{NEW_LINE}"
     if summary_prompt:
         summary_prompt.value = task_preface + summary_prompt.value
         prompts.append(summary_prompt)

@@ -34,6 +34,7 @@ def perform_refinement(hgen_args: HGenArgs,
                        questionnaire: QuestionnairePrompt,
                        summary: str,
                        export_path: str):
+    generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
     try:
         logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")
         prompt_builder = _get_prompt_builder_for_generation(hgen_args,
@@ -45,7 +46,6 @@ def perform_refinement(hgen_args: HGenArgs,
                                                                 artifact_generations=generated_artifact_content,
                                                                 target_layer_id=hgen_args.target_type,
                                                                 generate_names=False)
-        generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
         refined_artifact_content = get_predictions(prompt_builder,
                                                    PromptDataset(artifact_df=artifacts),
                                                    hgen_args.hgen_llm_manager,

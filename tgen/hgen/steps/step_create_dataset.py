@@ -90,7 +90,8 @@ class CreateHGenDataset(iStep[HGenArgs, HGenState]):
         :return: The dataframe containing new and old trace links
         """
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
-        tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD})
+        tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD},
+                                 layer_ids=[hgen_args.target_type, hgen_args.source_layer_id])
         trace_predictions: List[TracePredictionEntry] = tracing_job.run().body.prediction_entries
         traces = {}
         for entry in trace_predictions:

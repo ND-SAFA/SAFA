@@ -13,7 +13,7 @@
                 "object_type": "PROMPT",
                 "project_reader": {
                   "object_type": "Artifact",
-                  "project_path": "[DATA_PATH]/bend-summaries"
+                  "project_path": "[DATA_PATH]/test"
                 }
               }
             }

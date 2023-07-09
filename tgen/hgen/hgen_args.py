@@ -1,17 +1,47 @@
-from collections import Set
 from dataclasses import dataclass, field
-from typing import Union
+from typing import List, Union
 
-from tgen.constants.model_constants import get_efficient_default_llm_manager, get_best_default_llm_manager
-from tgen.data.clustering.iclustering import Clusters
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
+
+SUMMARY_INSTRUCTIONS = "First, write a in-depth, comprehensive summary " \
+                       "describing the system by focusing on the high level features the system provides its users. " \
+                       "Consider the following in your response: "
+TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
+GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
+
+
+@dataclass
+class HGenState:
+    export_path: str = None  # Path to output of current run
+    """
+    Step 1 - Artifact generation
+    """
+    generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
+    summary: str = None  # The summary of all the source artifacts.
+    generation_questionnaire: QuestionnairePrompt = None
+    """
+    Step 2 - Refine 1
+    """
+    refinement_number: int = 1  # The current refinement step
+    refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE_CONTEXT.value  # The questionnaire containing all the artifacts.
+    refined_content: List[str] = None  # The refined output.
+
+    """
+    Step 4 - Dataset Construction
+    """
+    source_dataset: PromptDataset = None  # The dataset containing the original artifacts.
+    original_dataset: Union[PromptDataset, TraceDataset] = None
+
+    dataset: TraceDataset = None  # The final dataset with generated artifacts.
 
 
 @dataclass
@@ -47,7 +77,30 @@ class HGenArgs(BaseObject):
     """
     The path to save checkpoints to if desired
     """
-    export_path: str = None
+    export_dir: str = None
+    """
+    Max tokens to use for generating questionnaire.
+    """
+    questionnaire_tokens = 3000
+    """
+    Max number of tokens to use for artifact generation.
+    """
+    artifact_generation_tokens = 2000
+    """
+    Max number of tokens to use for refinement.
+    """
+    refinement_tokens = 2000
+    """
+    Max number of tokens to use for generating artifact names.
+    """
+    artifact_name_tokens = 1000
+    """
+    The persistent state of content of HGEN.
+    """
+    state: HGenState = HGenState()
+    """
+    Format of """
+    format_of_artifacts: str = None
 
     def __post_init__(self) -> None:
         """

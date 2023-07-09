@@ -62,8 +62,11 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
 
         type2count = self.get_type_counts()
-        if len(type2count) > 2:
+        n_types = len(type2count)
+        if n_types > 2:
             raise NotImplementedError("Multi-layer tracing is under construction.")
+        if n_types < 2:
+            raise ValueError(f"Expected to find two types of artifacts, only found: {n_types}")
         n_parents = min(type2count.values())
         parent_type = [t for t, c in type2count.items() if c == n_parents][0]
         child_type = [t for t, c in type2count.items() if c != n_parents][0]

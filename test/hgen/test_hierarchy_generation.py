@@ -22,7 +22,6 @@ from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import fake_anthropic_completion
@@ -33,6 +32,7 @@ from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.enum_util import EnumDict
 from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.util.state.state.llm_trainer_state import LLMTrainerState
 
 
 def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):
@@ -43,6 +43,7 @@ def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteri
             clusters[cluster_num] = []
         clusters[cluster_num].append(artifact_id)
     return {cluster_method: {uuid.uuid4(): artifacts for cluster_num, artifacts in clusters.items()}}
+
 
 @skip("Skipping hgen tests until can fix for update")
 class TestHierarchyGeneration(BaseTest):
@@ -219,7 +220,7 @@ class TestHierarchyGeneration(BaseTest):
         llm_manager = OpenAIManager(llm_args=OpenAIArgs(metrics=[]))
         prompt = BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Are these two artifacts related?")
         prompt2 = MultiArtifactPrompt(include_ids=False, data_type=MultiArtifactPrompt.DataType.TRACES)
-        prompt_builder = PromptBuilder( prompts=[prompt, prompt2])
+        prompt_builder = PromptBuilder(prompts=[prompt, prompt2])
         return LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager, llm_manager=llm_manager,
                                           prompt_builder=prompt_builder, completion_type=LLMCompletionType.CLASSIFICATION))
 
@@ -268,7 +269,7 @@ class TestHierarchyGeneration(BaseTest):
     def get_hierarchy_generator(self, tgen_trainer: LLMTrainer, layer_id: str = None, **params):
         llm_manager = OpenAIManager(OpenAIArgs())
         args = HGenArgs(tgen_trainer=tgen_trainer, target_type=self.TARGET_TYPE,
-                        source_layer_id=self.LAYER_ID if not layer_id else layer_id, export_path=TEST_OUTPUT_DIR,
+                        source_layer_id=self.LAYER_ID if not layer_id else layer_id, export_dir=TEST_OUTPUT_DIR,
                         hgen_llm_manager=llm_manager,
                         **params)
         return HierarchyGenerator(args)

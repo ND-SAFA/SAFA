@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, List, Type, TypeVar
 
-from tgen.util.state.state.pipelinestate import PipelineArgs, PipelineState
+from tgen.pipeline.pipeline_state import PipelineArgs, PipelineState
 
 StateType = TypeVar("StateType", bound=PipelineState)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)

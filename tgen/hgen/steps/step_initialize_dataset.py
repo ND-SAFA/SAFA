@@ -8,7 +8,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint
-from tgen.ranking.pipeline.ipipeline import iStep
+from tgen.pipeline.ipipeline import iStep
 from tgen.util.dataframe_util import DataFrameUtil
 
 

@@ -7,7 +7,7 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import _get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
-from tgen.ranking.pipeline.ipipeline import iStep
+from tgen.pipeline.ipipeline import iStep
 from tgen.util.logging.logger_manager import logger
 
 

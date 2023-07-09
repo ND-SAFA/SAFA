@@ -6,7 +6,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.ranking.pipeline.sort_step import registered_sorters
+from tgen.ranking.steps.sort_step import registered_sorters
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.util.data_structure_util import DataStructureUtil

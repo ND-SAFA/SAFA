@@ -14,7 +14,7 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, SUMMARY_INSTRUCTIONS
 from tgen.hgen.hgen_util import _convert_spaces_to_dashes, _get_prompt_builder_for_generation, get_predictions
-from tgen.ranking.pipeline.ipipeline import iStep
+from tgen.pipeline.ipipeline import iStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 

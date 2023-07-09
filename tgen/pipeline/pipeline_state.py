@@ -5,6 +5,9 @@ from tgen.util.base_object import BaseObject
 
 @dataclass
 class PipelineArgs:
+    """
+    The pipeline configuration and arguments.
+    """
     pass
 
 

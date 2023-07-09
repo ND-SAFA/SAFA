@@ -7,7 +7,7 @@ from tgen.hgen.steps.step_create_dataset import CreateHGenDataset
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContent
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_output import RefineArtifactContent
-from tgen.ranking.pipeline.ipipeline import iPipeline
+from tgen.pipeline.ipipeline import iPipeline
 from tgen.util.base_object import BaseObject
 
 

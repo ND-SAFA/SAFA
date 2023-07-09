@@ -1,9 +1,9 @@
 from copy import deepcopy
 from typing import Any, Generic, Optional, TypeVar
 
+from tgen.pipeline.pipeline_state import PipelineState
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
-from tgen.util.state.state.pipelinestate import PipelineState
 
 StateType = TypeVar("StateType", bound=PipelineState)
 

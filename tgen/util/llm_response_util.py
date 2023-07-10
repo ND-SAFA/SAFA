@@ -24,7 +24,7 @@ class LLMResponseUtil:
             assert len(tags) > 0, f"Missing expected tag {tag_name}"
             content = [tag.contents[0] for tag in tags] if not is_nested else [LLMResponseUtil._parse_children(tag) for tag in tags]
         except (AssertionError, IndexError):
-            error = f"Unable to parse {res}"
+            error = f"Unable to parse {tag_name}"
             logger.exception(error)
             if raise_exception:
                 raise Exception(error)

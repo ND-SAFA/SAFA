@@ -17,12 +17,15 @@ from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger
+from tgen.util.status import Status
 
 
 class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
+
     def run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates a dataset containing original artifacts, generated upper level artifacts, and trace links between them.
+        :param state: The current state of hgen at this point in time
         :param args: The arguments and current state of HGEN.
         :return: None
         """
@@ -92,6 +95,9 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD},
                                  layer_ids=[hgen_args.target_type, hgen_args.source_layer_id])
+        result = tracing_job.run()
+        if result.status != Status.SUCCESS:
+            raise Exception(f"Trace link generation failed: {result.body}")
         trace_predictions: List[TracePredictionEntry] = tracing_job.run().body.prediction_entries
         traces = {}
         for entry in trace_predictions:

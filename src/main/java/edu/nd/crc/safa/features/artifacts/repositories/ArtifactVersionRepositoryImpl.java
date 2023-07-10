@@ -28,6 +28,7 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
 import edu.nd.crc.safa.features.types.services.TypeService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -172,7 +173,7 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public void updateTimInfo(ProjectVersion projectVersion, ArtifactVersion versionEntity,
-                              ArtifactVersion previousVersionEntity) {
+                              ArtifactVersion previousVersionEntity, SafaUser user) {
         ModificationType modificationType = versionEntity.getModificationType();
         boolean added = modificationType == ModificationType.ADDED;
         boolean removed = modificationType == ModificationType.REMOVED;

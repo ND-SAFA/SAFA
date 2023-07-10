@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -105,7 +106,7 @@ public abstract class GenericVersionRepository<
      */
     @Override
     public Pair<V, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                A appEntity) {
+                                                                A appEntity, SafaUser user) {
         VersionEntityAction<V> versionEntityAction = () -> {
             B b = this.createOrUpdateRelatedEntities(
                 projectVersion,
@@ -117,7 +118,7 @@ public abstract class GenericVersionRepository<
                 appEntity);
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
-                createOrUpdateVersionEntity(versionEntity);
+                createOrUpdateVersionEntity(versionEntity, user);
                 UUID baseEntityId = b.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
@@ -131,7 +132,9 @@ public abstract class GenericVersionRepository<
     @Override
     public Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        UUID baseEntityId) {
+        UUID baseEntityId,
+        SafaUser user) {
+
         VersionEntityAction<V> versionEntityAction = () -> {
             Optional<B> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
@@ -141,7 +144,7 @@ public abstract class GenericVersionRepository<
                     projectVersion,
                     b,
                     null);
-                this.createOrUpdateVersionEntity(removedVersionEntity);
+                this.createOrUpdateVersionEntity(removedVersionEntity, user);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
@@ -209,13 +212,14 @@ public abstract class GenericVersionRepository<
     public List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
         List<A> appEntities,
-        boolean asCompleteSet) {
+        boolean asCompleteSet,
+        SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
         List<Pair<V, CommitError>> response = appEntities
             .stream()
             .map(a -> {
-                Pair<V, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, a);
+                Pair<V, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, a, user);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
@@ -232,7 +236,8 @@ public abstract class GenericVersionRepository<
                 .filter(b -> !processedAppEntities.contains(b.getBaseEntityId()))
                 .map(b -> this.deleteVersionEntityByBaseEntityId(
                     projectVersion,
-                    b.getBaseEntityId()))
+                    b.getBaseEntityId(),
+                    user))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
         }
@@ -240,13 +245,13 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private void createOrUpdateVersionEntity(V versionEntity) throws SafaError {
+    private void createOrUpdateVersionEntity(V versionEntity, SafaUser user) throws SafaError {
         try {
             Optional<V> previousEntity = this.findExistingVersionEntity(versionEntity);
             previousEntity.ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
             this.save(versionEntity);
-            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null));
+            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

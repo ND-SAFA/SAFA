@@ -8,8 +8,9 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -20,6 +21,7 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,8 @@ public class TraceLinkVersionRepositoryImpl
     private ArtifactRepository artifactRepository;
     @Autowired
     private TraceMatrixService traceMatrixService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {
@@ -134,7 +138,7 @@ public class TraceLinkVersionRepositoryImpl
 
     @Override
     public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity,
-                              TraceLinkVersion previousVersionEntity) {
+                              TraceLinkVersion previousVersionEntity, SafaUser user) {
         ModificationType modificationType = versionEntity.getModificationType();
         boolean added = modificationType == ModificationType.ADDED;
         boolean removed = modificationType == ModificationType.REMOVED;
@@ -145,25 +149,43 @@ public class TraceLinkVersionRepositoryImpl
 
             ArtifactType sourceType = versionEntity.getTraceLink().getSourceType();
             ArtifactType targetType = versionEntity.getTraceLink().getTargetType();
-            TraceMatrixEntry traceMatrixEntry = traceMatrixService.getEntry(projectVersion, sourceType, targetType)
-                .orElseThrow(() ->
-                    new SafaItemNotFoundError("Missing trace matrix object for %s and %s",
-                        sourceType.getName(),
-                        targetType.getName()));
+            TraceMatrixEntry traceMatrixEntry =
+                traceMatrixService.getOrCreateEntry(projectVersion, sourceType, targetType);
 
             if (added) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
+                notifyTraceMatrixUpdate(traceMatrixEntry, user);
             } else if (removed) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, -1);
+
+                if (traceMatrixEntry.getCount() == 0) {
+                    traceMatrixService.delete(traceMatrixEntry);
+                    notifyTraceMatrixDelete(traceMatrixEntry, user);
+                } else {
+                    notifyTraceMatrixUpdate(traceMatrixEntry, user);
+                }
             } else {
                 // To make sure the generated/approved counts are right, remove counts for the previous
                 // version of the entity, and then add in new counts for the updated version
                 updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
+                notifyTraceMatrixUpdate(traceMatrixEntry, user);
             }
 
             traceMatrixService.save(traceMatrixEntry);
         }
+    }
+
+    private void notifyTraceMatrixUpdate(TraceMatrixEntry entry, SafaUser user) {
+        EntityChangeBuilder builder = EntityChangeBuilder.create(entry.getProjectVersion().getVersionId())
+                .withTraceMatrixUpdate(entry.getId());
+        notificationService.broadcastChangeToUser(builder, user);
+    }
+
+    private void notifyTraceMatrixDelete(TraceMatrixEntry entry, SafaUser user) {
+        EntityChangeBuilder builder = EntityChangeBuilder.create(entry.getProjectVersion().getVersionId())
+            .withTraceMatrixUpdate(entry.getId());
+        notificationService.broadcastChangeToUser(builder, user);
     }
 
     private void updateTraceMatrixEntry(TraceMatrixEntry traceMatrixEntry, TraceLinkVersion versionEntity, int amount) {

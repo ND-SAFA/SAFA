@@ -60,7 +60,8 @@ public class Change {
         TRACES,
         MODELS,
         WARNINGS,
-        JOBS;
+        JOBS,
+        TRACE_MATRICES;
 
         @Override
         public String toString() {

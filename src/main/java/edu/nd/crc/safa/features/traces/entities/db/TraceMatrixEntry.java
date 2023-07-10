@@ -55,4 +55,13 @@ public class TraceMatrixEntry {
 
     @Column
     private int approvedCount;
+
+    public TraceMatrixEntry(ProjectVersion projectVersion, ArtifactType sourceType, ArtifactType targetType) {
+        this.projectVersion = projectVersion;
+        this.sourceType = sourceType;
+        this.targetType = targetType;
+        this.count = 0;
+        this.generatedCount = 0;
+        this.approvedCount = 0;
+    }
 }

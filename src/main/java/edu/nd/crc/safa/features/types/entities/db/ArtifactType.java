@@ -62,15 +62,11 @@ public class ArtifactType implements Serializable {
     @Column(name = "color", nullable = false)
     private String color;
 
-    @Column(name = "count", nullable = false)
-    private int count;
-
     public ArtifactType(Project project, String name) {
         this.project = project;
         this.name = name;
         this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
         this.color = "color" + (int)(Math.random() * 10);  //TODO do we want a random color to start?
-        this.count = 0;
     }
 
     @Override

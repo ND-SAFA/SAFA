@@ -36,7 +36,7 @@ public class TypeAppEntity implements IAppEntity {
         this.name = artifactType.getName();
         this.icon = artifactType.getIcon();
         this.color = artifactType.getColor();
-        this.count = artifactType.getCount();
+        this.count = 0; //TODO
     }
 
     @Override

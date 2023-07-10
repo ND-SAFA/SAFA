@@ -129,7 +129,13 @@ public class ArtifactTypeController extends BaseController {
     @DeleteMapping(AppRoutes.ArtifactType.DELETE_ARTIFACT_TYPE)
     public void deleteArtifactType(@PathVariable UUID typeId) throws SafaError {
         ArtifactTypeRepository artifactTypeRepository = this.serviceProvider.getArtifactTypeRepository();
-        ArtifactType artifactType = artifactTypeRepository.findByTypeId(typeId);
+        Optional<ArtifactType> artifactTypeOptional = artifactTypeRepository.findById(typeId);
+
+        if (artifactTypeOptional.isEmpty()) {
+            throw new SafaItemNotFoundError("No type with id %s", typeId);
+        }
+
+        ArtifactType artifactType = artifactTypeOptional.get();
         Project project = artifactType.getProject();
         this.resourceBuilder.setProject(project).withEditProject();
         artifactTypeRepository.delete(artifactType);

@@ -5,7 +5,9 @@ from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.util.file_util import FileUtil
 from tgen.util.supported_enum import SupportedEnum
 
-CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP"]
+CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
+                   "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
+                   "PL", "R"]
 
 
 class SupportedChunker(SupportedEnum):

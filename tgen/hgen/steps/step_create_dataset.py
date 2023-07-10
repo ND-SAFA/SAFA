@@ -12,7 +12,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
-from tgen.pipeline.ipipeline import iStep
+from tgen.pipeline.abstract_pipeline import iStep
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict

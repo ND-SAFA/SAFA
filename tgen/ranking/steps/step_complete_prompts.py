@@ -1,4 +1,4 @@
-from tgen.pipeline.ipipeline import iStep
+from tgen.pipeline.abstract_pipeline import iStep
 from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState

@@ -18,7 +18,7 @@ class iStep(ABC, Generic[ArgType, StateType]):
         """
 
 
-class iPipeline(ABC, Generic[ArgType, StateType]):
+class AbstractPipeline(ABC, Generic[ArgType, StateType]):
 
     def __init__(self, args: ArgType, steps: List[Type[iStep]]):
         """

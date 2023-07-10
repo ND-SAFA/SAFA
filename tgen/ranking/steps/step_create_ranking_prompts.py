@@ -1,6 +1,6 @@
 from typing import Dict
 
-from tgen.pipeline.ipipeline import iStep
+from tgen.pipeline.abstract_pipeline import iStep
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState

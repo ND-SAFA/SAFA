@@ -7,7 +7,7 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import _get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
-from tgen.pipeline.ipipeline import iStep
+from tgen.pipeline.abstract_pipeline import iStep
 from tgen.util.logging.logger_manager import logger
 
 
@@ -62,6 +62,8 @@ class RefineArtifactContent(iStep[HGenArgs, HGenState]):
             logger.exception("Refining the artifact content failed. Using original content instead.")
             refined_artifact_content = generated_artifact_content
         return generated_artifacts_tag, refined_artifact_content
+
+
 def perform_refinement(hgen_args: HGenArgs,
                        generated_artifact_content: List[str],
                        questionnaire: QuestionnairePrompt,

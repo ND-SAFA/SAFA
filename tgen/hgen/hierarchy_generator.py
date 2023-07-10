@@ -7,11 +7,11 @@ from tgen.hgen.steps.step_create_dataset import CreateHGenDataset
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContent
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_refine_output import RefineArtifactContent
-from tgen.pipeline.ipipeline import iPipeline
+from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.util.base_object import BaseObject
 
 
-class HierarchyGenerator(iPipeline[HGenArgs, HGenState], BaseObject):
+class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     """
     Responsible for generating higher-level artifacts from low-level artifacts
     """

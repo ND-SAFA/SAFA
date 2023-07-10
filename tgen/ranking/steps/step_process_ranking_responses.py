@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from tgen.pipeline.ipipeline import ArgType, iStep
+from tgen.pipeline.abstract_pipeline import ArgType, iStep
 from tgen.pipeline.pipeline_state import State
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState

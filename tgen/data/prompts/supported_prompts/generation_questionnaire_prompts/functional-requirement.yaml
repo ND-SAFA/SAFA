@@ -1,0 +1,43 @@
+format:
+- 'The [system name] shall [high-level functionality description] by [how the functionality
+  is achieved]. '
+step:
+- deliverable:
+  - A high-level description of the system's architecture and the purpose of each
+    major component.
+  instructions:
+  - Examine the code and identify the major components and modules. Group related
+    components and modules together into logical groupings. Describe the purpose and
+    functionality of each grouping.
+  name:
+  - Group
+- deliverable:
+  - A description of the data and processes for each major component grouping.
+  instructions:
+  - For each grouping, identify the inputs, outputs, and data flow between components.
+    Describe the transformations and processing applied to the data.
+  name:
+  - Flow
+- deliverable:
+  - A description of the system's external interfaces, data storage, and the purpose
+    of any stored data.
+  instructions:
+  - Identify the external interfaces and describe how the system interacts with external
+    entities. Identify any stored data and describe its purpose.
+  name:
+  - Interface
+- deliverable:
+  - A high-level natural language description of the system's functionality and purpose.
+  instructions:
+  - Combine the information from the previous steps into coherent sentences and paragraphs
+    that describe the overall functionality and purpose of the system at a high level.
+  name:
+  - Description
+- deliverable:
+  - A refined natural language description that can serve as the Functional requirements
+    for the system.
+  instructions:
+  - 'Review and refine the natural language description. Ensure all major functionality
+    is covered at an appropriate level of detail for Functional requirements. '
+  name:
+  - Requirements

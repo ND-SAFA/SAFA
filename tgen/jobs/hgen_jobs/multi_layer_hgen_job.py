@@ -1,14 +1,21 @@
+import os
+from copy import deepcopy
 from typing import List
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
+from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.param_specs import ParamSpecs
 from tgen.util.status import Status
 
 
@@ -36,10 +43,15 @@ class MultiLayerHGenJob(AbstractJob):
         current_hgen_job = self.starting_hgen_job
         current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
         for i, next_target_type in enumerate(self.target_types):
-            res = current_hgen_job.run()
-            if res.status != Status.SUCCESS:
-                raise Exception(res.body)
-            dataset = res.body
+            proj_path = os.path.join(current_hgen_job.get_hgen_args().load_dir, SAVE_DATASET_DIRNAME) \
+                if current_hgen_job.get_hgen_args().load_dir else EMPTY_STRING
+            if os.path.exists(proj_path):
+                dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
+            else:
+                res = current_hgen_job.run()
+                if res.status != Status.SUCCESS:
+                    raise Exception(res.body)
+                dataset = res.body
             current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type, dataset)
         return current_hgen_job.run().body
 
@@ -56,7 +68,10 @@ class MultiLayerHGenJob(AbstractJob):
         new_params = DataclassUtil.convert_to_dict(current_args, source_layer_id=current_args.target_type,
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,
-                                                   dataset_for_sources=PromptDataset(trace_dataset=generated_dataset))
+                                                   dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
+                                                   load_dir=None)
+        init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names
+        new_params = {name: new_params[name] for name in init_params}
         next_job = BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)
         next_job.result.experimental_vars = {"target_type": next_target_type}
         return next_job

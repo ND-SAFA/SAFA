@@ -10,7 +10,7 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
-from tgen.hgen.hgen_util import create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
+from tgen.hgen.hgen_util import create_artifact_df_from_generated_artifacts, save_dataset_checkpoint, SAVE_DATASET_DIRNAME
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -59,7 +59,7 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
 
         dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
 
-        save_path = save_dataset_checkpoint(dataset, export_path, filename="final_generated_dataset")
+        save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
         save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         state.dataset = dataset
 

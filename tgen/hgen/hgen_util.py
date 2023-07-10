@@ -40,6 +40,7 @@ GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of 
 TASK_INSTRUCTIONS = "Then, reverse engineer as many {target_type}s as possible for the {source_type}. " \
                     "Each {target_type} should be a single line which uses the following format '{format}'. " \
                     "Enclose all {target_type}s in a comma deliminated list. "
+SAVE_DATASET_DIRNAME = "final_generated_dataset"
 
 
 def save_dataset_checkpoint(dataset: Any, export_path: str = None,

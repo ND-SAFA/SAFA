@@ -5,10 +5,14 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
+import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -16,13 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Responsible for creating new versions and retrieving old ones.
  */
 @Service
+@AllArgsConstructor
 public class VersionService {
     private final ProjectVersionRepository projectVersionRepository;
-
-    @Autowired
-    public VersionService(ProjectVersionRepository projectVersionRepository) {
-        this.projectVersionRepository = projectVersionRepository;
-    }
+    private final TypeService typeService;
+    private final ArtifactTypeCountService typeCountService;
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
         return this.projectVersionRepository.findByProjectInBackwardsOrder(project);
@@ -34,7 +36,8 @@ public class VersionService {
             projectVersion.getMajorVersion() + 1,
             0,
             0);
-        this.projectVersionRepository.save(newVersion);
+        newVersion = this.projectVersionRepository.save(newVersion);
+        createTypeCountEntries(newVersion);
         return newVersion;
     }
 
@@ -44,7 +47,8 @@ public class VersionService {
             projectVersion.getMajorVersion(),
             projectVersion.getMinorVersion() + 1,
             0);
-        this.projectVersionRepository.save(newVersion);
+        newVersion = this.projectVersionRepository.save(newVersion);
+        createTypeCountEntries(newVersion);
         return newVersion;
     }
 
@@ -54,7 +58,8 @@ public class VersionService {
             projectVersion.getMajorVersion(),
             projectVersion.getMinorVersion(),
             projectVersion.getRevision() + 1);
-        this.projectVersionRepository.save(newVersion);
+        newVersion = this.projectVersionRepository.save(newVersion);
+        createTypeCountEntries(newVersion);
         return newVersion;
     }
 
@@ -76,8 +81,20 @@ public class VersionService {
 
     public ProjectVersion createInitialProjectVersion(Project project) {
         ProjectVersion projectVersion = new ProjectVersion(project, 1, 0, 0);
-        this.projectVersionRepository.save(projectVersion);
-        projectVersion.setProject(project);
+        projectVersion = this.projectVersionRepository.save(projectVersion);
+        createTypeCountEntries(projectVersion);
         return projectVersion;
+    }
+
+    /**
+     * Create type count entities for the given version for all types in a project
+     *
+     * @param version The version to add counts for
+     */
+    private void createTypeCountEntries(ProjectVersion version) {
+        for (ArtifactType type : typeService.getTypes(version.getProject())) {
+            ArtifactTypeCount typeCount = new ArtifactTypeCount(version, type);
+            typeCountService.save(typeCount);
+        }
     }
 }

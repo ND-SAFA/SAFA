@@ -41,11 +41,20 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     }
 
     public List<TypeAppEntity> getAppEntities(Project project) {
-        return artifactTypeRepository
-            .findByProject(project)
+        return getTypes(project)
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all types within a project.
+     *
+     * @param project The project
+     * @return The types in the project
+     */
+    public List<ArtifactType> getTypes(Project project) {
+        return artifactTypeRepository.findByProject(project);
     }
 
     /**

@@ -171,7 +171,8 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public void updateTimInfo(ProjectVersion projectVersion, ArtifactVersion versionEntity) {
+    public void updateTimInfo(ProjectVersion projectVersion, ArtifactVersion versionEntity,
+                              ArtifactVersion previousVersionEntity) {
         ModificationType modificationType = versionEntity.getModificationType();
         boolean added = modificationType == ModificationType.ADDED;
         boolean removed = modificationType == ModificationType.REMOVED;

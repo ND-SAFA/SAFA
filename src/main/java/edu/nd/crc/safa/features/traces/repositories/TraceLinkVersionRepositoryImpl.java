@@ -133,12 +133,14 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity) {
+    public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity,
+                              TraceLinkVersion previousVersionEntity) {
         ModificationType modificationType = versionEntity.getModificationType();
         boolean added = modificationType == ModificationType.ADDED;
         boolean removed = modificationType == ModificationType.REMOVED;
+        boolean modified = modificationType == ModificationType.MODIFIED;
 
-        if (added || removed) {
+        if (added || removed || modified) {
             // TODO this might need to get a table lock somehow if simultaneous updates come in from different sources
 
             ArtifactType sourceType = versionEntity.getTraceLink().getSourceType();
@@ -151,8 +153,13 @@ public class TraceLinkVersionRepositoryImpl
 
             if (added) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
-            } else {
+            } else if (removed) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, -1);
+            } else {
+                // To make sure the generated/approved counts are right, remove counts for the previous
+                // version of the entity, and then add in new counts for the updated version
+                updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
+                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
             }
 
             traceMatrixService.save(traceMatrixEntry);

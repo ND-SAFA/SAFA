@@ -121,5 +121,12 @@ public interface IVersionRepository<
     EntityDelta<A> calculateEntityDelta(ProjectVersion baselineVersion,
                                         ProjectVersion targetVersion);
 
-    void updateTimInfo(ProjectVersion projectVersion, V versionEntity);
+    /**
+     * Update TIM related information as needed for a given entity update.
+     *
+     * @param projectVersion The version the update is happening in
+     * @param versionEntity The newly updated entity
+     * @param originalVersionEntity The previous version of the entity, if it exists (for calculating differences)
+     */
+    void updateTimInfo(ProjectVersion projectVersion, V versionEntity, V originalVersionEntity);
 }

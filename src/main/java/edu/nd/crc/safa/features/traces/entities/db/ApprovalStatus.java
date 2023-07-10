@@ -26,7 +26,7 @@ public enum ApprovalStatus implements Serializable {
      */
     DECLINED("declined");
 
-    private String value;
+    private final String value;
 
     @Override
     public String toString() {

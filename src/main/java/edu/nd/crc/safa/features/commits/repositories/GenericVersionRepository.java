@@ -242,11 +242,11 @@ public abstract class GenericVersionRepository<
 
     private void createOrUpdateVersionEntity(V versionEntity) throws SafaError {
         try {
-            this.findExistingVersionEntity(versionEntity)
-                .ifPresent(existingVersionEntity ->
-                    versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
+            Optional<V> previousEntity = this.findExistingVersionEntity(versionEntity);
+            previousEntity.ifPresent(existingVersionEntity ->
+                versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
             this.save(versionEntity);
-            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity);
+            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null));
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

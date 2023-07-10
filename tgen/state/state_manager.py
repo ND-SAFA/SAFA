@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Any, Generic, Optional, TypeVar
 
-from tgen.pipeline.pipeline_state import State
+from tgen.state.state import State
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
 

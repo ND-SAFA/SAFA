@@ -9,7 +9,8 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.pipeline.pipeline_state import PipelineArgs, State
+from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.state.state import State
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 

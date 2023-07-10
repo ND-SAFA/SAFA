@@ -20,7 +20,7 @@ from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 
 Res = namedtuple("Res", ["id"])
 

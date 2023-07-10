@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.pipeline.pipeline_state import State
+from tgen.state.state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are a software engineer on a software system. " \

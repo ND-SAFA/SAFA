@@ -21,8 +21,8 @@ from tgen.train.trace_output.trace_prediction_output import TracePredictionOutpu
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
-from tgen.util.state.state.state_manager import StateManager
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
+from tgen.state.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):

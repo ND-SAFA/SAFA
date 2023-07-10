@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 load_dotenv()

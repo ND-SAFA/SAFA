@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
-from tgen.pipeline.pipeline_state import PipelineArgs
+from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass

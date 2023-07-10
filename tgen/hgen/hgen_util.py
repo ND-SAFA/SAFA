@@ -30,7 +30,7 @@ from tgen.train.trainers.llm_trainer import LLMTrainer
 from tgen.util.dict_util import DictUtil
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.state.state.llm_trainer_state import LLMTrainerState
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 
 
 def save_dataset_checkpoint(dataset: Any, export_path: str = None,

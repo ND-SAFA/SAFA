@@ -27,4 +27,8 @@ public class ArtifactTypeCountService {
     public Optional<ArtifactTypeCount> getByProjectVersionAndType(ProjectVersion projectVersion, ArtifactType type) {
         return repo.getByProjectVersionAndType(projectVersion, type);
     }
+
+    public void save(ArtifactTypeCount artifactTypeCount) {
+        repo.save(artifactTypeCount);
+    }
 }

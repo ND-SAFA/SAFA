@@ -21,11 +21,13 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,31 +40,31 @@ public class ArtifactVersionRepositoryImpl
     extends GenericVersionRepository<Artifact, ArtifactVersion, ArtifactAppEntity> {
 
     @Autowired
-    ArtifactVersionRepository artifactVersionRepository;
+    private ArtifactVersionRepository artifactVersionRepository;
 
     @Autowired
-    ArtifactRepository artifactRepository;
+    private ArtifactRepository artifactRepository;
 
     @Autowired
-    ArtifactTypeRepository artifactTypeRepository;
+    private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
-    DocumentArtifactRepository documentArtifactRepository;
+    private DocumentArtifactRepository documentArtifactRepository;
 
     @Autowired
-    DocumentRepository documentRepository;
+    private DocumentRepository documentRepository;
 
     @Autowired
-    FTAArtifactRepository ftaArtifactRepository;
+    private FTAArtifactRepository ftaArtifactRepository;
 
     @Autowired
-    SafetyCaseArtifactRepository safetyCaseArtifactRepository;
+    private SafetyCaseArtifactRepository safetyCaseArtifactRepository;
 
     @Autowired
-    TraceLinkVersionRepository traceLinkVersionRepository;
+    private AttributeValueService attributeValueService;
 
     @Autowired
-    AttributeValueService attributeValueService;
+    private ArtifactTypeCountService typeCountService;
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
@@ -166,6 +168,29 @@ public class ArtifactVersionRepositoryImpl
         // Step 3 - Attach Safety Case or FTA information
         attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
         return artifactAppEntity;
+    }
+
+    @Override
+    public void updateTimInfo(ProjectVersion projectVersion, ArtifactVersion versionEntity) {
+        ModificationType modificationType = versionEntity.getModificationType();
+        boolean added = modificationType == ModificationType.ADDED;
+        boolean removed = modificationType == ModificationType.REMOVED;
+
+        if (added || removed) {
+            // TODO this might need to get a table lock somehow if simultaneous updates come in from different sources
+
+            ArtifactType type = versionEntity.getType();
+            ArtifactTypeCount typeCount = typeCountService.getByProjectVersionAndType(projectVersion, type)
+                .orElseThrow(() -> new SafaItemNotFoundError("Missing type count object for %s", type.getName()));
+
+            if (added) {
+                typeCount.setCount(typeCount.getCount() + 1);
+            } else {
+                typeCount.setCount(typeCount.getCount() - 1);
+            }
+
+            typeCountService.save(typeCount);
+        }
     }
 
     /**

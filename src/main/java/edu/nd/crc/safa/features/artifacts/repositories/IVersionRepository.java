@@ -120,4 +120,6 @@ public interface IVersionRepository<
      */
     EntityDelta<A> calculateEntityDelta(ProjectVersion baselineVersion,
                                         ProjectVersion targetVersion);
+
+    void updateTimInfo(ProjectVersion projectVersion, V versionEntity);
 }

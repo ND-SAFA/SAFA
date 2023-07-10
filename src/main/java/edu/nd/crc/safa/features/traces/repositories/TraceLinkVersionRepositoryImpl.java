@@ -9,13 +9,17 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +31,13 @@ public class TraceLinkVersionRepositoryImpl
     extends GenericVersionRepository<TraceLink, TraceLinkVersion, TraceAppEntity> {
 
     @Autowired
-    TraceLinkVersionRepository traceLinkVersionRepository;
+    private TraceLinkVersionRepository traceLinkVersionRepository;
     @Autowired
-    TraceLinkRepository traceLinkRepository;
+    private TraceLinkRepository traceLinkRepository;
     @Autowired
-    ArtifactRepository artifactRepository;
+    private ArtifactRepository artifactRepository;
+    @Autowired
+    private TraceMatrixService traceMatrixService;
 
     @Override
     public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {
@@ -124,6 +130,45 @@ public class TraceLinkVersionRepositoryImpl
             trace.getScore(),
             trace.getTraceType()
         );
+    }
+
+    @Override
+    public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity) {
+        ModificationType modificationType = versionEntity.getModificationType();
+        boolean added = modificationType == ModificationType.ADDED;
+        boolean removed = modificationType == ModificationType.REMOVED;
+
+        if (added || removed) {
+            // TODO this might need to get a table lock somehow if simultaneous updates come in from different sources
+
+            ArtifactType sourceType = versionEntity.getTraceLink().getSourceType();
+            ArtifactType targetType = versionEntity.getTraceLink().getTargetType();
+            TraceMatrixEntry traceMatrixEntry = traceMatrixService.getEntry(projectVersion, sourceType, targetType)
+                .orElseThrow(() ->
+                    new SafaItemNotFoundError("Missing trace matrix object for %s and %s",
+                        sourceType.getName(),
+                        targetType.getName()));
+
+            if (added) {
+                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
+            } else {
+                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, -1);
+            }
+
+            traceMatrixService.save(traceMatrixEntry);
+        }
+    }
+
+    private void updateTraceMatrixEntry(TraceMatrixEntry traceMatrixEntry, TraceLinkVersion versionEntity, int amount) {
+        traceMatrixEntry.setCount(traceMatrixEntry.getCount() + amount);
+
+        if (versionEntity.getTraceType() == TraceType.GENERATED) {
+            traceMatrixEntry.setGeneratedCount(traceMatrixEntry.getGeneratedCount() + amount);
+
+            if (versionEntity.getApprovalStatus() == ApprovalStatus.APPROVED) {
+                traceMatrixEntry.setApprovedCount(traceMatrixEntry.getApprovedCount() + amount);
+            }
+        }
     }
 
     private TraceLink createNewTraceLink(TraceAppEntity newTrace, Project project) throws SafaError {

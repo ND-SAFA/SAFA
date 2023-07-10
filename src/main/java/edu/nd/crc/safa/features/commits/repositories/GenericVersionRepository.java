@@ -246,6 +246,7 @@ public abstract class GenericVersionRepository<
                 .ifPresent(existingVersionEntity ->
                     versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
             this.save(versionEntity);
+            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity);
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();

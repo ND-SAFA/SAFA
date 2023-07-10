@@ -4,7 +4,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
@@ -21,7 +27,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class TypeService implements IAppEntityService<TypeAppEntity> {
-    ArtifactTypeRepository artifactTypeRepository;
+    private ArtifactTypeRepository artifactTypeRepository;
+    private ArtifactRepository artifactRepository;
+    private NotificationService notificationService;
 
     @Override
     public List<TypeAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
@@ -75,7 +83,98 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @return the created artifact type
      */
     public ArtifactType createArtifactType(Project project, String name) {
-        ArtifactType artifactType = new ArtifactType(project, name);
-        return saveArtifactType(artifactType);
+        return createArtifactType(new ArtifactType(project, name));
+    }
+
+    /**
+     * Create an artifact type for a given project.
+     *
+     * @param project the project the type belongs to
+     * @param name the name of the artifact type
+     * @param color the color associated with the type
+     * @return the created artifact type
+     */
+    public ArtifactType createArtifactType(Project project, String name, String color) {
+        return createArtifactType(new ArtifactType(project, name, color));
+    }
+
+    /**
+     * Save an artifact type to the database with some error checking and notifications.
+     *
+     * @param artifactType The type we are creating
+     * @return The type that got saved to the database
+     */
+    private ArtifactType createArtifactType(ArtifactType artifactType) {
+        ArtifactType existingType = getArtifactType(artifactType.getProject(), artifactType.getName());
+        if (existingType != null) {
+            throw new SafaError("Type exists: " + artifactType.getName());
+        }
+
+        artifactType = saveArtifactType(artifactType);
+
+        notifyTypeUpdate(artifactType);
+
+        return artifactType;
+    }
+
+    /**
+     * Update values in an artifact type.
+     *
+     * @param project Project containing the type
+     * @param updatedArtifactType The updated type definition
+     * @return The type after the update (may not match the passed in type 100% as we do not allow editing
+     *         certain values)
+     */
+    public ArtifactType updateArtifactType(Project project, ArtifactType updatedArtifactType) {
+        ArtifactType originalType = getArtifactType(project, updatedArtifactType.getName());
+
+        if (originalType == null) {
+            throw new SafaItemNotFoundError(updatedArtifactType.getName());
+        }
+
+        // Don't allow editing the id or project
+        updatedArtifactType.setId(originalType.getId());
+        updatedArtifactType.setProject(originalType.getProject());
+
+        updatedArtifactType = saveArtifactType(updatedArtifactType);
+
+        notifyTypeUpdate(updatedArtifactType);
+
+        return updatedArtifactType;
+    }
+
+    /**
+     * Delete a type
+     *
+     * @param type The type to delete
+     */
+    public void deleteArtifactType(ArtifactType type) {
+        artifactTypeRepository.delete(type);
+        notifyTypeDeleted(type);
+    }
+
+    private void notifyTypeUpdate(ArtifactType artifactType) {
+        Project project = artifactType.getProject();
+
+        // Step - Calculate affected artifact ids
+        List<UUID> artifactIds = artifactRepository
+            .findByProjectAndType(project, artifactType)
+            .stream()
+            .map(Artifact::getArtifactId)
+            .collect(Collectors.toList());
+
+        // Step - broadcast change to artifact type and affected artifacts
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(project.getProjectId())
+                .withTypeUpdate(artifactType.getId())
+                .withArtifactsUpdate(artifactIds));
+    }
+
+    private void notifyTypeDeleted(ArtifactType artifactType) {
+        notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(artifactType.getProject().getProjectId())
+                .withTypeDelete(artifactType.getId())
+                .withUpdateLayout());
     }
 }

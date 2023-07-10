@@ -1,22 +1,17 @@
 package edu.nd.crc.safa.features.types.controllers;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.types.services.TypeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,23 +44,10 @@ public class ArtifactTypeController extends BaseController {
     @PostMapping(AppRoutes.ArtifactType.CREATE_ARTIFACT_TYPE)
     public TypeAppEntity createArtifactType(@PathVariable UUID projectId,
                                             @RequestBody ArtifactType artifactType) throws SafaError {
+
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-
-        Optional<ArtifactType> originalType = this.serviceProvider.getArtifactTypeRepository()
-            .findByProjectAndNameIgnoreCase(project, artifactType.getName());
-
-        if (originalType.isPresent()) {
-            throw new SafaError("Type exists: " + artifactType.getName());
-        }
-
-        // Don't trust values sent to us
-        artifactType.setProject(project);
-        artifactType.setId(null);
-
-        this.serviceProvider.getArtifactTypeRepository().save(artifactType);
-
-        notifyTypeUpdate(project, artifactType);
-
+        TypeService typeService = serviceProvider.getTypeService();
+        artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor());
         return new TypeAppEntity(artifactType);
     }
 
@@ -82,42 +64,9 @@ public class ArtifactTypeController extends BaseController {
     public TypeAppEntity updateArtifactType(@PathVariable UUID projectId, @PathVariable String artifactType,
                                             @RequestBody ArtifactType artifactTypeObj) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
-
-        Optional<ArtifactType> originalType = this.serviceProvider.getArtifactTypeRepository()
-            .findByProjectAndNameIgnoreCase(project, artifactType);
-
-        if (originalType.isEmpty()) {
-            throw new SafaItemNotFoundError(artifactType);
-        }
-
-        // Don't allow editing the type or project
-        artifactTypeObj.setId(originalType.get().getId());
-        artifactTypeObj.setProject(originalType.get().getProject());
-
-        this.serviceProvider.getArtifactTypeRepository().save(artifactTypeObj);
-
-        notifyTypeUpdate(project, artifactTypeObj);
-
+        TypeService typeService = serviceProvider.getTypeService();
+        artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj);
         return new TypeAppEntity(artifactTypeObj);
-    }
-
-    private void notifyTypeUpdate(Project project, ArtifactType artifactType) {
-        // Step - Calculate affected artifact ids
-        List<UUID> artifactIds = this.serviceProvider
-            .getArtifactRepository()
-            .findByProjectAndType(project, artifactType)
-            .stream()
-            .map(Artifact::getArtifactId)
-            .collect(Collectors.toList());
-
-        // Step - broadcast change to artifact type and affected artifacts
-        this.serviceProvider
-            .getNotificationService()
-            .broadcastChange(
-                EntityChangeBuilder
-                    .create(project.getProjectId())
-                    .withTypeUpdate(artifactType.getId())
-                    .withArtifactsUpdate(artifactIds));
     }
 
     /**
@@ -128,23 +77,16 @@ public class ArtifactTypeController extends BaseController {
      */
     @DeleteMapping(AppRoutes.ArtifactType.DELETE_ARTIFACT_TYPE)
     public void deleteArtifactType(@PathVariable UUID typeId) throws SafaError {
-        ArtifactTypeRepository artifactTypeRepository = this.serviceProvider.getArtifactTypeRepository();
-        Optional<ArtifactType> artifactTypeOptional = artifactTypeRepository.findById(typeId);
+        TypeService typeService = serviceProvider.getTypeService();
+        ArtifactType type = typeService.getArtifactType(typeId);
 
-        if (artifactTypeOptional.isEmpty()) {
+        if (type == null) {
             throw new SafaItemNotFoundError("No type with id %s", typeId);
         }
 
-        ArtifactType artifactType = artifactTypeOptional.get();
-        Project project = artifactType.getProject();
+        Project project = type.getProject();
         this.resourceBuilder.setProject(project).withEditProject();
-        artifactTypeRepository.delete(artifactType);
-        this.serviceProvider
-            .getNotificationService()
-            .broadcastChange(
-                EntityChangeBuilder
-                    .create(artifactType.getProject().getProjectId())
-                    .withTypeDelete(artifactType.getId())
-                    .withUpdateLayout());
+
+        typeService.deleteArtifactType(type);
     }
 }

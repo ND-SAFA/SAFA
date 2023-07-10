@@ -26,8 +26,8 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
-import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,7 +46,7 @@ public class ArtifactVersionRepositoryImpl
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private ArtifactTypeRepository artifactTypeRepository;
+    private TypeService artifactTypeService;
 
     @Autowired
     private DocumentArtifactRepository documentArtifactRepository;
@@ -333,10 +333,10 @@ public class ArtifactVersionRepositoryImpl
     }
 
     private ArtifactType findOrCreateArtifactType(Project project, String typeName) {
-        ArtifactType artifactType = this.artifactTypeRepository
-            .findByProjectAndNameIgnoreCase(project, typeName)
-            .orElseGet(() -> new ArtifactType(project, typeName));
-        this.artifactTypeRepository.save(artifactType);
+        ArtifactType artifactType = this.artifactTypeService.getArtifactType(project, typeName);
+        if (artifactType == null) {
+            artifactType = this.artifactTypeService.createArtifactType(project, typeName);
+        }
         return artifactType;
     }
 }

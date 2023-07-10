@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.types.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,9 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
 
     @Override
     public List<TypeAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
-        return getAppEntities(projectVersion.getProject());
+        List<TypeAppEntity> types = getAppEntities(projectVersion.getProject());
+        attachTypeCounts(projectVersion, types);
+        return types;
     }
 
     public List<TypeAppEntity> getAppEntities(Project project) {
@@ -45,6 +49,17 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
             .stream()
             .map(TypeAppEntity::new)
             .collect(Collectors.toList());
+    }
+
+    private void attachTypeCounts(ProjectVersion projectVersion, List<TypeAppEntity> types) {
+        // Doing it this way allows us to reduce database calls which is faster
+        Map<UUID, TypeAppEntity> typeMap = new HashMap<>();
+        types.forEach(type -> typeMap.put(type.getId(), type));
+
+        List<ArtifactTypeCount> counts = typeCountService.getByProjectVersion(projectVersion);
+        for (ArtifactTypeCount count : counts) {
+            typeMap.get(count.getType().getId()).setCount(count.getCount());
+        }
     }
 
     /**

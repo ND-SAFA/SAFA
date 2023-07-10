@@ -14,9 +14,11 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.features.versions.services.VersionService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
     private ArtifactTypeRepository artifactTypeRepository;
     private ArtifactRepository artifactRepository;
     private NotificationService notificationService;
+    private ArtifactTypeCountService typeCountService;
+    private VersionService versionService;
 
     @Override
     public List<TypeAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
@@ -112,9 +116,24 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
 
         artifactType = saveArtifactType(artifactType);
 
+        createTypeCounts(artifactType);
+
         notifyTypeUpdate(artifactType);
 
         return artifactType;
+    }
+
+    /**
+     * Create type count objects for this type for all existing versions in a project.
+     *
+     * @param artifactType The type we are counting
+     */
+    private void createTypeCounts(ArtifactType artifactType) {
+        Project project = artifactType.getProject();
+        for (ProjectVersion projectVersion : versionService.getProjectVersions(project)) {
+            ArtifactTypeCount typeCount = new ArtifactTypeCount(projectVersion, artifactType);
+            typeCountService.save(typeCount);
+        }
     }
 
     /**

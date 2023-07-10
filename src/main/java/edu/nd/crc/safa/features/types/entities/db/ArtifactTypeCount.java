@@ -11,7 +11,6 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +22,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ArtifactTypeCount {
 
     @Id
@@ -43,4 +41,10 @@ public class ArtifactTypeCount {
 
     @Column
     private int count;
+
+    public ArtifactTypeCount(ProjectVersion projectVersion, ArtifactType type) {
+        this.projectVersion = projectVersion;
+        this.type = type;
+        this.count = 0;
+    }
 }

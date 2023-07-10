@@ -67,7 +67,8 @@ class Summarizer(BaseObject):
         indices2resummarize = set()
         prompts_for_summaries = []
         for i, content, chunker_type, id_ in zip(range(len(contents)), contents, chunker_types, ids):
-            prompts = self._create_summarization_prompts(content, chunker_type, id_)
+            prompts = self._create_summarization_prompts(content, chunker_type, id_,
+                                                         code_or_above_limit_only=self.code_or_above_limit_only)
             if len(prompts) < 1:  # no prompt because does not need summarized
                 continue
             # Summarize the summarized chunks to have one congruent summary at the end

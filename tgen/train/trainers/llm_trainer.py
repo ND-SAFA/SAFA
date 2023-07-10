@@ -79,8 +79,9 @@ class LLMTrainer(AbstractTrainer):
                                                  prompt_args=self.llm_manager.prompt_args)
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
-        first_prompt = prompt_df['prompt'][0]
-        print("Prompt:", first_prompt)
+        first_prompt = prompt_df[PromptKeys.PROMPT][0]
+        logger.debug(first_prompt)
+
         res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
 

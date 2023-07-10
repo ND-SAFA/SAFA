@@ -1,8 +1,8 @@
 from copy import deepcopy
 from string import ascii_uppercase
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
@@ -14,7 +14,7 @@ class QuestionnairePrompt(Prompt):
     Contains a list of questions for the model to answer
     """
 
-    def __init__(self, question_prompts: List[QuestionPrompt], instructions: str = "",
+    def __init__(self, question_prompts: Union[List[QuestionPrompt], Dict[int, QuestionPrompt]], instructions: str = EMPTY_STRING,
                  response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt
@@ -23,6 +23,9 @@ class QuestionnairePrompt(Prompt):
         :param response_manager: Manages the responses from the prompt
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         """
+        if isinstance(question_prompts, Dict):
+            starting_number = min(question_prompts.keys())
+            question_prompts = [question_prompts[i] for i in range(starting_number, len(question_prompts) + starting_number)]
         self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
         self.use_bullets_for_enumeration = len(self.enumeration_chars) < len(self.question_prompts)

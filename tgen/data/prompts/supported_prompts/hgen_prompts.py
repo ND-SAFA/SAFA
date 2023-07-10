@@ -62,4 +62,4 @@ REFINE_STEPS = {
 REFINE_QUESTIONNAIRE = QuestionnairePrompt(instructions="Review each {target_type} carefully to ensure high quality. "
                                                         "For each {target_type}:",
                                            enumeration_chars=["-"],
-                                           question_prompts=[REFINE_STEPS[i] for i in range(1, len(REFINE_STEPS) + 1)])
+                                           question_prompts=REFINE_STEPS)

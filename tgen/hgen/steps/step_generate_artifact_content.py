@@ -14,12 +14,12 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, SUMMARY_INSTRUCTIONS
 from tgen.hgen.hgen_util import _convert_spaces_to_dashes, _get_prompt_builder_for_generation, get_predictions
-from tgen.pipeline.abstract_pipeline import iStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 
 
-class GenerateArtifactContent(iStep[HGenArgs, HGenState]):
+class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
     def run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the content for the new artifacts.

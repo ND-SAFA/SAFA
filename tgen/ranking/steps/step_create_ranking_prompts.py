@@ -1,12 +1,12 @@
 from typing import Dict
 
-from tgen.pipeline.abstract_pipeline import iStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 
 
-class CreateRankingPrompts(iStep[RankingArgs, RankingState]):
+class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
     def run(self, args: RankingArgs, state: RankingState) -> None:
         self.create_ranking_prompts(args, state)
 

@@ -8,11 +8,11 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint
-from tgen.pipeline.abstract_pipeline import iStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.dataframe_util import DataFrameUtil
 
 
-class InitializeDatasetStep(iStep[HGenArgs, HGenState]):
+class InitializeDatasetStepAbstract(AbstractPipelineStep[HGenArgs, HGenState]):
     def run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Gets the original source datasets used for the generation

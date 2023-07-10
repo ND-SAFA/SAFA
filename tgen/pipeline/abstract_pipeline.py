@@ -7,7 +7,7 @@ StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
 
 
-class iStep(ABC, Generic[ArgType, StateType]):
+class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
     @abstractmethod
     def run(self, args: ArgType, state: State) -> None:
         """
@@ -20,7 +20,7 @@ class iStep(ABC, Generic[ArgType, StateType]):
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
 
-    def __init__(self, args: ArgType, steps: List[Type[iStep]]):
+    def __init__(self, args: ArgType, steps: List[Type[AbstractPipelineStep]]):
         """
         Constructs pipeline of steps.
         :param steps: Steps to perform in sequential order.

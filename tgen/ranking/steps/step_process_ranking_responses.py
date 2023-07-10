@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from tgen.pipeline.abstract_pipeline import ArgType, iStep
+from tgen.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.pipeline.pipeline_state import State
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -16,7 +16,7 @@ RESPONSE_PROCESSING_STEPS = [
 ]
 
 
-class ProcessRankingResponses(iStep[RankingArgs, RankingState]):
+class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
     def run(self, args: ArgType, state: State) -> None:
         self.process_ranking_prompts(args, state)
 

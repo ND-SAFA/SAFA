@@ -5,11 +5,11 @@ from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.pipeline.pipeline_state import PipelineState
+from tgen.pipeline.pipeline_state import State
 
 
 @dataclass
-class LLMTrainerState(PipelineState):
+class LLMTrainerState(State):
     """
     Represents a state of the LLMTrainer in time
     """

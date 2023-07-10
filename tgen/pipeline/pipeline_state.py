@@ -12,7 +12,7 @@ class PipelineArgs:
 
 
 @dataclass
-class PipelineState(BaseObject):
+class State(BaseObject):
     """
     Represents a state of an object in time
     """

@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.pipeline.pipeline_state import PipelineState
+from tgen.pipeline.pipeline_state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are a software engineer on a software system. " \
@@ -22,7 +22,7 @@ DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings
 
 
 @dataclass
-class RankingState(PipelineState):
+class RankingState(State):
     # Instructions
     project_path: str = None  # path to original dataset
     experiment_id: str = None  # The UUID of the run on the dataset.

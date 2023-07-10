@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Generic, List, Type, TypeVar
 
-from tgen.pipeline.pipeline_state import PipelineArgs, PipelineState
+from tgen.pipeline.pipeline_state import PipelineArgs, State
 
-StateType = TypeVar("StateType", bound=PipelineState)
+StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
 
 
 class iStep(ABC, Generic[ArgType, StateType]):
     @abstractmethod
-    def run(self, args: ArgType, state: PipelineState) -> None:
+    def run(self, args: ArgType, state: State) -> None:
         """
         Runs the step operations, modifying state in some way.
         :param args: The pipeline arguments and configuration.

@@ -1,11 +1,11 @@
 from copy import deepcopy
 from typing import Any, Generic, Optional, TypeVar
 
-from tgen.pipeline.pipeline_state import PipelineState
+from tgen.pipeline.pipeline_state import State
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
 
-StateType = TypeVar("StateType", bound=PipelineState)
+StateType = TypeVar("StateType", bound=State)
 
 
 class StateManager(BaseObject, Generic[StateType]):

@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.services.TypeService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,7 +48,8 @@ public class ArtifactTypeController extends BaseController {
 
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         TypeService typeService = serviceProvider.getTypeService();
-        artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor());
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        artifactType = typeService.createArtifactType(project, artifactType.getName(), artifactType.getColor(), user);
         return new TypeAppEntity(artifactType);
     }
 
@@ -65,7 +67,8 @@ public class ArtifactTypeController extends BaseController {
                                             @RequestBody ArtifactType artifactTypeObj) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         TypeService typeService = serviceProvider.getTypeService();
-        artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        artifactTypeObj = typeService.updateArtifactType(project, artifactTypeObj, user);
         return new TypeAppEntity(artifactTypeObj);
     }
 
@@ -87,6 +90,7 @@ public class ArtifactTypeController extends BaseController {
         Project project = type.getProject();
         this.resourceBuilder.setProject(project).withEditProject();
 
-        typeService.deleteArtifactType(type);
+        SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
+        typeService.deleteArtifactType(type, user);
     }
 }

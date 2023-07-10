@@ -37,11 +37,12 @@ import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
+import edu.nd.crc.safa.features.versions.services.VersionService;
 import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
 
 import org.junit.jupiter.api.AfterEach;
@@ -61,7 +62,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ProjectVersionRepository projectVersionRepository;
     private final DocumentRepository documentRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
-    private final ArtifactTypeRepository artifactTypeRepository;
+    private final TypeService artifactTypeService;
     private final ArtifactRepository artifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkRepository traceLinkRepository;
@@ -71,6 +72,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
     private final AttributeSystemServiceProvider attributeSystemServiceProvider;
+    private final VersionService versionService;
 
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
@@ -90,7 +92,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.projectVersionRepository = serviceProvider.getProjectVersionRepository();
         this.documentRepository = serviceProvider.getDocumentRepository();
         this.documentArtifactRepository = serviceProvider.getDocumentArtifactRepository();
-        this.artifactTypeRepository = serviceProvider.getArtifactTypeRepository();
+        this.artifactTypeService = serviceProvider.getTypeService();
         this.artifactRepository = serviceProvider.getArtifactRepository();
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
@@ -99,6 +101,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
         this.customAttributeRepository = customAttributeRepository;
         this.attributeSystemServiceProvider = attributeSystemServiceProvider;
+        this.versionService = serviceProvider.getVersionService();
         DbEntityBuilder.instance = this;
     }
 
@@ -119,7 +122,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.projectVersionRepository.deleteAll();
         this.documentRepository.deleteAll();
         this.documentArtifactRepository.deleteAll();
-        this.artifactTypeRepository.deleteAll();
+        this.artifactTypeService.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
         this.customAttributeRepository.deleteAll();
@@ -196,11 +199,10 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public DbEntityBuilder newVersion(String projectName) {
         Project project = getProject(projectName);
-        ProjectVersion projectVersion = new ProjectVersion(project,
+        ProjectVersion projectVersion = versionService.createNewVersion(project,
             MAJOR_VERSION,
             MINOR_VERSION,
             this.revisionNumber++);
-        this.projectVersionRepository.save(projectVersion);
         addEntry(this.versions, projectName, projectVersion);
         return this;
     }
@@ -211,8 +213,7 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public DbEntityBuilder newType(String projectName, String typeName) {
         Project project = getProject(projectName);
-        ArtifactType artifactType = new ArtifactType(project, typeName);
-        this.artifactTypeRepository.save(artifactType);
+        ArtifactType artifactType = this.artifactTypeService.createArtifactType(project, typeName, currentUser);
         addEntry(this.artifactTypes, projectName, typeName, artifactType);
         return this;
     }

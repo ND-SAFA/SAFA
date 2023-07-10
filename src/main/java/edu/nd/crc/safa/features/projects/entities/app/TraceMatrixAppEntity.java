@@ -20,7 +20,7 @@ public class TraceMatrixAppEntity implements IAppEntity {
         this.sourceType = traceMatrixEntry.getSourceType().getName();
         this.targetType = traceMatrixEntry.getTargetType().getName();
         this.count = traceMatrixEntry.getCount();
-        this.generatedCount = traceMatrixEntry.getCount();
+        this.generatedCount = traceMatrixEntry.getGeneratedCount();
         this.approvedCount = traceMatrixEntry.getApprovedCount();
     }
 }

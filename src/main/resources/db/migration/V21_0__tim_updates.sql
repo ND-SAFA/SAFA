@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS trace_matrix
     count                INT NOT NULL DEFAULT 0,
     generated_count       INT NOT NULL DEFAULT 0,
     approved_count        INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (source_type_id) REFERENCES artifact_type (id),
-    FOREIGN KEY (target_type_id) REFERENCES artifact_type (id),
-    FOREIGN KEY (project_version_id) REFERENCES project_version (version_id)
+    FOREIGN KEY (source_type_id) REFERENCES artifact_type (id) ON DELETE CASCADE,
+    FOREIGN KEY (target_type_id) REFERENCES artifact_type (id) ON DELETE CASCADE,
+    FOREIGN KEY (project_version_id) REFERENCES project_version (version_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS type_counts
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS type_counts
     type_id              VARCHAR(255) NOT NULL,
     project_version_id   VARCHAR(255) NOT NULL,
     count                INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (type_id) REFERENCES artifact_type (id),
-    FOREIGN KEY (project_version_id) REFERENCES project_version (version_id)
+    FOREIGN KEY (type_id) REFERENCES artifact_type (id) ON DELETE CASCADE,
+    FOREIGN KEY (project_version_id) REFERENCES project_version (version_id) ON DELETE CASCADE
 );
 

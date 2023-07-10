@@ -53,7 +53,6 @@ import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
-import edu.nd.crc.safa.features.types.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
@@ -95,7 +94,6 @@ public class ServiceProvider {
     // Versions
     private final VersionService versionService;
     // Types
-    private final ArtifactTypeRepository artifactTypeRepository;
     private final TypeService typeService;
     // Artifact
     private final ArtifactRepository artifactRepository;

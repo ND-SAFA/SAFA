@@ -73,8 +73,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public TraceLink createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                   TraceAppEntity newTrace) throws SafaError {
+    public TraceLink createOrUpdateRelatedEntities(ProjectVersion projectVersion, TraceAppEntity newTrace,
+                                                   SafaUser user) throws SafaError {
         Project project = projectVersion.getProject();
 
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
@@ -82,8 +82,7 @@ public class TraceLinkVersionRepositoryImpl
                 project,
                 newTrace.getSourceName(),
                 newTrace.getTargetName());
-        TraceLink traceLink = traceLinkOptional.isEmpty() ? createNewTraceLink(newTrace, project) :
-            traceLinkOptional.get();
+        TraceLink traceLink = traceLinkOptional.orElseGet(() -> createNewTraceLink(newTrace, project));
         assertNotOverridingManualLink(projectVersion, newTrace, traceLink);
 
         return traceLink;

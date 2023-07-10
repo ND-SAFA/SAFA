@@ -108,9 +108,7 @@ public abstract class GenericVersionRepository<
     public Pair<V, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
                                                                 A appEntity, SafaUser user) {
         VersionEntityAction<V> versionEntityAction = () -> {
-            B b = this.createOrUpdateRelatedEntities(
-                projectVersion,
-                appEntity);
+            B b = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
 
             V versionEntity = this.instantiateVersionEntityFromAppEntity(
                 projectVersion,
@@ -435,10 +433,11 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
+     * @param user The user doing the operation
      * @return Returns the base entity associated with given app entity.
      */
     protected abstract B createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                       A artifactAppEntity) throws SafaError;
+                                                       A artifactAppEntity, SafaUser user) throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing

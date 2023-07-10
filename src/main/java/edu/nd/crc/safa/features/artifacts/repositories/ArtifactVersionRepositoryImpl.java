@@ -109,8 +109,9 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public Artifact createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                  ArtifactAppEntity artifactAppEntity) throws SafaError {
-        Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity);
+                                                  ArtifactAppEntity artifactAppEntity,
+                                                  SafaUser user) throws SafaError {
+        Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity, user);
         artifactAppEntity.setId(artifactAppEntity.getId());
 
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
@@ -306,12 +307,12 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    private Artifact createOrUpdateArtifactFromAppEntity(Project project,
-                                                         ArtifactAppEntity artifactAppEntity) throws SafaError {
+    private Artifact createOrUpdateArtifactFromAppEntity(Project project, ArtifactAppEntity artifactAppEntity,
+                                                         SafaUser user) throws SafaError {
         UUID artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.getType();
         String artifactName = artifactAppEntity.getName();
-        ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
+        ArtifactType artifactType = findOrCreateArtifactType(project, typeName, user);
         DocumentType documentType = artifactAppEntity.getDocumentType();
         if (artifactId == null) {
             Artifact newArtifact = this.artifactRepository
@@ -334,10 +335,10 @@ public class ArtifactVersionRepositoryImpl
         }
     }
 
-    private ArtifactType findOrCreateArtifactType(Project project, String typeName) {
+    private ArtifactType findOrCreateArtifactType(Project project, String typeName, SafaUser user) {
         ArtifactType artifactType = this.artifactTypeService.getArtifactType(project, typeName);
         if (artifactType == null) {
-            artifactType = this.artifactTypeService.createArtifactType(project, typeName);
+            artifactType = this.artifactTypeService.createArtifactType(project, typeName, user);
         }
         return artifactType;
     }

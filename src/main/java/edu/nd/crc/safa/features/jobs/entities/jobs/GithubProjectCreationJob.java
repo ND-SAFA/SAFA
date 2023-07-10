@@ -283,7 +283,8 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     private ArtifactType createArtifactType(Project project, String artifactTypeName) {
-        ArtifactType artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeName);
+        ArtifactType artifactType = serviceProvider.getTypeService()
+            .createArtifactType(project, artifactTypeName, user);
         List<AttributePositionAppEntity> attributePositions = List.of(
             new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
         );

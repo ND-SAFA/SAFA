@@ -12,7 +12,10 @@ import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -20,47 +23,41 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Responsible for creating new versions and retrieving old ones.
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VersionService {
     private final ProjectVersionRepository projectVersionRepository;
-    private final TypeService typeService;
     private final ArtifactTypeCountService typeCountService;
+
+    @Setter(onMethod = @__({@Autowired, @Lazy}))  // Prevents circular dependency
+    private TypeService typeService;
 
     public List<ProjectVersion> getProjectVersions(@PathVariable Project project) {
         return this.projectVersionRepository.findByProjectInBackwardsOrder(project);
     }
 
-    public ProjectVersion createNewMajorVersion(Project project) throws SafaError {
-        ProjectVersion projectVersion = getCurrentVersion(project);
-        ProjectVersion newVersion = new ProjectVersion(project,
-            projectVersion.getMajorVersion() + 1,
-            0,
-            0);
+    public ProjectVersion createNewVersion(Project project, int major, int minor, int revision) {
+        ProjectVersion newVersion = new ProjectVersion(project, major, minor, revision);
         newVersion = this.projectVersionRepository.save(newVersion);
         createTypeCountEntries(newVersion);
         return newVersion;
+    }
+
+    public ProjectVersion createNewMajorVersion(Project project) throws SafaError {
+        ProjectVersion projectVersion = getCurrentVersion(project);
+        return createNewVersion(project, projectVersion.getMajorVersion() + 1, 0, 0);
     }
 
     public ProjectVersion createNewMinorVersion(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
-        ProjectVersion newVersion = new ProjectVersion(project,
-            projectVersion.getMajorVersion(),
-            projectVersion.getMinorVersion() + 1,
-            0);
-        newVersion = this.projectVersionRepository.save(newVersion);
-        createTypeCountEntries(newVersion);
-        return newVersion;
+        return createNewVersion(project, projectVersion.getMajorVersion(), projectVersion.getMinorVersion() + 1, 0);
     }
 
     public ProjectVersion createNextRevision(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
-        ProjectVersion newVersion = new ProjectVersion(project,
+        return createNewVersion(project,
             projectVersion.getMajorVersion(),
             projectVersion.getMinorVersion(),
             projectVersion.getRevision() + 1);
-        newVersion = this.projectVersionRepository.save(newVersion);
-        createTypeCountEntries(newVersion);
-        return newVersion;
     }
 
     /**

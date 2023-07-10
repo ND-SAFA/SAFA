@@ -108,10 +108,11 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      *
      * @param project the project the type belongs to
      * @param name the name of the artifact type
+     * @param user The user doing the operation
      * @return the created artifact type
      */
-    public ArtifactType createArtifactType(Project project, String name) {
-        return createArtifactType(new ArtifactType(project, name));
+    public ArtifactType createArtifactType(Project project, String name, SafaUser user) {
+        return createArtifactType(new ArtifactType(project, name), user);
     }
 
     /**
@@ -120,19 +121,21 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @param project the project the type belongs to
      * @param name the name of the artifact type
      * @param color the color associated with the type
+     * @param user The user doing the operation
      * @return the created artifact type
      */
-    public ArtifactType createArtifactType(Project project, String name, String color) {
-        return createArtifactType(new ArtifactType(project, name, color));
+    public ArtifactType createArtifactType(Project project, String name, String color, SafaUser user) {
+        return createArtifactType(new ArtifactType(project, name, color), user);
     }
 
     /**
      * Save an artifact type to the database with some error checking and notifications.
      *
      * @param artifactType The type we are creating
+     * @param user The user doing the operation
      * @return The type that got saved to the database
      */
-    private ArtifactType createArtifactType(ArtifactType artifactType) {
+    private ArtifactType createArtifactType(ArtifactType artifactType, SafaUser user) {
         ArtifactType existingType = getArtifactType(artifactType.getProject(), artifactType.getName());
         if (existingType != null) {
             throw new SafaError("Type exists: " + artifactType.getName());
@@ -142,7 +145,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
 
         createTypeCounts(artifactType);
 
-        notifyTypeUpdate(artifactType);
+        notifyTypeUpdate(artifactType, user);
 
         return artifactType;
     }
@@ -165,10 +168,11 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      *
      * @param project Project containing the type
      * @param updatedArtifactType The updated type definition
+     * @param user The user doing the operation
      * @return The type after the update (may not match the passed in type 100% as we do not allow editing
      *         certain values)
      */
-    public ArtifactType updateArtifactType(Project project, ArtifactType updatedArtifactType) {
+    public ArtifactType updateArtifactType(Project project, ArtifactType updatedArtifactType, SafaUser user) {
         ArtifactType originalType = getArtifactType(project, updatedArtifactType.getName());
 
         if (originalType == null) {
@@ -181,7 +185,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
 
         updatedArtifactType = saveArtifactType(updatedArtifactType);
 
-        notifyTypeUpdate(updatedArtifactType);
+        notifyTypeUpdate(updatedArtifactType, user);
 
         return updatedArtifactType;
     }
@@ -190,13 +194,14 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * Delete a type
      *
      * @param type The type to delete
+     * @param user The user doing the operation
      */
-    public void deleteArtifactType(ArtifactType type) {
+    public void deleteArtifactType(ArtifactType type, SafaUser user) {
         artifactTypeRepository.delete(type);
-        notifyTypeDeleted(type);
+        notifyTypeDeleted(type, user);
     }
 
-    private void notifyTypeUpdate(ArtifactType artifactType) {
+    private void notifyTypeUpdate(ArtifactType artifactType, SafaUser user) {
         Project project = artifactType.getProject();
 
         // Step - Calculate affected artifact ids
@@ -207,17 +212,21 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
             .collect(Collectors.toList());
 
         // Step - broadcast change to artifact type and affected artifacts
-        notificationService.broadcastChange(
+        notificationService.broadcastChangeToUser(
             EntityChangeBuilder.create(project.getProjectId())
                 .withTypeUpdate(artifactType.getId())
-                .withArtifactsUpdate(artifactIds));
+                .withArtifactsUpdate(artifactIds), user);
     }
 
-    private void notifyTypeDeleted(ArtifactType artifactType) {
-        notificationService.broadcastChange(
+    private void notifyTypeDeleted(ArtifactType artifactType, SafaUser user) {
+        notificationService.broadcastChangeToUser(
             EntityChangeBuilder
                 .create(artifactType.getProject().getProjectId())
                 .withTypeDelete(artifactType.getId())
-                .withUpdateLayout());
+                .withUpdateLayout(), user);
+    }
+
+    public void deleteAll() {
+        artifactTypeRepository.deleteAll();
     }
 }

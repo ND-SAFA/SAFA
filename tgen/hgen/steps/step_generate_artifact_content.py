@@ -12,14 +12,16 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.hgen_args import HGenArgs, HGenState, SUMMARY_INSTRUCTIONS
-from tgen.hgen.hgen_util import _convert_spaces_to_dashes, _get_prompt_builder_for_generation, get_predictions
+from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
+from tgen.hgen.hgen_util import _convert_spaces_to_dashes, _get_prompt_builder_for_generation, get_predictions, SUMMARY_INSTRUCTIONS, \
+    TASK_INSTRUCTIONS
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 
 
 class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
+
     def run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the content for the new artifacts.
@@ -33,14 +35,12 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         source_layer_only_dataset = state.source_dataset
         export_path = state.export_path
 
-        args.format_of_artifacts = format_of_artifacts
+        state.format_of_artifacts = format_of_artifacts
         state.generation_questionnaire = summary_questionnaire
 
-        task_prompt = Prompt("Then, reverse engineer as many {target_type}s as possible for the {source_type}. "
-                             "Each {target_type} should use the following format '{format}'. "
-                             "Enclose all {target_type}s in a comma deliminated list. ",
+        task_prompt = Prompt(TASK_INSTRUCTIONS,
                              response_manager=PromptResponseManager(
-                                 response_tag=_convert_spaces_to_dashes(args.target_type))
+                                 response_tag=_convert_spaces_to_dashes(f"{args.target_type}s"))
 
                              )
         task_prompt.format_value(format=format_of_artifacts)
@@ -49,8 +49,8 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         generated_artifacts_tag = task_prompt.response_manager.response_tag
         generation_predictions = get_predictions(prompt_builder,
                                                  source_layer_only_dataset,
-                                                 args.hgen_llm_manager,
-                                                 args.artifact_generation_tokens,
+                                                 hgen_args=args,
+                                                 prediction_step=PredictionStep.GENERATION,
                                                  response_prompt_ids={task_prompt.id, summary_questionnaire.id},
                                                  tags_for_response={generated_artifacts_tag, summary_tag},
                                                  return_first=True,
@@ -69,10 +69,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         """
 
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
-        format_prompt: Prompt = Prompt("Finally, provide an example of the typical format for a {target_type}. "
-                                       "The format should be for only the body of the {target_type} and should exclude any title.",
-                                       response_manager=PromptResponseManager(response_tag="format",
-                                                                              required_tag_ids=REQUIRE_ALL_TAGS))  # TODO move this
+        format_prompt = SupportedPrompts.HGEN_FORMAT_PROMPT.value
         questionnaire_content = GenerateArtifactContent._get_content_for_summary_prompt(hgen_args, format_prompt, instructions_prompt)
         step_id, _, instructions_id, _ = instructions_prompt.response_manager.get_all_tag_ids()
         steps = questionnaire_content[step_id]
@@ -109,7 +106,10 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
             logger.info("Creating questionnaire prompt for generation\n")
             prompt_builder = PromptBuilder(prompts=[instructions_prompt, format_prompt])
             prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
-            questionnaire_content = get_predictions(prompt_builder, PromptDataset(),
+            questionnaire_content = get_predictions(prompt_builder,
+                                                    PromptDataset(),
+                                                    hgen_args=hgen_args,
+                                                    prediction_step = PredictionStep.INSTRUCTIONS,
                                                     response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
             FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
         return questionnaire_content

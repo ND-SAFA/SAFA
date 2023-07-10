@@ -18,3 +18,12 @@ class PromptUtil:
         """
         return f"<{tag_name}>{tag_content}</{tag_name}>"
 
+    @staticmethod
+    def format_as_markdown(string: str, level: int = 1) -> str:
+        """
+        Formats the string as markdown header
+        :param string: The string to format
+        :param level: The level of the header
+        :return: The string formatted as markdown
+        """
+        return f"{'#' * level} {string}"

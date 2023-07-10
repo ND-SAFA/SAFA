@@ -147,6 +147,7 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
                                     response_prompt_ids=name_prompt.id,
                                     tags_for_response=name_prompt.response_manager.response_tag,
                                     return_first=True)
+            names = [name.replace(NEW_LINE, EMPTY_STRING).strip() for name in names]
             assert len(set(names)) == len(names), f"Found duplicates names: {names}"
             assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
             new_artifact_df.index = names

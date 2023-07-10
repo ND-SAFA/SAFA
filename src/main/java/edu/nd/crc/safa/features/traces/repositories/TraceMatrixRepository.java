@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.traces.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ public interface TraceMatrixRepository extends CrudRepository<TraceMatrixEntry, 
     Optional<TraceMatrixEntry> getByProjectVersionAndSourceTypeAndTargetType(ProjectVersion projectVersion,
                                                                              ArtifactType sourceType,
                                                                              ArtifactType targetType);
+
+    List<TraceMatrixEntry> getByProjectVersion(ProjectVersion projectVersion);
 }

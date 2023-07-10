@@ -24,7 +24,8 @@ class QuestionnairePrompt(Prompt):
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         """
         if isinstance(question_prompts, Dict):
-            question_prompts = [question_prompts[i] for i in range(min(question_prompts.keys()), len(question_prompts) + 1)]
+            starting_number = min(question_prompts.keys())
+            question_prompts = [question_prompts[i] for i in range(starting_number, len(question_prompts) + starting_number)]
         self.question_prompts = [deepcopy(prompt) for prompt in question_prompts]
         self.enumeration_chars = enumeration_chars
         self.use_bullets_for_enumeration = len(self.enumeration_chars) < len(self.question_prompts)

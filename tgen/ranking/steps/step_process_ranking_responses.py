@@ -1,8 +1,8 @@
 import random
 from typing import List
 
-from tgen.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
-from tgen.pipeline.pipeline_state import State
+from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
+from tgen.state.state import State
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.util.llm_response_util import LLMResponseUtil

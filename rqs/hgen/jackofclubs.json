@@ -8,7 +8,7 @@
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/jackofclubs",
               "source_layer_id": "C++",
-              "target_type": "Design Requirement",
+              "target_type": "Software Design Document",
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {

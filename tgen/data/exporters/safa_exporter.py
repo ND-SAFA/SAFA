@@ -84,11 +84,12 @@ class SafaExporter(AbstractDatasetExporter):
         Create trace definition between each layer in trace creator.
         :return: None
         """
+
         for _, row in self.get_dataset().layer_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
             matrix_name = f"{source_type}2{target_type}"
-            file_name = matrix_name + ".csv"
+            file_name = matrix_name + ".json"
             export_file_path = os.path.join(self.export_path, file_name)
             trace_df = self.create_trace_df_for_layer(source_type, target_type)
             self.trace_definitions.append({
@@ -96,7 +97,23 @@ class SafaExporter(AbstractDatasetExporter):
                 SafaKeys.SOURCE_ID: source_type,
                 SafaKeys.TARGET_ID: target_type
             })
-            trace_df.to_csv(export_file_path, index=False, encoding="utf-8")
+            traces_json = []
+            for trace_index, trace_row in trace_df.iterrows():
+                trace_entry = {
+                    "sourceName": trace_row[TraceKeys.SOURCE.value],
+                    "targetName": trace_row[TraceKeys.TARGET.value]
+                }
+
+                if TraceKeys.SCORE.value in trace_row:
+                    trace_entry["traceType"] = "GENERATED"
+                    trace_entry["approvalStatus"] = "UNREVIEWED"
+                    trace_entry["score"] = trace_row[TraceKeys.SCORE.value]
+
+                else:
+                    trace_entry["traceType"] = "MANUAL"
+                    trace_entry["score"] = 1
+                traces_json.append(trace_entry)
+            FileUtil.write({"traces": traces_json}, export_file_path)
 
     def create_trace_df_for_layer(self, source_type, target_type) -> pd.DataFrame:
         """

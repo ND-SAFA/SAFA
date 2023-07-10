@@ -1,7 +1,6 @@
 import uuid
 from typing import List
 
-from tgen.constants.prediction_constants import HGEN_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -93,8 +92,8 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: The dataframe containing new and old trace links
         """
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
-        tracing_job = RankingJob(artifact_df=artifact_df, ranking_args={"min_threshold": HGEN_TOP_PREDICTION_MIN_THRESHOLD},
-                                 layer_ids=[hgen_args.target_type, hgen_args.source_layer_id])
+        tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
+        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")

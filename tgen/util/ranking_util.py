@@ -5,9 +5,8 @@ from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAUL
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
-from tgen.ranking.pipeline.base import RankingStore
-from tgen.ranking.pipeline.sort_step import GenericSorter
+from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
+from tgen.ranking.steps.sort_step import GenericSorter
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -41,13 +40,9 @@ class RankingUtil:
                 parent2children_sorted[parent_id] = sorted_children_ids
             parent2children = parent2children_sorted
 
-        ranking_store = RankingStore()
-        ranking_store.artifact_map = artifact_map
-        ranking_store.parent_ids = parent_ids  # flip flop because in study source = target
-        ranking_store.parent2children = parent2children
-        ranking_step = ArtifactRankingStep()
-        ranking_step(ranking_store)
-        batched_ranked_children = ranking_store.processed_ranking_response
+        ranking_step = ArtifactRankingPipeline(artifact_map=artifact_map, parent_ids=parent_ids, parent2children=parent2children)
+        batched_ranked_children = ranking_step.run()
+
         parent2rankings = {source: ranked_children for source, ranked_children in zip(parent_ids, batched_ranked_children)}
         return parent2rankings
 
@@ -128,7 +123,6 @@ class RankingUtil:
         predictions = []
 
         for child, trace_predictions in children2entry.items():
-
             sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
             selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
             top_parent = sorted_entries[0]

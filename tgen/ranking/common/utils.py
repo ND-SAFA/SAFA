@@ -5,19 +5,12 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 
 
 @dataclass
-class TracingRequestIds:
-    """
-    Contains ids to trace between.
-    """
-    child_ids: List[str]
-    parent_ids: List[str]
-
-
-@dataclass
-class TracingRequest(TracingRequestIds):
+class TracingRequest:
     """
     Contains the information to tracing a single level.
     """
+    child_ids: List[str]
+    parent_ids: List[str]
     artifact_map: Dict[str, str]
 
     def get_tracing_pairs(self) -> List[Tuple[str, str]]:

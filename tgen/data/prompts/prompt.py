@@ -1,9 +1,8 @@
 import uuid
-
 from typing import Dict, Any
 
-from tgen.constants.deliminator_constants import NEW_LINE, SPACE
-from tgen.data.prompts.prompt_response_manager import RESPONSE_FORMAT, PromptResponseManager
+from tgen.constants.deliminator_constants import SPACE
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.util.str_util import StrUtil
 
 
@@ -11,6 +10,7 @@ class Prompt:
     """
     Represents a prompt with special formatting that allows delaying the formatting of certain fields
     """
+    SEED = 1
 
     def __init__(self, value: str, response_manager: PromptResponseManager = None, prompt_id: str = None):
         """
@@ -20,8 +20,9 @@ class Prompt:
         :param prompt_id: Specify specific id for the prompt
         """
         self.value = value
-        self.id = prompt_id if prompt_id is not None else str(uuid.uuid4())
+        self.id = prompt_id if prompt_id is not None else str(uuid.uuid5(uuid.NAMESPACE_DNS, str(Prompt.SEED)))
         self.response_manager = response_manager if response_manager else PromptResponseManager(include_response_instructions=False)
+        Prompt.SEED += 1
 
     def build(self, **kwargs) -> str:
         """

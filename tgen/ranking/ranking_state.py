@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.pipeline.pipeline_state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are a software engineer on a software system. " \
@@ -12,17 +13,16 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "\n\nSource: "
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "Rank the artifacts from most to least related" \
-                               " to the operation of the source's functionality. " \
+                               " to the fulfillment of the source's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
-                               "first element is the most related the functionality of the source " \
-                               "while the last element is the least related. " \
+                               "first element is the most related while the last element is the least. " \
                                "Enclose the list in <links></links>."
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 
 @dataclass
-class RankingStore:
+class RankingState(State):
     # Instructions
     project_path: str = None  # path to original dataset
     experiment_id: str = None  # The UUID of the run on the dataset.
@@ -53,14 +53,9 @@ class RankingStore:
     experiment: bool = False
 
     # Project
-    artifact_map: Dict = field(default=None, repr=False)  # map of artifact name to body
-    parent_ids: Optional[List[str]] = field(default=None, repr=False)  # enumerates order of prompts
     traced_ids: Optional[List[str]] = field(default=None, repr=False)  # determines label of model responses
     all_target_ids: Optional[List[str]] = field(default=None, repr=False)  # helps find missing artifact ids in model responses
     trace_entries: Optional[List[Dict]] = field(default=None, repr=False)  # determines what links get included in source queries
-
-    # Models
-    parent2children: Dict = field(default_factory=dict)
 
     # Jobs
     job_result: Optional[JobResult] = None

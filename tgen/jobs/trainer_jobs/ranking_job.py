@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -6,7 +6,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.ranking.pipeline.sort_step import registered_sorters
+from tgen.ranking.steps.sort_step import registered_sorters
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.util.data_structure_util import DataStructureUtil
@@ -19,7 +19,8 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
-                 sorter: str = "vsm", select_top_predictions: bool = True, ranking_args: Dict = None):
+                 sorter: str = "vsm", select_top_predictions: bool = True, ranking_args: Dict = None,
+                 layer_ids: Tuple[str, str] = None):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -33,6 +34,7 @@ class RankingJob(AbstractJob):
         self.sorter = sorter
         self.select_top_predictions = select_top_predictions
         self.ranking_args = ranking_args if ranking_args else {}
+        self.layer_ids = layer_ids
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -51,7 +53,10 @@ class RankingJob(AbstractJob):
         artifact_map = DataStructureUtil.create_artifact_map(artifact_df)
 
         # TODO: Deal with multi-layer
-        parent_type, child_type = artifact_df.get_parent_child_types()
+        if self.layer_ids:
+            parent_type, child_type = self.layer_ids
+        else:
+            parent_type, child_type = artifact_df.get_parent_child_types()
 
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)

@@ -28,7 +28,7 @@ class StructuredKeys:
             """
             :return: Returns the list of columns in trace dataframe.
             """
-            return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL]
+            return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL, StructuredKeys.Trace.SCORE]
 
     class Artifact(Enum):
         ID = "id"

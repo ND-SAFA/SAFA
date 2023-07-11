@@ -1,0 +1,17 @@
+format:
+- " \nThe system shall [function] by [how it works] in order to [purpose]. The system\
+  \ accepts [inputs] and produces [outputs]. The system stores [data] and has a [architecture/structure]\
+  \ consisting of [components]. The system handles [error/exception cases] and integrates\
+  \ with [external systems]. The system can be accessed through [interfaces] and has\
+  \ [security] controls.\n"
+questions:
+- - What is the overall purpose of the system?
+  - What are the inputs to the system?
+  - What are the outputs of the system?
+  - What data is stored/persisted in the system?
+  - What are the main functions/methods in the system and what do they do?
+  - What is the flow of control/logic in the system?
+  - What are the error/exception handling cases in the system?
+  - What are the dependencies/integrations with external systems?
+  - What are the interfaces to the system?
+  - What are the security/access controls in the system?

@@ -17,7 +17,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     """
     steps = [InitializeDatasetStepAbstract,
              GenerateArtifactContent,
-             RefineArtifactContent,
              CreateHGenDataset]
 
     def __init__(self, args: HGenArgs):

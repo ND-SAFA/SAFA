@@ -7,21 +7,20 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/jackofclubs",
-              "source_layer_id": "C++",
-              "target_type": "Software Design Document",
+              "source_layer_id": "C++ Code",
+              "target_type": "User Story",
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {
                   "object_type": "Artifact",
-                  "project_path": "[DATA_PATH]/jackofclubs"
-                },
-                "summarizer": {
-                  "code_or_exceeds_limit_only": false
+                  "project_path": "[DATA_PATH]/jackofclubs_summarized"
                 }
               }
             }
           },
-          "target_types": []
+          "target_types": [
+            "Epic"
+          ]
         }
       ]
     }

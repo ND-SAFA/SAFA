@@ -7,14 +7,14 @@ from yaml.constructor import SafeConstructor
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, SUMMARY_INSTRUCTIONS, \
-    TASK_INSTRUCTIONS
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, parse_generated_artifacts
+from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
@@ -69,14 +69,15 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         """
 
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
+        instructions_prompt.response_manager.formatter = lambda tag, val: parse_generated_artifacts(val)
         format_prompt = SupportedPrompts.HGEN_FORMAT_PROMPT.value
         questionnaire_content = GenerateArtifactContent._get_content_for_summary_prompt(hgen_args, format_prompt, instructions_prompt)
-        step_id, _, instructions_id, _ = instructions_prompt.response_manager.get_all_tag_ids()
-        steps = questionnaire_content[step_id]
-        questions = [QuestionPrompt(step[instructions_id][0]) for i, step in enumerate(steps) if i < len(steps) - 1]
+        question_id = instructions_prompt.response_manager.response_tag
+        questions = questionnaire_content[question_id][0]
+        question_prompts = [QuestionPrompt(question) for i, question in enumerate(questions)]
         format_of_artifacts = questionnaire_content[format_prompt.response_manager.response_tag][0]
         response_manager = PromptResponseManager(response_tag="summary")
-        questionnaire_prompt = QuestionnairePrompt(question_prompts=questions,
+        questionnaire_prompt = QuestionnairePrompt(question_prompts=question_prompts,
                                                    enumeration_chars=["-"],
                                                    instructions=SUMMARY_INSTRUCTIONS,
                                                    response_manager=response_manager)
@@ -98,7 +99,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
             return bs4.Tag(value)
 
         questionnaire_prompt_path = GenerateArtifactContent._get_path_to_generation_questionnaire_prompt(
-            convert_spaces_to_dashes(hgen_args.target_type))
+            target_type=hgen_args.target_type, source_type=hgen_args.source_type)
         if os.path.exists(questionnaire_prompt_path):
             SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
             questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
@@ -115,10 +116,11 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         return questionnaire_content
 
     @staticmethod
-    def _get_path_to_generation_questionnaire_prompt(target_type: str) -> str:
+    def _get_path_to_generation_questionnaire_prompt(target_type: str, source_type: str) -> str:
         """
         Gets the path to the generation questionnaire prompts for a given target type
         :param target_type: The target type being generated
         :return: The path to the generation questionnaire prompts for a given target type
         """
-        return os.path.join(GENERATION_QUESTIONNAIRE_PROMPTS_PATH, f"{target_type}.yaml")
+        file_name = f"{convert_spaces_to_dashes(source_type)}-to-{convert_spaces_to_dashes(target_type)}"
+        return os.path.join(GENERATION_QUESTIONNAIRE_PROMPTS_PATH, f"{file_name}.yaml")

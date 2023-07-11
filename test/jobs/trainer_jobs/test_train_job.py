@@ -45,7 +45,7 @@ class TestTrainJob(BaseJobTest):
     def test_initialize_with_deterministic_dataset_manager(self):
         job = self._get_job(deterministic=True)
         self.assertIsInstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager)
-        self.assertEquals(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR,
+        self.assertEqual(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR,
                                                                                       job.trainer_dataset_manager.dataset_name))
 
     def _get_job(self, deterministic: bool = False, use_llama: bool = False) -> HuggingFaceJob:
@@ -71,5 +71,5 @@ class TestTrainJob(BaseJobTest):
             }
         }
         job = ObjectCreator.create(HuggingFaceJob, override=True, **train_job_definition)
-        self.assertEquals(job.trainer_args.num_train_epochs, 1)
+        self.assertEqual(job.trainer_args.num_train_epochs, 1)
         return job

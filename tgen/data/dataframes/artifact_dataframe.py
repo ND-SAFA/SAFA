@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Type
+from typing import Any, Dict, Tuple, Type
 
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -61,10 +61,32 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: Parent type and child type.
         """
 
-        counts_df = self[ArtifactKeys.LAYER_ID].value_counts()
-        if len(counts_df) > 2:
+        type2count = self.get_type_counts()
+        n_types = len(type2count)
+        if n_types > 2:
             raise NotImplementedError("Multi-layer tracing is under construction.")
-        n_sources = min(counts_df)
-        parent_type = counts_df[counts_df == n_sources].index[0]
-        child_type = counts_df[counts_df != n_sources].index[0]
+        if n_types < 2:
+            raise ValueError(f"Expected to find two types of artifacts, only found: {n_types}")
+        n_parents = min(type2count.values())
+        parent_type = [t for t, c in type2count.items() if c == n_parents][0]
+        child_type = [t for t, c in type2count.items() if c != n_parents][0]
         return parent_type, child_type
+
+    def get_type_counts(self) -> Dict[str, str]:
+        """
+        Returns how many artifacts of each type exist in data frame.
+        :return: map between type to number of artifacts of that type.
+        """
+        counts_df = self[ArtifactKeys.LAYER_ID].value_counts()
+        type2count = dict(counts_df)
+        return type2count
+
+    def get_map(self) -> Dict[str, str]:
+        """
+        :return: Returns map of artifact ids to content.
+        """
+        artifact_map = {}
+        for name, row in self.iterrows():
+            content = row[ArtifactKeys.CONTENT.value]
+            artifact_map[name] = content
+        return artifact_map

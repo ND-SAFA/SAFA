@@ -11,7 +11,7 @@ class TestReplaceWordsStep(BaseTest):
         expected_result = "This is the new word and new_word is too."
         step = self.get_test_step()
         result = step.run(test_content.split())
-        self.assertEquals(" ".join(result), expected_result)
+        self.assertEqual(" ".join(result), expected_result)
 
     def get_test_step(self):
         return ManualReplaceWordsStep(self.TEST_WORD_REPLACE_MAPPINGS)

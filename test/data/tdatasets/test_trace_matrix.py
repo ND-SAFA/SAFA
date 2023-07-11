@@ -42,9 +42,9 @@ class TestTraceMatrix(BaseTest):
             source_queries = self.trace_matrix.query_matrix[source]
             source_pred = source_queries.preds
             source_labels = source_queries.links
-            self.assertEquals(len(source_pred), self.N_TARGETS)
-            self.assertEquals(len(source_labels), self.N_TARGETS)
-        self.assertEquals(len(self.trace_matrix.source_ids), len(self.SOURCE_ARTIFACTS))
+            self.assertEqual(len(source_pred), self.N_TARGETS)
+            self.assertEqual(len(source_labels), self.N_TARGETS)
+        self.assertEqual(len(self.trace_matrix.source_ids), len(self.SOURCE_ARTIFACTS))
 
     def test_source_queries(self) -> None:
         """

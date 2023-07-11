@@ -3,13 +3,14 @@ from typing import Dict, List
 
 from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.ranking.pipeline.artifact_ranking_step import ArtifactRankingStep
-from tgen.ranking.pipeline.base import RankingStore
-from tgen.ranking.pipeline.sort_step import GenericSorter
+from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
+from tgen.ranking.steps.sort_step import GenericSorter
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.util.list_util import ListUtil
 from tgen.util.logging.logger_manager import logger
 
 
@@ -20,13 +21,14 @@ class RankingUtil:
 
     @staticmethod
     def rank_children(parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str],
-                      sorter: GenericSorter = None) -> Dict[str, List[str]]:
+                      sorter: GenericSorter = None, max_children: int = 30) -> Dict[str, List[str]]:
         """
         Ranks children for each parent id.
         :param parent_ids: The parent artifact ids.
         :param parent2children: Map of parent to relevant children.
         :param artifact_map: Map of artifact id to body.
         :param sorter: Sorting function to prepare children with.
+        :param max_children: The maximum number of children to rank
         :return: Map of parent to ranked children.
         """
         if sorter:
@@ -34,17 +36,13 @@ class RankingUtil:
             for parent_id in parent_ids:
                 children_ids = parent2children[parent_id]
                 parent_map = sorter([parent_id], children_ids, artifact_map)
-                sorted_children_ids = parent_map[parent_id]
+                sorted_children_ids = parent_map[parent_id][:max_children]
                 parent2children_sorted[parent_id] = sorted_children_ids
             parent2children = parent2children_sorted
 
-        ranking_store = RankingStore()
-        ranking_store.artifact_map = artifact_map
-        ranking_store.parent_ids = parent_ids  # flip flop because in study source = target
-        ranking_store.parent2children = parent2children
-        ranking_step = ArtifactRankingStep()
-        ranking_step(ranking_store)
-        batched_ranked_children = ranking_store.processed_ranking_response
+        ranking_step = ArtifactRankingPipeline(artifact_map=artifact_map, parent_ids=parent_ids, parent2children=parent2children)
+        batched_ranked_children = ranking_step.run()
+
         parent2rankings = {source: ranked_children for source, ranked_children in zip(parent_ids, batched_ranked_children)}
         return parent2rankings
 
@@ -81,20 +79,7 @@ class RankingUtil:
         :param min_score: The score of the last ranked artifact.
         :return: List of scores.
         """
-        return RankingUtil.create_increment_list(len(ranked_targets), min_score=min_score)
-
-    @staticmethod
-    def create_increment_list(n: int, max_score=1.0, min_score=0.0):
-        """
-        Creates a list with scores decreasing linearly from max to min score.
-        :param n: The length of the list.
-        :param max_score: The score of the first item.
-        :param min_score: The score of the last item.
-        :return: The list of scores.
-        """
-        increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
-        descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
-        return descending_list
+        return ListUtil.create_step_list(len(ranked_targets), min_score=min_score)
 
     @staticmethod
     def calculate_ranking_metrics(dataset: TraceDataset, ranking_entries: List[TracePredictionEntry]):
@@ -104,6 +89,8 @@ class RankingUtil:
         :param ranking_entries: The ranking predictions.
         :return:
         """
+        if dataset.trace_df is None:
+            return
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
             all_link_ids = list(dataset.trace_df.index)
@@ -132,15 +119,14 @@ class RankingUtil:
         :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
         :return: List of selected predictions.
         """
-        children2entry = RankingUtil.group_trace_predictions(trace_predictions, "source")
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
         predictions = []
 
         for child, trace_predictions in children2entry.items():
-
-            sorted_entries = sorted(trace_predictions, key=lambda e: e["score"], reverse=True)
-            selected_entries = [s for s in sorted_entries if s["score"] >= parent_threshold]
+            sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
+            selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
             top_parent = sorted_entries[0]
-            if len(selected_entries) == 0 and top_parent["score"] >= min_threshold:
+            if len(selected_entries) == 0 and top_parent[StructuredKeys.SCORE] >= min_threshold:
                 selected_entries.append(top_parent)
             predictions.extend(selected_entries)
         return predictions

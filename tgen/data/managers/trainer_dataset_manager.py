@@ -50,7 +50,7 @@ class TrainerDatasetManager(BaseObject):
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator,
                                   DatasetRole.EVAL: eval_dataset_creator}
-        self._datasets = None
+        self._datasets = {}
         self._hf_datasets = None
         self.augmenter = augmenter
 
@@ -60,7 +60,7 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: the dataset role
         :return: the dataset creator for the given role
         """
-        return self._dataset_creators[dataset_role]
+        return self._dataset_creators.get(dataset_role, None)
 
     def export_dataset_splits(self, output_dir: str, format_type: SupportedDatasetExporter = SupportedDatasetExporter.CSV) \
             -> List[str]:
@@ -82,7 +82,7 @@ class TrainerDatasetManager(BaseObject):
         return output_paths
 
     @staticmethod
-    def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]):
+    def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> "TrainerDatasetManager":
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_creators_map: The map of roles to data to set in instance.
@@ -93,6 +93,20 @@ class TrainerDatasetManager(BaseObject):
             train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
             val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
+
+    @staticmethod
+    def create_from_datasets(dataset_map: Dict[DatasetRole, iDataset]) -> "TrainerDatasetManager":
+        """
+        Creates instance containing dataset for each mapped role.
+        :param dataset_map: The map of roles to data to set in instance.
+        :return: TrainerDatasetManager with initialized data.
+        """
+        trainer_dataset_manager = TrainerDatasetManager()
+        for role, dataset in dataset_map.items():
+            assert role in trainer_dataset_manager._dataset_creators, f"Unknown dataset role {role}"
+            assert isinstance(dataset, iDataset), f"Unexpected type of dataset {type(dataset)}"
+            trainer_dataset_manager._datasets[role] = dataset
+        return trainer_dataset_manager
 
     @overrides(BaseObject)
     def use_values_from_object_for_undetermined(self, obj: "TrainerDatasetManager") -> None:
@@ -116,7 +130,7 @@ class TrainerDatasetManager(BaseObject):
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
         """
-        if self._datasets is None:
+        if not self._datasets:
             self._datasets = self._create_datasets_from_creators(self._dataset_creators)
             self._prepare_datasets(self.augmenter)
         return self._datasets
@@ -159,7 +173,9 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: the role of the dataset
         :return: the dataset filename
         """
-        dataset_name = self.get_creator(dataset_role).get_name() if not dataset_name else dataset_name
+        if not dataset_name:
+            dataset_name = self.get_creator(dataset_role).get_name() if self.get_creator(dataset_role) is not None \
+                else type(self.get_datasets()[dataset_role])
         return f"{dataset_name}_{dataset_role.name.lower()}{CSVKeys.EXT}"
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
@@ -261,4 +277,5 @@ class TrainerDatasetManager(BaseObject):
         Returns string representation of role to type of mapped dataset.
         :return: String representation of trainer data container.
         """
-        return str({role.name: type(self.get_creator(role)) for role in DatasetRole})
+        return str({role.name: type(self.get_creator(role)) for role in DatasetRole}) if self._dataset_creators is not None \
+            else str({role.name: type(self.get_datasets()[role]) for role in DatasetRole})

@@ -29,10 +29,10 @@ class TestTraceDataFrame(BaseTest):
         self.assertSize(1, without_dups)
 
     def assert_link(self, link: EnumDict, source_id, target_id, label, link_id):
-        self.assertEquals(link[TraceKeys.SOURCE], source_id)
-        self.assertEquals(link[TraceKeys.TARGET], target_id)
-        self.assertEquals(link[TraceKeys.LABEL], label)
-        self.assertEquals(link[TraceKeys.LINK_ID], link_id)
+        self.assertEqual(link[TraceKeys.SOURCE], source_id)
+        self.assertEqual(link[TraceKeys.TARGET], target_id)
+        self.assertEqual(link[TraceKeys.LABEL], label)
+        self.assertEqual(link[TraceKeys.LINK_ID], link_id)
 
     def get_trace_data_frame(self):
         return TraceDataFrame(EnumDict({TraceKeys.SOURCE: ["s1", "s2"], TraceKeys.TARGET: ["t1", "t2"],

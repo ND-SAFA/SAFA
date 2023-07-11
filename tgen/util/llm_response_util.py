@@ -9,40 +9,57 @@ from tgen.util.logging.logger_manager import logger
 class LLMResponseUtil:
 
     @staticmethod
-    def parse(res: str, tag_name: str, many: bool = False) -> Union[str, List[Tag]]:
+    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False) -> List[Union[str, Dict]]:
         """
         Parses the LLM response for the given html tags
         :param res: The LLM response
         :param tag_name: The name of the tag to find
-        :param many: If True, the response contains sibling and nested tags and  Tag objects are returned. Otherwise, just the single content
+        :param is_nested: If True, the response contains nested tags so all Tag objects are returned, else just the single content
+        :param raise_exception: if True, raises an exception if parsing fails
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
         tags = BeautifulSoup(res, features="lxml").findAll(tag_name)
 
         try:
             assert len(tags) > 0, f"Missing expected tag {tag_name}"
-            if many:
-                return tags
-            selected_tag = tags[0]
-            if len(selected_tag.contents) == 0:
-                return ""
-            return selected_tag.contents[0]
+            content = [tag.contents[0] for tag in tags] if not is_nested else [LLMResponseUtil._parse_children(tag) for tag in tags]
         except (AssertionError, IndexError):
-            logger.exception(f"Unable to parse tag {tag_name} in:\n{res}")
-            content = res if not many else []
+            error = f"Unable to parse {tag_name}"
+            logger.exception(error)
+            if raise_exception:
+                raise Exception(error)
+            content = []
         return content
 
     @staticmethod
-    def extract_labels(r: str, labels2props: Dict) -> Dict:
+    def _parse_children(tag: Tag) -> Dict[str, str]:
+        """
+        Parses all children tags in the given tag
+        :param tag: The parent tag
+        :return: The children of the tag
+        """
+        children = {}
+        for child in tag.children:
+            if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
+                children[child.name] = child.contents[0]
+        return children
+
+    @staticmethod
+    def extract_labels(r: str, labels2props: Union[Dict, List]) -> Dict:
         """
         Extracts XML labels from response.
         :param r: The text response.
         :param labels2props: Dictionary mapping XML property name to export prop name.
         :return: Dictionary of prop names to values.
         """
+        if isinstance(labels2props, list):
+            labels2props = {label: label for label in labels2props}
         props = {}
         for tag, prop in labels2props.items():
-            prop_value = LLMResponseUtil.parse(r, tag)
+            try:
+                prop_value = LLMResponseUtil.parse(r, tag, raise_exception=True)
+            except Exception:
+                prop_value = []
             props[prop] = prop_value
         return props
 

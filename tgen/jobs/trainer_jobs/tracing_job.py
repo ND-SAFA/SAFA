@@ -2,6 +2,7 @@ from typing import Dict, List, Union
 
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -54,11 +55,11 @@ class TracingJob(AbstractJob):
         prediction_output: TracePredictionOutput = base_tracing_job.run().body
 
         entries = prediction_output.prediction_entries
-        entries = [entry for entry in entries if entry["score"] >= self.prediction_threshold]
+        entries = [entry for entry in entries if entry[StructuredKeys.SCORE] >= self.prediction_threshold]
 
         parent2entries: Dict[str, List[TracePredictionEntry]] = self.create_artifact_predictions_map(entries, TraceKeys.TARGET.value)
         parent_ids = list(parent2entries.keys())
-        parent2children: Dict[str, List[str]] = {target: [t[TraceKeys.SOURCE.value] for t in entries] for target, entries in
+        parent2children: Dict[str, List[str]] = {target: [t[StructuredKeys.SCORE] for t in entries] for target, entries in
                                                  parent2entries.items()}
 
         parent2rankings = RankingUtil.rank_children(parent_ids, parent2children, artifact_map)
@@ -83,5 +84,6 @@ class TracingJob(AbstractJob):
         :return: Map of key value to entries after they have been sorted.
         """
         id2entries: Dict[str, List[Dict]] = RankingUtil.group_trace_predictions(predictions, artifact_key)
-        id2entries = {t_id: sorted(entries, key=lambda t: t["score"], reverse=True) for t_id, entries in id2entries.items()}
+        id2entries = {t_id: sorted(entries, key=lambda t: t[StructuredKeys.SCORE], reverse=True) for t_id, entries in
+                      id2entries.items()}
         return id2entries

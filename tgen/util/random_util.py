@@ -21,3 +21,13 @@ class RandomUtil:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         RandomUtil.CURRENT_SEED = random_seed
+
+    @staticmethod
+    def current_seed() -> int:
+        """
+        Returns the seed that is currently set
+        :return: The seed that is currently set
+        """
+        state = random.getstate()
+        seed = state[1][0]
+        return seed

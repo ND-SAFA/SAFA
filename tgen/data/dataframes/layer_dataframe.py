@@ -1,4 +1,4 @@
-from typing import Type
+from typing import List, Tuple, Type
 
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -38,6 +38,18 @@ class LayerDataFrame(AbstractProjectDataFrame):
         """
         return self.add_new_row({LayerKeys.SOURCE_TYPE: source_type,
                                  LayerKeys.TARGET_TYPE: target_type})
+
+    def as_list(self) -> List[Tuple[str, str]]:
+        """
+        Converts layer data frame into list of strings.
+        :return:list of child x parent types.
+        """
+        tracing_layers = []
+        for i, row in self.iterrows():
+            child_type = row[LayerKeys.SOURCE_TYPE.value]
+            parent_type = row[LayerKeys.TARGET_TYPE.value]
+            tracing_layers.append((child_type, parent_type))
+        return tracing_layers
 
     @classmethod
     def concat(cls, dataframe1: "AbstractProjectDataFrame", dataframe2: "AbstractProjectDataFrame",

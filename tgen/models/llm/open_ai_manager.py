@@ -1,5 +1,3 @@
-import time
-
 import openai
 from openai.openai_object import OpenAIObject
 
@@ -30,8 +28,9 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param llm_args: args used for the requests to Anthropic model
         """
         if llm_args is None:
-            llm_args = OpenAIArgs()
+            llm_args = OpenAIArgs(prompt_args=self.prompt_args)
         assert isinstance(llm_args, OpenAIArgs), "Must use OpenAI args with OpenAI manager"
+        llm_args.prompt_args = self.prompt_args
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
         logger.info(f"Created OpenAI manager with Model: {self.llm_args.model}")
 
@@ -70,7 +69,6 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                 res = batch_res
             else:
                 res.choices.extend(batch_res.choices)
-            time.sleep(60)  # trying to avoid rate limit
         return res
 
     @staticmethod

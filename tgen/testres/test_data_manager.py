@@ -3,8 +3,8 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 
 
 class TestDataManager:
@@ -47,7 +47,7 @@ class TestDataManager:
                                            'epoch': 3.0},
                                'status': 0}
     EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
-    EXAMPLE_PREDICTION_METRICS = {'map': 0.6948729753494263, 'ap': 0.0749}
+    EXAMPLE_PREDICTION_METRICS = {'map': 0.6948729753494263, 'global_ap': 0.0749}
 
     @staticmethod
     def get_path(paths: Union[List[str], str], data=None):

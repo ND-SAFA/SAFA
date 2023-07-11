@@ -17,7 +17,7 @@ class TestRemoveUnwantedCharStep(BaseTest):
         test_word = "test�w0rd!"
         expected_result = "testw0rd!"
         result = self.get_test_step()._remove_unwanted_chars_from_word(test_word)
-        self.assertEquals(result, expected_result)
+        self.assertEqual(result, expected_result)
 
     def test_run(self):
         test_word_list = "Th!s is� a test 2 c if this method works!".split()

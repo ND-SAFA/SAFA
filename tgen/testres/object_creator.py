@@ -13,10 +13,10 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.testres.definition_creator import DefinitionCreator
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
@@ -29,7 +29,7 @@ class ObjectCreator:
     }
 
     augmenter_definition = {"steps":
-                                {"*": [[], [{"object_type": "SOURCE_TARGET_SWAP"}]]}
+                                {"*": [[], [{"object_type": "RESAMPLE"}]]}
                             }
 
     trainer_args_definition = {

@@ -12,17 +12,17 @@ class TestResampleStep(BaseTest):
         step = self.get_resample_step()
 
         augmented_data = list(step.run(data_entries))
-        self.assertEquals(len(augmented_data), self.RESAMPLE_RATE * len(data_entries))
+        self.assertEqual(len(augmented_data), self.RESAMPLE_RATE * len(data_entries))
         self.resample_test(augmented_data, data_entries, self.RESAMPLE_RATE)
 
         n_expected = 9
         augmented_data_n_expected = list(step.run(data_entries, n_needed=n_expected))
-        self.assertEquals(len(augmented_data_n_expected), n_expected)
+        self.assertEqual(len(augmented_data_n_expected), n_expected)
 
     def test_augment(self):
         step = self.get_resample_step()
         resampled_entry = step._augment(("source", "target"))
-        self.assertEquals(len(resampled_entry), 3)
+        self.assertEqual(len(resampled_entry), 3)
 
     def get_resample_step(self):
         return ResampleStep(1, self.RESAMPLE_RATE)
@@ -33,11 +33,11 @@ class TestResampleStep(BaseTest):
         for resampled_entry, reference_index in augmented_data:
             if resampled_entry == entry1:
                 n_entries[0] += 1
-                self.assertEquals(reference_index, 0)
+                self.assertEqual(reference_index, 0)
             elif resampled_entry == entry2:
                 n_entries[1] += 1
-                self.assertEquals(reference_index, 1)
+                self.assertEqual(reference_index, 1)
             else:
                 self.fail("unknown entry " + resampled_entry)
         for n in n_entries:
-            self.assertEquals(n, resample_rate)
+            self.assertEqual(n, resample_rate)

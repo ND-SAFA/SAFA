@@ -18,7 +18,7 @@ class BaseSplitTest(BaseTraceTest):
         splitter = DatasetSplitter(trace_dataset, percent_splits, strategies=[strategy] * (len(percent_splits)-1))
         splits = splitter.split_dataset()
         split_link_ids = [set(split.trace_df.index) for split in splits.values()]
-        self.assertEquals(sum([len(split) for split in splits.values()]), n_orig_links)
+        self.assertEqual(sum([len(split) for split in splits.values()]), n_orig_links)
         for dataset_role, split in splits.items():
             self.assertLessEqual(abs(len(split) - round(n_orig_links * percent_splits[dataset_role])), 1)
         for i, split in enumerate(splits.values()):
@@ -27,4 +27,4 @@ class BaseSplitTest(BaseTraceTest):
                 if i == j:
                     continue
                 intersection = other_link_ids.intersection(link_ids)
-                self.assertEquals(len(intersection), 0)
+                self.assertEqual(len(intersection), 0)

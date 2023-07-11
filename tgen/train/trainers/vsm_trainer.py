@@ -1,5 +1,5 @@
 import time
-from typing import List, Tuple, Union
+from typing import Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -10,13 +10,17 @@ from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from tgen.data.processing.cleaning.data_cleaner import DataCleaner
+from tgen.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
+from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
+from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.ranking.pipeline.utils import extract_prompt_artifacts
+from tgen.ranking.common.utils import extract_tracing_requests
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.stage_eval import Metrics
@@ -34,18 +38,21 @@ class VSMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, vectorizer: CountVectorizer = TfidfVectorizer,
-                 metrics: List[str] = None):
+                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None):
         """
         Initializes trainer with the datasets used for training + eval
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
         :param vectorizer: vectorizer for assigning weights to words, must be one of sklearn.text.extraction
         :param metrics: A list of metric names to use for evaluation
         """
+        if steps is None:
+            steps = [RemoveNonAlphaCharsStep(), SeparateCamelCaseStep(), LemmatizeWordStep()]
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model = vectorizer()
         self.metrics = metrics
+        self.data_pipeline = DataCleaner(steps=steps)
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
@@ -85,8 +92,12 @@ class VSMTrainer(AbstractTrainer):
         :param train_dataset: The dataset to use for training
         :return: None
         """
-        raw_sources, raw_targets, _ = self.get_raw_sources_and_targets(train_dataset)
-        combined = pd.concat([raw_sources, raw_targets], axis=0)
+        tracing_requests = extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
+        artifacts = []
+        for tracing_request in tracing_requests:
+            artifacts = artifacts + tracing_request.get_parent_content()
+            artifacts = artifacts + tracing_request.get_children_content()
+        combined = pd.Series(artifacts)
         self.model.fit(combined)
 
     def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:
@@ -96,30 +107,37 @@ class VSMTrainer(AbstractTrainer):
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
         :return: The output from the prediction
         """
-        parent_artifacts, child_artifacts, parent_child_pairs = self.get_raw_sources_and_targets(eval_dataset)
-        parent_tf_matrix, child_tf_matrix = self.create_term_frequency_matrices(parent_artifacts, child_artifacts)
-        similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(parent_tf_matrix, child_tf_matrix)
-        predictions, label_ids, source_target_pairs, link_ids = [], [], [], []
-        for i, (parent_id, child_id) in enumerate(parent_child_pairs):
-            link_id = TraceDataFrame.generate_link_id(source_id=child_id, target_id=parent_id)
-            if link_id not in eval_dataset.trace_df:  # source, target pair between layers that should not be linked
-                continue
-            row, col = divmod(i, len(child_artifacts))
-            predictions.append(similarity_matrix[row][col])
-            label_ids.append(int(predictions[-1] > threshold))
-            link_ids.append(link_id)
-            source_target_pairs.append((child_id, parent_id))  # source, target
-        prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=None)
-        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)
+        tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
+        predictions, source_target_pairs, link_ids = [], [], []
+        for tracing_request in tracing_requests:
+            parent_artifacts = tracing_request.get_parent_content()
+            child_artifacts = tracing_request.get_children_content()
+            child_parent_pairs = tracing_request.get_tracing_pairs()
 
+            parent_tf_matrix, child_tf_matrix = self.create_term_frequency_matrices(parent_artifacts, child_artifacts)
+            similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(parent_tf_matrix, child_tf_matrix)
+
+            for i, (child_id, parent_id) in enumerate(child_parent_pairs):
+                link_id = TraceDataFrame.generate_link_id(source_id=child_id, target_id=parent_id)
+                row, col = divmod(i, len(child_artifacts))
+                similarity_score = similarity_matrix[row][col]
+
+                predictions.append(similarity_score)
+                source_target_pairs.append((child_id, parent_id))  # source, target
+                link_ids.append(link_id)
+
+        metrics = None
         if eval_dataset.trace_df.get_label_count(1) > 0:
             metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
                 if self.metrics else None
-            prediction_output.metrics = metrics
-            trace_prediction_output.metrics = metrics
+        prediction_output = PredictionOutput(predictions=predictions, label_ids=None, metrics=metrics)
+        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output,
+                                                        source_target_pairs=source_target_pairs,
+                                                        metrics=metrics)
         return trace_prediction_output
 
-    def create_term_frequency_matrices(self, raw_sources: pd.Series, raw_targets: pd.Series) -> Tuple[csr_matrix, csr_matrix]:
+    def create_term_frequency_matrices(self, raw_sources: Iterable[str], raw_targets: Iterable[str]) -> \
+            Tuple[csr_matrix, csr_matrix]:
         """
         Creates 2 TermFrequencyMatrices (one for A another for B) where the weight of
         each (row, col) pair is calculated via TF-IDF
@@ -127,6 +145,8 @@ class VSMTrainer(AbstractTrainer):
         :param raw_targets : The target documents whose matrix is the second element
         :return: CountMatrix for raw_sources and raw_targets, and also the trained model
         """
+        raw_sources = self.data_pipeline.run(list(raw_sources))
+        raw_targets = self.data_pipeline.run(list(raw_targets))
         set_source: csr_matrix = self.model.transform(raw_sources)
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target
@@ -140,25 +160,6 @@ class VSMTrainer(AbstractTrainer):
         :return: The similarity matrix where each cell contains the similarity of the corresponding source (row) and target (col)
         """
         return 1 - pairwise_distances(tf_source, Y=tf_target, metric="cosine", n_jobs=-1)
-
-    @staticmethod
-    def get_raw_sources_and_targets(dataset: TraceDataset) -> Tuple[pd.Series, pd.Series, List[Tuple[str, str]]]:
-        """
-        Gets the raw source and target tokens from a dataset
-        :param dataset: The dataset to use for sources and targets
-        :return: The raw source and target tokens as a tuple of pd.Series and a list containing the ids of each source target pair
-        """
-        parent_ids, child_ids = extract_prompt_artifacts(dataset.artifact_df)
-        parent_artifacts = [dataset.artifact_df.get_artifact(s_id) for s_id in parent_ids]
-        child_artifacts = [dataset.artifact_df.get_artifact(t_id) for t_id in child_ids]
-        parent_child_pairs = []
-        for parent_id in parent_ids:
-            for child_id in child_ids:
-                parent_child_pairs.append((parent_id, child_id))
-
-        parent_bodies = pd.Series([artifact[ArtifactKeys.CONTENT] for artifact in parent_artifacts])
-        child_bodies = pd.Series([artifact[ArtifactKeys.CONTENT] for artifact in child_artifacts])
-        return parent_bodies, child_bodies, parent_child_pairs
 
     @staticmethod
     def eval(trace_df: TraceDataFrame, predictions: List[float], link_ids: List[int], metrics: List[str]) -> Metrics:

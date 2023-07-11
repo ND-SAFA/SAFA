@@ -1,8 +1,6 @@
 from copy import deepcopy
 from unittest import mock
 
-from bs4 import BeautifulSoup
-
 from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -17,6 +15,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.train.args.anthropic_args import AnthropicArgs
 from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.util.llm_response_util import LLMResponseUtil
 
 
 class TestLLMClustering(BaseTest):
@@ -38,7 +37,7 @@ class TestLLMClustering(BaseTest):
         mock_completion_request.return_value = GenerationResponse(
             batch_responses=["\n".join([f'<feature>{feature}</feature>' for feature in self.expected_clusters.keys()])])
         features = LLMClustering._get_features(list(self.artifact_df.index), list(self.artifact_df[ArtifactKeys.CONTENT]),
-                                                           "user_story", self.llm_manager)
+                                               "user_story", self.llm_manager)
         for feature in self.expected_clusters.keys():
             self.assertIn(feature, features)
 
@@ -99,20 +98,21 @@ class TestLLMClustering(BaseTest):
 
     def test_get_cluster_name_and_artifacts(self):
         artifact_ids = list(self.artifact_df.index)
-        groups = BeautifulSoup(self.res.batch_responses[0], features="lxml").findAll(LLMClustering.CLUSTER_TAG)
+        groups = LLMResponseUtil.parse(self.res.batch_responses[0], tag_name=LLMClustering.CLUSTER_TAG, is_nested=True)
         cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(groups[0], artifact_ids)
         self.assertEqual("Air lease and arm/disarm functionality", cluster_name_)
         self.assertListEqual(artifacts, [artifact_ids[0], artifact_ids[1], artifact_ids[11]])
 
-        bad_group_empty = BeautifulSoup('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
-                                        '\n<artifacts></artifacts>\n</group>', features="lxml").find(LLMClustering.CLUSTER_TAG)
-        cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_empty, artifact_ids)
+        bad_group_empty = LLMResponseUtil.parse('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
+                                                '\n<artifacts></artifacts>\n</group>', tag_name=LLMClustering.CLUSTER_TAG,
+                                                is_nested=True)
+        cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_empty[0], artifact_ids)
         self.assertSize(0, artifacts)
 
-        bad_group_format = BeautifulSoup('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
-                                         '\n<artifacts>Claude is dumb sometimes</artifacts>\n</group>', features="lxml") \
-            .find(LLMClustering.CLUSTER_TAG)
-        cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_format, artifact_ids)
+        bad_group_format = LLMResponseUtil.parse('<group>\n<feature>Air lease and arm/disarm functionality</feature>'
+                                                 '\n<artifacts>Claude is dumb sometimes</artifacts>\n</group>',
+                                                 tag_name=LLMClustering.CLUSTER_TAG, is_nested=True)
+        cluster_name_, artifacts = LLMClustering._get_cluster_name_and_artifacts(bad_group_format[0], artifact_ids)
         self.assertSize(0, artifacts)
 
     def test_get_artifact_id_from_num(self):

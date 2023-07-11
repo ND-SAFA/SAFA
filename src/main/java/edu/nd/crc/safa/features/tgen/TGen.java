@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
@@ -78,9 +77,22 @@ public class TGen implements ITraceGenerationController {
      * @param request Contains content to summarize and assocatied parameteres.
      * @return TGen response.
      */
-    public TGenSummaryResponse generateSummaries(TGenSummaryRequest request) {
-        String summarizeEndpoint = getEndpoint("summarize");
-        return this.safaRequestBuilder.sendPost(summarizeEndpoint, request, TGenSummaryResponse.class);
+    public TGenSummaryResponse generateSummaries(TGenSummaryRequest request, JobLogger logger) {
+        return sendSummarizeRequest(request, logger);
+    }
+
+    public TGenSummaryResponse sendSummarizeRequest(TGenSummaryRequest payload, JobLogger logger) {
+        String predictEndpoint;
+
+        int nArtifacts = payload.getArtifacts().size();
+        log(logger, String.format("Summarizing %s artifacts.", nArtifacts));
+        if (nArtifacts <= Defaults.SUMMARY_ARTIFACT_THRESHOLD) {
+            predictEndpoint = getEndpoint("summarize-sync");
+            return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenSummaryResponse.class);
+        } else {
+            predictEndpoint = getEndpoint("summarize");
+            return this.performTGenJob(predictEndpoint, payload, TGenSummaryResponse.class, logger);
+        }
     }
 
     /**
@@ -124,7 +136,7 @@ public class TGen implements ITraceGenerationController {
         String predictEndpoint;
         int candidates = payload.getDataset().getNumOfCandidates();
         log(logger, String.format("Number of candidates: %s", candidates));
-        if (candidates <= Defaults.CANDIDATE_THRESHOLD) {
+        if (candidates <= Defaults.TRACE_CANDIDATE_THRESHOLD) {
             predictEndpoint = getEndpoint("predict-sync");
             return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
         } else {
@@ -132,6 +144,7 @@ public class TGen implements ITraceGenerationController {
             return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
         }
     }
+
 
     public TGenTraceGenerationResponse performSearch(TGenPredictionRequestDTO payload, JobLogger logger) {
         int candidates = payload.getDataset().getNumOfCandidates();
@@ -194,7 +207,6 @@ public class TGen implements ITraceGenerationController {
         List<TGenTraceGenerationResponse.PredictedLink> predictions) {
         return predictions
             .stream()
-            .filter(p -> p.getScore() > ProjectVariables.TRACE_THRESHOLD)
             .map(p -> new TraceAppEntity(
                 null,
                 p.getSource(),
@@ -203,7 +215,8 @@ public class TGen implements ITraceGenerationController {
                 null,
                 ApprovalStatus.UNREVIEWED,
                 p.getScore(),
-                TraceType.GENERATED
+                TraceType.GENERATED,
+                true
             )).collect(Collectors.toList());
     }
 
@@ -300,6 +313,7 @@ public class TGen implements ITraceGenerationController {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
         static final int WAIT_SECONDS = 5;
-        static final int CANDIDATE_THRESHOLD = 50;
+        static final int TRACE_CANDIDATE_THRESHOLD = 50;
+        static final int SUMMARY_ARTIFACT_THRESHOLD = 50;
     }
 }

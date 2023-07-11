@@ -3,43 +3,40 @@ from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQ
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 
-INSTRUCTION_CREATION_PROMPT = Prompt("Break the process of reverse engineering {target_type} from {source_type} into steps. "
-                                     "The steps should be generalized so that they would work on any software project, "
-                                     "and the focus should be on extracting information specific to the system. "
-                                     "Each step should include instructions on how to perform the step, "
-                                     "a description of the expected deliverable, and a one word unique name for the step. "
-                                     "The deliverable descriptions should indicate the type of information "
-                                     "that would satisfy the step, rather than providing a specific example. "
-                                     "Deliverables should be able to be accomplished with natural langauge alone. "
-                                     "The final step should be the {target_type} creation.",
-                                     PromptResponseManager(response_tag={"step":
-                                                                             ["name",
-                                                                              "instructions",
-                                                                              "expected-deliverable-description"]},
-                                                           id2tag={"step": "step", "instructions": "instructions",
-                                                                   "deliverable": "expected-deliverable-description",
-                                                                   "name": "name"},
-                                                           response_instructions_format="Each step should be enclosed in {step} "
-                                                                                        "with the instructions enclosed "
-                                                                                        "in {instructions}, "
-                                                                                        "a general description "
-                                                                                        "of the expected deliverable "
-                                                                                        "from the step enclosed in {deliverable},"
-                                                                                        "and the step name enclosed in {name}.",
+INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must "
+                                     "reverse engineer {target_type} from the {source_type}. "
+                                     "Consider what information you would need to extract from the system. "
+                                     "Then construct a set of questions about the {source_type} that by answering "
+                                     "you would be able to create the {target_type}. "
+                                     "Output the questions in a new-line deliminated list. ",
+                                     PromptResponseManager(response_tag="questions",
                                                            required_tag_ids=REQUIRE_ALL_TAGS))
+FORMAT_PROMPT = Prompt("Finally, provide an example of the typical format for a {target_type}. "
+                       "The format should be for only the body of the {target_type} and should exclude any title. ",
+                       response_manager=PromptResponseManager(response_tag="format",
+                                                              required_tag_ids=REQUIRE_ALL_TAGS))
 
 GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
                            "{source_type}s in the system: ")
+SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
+                       "describing the system by focusing on any technical details or dependencies needed for the {target_type}s. " \
+                       "Exclude details that are generally applicable across systems " \
+                       "and focus only on details that are truly specific to the design and behavior of this particular system. " \
+                       "Consider the following in your response: "
+TASK_INSTRUCTIONS = "Then, use this information to determine the main features and " \
+                    "functionality provided by the system to the target audience. " \
+                    "Reverse engineer as many {target_type}s as possible for the {source_type}. " \
+                    "There should be a clear and singular purpose or goal for each {target_type}, " \
+                    "and each {target_type} should be independent of all others. " \
+                    "Provide any technical details that would be necessary to implement the {target_type} " \
+                    "but avoid ambiguous or vague language. " \
+                    "Each {target_type} should use following format '{format}'. " \
+                    "Enclose all {target_type}s in a new-line deliminated list. "
+
 
 REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "
                            "{target_type}s. You are given a summary of the system: ")
-
-FORMAT_PROMPT = Prompt("Finally, provide an example of the typical format for a {target_type}. "
-                       "The format should be for only the body of the {target_type} and should exclude any title.",
-                       response_manager=PromptResponseManager(response_tag="format",
-                                                              required_tag_ids=REQUIRE_ALL_TAGS))
-
 REFINE_STEPS = {
     1: QuestionPrompt("Check that each {target_type} is at the appropriate level of detail for the intended audience. "
                       "Ensure that each {target_type} contains enough context for someone unfamiliar with the system to understand, "
@@ -82,16 +79,3 @@ REFINE_QUESTIONNAIRE = QuestionnairePrompt(instructions="Review each {target_typ
                                                         "For each {target_type}:",
                                            enumeration_chars=["-"],
                                            question_prompts=REFINE_STEPS)
-SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
-                       "describing the system by focusing on any technical details or dependencies needed for the {target_type}s. " \
-                       "Exclude details that are generally applicable across systems " \
-                       "and focus only on details that are truly specific to the design and behavior of this particular system." \
-                       "Consider the following in your response: "
-GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
-TASK_INSTRUCTIONS = "Then, reverse engineer as many {target_type}s as possible for the {source_type}. " \
-                    "There should be a clear and singular purpose or goal for each {target_type}, " \
-                    "and each {target_type} should be independent of all others. " \
-                    "Provide any technical details that would be necessary to implement the {target_type} " \
-                    "but avoid ambiguous or vague language and do not be overly verbose. " \
-                    "Each {target_type} should be a single line which uses the following format '{format}'. " \
-                    "Enclose all {target_type}s in a comma deliminated list. "

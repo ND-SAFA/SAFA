@@ -13,7 +13,7 @@ from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import _convert_spaces_to_dashes, _get_prompt_builder_for_generation, get_predictions, SUMMARY_INSTRUCTIONS, \
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, SUMMARY_INSTRUCTIONS, \
     TASK_INSTRUCTIONS
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
@@ -40,11 +40,11 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
 
         task_prompt = Prompt(TASK_INSTRUCTIONS,
                              response_manager=PromptResponseManager(
-                                 response_tag=_convert_spaces_to_dashes(f"{args.target_type}s"))
+                                 response_tag=convert_spaces_to_dashes(f"{args.target_type}s"))
 
                              )
         task_prompt.format_value(format=format_of_artifacts)
-        prompt_builder = _get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire)
+        prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire)
         summary_tag = summary_questionnaire.response_manager.response_tag
         generated_artifacts_tag = task_prompt.response_manager.response_tag
         generation_predictions = get_predictions(prompt_builder,
@@ -98,7 +98,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
             return bs4.Tag(value)
 
         questionnaire_prompt_path = GenerateArtifactContent._get_path_to_generation_questionnaire_prompt(
-            _convert_spaces_to_dashes(hgen_args.target_type))
+            convert_spaces_to_dashes(hgen_args.target_type))
         if os.path.exists(questionnaire_prompt_path):
             SafeConstructor.add_constructor('!!python/object:bs4.element.Tag', construct_tag_from_yaml)
             questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)

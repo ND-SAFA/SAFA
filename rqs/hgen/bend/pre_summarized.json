@@ -7,7 +7,7 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/bend",
-              "load_dir": "[OUTPUT_PATH]/hgen/bend/f75e9a2d-e6cf-41dc-9703-af61d7189a13",
+              "load_dir": "[OUTPUT_PATH]/hgen/bend/functional",
               "source_layer_id": "Java",
               "target_type": "Functional Requirement",
               "dataset_creator_for_sources": {

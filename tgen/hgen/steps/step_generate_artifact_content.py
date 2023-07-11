@@ -7,14 +7,14 @@ from yaml.constructor import SafeConstructor
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, SUMMARY_INSTRUCTIONS, \
-    TASK_INSTRUCTIONS
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions
+from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger

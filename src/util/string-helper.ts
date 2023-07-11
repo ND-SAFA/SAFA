@@ -133,3 +133,12 @@ export function isCodeArtifact(name: string): boolean {
 
   return codeFileRegex.test(name);
 }
+
+/**
+ * Sanitizes the id of a node so it is valid in the DOM.
+ * @param id - The artifact id.
+ * @return The sanitized artifact id.
+ */
+export function sanitizeNodeId(id?: string): string {
+  return id?.replace(/^[^a-z]+|[^\w:.-]+/gi, "") || "";
+}

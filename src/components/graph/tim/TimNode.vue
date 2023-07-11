@@ -14,6 +14,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
+import { sanitizeNodeId } from "@/util";
 import { typeOptionsStore, useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
@@ -29,7 +30,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
   data: {
     type: GraphElementType.node,
     graph: GraphMode.tim,
-    id: props.artifactType?.replace(/ /g, "") || "",
+    id: sanitizeNodeId(props.artifactType),
     artifactType: props.artifactType,
     count: props.count,
     typeColor:

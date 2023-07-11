@@ -155,7 +155,7 @@ public class TraceLinkVersionRepositoryImpl
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
                 notifyTraceMatrixUpdate(traceMatrixEntry, user);
             } else if (removed) {
-                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, -1);
+                updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
 
                 if (traceMatrixEntry.getCount() == 0) {
                     traceMatrixService.delete(traceMatrixEntry);

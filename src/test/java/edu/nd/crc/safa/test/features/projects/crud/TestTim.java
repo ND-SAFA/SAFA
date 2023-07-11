@@ -107,6 +107,43 @@ public class TestTim extends ApplicationBaseTest {
         assertTraces(traces);
     }
 
+    @Test
+    public void testDeletedItems() {
+        ProjectVersion version = initialSetup();
+        createArtifacts(version);
+        createLinks(version);
+
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+
+        version = createProjectVersion();
+        deleteLinks(version, project.getTraces());
+        deleteArtifacts(version, project.getArtifacts());
+
+        project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
+        List<TypeAppEntity> types = project.getArtifactTypes();
+
+        assertNoTypes(types);
+        assertNoTraces(traces);
+    }
+
+    @Test
+    public void testApprovedLinks() {
+        ProjectVersion version = initialSetup();
+        createArtifacts(version);
+        createLinks(version);
+
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+
+        version = createProjectVersion();
+        approveLinks(version, project.getTraces());
+
+        project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
+
+        assertApprovedTraces(traces);
+    }
+
     private void assertTypes(List<TypeAppEntity> types) {
         List<String> notFound = new ArrayList<>(List.of(type1Name, type2Name));
         for (TypeAppEntity type : types) {
@@ -146,6 +183,44 @@ public class TestTim extends ApplicationBaseTest {
         }
     }
 
+    private void assertApprovedTraces(List<TraceMatrixAppEntity> traces) {
+        assertEquals(2, traces.size());
+        for (TraceMatrixAppEntity trace : traces) {
+            if (type1Name.equalsIgnoreCase(trace.getSourceType())
+                && type2Name.equalsIgnoreCase(trace.getTargetType())) {
+                assertEquals(2, trace.getCount());
+                assertEquals(1, trace.getGeneratedCount());
+                assertEquals(1, trace.getApprovedCount());
+            } else if (type2Name.equalsIgnoreCase(trace.getSourceType())
+                && type2Name.equalsIgnoreCase(trace.getTargetType())) {
+                assertEquals(1, trace.getCount());
+                assertEquals(1, trace.getGeneratedCount());
+                assertEquals(1, trace.getApprovedCount());
+            } else {
+                fail(String.format("Unknown trace pair %s -> %s", trace.getSourceType(), trace.getTargetType()));
+            }
+        }
+    }
+
+    private void assertNoTraces(List<TraceMatrixAppEntity> traces) {
+        assertEquals(2, traces.size());
+        for (TraceMatrixAppEntity trace : traces) {
+            if (type1Name.equalsIgnoreCase(trace.getSourceType())
+                && type2Name.equalsIgnoreCase(trace.getTargetType())) {
+                assertEquals(0, trace.getCount());
+                assertEquals(0, trace.getGeneratedCount());
+                assertEquals(0, trace.getApprovedCount());
+            } else if (type2Name.equalsIgnoreCase(trace.getSourceType())
+                && type2Name.equalsIgnoreCase(trace.getTargetType())) {
+                assertEquals(0, trace.getCount());
+                assertEquals(0, trace.getGeneratedCount());
+                assertEquals(0, trace.getApprovedCount());
+            } else {
+                fail(String.format("Unknown trace pair %s -> %s", trace.getSourceType(), trace.getTargetType()));
+            }
+        }
+    }
+
     private ArtifactAppEntity createArtifact(String typeName, String name) {
         return new ArtifactAppEntity(null, typeName, name,
             "", "", DocumentType.ARTIFACT_TREE, new HashMap<>());
@@ -170,6 +245,12 @@ public class TestTim extends ApplicationBaseTest {
         serviceProvider.getCommitService().performCommit(projectCommit, currentUser);
     }
 
+    private void deleteArtifacts(ProjectVersion version, List<ArtifactAppEntity> artifacts) {
+        ProjectCommit projectCommit = new ProjectCommit(version, true);
+        projectCommit.addArtifacts(ModificationType.REMOVED, artifacts);
+        serviceProvider.getCommitService().performCommit(projectCommit, currentUser);
+    }
+
     private TraceAppEntity createTrace(String sourceName, String targetName, ApprovalStatus status, TraceType type) {
         return new TraceAppEntity(null, sourceName, null, targetName, null, status, 1, type);
     }
@@ -182,6 +263,21 @@ public class TestTim extends ApplicationBaseTest {
             createTrace(artifact1Name, artifact3Name, ApprovalStatus.UNREVIEWED, TraceType.GENERATED));
         projectCommit.addTrace(ModificationType.ADDED,
             createTrace(artifact2Name, artifact3Name, ApprovalStatus.APPROVED, TraceType.GENERATED));
+        serviceProvider.getCommitService().performCommit(projectCommit, currentUser);
+    }
+
+    private void deleteLinks(ProjectVersion version, List<TraceAppEntity> links) {
+        ProjectCommit projectCommit = new ProjectCommit(version, true);
+        projectCommit.addTraces(ModificationType.REMOVED, links);
+        serviceProvider.getCommitService().performCommit(projectCommit, currentUser);
+    }
+
+    private void approveLinks(ProjectVersion version, List<TraceAppEntity> links) {
+        ProjectCommit projectCommit = new ProjectCommit(version, true);
+        for (TraceAppEntity link : links) {
+            link.setApprovalStatus(ApprovalStatus.APPROVED);
+            projectCommit.addTrace(ModificationType.MODIFIED, link);
+        }
         serviceProvider.getCommitService().performCommit(projectCommit, currentUser);
     }
 }

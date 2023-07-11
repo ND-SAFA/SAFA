@@ -35,7 +35,8 @@ public class TraceAppEntity implements IAppEntity {
                           UUID targetId,
                           ApprovalStatus approvalStatus,
                           double score,
-                          TraceType traceType) {
+                          TraceType traceType,
+                          boolean isVisible) {
         this.traceLinkId = traceLinkId;
         this.sourceName = sourceName;
         this.sourceId = sourceId;
@@ -44,6 +45,7 @@ public class TraceAppEntity implements IAppEntity {
         this.approvalStatus = approvalStatus;
         this.score = score;
         this.traceType = traceType;
+        this.isVisible = isVisible;
     }
 
     public TraceAppEntity asManualTrace() {

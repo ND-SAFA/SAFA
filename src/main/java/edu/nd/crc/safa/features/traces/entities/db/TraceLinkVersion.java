@@ -110,6 +110,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.approvalStatus = traceAppEntity.getApprovalStatus() == null
             ? getDefaultApprovalStatus(traceLinkVersion.traceType) :
             traceAppEntity.getApprovalStatus();
+        traceLinkVersion.isVisible = traceAppEntity.isVisible();
         traceLinkVersion.score = traceAppEntity.getScore() == 0 ? traceLinkVersion.score : traceAppEntity.getScore();
         traceLinkVersion.projectVersion = projectVersion;
         traceLinkVersion.modificationType = modificationType;
@@ -218,7 +219,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
                 other.traceLink.targetArtifact.getName(),
                 other.traceType,
                 other.approvalStatus,
-                other.score
+                other.score,
+                other.isVisible
             );
         }
         return false;
@@ -231,7 +233,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
             other.getTargetName(),
             other.getTraceType(),
             other.getApprovalStatus(),
-            other.getScore()
+            other.getScore(),
+            other.isVisible()
         );
     }
 
@@ -239,12 +242,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
                                    String targetName,
                                    TraceType traceType,
                                    ApprovalStatus approvalStatus,
-                                   double score) {
+                                   double score,
+                                   boolean isVisible) {
         return this.traceLink.sourceArtifact.getName().equals(sourceName)
             && this.traceLink.targetArtifact.getName().equals(targetName)
             && this.traceType == traceType
             && this.approvalStatus == approvalStatus
-            && areEqualWithDelta(this.score, score, 0.001);
+            && areEqualWithDelta(this.score, score, 0.001)
+            && this.isVisible == isVisible;
     }
 
     private boolean areEqualWithDelta(double a, double b, double delta) {

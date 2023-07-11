@@ -105,6 +105,7 @@ public class AppRoutes {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
         public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+        public static final String ADD_BATCH = GET_GENERATED_LINKS_IN_PROJECT_VERSION + "/add-batch";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -127,7 +127,8 @@ public class TraceLinkVersionRepositoryImpl
             targetArtifact.getArtifactId(),
             trace.getApprovalStatus(),
             trace.getScore(),
-            trace.getTraceType()
+            trace.getTraceType(),
+            trace.isVisible()
         );
     }
 

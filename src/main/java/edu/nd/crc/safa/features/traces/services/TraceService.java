@@ -32,7 +32,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      * Retrieves list of filtered trace links at given version.
      *
      * @param projectVersion The version of the trace links to retrieve.
-     * @param user The user making the request
+     * @param user           The user making the request
      * @param tracePredicate The filtering predicate, returns link if true on predicate.
      * @return List of filtered trace links.
      */
@@ -57,18 +57,18 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
     public List<TraceAppEntity> retrieveActiveTraces(ProjectVersion projectVersion,
                                                      List<UUID> existingArtifactIds) {
         return retrieveTracesContainingArtifacts(projectVersion, existingArtifactIds,
-            t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+            t -> t.getApprovalStatus() != ApprovalStatus.DECLINED && t.isVisible());
     }
 
     public List<TraceAppEntity> retrieveTracesContainingArtifacts(ProjectVersion projectVersion,
                                                                   List<UUID> existingArtifactIds,
-                                                                  Predicate<TraceAppEntity> tracePredicate) {
+                                                                  Predicate<TraceAppEntity> traceFilter) {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
             .filter(t -> existingArtifactIds.contains(t.getSourceId())
                 && existingArtifactIds.contains(t.getTargetId()))
-            .filter(tracePredicate)
+            .filter(traceFilter)
             .collect(Collectors.toList());
         //TODO: Look at absorbing filter method into the retrieval method by default.
     }

@@ -19,7 +19,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     Represents the config format for all data used by the huggingface trainer.
     """
     __COLS = None
-    COL_IGNORE = []
+    OPTIONAL_COLUMNS: List[str] = []
 
     def __init__(self, data=None, index: Axes = None, columns: Axes = None, dtype: Dtype = None, copy: bool = None):
         """
@@ -40,7 +40,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: A set containing the names of the columns in the dataframe
         """
         if cls.__COLS is None:
-            cls.__COLS = [e.value for e in cls.data_keys() if e not in cls.COL_IGNORE]
+            cls.__COLS = [e.value for e in cls.data_keys() if e not in cls.OPTIONAL_COLUMNS]
         return cls.__COLS
 
     @classmethod
@@ -112,12 +112,15 @@ class AbstractProjectDataFrame(pd.DataFrame):
         columns = self.columns if columns is None else columns
         columns = [col.value if isinstance(col, Enum) else col.lower() for col in columns]
         expected_columns = deepcopy(self.column_names())
+        expected_columns = [c for c in expected_columns if c not in self.OPTIONAL_COLUMNS]
         if self.index_name() and self.index_name() not in columns:
             expected_columns.remove(self.index_name())
         missing_columns = set(expected_columns).difference(columns)
         assert len(missing_columns) == 0, f"Expected the following columns to be present in the df: {missing_columns}. " \
                                           f"Received instead {columns}"
         unexpected_columns = set(columns).difference(expected_columns)
+        unexpected_columns = [c for c in unexpected_columns if c not in self.OPTIONAL_COLUMNS]
+
         assert len(unexpected_columns) == 0, f"Unexpected columns in the trace df: {unexpected_columns}"
         i = 0
         for col in expected_columns:

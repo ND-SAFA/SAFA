@@ -74,7 +74,8 @@ public class TGen implements ITraceGenerationController {
     /**
      * Generates summaries for given content.
      *
-     * @param request Contains content to summarize and assocatied parameteres.
+     * @param request Contains content to summarize and associated parameters.
+     * @param logger  Optional logger for relaying log messages.
      * @return TGen response.
      */
     public TGenSummaryResponse generateSummaries(TGenSummaryRequest request, JobLogger logger) {
@@ -144,7 +145,6 @@ public class TGen implements ITraceGenerationController {
             return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
         }
     }
-
 
     public TGenTraceGenerationResponse performSearch(TGenPredictionRequestDTO payload, JobLogger logger) {
         int candidates = payload.getDataset().getNumOfCandidates();

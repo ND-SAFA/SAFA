@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.summary.SummaryService;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -129,7 +130,16 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(value = "Generating Trace Links", position = 3)
+    @IJobStep(value = "Summarize Code Artifacts", position = 3)
+    public void summarizeCodeArtifacts() {
+        ProjectCommit projectCommit = this.getProjectCommit();
+        List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();
+        SummaryService summaryService = this.serviceProvider.getSummaryService();
+        summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
+        projectCommit.getArtifacts().setAdded(newArtifacts);
+    }
+
+    @IJobStep(value = "Generating Trace Links", position = 4)
     public void generatingTraces(JobLogger logger) {
         ProjectCommit projectCommit = getProjectCommit();
 
@@ -143,5 +153,12 @@ public class FlatFileProjectCreationJob extends CommitJob {
         logger.log("%d traces generated.", generatedLinks.size());
 
         projectCommit.getTraces().getAdded().addAll(generatedLinks);
+    }
+
+    @Override
+    protected void afterJob(boolean success) throws Exception {
+        if (!success) {
+            this.serviceProvider.getProjectService().deleteProject(this.projectVersion.getProject());
+        }
     }
 }

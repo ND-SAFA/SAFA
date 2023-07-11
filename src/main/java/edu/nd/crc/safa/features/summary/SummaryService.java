@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.tgen.TGen;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,10 @@ public class SummaryService {
      * @return List of summaries.
      */
     public List<String> generateSummaries(SummarizeRequestDTO request) {
-        BaseGenerationModels baseModel = request.getModel();
+        return generateSummaries(request, null);
+    }
+
+    public List<String> generateSummaries(SummarizeRequestDTO request, JobLogger jobLogger) {
         List<TGenSummaryArtifact> artifacts = new ArrayList<>();
         for (TGenSummaryArtifact artifact : request.getArtifacts()) {
             if (artifact.getId() == null) { // For non-artifacts, ad-hoc id is created for them.
@@ -39,7 +42,7 @@ public class SummaryService {
         }
         TGen tgen = new TGen(safaRequestBuilder);
         TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts, request.getModel());
-        TGenSummaryResponse response = tgen.generateSummaries(tgenRequest);
+        TGenSummaryResponse response = tgen.generateSummaries(tgenRequest, jobLogger);
 
         List<String> summaries = new ArrayList<>();
         for (TGenSummaryArtifact artifact : response.getArtifacts().values()) {
@@ -54,7 +57,11 @@ public class SummaryService {
      * @param projectArtifacts Set of all artifacts in project.
      * @return List of code artifacts with summaries populated.
      */
-    public List<ArtifactAppEntity> summarizeCodeArtifacts(List<ArtifactAppEntity> projectArtifacts) {
+    public List<ArtifactAppEntity> addSummariesToCode(List<ArtifactAppEntity> projectArtifacts) {
+        return addSummariesToCode(projectArtifacts, null);
+    }
+
+    public List<ArtifactAppEntity> addSummariesToCode(List<ArtifactAppEntity> projectArtifacts, JobLogger logger) {
         List<ArtifactAppEntity> codeArtifacts = projectArtifacts
             .stream()
             .filter(a -> TGenSummaryArtifactType.isCode(a.getName()) && !a.hasSummary()).collect(Collectors.toList());
@@ -62,17 +69,18 @@ public class SummaryService {
             return new ArrayList<>();
         }
         List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
-            a.getId().toString(),
+            a.getTraceableId(), // avoid using id if artifact is not yet created.
             a.getName(),
             a.getBody(),
             TGenSummaryArtifactType.getArtifactType(a.getName()))
         ).collect(Collectors.toList());
-        List<String> summarizedArtifacts = this.generateSummaries(new SummarizeRequestDTO(summaryArtifacts));
+        List<String> summarizedArtifacts = this.generateSummaries(new SummarizeRequestDTO(summaryArtifacts), logger);
         for (int i = 0; i < codeArtifacts.size(); i++) {
             String artifactSummary = summarizedArtifacts.get(i);
             ArtifactAppEntity artifact = codeArtifacts.get(i);
             artifact.setSummary(artifactSummary);
         }
+
         return codeArtifacts;
     }
 }

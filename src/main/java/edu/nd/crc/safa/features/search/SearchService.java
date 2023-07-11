@@ -94,7 +94,8 @@ public class SearchService {
             .map(TGenTraceGenerationResponse.PredictedLink::getSource)
             .map(UUID::fromString)
             .collect(Collectors.toList());
-        matchedArtifactIds = matchedArtifactIds.subList(0, n);
+        int maxIndex = Math.min(matchedArtifactIds.size(), n);
+        matchedArtifactIds = matchedArtifactIds.subList(0, maxIndex);
         List<String> matchedArtifactBodies = matchedArtifactIds
             .stream().map(UUID::toString)
             .map(artifactLayer::get)

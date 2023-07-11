@@ -86,12 +86,12 @@ public class GenerateLinksJob extends CommitJob {
     @IJobStep(value = "Summarizing code artifacts.", position = 2)
     public void createArtifactSummaries() {
         SummaryService summaryService = this.serviceProvider.getSummaryService();
-        List<ArtifactAppEntity> codeArtifacts =
-            summaryService.summarizeCodeArtifacts(this.projectAppEntity.getArtifacts());
+        List<ArtifactAppEntity> modifiedArtifacts =
+            summaryService.addSummariesToCode(this.projectAppEntity.getArtifacts());
         CommitService commitService = this.serviceProvider.getCommitService();
         ProjectCommit projectCommit = new ProjectCommit();
         projectCommit.setCommitVersion(this.projectVersion);
-        projectCommit.addArtifacts(ModificationType.MODIFIED, codeArtifacts);
+        projectCommit.addArtifacts(ModificationType.MODIFIED, modifiedArtifacts);
         commitService.performCommit(projectCommit, this.user);
     }
 
@@ -107,6 +107,7 @@ public class GenerateLinksJob extends CommitJob {
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
             List<TraceAppEntity> tracePredictions = controller.generateLinks(tracingPayload, this.getDbLogger());
             LinkVisibilityService.setLinksVisibility(tracePredictions);
+            LinkScoreService.convertLinksToPercentiles(tracePredictions);
             this.generatedTraces = tracePredictions;
 
             logger.log("Generated %d traces.", generatedTraces.size());

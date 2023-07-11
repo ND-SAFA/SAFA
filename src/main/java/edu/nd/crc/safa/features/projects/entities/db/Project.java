@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.projects.entities.db;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,9 +49,13 @@ public class Project implements Serializable {
         columnDefinition = "mediumtext")
     String description;
 
+    @Column(name = "last_edited")
+    private LocalDateTime lastEdited;
+
     public Project(String name, String description) {
         this.setName(name);
         this.setDescription(description);
+        this.lastEdited = LocalDateTime.now();
     }
 
     /**
@@ -76,5 +81,13 @@ public class Project implements Serializable {
         }
         this.name = projectAppEntity.getName();
         this.description = projectAppEntity.getDescription();
+        this.lastEdited = projectAppEntity.getLastEdited();
+        if (this.lastEdited == null) {
+            this.lastEdited = LocalDateTime.now();
+        }
+    }
+
+    public void setLastEdited() {
+        this.lastEdited = LocalDateTime.now();
     }
 }

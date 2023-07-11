@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -35,6 +36,8 @@ import lombok.Data;
 @Data
 public class ProjectAppEntity implements IAppEntity {
     private UUID projectId;
+
+    private LocalDateTime lastEdited;
 
     @NotNull
     private String name;
@@ -91,6 +94,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.attributes = new ArrayList<>();
         this.attributeLayouts = new ArrayList<>();
         this.subtrees = new HashMap<>();
+        this.lastEdited = LocalDateTime.now();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -109,6 +113,7 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, SubtreeAppEntity> subtrees) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
+        this.lastEdited = project.getLastEdited();
         this.name = project.getName();
         this.description = project.getDescription();
         this.projectVersion = projectVersion;

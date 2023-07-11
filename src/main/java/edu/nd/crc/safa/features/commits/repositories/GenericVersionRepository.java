@@ -254,7 +254,6 @@ public abstract class GenericVersionRepository<
 
             this.save(versionEntity);
 
-
             this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
         } catch (Exception e) {
             e.printStackTrace();

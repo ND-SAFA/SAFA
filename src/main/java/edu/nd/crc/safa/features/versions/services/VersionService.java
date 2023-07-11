@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactTypeCount;
 import edu.nd.crc.safa.features.types.services.ArtifactTypeCountService;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class VersionService {
     private final ProjectVersionRepository projectVersionRepository;
     private final ArtifactTypeCountService typeCountService;
+    private final TraceMatrixService traceMatrixService;
 
     @Setter(onMethod = @__({@Autowired, @Lazy}))  // Prevents circular dependency
     private TypeService typeService;
@@ -36,20 +39,28 @@ public class VersionService {
     }
 
     public ProjectVersion createNewVersion(Project project, int major, int minor, int revision) {
+        return createNewVersion(project, major, minor, revision, getCurrentVersionOptional(project).orElse(null));
+    }
+
+    public ProjectVersion createNewVersion(Project project, int major, int minor,
+                                           int revision, ProjectVersion prevVersion) {
+
         ProjectVersion newVersion = new ProjectVersion(project, major, minor, revision);
         newVersion = this.projectVersionRepository.save(newVersion);
-        createTypeCountEntries(newVersion);
+        createTypeCountEntries(newVersion, prevVersion);
+        createTraceCountEntries(newVersion, prevVersion);
         return newVersion;
     }
 
     public ProjectVersion createNewMajorVersion(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
-        return createNewVersion(project, projectVersion.getMajorVersion() + 1, 0, 0);
+        return createNewVersion(project, projectVersion.getMajorVersion() + 1, 0, 0, projectVersion);
     }
 
     public ProjectVersion createNewMinorVersion(Project project) throws SafaError {
         ProjectVersion projectVersion = getCurrentVersion(project);
-        return createNewVersion(project, projectVersion.getMajorVersion(), projectVersion.getMinorVersion() + 1, 0);
+        return createNewVersion(project, projectVersion.getMajorVersion(), projectVersion.getMinorVersion() + 1,
+            0, projectVersion);
     }
 
     public ProjectVersion createNextRevision(Project project) throws SafaError {
@@ -57,7 +68,8 @@ public class VersionService {
         return createNewVersion(project,
             projectVersion.getMajorVersion(),
             projectVersion.getMinorVersion(),
-            projectVersion.getRevision() + 1);
+            projectVersion.getRevision() + 1,
+            projectVersion);
     }
 
     /**
@@ -68,18 +80,19 @@ public class VersionService {
      * @throws SafaError Throws error if
      */
     public ProjectVersion getCurrentVersion(Project project) throws SafaError {
-        Optional<ProjectVersion> projectVersionQuery = this.projectVersionRepository.getCurrentVersion(project);
-        if (projectVersionQuery.isPresent()) {
-            return projectVersionQuery.get();
-        } else {
-            throw new SafaError("Expected given project to contain an initial version.");
-        }
+        Optional<ProjectVersion> projectVersionQuery = getCurrentVersionOptional(project);
+        return projectVersionQuery.orElseThrow(() ->
+            new SafaError("Expected given project to contain an initial version."));
+    }
+
+    private Optional<ProjectVersion> getCurrentVersionOptional(Project project) {
+        return this.projectVersionRepository.getCurrentVersion(project);
     }
 
     public ProjectVersion createInitialProjectVersion(Project project) {
         ProjectVersion projectVersion = new ProjectVersion(project, 1, 0, 0);
         projectVersion = this.projectVersionRepository.save(projectVersion);
-        createTypeCountEntries(projectVersion);
+        createTypeCountEntries(projectVersion, null);
         return projectVersion;
     }
 
@@ -87,11 +100,40 @@ public class VersionService {
      * Create type count entities for the given version for all types in a project
      *
      * @param version The version to add counts for
+     * @param prevVersion The previous version
      */
-    private void createTypeCountEntries(ProjectVersion version) {
+    private void createTypeCountEntries(ProjectVersion version, ProjectVersion prevVersion) {
         for (ArtifactType type : typeService.getTypes(version.getProject())) {
             ArtifactTypeCount typeCount = new ArtifactTypeCount(version, type);
+
+            if (prevVersion != null) {
+                ArtifactTypeCount prevTypeCount =
+                    typeCountService.getByProjectVersionAndType(prevVersion, type).orElseThrow();
+                typeCount.setCount(prevTypeCount.getCount());
+            }
+
             typeCountService.save(typeCount);
+        }
+    }
+
+    /**
+     * Copy trace count entries from one version to another
+     *
+     * @param version The version to add counts for
+     * @param prevVersion The previous version
+     */
+    private void createTraceCountEntries(ProjectVersion version, ProjectVersion prevVersion) {
+        if (prevVersion == null) {
+            return;
+        }
+
+        for (TraceMatrixEntry traceEntry : traceMatrixService.getEntries(prevVersion)) {
+            TraceMatrixEntry newEntry = traceMatrixService.createEntry(version, traceEntry.getSourceType(),
+                traceEntry.getTargetType());
+            newEntry.setCount(traceEntry.getCount());
+            newEntry.setGeneratedCount(traceEntry.getGeneratedCount());
+            newEntry.setApprovedCount(traceEntry.getApprovedCount());
+            traceMatrixService.save(newEntry);
         }
     }
 }

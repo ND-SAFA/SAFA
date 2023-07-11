@@ -40,7 +40,7 @@ public class TestTim extends ApplicationBaseTest {
 
     @Test
     public void testTypesNoArtifacts() {
-        ProjectVersion version = createProjectVersion();
+        ProjectVersion version = initialSetup();
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
         List<TypeAppEntity> types = project.getArtifactTypes();
@@ -50,7 +50,7 @@ public class TestTim extends ApplicationBaseTest {
 
     @Test
     public void testTypesWithArtifacts() {
-        ProjectVersion version = createProjectVersion();
+        ProjectVersion version = initialSetup();
         createArtifacts(version);
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
@@ -61,7 +61,7 @@ public class TestTim extends ApplicationBaseTest {
 
     @Test
     public void testTracesNoArtifacts() {
-        ProjectVersion version = createProjectVersion();
+        ProjectVersion version = initialSetup();
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
@@ -71,7 +71,7 @@ public class TestTim extends ApplicationBaseTest {
 
     @Test
     public void testTracesWithArtifacts() {
-        ProjectVersion version = createProjectVersion();
+        ProjectVersion version = initialSetup();
         createArtifacts(version);
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
@@ -82,13 +82,28 @@ public class TestTim extends ApplicationBaseTest {
 
     @Test
     public void testTracesWithArtifactsAndLinks() {
-        ProjectVersion version = createProjectVersion();
+        ProjectVersion version = initialSetup();
         createArtifacts(version);
         createLinks(version);
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
         List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
 
+        assertTraces(traces);
+    }
+
+    @Test
+    public void testCreatingNewVersion() {
+        ProjectVersion version = initialSetup();
+        createArtifacts(version);
+        createLinks(version);
+        version = createProjectVersion();
+
+        ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
+        List<TraceMatrixAppEntity> traces = project.getTraceMatrices();
+        List<TypeAppEntity> types = project.getArtifactTypes();
+
+        assertTypes(types);
         assertTraces(traces);
     }
 
@@ -137,10 +152,14 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private ProjectVersion createProjectVersion() {
-        return dbEntityBuilder.newProject(projectName)
+        return dbEntityBuilder.newVersionWithReturn(projectName);
+    }
+
+    private ProjectVersion initialSetup() {
+        dbEntityBuilder.newProject(projectName)
             .newType(projectName, type1Name)
-            .newType(projectName, type2Name)
-            .newVersionWithReturn(projectName);
+            .newType(projectName, type2Name);
+        return createProjectVersion();
     }
 
     private void createArtifacts(ProjectVersion version) {

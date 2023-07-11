@@ -87,8 +87,18 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
 
     @Override
     public List<TraceMatrixAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
-        return repo.getByProjectVersion(projectVersion).stream()
+        return getEntries(projectVersion).stream()
             .map(TraceMatrixAppEntity::new)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all entries associated with a project version
+     *
+     * @param projectVersion The project version
+     * @return The trace matrix entries in that version
+     */
+    public List<TraceMatrixEntry> getEntries(ProjectVersion projectVersion) {
+        return repo.getByProjectVersion(projectVersion);
     }
 }

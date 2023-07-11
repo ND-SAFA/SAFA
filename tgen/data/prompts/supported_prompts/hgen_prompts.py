@@ -33,19 +33,18 @@ GENERATION_PROMPT = Prompt("You are an engineering working on a software system 
                            "{source_type}s in the system: ")
 
 FORMAT_PROMPT = Prompt("Finally, provide an example of the typical format for a {target_type}. "
-                                "The format should be for only the body of the {target_type} and should exclude any title.",
-                                response_manager=PromptResponseManager(response_tag="format",
-                                                                       required_tag_ids=REQUIRE_ALL_TAGS))
+                       "The format should be for only the body of the {target_type} and should exclude any title.",
+                       response_manager=PromptResponseManager(response_tag="format",
+                                                              required_tag_ids=REQUIRE_ALL_TAGS))
 
 REFINE_STEPS = {
     1: QuestionPrompt("Ensure the {target_type} conveys meaningful and relevant information. "
-                      "The {target_type} should contain enough details that they would aid someone unfamiliar with the system "
-                      "in gaining an understanding the system. "),
+                      "The {target_type} should contain enough enough context for someone unfamiliar with the system to understand, "
+                      "but details should be specific to this system and not contain details "
+                      "that are true of all systems that a skilled practitioner would already know."
+                      "{target_type} should be easy to read and not be overly verbose. "),
     2: QuestionPrompt(
         "Check that each {target_type} is at the appropriate level of detail for the intended audience. "
-        "It should contain enough context for someone unfamiliar with the system to understand, "
-        "details should be specific to this system and not contain details "
-        "that are true of all systems that a skilled practitioner would already know. "
         "Remove any that do focus on general information rather than information specific to the system. "),
     3: QuestionPrompt(
         "Verify there is a clear and singular purpose or goal for the {target_type}. "

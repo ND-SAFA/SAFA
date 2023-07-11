@@ -1,0 +1,40 @@
+format:
+- As a [type of user], I want [some goal] so that [some reason].
+step:
+- deliverable:
+  - A high-level description of the system's components and how they relate to each
+    other.
+  instructions:
+  - 'Examine the code and identify the main functions and classes. Group related functions
+    and classes together. '
+  name:
+  - IdentifyComponents
+- deliverable:
+  - A description of each component's purpose, responsibilities, inputs, outputs,
+    and dependencies in the system.
+  instructions:
+  - 'For each component, determine its purpose and responsibilities. Identify any
+    inputs, outputs, or dependencies. '
+  name:
+  - DeterminePurpose
+- deliverable:
+  - A description of the data, its format, meaning, and how it moves through the system.
+  instructions:
+  - 'Identify the data used in the system and how it flows between components. Determine
+    the format and meaning of the data. '
+  name:
+  - IdentifyData
+- deliverable:
+  - A high-level description of the system's overall functionality and purpose.
+  instructions:
+  - 'Put together the information from the previous steps to determine the overall
+    functionality and purpose of the system. '
+  name:
+  - DetermineFunctionality
+- deliverable:
+  - 'One or more User stories describing a feature or part of the system''s functionality. '
+  instructions:
+  - 'Use the information from the previous steps to write one or more User stories
+    describing a feature or part of the overall functionality of the system. '
+  name:
+  - WriteUserStory

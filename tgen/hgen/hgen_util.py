@@ -21,6 +21,7 @@ from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQ
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
@@ -40,6 +41,7 @@ GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of 
 TASK_INSTRUCTIONS = "Then, reverse engineer as many {target_type}s as possible for the {source_type}. " \
                     "Each {target_type} should be a single line which uses the following format '{format}'. " \
                     "Enclose all {target_type}s in a comma deliminated list. "
+SAVE_DATASET_DIRNAME = "final_generated_dataset"
 
 
 def save_dataset_checkpoint(dataset: Any, export_path: str = None,
@@ -58,7 +60,7 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
     current_time_string = datetime.now().time().strftime('%Y-%m-%d %H:%M:%S')
     filename = current_time_string if not filename else filename
     full_export_path = os.path.join(export_path, filename)
-    if not isinstance(dataset, TraceDataset) and not isinstance(dataset, pd.DataFrame):
+    if not isinstance(dataset, iDataset) and not isinstance(dataset, pd.DataFrame):
         FileUtil.write_yaml(dataset, full_export_path)
     else:
         if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
@@ -141,8 +143,12 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
     if generate_names:
         try:
             logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-            name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. ",
-                                 PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS))
+            name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
+                                 f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
+                                 PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
+                                                       formatter=lambda tag, val: f"{val.replace(NEW_LINE, EMPTY_STRING).strip()} "
+                                                                                  f"{get_initials(hgen_args.target_type)}",
+                                                       ))
             artifact_prompt = ArtifactPrompt(include_id=False)
             prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
             dataset = PromptDataset(artifact_df=new_artifact_df)
@@ -153,7 +159,6 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
                                     response_prompt_ids=name_prompt.id,
                                     tags_for_response=name_prompt.response_manager.response_tag,
                                     return_first=True)
-            names = [name.replace(NEW_LINE, EMPTY_STRING).strip() for name in names]
             assert len(set(names)) == len(names), f"Found duplicates names: {names}"
             assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
             new_artifact_df.index = names
@@ -162,15 +167,17 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
     return new_artifact_df
 
 
-def _get_prompt_builder_for_generation(hgen_args: HGenArgs,
-                                       task_prompt: Union[QuestionnairePrompt, Prompt],
-                                       base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
-                                       summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
+def get_prompt_builder_for_generation(hgen_args: HGenArgs,
+                                      task_prompt: Union[QuestionnairePrompt, Prompt],
+                                      base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
+                                      summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
+    :param hgen_args: The arguments for the hierarchy generator
     :param task_prompt: The questionnaire prompt given to the model to produce the generations
     :param base_prompt: The main prompt that starts the prompt
     :param summary_prompt: Instructions for the model to create a summary of the system first
+    :param artifact_type: The type of artifact being presented in the prompt
     :return: The prompt builder used for the generations
     """
     generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
@@ -207,9 +214,20 @@ def parse_generated_artifacts(res: str) -> List[str]:
     return [re.sub(r'^\d+\.\s', '', content).strip() for content in res.split(NEW_LINE) if len(content) > 1]
 
 
-def _convert_spaces_to_dashes(str2convert) -> str:
+def convert_spaces_to_dashes(str2convert) -> str:
     """
     Converts the str to use dashes instead of spaces
     :return: The str with dashes instead of spaces
     """
     return "-".join(str2convert.split()).lower()
+
+
+def get_initials(input_string: str) -> str:
+    """
+    Creates a string with the first letter of each word
+    :param input_string: The input string
+    :return: The first letter of each word
+    """
+    words = input_string.split()
+    first_letters = [word[0] for word in words]
+    return ''.join(first_letters).upper()

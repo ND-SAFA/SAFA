@@ -6,7 +6,7 @@ from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import _get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
+from tgen.hgen.hgen_util import get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.logging.logger_manager import logger
 
@@ -48,10 +48,10 @@ class RefineArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         try:
             logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")
-            prompt_builder = _get_prompt_builder_for_generation(hgen_args,
-                                                                questionnaire,
-                                                                base_prompt=SupportedPrompts.HGEN_GENERATION,
-                                                                artifact_type=hgen_args.target_type)
+            prompt_builder = get_prompt_builder_for_generation(hgen_args,
+                                                               questionnaire,
+                                                               base_prompt=SupportedPrompts.HGEN_GENERATION,
+                                                               artifact_type=hgen_args.target_type)
             prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
             artifacts = create_artifact_df_from_generated_artifacts(hgen_args,
                                                                     artifact_generations=generated_artifact_content,

@@ -33,14 +33,7 @@ from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.prompt_util import PromptUtil
 
-SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
-                       "describing the system by focusing on the high level features the system provides its users. " \
-                       "Consider the following in your response: "
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
-GENERATION_INSTRUCTIONS = "Complete the following steps using your knowledge of the system:"
-TASK_INSTRUCTIONS = "Then, reverse engineer as many {target_type}s as possible for the {source_type}. " \
-                    "Each {target_type} should be a single line which uses the following format '{format}'. " \
-                    "Enclose all {target_type}s in a comma deliminated list. "
 SAVE_DATASET_DIRNAME = "final_generated_dataset"
 
 
@@ -229,5 +222,7 @@ def get_initials(input_string: str) -> str:
     :return: The first letter of each word
     """
     words = input_string.split()
+    if len(words) <= 1:
+        return input_string
     first_letters = [word[0] for word in words]
     return ''.join(first_letters).upper()

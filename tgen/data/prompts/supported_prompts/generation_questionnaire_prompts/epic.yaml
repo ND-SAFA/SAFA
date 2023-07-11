@@ -1,0 +1,55 @@
+format:
+- '
+
+  As a [user type], I want [capability] so that [benefit].
+
+
+  [System summary, including architecture, data, user experience, and implementation
+  details as needed to describe how the capability is delivered by the system.]
+
+  '
+step:
+- deliverable:
+  - A summary of the system's main capabilities and purpose.
+  instructions:
+  - Interview stakeholders and subject matter experts to understand the high-level
+    capabilities and purpose of the system.
+  name:
+  - Capabilities
+- deliverable:
+  - A description of the system's architecture, including its major components and
+    their interactions.
+  instructions:
+  - Review available documentation to identify the system's major components and how
+    they interact.
+  name:
+  - Architecture
+- deliverable:
+  - A summary of how users access the system's capabilities through its user interface.
+  instructions:
+  - Explore the user interface to understand how users interact with and navigate
+    the system.
+  name:
+  - User Experience
+- deliverable:
+  - A description of the system's data structures, data relationships, and organization
+    of information.
+  instructions:
+  - Analyze the data model and database schema to understand how the system stores
+    and organizes information.
+  name:
+  - Data
+- deliverable:
+  - A technical description of how the system is built and configured.
+  instructions:
+  - Review the system's source code and configuration settings to understand its implementation
+    details.
+  name:
+  - Implementation
+- deliverable:
+  - A cohesive, end-to-end description of the system and how its capabilities are
+    delivered.
+  instructions:
+  - Synthesize your findings into a high-level summary of how the system works.
+  name:
+  - Epic

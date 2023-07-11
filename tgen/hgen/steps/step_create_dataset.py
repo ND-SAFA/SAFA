@@ -29,7 +29,7 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-        artifact_generations = state.refined_content
+        artifact_generations = state.refined_content if state.refined_content else state.generated_artifact_content
         original_dataset_complete = state.original_dataset
         export_path = state.export_path
 

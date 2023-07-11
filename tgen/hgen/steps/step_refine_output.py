@@ -50,7 +50,7 @@ class RefineArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
             logger.info(f"Refining {len(generated_artifact_content)} {hgen_args.target_type}s\n")
             prompt_builder = get_prompt_builder_for_generation(hgen_args,
                                                                questionnaire,
-                                                               base_prompt=SupportedPrompts.HGEN_GENERATION,
+                                                               base_prompt=SupportedPrompts.HGEN_REFINEMENT,
                                                                artifact_type=hgen_args.target_type)
             prompt_builder.add_prompt(Prompt(f"SUMMARY OF SYSTEM: {summary}"), 1)
             artifacts = create_artifact_df_from_generated_artifacts(hgen_args,

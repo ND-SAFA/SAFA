@@ -4,6 +4,7 @@ from typing import Tuple
 import bs4
 from yaml.constructor import SafeConstructor
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
@@ -46,6 +47,10 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                              )
         task_prompt.format_value(format=format_of_artifacts)
         prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire)
+        if args.system_summary:
+            overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown('Overview of System:')}"
+                                               f"{NEW_LINE}{args.system_summary}")
+            prompt_builder.add_prompt(overview_of_system_prompt, 1)
         summary_tag = summary_questionnaire.response_manager.response_tag
         generated_artifacts_tag = task_prompt.response_manager.response_tag
         generation_predictions = get_predictions(prompt_builder,

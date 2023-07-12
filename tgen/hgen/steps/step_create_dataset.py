@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import List
 
@@ -6,6 +7,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactK
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
@@ -28,35 +30,40 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         :param args: The arguments and current state of HGEN.
         :return: None
         """
-        artifact_generations = state.refined_content if state.refined_content else state.generated_artifact_content
-        original_dataset_complete = state.original_dataset
+        proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME)
         export_path = state.export_path
 
-        original_artifact_df = original_dataset_complete.artifact_df
-        original_trace_dataset = original_dataset_complete.trace_dataset if isinstance(original_dataset_complete,
-                                                                                       PromptDataset) else original_dataset_complete
-        original_trace_df, original_layer_df = None, None
-        if original_trace_dataset:
-            original_trace_df = original_trace_dataset.trace_df
-            original_layer_df = original_trace_dataset.layer_df
+        if os.path.exists(proj_path):
+            dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
+        else:
+            artifact_generations = state.refined_content if state.refined_content else state.generated_artifact_content
+            original_dataset_complete = state.original_dataset
 
-        target_layer_id = CreateHGenDataset._get_target_layer_id(args, original_dataset_complete)
+            original_artifact_df = original_dataset_complete.artifact_df
+            original_trace_dataset = original_dataset_complete.trace_dataset \
+                if isinstance(original_dataset_complete, PromptDataset) else original_dataset_complete
+            original_trace_df, original_layer_df = None, None
+            if original_trace_dataset:
+                original_trace_df = original_trace_dataset.trace_df
+                original_layer_df = original_trace_dataset.layer_df
 
-        new_artifact_df = create_artifact_df_from_generated_artifacts(args, artifact_generations, target_layer_id)
-        save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
+            target_layer_id = CreateHGenDataset._get_target_layer_id(args, original_dataset_complete)
 
-        new_layer_df = CreateHGenDataset._create_layer_df_with_generated_artifacts(args, target_layer_id)
-        combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
-        new_trace_df = CreateHGenDataset._create_trace_df_with_generated_artifacts(args, combined_artifact_df)
-        save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
-                                export_path, filename="generated_dataset_checkpoint")
+            new_artifact_df = create_artifact_df_from_generated_artifacts(args, artifact_generations, target_layer_id)
+            save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
 
-        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
-                                                                   artifact_df=combined_artifact_df, trace_df=new_trace_df)
-        final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
-        final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
+            new_layer_df = CreateHGenDataset._create_layer_df_with_generated_artifacts(args, target_layer_id)
+            combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
+            new_trace_df = CreateHGenDataset._create_trace_df_with_generated_artifacts(args, combined_artifact_df)
+            save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
+                                    export_path, filename="generated_dataset_checkpoint")
 
-        dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
+            new_trace_df = TraceDatasetCreator.generate_negative_links(layer_mapping_df=new_layer_df,
+                                                                       artifact_df=combined_artifact_df, trace_df=new_trace_df)
+            final_trace_df = TraceDataFrame.concat(original_trace_df, new_trace_df) if original_trace_df is not None else new_trace_df
+            final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
+
+            dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
 
         save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
         save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)

@@ -96,10 +96,11 @@ def get_predictions(prompt_builder: PromptBuilder,
                                          completion_type=LLMCompletionType.GENERATION))
     tags_for_response = tags_for_response.pop() \
         if isinstance(tags_for_response, set) and len(tags_for_response) == 1 else tags_for_response
-    base_name, file_name = os.path.split(export_path) if export_path else (None, None)
+    base_name, file_name = os.path.split(export_path) if export_path else (EMPTY_STRING, EMPTY_STRING)
 
-    if hgen_args.load_dir and file_name and os.path.exists(os.path.join(hgen_args.load_dir, file_name)):
-        predictions = FileUtil.read_yaml(os.path.join(hgen_args.load_dir, file_name))
+    load_path = os.path.join(hgen_args.load_dir, file_name)
+    if os.path.exists(load_path):
+        predictions = FileUtil.read_yaml(load_path)
     else:
         predictions = trainer.perform_prediction().predictions
 

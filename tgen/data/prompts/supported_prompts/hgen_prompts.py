@@ -21,9 +21,9 @@ FORMAT_PROMPT = Prompt("Provide an example {target_type} for a software developm
                                                               formatter=lambda tag, val:
                                                               PromptUtil.strip_new_lines_and_extra_space(val)))
 
-GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
+GENERATION_PROMPT = Prompt("You are an engineer working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
-                           "{source_type}s in the system: ")
+                           "{source_type}s in the system below. ")
 SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
                        "describing the system by focusing on any technical details or dependencies needed for the {target_type}s. " \
                        "Exclude details that are generally applicable across systems " \

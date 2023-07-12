@@ -17,6 +17,7 @@ class BaseHGenJob(AbstractJob):
         """
         self.hgen_params = hgen_params
         self.hgen_args = hgen_args
+        self.hgen = HierarchyGenerator(self.get_hgen_args())
         super().__init__(job_args)
 
     def _run(self) -> TraceDataset:
@@ -24,8 +25,7 @@ class BaseHGenJob(AbstractJob):
         Runs the hierarchy generator and exports the resulting dataset
         :return: The result of the job
         """
-        hgen = HierarchyGenerator(self.get_hgen_args())
-        generated_dataset = hgen.run()
+        generated_dataset = self.hgen.run()
         return generated_dataset
 
     def get_hgen_args(self) -> HGenArgs:

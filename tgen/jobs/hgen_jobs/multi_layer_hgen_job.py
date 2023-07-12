@@ -43,15 +43,10 @@ class MultiLayerHGenJob(AbstractJob):
         current_hgen_job = self.starting_hgen_job
         current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
         for i, next_target_type in enumerate(self.target_types):
-            proj_path = os.path.join(current_hgen_job.get_hgen_args().load_dir, SAVE_DATASET_DIRNAME) \
-                if current_hgen_job.get_hgen_args().load_dir else EMPTY_STRING
-            if os.path.exists(proj_path):
-                dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
-            else:
-                res = current_hgen_job.run()
-                if res.status != Status.SUCCESS:
-                    raise Exception(res.body)
-                dataset = res.body
+            res = current_hgen_job.run()
+            if res.status != Status.SUCCESS:
+                raise Exception(res.body)
+            dataset = res.body
             current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type, dataset)
         return current_hgen_job.run().body
 
@@ -69,7 +64,8 @@ class MultiLayerHGenJob(AbstractJob):
                                                    source_type=current_args.target_type,
                                                    target_type=next_target_type,
                                                    dataset_for_sources=PromptDataset(trace_dataset=generated_dataset),
-                                                   load_dir=None)
+                                                   system_summary=current_hgen_job.hgen.state.summary,
+                                                   load_dir=EMPTY_STRING)
         init_params = ParamSpecs.create_from_method(HGenArgs.__init__).param_names
         new_params = {name: new_params[name] for name in init_params}
         next_job = BaseHGenJob(HGenArgs(**new_params), current_hgen_job.job_args)

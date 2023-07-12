@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import List, Union, Dict
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -28,6 +29,7 @@ class PredictionStep(Enum):
 
 DEFAULT_MAX_TOKENS = 10000
 DEFAULT_MAX_TOKENS_SMALL = 1000
+
 
 @dataclass
 class HGenState(State):
@@ -101,11 +103,15 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The path to load previous checkpoints from
     """
-    load_dir: str = None
+    load_dir: str = EMPTY_STRING
     """
     Max tokens to use for predictions.
     """
     max_tokens: Dict[int, int] = field(default_factory=dict)
+    """
+    Summary of the system 
+    """
+    system_summary: str = None
     """
     The llm manager to use for each prediction step
     """

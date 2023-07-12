@@ -1,0 +1,15 @@
+format:
+- " \nThe system shall [function] when [event/condition] occurs. The system shall\
+  \ [function] by [steps to accomplish function]. The system shall [function] within\
+  \ [performance requirement].\n"
+questions:
+- - What is the purpose of the system?
+  - What are the inputs to the system?
+  - What are the outputs of the system?
+  - What are the main functions/methods in the system?
+  - What do the functions/methods in the system do?
+  - What are the data structures used in the system and what do they represent?
+  - What is the flow of control/logic in the system?
+  - What are the boundary conditions/edge cases in the system?
+  - What are the error conditions in the system and how are they handled?
+  - What are the performance requirements of the system?

@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.test.features.sync;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -19,12 +20,12 @@ public abstract class AbstractSyncTest extends ApplicationBaseTest {
     /**
      * Converts JSON response to {@link ProjectAppEntity}
      */
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = ObjectMapperConfig.create();
     /**
      * Project created.
      */
     protected ProjectVersion projectVersion;
-    
+
     public AbstractSyncTest() {
         objectMapper.findAndRegisterModules();
     }

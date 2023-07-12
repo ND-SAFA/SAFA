@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -25,7 +26,6 @@ import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
@@ -128,7 +128,7 @@ public class FileDownloadService {
     private File writeTimFile(Project project, TimSchema timData) throws IOException {
         String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, ProjectVariables.TIM_FILENAME);
         File timFile = new File(pathToFile);
-        new ObjectMapper().writeValue(timFile, timData);
+        ObjectMapperConfig.create().writeValue(timFile, timData);
         return timFile;
     }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
@@ -23,7 +24,6 @@ import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 
@@ -44,7 +44,7 @@ public class TimFileParser implements IProjectDefinitionParser {
     public TimFileParser(JSONObject timFileJson, String pathToFiles) throws JsonProcessingException {
         super();
         this.pathToFiles = pathToFiles;
-        this.timSchema = new ObjectMapper().readValue(timFileJson.toString(), new TypeReference<>() {
+        this.timSchema = ObjectMapperConfig.create().readValue(timFileJson.toString(), new TypeReference<>() {
         });
     }
 

@@ -127,7 +127,7 @@ import {
   deltaStore,
   selectionStore,
   subtreeStore,
-  typeOptionsStore,
+  timStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -155,7 +155,7 @@ const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
-const typeOptions = computed(() => typeOptionsStore.artifactTypes);
+const typeOptions = computed(() => timStore.typeNames);
 
 const expanded = computed(() =>
   selectionStore.selectedArtifactId ? [selectionStore.selectedArtifactId] : []

@@ -1,0 +1,215 @@
+import { defineStore } from "pinia";
+
+import {
+  ArtifactCytoElementData,
+  ArtifactSchema,
+  ArtifactTypeSchema,
+  ProjectSchema,
+  SafetyCaseType,
+  TraceMatrixSchema,
+} from "@/types";
+import {
+  convertTypeToColor,
+  defaultTypeIcon,
+  isLinkAllowedByType,
+  removeMatches,
+} from "@/util";
+import { pinia } from "@/plugins";
+import projectStore from "@/hooks/project/useProject";
+
+/**
+ * This store manages the state of project TIM data,
+ * including artifact types and trace matrices.
+ */
+export const useTIM = defineStore("tim", {
+  state: () => ({
+    /**
+     * The artifact types in the project.
+     */
+    artifactTypes: [] as ArtifactTypeSchema[],
+    /**
+     * The trace matrices in the project.
+     */
+    traceMatrices: [] as TraceMatrixSchema[],
+  }),
+  getters: {
+    /**
+     * @returns all type names of artifacts.
+     */
+    typeNames(): string[] {
+      const safetyCaseTypes = Object.values(SafetyCaseType) as string[];
+
+      return this.artifactTypes
+        .map(({ name }) => name)
+        .filter((name) => !safetyCaseTypes.includes(name));
+    },
+  },
+  actions: {
+    /**
+     * Initializes project data.
+     *
+     * @param project - The project to load.
+     */
+    initializeProject(project: ProjectSchema): void {
+      this.artifactTypes = project.artifactTypes;
+      this.traceMatrices = project.traceMatrices;
+    },
+    /**
+     * Adds a new artifact types.
+     *
+     * @param artifactTypes - The artifact types to add.
+     */
+    addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeSchema[]): void {
+      const ids = artifactTypes.map(({ name }) => name);
+      const updatedArtifactTypes = [
+        ...removeMatches(this.artifactTypes, "name", ids),
+        ...artifactTypes,
+      ];
+
+      this.artifactTypes = updatedArtifactTypes;
+      projectStore.updateProject({ artifactTypes: updatedArtifactTypes });
+    },
+    /**
+     * Adds a new placeholder artifact type if it does not yet exist.
+     *
+     * @param newArtifacts - The artifact to add types from.
+     */
+    addTypesFromArtifacts(newArtifacts: ArtifactSchema[]): void {
+      newArtifacts.forEach(({ type }) => {
+        if (this.artifactTypes.find(({ name }) => name === type)) return;
+
+        this.artifactTypes = [
+          ...this.artifactTypes,
+          {
+            id: "",
+            name: type,
+            icon: defaultTypeIcon,
+            color: "base",
+            count: 1,
+          },
+        ];
+      });
+    },
+    /**
+     * Removes artifact types.
+     *
+     * @param removedTypeIds - The artifact type ids to remove.
+     */
+    deleteArtifactTypes(removedTypeIds: string[]): void {
+      const preservedArtifactTypes = removeMatches(
+        this.artifactTypes,
+        "id",
+        removedTypeIds
+      );
+
+      this.artifactTypes = preservedArtifactTypes;
+      projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
+    },
+    /**
+     * Adds a placeholder trace matrix between these types.
+     * @param sourceType - The source type.
+     * @param targetType - The target type.
+     */
+    addTraceMatrix(sourceType: string, targetType: string): void {
+      this.traceMatrices = [
+        ...this.traceMatrices,
+        {
+          id: "",
+          sourceType,
+          targetType,
+          count: 1,
+          generatedCount: 0,
+          approvedCount: 0,
+        },
+      ];
+    },
+    /**
+     * Removes a trace matrix between these types.
+     * @param sourceType - The source type.
+     * @param targetType - The target type.
+     */
+    deleteTraceMatrix(sourceType: string, targetType: string): void {
+      this.traceMatrices = this.traceMatrices.filter(
+        (matrix) =>
+          matrix.sourceType !== sourceType || matrix.targetType !== targetType
+      );
+    },
+    /**
+     * Gets the artifact type with the given name.
+     *
+     * @param name - The name of the artifact type to get.
+     * @returns The artifact type with the given name, or undefined if it does not exist.
+     */
+    getType(name: string): ArtifactTypeSchema | undefined {
+      return this.artifactTypes.find((type) => type.name === name);
+    },
+    /**
+     * TODO: This is a placeholder for when we use the type id as the reference, instead of the name.
+     * Returns the display name for a given artifact type.
+     *
+     * @param name - The name of the artifact type to get the display name
+     * @returns An icon id to display for the type.
+     */
+    getTypeName(name: string): string {
+      return name;
+    },
+    /**
+     * Returns the color code for a given artifact type.
+     *
+     * @param name - The name of the artifact type to get the color of.
+     * @param dontConvert - If true, the color will not be converted to a hex code.
+     * @returns A color code to display for the type.
+     */
+    getTypeColor(name: string, dontConvert?: boolean): string {
+      const artifactType = this.getType(name);
+
+      return dontConvert
+        ? artifactType?.color || "primary"
+        : convertTypeToColor(artifactType?.color || "");
+    },
+    /**
+     * Returns the icon id for a given artifact type.
+     *
+     * @param name - The name of the artifact type to get the icon of.
+     * @returns An icon id to display for the type.
+     */
+    getTypeIcon(name: string): string {
+      const artifactType = this.getType(name);
+
+      return artifactType?.icon || defaultTypeIcon;
+    },
+    /**
+     * TODO: update to use node id sanitization function.
+     * Gets the trace matrix with the given source and target types.
+     *
+     * @param sourceName - The source artifact type name.
+     * @param targetName - The target artifact type name.
+     * @returns The matching trace matrix, or undefined if it does not exist.
+     */
+    getMatrix(
+      sourceName: string,
+      targetName: string
+    ): TraceMatrixSchema | undefined {
+      return this.traceMatrices.find(
+        ({ sourceType, targetType }) =>
+          sourceType.replace(/ /g, "") === sourceName &&
+          targetType.replace(/ /g, "") === targetName
+      );
+    },
+    /**
+     * Determines if the trace link is allowed based on the type of the nodes.
+     *
+     * @param source - The source artifact.
+     * @param target - The target artifact.
+     * @return Whether the link is allowed.
+     */
+    canBeTraced(
+      source: ArtifactSchema | ArtifactCytoElementData,
+      target: ArtifactSchema | ArtifactCytoElementData
+    ): boolean {
+      return isLinkAllowedByType(source, target, this.traceMatrices);
+    },
+  },
+});
+
+export default useTIM(pinia);

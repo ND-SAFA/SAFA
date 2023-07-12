@@ -1,5 +1,6 @@
 import {
   ArtifactSchema,
+  ArtifactTypeSchema,
   AttributeCollectionSchema,
   AttributeSchema,
   ClassNameProps,
@@ -13,7 +14,6 @@ import {
   OutlinedProps,
   SelectOption,
   TestableProps,
-  TimArtifactLevelSchema,
 } from "@/types";
 
 /**
@@ -270,5 +270,5 @@ export interface ArtifactLevelInputProps {
   /**
    * The artifact level to display and allow editing of.
    */
-  artifactLevel: TimArtifactLevelSchema;
+  artifactType: ArtifactTypeSchema;
 }

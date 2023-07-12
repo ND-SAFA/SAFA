@@ -4,7 +4,7 @@
       bold
       color="primary"
       class="q-mr-xs"
-      :value="props.artifactLevel.name"
+      :value="props.artifactType.name"
     />
     <typography secondary value="Icon" />
     <q-btn-toggle
@@ -47,15 +47,12 @@ const allowEditing = computed(() =>
 
 const icon = computed({
   get(): string {
-    return allTypeIcons[props.artifactLevel.iconIndex];
+    return props.artifactType.icon;
   },
   set(iconId: string) {
-    props.artifactLevel.iconIndex = allTypeIcons.indexOf(iconId);
+    props.artifactType.icon = iconId;
 
-    artifactTypeApiStore.handleSaveIcon({
-      ...props.artifactLevel,
-      icon: iconId,
-    });
+    artifactTypeApiStore.handleSave(props.artifactType);
   },
 });
 </script>

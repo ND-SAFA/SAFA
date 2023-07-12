@@ -31,7 +31,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
-import { typeOptionsStore } from "@/hooks";
+import { timStore } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { AttributeChip } from "../chip";
 import ListItem from "./ListItem.vue";
@@ -45,7 +45,5 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const artifactType = computed(() =>
-  typeOptionsStore.getArtifactTypeDisplay(props.artifact.type)
-);
+const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 </script>

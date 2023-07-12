@@ -48,12 +48,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  appStore,
-  documentStore,
-  selectionStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { appStore, documentStore, selectionStore, timStore } from "@/hooks";
 import {
   PanelCard,
   Typography,
@@ -73,9 +68,7 @@ const countDisplay = computed(() => {
   return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
 
-const iconId = computed(() =>
-  typeOptionsStore.getArtifactTypeIcon(artifactLevelName.value)
-);
+const iconId = computed(() => timStore.getTypeIcon(artifactLevelName.value));
 
 /**
  * Switches to tree view and highlights this type level.

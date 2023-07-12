@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ArtifactSchema } from "@/types";
-import { appStore, subtreeStore, traceStore, typeOptionsStore } from "@/hooks";
+import { appStore, subtreeStore, timStore, traceStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import artifactStore from "../project/useArtifacts";
 
@@ -56,7 +56,7 @@ export const useSaveTrace = defineStore("saveTrace", {
      * - If neither are set, the default filter will be set to all types.
      */
     defaultHiddenSourceTypes(): string[] {
-      const allTypes = typeOptionsStore.artifactTypes;
+      const allTypes = timStore.typeNames;
       let hiddenTypes: string[] = [];
 
       if (this.sourceCount > 0) {
@@ -69,7 +69,7 @@ export const useSaveTrace = defineStore("saveTrace", {
         const targetTypes = this.targets
           .map((target) => target?.type || "")
           .filter((type) => !!type);
-        const sourceTypes = typeOptionsStore.tim.traces
+        const sourceTypes = timStore.traceMatrices
           .map((matrix) =>
             targetTypes.includes(matrix.targetType) ? matrix.sourceType : ""
           )
@@ -92,7 +92,7 @@ export const useSaveTrace = defineStore("saveTrace", {
      * - If neither are set, the default filter will be set to all types.
      */
     defaultHiddenTargetTypes(): string[] {
-      const allTypes = typeOptionsStore.artifactTypes;
+      const allTypes = timStore.typeNames;
       let hiddenTypes: string[] = [];
 
       if (this.targetCount > 0) {
@@ -105,7 +105,7 @@ export const useSaveTrace = defineStore("saveTrace", {
         const sourceTypes = this.sources
           .map((source) => source?.type || "")
           .filter((type) => !!type);
-        const targetTypes = typeOptionsStore.tim.traces
+        const targetTypes = timStore.traceMatrices
           .map((matrix) =>
             sourceTypes.includes(matrix.sourceType) ? matrix.targetType : ""
           )

@@ -86,7 +86,7 @@ export interface ProjectSchema extends IdentifierSchema {
    */
   traces: TraceLinkSchema[];
   /**
-   * The artifact types present in the project.
+   * The artifact types in the project.
    */
   artifactTypes: ArtifactTypeSchema[];
   /**

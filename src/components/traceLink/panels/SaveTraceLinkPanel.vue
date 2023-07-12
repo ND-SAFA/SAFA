@@ -28,9 +28,9 @@
         data-cy="panel-trace-directions"
       >
         <type-direction-input
-          v-for="level in artifactLevels"
-          :key="level.id"
-          :artifact-level="level"
+          v-for="type in artifactTypes"
+          :key="type.id"
+          :artifact-type="type"
         />
       </expansion-item>
 
@@ -70,12 +70,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import {
-  appStore,
-  traceApiStore,
-  traceSaveStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { appStore, timStore, traceApiStore, traceSaveStore } from "@/hooks";
 import {
   Typography,
   ArtifactInput,
@@ -89,7 +84,7 @@ import {
 
 const loading = ref(false);
 
-const artifactLevels = computed(() => typeOptionsStore.artifactLevels);
+const artifactTypes = computed(() => timStore.artifactTypes);
 
 /**
  * Creates a trace link from the given artifacts.

@@ -145,37 +145,29 @@ export const darkPalette: Record<string, string> = {
   nodeGenerated: ThemeColors.nodeGenerated,
 };
 
-const typeColorMap: Record<string, string> = {
-  "": Colors.blue,
-};
-
 /**
- * Returns the color for the given type.
- * @param type - The type to get the color for.
+ * Returns the color code based on a type color name.
+ * @param colorName - The color name to get the color for.
  * @return The color.
  */
-export function getTypeColor(type = ""): string {
-  if (!typeColorMap[type]) {
-    const remainingColors = [
-      // Colors.blueLight,
-      // Colors.greenLight,
-      // Colors.orange,
-      // Colors.orangeDark,
-      // Colors.red,
-      Colors.gradient1,
-      Colors.gradient2,
-      Colors.gradient3,
-      Colors.gradient4,
-      Colors.gradient5,
-    ].filter((color) => !Object.values(typeColorMap).includes(color));
-
-    typeColorMap[type] =
-      remainingColors.length === 0
-        ? Colors.blue
-        : remainingColors[Math.floor(Math.random() * remainingColors.length)];
-  }
-
-  return typeColorMap[type];
+export function convertTypeToColor(
+  colorName:
+    | "gradient1"
+    | "gradient2"
+    | "gradient3"
+    | "gradient4"
+    | "gradient5"
+    | string
+): string {
+  return (
+    {
+      gradient1: Colors.gradient1,
+      gradient2: Colors.gradient2,
+      gradient3: Colors.gradient3,
+      gradient4: Colors.gradient4,
+      gradient5: Colors.gradient5,
+    }[colorName] || Colors.blue
+  );
 }
 
 /**

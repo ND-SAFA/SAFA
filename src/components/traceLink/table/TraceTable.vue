@@ -67,12 +67,7 @@ export default {
 import { computed, ref } from "vue";
 import { FlatArtifact, TableGroupRow } from "@/types";
 import { artifactColumns, artifactMatrixColumns } from "@/util";
-import {
-  appStore,
-  artifactStore,
-  selectionStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { appStore, artifactStore, selectionStore, timStore } from "@/hooks";
 import {
   PanelCard,
   GroupableTable,
@@ -87,7 +82,7 @@ const colTypes = ref<string[]>([]);
 
 const loading = computed(() => appStore.isLoading > 0);
 
-const options = computed(() => typeOptionsStore.artifactTypes);
+const options = computed(() => timStore.typeNames);
 
 const rows = computed(() => artifactStore.currentArtifacts);
 

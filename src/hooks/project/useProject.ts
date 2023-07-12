@@ -13,8 +13,8 @@ import membersStore from "./useMembers";
 import warningStore from "./useWarnings";
 import documentStore from "./useDocuments";
 import subtreeStore from "./useSubtree";
-import typeOptionsStore from "./useTypeOptions";
 import attributesStore from "./useAttributes";
+import timStore from "./useTIM";
 
 /**
  * Manages the selected project.
@@ -100,23 +100,11 @@ export const useProject = defineStore("project", {
 
       selectionStore.clearSelections();
       membersStore.initializeProject(project);
-      typeOptionsStore.initializeProject(project);
+      timStore.initializeProject(project);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
       attributesStore.initializeProject(project);
       warningStore.artifactWarnings = project.warnings;
-    },
-    /**
-     * Runs the callback only if the project is defined. Otherwise logs a warning.
-     *
-     * @param cb - The callback to run.
-     */
-    ifProjectDefined(cb: () => void): void {
-      if (this.isProjectDefined) {
-        cb();
-      } else {
-        logStore.onWarning("Please select a project.");
-      }
     },
   },
 });

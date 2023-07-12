@@ -8,9 +8,9 @@ import {
   removeMatches,
   collectByField,
 } from "@/util";
+import { timStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import documentStore from "@/hooks/project/useDocuments";
-import typeOptionsStore from "@/hooks/project/useTypeOptions";
 import projectStore from "@/hooks/project/useProject";
 import layoutStore from "@/hooks/graph/useLayout";
 import selectionStore from "@/hooks/graph/useSelection";
@@ -72,7 +72,6 @@ export const useArtifacts = defineStore("artifacts", {
       projectStore.updateProject({
         artifacts: updatedArtifacts,
       });
-      typeOptionsStore.updateTIM();
     },
     /**
      * Adds a created artifact and updates the layout.
@@ -83,7 +82,7 @@ export const useArtifacts = defineStore("artifacts", {
       layoutStore.setArtifactToSavedPosition(artifact.id);
       this.addOrUpdateArtifacts([artifact]);
       selectionStore.selectArtifact(artifact.id);
-      typeOptionsStore.addTypesFromArtifacts([artifact]);
+      timStore.addTypesFromArtifacts([artifact]);
     },
     /**
      * Deletes the artifacts with the given names.
@@ -101,7 +100,6 @@ export const useArtifacts = defineStore("artifacts", {
         currentArtifacts: removeMatches(this.currentArtifacts, "id", ids),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
-      typeOptionsStore.updateTIM();
 
       if (ids.includes(selectionStore.selectedArtifact?.id || "")) {
         selectionStore.clearSelections();

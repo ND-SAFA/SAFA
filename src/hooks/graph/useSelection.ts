@@ -2,11 +2,12 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactSchema,
+  ArtifactTypeSchema,
   FilterAction,
-  TimArtifactLevelSchema,
-  TimTraceMatrixSchema,
   TraceLinkSchema,
+  TraceMatrixSchema,
 } from "@/types";
+import { timStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -16,7 +17,6 @@ import { pinia } from "@/plugins";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
 import traceStore from "../project/useTraces";
-import typeOptionsStore from "../project/useTypeOptions";
 import appStore from "../core/useApp";
 
 /**
@@ -77,14 +77,14 @@ export const useSelection = defineStore("selection", {
     /**
      * @return The currently selected artifact level.
      */
-    selectedArtifactLevel(): TimArtifactLevelSchema | undefined {
-      return typeOptionsStore.getArtifactLevel(this.selectedArtifactLevelType);
+    selectedArtifactLevel(): ArtifactTypeSchema | undefined {
+      return timStore.getType(this.selectedArtifactLevelType);
     },
     /**
      * @return The currently selected trace matrix.
      */
-    selectedTraceMatrix(): TimTraceMatrixSchema | undefined {
-      return typeOptionsStore.getTraceMatrix(
+    selectedTraceMatrix(): TraceMatrixSchema | undefined {
+      return timStore.getMatrix(
         this.selectedTraceMatrixTypes[0],
         this.selectedTraceMatrixTypes[1]
       );

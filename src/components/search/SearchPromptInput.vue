@@ -54,14 +54,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactSchema, TimArtifactLevelSchema } from "@/types";
+import { ArtifactSchema, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import {
   artifactStore,
   searchApiStore,
   searchStore,
   selectionStore,
-  typeOptionsStore,
+  timStore,
 } from "@/hooks";
 import { Typography, Icon, FlexBox, TypeButtons } from "@/components/common";
 import SearchOption from "./SearchOption.vue";
@@ -114,7 +114,7 @@ function filterOptions(search: string, update: (fn: () => void) => void) {
       // Artifact type search shows artifact types when there is search text.
       const lowercaseSearch = search.toLowerCase();
 
-      searchOptions.value = typeOptionsStore.artifactTypes.filter((type) =>
+      searchOptions.value = timStore.typeNames.filter((type) =>
         type.toLowerCase().includes(lowercaseSearch)
       );
     } else {
@@ -129,8 +129,8 @@ function filterOptions(search: string, update: (fn: () => void) => void) {
  * @param allOptions - All possible types.
  */
 function handleTypeChange(
-  option: TimArtifactLevelSchema,
-  allOptions: TimArtifactLevelSchema[]
+  option: ArtifactTypeSchema,
+  allOptions: ArtifactTypeSchema[]
 ): void {
   if (hiddenTypes.value.length === 0) {
     hiddenTypes.value = allOptions

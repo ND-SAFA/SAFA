@@ -59,7 +59,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ArtifactInput, TimArtifactLevelSchema } from "@/types";
+import { ArtifactInput, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import {
@@ -128,8 +128,8 @@ function filterOptions(
  * @param allOptions - All possible types.
  */
 function handleTypeChange(
-  option: TimArtifactLevelSchema,
-  allOptions: TimArtifactLevelSchema[]
+  option: ArtifactTypeSchema,
+  allOptions: ArtifactTypeSchema[]
 ): void {
   if (hiddenTypes.value.length === 0) {
     hiddenTypes.value = allOptions

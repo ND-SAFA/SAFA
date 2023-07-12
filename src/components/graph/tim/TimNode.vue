@@ -14,7 +14,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
-import { typeOptionsStore, useTheme } from "@/hooks";
+import { timStore, useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
 const props = defineProps<{
@@ -32,8 +32,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
     id: props.artifactType?.replace(/ /g, "") || "",
     artifactType: props.artifactType,
     count: props.count,
-    typeColor:
-      typeOptionsStore.getArtifactLevel(props.artifactType)?.color || "",
+    typeColor: timStore.getTypeColor(props.artifactType),
     icon: props.icon,
     dark: darkMode.value,
   },

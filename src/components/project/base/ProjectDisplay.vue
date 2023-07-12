@@ -48,7 +48,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { versionToString } from "@/util";
-import { projectStore, typeOptionsStore } from "@/hooks";
+import { projectStore, timStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
@@ -74,8 +74,6 @@ const description = computed(
 );
 
 const typeDirections = computed(() =>
-  Object.values(typeOptionsStore.artifactLevels)
-    .map((level) => [level.name, level.allowedTypes] as [string, string[]])
-    .filter(([, targets]) => targets.length > 0)
+  timStore.traceMatrices.map((matrix) => [matrix.sourceType, matrix.targetType])
 );
 </script>

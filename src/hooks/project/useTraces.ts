@@ -9,11 +9,11 @@ import {
   TraceType,
 } from "@/types";
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
+import { timStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import documentStore from "@/hooks/project/useDocuments";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
-import typeOptionsStore from "@/hooks/project/useTypeOptions";
 
 /**
  * This module defines the state of the current project's trace links.
@@ -74,7 +74,6 @@ export const useTraces = defineStore("traces", {
         currentArtifactIds: documentStore.currentDocument.artifactIds,
       });
       projectStore.updateProject({ traces: updatedTraces });
-      typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },
     /**
@@ -93,7 +92,6 @@ export const useTraces = defineStore("traces", {
         currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
       });
       projectStore.updateProject({ traces: allTraces });
-      typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },
     /**
@@ -187,7 +185,7 @@ export const useTraces = defineStore("traces", {
         this.doesLinkExist(target.id, source.id)
       ) {
         return "This trace link already exists.";
-      } else if (!typeOptionsStore.isLinkAllowedByType(source, target)) {
+      } else if (!timStore.canBeTraced(source, target)) {
         return `The type "${source.type}" cannot trace to "${target.type}".`;
       }
 

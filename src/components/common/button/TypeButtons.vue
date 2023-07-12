@@ -8,7 +8,7 @@
       <icon-button
         v-for="level of artifactLevels"
         v-show="visible"
-        :key="level.typeId"
+        :key="level.id"
         v-bind="buttonProps(level)"
         dense
         :tooltip-delay="0"

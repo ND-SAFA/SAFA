@@ -92,7 +92,7 @@ export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
     traces: project?.traces || [],
     projectVersion: project?.projectVersion,
     artifactTypes: project?.artifactTypes || [],
-    typeDirections: project?.typeDirections || {},
+    traceMatrices: project?.traceMatrices || [],
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},

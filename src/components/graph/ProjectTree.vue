@@ -23,7 +23,7 @@
     <template v-else #elements>
       <tim-node
         v-for="level in Object.values(tim.artifacts)"
-        :key="level.typeId"
+        :key="level.id"
         :count="level.count"
         :artifact-type="level.name"
         :icon="level.icon"

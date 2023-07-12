@@ -33,7 +33,7 @@ export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
     artifactLevel: TimArtifactLevelSchema
   ): Promise<void> {
     const type = typeOptionsStore.allArtifactTypes.find(
-      ({ typeId }) => typeId === artifactLevel.typeId
+      ({ id }) => id === artifactLevel.id
     );
 
     if (!type) return;

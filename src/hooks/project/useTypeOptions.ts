@@ -82,7 +82,7 @@ export const useTypeOptions = defineStore("typeOptions", {
         const icon = artifactType.icon.replace("mdi-help", defaultTypeIcon);
 
         this.tim.artifacts[artifactType.name] = {
-          typeId: existingType?.typeId || artifactType.typeId,
+          id: existingType?.id || artifactType.id,
           name: existingType?.name || artifactType.name,
           count: existingType?.count || 0,
           allowedTypes: existingType?.allowedTypes || [],
@@ -184,7 +184,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     removeArtifactTypes(removedTypeIds: string[]): void {
       const preservedTypes = removeMatches(
         this.allArtifactTypes,
-        "typeId",
+        "id",
         removedTypeIds
       );
       const names = preservedTypes.map(({ name }) => name);

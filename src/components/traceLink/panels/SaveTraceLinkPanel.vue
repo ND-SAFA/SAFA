@@ -29,7 +29,7 @@
       >
         <type-direction-input
           v-for="level in artifactLevels"
-          :key="level.typeId"
+          :key="level.id"
           :artifact-level="level"
         />
       </expansion-item>

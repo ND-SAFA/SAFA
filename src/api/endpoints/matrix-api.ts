@@ -1,4 +1,3 @@
-import { ArtifactTypeDirections } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -22,25 +21,6 @@ export async function createTraceMatrix(
     }),
     {
       method: "POST",
-    }
-  );
-}
-
-/**
- * Returns the trace directions allowed in given project.
- *
- * @param projectId - The project to load from.
- * @return The loaded trace matrices.
- */
-export async function getTraceMatrices(
-  projectId: string
-): Promise<ArtifactTypeDirections> {
-  return authHttpClient<ArtifactTypeDirections>(
-    fillEndpoint(Endpoint.retrieveTraceMatrices, {
-      projectId,
-    }),
-    {
-      method: "GET",
     }
   );
 }

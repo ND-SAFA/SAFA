@@ -18,21 +18,20 @@ export function createTIM(project?: ProjectSchema): TimSchema {
     artifactCounts[type] = (artifactCounts[type] || 0) + 1;
     artifactTypes[id] = type;
   });
+  const typeDirections: Record<string, string[]> = {};
 
   // Add trace counts from the artifact types, in case a type direction exists with 0 links.
-  Object.entries(project?.typeDirections || {}).forEach(
-    ([name, allowedTypes]) => {
-      allowedTypes.forEach((allowedType) => {
-        const type = `${name}${delimiter}${allowedType}`;
+  Object.entries(typeDirections).forEach(([name, allowedTypes]) => {
+    allowedTypes.forEach((allowedType) => {
+      const type = `${name}${delimiter}${allowedType}`;
 
-        traceCounts[type] = {
-          total: 0,
-          generated: 0,
-          approved: 0,
-        };
-      });
-    }
-  );
+      traceCounts[type] = {
+        total: 0,
+        generated: 0,
+        approved: 0,
+      };
+    });
+  });
 
   project?.traces.forEach(
     ({ sourceId, targetId, approvalStatus, traceType }) => {
@@ -56,13 +55,13 @@ export function createTIM(project?: ProjectSchema): TimSchema {
     artifacts: Object.entries(artifactCounts)
       .map(([artifactType, count]) => ({
         [artifactType]: {
-          typeId:
+          id:
             project?.artifactTypes.find(({ name }) => name === artifactType)
-              ?.typeId || artifactType,
+              ?.id || artifactType,
           name: artifactType,
           count,
           icon: defaultTypeIcon,
-          allowedTypes: project?.typeDirections[artifactType] || [],
+          allowedTypes: typeDirections[artifactType] || [],
           iconIndex: 0,
           color: getTypeColor(artifactType),
         },

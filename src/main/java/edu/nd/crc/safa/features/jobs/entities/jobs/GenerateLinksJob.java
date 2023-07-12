@@ -84,7 +84,7 @@ public class GenerateLinksJob extends CommitJob {
             .getProjectAppEntity(user, this.projectVersion);
     }
 
-    @IJobStep(value = "Summarizing code artifacts.", position = 2)
+    @IJobStep(value = "Summarizing Code Artifacts", position = 2)
     public void createArtifactSummaries() {
         SummaryService summaryService = this.serviceProvider.getSummaryService();
         List<ArtifactAppEntity> modifiedArtifacts =

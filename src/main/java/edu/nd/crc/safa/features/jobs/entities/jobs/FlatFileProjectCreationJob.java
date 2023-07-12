@@ -130,7 +130,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(value = "Summarize Code Artifacts", position = 3)
+    @IJobStep(value = "Summarizing Code Artifacts", position = 3)
     public void summarizeCodeArtifacts() {
         ProjectCommit projectCommit = this.getProjectCommit();
         List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();

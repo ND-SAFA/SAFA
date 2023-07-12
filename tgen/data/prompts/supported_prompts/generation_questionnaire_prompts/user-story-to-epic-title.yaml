@@ -1,0 +1,19 @@
+format:
+- '[Project Goal]: [Specific Objective/Feature]: [Desired Outcome]'
+questions:
+- - '- What is the goal of the user story? This will help identify the overall feature
+    the story relates to.'
+  - '- Who is the user story for? Knowing the user persona can indicate the epic theme.'
+  - '- What is the user trying to accomplish? Understanding the user need points to
+    the epic purpose.'
+  - '- Does this user story stand alone or enable other stories? Related stories may
+    suggest a larger epic.'
+  - '- What is the scope and impact of this story? The scope often hints at the epic
+    size.'
+  - '- What component or part of the system does this story affect? The system area
+    indicates the epic feature.'
+  - '- Is this a completely new capability or incremental improvement? New vs incremental
+    suggests epic type.'
+  - '- What business value does this story bring? The benefit points to epic goal.'
+  - '- Is there a higher-level goal this story ladders up to? The ladder helps uncover
+    the epic.'

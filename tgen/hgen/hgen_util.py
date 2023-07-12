@@ -96,10 +96,11 @@ def get_predictions(prompt_builder: PromptBuilder,
                                          completion_type=LLMCompletionType.GENERATION))
     tags_for_response = tags_for_response.pop() \
         if isinstance(tags_for_response, set) and len(tags_for_response) == 1 else tags_for_response
-    base_name, file_name = os.path.split(export_path) if export_path else (None, None)
+    base_name, file_name = os.path.split(export_path) if export_path else (EMPTY_STRING, EMPTY_STRING)
 
-    if hgen_args.load_dir and file_name and os.path.exists(os.path.join(hgen_args.load_dir, file_name)):
-        predictions = FileUtil.read_yaml(os.path.join(hgen_args.load_dir, file_name))
+    load_path = os.path.join(hgen_args.load_dir, file_name) if file_name else EMPTY_STRING
+    if os.path.exists(load_path):
+        predictions = FileUtil.read_yaml(load_path)
     else:
         predictions = trainer.perform_prediction().predictions
 
@@ -144,8 +145,9 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
                 name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
                                      f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
                                      PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                           formatter=lambda tag, val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
-                                                                                      f"{get_initials(hgen_args.target_type)}",
+                                                           formatter=lambda tag,
+                                                                            val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
+                                                                                 f"{get_initials(hgen_args.target_type)}",
                                                            ))
                 artifact_prompt = ArtifactPrompt(include_id=False)
                 prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
@@ -181,7 +183,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
                                                                                                        QuestionnairePrompt) \
         else task_prompt.response_manager
-    generation_step_response_manager.formatter = lambda tag, val: parse_generated_artifacts(val)
+    generation_step_response_manager.formatter = lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(val)
 
     artifact_prompt = MultiArtifactPrompt(prompt_start=PromptUtil.format_as_markdown("{artifact_type}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,

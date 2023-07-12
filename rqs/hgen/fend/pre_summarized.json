@@ -6,21 +6,20 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "export_dir": "[OUTPUT_PATH]/hgen/jackofclubs",
-              "load_dir": "[OUTPUT_PATH]/hgen/jackofclubs/6dd59a78-776b-4b5b-af65-419f1b6557e5",
-              "source_layer_id": "C++ Code",
-              "target_type": "User Story",
+              "export_dir": "[OUTPUT_PATH]/hgen/fend",
+              "source_layer_id": "Vue Code",
+              "target_type": "Functional Requirement",
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {
                   "object_type": "Artifact",
-                  "project_path": "[DATA_PATH]/jackofclubs_summarized"
+                  "project_path": "[DATA_PATH]/fend_summarizations"
                 }
               }
             }
           },
           "target_types": [
-            "Epic Title"
+            "Feature Description"
           ]
         }
       ]

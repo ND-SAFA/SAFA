@@ -5,8 +5,8 @@ from tgen.util.enum_util import FunctionalWrapper
 
 
 class DefaultLLMManager:
-    EFFICIENT = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-instant-v1-100k")))
-    BEST = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-v1.3-100k")))
+    EFFICIENT = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-instant-1.1")))
+    BEST = FunctionalWrapper(lambda: AnthropicManager(AnthropicArgs(model="claude-2.0")))
 
 
 def get_efficient_default_llm_manager() -> AbstractLLMManager:

@@ -15,29 +15,31 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
 
 FORMAT_PROMPT = Prompt("Provide an example {target_type} for a software development project. "
                        "Enclose your {target_type} example in <example></example>. "
-                       "Then, give an example of the typical format for an effective software development {target_type}. ",
+                       "Then, give an example of the typical format for an effective software development {target_type}. "
+                       "Include only the format. ",
                        response_manager=PromptResponseManager(response_tag="format",
                                                               required_tag_ids=REQUIRE_ALL_TAGS,
                                                               formatter=lambda tag, val:
                                                               PromptUtil.strip_new_lines_and_extra_space(val)))
 
-GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
+GENERATION_PROMPT = Prompt("You are an engineer working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
-                           "{source_type}s in the system: ")
+                           "{source_type}s in the system below. ")
 SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
                        "describing the system by focusing on any technical details or dependencies needed for the {target_type}s. " \
                        "Exclude details that are generally applicable across systems " \
                        "and focus only on details that are truly specific to the design and behavior of this particular system. " \
                        "Consider the following in your response: "
 TASK_INSTRUCTIONS = "Then, use this information to determine the main features and " \
-                    "functionality provided by the system to the target audience. " \
-                    "Reverse engineer as many {target_type}s as possible for the {source_type}. " \
-                    "There should be a clear and singular purpose or goal for each {target_type}, " \
-                    "and each {target_type} should be independent of all others. " \
+                    "functionality provided by the system to the target audience, " \
+                    "and reverse engineer a comprehensive set of {target_type}s from the {source_type} " \
+                    "for each of these features and functionality. " \
+                    "You may combine related features and functionality into a single {target_type} " \
+                    "but each {target_type} should be independent of all others. " \
                     "Provide any technical details that would be necessary to implement the {target_type} " \
                     "but avoid ambiguous or vague language. " \
                     "Each {target_type} should use following format '{format}'. " \
-                    "Enclose all {target_type}s in a new-line deliminated list. "
+                    "Output ALL {target_type} to cover every major feature and functionality."
 
 REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "
                        "{target_type}s. You are given a summary of the system: ")

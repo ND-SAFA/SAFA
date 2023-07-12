@@ -1,13 +1,30 @@
 format:
-- In order to [goal/desire], as a [role], I want [feature]
+- 'As a [user role], I want [a goal] so that [benefit].  Acceptance Criteria: - [Detailed
+  description of the expected behavior or outcome] - [Detailed description of the
+  expected behavior or outcome] - [Detailed description of the expected behavior or
+  outcome] - [Detailed description of the expected behavior or outcome]'
 questions:
-- - What is the overall purpose or goal of the system?
-  - Who are the intended users of the system?
-  - What key functions or capabilities does the system provide to users?
-  - What data or information does the system store, manipulate or display?
-  - What inputs does the system accept from users?
-  - What outputs does the system provide to users?
-  - What conditions or events trigger certain system behaviors?
-  - What security or access controls does the system implement?
-  - What interfaces does the system expose to users?
-  - What third-party systems or services does this system integrate with?
+- - '- What are the main classes/functions in the code? This will help identify the
+    key components and functionality.'
+  - '- What are the inputs and outputs of the main classes/functions? This will help
+    understand the data flow.'
+  - '- Are there any UI or interface classes? If so, what do they allow the user to
+    do? This will help understand the user interactions.'
+  - '- Are there any database or storage related classes? If so, what data is being
+    stored or retrieved? This will help understand the persistence layer.'
+  - '- Are there any external services or APIs being called? If so, what functionality
+    do they provide? This will reveal any external dependencies.'
+  - '- Are there any configuration files? If so, what customization options do they
+    provide? This highlights any configurable parameters.'
+  - '- Are there any logging or instrumentation statements? If so, what events are
+    being tracked? This provides insight into analytics or telemetry.'
+  - '- What are the dependencies between components and how do they interact? This
+    exposes the overall architecture.'
+  - '- Does the code include any comments, documentation, or domain language? If so,
+    what additional context do they provide? This can indicate the problem space.'
+  - '- What are the different code paths and conditional branches? This highlights
+    the main scenarios.'
+  - '- How is error handling and exceptions managed? This reveals assumptions about
+    failure modes.'
+  - '- What are the unit, integration, and end-to-end tests covering? This points
+    to the critical functionality and use cases.'

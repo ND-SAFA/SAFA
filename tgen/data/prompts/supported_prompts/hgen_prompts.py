@@ -12,6 +12,7 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
                                      "Output the questions in a new-line deliminated list. ",
                                      PromptResponseManager(response_tag="questions",
                                                            required_tag_ids=REQUIRE_ALL_TAGS))
+
 FORMAT_PROMPT = Prompt("Provide an example {target_type} for a software development project. "
                        "Enclose your {target_type} example in <example></example>. "
                        "Then, give an example of the typical format for an effective software development {target_type}. ",

@@ -38,22 +38,3 @@ export async function deleteArtifactType(typeId: string): Promise<void> {
     }
   );
 }
-
-/**
- * Returns the list of artifact types associated with project specified.
- *
- * @param projectId - The id of the project whose types are returned.
- * @return All artifact types.
- */
-export async function getProjectArtifactTypes(
-  projectId: string
-): Promise<ArtifactTypeSchema[]> {
-  return authHttpClient<ArtifactTypeSchema[]>(
-    fillEndpoint(Endpoint.getProjectArtifactTypes, {
-      projectId,
-    }),
-    {
-      method: "GET",
-    }
-  );
-}

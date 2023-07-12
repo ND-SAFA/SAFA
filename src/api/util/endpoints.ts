@@ -78,7 +78,6 @@ export enum Endpoint {
   sync = "projects/versions/:versionId/changes",
 
   // Types
-  getProjectArtifactTypes = "projects/:projectId/artifactTypes",
   createOrUpdateArtifactType = "projects/:projectId/artifactTypes",
   deleteArtifactType = "projects/:projectId/artifactTypes/:typeId",
 

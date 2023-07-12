@@ -13,7 +13,7 @@ import {
   useApi,
 } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
-import { getProjectArtifactTypes, getTraceMatrices } from "@/api";
+import { getTraceMatrices } from "@/api";
 import { pinia } from "@/plugins";
 
 export const useSetProjectApi = defineStore("setProjectApi", () => {
@@ -58,7 +58,6 @@ export const useSetProjectApi = defineStore("setProjectApi", () => {
       const projectId = project.projectId;
       const versionId = project.projectVersion?.versionId || "";
 
-      project.artifactTypes = await getProjectArtifactTypes(projectId);
       project.typeDirections = await getTraceMatrices(projectId);
       projectStore.initializeProject(project);
 

@@ -110,13 +110,13 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                 format_prompt.value += "The format should be for only the body of the {target_type} and should exclude any title. "
 
             questionnaire_content = {}
-            for prompt in [instructions_prompt, format_prompt]:
+            for prompt, step in [(format_prompt, PredictionStep.FORMAT), (instructions_prompt, PredictionStep.INSTRUCTIONS)]:
                 prompt_builder = PromptBuilder(prompts=[prompt])
                 prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
                 predictions = get_predictions(prompt_builder,
                                                         PromptDataset(),
                                                         hgen_args=hgen_args,
-                                                        prediction_step=PredictionStep.INSTRUCTIONS,
+                                                        prediction_step=step,
                                                         response_prompt_ids=prompt.id)[0]
                 questionnaire_content.update(predictions)
             FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)

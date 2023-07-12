@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import openai
 from openai.openai_object import OpenAIObject
 
@@ -16,6 +18,8 @@ if not IS_TEST:
                                         f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
     openai.organization = OPEN_AI_ORG
     openai.api_key = OPEN_AI_KEY
+
+Res = namedtuple('Res', ['choices'])
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
@@ -58,18 +62,16 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param params: Params necessary for request
         :return: The response from open  ai
         """
-        prompt = params.get(OpenAIParams.PROMPT)
-        batches = ListUtil.batch(prompt, n=OpenAIManager.MAX_COMPLETION_PROMPTS) if isinstance(prompt, list) else [prompt]
-        res = None
+        params.pop(OpenAIParams.LOG_PROBS)
+        prompt = params.pop(OpenAIParams.PROMPT)
+        prompts = prompt if isinstance(prompt, list) else [prompt]
+        choices = []
         logger.info(f"Starting OpenAI batch: {params['model']}")
-        for batch in tgen_tqdm(batches, desc="Making completion requests"):
-            params[OpenAIParams.PROMPT] = batch
-            batch_res = openai.Completion.create(**params)
-            if res is None:
-                res = batch_res
-            else:
-                res.choices.extend(batch_res.choices)
-        return res
+        for p in tgen_tqdm(prompts, desc="Making completion requests"):
+            params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
+            res = openai.ChatCompletion.create(**params)
+            choices.extend(res.choices)
+        return Res(choices=choices)
 
     @staticmethod
     def translate_to_response(task: LLMCompletionType, res: OpenAIObject, **params) -> SupportedLLMResponses:
@@ -80,7 +82,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :param params: The parameters to the API.
         :return: A response for the supported types.
         """
-        text_responses = [choice.text.strip() for choice in res.choices]
+        text_responses = [choice.message["content"].strip() for choice in res.choices]
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse(text_responses)
         elif task == LLMCompletionType.CLASSIFICATION:

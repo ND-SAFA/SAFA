@@ -4,7 +4,7 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.util.prompt_util import PromptUtil
 
-INSTRUCTION_CREATION_PROMPT = Prompt("Now imagine you are given only {source_type} from a system and you must "
+INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must "
                                      "reverse engineer {target_type} from the {source_type}. "
                                      "Consider what information you would need to extract from the system. "
                                      "Then construct a set of questions about the {source_type} that by answering "
@@ -12,7 +12,8 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Now imagine you are given only {source_typ
                                      "Output the questions in a new-line deliminated list. ",
                                      PromptResponseManager(response_tag="questions",
                                                            required_tag_ids=REQUIRE_ALL_TAGS))
-FORMAT_PROMPT = Prompt("First, provide an example {target_type} for a software development project. "
+
+FORMAT_PROMPT = Prompt("Provide an example {target_type} for a software development project. "
                        "Enclose your {target_type} example in <example></example>. "
                        "Then, give an example of the typical format for an effective software development {target_type}. ",
                        response_manager=PromptResponseManager(response_tag="format",

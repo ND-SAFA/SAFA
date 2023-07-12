@@ -1,0 +1,17 @@
+format:
+- 'Description: [Provide a concise and clear description of the feature, highlighting
+  its purpose and functionality.]  Acceptance Criteria: - [List specific criteria
+  that must be met for the feature to be considered complete and functioning correctly.
+  Use bullet points for clarity and specificity.] - [Each criterion should be clear,
+  measurable, and verifiable.] - [Include any relevant security or privacy considerations.]'
+questions:
+- - What is the purpose or goal of the system?
+  - What are the main capabilities or functions of the system?
+  - What types of users will interact with the system?
+  - What tasks can the users perform with the system?
+  - What data or information does the system handle or manage?
+  - What inputs does the system require to function?
+  - What outputs does the system produce?
+  - What interfaces does the system have?
+  - What are the system's non-functional requirements (performance, security, etc.)?
+  - What constraints or limitations does the system have?

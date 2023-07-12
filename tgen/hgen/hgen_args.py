@@ -10,21 +10,24 @@ from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPromp
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
+from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 
 
 class PredictionStep(Enum):
     INSTRUCTIONS = auto()
+    FORMAT = auto()
     GENERATION = auto()
     REFINEMENT = auto()
     NAME = auto()
 
 
 DEFAULT_MAX_TOKENS = 10000
-
+DEFAULT_MAX_TOKENS_SMALL = 1000
 
 @dataclass
 class HGenState(State):
@@ -102,14 +105,11 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     Max tokens to use for predictions.
     """
-    max_tokens: Dict[str, int] = field(default_factory=lambda: defaultdict(str,
-                                                                           {e.value: (DEFAULT_MAX_TOKENS
-                                                                                      if e != PredictionStep.NAME else 1000)
-                                                                            for e in PredictionStep}))
+    max_tokens: Dict[int, int] = field(default_factory=dict)
     """
     The llm manager to use for each prediction step
     """
-    llm_managers: Dict[str, AbstractLLMManager] = field(default_factory=dict, init=False)
+    llm_managers: Dict[int, AbstractLLMManager] = field(default_factory=dict, init=False)
 
     def __post_init__(self) -> None:
         """
@@ -122,3 +122,10 @@ class HGenArgs(PipelineArgs, BaseObject):
         self.target_type = self.target_type.capitalize()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
+        self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-3.5-turbo'))
+        for e in PredictionStep:
+            if e.value not in self.max_tokens:
+                if e in [PredictionStep.NAME, PredictionStep.FORMAT]:
+                    self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
+                else:
+                    self.max_tokens[e.value] = DEFAULT_MAX_TOKENS

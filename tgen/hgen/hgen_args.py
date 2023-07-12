@@ -27,7 +27,7 @@ class PredictionStep(Enum):
     NAME = auto()
 
 
-DEFAULT_MAX_TOKENS = 10000
+DEFAULT_MAX_TOKENS = 50000
 DEFAULT_MAX_TOKENS_SMALL = 1000
 
 

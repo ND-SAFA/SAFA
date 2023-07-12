@@ -133,27 +133,32 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
     new_artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(uuid.uuid4()) for _ in artifact_generations],
                                          ArtifactKeys.CONTENT: artifact_generations,
                                          ArtifactKeys.LAYER_ID: [target_layer_id for _ in artifact_generations]})
+
     if generate_names:
         try:
-            logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
-            name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
-                                 f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
-                                 PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
-                                                       formatter=lambda tag, val: f"{val.replace(NEW_LINE, EMPTY_STRING).strip()} "
-                                                                                  f"{get_initials(hgen_args.target_type)}",
-                                                       ))
-            artifact_prompt = ArtifactPrompt(include_id=False)
-            prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
-            dataset = PromptDataset(artifact_df=new_artifact_df)
-            names = get_predictions(prompt_builder,
-                                    dataset,
-                                    hgen_args=hgen_args,
-                                    prediction_step=PredictionStep.NAME,
-                                    response_prompt_ids=name_prompt.id,
-                                    tags_for_response=name_prompt.response_manager.response_tag,
-                                    return_first=True)
-            assert len(set(names)) == len(names), f"Found duplicates names: {names}"
-            assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
+            long_artifacts = [content for content in artifact_generations if len(content.split()) > 5]
+            if len(long_artifacts) == 0:
+                names = artifact_generations
+            else:
+                logger.info(f"Creating names for {len(new_artifact_df)} {hgen_args.target_type}\n")
+                name_prompt = Prompt(f"Create a title for the {hgen_args.target_type} below. "
+                                     f"Titles should be a 3-5 word identifier of the {hgen_args.target_type}. ",
+                                     PromptResponseManager(response_tag="title", required_tag_ids=REQUIRE_ALL_TAGS,
+                                                           formatter=lambda tag, val: f"{PromptUtil.strip_new_lines_and_extra_space(val)} "
+                                                                                      f"{get_initials(hgen_args.target_type)}",
+                                                           ))
+                artifact_prompt = ArtifactPrompt(include_id=False)
+                prompt_builder = PromptBuilder(prompts=[name_prompt, artifact_prompt])
+                dataset = PromptDataset(artifact_df=new_artifact_df)
+                names = get_predictions(prompt_builder,
+                                        dataset,
+                                        hgen_args=hgen_args,
+                                        prediction_step=PredictionStep.NAME,
+                                        response_prompt_ids=name_prompt.id,
+                                        tags_for_response=name_prompt.response_manager.response_tag,
+                                        return_first=True)
+                assert len(set(names)) == len(names), f"Found duplicates names: {names}"
+                assert len(names) == len(new_artifact_df.index), "Number of predicted names does not match number of artifacts"
             new_artifact_df.index = names
         except Exception:
             logger.exception("Unable to generate names for the artifacts")

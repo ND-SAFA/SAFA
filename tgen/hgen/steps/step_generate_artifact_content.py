@@ -18,6 +18,7 @@ from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTION
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
+from tgen.util.prompt_util import PromptUtil
 
 
 class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -105,13 +106,19 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
             questionnaire_content = FileUtil.read_yaml(questionnaire_prompt_path)
         else:
             logger.info("Creating questionnaire prompt for generation\n")
-            prompt_builder = PromptBuilder(prompts=[instructions_prompt, format_prompt])
-            prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
-            questionnaire_content = get_predictions(prompt_builder,
-                                                    PromptDataset(),
-                                                    hgen_args=hgen_args,
-                                                    prediction_step = PredictionStep.INSTRUCTIONS,
-                                                    response_prompt_ids={instructions_prompt.id, format_prompt.id})[0]
+            if "title" not in hgen_args.target_type.lower():
+                format_prompt.value += "The format should be for only the body of the {target_type} and should exclude any title. "
+
+            questionnaire_content = {}
+            for prompt in [instructions_prompt, format_prompt]:
+                prompt_builder = PromptBuilder(prompts=[prompt])
+                prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
+                predictions = get_predictions(prompt_builder,
+                                                        PromptDataset(),
+                                                        hgen_args=hgen_args,
+                                                        prediction_step=PredictionStep.INSTRUCTIONS,
+                                                        response_prompt_ids=prompt.id)[0]
+                questionnaire_content.update(predictions)
             FileUtil.write_yaml(questionnaire_content, questionnaire_prompt_path)
         return questionnaire_content
 

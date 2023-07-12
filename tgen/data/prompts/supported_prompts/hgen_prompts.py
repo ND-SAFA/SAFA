@@ -2,8 +2,9 @@ from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.util.prompt_util import PromptUtil
 
-INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must "
+INSTRUCTION_CREATION_PROMPT = Prompt("Now imagine you are given only {source_type} from a system and you must "
                                      "reverse engineer {target_type} from the {source_type}. "
                                      "Consider what information you would need to extract from the system. "
                                      "Then construct a set of questions about the {source_type} that by answering "
@@ -11,10 +12,13 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
                                      "Output the questions in a new-line deliminated list. ",
                                      PromptResponseManager(response_tag="questions",
                                                            required_tag_ids=REQUIRE_ALL_TAGS))
-FORMAT_PROMPT = Prompt("Finally, provide an example of the typical format for a {target_type}. "
-                       "The format should be for only the body of the {target_type} and should exclude any title. ",
+FORMAT_PROMPT = Prompt("First, provide an example {target_type} for a software development project. "
+                       "Enclose your {target_type} example in <example></example>. "
+                       "Then, give an example of the typical format for an effective software development {target_type}. ",
                        response_manager=PromptResponseManager(response_tag="format",
-                                                              required_tag_ids=REQUIRE_ALL_TAGS))
+                                                              required_tag_ids=REQUIRE_ALL_TAGS,
+                                                              formatter=lambda tag, val:
+                                                              PromptUtil.strip_new_lines_and_extra_space(val)))
 
 GENERATION_PROMPT = Prompt("You are an engineering working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
@@ -34,9 +38,8 @@ TASK_INSTRUCTIONS = "Then, use this information to determine the main features a
                     "Each {target_type} should use following format '{format}'. " \
                     "Enclose all {target_type}s in a new-line deliminated list. "
 
-
 REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "
-                           "{target_type}s. You are given a summary of the system: ")
+                       "{target_type}s. You are given a summary of the system: ")
 REFINE_STEPS = {
     1: QuestionPrompt("Check that each {target_type} is at the appropriate level of detail for the intended audience. "
                       "Ensure that each {target_type} contains enough context for someone unfamiliar with the system to understand, "

@@ -1,6 +1,6 @@
 from typing import Any
 
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, SPACE
 
 
 class PromptUtil:
@@ -19,11 +19,20 @@ class PromptUtil:
         return f"<{tag_name}>{tag_content}</{tag_name}>"
 
     @staticmethod
-    def format_as_markdown(string: str, level: int = 1) -> str:
+    def format_as_markdown(original_string: str, level: int = 1) -> str:
         """
         Formats the string as markdown header
-        :param string: The string to format
+        :param original_string: The string to format
         :param level: The level of the header
         :return: The string formatted as markdown
         """
-        return f"{'#' * level} {string}"
+        return f"{'#' * level} {original_string}"
+
+    @staticmethod
+    def strip_new_lines_and_extra_space(original_string) -> str:
+        """
+        Removes new lines and extra leading or trailing spaces from the string
+        :param original_string: The original string
+        :return: The string without new lines or leading or trailing spaces
+        """
+        return original_string.replace(NEW_LINE, SPACE).strip()

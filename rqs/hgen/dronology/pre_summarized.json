@@ -1,0 +1,28 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "MULTI_LAYER_HGEN",
+          "starting_hgen_job": {
+            "hgen_args": {
+              "export_dir": "[OUTPUT_PATH]/hgen/dronology",
+              "source_layer_id": "Java Code",
+              "target_type": "Design Requirement",
+              "dataset_creator_for_sources": {
+                "object_type": "PROMPT",
+                "project_reader": {
+                  "object_type": "Artifact",
+                  "project_path": "[DATA_PATH]/dronology"
+                }
+              }
+            }
+          },
+          "target_types": [
+            "Functional Requirement"
+          ]
+        }
+      ]
+    }
+  ]
+}

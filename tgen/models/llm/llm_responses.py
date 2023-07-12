@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 
 @dataclass
@@ -12,11 +12,17 @@ class GenerationResponse:
 
 
 @dataclass
+class ClassificationItemResponse:
+    text: str
+    probs: Optional[Dict[str, float]] = None
+
+
+@dataclass
 class ClassificationResponse:
     """
     The response for a batch of classification request.
     """
-    batch_label_probs: List[Dict[str, float]]
+    batch_responses: List[ClassificationItemResponse]  # string if anthropic, dictionary is openAI.
 
 
 SupportedLLMResponses = Union[ClassificationResponse, GenerationResponse]

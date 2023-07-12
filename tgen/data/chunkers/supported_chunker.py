@@ -5,6 +5,10 @@ from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.util.file_util import FileUtil
 from tgen.util.supported_enum import SupportedEnum
 
+CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
+                   "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
+                   "PL", "R"]
+
 
 class SupportedChunker(SupportedEnum):
     PY = PythonChunker
@@ -23,7 +27,8 @@ class SupportedChunker(SupportedEnum):
         if not path_to_file:
             return default
         ext = FileUtil.get_file_ext(path_to_file).split(".")[-1]
-        return SupportedChunker.get_chunker_from_ext(ext)
+        chunker_type = SupportedChunker.get_chunker_from_ext(ext)
+        return chunker_type
 
     @staticmethod
     def get_chunker_from_ext(ext: str) -> "SupportedChunker":
@@ -32,6 +37,9 @@ class SupportedChunker(SupportedEnum):
         :param ext: The ext of the file being chunked
         :return: The chunker to use
         """
+        ext = ext.upper()
+        if ext in CODE_EXTENSIONS:
+            return SupportedChunker.CODE
         try:
             return SupportedChunker[ext.upper()]
         except Exception:

@@ -5,11 +5,12 @@ from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage
 from tgen.train.trace_output.stage_eval import Metrics
 from tgen.util.base_object import BaseObject
 from tgen.util.enum_util import FunctionalWrapper
+from tgen.util.supported_enum import SupportedEnum
 
 ComparisonFunction = Callable[[Any, Any], bool]
 
 
-class SupportedComparisonFunction:
+class SupportedComparisonFunction(SupportedEnum):
     """
     Represents the different ways to compare metrics scores.
     Note, this is not an enum because functional wrapper break deepcopy method.

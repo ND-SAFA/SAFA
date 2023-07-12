@@ -1,26 +1,28 @@
-from typing import Dict, List, Union
+import json
+from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
-from scipy.special import softmax
 
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
+    REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.open_ai_args import OpenAIParams
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.util.uncased_dict import UncasedDict
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
+from tgen.state.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):
@@ -28,23 +30,14 @@ class LLMTrainer(AbstractTrainer):
     Interfaces with open-ai server to fine-tune models and make predictions
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_creator: AbstractPromptCreator,
-                 llm_manager: AbstractLLMManager, summarizer: Summarizer = None, **kwargs):
+    def __init__(self, initial_state: LLMTrainerState):
         """
         Initializes the trainer with the necessary arguments for training and prediction
-        :param trainer_dataset_manager: The dataset manager for training and prediction
-        :param prompt_creator: Creates the prompts for trace link prediction.
-        :param summarizer: The summarizer to use for shortening artifacts over the token limit.
-        :param kwargs: Ignored.
+        :param initial_state: The current state of the trainer to use
         """
-        if summarizer is None:
-            summarizer = Summarizer(llm_manager, model_for_token_limit=llm_manager.llm_args.model,
-                                    code_or_exceeds_limit_only=False,
-                                    max_tokens_for_token_limit=llm_manager.llm_args.get_max_tokens())
-        super().__init__(trainer_dataset_manager, trainer_args=llm_manager.llm_args)
-        self.llm_manager = llm_manager
-        self.summarizer = summarizer
-        self.prompt_creator = prompt_creator
+        super().__init__(initial_state.trainer_dataset_manager, trainer_args=initial_state.llm_manager.llm_args)
+        self.initial_state = initial_state
+        self.state_manager = StateManager(self.initial_state)
 
     def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
         """
@@ -53,18 +46,18 @@ class LLMTrainer(AbstractTrainer):
         """
         train_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN])
         training_file_id = train_dataset.get_project_file_id(self.llm_manager,
-                                                             prompt_creator=self.prompt_creator,
+                                                             prompt_builder=self.prompt_builder,
                                                              summarizer=self.summarizer)
         custom_params = {}
         instructions = {}
         include_classification_metrics = DatasetRole.VAL in self.trainer_dataset_manager
         if include_classification_metrics:
             instructions["include_classification_metrics"] = True
-            instructions["prompt_creator"] = self.prompt_creator
+            instructions["prompt_builder"] = self.prompt_builder
             val_dataset: PromptDataset = self.convert_dataset_to_prompt_dataset(self.trainer_dataset_manager[DatasetRole.VAL])
             custom_params[OpenAIParams.VALIDATION_FILE] = val_dataset.get_project_file_id(
                 self.llm_manager,
-                prompt_creator=self.prompt_creator,
+                prompt_builder=self.prompt_builder,
                 summarizer=self.summarizer)
 
         res = self.llm_manager.make_fine_tune_request(completion_type=completion_type, training_file=training_file_id,
@@ -81,18 +74,21 @@ class LLMTrainer(AbstractTrainer):
         """
         dataset: PromptDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         dataset = self.convert_dataset_to_prompt_dataset(dataset)
-        prompt_df = dataset.get_prompts_dataframe(summarizer=self.summarizer, prompt_creator=self.prompt_creator)
+        prompt_df = dataset.get_prompt_dataframe(summarizer=self.summarizer,
+                                                 prompt_builder=self.prompt_builder,
+                                                 prompt_args=self.llm_manager.prompt_args)
         if self.llm_manager.llm_args.output_dir:
             dataset.export_prompt_dataframe(prompt_df, self.llm_manager.llm_args.output_dir)
-        task = LLMCompletionType.CLASSIFICATION if isinstance(self.prompt_creator, ClassificationPromptCreator) \
-            else LLMCompletionType.GENERATION
-        res = self.llm_manager.make_completion_request(completion_type=task,
+        first_prompt = prompt_df[PromptKeys.PROMPT][0]
+        logger.debug(first_prompt)
+
+        res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
 
         if isinstance(res, ClassificationResponse):
-            output = self._create_classification_output(res, dataset)
+            output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):
-            output = self._create_generation_output(res.batch_responses)
+            output = self._create_generation_output(res.batch_responses, self.prompt_builder)
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
         return output
@@ -116,63 +112,108 @@ class LLMTrainer(AbstractTrainer):
         return dataset
 
     @staticmethod
-    def _create_generation_output(responses: List[str]):
+    def _create_generation_output(responses: List[str], prompt_builder: PromptBuilder) -> TracePredictionOutput:
         """
         Creates the output for a generation
         :param responses: The response from the completion.
+        :param prompt_builder: The builder responsible for building the prompts
         :return: The generation output.
         """
-        return TracePredictionOutput(predictions=[r.strip() for r in responses])  #
+        return TracePredictionOutput(predictions=[prompt_builder.parse_responses(r) for r in responses])  #
 
-    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset):
+    def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset, prompt_builder: PromptBuilder):
         """
         Creates the output for a classification
         :param res: The response from the completion
         :param dataset: The dataset being predicted on
+        :param prompt_builder: The builder responsible for building the prompts
         :return: The classification output
         """
-        scores = list(map(lambda label_probs: self._get_score(label_probs), res.batch_label_probs))
         trace_dataset = dataset.trace_dataset
-        output = TracePredictionOutput(predictions=scores)
+        trace_df = trace_dataset.trace_df
+        prediction_entries = []
 
-        if trace_dataset is not None and len(trace_dataset.trace_df) > 0:
+        scores = []
+        classifications = []
+        class2correct = {}
+        for i, classification_item in enumerate(res.batch_responses):
+            r = classification_item.text
+            entry = LLMResponseUtil.extract_labels(r, {label: label for label in CURRENT_LABELS})
+            entry[CLASSIFICATION_LABEL] = entry[CLASSIFICATION_LABEL].upper().strip()
+
+            score = self.extract_score(entry)
+            trace_row = trace_df.iloc[i]
+            label = trace_row[TraceKeys.LABEL.value]
+            predicted_label = 1 if score >= 0.5 else 0
+            correct_label = "correct" if label == predicted_label else "wrong"
+
+            entry[StructuredKeys.SCORE] = score
+            entry[TraceKeys.SOURCE.value] = trace_row[TraceKeys.SOURCE.value]
+            entry[TraceKeys.TARGET.value] = trace_row[TraceKeys.TARGET.value]
+            entry[TraceKeys.LABEL.value] = trace_row[TraceKeys.LABEL.value]
+
+            self.update_classification_metrics(class2correct, correct_label, entry, label)
+            scores.append(score)
+            classifications.append(entry["classification"])
+            prediction_entries.append(entry)
+
+        prediction_entries = sorted(prediction_entries, key=lambda p: p[TraceKeys.SCORE.value], reverse=True)
+        output = TracePredictionOutput(prediction_entries=prediction_entries)
+        if trace_dataset is not None and len(trace_dataset.trace_df[TraceKeys.LABEL].unique()) == 2:
             metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                              predicted_similarities=scores)
             output.metrics = metrics_manager.eval(self.llm_manager.llm_args.metrics)
             if output.metrics:
-                logger.log_with_title(f"Metrics", repr(output.metrics))
+                logger.log_with_title("Candidate Metrics", repr(output.metrics))
+                logger.log_with_title("Class Counts", json.dumps(class2correct))
             output.label_ids = metrics_manager.trace_matrix.labels
-            output.prediction_entries = metrics_manager.get_trace_predictions()
 
         return output
 
-    def _get_score(self, probs: Dict) -> float:
+    @staticmethod
+    def extract_score(entry):
         """
-        Gets the score from the predicted completions
-        :param probs: The probabilities of each top completion
-        :return: The softmax score from the predicted completions
+        Extracts the score from the classification entry response.
+        :param entry: Entry containing score or classification, to extract score from.
+        :return: The final score as a float.
         """
-        assert isinstance(self.prompt_creator,
-                          ClassificationPromptCreator), "Must provide a classification prompt generator to get prediction score"
-        if len(probs) == 0:
-            return 0.5
+        classification = entry["classification"]
+        lower_bound, upper_bound = CLASSIFICATION_SCORES[classification]
+        score_range = upper_bound - lower_bound
+        try:
+            score = float(entry["confidence"])
+            if classification in REVERSE_CATEGORIES:
+                score = upper_bound - (score * score_range)
+            else:
+                score = (score * score_range) + lower_bound
+        except:
+            score = lower_bound
+            logger.info("Processing link with missing score.")
 
-        probs = UncasedDict(probs)
-        neg_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.neg_class
-        pos_str = self.prompt_creator.args.completion_prefix + self.prompt_creator.pos_class
-
-        neg_str = neg_str.strip()
-        pos_str = pos_str.strip()
-
-        if pos_str in probs and neg_str in probs:
-            v0 = probs.get(neg_str, 0)
-            v1 = probs.get(pos_str, 0)
-            prob_v = [v0, v1]
-            score = softmax(prob_v)[1]
-        elif pos_str in probs:
-            score = 1
-        elif neg_str in probs:
-            score = 0
-        else:
-            score = 0.5
         return score
+
+    @staticmethod
+    def update_classification_metrics(class2correct, correct_label, entry, label) -> None:
+        """
+        Updates the classification metrics on the categories of traces.
+        :param class2correct: The current metrics on the classes.
+        :param correct_label: The correct label of the entry.
+        :param entry: The
+        :param label:
+        :return:
+        """
+        classification = entry["classification"]
+        if classification not in class2correct:
+            class2correct[classification] = {c: 0 for c in [0, 1]}
+        class2correct[classification][label] += 1
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Gets an item from its state since it does not exist in trainer
+        :param item: The name of the item to get
+        :return: The item
+        """
+        try:
+            return self.state_manager.get(item)
+        except AttributeError:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")

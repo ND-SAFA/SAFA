@@ -17,7 +17,7 @@ class Experiment(BaseObject):
     _EXPERIMENT_DIR_NAME = "experiment_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
-                 experiment_id: int = EXPERIMENT_ID_DEFAULT, delete_prev_experiment_dir: bool = True):
+                 experiment_id: int = EXPERIMENT_ID_DEFAULT, delete_prev_experiment_dir: bool = False):
         """
         Represents an experiment run
         :param steps: List of all experiment steps to run
@@ -70,14 +70,6 @@ class Experiment(BaseObject):
         if self.logger_config.output_dir is None:
             self.logger_config.output_dir = self.output_dir
         LoggerManager.configure_logger(self.logger_config)
-
-    def _get_step_output_path(self, step_num: int) -> str:
-        """
-        Gets the output path for the step
-        :param step_num: the number of the step
-        :return: the output path
-        """
-        return os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME.format(step_num))
 
     def get_step_output_dir(self, experiment_id: int, step_id: int) -> str:
         """

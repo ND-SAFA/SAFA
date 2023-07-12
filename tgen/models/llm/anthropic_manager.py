@@ -7,7 +7,7 @@ from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse, SupportedLLMResponses
+from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.train.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.util.logging.logger_manager import logger
@@ -117,11 +117,12 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Any additional parameters to customize translation.
         :return: A task-specific response.
         """
+        texts = [r["completion"] for r in res]
         if task == LLMCompletionType.GENERATION:
-            return GenerationResponse([r["completion"] for r in res])
+            return GenerationResponse(texts)
         if task == LLMCompletionType.CLASSIFICATION:
-            results = [AnthropicManager._get_log_prob(r["completion"]) for r in res]
-            return ClassificationResponse(results)
+            classification_items = [ClassificationItemResponse(t) for t in texts]
+            return ClassificationResponse(classification_items)
         else:
             raise ValueError(f"Response is not supported by anthropic manager: {task}")
 

@@ -1,4 +1,5 @@
 import random
+from collections import Counter
 from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -46,13 +47,13 @@ class TraceDataset(iDataset):
         self.__assert_dataframe_types(artifact_df, trace_df, layer_df)
         self.layer_df = layer_df
         self.artifact_df = artifact_df
-        self.trace_df = trace_df
         if not pos_link_ids or not neg_link_ids:
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(trace_df)
-        self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
+        self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
+        trace_df = TraceDataFrame(trace_df.sample(frac=1))
         self.trace_matrix = TraceMatrix(trace_df, randomize=randomize)
-        self.shuffle_link_ids()
+        self.trace_df = trace_df
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
         """
@@ -151,9 +152,9 @@ class TraceDataset(iDataset):
         target = self.artifact_df.add_artifact(target_id, target_tokens)
         new_link = self.trace_df.add_link(source_id, target_id, int(is_true_link))
         if is_true_link:
-            self.pos_link_ids.append(new_link[TraceKeys.LINK_ID])
+            self._pos_link_ids.append(new_link[TraceKeys.LINK_ID])
         else:
-            self.neg_link_ids.append(new_link[TraceKeys.LINK_ID])
+            self._neg_link_ids.append(new_link[TraceKeys.LINK_ID])
         return new_link[TraceKeys.LINK_ID]
 
     def augment_pos_links(self, augmenter: DataAugmenter) -> None:
@@ -165,7 +166,7 @@ class TraceDataset(iDataset):
 
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
+                             lambda data: augmenter.run(data, n_total_expected=len(self._neg_link_ids),
                                                         include_all_but_step_type=SourceTargetSwapStep)]
         for run in augmentation_runs:
             pos_links, data_entries = self._get_data_entries_for_augmentation()
@@ -177,7 +178,14 @@ class TraceDataset(iDataset):
         Gets link ids in the order that they are given in the trainer dataset
         :return: a list of ordered link ids
         """
-        return [link_id for link_id in self.pos_link_ids + self.neg_link_ids]
+        pos_link_ids = self.get_pos_link_ids()
+        neg_link_ids = self.get_neg_link_ids()
+        link_counts = Counter(pos_link_ids + neg_link_ids)
+        link_ids = []
+        for id_ in self.trace_df.index:
+            aug_trace_ids = [id_ for i in range(link_counts[id_])]
+            link_ids.extend(aug_trace_ids)
+        return link_ids
 
     def get_ordered_links(self) -> List[EnumDict]:
         """
@@ -212,10 +220,9 @@ class TraceDataset(iDataset):
         :param augmenter: the augmenter to use for augmentation
         :return: Prepared trace data
         """
-        if len(self.pos_link_ids) > 0:
+        if len(self._pos_link_ids) > 0:
             if augmenter:
                 self.augment_pos_links(augmenter)
-            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
 
     def prepare_for_testing(self) -> None:
         """
@@ -223,32 +230,6 @@ class TraceDataset(iDataset):
         :return: None
         """
         return
-
-    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks pos trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.pos_link_ids = self._resize_data(self.pos_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks neg trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def shuffle_link_ids(self) -> None:
-        """
-        Shuffles the positive and negative link ids.
-        :return: None
-        """
-        random.shuffle(self.pos_link_ids)
-        random.shuffle(self.neg_link_ids)
 
     def construct_graph_from_traces(self) -> nx.Graph:
         """
@@ -262,16 +243,44 @@ class TraceDataset(iDataset):
                           if row[TraceKeys.LABEL] > TRACE_THRESHOLD])
         return G
 
+    def get_pos_link_ids(self, unique: bool = False) -> List[int]:
+        """
+        Gets the link ids that represents a positive link
+        :param unique: If True, includes duplicates of the links from augmentation, else just unique ids
+        :return: Link ids that are positive links
+        """
+        if unique:
+            return self.get_link_ids_by_label(label=1)
+        return self._pos_link_ids
+
+    def get_neg_link_ids(self, unique: bool = False) -> List[int]:
+        """
+        Gets the link ids that represents a negative link
+        :param unique: If True, returns set of unique negative links.
+        :return: Link ids that are positive links
+        """
+        if unique:
+            return self.get_link_ids_by_label(label=0)
+        return self._neg_link_ids
+
+    def get_link_ids_by_label(self, label: int = 1) -> List[int]:
+        """
+        Gets all link ids that have the given label
+        :param label: The label representing whether the link is positive or negative
+        :return: The list of link ids that have the given label
+        """
+        return list(self.trace_df.filter_by_row(lambda row: row[TraceKeys.LABEL.value] == label).index)
+
     def _get_data_entries_for_augmentation(self) -> Tuple[List[pd.DataFrame], List[Tuple[str, str]]]:
         """
         Gets the data entries (link source, target, token pairs) for the augmentation
         :return: all links being used for augmentation and the data entries
         """
         source_target_pairs = []
-        for link_id in self.pos_link_ids:
+        for link_id in self._pos_link_ids:
             source, target = self.get_link_source_target_artifact(link_id)
             source_target_pairs.append((source[ArtifactKeys.CONTENT], target[ArtifactKeys.CONTENT]))
-        return self.pos_link_ids, source_target_pairs
+        return self._pos_link_ids, source_target_pairs
 
     def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
                                         orig_link_ids: List[int]) -> None:
@@ -337,6 +346,24 @@ class TraceDataset(iDataset):
         entry[DataKey.LABEL_KEY] = self.trace_df.get_link(link_id)[TraceKeys.LABEL]
         return entry
 
+    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks pos trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self._pos_link_ids = self._resize_data(self._pos_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks neg trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self._neg_link_ids = self._resize_data(self._neg_link_ids, new_length, include_duplicates=include_duplicates)
+
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """
@@ -351,7 +378,8 @@ class TraceDataset(iDataset):
         include_duplicates = True if new_length > len(
             data) else include_duplicates  # must include duplicates to make a bigger data
         reduction_func = random.choices if include_duplicates else random.sample
-        return reduction_func(data, k=new_length)
+        reduced_data = reduction_func(data, k=new_length)
+        return reduced_data
 
     @staticmethod
     def _extract_feature_info(feature: Dict[str, any], prefix: str = EMPTY_STRING) -> Dict[str, any]:
@@ -401,7 +429,7 @@ class TraceDataset(iDataset):
         Returns the length of the dataset
         :return: the length of the dataset
         """
-        return len(self.pos_link_ids) + len(self.neg_link_ids)
+        return len(self._pos_link_ids + self._neg_link_ids)
 
     def __add__(self, other: "TraceDataset") -> "TraceDataset":
         """
@@ -412,8 +440,8 @@ class TraceDataset(iDataset):
         layer_mapping_df = LayerDataFrame.concat(self.layer_df, other.layer_df, ignore_index=True)
         artifact_df = ArtifactDataFrame.concat(self.artifact_df, other.artifact_df)
         trace_df = TraceDataFrame.concat(self.trace_df, other.trace_df)
-        pos_link_ids = deepcopy(self.pos_link_ids) + deepcopy(other.pos_link_ids)
-        neg_link_ids = deepcopy(self.neg_link_ids) + deepcopy(other.neg_link_ids)
+        pos_link_ids = deepcopy(self._pos_link_ids) + deepcopy(other._pos_link_ids)
+        neg_link_ids = deepcopy(self._neg_link_ids) + deepcopy(other._neg_link_ids)
         return TraceDataset(artifact_df=artifact_df, trace_df=trace_df, layer_df=layer_mapping_df,
                             pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids)
 

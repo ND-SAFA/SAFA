@@ -51,10 +51,12 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result.body = run_result
             self.result.status = Status.SUCCESS
         except Exception as e:
+            traceback.print_exc()
             logger.exception("Job failed during run")
             self.result.body = traceback.format_exc()
             self.result.status = Status.FAILURE
         if self.save_job_output and self.job_args.output_dir:
+            logger.info(f"Saving job output: {self.job_args.output_dir}")
             self.save(self.job_args.output_dir)
             wandb.finish()
         self.cleanup()

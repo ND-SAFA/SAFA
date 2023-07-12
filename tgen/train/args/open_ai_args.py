@@ -3,6 +3,7 @@ from typing import Dict
 
 from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
     LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.dataclass_util import DataclassUtil
@@ -34,6 +35,7 @@ class OpenAIArgs(AbstractLLMArgs):
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     model_suffix: str = None
     max_tokens: int = MAX_TOKENS_DEFAULT
+    prompt_args: PromptArgs = None
     _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [OpenAIParams.MODEL, OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
                                                  OpenAIParams.LEARNING_RATE_MULTIPLIER],
                              TrainerTask.PREDICT: [OpenAIParams.MODEL, OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS,
@@ -59,11 +61,16 @@ class OpenAIArgs(AbstractLLMArgs):
         :return: Parameters with customizations added.
         """
         if instructions.get("include_classification_metrics", None):
-            assert "prompt_creator" in instructions, "Expected prompt_creator to be defined when including classification metrics."
-            prompt_creator = instructions["prompt_creator"]
-            assert hasattr(prompt_creator, "pos_class"), "Expected prompt creator to define `pos_class`"
-            pos_class = getattr(prompt_creator, "pos_class")
-            params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator.format_completion(pos_class)
+            assert "prompt_builder" in instructions, "Expected prompt_creator to be defined when including classification metrics."
+            prompt_creator = instructions["prompt_builder"]
+            pos_class = None
+            for prompt in prompt_creator._prompts:
+                choices = getattr(prompt, "choices", None)
+                if choices is not None:
+                    pos_class = choices[0]
+                    break
+            assert pos_class is not None, "Expected prompt creator to define `pos_class`"
+            params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator._format_completion(pos_class, self.prompt_args,)
             params[OpenAIParams.COMPUTE_CLASSIFICATION_METRICS] = True
         return params
 

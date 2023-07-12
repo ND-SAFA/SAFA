@@ -1,15 +1,17 @@
 import itertools
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 import pandas as pd
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.constants.model_constants import get_default_llm_manager
-from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.constants.model_constants import get_efficient_default_llm_manager
+from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
-from tgen.data.prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.data.prompts.supported_prompts_old import SupportedPromptsOld
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -21,14 +23,15 @@ from tgen.util.logging.logger_manager import logger
 
 class Summarizer(BaseObject):
     """
+
     Summarizes bodies of code or text to create shorter, more succinct input for model
     """
     SUMMARY_TAG = "summary"
 
     def __init__(self, llm_manager: AbstractLLMManager = None, model_for_token_limit: str = OPEN_AI_MODEL_DEFAULT,
                  max_tokens_for_token_limit: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
-                 nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
-                 code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
+                 nl_base_prompt: SupportedPromptsOld = SupportedPrompts.NL_SUMMARY,
+                 code_base_prompt: SupportedPromptsOld = SupportedPrompts.CODE_SUMMARY):
         """
         Initializes a summarizer for a specific model
         :param model_for_token_limit: name of the model that should be used to evaluate token_limit
@@ -37,18 +40,16 @@ class Summarizer(BaseObject):
         :param nl_base_prompt: The default prompt to use for summarization.
         :param code_base_prompt: The default summarization prompt to use for code.
         """
-        self.llm_manager = get_default_llm_manager() if llm_manager is None else llm_manager
+        self.llm_manager = get_efficient_default_llm_manager() if llm_manager is None else llm_manager
         self.model_for_token_limit = model_for_token_limit
         self.token_limit = TokenLimitCalculator.calculate_token_limit(self.model_for_token_limit, max_tokens_for_token_limit)
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.prompt_args = self.llm_manager.prompt_args
-        self.code_prompt_creator = GenerationPromptCreator(
-            prompt_args=self.prompt_args,
-            base_prompt=code_base_prompt)
-        self.nl_prompt_creator = GenerationPromptCreator(
-            prompt_args=self.prompt_args,
-            base_prompt=nl_base_prompt)
+        self.code_prompt_builder = PromptBuilder(
+            prompts=code_base_prompt.value)
+        self.nl_prompt_builder = PromptBuilder(
+            prompts=nl_base_prompt.value)
 
     def summarize_bulk(self, contents: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None) -> List[str]:
         """
@@ -66,7 +67,8 @@ class Summarizer(BaseObject):
         indices2resummarize = set()
         prompts_for_summaries = []
         for i, content, chunker_type, id_ in zip(range(len(contents)), contents, chunker_types, ids):
-            prompts = self._create_summarization_prompts(content, chunker_type, id_)
+            prompts = self._create_summarization_prompts(content, chunker_type, id_,
+                                                         code_or_above_limit_only=self.code_or_above_limit_only)
             if len(prompts) < 1:  # no prompt because does not need summarized
                 continue
             # Summarize the summarized chunks to have one congruent summary at the end
@@ -144,7 +146,7 @@ class Summarizer(BaseObject):
         all_prompts = list(itertools.chain.from_iterable(prompts))
         res: GenerationResponse = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
                                                                       prompt=all_prompts)
-        batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG).strip() for r in res.batch_responses] \
+        batch_responses = [LLMResponseUtil.parse(r, Summarizer.SUMMARY_TAG)[0].strip() for r in res.batch_responses] \
             if res else [EMPTY_STRING]
         summaries = []
         start_index = 0
@@ -170,8 +172,9 @@ class Summarizer(BaseObject):
         chunks = chunker.chunk(content=content, id_=id_)
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
             return []  # skip summarizing content below token limit unless code
-        prompt_creator = self.nl_prompt_creator if chunker_type == SupportedChunker.NL else self.code_prompt_creator
-        return [prompt_creator.create(target_content=chunk)[PromptKeys.PROMPT.value] for chunk in chunks]
+        prompt_builder = self.nl_prompt_builder if chunker_type == SupportedChunker.NL else self.code_prompt_builder
+        return [prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
+                                     artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
     def _summarize_selective(self, contents, indices2summarize, prompts_for_summaries):
         """

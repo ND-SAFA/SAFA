@@ -1,9 +1,9 @@
 import os.path
-from typing import Dict, Tuple, Generic
+from typing import Dict
 
 import pandas as pd
 
-from tgen.constants.dataset_constants import NO_ORPHAN_CHECK_VALUE
+from tgen.constants.dataset_constants import NO_CHECK_VALUE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -33,7 +33,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         super().__init__(overrides)
         self.project_path = project_path
-        self.overrides["allowed_orphans"] = NO_ORPHAN_CHECK_VALUE
+        self.overrides["allowed_orphans"] = NO_CHECK_VALUE
 
     def read_project(self, n_threads: int = 1) -> TraceDataFramesTypes:
         """

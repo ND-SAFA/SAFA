@@ -11,6 +11,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
     """
     Contains the trace links found in a project
     """
+    OPTIONAL_COLUMNS = [StructuredKeys.Trace.SCORE.value]
 
     def __init__(self, *args, **kwargs):
         """
@@ -106,3 +107,11 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: the link id
         """
         return hash(str(hash(source_id)) + "-" + str(hash(target_id)))
+
+    def get_label_count(self, label: int = 1) -> int:
+        """
+        :return: Returns the number of true positives in data frame.
+        """
+        label_counts = self[TraceKeys.LABEL].value_counts()
+        n_label = label_counts.get(label, 0)
+        return n_label

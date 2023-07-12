@@ -11,7 +11,7 @@ class ComparisonCriterion(BaseObject):
     The criterion for determining best task involving models by comparison metrics between tasks.
     """
     metrics: Union[List[str], str]
-    comparison_function: Union[ComparisonFunction, str] = SupportedComparisonFunction.MAX
+    comparison_function: Union[ComparisonFunction, str] = SupportedComparisonFunction.MAX.value
 
     def __post_init__(self):
         """
@@ -20,4 +20,5 @@ class ComparisonCriterion(BaseObject):
         if isinstance(self.metrics, str):
             self.metrics = [self.metrics]
         if isinstance(self.comparison_function, str):
-            self.comparison_function = getattr(SupportedComparisonFunction, self.comparison_function.upper())
+            comparison_enum: SupportedComparisonFunction = getattr(SupportedComparisonFunction, self.comparison_function.upper())
+            self.comparison_function = comparison_enum.value

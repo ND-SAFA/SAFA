@@ -29,7 +29,7 @@ _CITATION = """
 class MapMetric(AbstractTraceMetric):
     name = "map"
     MAP_KEY = "map"
-    AP_KEY = "ap"
+    AP_KEY = "global_ap"
 
     # TODO
     def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=THRESHOLD_DEFAULT,

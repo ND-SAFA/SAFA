@@ -70,3 +70,19 @@ class ListUtil:
         """
         msg = f"Expected all label sizes to be equal: {arr}" if default_msg is None else default_msg
         assert len(set(arr)) == 1, msg
+
+    @staticmethod
+    def create_step_list(n: int, max_score=1.0, min_score=0.0, ascending=False):
+        """
+        Creates a list with scores decreasing linearly from max to min score.
+        :param n: The length of the list.
+        :param max_score: The score of the first item.
+        :param min_score: The score of the last item.
+        :param ascending: If numbers should be ascending in order.
+        :return: The list of scores.
+        """
+        increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
+        descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
+        if ascending:
+            descending_list = sorted(descending_list)
+        return descending_list

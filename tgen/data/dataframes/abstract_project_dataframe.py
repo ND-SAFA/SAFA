@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Dict, List, Union, Callable, Type
+from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
@@ -19,6 +19,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     Represents the config format for all data used by the huggingface trainer.
     """
     __COLS = None
+    OPTIONAL_COLUMNS: List[str] = []
 
     def __init__(self, data=None, index: Axes = None, columns: Axes = None, dtype: Dtype = None, copy: bool = None):
         """
@@ -39,7 +40,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :return: A set containing the names of the columns in the dataframe
         """
         if cls.__COLS is None:
-            cls.__COLS = [e.value for e in cls.data_keys()]
+            cls.__COLS = [e.value for e in cls.data_keys() if e not in cls.OPTIONAL_COLUMNS]
         return cls.__COLS
 
     @classmethod
@@ -111,12 +112,15 @@ class AbstractProjectDataFrame(pd.DataFrame):
         columns = self.columns if columns is None else columns
         columns = [col.value if isinstance(col, Enum) else col.lower() for col in columns]
         expected_columns = deepcopy(self.column_names())
+        expected_columns = [c for c in expected_columns if c not in self.OPTIONAL_COLUMNS]
         if self.index_name() and self.index_name() not in columns:
             expected_columns.remove(self.index_name())
         missing_columns = set(expected_columns).difference(columns)
         assert len(missing_columns) == 0, f"Expected the following columns to be present in the df: {missing_columns}. " \
                                           f"Received instead {columns}"
         unexpected_columns = set(columns).difference(expected_columns)
+        unexpected_columns = [c for c in unexpected_columns if c not in self.OPTIONAL_COLUMNS]
+
         assert len(unexpected_columns) == 0, f"Unexpected columns in the trace df: {unexpected_columns}"
         i = 0
         for col in expected_columns:
@@ -177,7 +181,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     def filter_by_index(self, index_to_filter: List) -> "AbstractProjectDataFrame":
         """
         Returns a copy of the dataframe with filter applied to rows
-        :param index_to_filter: The list of indices to filter out
+        :param index_to_filter: The list of indices to keep.
         :return: A copy of the dataframe with filter applied to rows
         """
         return self.__class__(DataFrameUtil.filter_df_by_index(self, index_to_filter))
@@ -191,7 +195,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         duplicated_indices = set(self.index[is_duplicated])
         if len(duplicated_indices) > 0:
             logger.warning(f"Removing {len(duplicated_indices)} duplicates from {self.__class__.__name__}: {duplicated_indices}")
-        return self.__class__(self[~is_duplicated])
+        return self[~is_duplicated]
 
     @overrides(pd.DataFrame)
     def to_dict(self, orient: str = 'dict', into: Type = dict, index: bool = True) -> Dict:

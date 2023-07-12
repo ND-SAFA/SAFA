@@ -87,7 +87,7 @@ class TestAssertions:
         expected_output = expected_output if expected_output else TestDataManager.EXAMPLE_TRAINING_OUTPUT
         if "status" in expected_output:
             expected_output.pop("status")
-            test_case.assertEquals(job_result.status, Status.SUCCESS)
+            test_case.assertEqual(job_result.status, Status.SUCCESS)
         output = job_result.body
         if isinstance(output, AbstractTraceOutput):
             output = output.output_to_dict()
@@ -105,8 +105,8 @@ class TestAssertions:
         """
         diff1 = set(list1).difference(list2)
         diff2 = set(list2).difference(list1)
-        test_case.assertEquals(len(diff1), 0)
-        test_case.assertEquals(len(diff2), 0)
+        test_case.assertEqual(len(diff1), 0)
+        test_case.assertEqual(len(diff2), 0)
 
     @staticmethod
     def verify_entities_in_df(test_case: TestCase, expected_entities: List[Dict], entity_df: pd.DataFrame, **kwargs) -> None:
@@ -121,7 +121,7 @@ class TestAssertions:
         test_case.assertEqual(len(expected_entities), len(entity_df))
         for entity in expected_entities:
             query_df = DataFrameUtil.query_df(entity_df, entity)
-            test_case.assertEquals(1, len(query_df), msg=f"Could not find row with: {entity}")
+            test_case.assertEqual(1, len(query_df), msg=f"Could not find row with: {entity}")
 
     @staticmethod
     def verify_row_contains(test_case: TestCase, row: pd.Series, properties: Dict, delta=0.01) -> None:

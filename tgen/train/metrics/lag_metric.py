@@ -56,7 +56,6 @@ class LagMetric(AbstractTraceMetric):
             if len(true_trace_indices) == 0:
                 return np.nan
 
-            n_true = len(true_trace_indices)
             n_analyzed = max(true_trace_indices) + 1
             return n_analyzed
 

@@ -75,7 +75,8 @@ class TracePredictionOutput(AbstractTraceOutput):
         self_val, other_val = self._get_comparison_vals(other, comparison_metric)
         if self_val is None or other_val is None:
             return False
-        return comparison_criterion.comparison_function(self_val, other_val)
+        result = comparison_criterion.comparison_function(self_val, other_val)
+        return result
 
     def _can_compare_with_metric(self, other: "TracePredictionOutput", comparison_metric_name: str) -> bool:
         """

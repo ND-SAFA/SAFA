@@ -58,7 +58,7 @@ class TestDefinitionCreator(BaseTest):
         for parent_key, parent_value in definition.items():
             parent_object = getattr(predict_job, parent_key)
             for child_key, child_value in parent_value.items():
-                self.assertEquals(getattr(parent_object, child_key), child_value)
+                self.assertEqual(getattr(parent_object, child_key), child_value)
 
     def verify_trainer_dataset_manager(self, trainer_dataset_manager: TrainerDatasetManager,
                                        target_role: DatasetRole = DatasetRole.TRAIN):
@@ -68,6 +68,6 @@ class TestDefinitionCreator(BaseTest):
             self.assertIsNone(trainer_dataset_manager[dataset_role])
         dataset = trainer_dataset_manager[target_role]
 
-        self.assertEquals(len(dataset.pos_link_ids), 4)
-        self.assertEquals(len(dataset.neg_link_ids), 4)
-        self.assertEquals(len(dataset.trace_df), 8)
+        self.assertEqual(len(dataset.pos_link_ids), 4)
+        self.assertEqual(len(dataset.neg_link_ids), 4)
+        self.assertEqual(len(dataset.trace_df), 8)

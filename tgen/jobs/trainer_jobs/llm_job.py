@@ -1,12 +1,13 @@
 from typing import Union
 
-from tgen.constants.model_constants import get_default_llm_manager
+from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.abstract_prompt_creator import AbstractPromptCreator
-from tgen.data.prompts.classification_prompt_creator import ClassificationPromptCreator
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.train.args.abstract_llm_args import AbstractLLMArgs
 from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -19,25 +20,30 @@ class LLMJob(AbstractTrainerJob):
     Job to handle open ai tasks
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, trainer_args: AbstractLLMArgs = None,
-                 task: TrainerTask = TrainerTask.PREDICT, job_args: JobArgs = None, prompt_creator: AbstractPromptCreator = None,
-                 llm_manager: AbstractLLMManager = None):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, prompt_builder: PromptBuilder,
+                 trainer_args: AbstractLLMArgs = None, task: TrainerTask = TrainerTask.PREDICT,
+                 job_args: JobArgs = None, llm_manager: AbstractLLMManager = None,
+                 completion_type: LLMCompletionType = LLMCompletionType.GENERATION):
         """
         Initializes job with necessary args
         :param trainer_args: The arguments for training and prediction calls
         :param trainer_dataset_manager: The dataset manager for training and prediction
+        :param prompt_builder: Responsible for building the prompt used by the LLM
+        :param task: The type of task to perform (i.e. train, predict. etc)
+        :param job_args: Any args necessary for the job
+        :param llm_manager: Manages the LLM used in job
+        :param completion_type: The type of completion (prediction or generation)
         """
         if llm_manager is None:
-            llm_manager = get_default_llm_manager()
+            llm_manager = get_efficient_default_llm_manager()
         if trainer_args is None:
             trainer_args = llm_manager.llm_args
-        if prompt_creator is None:
-            prompt_creator = ClassificationPromptCreator(prompt_args=llm_manager.prompt_args)
         super().__init__(model_manager=None, trainer_dataset_manager=trainer_dataset_manager,
                          trainer_args=trainer_args, task=task, job_args=job_args)
         self.trainer_args = trainer_args
-        self.prompt_creator = prompt_creator
+        self.prompt_builder = prompt_builder
         self.llm_manager = llm_manager
+        self.completion_type = completion_type
 
     @overrides(AbstractTrainerJob)
     def get_trainer(self, **kwargs) -> LLMTrainer:
@@ -47,10 +53,12 @@ class LLMJob(AbstractTrainerJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = LLMTrainer(trainer_args=self.trainer_args,
+            self._trainer = LLMTrainer(LLMTrainerState(trainer_args=self.trainer_args,
                                        trainer_dataset_manager=self.trainer_dataset_manager,
-                                       prompt_creator=self.prompt_creator,
-                                       llm_manager=self.llm_manager)
+                                       prompt_builder=self.prompt_builder,
+                                       llm_manager=self.llm_manager,
+                                       completion_type=self.completion_type,
+                                       **kwargs))
         return self._trainer
 
     @overrides(AbstractTrainerJob)

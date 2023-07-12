@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { ArtifactTypeSchema, TimArtifactLevelSchema } from "@/types";
 import { useApi, projectStore, typeOptionsStore } from "@/hooks";
 import { pinia } from "@/plugins";
-import { saveArtifactType } from "@/api/endpoints";
+import { createArtifactType, editArtifactType } from "@/api/endpoints";
 
 export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
   const artifactTypeApi = useApi("artifactTypeApi");
@@ -14,14 +14,20 @@ export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
    * @param artifactType - The artifact type to add or edit.
    */
   async function handleSave(artifactType: ArtifactTypeSchema): Promise<void> {
-    await artifactTypeApi.handleRequest(async () => {
-      const updatedArtifactType = await saveArtifactType(
-        projectStore.projectId,
-        artifactType
-      );
+    await artifactTypeApi.handleRequest(
+      async () => {
+        const updatedArtifactType = artifactType.id
+          ? await editArtifactType(projectStore.projectId, artifactType)
+          : await createArtifactType(projectStore.projectId, artifactType);
 
-      typeOptionsStore.addOrUpdateArtifactTypes([updatedArtifactType]);
-    });
+        typeOptionsStore.addOrUpdateArtifactTypes([updatedArtifactType]);
+      },
+      {},
+      {
+        success: `Saved artifact type: ${artifactType.name}`,
+        error: `Unable to save artifact type: ${artifactType.name}`,
+      }
+    );
   }
 
   /**

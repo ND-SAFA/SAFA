@@ -78,8 +78,13 @@ export enum Endpoint {
   sync = "projects/versions/:versionId/changes",
 
   // Types
-  createOrUpdateArtifactType = "projects/:projectId/artifactTypes",
-  deleteArtifactType = "projects/:projectId/artifactTypes/:typeId",
+  createArtifactType = "projects/:projectId/artifactTypes",
+  editArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
+  deleteArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
+
+  // Trace Matrices
+  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
+  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
@@ -124,10 +129,6 @@ export enum Endpoint {
   // Parse Entities
   parseArtifactFile = "projects/parse/artifacts/:artifactType",
   parseTraceFile = "projects/parse/traces",
-
-  // Trace Matrices
-  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
-  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
 
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",

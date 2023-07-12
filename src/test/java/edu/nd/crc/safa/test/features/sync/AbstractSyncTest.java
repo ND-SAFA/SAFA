@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
  * Test that correct entities are retrived for an EntityChangeMessage
  */
 public abstract class AbstractSyncTest extends ApplicationBaseTest {
+
     /**
      * Converts JSON response to {@link ProjectAppEntity}
      */
@@ -23,9 +24,14 @@ public abstract class AbstractSyncTest extends ApplicationBaseTest {
      * Project created.
      */
     protected ProjectVersion projectVersion;
+    
+    public AbstractSyncTest() {
+        objectMapper.findAndRegisterModules();
+    }
 
     @Test
     public void runTest() throws Exception {
+
         // Step - Create project and version
         this.projectVersion = this.creationService.createProjectWithNewVersion(projectName);
 

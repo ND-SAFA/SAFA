@@ -1,0 +1,13 @@
+format:
+- "\nAs a [user type], I need to be able to [key task] so that I can [purpose or goal].\
+  \ The system should [main capability] and allow me to [key task]. The system needs\
+  \ to store and manage [data/information] and integrate with [external system]. The\
+  \ system must meet [non-functional requirement] constraints.  \n"
+questions:
+- - What is the overall purpose or goal of the system?
+  - What are the main capabilities or functions of the system?
+  - What types of users interact with the system?
+  - What are the key tasks each type of user needs to perform?
+  - What data or information does the system need to store and manage?
+  - What external systems or data sources does this system integrate with?
+  - What constraints or non-functional requirements impact the design of the system?

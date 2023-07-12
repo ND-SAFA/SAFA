@@ -4,14 +4,16 @@ from unittest.mock import patch
 
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from tgen.data.processing.augmentation.resample_step import ResampleStep
+from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
-from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.variables.experimental_variable import ExperimentalVariable
 
 
@@ -33,7 +35,8 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
     def test_prepare_datasets(self, create_mock):
         dataset_container_manager: TrainerDatasetManager = self.create_dataset_manager(
             [DatasetRole.PRE_TRAIN, DatasetRole.EVAL, DatasetRole.VAL])
-        dataset_container_manager._prepare_datasets(None)
+        augmenter = DataAugmenter(steps=[ResampleStep()])
+        dataset_container_manager._prepare_datasets(augmenter)
         self.assert_final_datasets_are_as_expected(dataset_container_manager)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")

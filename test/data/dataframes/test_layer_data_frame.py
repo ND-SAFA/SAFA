@@ -15,8 +15,8 @@ class TestLayerDataFrame(BaseTest):
         self.assert_layer(layer, "source3", "target3")
 
     def assert_layer(self, layer: EnumDict, source_type, target_type):
-        self.assertEquals(layer[LayerKeys.SOURCE_TYPE], source_type)
-        self.assertEquals(layer[LayerKeys.TARGET_TYPE], target_type)
+        self.assertEqual(layer[LayerKeys.SOURCE_TYPE], source_type)
+        self.assertEqual(layer[LayerKeys.TARGET_TYPE], target_type)
 
     def get_layer_data_frame(self):
         return LayerDataFrame({LayerKeys.SOURCE_TYPE: ["source1", "source2"], LayerKeys.TARGET_TYPE: ["target1", "target2"]})

@@ -12,9 +12,9 @@ class TestListUtil(BaseTest):
         n_items_nums = [i for i in range(4, 10)]
 
         def verify(start):
-            self.assertEquals(result[0], start)
-            self.assertEquals(result[-1], (n_items - 1) + start)
-            self.assertEquals(len(result), n_items)
+            self.assertEqual(result[0], start)
+            self.assertEqual(result[-1], (n_items - 1) + start)
+            self.assertEqual(len(result), n_items)
 
         for i in range(0, 5, 2):
             for n_items in n_items_nums:

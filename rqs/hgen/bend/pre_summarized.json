@@ -8,7 +8,7 @@
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/bend",
               "source_layer_id": "Java",
-              "target_type": "Design Requirement",
+              "target_type": "Functional Requirement",
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {
@@ -18,9 +18,7 @@
               }
             }
           },
-          "target_types": [
-            "User Story"
-          ]
+          "target_types": ["User Story"]
         }
       ]
     }

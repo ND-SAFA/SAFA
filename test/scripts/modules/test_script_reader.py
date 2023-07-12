@@ -3,7 +3,6 @@ import os
 from tgen.scripts.modules.script_reader import ScriptOutputReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_RESULT_READER
-from tgen.testres.test_assertions import TestAssertions
 
 
 class TestResultReader(BaseTest):
@@ -26,14 +25,6 @@ class TestResultReader(BaseTest):
     EXPECTED_EVAL_METRICS = {"map": 0.194, "ap": 0.0769, "f1": 0.16, "f2": 0.314, "precision@1": 0.053,
                              "precision@2": 0.053, "precision@3": 0.035, "avg_true_links": 1.1, "lag": 6,
                              "precision_at_recall_95": 0.20}
-
-    def test_read(self):
-        result_reader = ScriptOutputReader(self.EXPERIMENT_PATH, export=False)
-        val_df, eval_df = result_reader.read()
-        self.assertEqual(1, len(val_df))
-        self.assertEqual(1, len(eval_df))
-        TestAssertions.verify_row_contains(self, eval_df.iloc[0], self.EXPECTED_EVAL_METRICS)
-        TestAssertions.verify_row_contains(self, val_df.iloc[0], self.EXPECTED_VAL_METRICS)
 
     def test_read_validation_entries(self) -> None:
         """

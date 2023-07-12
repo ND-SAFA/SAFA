@@ -1,0 +1,13 @@
+format:
+- In order to [goal/desire], as a [role], I want [feature]
+questions:
+- - What is the overall purpose or goal of the system?
+  - Who are the intended users of the system?
+  - What key functions or capabilities does the system provide to users?
+  - What data or information does the system store, manipulate or display?
+  - What inputs does the system accept from users?
+  - What outputs does the system provide to users?
+  - What conditions or events trigger certain system behaviors?
+  - What security or access controls does the system implement?
+  - What interfaces does the system expose to users?
+  - What third-party systems or services does this system integrate with?

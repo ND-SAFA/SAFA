@@ -1,0 +1,32 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "MULTI_LAYER_HGEN",
+          "starting_hgen_job": {
+            "hgen_args": {
+              "load_dir": "[OUTPUT_PATH]/hgen/fend/dd8dde2f-5a61-4a70-b1d1-d64bcafd4143",
+              "export_dir": "[OUTPUT_PATH]/hgen/fend",
+              "source_layer_id": "Vue Code",
+              "target_type": "Functional Requirement",
+              "dataset_creator_for_sources": {
+                "object_type": "PROMPT",
+                "project_reader": {
+                  "object_type": "Artifact",
+                  "project_path": "[DATA_PATH]/fend"
+                },
+                "summarizer": {
+                  "code_or_exceeds_limit_only": false
+                }
+              }
+            }
+          },
+          "target_types": [
+            "Feature Description"
+          ]
+        }
+      ]
+    }
+  ]
+}

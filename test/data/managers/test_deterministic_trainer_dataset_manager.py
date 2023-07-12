@@ -1,12 +1,12 @@
 import os
 from typing import List
 
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.variables.experimental_variable import ExperimentalVariable
 
 
@@ -16,29 +16,29 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
 
     def test_get_datasets(self):
         expected_dataset_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]
-        dataset_container_manager_first = self.create_dataset_manager(expected_dataset_roles[1:])
-        datasets1 = dataset_container_manager_first.get_datasets()
-        self.assert_final_datasets_are_as_expected(dataset_container_manager_first, include_pretrain=False)
-        self.assertTrue(os.path.exists(dataset_container_manager_first.get_output_path()))
-        dataset_files = os.listdir(dataset_container_manager_first.get_output_path())
+        deterministic_dataset_manager = self.create_dataset_manager(expected_dataset_roles[1:])
+        role2dataset = deterministic_dataset_manager.get_datasets()
+        self.assert_final_datasets_are_as_expected(deterministic_dataset_manager, include_pretrain=False)
+        self.assertTrue(os.path.exists(deterministic_dataset_manager.get_output_path()))
+        dataset_files = os.listdir(deterministic_dataset_manager.get_output_path())
         for dataset_role in expected_dataset_roles:
-            self.assertIn(dataset_container_manager_first.get_dataset_filename(dataset_role,
-                                                                               dataset_container_manager_first.dataset_name),
-                          dataset_files)
+            dataset_file_name = deterministic_dataset_manager.get_dataset_filename(dataset_role,
+                                                                                   deterministic_dataset_manager.dataset_name)
+            self.assertIn(dataset_file_name, dataset_files)
         dataset_container_manager_second = self.create_dataset_manager(expected_dataset_roles[1:])
         datasets2 = dataset_container_manager_second.get_datasets()
-        for dataset_role, dataset in datasets1.items():
+        for dataset_role, dataset in role2dataset.items():
             if dataset_role in expected_dataset_roles[1:]:
-                self.assertListEqual(sorted(dataset.pos_link_ids), sorted(datasets2[dataset_role].pos_link_ids))
+                self.assertListEqual(sorted(dataset.get_pos_link_ids()), sorted(datasets2[dataset_role].get_pos_link_ids()))
 
-    def create_dataset_manager(self, keys: List[DatasetRole]):
+    def create_dataset_manager(self, dataset_roles: List[DatasetRole]):
         args = ObjectCreator.get_definition(TrainerDatasetManager)
         dataset_creators = {
             DatasetRole.EVAL: ("eval_dataset_creator", self.eval_dataset_creator_definition),
             DatasetRole.VAL: ("val_dataset_creator", self.val_dataset_creator_definition)
         }
-        for key in keys:
-            arg_name, definition = dataset_creators[key]
+        for role in dataset_roles:
+            arg_name, definition = dataset_creators[role]
             args[arg_name] = definition
         args["augmenter"] = ObjectCreator.augmenter_definition
         args["random_seed"] = 10

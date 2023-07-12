@@ -10,7 +10,7 @@ class TestDataAugmenterFromDefinition(BaseTest):
             "steps": []
         }
         data_augmenter = ObjectCreator.create(DataAugmenter, override=True, **definition)
-        self.assertEquals(len(data_augmenter.steps), 0)
+        self.assertEqual(len(data_augmenter.steps), 0)
 
     def test_one_step(self):
         definition = {
@@ -21,11 +21,11 @@ class TestDataAugmenterFromDefinition(BaseTest):
             ]
         }
         data_augmenter = ObjectCreator.create(DataAugmenter, override=True, **definition)
-        self.assertEquals(len(data_augmenter.steps), 1)
+        self.assertEqual(len(data_augmenter.steps), 1)
 
     def test_experiment(self):
         data_augmenters: ExperimentalVariable = ObjectCreator.create(DataAugmenter)
         n_a = len(data_augmenters[0].value.steps)
         n_b = len(data_augmenters[1].value.steps)
-        self.assertEquals(n_a, 0)
-        self.assertEquals(n_b, 1)
+        self.assertEqual(n_a, 0)
+        self.assertEqual(n_b, 1)

@@ -19,7 +19,7 @@ class TestModelManager(BaseTest):
         model: BertPreTrainedModel = AutoModelForSequenceClassification.from_pretrained(BaseTest.BASE_TEST_MODEL)
         manager = self.get_model_manager()
         layers = manager.get_encoder_layers(model)
-        self.assertEquals(len(layers), BaseTest.BASE_MODEL_LAYERS)
+        self.assertEqual(len(layers), BaseTest.BASE_MODEL_LAYERS)
 
     def test_freeze_layers(self):
         layers2freeze = [-2, 0]
@@ -61,7 +61,7 @@ class TestModelManager(BaseTest):
         test_generator = self.get_model_manager()
         test_generator.set_max_seq_length(2)
 
-        self.assertEquals(test_generator._max_seq_length, 2)
+        self.assertEqual(test_generator._max_seq_length, 2)
 
     @patch.object(ModelManager, 'get_tokenizer')
     def test_set_max_seq_length_greater_than_model_max(self, get_tokenizer_mock: mock.MagicMock):
@@ -69,7 +69,7 @@ class TestModelManager(BaseTest):
         test_generator = self.get_model_manager()
         test_generator.set_max_seq_length(6)
 
-        self.assertEquals(test_generator._max_seq_length, 5)
+        self.assertEqual(test_generator._max_seq_length, 5)
 
     def get_model_manager(self):
         return ModelManager("path")

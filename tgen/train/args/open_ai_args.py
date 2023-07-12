@@ -23,6 +23,7 @@ class OpenAIParams:
     MAX_TOKENS = "max_tokens"
     LOG_PROBS = "logprobs"
     PROMPT = "prompt"
+    MESSAGES = "messages"
     VALIDATION_FILE = "validation_file"
     CLASSIFICATION_POSITIVE_CLASS = "classification_positive_class"
 

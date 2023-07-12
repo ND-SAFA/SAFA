@@ -5,33 +5,28 @@
         {
           "object_type": "LLM",
           "task": "PREDICT",
-          "llm_util": {
-            "object_type": "ANTHROPIC"
-          },
-          "job_args": {
-            "random_seed": 812
-          },
           "trainer_args": {
             "object_type": "ANTHROPIC",
             "model": "claude-instant-v1"
           },
+          "llm_manager": {
+            "object_type": "ANTHROPIC",
+            "llm_args": {
+              "metrics": [
+                "classification",
+                "confusion_matrix",
+                "specificity",
+                "accuracy"
+              ]
+            }
+          },
           "trainer_dataset_manager": {
-            "train_dataset_creator": {
+            "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
-                "object_type": "HUB",
-                "name": "cm1"
+                "object_type": "STRUCTURE",
+                "project_path": "~/desktop/safa/datasets/paper/test"
               }
-            },
-            "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.15
-            },
-            "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
-              "val_percentage": 0.15
             }
           }
         }

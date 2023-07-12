@@ -2,10 +2,13 @@ from collections import OrderedDict
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.testres.base_tests.base_split_test import BaseSplitTest
+from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from tgen.data.processing.augmentation.resample_step import ResampleStep
 from tgen.data.splitting.dataset_splitter import DatasetSplitter
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
+from tgen.testres.base_tests.base_split_test import BaseSplitTest
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 
 
@@ -14,20 +17,46 @@ class TestTraceDatasetSplitter(BaseSplitTest):
     Responsible for testing trace dataset splitter under default functionality ensuring
     that splits contain the right sizes.
     """
+    split_percentages = OrderedDict({DatasetRole.TRAIN: 2 / 3,
+                                     DatasetRole.VAL: 1 / 3})
+    split_counts = {
+        DatasetRole.TRAIN: 16,
+        DatasetRole.VAL: 8
+    }
 
     @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
+        """
+        Tests correctness of trace entries after splitting and balancing.
+        """
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        splitter = DatasetSplitter(self.get_trace_dataset(), OrderedDict({DatasetRole.TRAIN: 1-self.VAlIDATION_PERCENTAGE,
-                                                              DatasetRole.VAL: self.VAlIDATION_PERCENTAGE}))
-        splits = splitter.split_dataset()
-        splits[DatasetRole.TRAIN].prepare_for_training()
-        model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
-        trainer_dataset = splits[DatasetRole.TRAIN].to_trainer_dataset(model_generator)
-        self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
+        dataset = self.get_trace_dataset()
+        dataset.prepare_for_training()
 
-    def get_expected_train_dataset_size(self, resample_rate=BaseTraceTest.RESAMPLE_RATE,
-                                        validation_percentage=BaseTraceTest.VAlIDATION_PERCENTAGE):
-        num_train_pos_links = round(self.N_POSITIVE * (1 - validation_percentage))
-        return resample_rate * num_train_pos_links * 2  # equal number pos and neg links
+        splitter = DatasetSplitter(dataset, self.split_percentages)
+        splits = splitter.split_dataset()
+        augmenter = DataAugmenter(steps=[ResampleStep()])
+
+        for role in [DatasetRole.TRAIN, DatasetRole.VAL]:
+            role_dataset: TraceDataset = splits[role]
+            role_dataset.prepare_for_training(augmenter)
+            n_expected = self.split_counts[role]
+
+            self.assertEqual(n_expected, len(role_dataset))
+
+            model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
+            trainer_dataset = role_dataset.to_trainer_dataset(model_generator)
+            n_links = len(trainer_dataset)
+
+            self.assertTrue(isinstance(trainer_dataset[0], dict))
+            self.assertEqual(n_expected, n_links)
+
+    def get_expected_train_dataset_size(self, validation_percentage=BaseTraceTest.VAlIDATION_PERCENTAGE):
+        """
+        Calculates the size of the training split.
+        :param validation_percentage: The percentage of the dataset used for validation.
+        :return: The balanced dataset size for training.
+        """
+        train_percentage = (1 - validation_percentage)
+        n_negative = round(self.N_NEGATIVE * train_percentage)
+        return n_negative * 2  # equal number pos and neg links

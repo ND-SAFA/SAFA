@@ -28,8 +28,8 @@ class TestPreTrainSplitStrategy(BaseTraceTest):
             file_contents.append(file_content)
             n_lines += len(file_content)
         orig_contents = self.get_file_contents(orig_dataset.training_file_path)
-        self.assertEquals(n_lines, len(orig_contents))
-        self.assertEquals(0, len(set(file_contents[0]).intersection(set(file_contents[1]))))
+        self.assertEqual(n_lines, len(orig_contents))
+        self.assertEqual(0, len(set(file_contents[0]).intersection(set(file_contents[1]))))
 
     def test_create_split(self):
         strategy = self.get_pre_train_split_strategy()

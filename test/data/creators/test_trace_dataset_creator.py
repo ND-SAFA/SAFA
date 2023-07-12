@@ -61,4 +61,4 @@ class TestTraceDatasetCreator(BaseTest):
         trace_dataset_creator = TraceDatasetCreator(project_reader, **kwargs)
         trace_dataset = trace_dataset_creator.create()
         self.assertEqual(test_project.get_n_links(), len(trace_dataset))
-        self.assertEqual(test_project.get_n_positive_links(), len(trace_dataset.pos_link_ids))
+        self.assertEqual(test_project.get_n_positive_links(), len(trace_dataset.get_pos_link_ids()))

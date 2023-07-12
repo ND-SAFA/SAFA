@@ -13,9 +13,9 @@ class TestDataclasssUtil(BaseTest):
         job_result = JobResult(job_id=job_id, status=Status.UNKNOWN)
 
         dict_ = DataclassUtil.convert_to_dict(job_result)
-        self.assertEquals(dict_["job_id"], job_id)
-        self.assertEquals(dict_["status"], Status.UNKNOWN)
+        self.assertEqual(dict_["job_id"], job_id)
+        self.assertEqual(dict_["status"], Status.UNKNOWN)
 
         dict_ = DataclassUtil.convert_to_dict(job_result, status=Status.SUCCESS)
-        self.assertEquals(dict_["job_id"], job_id)
-        self.assertEquals(dict_["status"], Status.SUCCESS)
+        self.assertEqual(dict_["job_id"], job_id)
+        self.assertEqual(dict_["status"], Status.SUCCESS)

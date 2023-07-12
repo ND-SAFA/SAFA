@@ -23,9 +23,9 @@ class TestArtifacteDataFrame(BaseTest):
         self.assertIsNone(artifact_does_not_exist)
 
     def assert_artifact(self, artifact: EnumDict, id_, body, layer_id):
-        self.assertEquals(artifact[ArtifactKeys.ID], id_)
-        self.assertEquals(artifact[ArtifactKeys.CONTENT], body)
-        self.assertEquals(artifact[ArtifactKeys.LAYER_ID], layer_id)
+        self.assertEqual(artifact[ArtifactKeys.ID], id_)
+        self.assertEqual(artifact[ArtifactKeys.CONTENT], body)
+        self.assertEqual(artifact[ArtifactKeys.LAYER_ID], layer_id)
 
     def get_artifact_data_frame(self):
         return ArtifactDataFrame({ArtifactKeys.ID: ["s1", "s2"], ArtifactKeys.CONTENT: ["body1", "body2"],

@@ -20,7 +20,7 @@ class TestExperiment(BaseExperimentTest):
         experiment.run()
         self.assertEqual(hf_run_mock.call_count, 9)
         result_dirs = os.listdir(os.path.join(experiment.output_dir, "experiment_0"))
-        self.assertEquals(len(result_dirs), len(experiment.steps))
+        self.assertEqual(len(result_dirs), len(experiment.steps))
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")

@@ -1,0 +1,9 @@
+format:
+- '[Verb] [Object] [Qualifier]'
+questions:
+- - What is the overall goal or objective of the user story?
+  - Who are the main actors or personas involved?
+  - What is the primary benefit or value to the actors?
+  - At what level of abstraction is the user story written?
+  - What other related user stories exist?
+  - What common theme or higher-level goal ties multiple related user stories together?

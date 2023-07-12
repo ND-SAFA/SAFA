@@ -1,10 +1,10 @@
 from tgen.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
+from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH, STRUCTURE_PROJECT_PATH
 from tgen.testres.testprojects.csv_test_project import CsvTestProject
 from tgen.testres.testprojects.structured_test_project import StructuredTestProject
-from tgen.testres.definition_creator import DefinitionCreator
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -21,10 +21,10 @@ class TestMultiTraceDatasetCreator(BaseTraceTest):
         for dataset in expected_datasets:
             for link_id in dataset.trace_df.index:
                 self.assertIn(link_id, multi_dataset.trace_df)
-            for link_id in dataset.pos_link_ids:
-                self.assertIn(link_id, multi_dataset.pos_link_ids)
-            for link_id in dataset.neg_link_ids:
-                self.assertIn(link_id, multi_dataset.neg_link_ids)
+            for link_id in dataset._pos_link_ids:
+                self.assertIn(link_id, multi_dataset._pos_link_ids)
+            for link_id in dataset._neg_link_ids:
+                self.assertIn(link_id, multi_dataset._neg_link_ids)
 
     @staticmethod
     def get_multi_trace_dataset_creator():

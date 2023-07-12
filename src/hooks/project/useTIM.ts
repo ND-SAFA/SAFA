@@ -55,7 +55,7 @@ export const useTIM = defineStore("tim", {
       this.traceMatrices = project.traceMatrices;
     },
     /**
-     * Adds a new artifact types.
+     * Adds new artifact types.
      *
      * @param artifactTypes - The artifact types to add.
      */
@@ -106,13 +106,27 @@ export const useTIM = defineStore("tim", {
       projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
     },
     /**
+     * Adds new trace matrices.
+     *
+     * @param traceMatrices - The trace matrices to add.
+     */
+    addOrUpdateTraceMatrices(traceMatrices: TraceMatrixSchema[]): void {
+      const ids = traceMatrices.map(({ id }) => id);
+      const updatedTraceMatrices = [
+        ...removeMatches(this.traceMatrices, "id", ids),
+        ...traceMatrices,
+      ];
+
+      this.traceMatrices = updatedTraceMatrices;
+      projectStore.updateProject({ traceMatrices: updatedTraceMatrices });
+    },
+    /**
      * Adds a placeholder trace matrix between these types.
      * @param sourceType - The source type.
      * @param targetType - The target type.
      */
     addTraceMatrix(sourceType: string, targetType: string): void {
-      this.traceMatrices = [
-        ...this.traceMatrices,
+      this.addOrUpdateTraceMatrices([
         {
           id: "",
           sourceType,
@@ -121,10 +135,26 @@ export const useTIM = defineStore("tim", {
           generatedCount: 0,
           approvedCount: 0,
         },
-      ];
+      ]);
+    },
+    /**
+     * Removes trace matrices.
+     *
+     * @param removedMatrixIds - The trace matrix ids to remove.
+     */
+    deleteTraceMatrices(removedMatrixIds: string[]): void {
+      const preservedTraceMatrices = removeMatches(
+        this.traceMatrices,
+        "id",
+        removedMatrixIds
+      );
+
+      this.traceMatrices = preservedTraceMatrices;
+      projectStore.updateProject({ traceMatrices: preservedTraceMatrices });
     },
     /**
      * Removes a trace matrix between these types.
+     *
      * @param sourceType - The source type.
      * @param targetType - The target type.
      */

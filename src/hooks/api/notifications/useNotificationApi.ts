@@ -57,6 +57,9 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         // (entityIds = type id)
         timStore.deleteArtifactTypes(change.entityIds);
         break;
+      case EntityType.TRACE_MATRICES:
+        timStore.deleteTraceMatrices(change.entityIds);
+        break;
       case EntityType.DOCUMENT:
         // (entityIds = document id)
         change.entityIds.forEach((id) => documentStore.removeDocument(id));
@@ -124,6 +127,9 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         return getVersionApiStore.handleLoad(versionId);
       case EntityType.TYPES:
         timStore.addOrUpdateArtifactTypes(project.artifactTypes);
+        break;
+      case EntityType.TRACE_MATRICES:
+        timStore.addOrUpdateTraceMatrices(project.traceMatrices);
         break;
       case EntityType.DOCUMENT:
         await documentStore.updateDocuments(project.documents);

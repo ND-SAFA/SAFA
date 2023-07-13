@@ -4,9 +4,6 @@
       "jobs": [
         {
           "object_type": "VSM",
-          "metrics": [
-            "MAP"
-          ],
           "job_args": {
             "random_seed": 42
           },
@@ -15,14 +12,14 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/paper/drone-pl"
+                "project_path": "~/desktop/safa/datasets/paper/cm1"
               }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/paper/drone-pl"
+                "project_path": "~/desktop/safa/datasets/paper/cm1"
               }
             }
           }

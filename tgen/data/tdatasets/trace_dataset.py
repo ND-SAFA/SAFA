@@ -12,7 +12,7 @@ from tqdm import tqdm
 from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -363,6 +363,18 @@ class TraceDataset(iDataset):
         :return:  None (links are automatically set in current instance).
         """
         self._neg_link_ids = self._resize_data(self._neg_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def get_parent_child_types(self) -> List[Tuple[str, str]]:
+        """
+        Returns the artifacts types of the parent and child artifacts per tracing request.
+        :return: Parent type and child type.
+        """
+        tracing_types = []
+        for _, layer_row in self.layer_df.iterrows():
+            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
+            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+            tracing_types.append((parent_type, child_type))
+        return tracing_types
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

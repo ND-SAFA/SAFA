@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-DEFAULT_BODY_TITLE = "# Artifacts"
+DEFAULT_BODY_TITLE = "# Software Artifacts"
 
 
 def builder_method(func):
@@ -19,8 +19,8 @@ def builder_method(func):
 
 class RankingPromptBuilder:
 
-    def __init__(self, goal: str = "", query: str = "", instructions: str = "", body_title: str = DEFAULT_BODY_TITLE,
-                 section_delimiter: str = "\n\n"):
+    def __init__(self, goal: str = "", query: str = "", instructions: str = "",
+                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n"):
         """
         Builder for prompts with tasks.
         """
@@ -65,7 +65,7 @@ class RankingPromptBuilder:
         :return: Builds and returns prompt.
         """
         body = self.join_prompts([self.body_title, self.body], "\n\n")
-        items = [self.goal + self.query, body, self.context, self.instructions]
+        items = [self.goal + self.query, self.context, body, self.instructions]
         prompt = self.join_prompts(items, self.section_delimiter)
         return prompt
 
@@ -79,7 +79,7 @@ class RankingPromptBuilder:
         :return: Artifact prompt string.
         """
         body = artifact_body.replace("\n\n", "\n")
-        return f"<artifact><id>{artifact_name}</id><body>{body}</body></artifact>{separator}"
+        return f"## {artifact_name}\n{body}{separator}"
 
     @staticmethod
     def join_prompts(prompts: List[Optional[str]], delimiter: str):

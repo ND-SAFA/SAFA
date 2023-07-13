@@ -1,10 +1,9 @@
-import random
 from typing import List
 
-from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
-from tgen.state.state import State
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
+from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
+from tgen.state.state import State
 from tgen.util.llm_response_util import LLMResponseUtil
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
@@ -30,7 +29,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         state.processed_ranking_response: List[List[str]] = ProcessRankingResponses.process_ranked_artifacts(args, state)
 
     @staticmethod
-    def process_ranked_artifacts(args: RankingArgs, state: RankingState, add_missing=False) -> List[List[str]]:
+    def process_ranked_artifacts(args: RankingArgs, state: RankingState) -> List[List[str]]:
         """
         Reads the ranking responses and performs post-processing.
         :param args: The ranking pipeline configuration.
@@ -41,22 +40,17 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         batch_response = state.ranking_responses
 
         ranked_target_links = [[] for _ in range(len(args.parent_ids))]
-        for source_name, prompt_response in zip(args.parent_ids, batch_response.batch_responses):
-            source_index = args.parent_ids.index(source_name)
-            related_targets = args.parent2children[source_name]
-
+        for parent_name, prompt_response in zip(args.parent_ids, batch_response.batch_responses):
+            parent_index = args.parent_ids.index(parent_name)
+            related_children = state.sorted_parent2children[parent_name]
+            related = LLMResponseUtil.parse(prompt_response, "related")
+            deps = LLMResponseUtil.parse(prompt_response, "context")
             response_list = ProcessRankingResponses.convert_response_to_list(prompt_response)  # string response into list
             artifact_indices = ProcessRankingResponses.parse_artifact_indices(response_list)  # processes each artifact id
-            artifact_ids = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_targets)
-            artifact_ids = ProcessRankingResponses.remove_duplicate_ids(artifact_ids)
-            ranked_target_links[source_index].extend(artifact_ids)
+            children_ids = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_children)
+            children_ids = ProcessRankingResponses.remove_duplicate_ids(children_ids)
+            ranked_target_links[parent_index].extend(children_ids)
 
-        if add_missing:
-            target_ids = state.all_target_ids
-            for r_list in ranked_target_links:
-                missing_ids = [t_id for t_id in target_ids if t_id not in r_list]
-                random.shuffle(missing_ids)
-                r_list.extend(missing_ids)
         return ranked_target_links
 
     @staticmethod

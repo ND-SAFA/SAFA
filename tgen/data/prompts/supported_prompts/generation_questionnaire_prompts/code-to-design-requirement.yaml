@@ -1,0 +1,31 @@
+format:
+- 'The format for an effective software development Design requirement is: The software
+  shall [specific requirement] to ensure [desired outcome].'
+questions:
+- - '- What are the main classes/components in the code and what are their responsibilities?'
+  - '- How are the different classes/components related to each other? What are the
+    key interactions and dependencies?'
+  - '- What are the key functions/methods in each class/component? What do they do?'
+  - '- What are the major data structures and how are they used?'
+  - '- What are the inputs and outputs of the overall system?'
+  - '- Are there any major subsystems that can be identified? What are their responsibilities?'
+  - '- What external resources (databases, APIs, etc.) does the system interact with
+    and why?'
+  - '- Are there any key algorithms or logic flows that can be identified? What do
+    they do?'
+  - '- What assumptions seem to have been made about the environment the system runs
+    in or its users?'
+  - '- Are there any obvious design patterns used?'
+  - '- What are the major control flows in the system? Is there key initialization/startup
+    logic?'
+  - '- How is state managed in the system? Is there a central state or is it distributed?'
+  - '- How does the system handle errors and exceptions? Is there centralized error
+    handling?'
+  - '- What are the synchronization and concurrency mechanisms used, if any?'
+  - '- Are there any obvious security mechanisms or considerations in the design?'
+  - '- Are there any clear modularization techniques or encapsulation used in the
+    design?'
+  - '- What are the key configuration options and how are they handled?'
+  - '- Is there logging/telemetry and how is it used?'
+  - '- Is the system designed for testability? Are there seams for mocking, injection,
+    etc?'

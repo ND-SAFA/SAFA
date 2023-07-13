@@ -25,7 +25,7 @@ class SupportedJobType(SupportedEnum):
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
     LLM = LLMJob
-    TRACE = TracingJob
+    TRACING = TracingJob
     RANKING = RankingJob
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob

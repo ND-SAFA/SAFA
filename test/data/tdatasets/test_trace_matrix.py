@@ -4,8 +4,8 @@ import numpy as np
 from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.metrics.metrics_manager import MetricsManager
 
@@ -44,7 +44,7 @@ class TestTraceMatrix(BaseTest):
             source_labels = source_queries.links
             self.assertEqual(len(source_pred), self.N_TARGETS)
             self.assertEqual(len(source_labels), self.N_TARGETS)
-        self.assertEqual(len(self.trace_matrix.source_ids), len(self.SOURCE_ARTIFACTS))
+        self.assertEqual(len(self.trace_matrix.parent_ids), len(self.SOURCE_ARTIFACTS))
 
     def test_source_queries(self) -> None:
         """

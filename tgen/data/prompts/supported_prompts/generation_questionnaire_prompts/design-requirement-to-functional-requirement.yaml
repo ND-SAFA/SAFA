@@ -1,0 +1,14 @@
+format:
+- The software should [action/verb] [object/noun] [in/on/at] [specific condition/requirement].
+questions:
+- - '- What are the main components or modules in the design?'
+  - '- What are the key functions or capabilities that each component provides?'
+  - '- How do the different components interact or communicate with each other?'
+  - '- What are the inputs and outputs for each component?'
+  - '- What data structures or storage mechanisms are used by each component?'
+  - '- What algorithms or logic is implemented in each component?'
+  - '- What are the performance, scalability, reliability, and other non-functional
+    requirements?'
+  - '- What external systems or actors does the design interact with?'
+  - '- What use cases or user workflows is the system intended to support?'
+  - '- What are the key quality attributes the design aims to achieve?'

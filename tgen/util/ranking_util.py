@@ -1,12 +1,10 @@
 import json
-from typing import Dict, List
+from typing import List
 
-from tgen.constants.prediction_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
+from tgen.constants.tgen_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
-from tgen.ranking.steps.sort_step import GenericSorter
 from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -20,35 +18,8 @@ class RankingUtil:
     """
 
     @staticmethod
-    def rank_children(parent_ids: List[str], parent2children: Dict[str, List[str]], artifact_map: Dict[str, str],
-                      sorter: GenericSorter = None, max_children: int = 30) -> Dict[str, List[str]]:
-        """
-        Ranks children for each parent id.
-        :param parent_ids: The parent artifact ids.
-        :param parent2children: Map of parent to relevant children.
-        :param artifact_map: Map of artifact id to body.
-        :param sorter: Sorting function to prepare children with.
-        :param max_children: The maximum number of children to rank
-        :return: Map of parent to ranked children.
-        """
-        if sorter:
-            parent2children_sorted = {}
-            for parent_id in parent_ids:
-                children_ids = parent2children[parent_id]
-                parent_map = sorter([parent_id], children_ids, artifact_map)
-                sorted_children_ids = parent_map[parent_id][:max_children]
-                parent2children_sorted[parent_id] = sorted_children_ids
-            parent2children = parent2children_sorted
-
-        ranking_step = ArtifactRankingPipeline(artifact_map=artifact_map, parent_ids=parent_ids, parent2children=parent2children)
-        batched_ranked_children = ranking_step.run()
-
-        parent2rankings = {source: ranked_children for source, ranked_children in zip(parent_ids, batched_ranked_children)}
-        return parent2rankings
-
-    @staticmethod
     def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str], original_entries: List[TracePredictionEntry] = None,
-                                   min_score: float = 0.5):
+                                   min_score: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD):
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
         :param parent_id: The parent artifact id.

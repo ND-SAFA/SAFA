@@ -41,7 +41,7 @@ class SupportedTraceMetric(SupportedEnum):
         :return: Returns the metrics that are applied on a per query basis.
         """
         return [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                PrecisionAtRecallMetric.name, LagMetric.name, AverageTrueLinksMetric.name]
+                PrecisionAtRecallMetric.name, LagMetric.name, AverageTrueLinksMetric.name, PositiveLinkIndices.name]
 
 
 def get_metric_path(metric_name: str) -> str:

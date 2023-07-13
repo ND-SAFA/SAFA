@@ -81,6 +81,8 @@ class ListUtil:
         :param ascending: If numbers should be ascending in order.
         :return: The list of scores.
         """
+        if n == 1:
+            return [max_score]
         increment = (max_score - min_score) / (n - 1)  # Calculate the increment between numbers
         descending_list = [max_score - i * increment for i in range(n)]  # Generate the descending list
         if ascending:

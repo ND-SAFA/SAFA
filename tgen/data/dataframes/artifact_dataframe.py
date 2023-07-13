@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Type
 
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -54,23 +54,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: Artifacts in data frame of given type.
         """
         return self.filter_by_row(lambda r: r[ArtifactKeys.LAYER_ID.value] == type_name)
-
-    def get_parent_child_types(self) -> Tuple[str, str]:
-        """
-        Returns the artifacts types of the parent and child artifacts.
-        :return: Parent type and child type.
-        """
-
-        type2count = self.get_type_counts()
-        n_types = len(type2count)
-        if n_types > 2:
-            raise NotImplementedError("Multi-layer tracing is under construction.")
-        if n_types < 2:
-            raise ValueError(f"Expected to find two types of artifacts, only found: {n_types}")
-        n_parents = min(type2count.values())
-        parent_type = [t for t, c in type2count.items() if c == n_parents][0]
-        child_type = [t for t, c in type2count.items() if c != n_parents][0]
-        return parent_type, child_type
 
     def get_type_counts(self) -> Dict[str, str]:
         """

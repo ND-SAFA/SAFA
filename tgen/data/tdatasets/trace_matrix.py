@@ -27,31 +27,33 @@ class TraceMatrix:
         :param randomize: if True, randomizes the order of links in the matrix
         """
         self.query_matrix = {}
-        self.source_ids = []
+        self.parent_ids = []
         self.labels = []
-        self.entries = []
         self.scores = predicted_scores
         self._fill_trace_matrix(trace_df, predicted_scores, link_ids)
         if randomize:
             self._do_randomize()
 
-    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float], default_value: float = None):
+    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float], default_value: float = None,
+                               joining_function: Callable = None):
         """
         Calculates the average metric for each source artifact in project.
         :param metric: The metric to compute for each query in matrix.
         :param default_value: The value to use if there are no valid metric scores.
         :return: Average metric value.
         """
+        if not joining_function:
+            joining_function = lambda values: sum(values) / len(values)
         metric_values = []
         for source, query in self.query_matrix.items():
             query_predictions = query.preds
             query_labels = [link[TraceKeys.LABEL] for link in query.links]
             query_metric = metric(query_labels, query_predictions)
-            if not np.isnan(query_metric):
+            if isinstance(query_metric, dict) or not np.isnan(query_metric):
                 metric_values.append(query_metric)
         if len(metric_values) == 0:
             return default_value
-        return sum(metric_values) / len(metric_values)
+        return joining_function(metric_values)
 
     def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int, **kwargs):
         """
@@ -69,10 +71,10 @@ class TraceMatrix:
             :return: The metric score.
             """
             zipped = zip(query_labels, query_preds)
-            results = sorted(zipped, key=lambda x: x[1], reverse=True)[:k]
-            local_preds = [p for l, p in results]
-            local_labels = [l for l, p in results]
-            return metric(local_labels, local_preds)
+            results = sorted(zipped, key=lambda x: x[1], reverse=True)
+            local_preds = [p for _, p in results]
+            local_labels = [l for l, _ in results]
+            return metric(local_labels[:k], local_preds[:k])
 
         return self.calculate_query_metric(metric_at_k, **kwargs)
 
@@ -97,21 +99,23 @@ class TraceMatrix:
         :param pred: the prediction associated with the link
         :return: None
         """
-        if link[TraceKeys.SOURCE] not in self.query_matrix:
-            self.query_matrix[link[TraceKeys.SOURCE]] = Query(links=[], preds=[])
-            self.source_ids.append(link[TraceKeys.SOURCE])
-        self.query_matrix[link[TraceKeys.SOURCE]].links.append(link)
-        self.labels.append(link[TraceKeys.LABEL])
-        self.entries.append({"source": link[TraceKeys.SOURCE], "target": link[TraceKeys.TARGET]})
+        parent_id = link[TraceKeys.TARGET]
+        child_id = link[TraceKeys.SOURCE]
+        label = link[TraceKeys.LABEL]
+        if parent_id not in self.query_matrix:
+            self.query_matrix[parent_id] = Query(links=[], preds=[])
+            self.parent_ids.append(parent_id)
+        self.query_matrix[parent_id].links.append(link)
+        self.labels.append(label)
         if pred is not None:
-            self.query_matrix[link[TraceKeys.SOURCE]].preds.append(pred)
+            self.query_matrix[parent_id].preds.append(pred)
 
     def _do_randomize(self) -> None:
         """
         Randomizes the order of links in the matrix and source ids.
         :return: None
         """
-        random.shuffle(self.source_ids)
+        random.shuffle(self.parent_ids)
         for source, query in self.query_matrix.items():
             links_to_randomize = deepcopy(query.links)
             random.shuffle(links_to_randomize)

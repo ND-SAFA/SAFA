@@ -183,10 +183,11 @@ class ExperimentStep(BaseObject):
             job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTrainerJob):
                 model_path = os.path.join(job_base_path, "models")
-                setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
-                setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                if hasattr(job, "trainer_args") and job.trainer_args is not None:
+                    setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
+                    setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                    setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.job_args, "output_dir", model_path)
-                setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
                     setattr(job.trainer_dataset_manager, "output_dir", output_dir)
                     setattr(job.trainer_dataset_manager, "random_seed", job.job_args.random_seed)

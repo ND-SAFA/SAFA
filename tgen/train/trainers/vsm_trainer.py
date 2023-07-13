@@ -1,5 +1,6 @@
+import json
 import time
-from typing import Iterable, List, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +11,7 @@ from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
@@ -27,6 +29,7 @@ from tgen.train.trace_output.stage_eval import Metrics
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 
 SimilarityMatrix = Union[csr_matrix, np.array]
@@ -50,9 +53,9 @@ class VSMTrainer(AbstractTrainer):
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.model = vectorizer()
+        self.model = vectorizer(strip_accents="ascii")
         self.metrics = metrics
-        self.data_pipeline = DataCleaner(steps=steps)
+        self.artifact_map = VSMTrainer.create_clean_artifact_map(self.trainer_dataset_manager, steps)
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
@@ -88,17 +91,20 @@ class VSMTrainer(AbstractTrainer):
 
     def train(self, train_dataset: TraceDataset) -> None:
         """
-        Fits the model on the raw source and target tokens used for training
+        Fits the model on the set of raw source and target tokens in training dataset.
         :param train_dataset: The dataset to use for training
         :return: None
         """
         tracing_requests = extract_tracing_requests(train_dataset.artifact_df, train_dataset.layer_df.as_list())
         artifacts = []
         for tracing_request in tracing_requests:
-            artifacts = artifacts + tracing_request.get_parent_content()
-            artifacts = artifacts + tracing_request.get_children_content()
+            artifacts = artifacts + self.get_artifacts(tracing_request.parent_ids)
+            artifacts = artifacts + self.get_artifacts(tracing_request.child_ids)
         combined = pd.Series(artifacts)
         self.model.fit(combined)
+
+    def get_artifacts(self, artifact_ids: List[str]) -> List[str]:
+        return [self.artifact_map[a_id] for a_id in artifact_ids]
 
     def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:
         """
@@ -110,8 +116,8 @@ class VSMTrainer(AbstractTrainer):
         tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
         predictions, source_target_pairs, link_ids = [], [], []
         for tracing_request in tracing_requests:
-            parent_artifacts = tracing_request.get_parent_content()
-            child_artifacts = tracing_request.get_children_content()
+            parent_artifacts = self.get_artifacts(tracing_request.parent_ids)
+            child_artifacts = self.get_artifacts(tracing_request.child_ids)
             child_parent_pairs = tracing_request.get_tracing_pairs()
 
             parent_tf_matrix, child_tf_matrix = self.create_term_frequency_matrices(parent_artifacts, child_artifacts)
@@ -130,6 +136,7 @@ class VSMTrainer(AbstractTrainer):
         if eval_dataset.trace_df.get_label_count(1) > 0:
             metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
                 if self.metrics else None
+            logger.log_with_title("VSM Metrics", json.dumps(metrics))
         prediction_output = PredictionOutput(predictions=predictions, label_ids=None, metrics=metrics)
         trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output,
                                                         source_target_pairs=source_target_pairs,
@@ -145,11 +152,35 @@ class VSMTrainer(AbstractTrainer):
         :param raw_targets : The target documents whose matrix is the second element
         :return: CountMatrix for raw_sources and raw_targets, and also the trained model
         """
-        raw_sources = self.data_pipeline.run(list(raw_sources))
-        raw_targets = self.data_pipeline.run(list(raw_targets))
         set_source: csr_matrix = self.model.transform(raw_sources)
         set_target: csr_matrix = self.model.transform(raw_targets)
         return set_source, set_target
+
+    @staticmethod
+    def create_clean_artifact_map(trainer_dataset_manager: TrainerDatasetManager, cleaning_steps: List[AbstractDataProcessingStep]) -> \
+            Dict[str, str]:
+        """
+        Creates a map of artifact ids to cleaned artifact bodies for all datasets.
+        :param trainer_dataset_manager: The trainer dataset manager containing datasets with artifacts to clean.
+        :param cleaning_steps: The cleaning steps to perform.
+        :return: Map of artifact id to clean body.
+        """
+        data_cleaner = DataCleaner(steps=cleaning_steps)
+        artifacts_seen = set()
+        artifact_ids = []
+        artifact_bodies = []
+        for dataset_role in DatasetRole:
+            dataset = trainer_dataset_manager[dataset_role]
+            if dataset is None:
+                continue
+            for artifact_id, artifact_row in dataset.artifact_df.iterrows():
+                if artifact_id not in artifacts_seen:
+                    artifacts_seen.add(artifact_id)
+                    artifact_ids.append(artifact_id)
+                    artifact_bodies.append(artifact_row[ArtifactKeys.CONTENT.value])
+
+        artifact_bodies = data_cleaner.run(list(artifact_bodies))
+        return {a_id: a_body for a_id, a_body in zip(artifact_ids, artifact_bodies)}
 
     @staticmethod
     def calculate_similarity_matrix_from_term_frequencies(tf_source: csr_matrix, tf_target: csr_matrix) -> SimilarityMatrix:

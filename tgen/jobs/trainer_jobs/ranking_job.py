@@ -72,7 +72,7 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
-        pipeline_args = RankingArgs(export_dir=export_dir,
+        pipeline_args = RankingArgs(export_dir=export_dir,  # TODO : make kwargs in constructor relay here
                                     artifact_map=artifact_map,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
@@ -84,7 +84,6 @@ class RankingJob(AbstractJob):
         os.makedirs(pipeline_args.export_dir, exist_ok=True)
         pipeline = ArtifactRankingPipeline(pipeline_args)
         parent2rankings = pipeline.run()
-        parent2rankings = {p_id: pipeline_args.children_ids for p_id in pipeline_args.parent_ids}
         predicted_entries = RankingUtil.ranking_to_predictions(parent2rankings)
         if self.select_top_predictions:
             predicted_entries = RankingUtil.select_predictions(predicted_entries, **self.ranking_args)

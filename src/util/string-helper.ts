@@ -129,7 +129,7 @@ export function versionToString(currentVersion?: VersionSchema): string {
  */
 export function isCodeArtifact(name: string): boolean {
   const codeFileRegex =
-    /\.(js|ts|tsx|vue|java|py|cpp|c|php|html|css|sass|scss|json|yaml|yml)$/i;
+    /\.(js|ts|tsx|vue|java|py|cpp|c|php|html|css|sass|scss|json|yaml|yml|go)$/i;
 
   return codeFileRegex.test(name);
 }

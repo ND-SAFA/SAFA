@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN
+from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN, DEFAULT_RANKING_MODEL, GENERATE_SUMMARY_DEFAULT
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 
@@ -30,7 +30,7 @@ class RankingArgs(PipelineArgs):
     """
     The number of maximum children to give to claude
     """
-    n_max_children: int = DEFAULT_MAX_N_CHILDREN
+    max_children_per_query: int = DEFAULT_MAX_N_CHILDREN
     """
     The sorting algorithm to use before ranking with claude
     """
@@ -46,4 +46,16 @@ class RankingArgs(PipelineArgs):
     """
     The maximum number of tokens per source artifacts.
     """
-    n_completion_tokens = 5000
+    n_completion_tokens = 1000
+    """
+    Whether to generate a project summary.
+    """
+    generate_summary: bool = GENERATE_SUMMARY_DEFAULT
+    """
+    A pre-existing project summary to use.
+    """
+    project_summary: str = None
+    """
+    The model used to rank
+    """
+    model: str = DEFAULT_RANKING_MODEL

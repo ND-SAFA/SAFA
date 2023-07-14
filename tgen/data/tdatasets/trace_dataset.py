@@ -52,8 +52,14 @@ class TraceDataset(iDataset):
         self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
         trace_df = TraceDataFrame(trace_df.sample(frac=1))
-        self.trace_matrix = TraceMatrix(trace_df, randomize=randomize)
+        self.__trace_matrix = None
+        self.randomize = randomize
         self.trace_df = trace_df
+
+    def get_trace_matrix(self) -> TraceMatrix:
+        if self.__trace_matrix is None:
+            self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
+        return self.__trace_matrix
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
         """

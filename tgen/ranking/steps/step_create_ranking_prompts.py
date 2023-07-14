@@ -23,7 +23,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
 
         prompts = []
         for p_name in parent_names:
-            prompt = CreateRankingPrompts.create_prompts(artifact_map, p_name, state, args.n_max_children)
+            prompt = CreateRankingPrompts.create_prompts(artifact_map, p_name, state, args.max_children_per_query)
             prompts.append(prompt)
 
         state.ranking_prompts = prompts

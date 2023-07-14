@@ -84,8 +84,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: Anthropic's response to completion request.
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
-        logger.info(f"Starting Anthropic batch: {params['model']}")
         prompts = params[AnthropicParams.PROMPT]
+        logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
+
         response = []
         if isinstance(prompts, str):
             prompts = [prompts]

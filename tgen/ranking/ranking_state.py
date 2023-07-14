@@ -6,9 +6,9 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.state.state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
-                       "You are a software engineer on a software project described under `# Software Specification`. " \
-                       "You are tasked with finding the children of the parent artifact." \
-                       "\n\nParent Artifact: "
+                       "You are a software engineer on a software project. " \
+                       "You are given a parent software artifact and a list of potential children." \
+                       "You task is to find the children of the parent artifact.\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Describe the behavior of the parent relative to its role in the system. " \
                                "Enclose your answer in <context></context>." \

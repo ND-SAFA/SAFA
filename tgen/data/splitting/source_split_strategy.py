@@ -1,5 +1,6 @@
-import math
 from typing import List, Tuple
+
+import math
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
@@ -41,12 +42,13 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
         :param n_links_per_source: The number of links per source to include
         :return: Array of trace links.
         """
-        source_names = trace_dataset.trace_matrix.parent_ids
+        trace_matrix = trace_dataset.get_trace_matrix()
+        source_names = trace_matrix.parent_ids
         n_sources = len(source_names) if n_sources is None else n_sources
         n_links_per_source = math.inf if n_links_per_source is None else n_links_per_source
         agg_links = []
         for source_name in source_names[:n_sources]:
-            source_links = trace_dataset.trace_matrix.query_matrix[source_name].links
+            source_links = trace_matrix.query_matrix[source_name].links
             links_per_query = min(len(source_links), n_links_per_source)
             query_links = source_links[:links_per_query]
             agg_links.extend(query_links)

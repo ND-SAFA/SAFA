@@ -27,8 +27,12 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
     def complete_ranking_prompts(args: RankingArgs, state: RankingState) -> None:
         """
         Completes the ranking prompts.
+        :param args: The pipeline configuration.
         :param state: The ranking store.
         :return: None
         """
-        batch_response = complete_prompts(state.ranking_prompts, max_tokens=args.n_completion_tokens)
+        kwargs = {}
+        if args.model:
+            kwargs["model"] = args.model
+        batch_response = complete_prompts(state.ranking_prompts, max_tokens=args.n_completion_tokens, **kwargs)
         return batch_response

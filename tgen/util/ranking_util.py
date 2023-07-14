@@ -18,8 +18,21 @@ class RankingUtil:
     """
 
     @staticmethod
+    def ranking_to_predictions(parent2rankings) -> List[TracePredictionEntry]:
+        """
+        Converts ranking to prediction entries.
+        :param parent2rankings: Mapping of parent name to ranked children.
+        :return: List of prediction entries.
+        """
+        predicted_entries = []
+        for parent_id, ranked_children in parent2rankings.items():
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
+            predicted_entries.extend(target_predicted_entries)
+        return predicted_entries
+
+    @staticmethod
     def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str], original_entries: List[TracePredictionEntry] = None,
-                                   min_score: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD):
+                                   min_score: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD) -> List[TracePredictionEntry]:
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
         :param parent_id: The parent artifact id.

@@ -18,7 +18,7 @@ def complete_prompts(prompts: List[str], max_tokens: int = 400, temperature: flo
         "prompt": [f"\n\nHuman: {p}\n\nAssistant:" for p in prompts],
         "max_tokens_to_sample": max_tokens,
         "temperature": temperature,
-        **kwargs
+        **kwargs,
     }
     batch_response = manager.make_completion_request(LLMCompletionType.GENERATION, **params)
     return batch_response

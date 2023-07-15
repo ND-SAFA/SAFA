@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.api.responses.TGenTraceGenerationResponse;
+import edu.nd.crc.safa.features.tgen.entities.TGenLink;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +51,7 @@ public class SearchService {
         promptLayer.put(PROMPT_KEY, prompt);
         Map<UUID, String> artifactMap = constructTargetLayer(projectAppEntity, searchTypes);
         Map<String, String> artifactLayer = convertArtifactMapToLayer(artifactMap);
-        return searchSourceLayer(artifactLayer, promptLayer, n);
+        return searchSourceLayer(promptLayer, artifactLayer, n);
     }
 
     /**
@@ -84,14 +85,17 @@ public class SearchService {
      */
     public SearchResponse searchSourceLayer(Map<String, String> promptLayer,
                                             Map<String, String> artifactLayer, int n) {
+        Map<String, Map<String, String>> artifactLayers = new HashMap<>();
+        artifactLayers.put("prompt", promptLayer);
+        artifactLayers.put("artifacts", artifactLayer);
 
-        TGenDataset dataset = new TGenDataset(List.of(artifactLayer), List.of(promptLayer));
+        TGenDataset dataset = new TGenDataset(artifactLayers, List.of(List.of("artifacts", "prompt")));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
         TGen tgen = new TGen(this.safaRequestBuilder);
         TGenTraceGenerationResponse response = tgen.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenTraceGenerationResponse.PredictedLink::getSource)
+            .map(TGenLink::getSource)
             .map(UUID::fromString)
             .collect(Collectors.toList());
         int maxIndex = Math.min(matchedArtifactIds.size(), n);

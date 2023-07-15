@@ -3,16 +3,14 @@ package edu.nd.crc.safa.features.models.vsm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
-import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.generator.TraceLinkConstructor;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -26,19 +24,24 @@ public class VSMController implements ITraceGenerationController {
      * Generates set of trace links between source and target pairs of artifacts using the
      * vector-space model
      *
-     * @param tracingPayload List of artifact levels defining set of source and target artifacts.
+     * @param tGenDataset The dataset to trace.
      * @return List of trace links.
      */
     @Override
-    public List<TraceAppEntity> generateLinks(TracingPayload tracingPayload, JobLogger jobLogger) {
+    public List<TraceAppEntity> generateLinks(TGenDataset tGenDataset, JobLogger jobLogger) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
-        for (ArtifactLevel artifactLevel : tracingPayload.getArtifactLevels()) {
-            Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(artifactLevel.getSources());
-            Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(artifactLevel.getTargets());
-            TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()
-                .asGeneratedTrace(score)
-                .betweenArtifacts(s, t);
-            generatedLinks.addAll(generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor));
+        for (List<String> layer : tGenDataset.getLayers()) {
+            String childType = layer.get(0);
+            String parentType = layer.get(0);
+
+            Map<String, String> childLayer = tGenDataset.getArtifactLayers().get(childType);
+            Map<String, String> parentLayer = tGenDataset.getArtifactLayers().get(parentType);
+
+            Map<String, Collection<String>> childTokens = tokenizeArtifactAppEntities(childLayer);
+            Map<String, Collection<String>> parentTokens = tokenizeArtifactAppEntities(parentLayer);
+            TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) ->
+                new TraceAppEntity(s, t).asGeneratedTrace(score);
+            generatedLinks.addAll(generateLinksFromTokens(childTokens, parentTokens, traceLinkConstructor));
         }
 
         return generatedLinks;
@@ -62,12 +65,12 @@ public class VSMController implements ITraceGenerationController {
         return generatedLS;
     }
 
-    private Map<String, Collection<String>> tokenizeArtifactAppEntities(List<ArtifactAppEntity> artifacts) {
-        Map<String, Collection<String>> artifactTokens = new HashMap<>();
-        for (ArtifactAppEntity artifact : artifacts) {
-            artifactTokens.put(artifact.getName(), getWordsInArtifactAppEntity(artifact));
-        }
-        return artifactTokens;
+    private Map<String, Collection<String>> tokenizeArtifactAppEntities(Map<String, String> artifacts) {
+        return artifacts
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(entry -> entry.getKey(),
+                entry -> getWordsInArtifactAppEntity(entry.getValue())));
     }
 
     private void buildIndex(Collection<Collection<String>> docTokens) {
@@ -75,8 +78,8 @@ public class VSMController implements ITraceGenerationController {
         idf = TfIdf.idfFromTfs(tfs);
     }
 
-    private List<String> getWordsInArtifactAppEntity(ArtifactAppEntity artifact) {
-        String[] artifactWords = artifact.getBody().split(" ");
+    private List<String> getWordsInArtifactAppEntity(String content) {
+        String[] artifactWords = content.split(" ");
         return Arrays.asList(artifactWords);
     }
 

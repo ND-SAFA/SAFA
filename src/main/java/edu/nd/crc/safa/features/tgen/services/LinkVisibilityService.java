@@ -26,7 +26,6 @@ public class LinkVisibilityService {
         HashMap<String, List<TraceAppEntity>> child2links = createPredictionMap(links);
         List<TraceAppEntity> finalLinks = new ArrayList<>();
         for (Map.Entry<String, List<TraceAppEntity>> entry : child2links.entrySet()) {
-
             List<TraceAppEntity> childLinks = entry.getValue();
             List<TraceAppEntity> selectedLinks = childLinks
                 .stream()

@@ -1,8 +1,9 @@
 package edu.nd.crc.safa.features.summary;
 
+import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
+import edu.nd.crc.safa.features.tgen.api.responses.ITGenResponse;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,10 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class TGenSummaryResponse extends AbstractTGenResponse {
+public class TGenSummaryResponse implements ITGenResponse {
     /**
      * The content sent to summarize.
      */
     Map<String, TGenSummaryArtifact> artifacts;
+    List<String> logs;
 }

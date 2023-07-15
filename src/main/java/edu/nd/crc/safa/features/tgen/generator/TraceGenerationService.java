@@ -1,19 +1,21 @@
 package edu.nd.crc.safa.features.tgen.generator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -36,31 +38,36 @@ public class TraceGenerationService {
      * @param projectAppEntity The project app entity containing artifacts and links.
      * @return TracingPayload detailing the artifacts and the method to trace with.
      */
-    public static TracingPayload extractPayload(TracingRequest tracingRequest,
-                                                ProjectAppEntity projectAppEntity) {
-        List<ArtifactLevel> artifactLevels = new ArrayList<>();
+    public static TGenDataset extractPayload(TracingRequest tracingRequest,
+                                             ProjectAppEntity projectAppEntity) {
+        Map<String, Map<String, String>> artifactLayers = new HashMap<>();
+        List<List<String>> layers = new ArrayList<>();
         for (ArtifactLevelRequest artifactLevelRequest : tracingRequest.getArtifactLevels()) {
-            List<ArtifactAppEntity> sources = projectAppEntity.getByArtifactType(artifactLevelRequest.getSource());
-            List<ArtifactAppEntity> targets = projectAppEntity.getByArtifactType(artifactLevelRequest.getTarget());
-            ArtifactLevel artifactLevel = new ArtifactLevel(sources, targets);
-            artifactLevels.add(artifactLevel);
+            String childType = artifactLevelRequest.getSource();
+            String parentType = artifactLevelRequest.getTarget();
+
+            for (String artifactType : List.of(childType, parentType)) {
+                artifactLayers.computeIfAbsent(artifactType, t -> {
+                    List<ArtifactAppEntity> artifacts = projectAppEntity.getByArtifactType(t);
+                    return ProjectDataStructures.createArtifactLayer(artifacts);
+                });
+            }
+            layers.add(List.of(childType, parentType));
         }
-        return new TracingPayload(
-            artifactLevels
-        );
+        return new TGenDataset(artifactLayers, layers);
     }
 
     public List<TraceAppEntity> generateTraceLinks(TraceGenerationRequest traceGenerationRequest,
                                                    ProjectAppEntity projectAppEntity) {
         List<TraceAppEntity> generatedTraces = new ArrayList<>();
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
-            TracingPayload tracingPayload = extractPayload(tracingRequest, projectAppEntity);
+            TGenDataset tracingPayload = extractPayload(tracingRequest, projectAppEntity);
             generatedTraces.addAll(generateLinksWithMethod(tracingPayload));
         }
         return generatedTraces;
     }
 
-    public List<TraceAppEntity> generateLinksWithMethod(TracingPayload tracingPayload) {
+    public List<TraceAppEntity> generateLinksWithMethod(TGenDataset tracingPayload) {
         return new ArrayList<>(traceGenerationController.generateLinks(tracingPayload, null));
     }
 

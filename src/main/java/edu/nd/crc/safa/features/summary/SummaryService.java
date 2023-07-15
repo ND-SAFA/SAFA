@@ -41,7 +41,7 @@ public class SummaryService {
             artifacts.add(artifact);
         }
         TGen tgen = new TGen(safaRequestBuilder);
-        TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts, request.getModel());
+        TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts);
         TGenSummaryResponse response = tgen.generateSummaries(tgenRequest, jobLogger);
 
         List<String> summaries = new ArrayList<>();

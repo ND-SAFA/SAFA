@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.summary.TGenSummaryArtifactType;
 import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class HGenService {
+    private final String HGEN_SOURCE_NAME = "source_layer";
     ArtifactService artifactService;
     CommitService commitService;
     SafaUserService safaUserService;
@@ -46,14 +48,14 @@ public class HGenService {
      * @return List of generated artifacts.
      */
     public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
-        String targetType = request.getTargetType();
+        List<String> targetTypes = request.getTargetTypes();
         TGen controller = new TGen(safaRequestBuilder);
-        
+
         List<ArtifactAppEntity> sourceArtifacts = artifactService.getAppEntities(projectVersion);
         List<TGenSummaryArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
-        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetType, request.getClusters());
-        TGenHGenResponse response = controller.generateHierarchy(tgenRequest);
-        ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, response.getDataset(), targetType);
+        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes);
+        TGenDataset dataset = controller.generateHierarchy(tgenRequest);
+        ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, dataset, targetTypes);
         projectCommit.setCommitVersion(projectVersion);
 
         SafaUser currentUser = this.safaUserService.getCurrentUser();
@@ -66,18 +68,20 @@ public class HGenService {
      *
      * @param sourceArtifacts The artifacts sent to HGEN.
      * @param dataset         The dataset response of HGEN.
-     * @param targetType      The target type of artifacts.
+     * @param targetTypes     The target type of artifacts.
      * @return The project commit containing generated entities
      */
     private ProjectCommit createHGenCommit(List<ArtifactAppEntity> sourceArtifacts,
                                            TGenDataset dataset,
-                                           String targetType) {
+                                           List<String> targetTypes) {
         ProjectCommit projectCommit = new ProjectCommit();
-
         Map<UUID, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactMap(sourceArtifacts);
-        Map<String, String> generatedArtifactMap = dataset.getTargetLayers().get(0);
-        List<ArtifactAppEntity> artifactsGenerated = toArtifacts(generatedArtifactMap, targetType);
-        projectCommit.addArtifacts(ModificationType.ADDED, artifactsGenerated);
+
+        for (String targetType : targetTypes) {
+            List<ArtifactAppEntity> artifactsGenerated = toArtifacts(
+                dataset.getArtifactLayers().get(targetType), targetType);
+            projectCommit.addArtifacts(ModificationType.ADDED, artifactsGenerated);
+        }
 
         if (dataset.getTrueLinks() != null) {
             List<TraceAppEntity> generatedTraces = toTraces(dataset.getTrueLinks(), artifactMap);
@@ -94,16 +98,16 @@ public class HGenService {
      * @param artifactMap The map of source artifacts.
      * @return Trace entities.
      */
-    private List<TraceAppEntity> toTraces(List<List<String>> links,
+    private List<TraceAppEntity> toTraces(List<TGenLink> links,
                                           Map<UUID, ArtifactAppEntity> artifactMap) {
         return links.stream().map(t -> {
-            String sourceId = t.get(0);
-            String targetName = t.get(1);
+            String sourceId = t.getSource();
+            String targetName = t.getTarget();
             TraceAppEntity traceAppEntity = new TraceAppEntity();
             ArtifactAppEntity sourceArtifact = artifactMap.get(UUID.fromString(sourceId));
             traceAppEntity.setSourceName(sourceArtifact.getName());
             traceAppEntity.setTargetName(targetName);
-            traceAppEntity.asManualTrace();
+            traceAppEntity.asGeneratedTrace(t.getScore());
             return traceAppEntity;
         }).collect(Collectors.toList());
     }

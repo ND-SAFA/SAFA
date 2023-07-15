@@ -1,8 +1,12 @@
 package edu.nd.crc.safa.features.tgen.api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import edu.nd.crc.safa.features.tgen.entities.TGenLink;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,25 +19,37 @@ import lombok.NoArgsConstructor;
 @Data
 public class TGenDataset {
     /**
-     * Map of source artifact ids to content body.
+     * Map of artifact type to artifact maps.
      */
-    @JsonProperty("source_layers")
-    List<Map<String, String>> sourceLayers; // snake_case to match TGEN
+    @JsonProperty("artifact_layers")
+    Map<String, Map<String, String>> artifactLayers; // snake_case to match TGEN
     /**
-     * Map of target artifact ids to content body.
+     * List of layers being traced (child -> parent).
      */
-    @JsonProperty("target_layers")
-    List<Map<String, String>> targetLayers; // snake_case to match TGEN
+    @JsonProperty()
+    List<List<String>> layers;
     /**
      * The trace links between artifacts in all artifact layers.
      */
     @Nullable
     @JsonProperty("true_links")
-    List<List<String>> trueLinks;
+    List<TGenLink> trueLinks;
 
-    public TGenDataset(List<Map<String, String>> sourceLayers, List<Map<String, String>> targetLayers) {
-        this.sourceLayers = sourceLayers;
-        this.targetLayers = targetLayers;
+    @JsonIgnore
+    Map<String, List<String>> layerIds = new HashMap<>();
+
+    public TGenDataset(Map<String, Map<String, String>> artifactLayers, List<List<String>> layers) {
+        this.artifactLayers = artifactLayers;
+        this.layers = layers;
+    }
+
+    public List<String> getArtifacts(String artifactType) {
+        if (!this.layerIds.containsKey(artifactType)) {
+            Map<String, String> artifactMap = this.artifactLayers.get(artifactType);
+            List<String> artifacts = new ArrayList<>(artifactMap.values());
+            this.layerIds.put(artifactType, artifacts);
+        }
+        return this.layerIds.get(artifactType);
     }
 
     /**
@@ -41,10 +57,15 @@ public class TGenDataset {
      */
     @JsonIgnore
     public int getNumOfCandidates() {
-        int total = 0;
-        for (int i = 0; i < sourceLayers.size(); i++) {
-            total += sourceLayers.get(i).size() * targetLayers.get(i).size();
+        int nCandidates = 0;
+        for (List<String> layer : this.layers) {
+            String childType = layer.get(0);
+            String parentType = layer.get(0);
+
+            Map<String, String> childArtifactMap = this.artifactLayers.get(childType);
+            Map<String, String> parentArtifactMap = this.artifactLayers.get(parentType);
+            nCandidates += childArtifactMap.size() * parentArtifactMap.size();
         }
-        return total;
+        return nCandidates;
     }
 }

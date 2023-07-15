@@ -2,10 +2,8 @@ package edu.nd.crc.safa.features.hgen;
 
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
-import edu.nd.crc.safa.features.tgen.api.requests.AbstractGenerationRequest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -17,7 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @NoArgsConstructor
-public class HGenRequestDTO extends AbstractGenerationRequest {
+public class HGenRequestDTO {
     /**
      * List of artifact ids to generate hierarchy for.
      */
@@ -27,10 +25,5 @@ public class HGenRequestDTO extends AbstractGenerationRequest {
      * The target type of artifact to create.
      */
     @NotNull
-    String targetType;
-    /**
-     * List of lists representing clusters.
-     */
-    @Nullable
-    List<List<String>> clusters;
+    List<@Valid String> targetTypes;
 }

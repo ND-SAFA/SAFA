@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.hgen.HGenResponse;
 import edu.nd.crc.safa.features.hgen.TGenHGenRequest;
-import edu.nd.crc.safa.features.hgen.TGenHGenResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
@@ -23,15 +23,14 @@ import edu.nd.crc.safa.features.summary.TGenSummaryRequest;
 import edu.nd.crc.safa.features.summary.TGenSummaryResponse;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.api.requests.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.tgen.api.responses.AbstractTGenResponse;
+import edu.nd.crc.safa.features.tgen.api.responses.ITGenResponse;
 import edu.nd.crc.safa.features.tgen.api.responses.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.tgen.entities.TGenStatus;
 import edu.nd.crc.safa.features.tgen.entities.TGenTask;
 import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
-import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -66,9 +65,9 @@ public class TGen implements ITraceGenerationController {
      * @param request The request detailing clusters of artifacts.
      * @return The generated artifacts per cluster.
      */
-    public TGenHGenResponse generateHierarchy(TGenHGenRequest request) {
+    public HGenResponse generateHierarchy(TGenHGenRequest request) {
         String summarizeEndpoint = getEndpoint("hgen");
-        return this.performTGenJob(summarizeEndpoint, request, TGenHGenResponse.class, null);
+        return this.performTGenJob(summarizeEndpoint, request, HGenResponse.class, null);
     }
 
     /**
@@ -111,15 +110,14 @@ public class TGen implements ITraceGenerationController {
     /**
      * Generates links using a deep learning model starting at a given state.
      *
-     * @param tracingPayload The artifact to trace between.
-     * @param logger         The logger used to send TGEN logs to.
+     * @param dataset The dataset to trace.
+     * @param logger  The logger used to send TGEN logs to.
      * @return List of generated traces.
      */
     public List<TraceAppEntity> generateLinks(
-        TracingPayload tracingPayload, JobLogger logger) {
+        TGenDataset dataset, JobLogger logger) {
         // Step - Build request
-        TGenPredictionRequestDTO payload = createTraceGenerationPayload(
-            tracingPayload);
+        TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
 
         // Step - Send request
         TGenTraceGenerationResponse output = this.sendTraceLinkRequest(payload, logger);
@@ -162,10 +160,10 @@ public class TGen implements ITraceGenerationController {
      * @param <T>           The generic for the job result class.
      * @return Parsed TGEN response if job is successful.
      */
-    private <T extends AbstractTGenResponse> T performTGenJob(String endpoint,
-                                                              Object payload,
-                                                              Class<T> responseClass,
-                                                              JobLogger logger) {
+    private <T extends ITGenResponse> T performTGenJob(String endpoint,
+                                                       Object payload,
+                                                       Class<T> responseClass,
+                                                       JobLogger logger) {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");
@@ -204,20 +202,13 @@ public class TGen implements ITraceGenerationController {
      * @return The trace link entities.
      */
     private List<TraceAppEntity> convertPredictionsToLinks(
-        List<TGenTraceGenerationResponse.PredictedLink> predictions) {
+        List<TGenLink> predictions) {
         return predictions
             .stream()
             .map(p -> new TraceAppEntity(
-                null,
                 p.getSource(),
-                null,
-                p.getTarget(),
-                null,
-                ApprovalStatus.UNREVIEWED,
-                p.getScore(),
-                TraceType.GENERATED,
-                true
-            )).collect(Collectors.toList());
+                p.getTarget()
+            ).asGeneratedTrace(p.getScore())).collect(Collectors.toList());
     }
 
     /**
@@ -269,20 +260,6 @@ public class TGen implements ITraceGenerationController {
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-    }
-
-    /**
-     * Converts Client trace generation payload into TGEN payload.
-     *
-     * @param tracingPayload The tracing payload defined by client.
-     * @return The payload to send TGEN.
-     */
-    private TGenPredictionRequestDTO createTraceGenerationPayload(
-        TracingPayload tracingPayload) {
-        TGenDataset dataset = new TGenDataset(
-            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
-            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets));
-        return new TGenPredictionRequestDTO(dataset);
     }
 
     /**

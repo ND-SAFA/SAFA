@@ -28,6 +28,11 @@ public class TraceAppEntity implements IAppEntity {
     TraceType traceType;
     boolean isVisible = true;
 
+    public TraceAppEntity(String sourceName, String targetName) {
+        this.sourceName = sourceName;
+        this.targetName = targetName;
+    }
+
     public TraceAppEntity(UUID traceLinkId,
                           String sourceName,
                           UUID sourceId,
@@ -37,16 +42,16 @@ public class TraceAppEntity implements IAppEntity {
                           double score,
                           TraceType traceType,
                           boolean isVisible) {
+        this(sourceName, targetName);
+        this.score = score;
         this.traceLinkId = traceLinkId;
-        this.sourceName = sourceName;
         this.sourceId = sourceId;
-        this.targetName = targetName;
         this.targetId = targetId;
         this.approvalStatus = approvalStatus;
-        this.score = score;
         this.traceType = traceType;
         this.isVisible = isVisible;
     }
+
 
     public TraceAppEntity asManualTrace() {
         this.setApprovalStatus(ApprovalStatus.APPROVED);

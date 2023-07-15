@@ -17,7 +17,7 @@ class SummaryArtifactPayload(TypedDict):
 
 
 @dataclass
-class SummarizePayload:
+class SummarizeRequest:
     artifacts: List[SummaryArtifactPayload]
 
 
@@ -51,4 +51,4 @@ class SummarizeSerializer(serializers.Serializer):
         summary_serializer = SummaryArtifactSerializer(many=True, data=validated_data["artifacts"])
         summary_serializer.is_valid(raise_exception=True)
         summary_artifacts = summary_serializer.save()
-        return SummarizePayload(artifacts=summary_artifacts)
+        return SummarizeRequest(artifacts=summary_artifacts)

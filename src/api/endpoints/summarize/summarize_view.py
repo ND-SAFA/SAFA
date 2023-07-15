@@ -1,5 +1,5 @@
 from api.endpoints.base.views.endpoint import async_endpoint, endpoint
-from api.endpoints.summarize.summarize_serializer import SummarizePayload, SummarizeSerializer
+from api.endpoints.summarize.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.utils.view_util import ViewUtil
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.components.args.job_args import JobArgs
@@ -9,16 +9,16 @@ from tgen.train.args.anthropic_args import AnthropicArgs
 
 
 @endpoint(SummarizeSerializer)
-def perform_summarization_sync(request_data: SummarizePayload):
+def perform_summarization_sync(request_data: SummarizeRequest):
     return perform_summarize_request(request_data)
 
 
 @async_endpoint(SummarizeSerializer)
-def perform_summarization_job(request_data: SummarizePayload):
+def perform_summarization_job(request_data: SummarizeRequest):
     return perform_summarize_request(request_data)
 
 
-def perform_summarize_request(request_data: SummarizePayload):
+def perform_summarize_request(request_data: SummarizeRequest):
     """
     Performs artifact summarization.
     :param request_data: Serialized data.

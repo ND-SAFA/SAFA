@@ -1,21 +1,27 @@
+from typing import Dict, List, TypedDict
+
 from rest_framework import serializers
 
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.summarize.summarize_serializer import SummaryArtifactSerializer
 
 
-class HGenSerializer(AbstractSerializer):
+class HGenRequest(TypedDict):
+    artifacts: List[Dict]
+    targetTypes: List[str]
+
+
+class HGenSerializer(serializers.Serializer):
     """
     Serializes the request for hierarchy generation
     """
 
-    artifacts = serializers.ListSerializer(child=SummaryArtifactSerializer(),
-                                           help_text="List of artifacts to generate parent artifacts from.")
-    clusters = serializers.ListSerializer(
-        child=serializers.ListSerializer(
-            child=serializers.CharField(max_length=512, help_text="Artifact ID."),
-            help_text="Artifact IDs belonging to cluster."),
-        help_text="List of clusters.", required=False, allow_null=True)
+    artifacts = SummaryArtifactSerializer(help_text="List of artifacts to generate parent artifacts from.", many=True)
     targetTypes = serializers.ListSerializer(
         help_text="List of target types to generate.",
         child=serializers.CharField(max_length=1028, help_text="The types of artifacts to generate."))
+
+    def create(self, validated_data):
+        artifact_serializer = SummaryArtifactSerializer(data=validated_data["artifacts"], many=True)
+        artifact_serializer.is_valid(raise_exception=True)
+        artifacts = artifact_serializer.save()
+        return HGenRequest(artifacts=artifacts, targetTypes=validated_data["targetTypes"])

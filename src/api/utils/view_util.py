@@ -1,8 +1,9 @@
 import json
-from typing import Any
+from typing import Any, Type
 from uuid import UUID
 
 from django.http import HttpRequest
+from rest_framework import serializers
 
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.util.status import Status
@@ -29,7 +30,7 @@ class ViewUtil:
         return job_body
 
     @staticmethod
-    def read_request(request: HttpRequest, serializer_class) -> Any:
+    def read_request(request: HttpRequest, serializer_class: Type[serializers.Serializer]) -> Any:
         """
         Converts a HttpRequest to a dictionary
         :param request: the HttpRequest
@@ -39,7 +40,8 @@ class ViewUtil:
         data = json.loads(request.body)
         serializer = serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
-        return serializer.save()
+        obj = serializer.save()
+        return obj
 
     @staticmethod
     def is_uuid(model_id: str, version=4) -> bool:

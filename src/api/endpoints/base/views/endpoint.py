@@ -1,3 +1,4 @@
+import json
 import threading
 from typing import Any, Callable, Dict, Optional
 
@@ -51,7 +52,7 @@ def endpoint(serializer):
                     response = func(payload)
                     if isinstance(response, JsonResponse):
                         return response
-                    return JsonResponse(response, encoder=NpEncoder)
+                    return JsonResponse(response, encoder=NpEncoder, safe=False)
 
         return APIDecorator.as_view()
 
@@ -101,10 +102,13 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
             state["is_running"] = True
 
             def run_job():
-                result.update(func(*task_args, **task_kwargs))
+                response = func(*task_args, **task_kwargs)
+                response_str = json.dumps(response, cls=NpEncoder)
+                response_dict = json.loads(response_str)
+                result.update(response_dict)
                 state["is_running"] = False
 
-            logger.info(f"Welcome to TGEN. Beginning job: {current_task.request.id}")
+            logger.info(f"Beginning job: {current_task.request.id}")
             thread = threading.Thread(target=run_job)
             thread.start()
 

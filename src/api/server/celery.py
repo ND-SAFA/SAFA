@@ -13,8 +13,11 @@ celery = None
 if "BROKER_USERNAME" in os.environ:
     BROKER_USERNAME = os.environ["BROKER_USERNAME"]
     BROKER_PASSWORD = os.environ["BROKER_PASSWORD"]
+    host = "tgen-rabbitmq"
+    if os.environ["ENV_MODE"] == "local":
+        host = "localhost"
 
-    CELERY_BROKER_URL = f"amqp://tgen-rabbitmq:5672/"
+    CELERY_BROKER_URL = f"amqp://{host}:5672/"
 
     celery = Celery('server',
                     broker=CELERY_BROKER_URL)

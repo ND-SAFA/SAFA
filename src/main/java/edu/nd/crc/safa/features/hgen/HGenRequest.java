@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @NoArgsConstructor
-public class HGenRequestDTO {
+public class HGenRequest {
     /**
      * List of artifact ids to generate hierarchy for.
      */

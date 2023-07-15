@@ -5,9 +5,11 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.builders.HGenJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +34,11 @@ public class HGenController extends BaseController {
      * @return List of generates artifacts for new level.
      */
     @PostMapping(AppRoutes.HGen.GENERATE)
-    public ProjectCommit generateHierarchy(@PathVariable UUID versionId,
-                                           @RequestBody @Valid HGenRequestDTO request) {
+    public JobAppEntity generateHierarchy(@PathVariable UUID versionId,
+                                          @RequestBody @Valid HGenRequest request) throws Exception {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.serviceProvider.getHGenService().generateHierarchy(projectVersion, request);
+        SafaUser currentUser = this.serviceProvider.getSafaUserService().getCurrentUser();
+        HGenJobBuilder jobBuilder = new HGenJobBuilder(this.serviceProvider, projectVersion, request, currentUser);
+        return jobBuilder.perform();
     }
 }

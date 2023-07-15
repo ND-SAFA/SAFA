@@ -20,7 +20,6 @@ import edu.nd.crc.safa.features.tgen.TGen;
 import edu.nd.crc.safa.features.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
@@ -47,7 +46,7 @@ public class HGenService {
      * @param request        The request defining artifacts, clusters, and model.
      * @return List of generated artifacts.
      */
-    public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequestDTO request) {
+    public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequest request) {
         List<String> targetTypes = request.getTargetTypes();
         TGen controller = new TGen(safaRequestBuilder);
 
@@ -58,8 +57,6 @@ public class HGenService {
         ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, dataset, targetTypes);
         projectCommit.setCommitVersion(projectVersion);
 
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
-        this.commitService.performCommit(projectCommit, currentUser);
         return projectCommit;
     }
 

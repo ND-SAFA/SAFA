@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -11,7 +11,7 @@ from tgen.util.enum_util import EnumDict
 class GenerateArtifactsJob(BaseHGenJob):
     SOURCE_LAYER_ID = "source_layer"
 
-    def __init__(self, artifacts: List[EnumDict], target_type: str, artifact_ids_by_cluster: List[List[Union[str, int]]] = None,
+    def __init__(self, artifacts: List[Dict], target_type: str, artifact_ids_by_cluster: List[List[Union[str, int]]] = None,
                  job_args: JobArgs = None, **hgen_params):
         """
         Initializes the job with args needed for hierarchy generator

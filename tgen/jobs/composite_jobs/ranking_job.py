@@ -76,6 +76,7 @@ class RankingJob(AbstractJob):
         pipeline = ArtifactRankingPipeline(pipeline_args)
         parent2rankings, parent2explanations = pipeline.run()
         predicted_entries = RankingUtil.ranking_to_predictions(parent2rankings, parent2explanations)
+        if self.select_top_predictions:
             predicted_entries = RankingUtil.select_predictions(predicted_entries,
                                                                parent_threshold=pipeline_args.parent_primary_threshold,
                                                                min_threshold=pipeline_args.parent_min_threshold)

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.models;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**

@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.generation.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 

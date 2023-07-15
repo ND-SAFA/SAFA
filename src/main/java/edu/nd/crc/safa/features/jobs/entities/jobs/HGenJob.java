@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.hgen.HGenRequest;
-import edu.nd.crc.safa.features.hgen.HGenService;
+import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
+import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;

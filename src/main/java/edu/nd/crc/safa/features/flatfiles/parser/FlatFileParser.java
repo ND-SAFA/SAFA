@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IDataFile;
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionParser;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.Data;

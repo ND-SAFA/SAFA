@@ -9,7 +9,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.generation.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;

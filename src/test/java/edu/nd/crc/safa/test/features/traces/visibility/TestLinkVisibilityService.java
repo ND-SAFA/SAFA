@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.features.tgen.services.LinkVisibilityService;
+import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 

@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
-import edu.nd.crc.safa.features.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.tgen.generator.TraceLinkConstructor;
+import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.generation.tgen.generator.TraceLinkConstructor;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**

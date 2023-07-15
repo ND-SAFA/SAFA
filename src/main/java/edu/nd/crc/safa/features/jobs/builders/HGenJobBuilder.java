@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.hgen.HGenRequest;
+import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.HGenJob;

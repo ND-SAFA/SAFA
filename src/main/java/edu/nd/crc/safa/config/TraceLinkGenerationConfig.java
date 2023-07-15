@@ -3,7 +3,7 @@ package edu.nd.crc.safa.config;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.models.vsm.VSMController;
-import edu.nd.crc.safa.features.tgen.TGen;
+import edu.nd.crc.safa.features.generation.tgen.TGen;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

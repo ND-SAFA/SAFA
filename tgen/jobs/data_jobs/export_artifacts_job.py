@@ -6,7 +6,6 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
 from tgen.util.file_util import FileUtil
 
 
@@ -34,10 +33,13 @@ class ExportArtifactsJob(AbstractJob):
         Exports artifact bodies as delimited file. Any delimiter found in artifact bodies is removed.
         :return: JobResult containing export path.
         """
-        self.trace_dataset_creator.create()
-        artifacts: Iterable[str] = self.trace_dataset_creator.artifact_df[StructuredKeys.Artifact.CONTENT.value]
+        trace_dataset = self.trace_dataset_creator.create()
+        artifacts: Iterable[str] = trace_dataset.artifact_df[StructuredKeys.Artifact.CONTENT.value]
         artifacts = [a.replace(self.delimiter, "") for a in artifacts]
         content = self.delimiter.join(artifacts)
         file_path = os.path.join(self.job_args.output_dir, self.file_name)
         FileUtil.write(content, file_path)
+        artifact_export_path = os.path.join(self.job_args.output_dir, "artifacts.csv")
+        trace_dataset.artifact_df.to_csv(artifact_export_path)
+
         return file_path

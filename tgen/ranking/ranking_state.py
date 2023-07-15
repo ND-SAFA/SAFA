@@ -12,11 +12,11 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Describe the parent artifact's function in the software system. " \
                                " Enclose your answer in <function></function>" \
-                               "\n2. Find the artifacts who support the parent's function with in the system. " \
+                               "\n2. Find the artifacts who implement the parent's function within the system. " \
                                "Provide the list of artifacts and a description of how it relates to the parent. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
                                "Enclose your answer in <related></related>." \
-                               "\n3. Rank the artifacts from most to least important to the parent's function. " \
+                               "\n3. Rank the artifacts from most to least important to the parent's functioning. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related while the last element is the least. " \
                                "Enclose the list in <links></links>."

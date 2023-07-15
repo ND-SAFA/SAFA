@@ -18,8 +18,9 @@ INSTRUCTIONS_GOAL = "# Instructions\nPlease follow the instructions below to cre
 TASKS_DEFINITIONS = [
     "Create a sub-section called `Overview`. Provide a paragraph describing the main functionality of the system.",
     "Create a sub-sections for each major components in the system. ",
-    "For each component, provide a paragraph describing its responsibilities and its contribution(s) to the system.",
-    "Create a sub-section called `Data Flow` and describe the dependencies between components and how do they interact.",
+    "For each component, provide a paragraph describing its responsibilities within the system "
+    "and the system artifacts that help implement it.",
+    "Create a sub-section called `Data Flow` and describe the dependencies between components and how they interact.",
 ]
 FORMAT = "\n\n" \
          "Enclose your response in <summary></summary>."

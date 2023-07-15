@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.generation.hgen;
 import java.util.List;
 
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
-import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.TGenDataset;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

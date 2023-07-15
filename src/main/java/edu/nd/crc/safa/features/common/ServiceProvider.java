@@ -26,7 +26,7 @@ import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
-import edu.nd.crc.safa.features.generation.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;

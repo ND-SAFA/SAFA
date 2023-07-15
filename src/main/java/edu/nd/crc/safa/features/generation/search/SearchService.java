@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.common.TGenDataset;
 import edu.nd.crc.safa.features.generation.tgen.TGen;
-import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
 import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;

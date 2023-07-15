@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
+import edu.nd.crc.safa.features.generation.common.TGenDataset;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;

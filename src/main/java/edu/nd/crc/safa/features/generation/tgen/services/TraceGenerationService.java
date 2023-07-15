@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen.generator;
+package edu.nd.crc.safa.features.generation.tgen.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.TGenDataset;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;

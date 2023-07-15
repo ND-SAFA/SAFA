@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.generation.tgen;
 
+import edu.nd.crc.safa.features.generation.common.TGenDataset;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

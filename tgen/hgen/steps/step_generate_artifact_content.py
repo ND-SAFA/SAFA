@@ -48,7 +48,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                              )
         task_prompt.format_value(format=format_of_artifacts)
         prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire)
-        if args.system_summary and False:
+        if args.system_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown('Overview of System:')}"
                                                f"{NEW_LINE}{args.system_summary}")
             prompt_builder.add_prompt(overview_of_system_prompt, 1)

@@ -37,7 +37,11 @@ class NpEncoder(json.JSONEncoder):
             return obj.name
         from tgen.util.base_object import BaseObject
         if isinstance(obj, BaseObject):
-            return str(obj)
+            obj_fields = ReflectionUtil.get_fields(obj)
+            new_fields = {}
+            for field_name, field_value in obj_fields.items():
+                new_fields[field_name] = self.default(field_value)
+            return new_fields
         if isinstance(obj, list) or isinstance(obj, tuple):
             return [self.default(v) for v in obj]
         if isinstance(obj, dict):

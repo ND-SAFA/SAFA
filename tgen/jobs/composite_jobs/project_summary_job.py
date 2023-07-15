@@ -1,6 +1,5 @@
-from typing import Dict
+from typing import Dict, TypedDict
 
-from api.endpoints.project_summary.project_summary_serializer import ProjectSummaryResponse
 from tgen.constants.tgen_constants import DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.common.completion_util import complete_prompts
@@ -26,6 +25,13 @@ FORMAT = "\n\n" \
          "Enclose your response in <summary></summary>."
 TASKS = "".join([f"\n- {t}" for t in TASKS_DEFINITIONS])
 INSTRUCTIONS = INSTRUCTIONS_GOAL + TASKS + FORMAT
+
+
+class ProjectSummaryResponse(TypedDict):
+    """
+    The response for a project summary request.
+    """
+    summary: str
 
 
 class ProjectSummaryJob(AbstractJob):

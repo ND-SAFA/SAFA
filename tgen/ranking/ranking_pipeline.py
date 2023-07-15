@@ -9,6 +9,7 @@ from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
 from tgen.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.util.file_util import FileUtil
 
 
 class ArtifactRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
@@ -36,6 +37,7 @@ class ArtifactRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         if self.args.export_dir is not None:
             os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
-        batched_ranked_children = self.state.processed_ranking_response
+        batched_ranked_children = self.state.ranked_children
         parent2rankings = {source: ranked_children for source, ranked_children in zip(self.args.parent_ids, batched_ranked_children)}
-        return parent2rankings
+        parent2explanations = {s: e for s, e in zip(self.args.parent_ids, self.state.ranked_children_explanations)}
+        return parent2rankings, parent2explanations

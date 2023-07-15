@@ -29,5 +29,8 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         kwargs = {}
         if args.model:
             kwargs["model"] = args.model
-        batch_response = complete_prompts(state.ranking_prompts, max_tokens=args.n_completion_tokens, **kwargs)
+        batch_response = complete_prompts(state.ranking_prompts,
+                                          temperature=0,
+                                          max_tokens=args.n_completion_tokens,
+                                          **kwargs)
         return batch_response

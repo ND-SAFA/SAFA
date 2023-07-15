@@ -79,7 +79,8 @@ class TracingJob(AbstractJob):
 
         for parent_id, ranked_sources in parent2rankings.items():
             target_entries = parent2entries[parent_id]
-            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_sources, target_entries)
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_sources,
+                                                                              original_entries=target_entries)
             predicted_entries.extend(target_predicted_entries)
         if self.select_top_predictions:
             predicted_entries = RankingUtil.select_predictions(predicted_entries)

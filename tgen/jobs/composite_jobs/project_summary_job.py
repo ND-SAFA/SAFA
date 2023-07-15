@@ -58,7 +58,7 @@ class ProjectSummaryJob(AbstractJob):
         for target_artifact_name in artifact_ids:
             prompt_builder.with_artifact(target_artifact_name, self.artifact_map[target_artifact_name])
         prompt = prompt_builder.get()
-        generation_response = complete_prompts([prompt], max_tokens=self.n_tokens)
+        generation_response = complete_prompts([prompt], max_tokens=self.n_tokens, temperature=0)
         response = generation_response.batch_responses[0]
         summary = LLMResponseUtil.parse(response, "summary")[0].strip()
         return ProjectSummaryResponse(summary=summary)

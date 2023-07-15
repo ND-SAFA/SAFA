@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import Dict, List
 
 from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -18,7 +18,7 @@ class RankingUtil:
     """
 
     @staticmethod
-    def ranking_to_predictions(parent2rankings) -> List[TracePredictionEntry]:
+    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]]) -> List[TracePredictionEntry]:
         """
         Converts ranking to prediction entries.
         :param parent2rankings: Mapping of parent name to ranked children.
@@ -26,12 +26,14 @@ class RankingUtil:
         """
         predicted_entries = []
         for parent_id, ranked_children in parent2rankings.items():
-            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
+            explanations = parent2explanations[parent_id]
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, explanations=explanations)
             predicted_entries.extend(target_predicted_entries)
         return predicted_entries
 
     @staticmethod
-    def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str], original_entries: List[TracePredictionEntry] = None,
+    def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str],
+                                   original_entries: List[TracePredictionEntry] = None, explanations: List[str] = None,
                                    min_score: float = DEFAULT_MIN_RANKING_SCORE) -> List[TracePredictionEntry]:
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
@@ -44,7 +46,9 @@ class RankingUtil:
         children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
         scores = RankingUtil.assign_scores_to_targets(ranked_children_ids, min_score=min_score)
         predicted_entries = []
-        for child_id, score in zip(ranked_children_ids, scores):
+        for i in range(len(ranked_children_ids)):
+            child_id = ranked_children_ids[i]
+            score = scores[i]
             label = children2label.get(child_id, None)
             entry = {
                 "source": child_id,
@@ -52,6 +56,8 @@ class RankingUtil:
                 "score": score,
                 "label": label
             }
+            if explanations:
+                entry["explanation"] = explanations[i]
             predicted_entries.append(entry)
         return predicted_entries
 

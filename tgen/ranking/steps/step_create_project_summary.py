@@ -1,4 +1,4 @@
-from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob
+from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -24,5 +24,6 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
             summary = None
         else:  # GENERATED SUMMARY
             summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens)
-            summary = summary_job.run().body
+            response: ProjectSummaryResponse = summary_job.run().body
+            summary = response["summary"]
         state.project_summary = summary

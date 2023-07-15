@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -26,7 +26,9 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The ranking store.
         :return: None
         """
-        state.processed_ranking_response: List[List[str]] = ProcessRankingResponses.process_ranked_artifacts(args, state)
+        ranked_children, children_explanations = ProcessRankingResponses.process_ranked_artifacts(args, state)
+        state.ranked_children = ranked_children
+        state.ranked_children_explanations = children_explanations
 
     @staticmethod
     def process_ranked_artifacts(args: RankingArgs, state: RankingState) -> List[List[str]]:
@@ -39,19 +41,27 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         batch_response = state.ranking_responses
 
-        ranked_target_links = [[] for _ in range(len(args.parent_ids))]
+        ranked_children_list = [[] for _ in range(len(args.parent_ids))]
+        ranked_children_explanations = [None] * len(args.parent_ids)
         for parent_name, prompt_response in zip(args.parent_ids, batch_response.batch_responses):
             parent_index = args.parent_ids.index(parent_name)
             related_children = state.sorted_parent2children[parent_name]
-            related = LLMResponseUtil.parse(prompt_response, "related")
-            deps = LLMResponseUtil.parse(prompt_response, "context")
+
+            # content = LLMResponseUtil.parse(prompt_response, "context")
+            related = LLMResponseUtil.parse(prompt_response, "related")[0]
+            explanations = ProcessRankingResponses.read_explanations(related, related_children)
+
             response_list = ProcessRankingResponses.convert_response_to_list(prompt_response)  # string response into list
             artifact_indices = ProcessRankingResponses.parse_artifact_indices(response_list)  # processes each artifact id
-            children_ids = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_children)
-            children_ids = ProcessRankingResponses.remove_duplicate_ids(children_ids)
-            ranked_target_links[parent_index].extend(children_ids)
+            prompt_ranked_children = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_children)
+            prompt_ranked_children = ProcessRankingResponses.remove_duplicate_ids(prompt_ranked_children)
 
-        return ranked_target_links
+            prompt_ranked_children_explanations = [explanations[c] if c in explanations else None for c in prompt_ranked_children]
+
+            ranked_children_list[parent_index].extend(prompt_ranked_children)
+            ranked_children_explanations[parent_index] = prompt_ranked_children_explanations
+
+        return ranked_children_list, ranked_children_explanations
 
     @staticmethod
     def translate_indices_to_ids(artifact_indices: List[str], related_targets: List[str]):
@@ -108,3 +118,20 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                 new_list.append(artifact_id)
                 seen.add(artifact_id)
         return new_list
+
+    @staticmethod
+    def read_explanations(explanations: str, index_translations: List[str]) -> Dict[str, str]:
+        """
+        Reads trace link explanations.
+        :param explanations: Reads the trace links explanations.
+        :param index_translations: The names to use instead of indices.
+        :return: Dictionary mapping artifact index to explanation
+        """
+        elements = explanations.split("\n")
+        elements = [e.strip() for e in elements]
+        elements = [e for e in elements if len(e) > 0]
+        elements = [e.split("-") for e in elements]
+        elements = {e[0].strip(): e[1].strip() for e in elements}
+        elements = {int(a_id): e for a_id, e in elements.items()}
+        elements = {index_translations[a_id]: e for a_id, e in elements.items()}
+        return elements

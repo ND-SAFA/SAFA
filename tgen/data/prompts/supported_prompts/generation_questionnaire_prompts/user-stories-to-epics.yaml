@@ -1,0 +1,9 @@
+format:
+- As a [user/role], I want [feature] so that [benefit].
+questions:
+- - '- What is the overall goal or objective of this user story?'
+  - '- Who is the primary user or stakeholder for this user story?'
+  - '- What capability or feature does this user story enable for the user?'
+  - '- What larger workflow or process does this user story fit into?'
+  - '- What other user stories does this one relate to or depend on?'
+  - '- Which part of the system does this user story primarily concern?'

@@ -1,11 +1,15 @@
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List
+
+import numpy as np
+import pandas as pd
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.server.api.api_definition import ApiDefinition
+from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.json_util import JsonUtil
 
 
@@ -19,9 +23,8 @@ class ApiExporter(AbstractDatasetExporter):
         :param export_path: The path to export the dataset to
         """
         super().__init__(dataset_creator=dataset_creator, dataset=dataset, export_path=export_path)
-        self.source_layers: Dict[str, Dict[str, str]] = {}
-        self.target_layers: Dict[str, Dict[str, str]] = {}
-        self.true_links: List[Tuple[str, str]] = []
+        self.generated_layers: Dict[str, Dict[str, str]] = {}
+        self.true_links: List[TracePredictionEntry] = []
 
     def export(self, **kwargs) -> ApiDefinition:
         """
@@ -29,29 +32,39 @@ class ApiExporter(AbstractDatasetExporter):
         :return: The ApiDefinition
         """
         dataset = self.get_dataset()
-        self.true_links = dataset.get_source_target_pairs(dataset.get_pos_link_ids())
-        for link_id, link in dataset.trace_df.itertuples():
-            self._add_2_layer(link[TraceKeys.SOURCE], self.source_layers)
-            self._add_2_layer(link[TraceKeys.TARGET], self.target_layers)
-        definition = ApiDefinition(source_layers=list(self.source_layers.values()), target_layers=list(self.target_layers.values()),
+        links = dataset.trace_df.to_dict(orient="records")
+        self.true_links: List[Dict] = [t for t in links if not np.isnan(t["score"]) and t["score"] > 0]
+        for link_id, artifact_row in dataset.artifact_df.itertuples():
+            self._add_artifact(artifact_row)
+        layers = []
+        for i, layer_row in dataset.layer_df.iterrows():
+            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
+            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+            layers.append((child_type, parent_type))
+
+        definition = ApiDefinition(layers=layers,
+                                   artifact_layers=self.generated_layers,
                                    true_links=self.true_links)
         if self.export_path:
             JsonUtil.save_to_json_file(definition.as_dict(), self.export_path)
 
         return definition
 
-    def _add_2_layer(self, artifact_id: Union[str, int], artifact_layer: Dict[str, Dict[str, str]]) -> None:
+    def _add_artifact(self, artifact: pd.Series) -> None:
         """
         Adds the artifact to the source or target layer
-        :param artifact_id: The id of the artifact
-        :param artifact_layer: The layer to add the artifact to
+        :param artifact: The id of the artifact
         :return: None
         """
-        artifact = self.get_dataset().artifact_df.get_artifact(artifact_id)
-        if artifact[ArtifactKeys.LAYER_ID] not in artifact_layer:
-            artifact_layer[artifact[ArtifactKeys.LAYER_ID]] = {}
-        if artifact_id not in artifact_layer[artifact[ArtifactKeys.LAYER_ID]]:
-            artifact_layer[artifact[ArtifactKeys.LAYER_ID]][artifact_id] = artifact[ArtifactKeys.CONTENT]
+        artifact_id = artifact[ArtifactKeys.ID.value]
+        layer_id = artifact[ArtifactKeys.LAYER_ID.value]
+        content = artifact[ArtifactKeys.CONTENT.value]
+
+        if layer_id not in self.generated_layers:
+            self.generated_layers[layer_id] = {}
+
+        if artifact_id not in self.generated_layers[layer_id]:
+            self.generated_layers[layer_id][artifact_id] = content
 
     @staticmethod
     def include_filename() -> bool:

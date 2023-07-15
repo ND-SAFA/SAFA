@@ -1,0 +1,29 @@
+format:
+- '- Each design definition should be numbered. - Each design definition should have
+  a clear and concise description. - Bullet points should be used to list specific
+  requirements or considerations. - The design definitions should cover different
+  aspects of the software development project, such as user interface, database, security,
+  performance, and integration.'
+questions:
+- - '- What are the main classes/components in the code and what are their responsibilities?'
+  - '- How are the classes/components related to each other? What are the key interactions
+    and dependencies between them?'
+  - '- What are the key functions/methods in each class/component? What is their purpose?'
+  - '- What are the major data structures and how are they used by different classes/components?'
+  - '- Is there a clear separation of concerns in the code? Are components loosely
+    coupled?'
+  - '- What are the key algorithms used and where are they implemented?'
+  - '- What are the major control flows in the code? What triggers certain actions/flows?'
+  - '- Are there any major cross-cutting concerns like logging, configuration, security
+    etc? How are they implemented?'
+  - '- What are the external interfaces/APIs exposed by the system? What are their
+    inputs and outputs?'
+  - '- How is concurrency handled in the system, if applicable?'
+  - '- How is error handling implemented? Are there global exception handling policies?'
+  - '- What are the key configuration options and how are they handled?'
+  - '- Is there use of any design patterns? If so, what and where?'
+  - '- Does the code follow any architecture principles like SOLID, DRY etc?'
+  - '- What are the key dependencies and how are they managed?'
+  - '- What build/deployment mechanisms are implemented?'
+  - '- What testing frameworks/capabilities are included?'
+  - '- What documentation is available for understanding the code structure and flow?'

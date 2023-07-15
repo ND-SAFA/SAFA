@@ -18,8 +18,8 @@ class TracePredictionEntry(TypedDict):
     """
     source: str
     target: str
-    score: float
-    label: float = -1
+    score: Optional[float]
+    label: Optional[float] = -1.0
 
 
 class TracePredictionOutput(AbstractTraceOutput):

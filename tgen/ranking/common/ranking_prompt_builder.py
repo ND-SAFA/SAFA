@@ -1,5 +1,7 @@
 from typing import Any, List, Optional
 
+from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
+
 DEFAULT_BODY_TITLE = "# Software Artifacts"
 
 
@@ -20,7 +22,7 @@ def builder_method(func):
 class RankingPromptBuilder:
 
     def __init__(self, goal: str = "", query: str = "", instructions: str = "",
-                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n"):
+                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n", query_tag: str = DEFAULT_QUERY_TAG):
         """
         Builder for prompts with tasks.
         """
@@ -31,6 +33,7 @@ class RankingPromptBuilder:
         self.body_title = body_title
         self.body = ""
         self.context = ""
+        self.query_tag = query_tag
 
     @builder_method
     def with_query(self, query: str):
@@ -64,8 +67,9 @@ class RankingPromptBuilder:
         """
         :return: Builds and returns prompt.
         """
+        query_formatted = f"<{self.query_tag}>\n{self.query}\n</{self.query_tag}>" if self.query else self.query
         body = self.join_prompts([self.body_title, self.body], "\n\n")
-        items = [self.goal + self.query, self.context, body, self.instructions]
+        items = [self.goal + query_formatted, self.context, body, self.instructions]
         prompt = self.join_prompts(items, self.section_delimiter)
         return prompt
 

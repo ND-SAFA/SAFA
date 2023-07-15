@@ -1,5 +1,4 @@
 import os
-
 from typing import List
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -22,7 +21,7 @@ class TestApiExporter(BaseTest):
         exporter = ApiExporter(dataset_creator=orig_creator, export_path=export_path)
         api_definition = exporter.export()
         exported_api_definition_dict = JsonUtil.read_json_file(export_path)
-        exported_api_definition_dict["true_links"] = [tuple(link) for link in exported_api_definition_dict["true_links"]]
+        exported_api_definition_dict["true_links"] = [link for link in exported_api_definition_dict["true_links"]]
         api_definition_dict = api_definition.as_dict()
         self.assertDictEqual(exported_api_definition_dict, api_definition_dict)
         exported_dataset = TraceDatasetCreator(ApiProjectReader(api_definition), allowed_missing_sources=100,

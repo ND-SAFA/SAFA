@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from tgen.constants.tgen_constants import DEFAULT_PARENT_THRESHOLD, DEFAULT_TOP_PREDICTION_MIN_THRESHOLD
+from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -18,14 +18,27 @@ class RankingUtil:
     """
 
     @staticmethod
+    def ranking_to_predictions(parent2rankings) -> List[TracePredictionEntry]:
+        """
+        Converts ranking to prediction entries.
+        :param parent2rankings: Mapping of parent name to ranked children.
+        :return: List of prediction entries.
+        """
+        predicted_entries = []
+        for parent_id, ranked_children in parent2rankings.items():
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children)
+            predicted_entries.extend(target_predicted_entries)
+        return predicted_entries
+
+    @staticmethod
     def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str], original_entries: List[TracePredictionEntry] = None,
-                                   min_score: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD):
+                                   min_score: float = DEFAULT_MIN_RANKING_SCORE) -> List[TracePredictionEntry]:
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
         :param parent_id: The parent artifact id.
         :param ranked_children_ids: The ranked children for parent.
         :param original_entries: The original entries to extract labels from.
-        :param min_score: The minimum traceabilty score.
+        :param min_score: The minimum traceability score.
         :return:
         """
         children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
@@ -81,8 +94,9 @@ class RankingUtil:
             return metrics
 
     @staticmethod
-    def select_predictions(trace_predictions: List[TracePredictionEntry], parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
-                           min_threshold: float = DEFAULT_TOP_PREDICTION_MIN_THRESHOLD) -> List[TracePredictionEntry]:
+    def select_predictions(trace_predictions: List[TracePredictionEntry],
+                           parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
+                           min_threshold: float = DEFAULT_PARENT_MIN_THRESHOLD) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.

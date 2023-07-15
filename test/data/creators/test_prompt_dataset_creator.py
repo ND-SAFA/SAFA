@@ -99,7 +99,7 @@ class TestPromptDatasetCreator(BaseTest):
         :return: None
         """
         mock_completion.side_effect = fake_open_ai_completion
-        prompt_dataset: PromptDataset = dataset_creator.create()
+        prompt_dataset: PromptDataset = dataset_creator.create_artifact_df()
         for row in artifacts_entries:
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \

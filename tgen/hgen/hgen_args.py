@@ -1,7 +1,6 @@
-from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
@@ -125,7 +124,6 @@ class HGenArgs(PipelineArgs, BaseObject):
         assert self.tgen_trainer or self.dataset_creator_for_sources or self.dataset_for_sources, \
             "Must provide either a dataset creator to make a dataset with traces between artifacts of the source layer, " \
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."
-        self.target_type = self.target_type.capitalize()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-3.5-turbo'))

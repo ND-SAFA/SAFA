@@ -11,11 +11,11 @@ from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, parse_generated_artifacts
-from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation, parse_generated_artifacts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger
@@ -35,7 +35,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         summary_questionnaire, format_of_artifacts = GenerateArtifactContent.construct_questionnaire(args)
 
         source_layer_only_dataset = state.source_dataset
-        export_path = state.export_path
+        export_path = os.path.join(state.export_path, "artifact_gen_response.yaml") if state.export_path else None
 
         state.format_of_artifacts = format_of_artifacts
         state.generation_questionnaire = summary_questionnaire
@@ -61,7 +61,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                                                  response_prompt_ids={task_prompt.id, summary_questionnaire.id},
                                                  tags_for_response={generated_artifacts_tag, summary_tag},
                                                  return_first=False,
-                                                 export_path=os.path.join(export_path, "artifact_gen_response.yaml"))[0]
+                                                 export_path=export_path)[0]
         generated_artifact_content = generation_predictions[generated_artifacts_tag]
         summary = generation_predictions[summary_tag][0]
 

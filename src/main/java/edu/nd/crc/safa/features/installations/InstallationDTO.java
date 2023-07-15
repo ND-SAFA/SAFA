@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.installations.app;
+package edu.nd.crc.safa.features.installations;
 
 import java.util.Date;
 import java.util.UUID;

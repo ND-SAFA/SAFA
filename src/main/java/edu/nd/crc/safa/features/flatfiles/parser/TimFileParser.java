@@ -16,9 +16,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimSchema;
 import edu.nd.crc.safa.features.flatfiles.parser.tim.TimTraceDefinition;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.generation.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -96,8 +95,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             // Step - If generation is set, create generation request.\
             if (trace.generateLinks()) {
                 String generationMethod = trace.getGenerationMethod();
-                BaseGenerationModels baseGenerationModels = BaseGenerationModels.getModel(generationMethod);
-                traceGenerationRequest.addTracingRequest(baseGenerationModels, source, target);
+                traceGenerationRequest.addTracingRequest(source, target);
             }
 
             if (trace.hasFilename()) {

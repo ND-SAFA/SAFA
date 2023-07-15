@@ -66,37 +66,6 @@ public enum BaseGenerationModels {
     }
 
     /**
-     * Returns the base model associated with name.
-     *
-     * @param name The name of the model.
-     * @return The base generation model with name.
-     */
-    public static BaseGenerationModels getModel(String name) {
-        return name == null ? getDefault() : BaseGenerationModels.valueOf(name);
-    }
-
-    /**
-     * Retrieves base generation model by id.
-     *
-     * @param modelId The UUID of the model.
-     * @return The Base generation model.
-     */
-    public static BaseGenerationModels getModelById(UUID modelId) {
-        ModelAppEntity model = getDefaultModels()
-            .stream()
-            .filter(m -> m.getId().equals(modelId))
-            .findFirst().orElse(getDefaultModel());
-        return model.getBaseModel();
-    }
-
-    /**
-     * @return Returns the default model for search, tracing, and generation.
-     */
-    public static BaseGenerationModels getDefault() {
-        return BaseGenerationModels.GPT;
-    }
-
-    /**
      * @return Returns list of models available to user.
      */
     public static List<ModelAppEntity> getDefaultModels() {

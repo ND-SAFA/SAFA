@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.vsm;
+package edu.nd.crc.safa.features.traces.vsm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.models.ITraceGenerationController;
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
 import edu.nd.crc.safa.features.generation.tgen.generator.TraceLinkConstructor;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**

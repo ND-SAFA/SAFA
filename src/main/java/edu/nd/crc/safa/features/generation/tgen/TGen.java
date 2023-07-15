@@ -1,35 +1,25 @@
 package edu.nd.crc.safa.features.generation.tgen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.TGenConfig;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.common.ITGenResponse;
+import edu.nd.crc.safa.features.generation.common.TGenStatus;
+import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;
 import edu.nd.crc.safa.features.generation.hgen.TGenHGenRequest;
-import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
-import edu.nd.crc.safa.features.models.ITraceGenerationController;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryResponse;
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.generation.tgen.api.requests.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.generation.tgen.api.responses.ITGenResponse;
-import edu.nd.crc.safa.features.generation.tgen.api.responses.TGenTraceGenerationResponse;
-import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenStatus;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenTask;
-import edu.nd.crc.safa.features.generation.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
+import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.AccessLevel;
@@ -260,28 +250,6 @@ public class TGen implements ITraceGenerationController {
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
-    }
-
-    /**
-     * Creates the artifact payload based on the given TracingPayload and a getter function.
-     *
-     * @param tracingPayload The TracingPayload object containing the artifact levels.
-     * @param getter         A function that retrieves a list of ArtifactAppEntity objects based on the ArtifactLevel.
-     * @return A list of maps representing the artifact levels and their corresponding artifacts.
-     */
-    private List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload,
-                                                            Function<ArtifactLevel, List<ArtifactAppEntity>> getter) {
-        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
-
-        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
-            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
-            artifacts
-                .stream()
-                .filter(a -> a.getTraceString().length() > 0)
-                .forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getTraceString()));
-            artifactLevelsMap.add(artifactLevelsArtifactMap);
-        });
-        return artifactLevelsMap;
     }
 
     /**

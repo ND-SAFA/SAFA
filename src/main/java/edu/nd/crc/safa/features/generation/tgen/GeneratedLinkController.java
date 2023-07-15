@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen.controllers;
+package edu.nd.crc.safa.features.generation.tgen;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,8 +9,8 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen.api.responses;
+package edu.nd.crc.safa.features.generation.common;
 
 import java.util.List;
 

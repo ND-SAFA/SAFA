@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.models.vsm;
+package edu.nd.crc.safa.features.traces.vsm;
 
 import java.util.ArrayList;
 import java.util.Collection;

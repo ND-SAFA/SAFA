@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.generation.hgen;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.generation.tgen.api.responses.ITGenResponse;
+import edu.nd.crc.safa.features.generation.common.ITGenResponse;
+import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

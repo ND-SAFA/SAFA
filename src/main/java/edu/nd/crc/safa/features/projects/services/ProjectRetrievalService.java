@@ -20,8 +20,6 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
@@ -65,7 +63,6 @@ public class ProjectRetrievalService {
     private final ArtifactPositionService artifactPositionService;
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-    private final ModelService modelService;
     private final AttributeService attributeService;
     private final AttributeLayoutService attributeLayoutService;
     private final SafaUserService safaUserService;
@@ -104,8 +101,6 @@ public class ProjectRetrievalService {
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
-        List<ModelAppEntity> models = this.modelService.getUserModels(user);
-
         List<CustomAttributeAppEntity> attributes = this.attributeService
             .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
 
@@ -125,7 +120,6 @@ public class ProjectRetrievalService {
             warnings,
             errors,
             layout,
-            models,
             attributes,
             attributeLayouts,
             subtrees);

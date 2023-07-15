@@ -32,8 +32,7 @@ public class TraceGenerationRequest {
         return this.getRequests().size();
     }
 
-    public void addTracingRequest(BaseGenerationModels method,
-                                  String source,
+    public void addTracingRequest(String source,
                                   String target) {
         ArtifactLevelRequest artifactLevelRequest = new ArtifactLevelRequest(source, target);
         TracingRequest tracingRequest = new TracingRequest(

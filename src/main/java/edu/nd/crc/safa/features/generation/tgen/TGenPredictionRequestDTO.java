@@ -1,6 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen.api.requests;
-
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
+package edu.nd.crc.safa.features.generation.tgen;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.generation.prompt;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.generation.tgen.api.responses.ITGenResponse;
+import edu.nd.crc.safa.features.generation.common.ITGenResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

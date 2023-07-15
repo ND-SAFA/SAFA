@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifactType;
 import edu.nd.crc.safa.features.generation.tgen.TGen;
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
+import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
 import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.services.SafaUserService;

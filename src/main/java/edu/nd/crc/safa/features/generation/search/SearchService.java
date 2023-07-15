@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.tgen.TGen;
+import edu.nd.crc.safa.features.generation.tgen.TGenDataset;
+import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
+import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
-import edu.nd.crc.safa.features.generation.tgen.api.TGenDataset;
-import edu.nd.crc.safa.features.generation.tgen.api.requests.TGenPredictionRequestDTO;
-import edu.nd.crc.safa.features.generation.tgen.api.responses.TGenTraceGenerationResponse;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;

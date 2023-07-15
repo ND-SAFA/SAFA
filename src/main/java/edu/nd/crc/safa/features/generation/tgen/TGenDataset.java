@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen.api;
+package edu.nd.crc.safa.features.generation.tgen;
 
 import java.util.ArrayList;
 import java.util.HashMap;

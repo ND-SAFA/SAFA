@@ -15,7 +15,7 @@ class TestMultiTraceDatasetCreator(BaseTraceTest):
         Tests that creating multi-dataset contains the datasets within it.
         """
         multi_dataset_creator = self.get_multi_trace_dataset_creator()
-        multi_dataset = multi_dataset_creator.create()
+        multi_dataset = multi_dataset_creator.create_artifact_df()
         expected_projects = [StructuredTestProject(), CsvTestProject()]
         expected_datasets = [TraceDatasetCreator(project.get_project_reader()).create() for project in expected_projects]
         for dataset in expected_datasets:

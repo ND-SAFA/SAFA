@@ -1,6 +1,5 @@
 from typing import List, Union
 
-from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
@@ -35,13 +34,11 @@ class GenerateArtifactsJob(BaseHGenJob):
         Gets the arguments used for the hierarchy generation
         :return: The arguments used for the hierarchy generation
         """
-        manual_clusters = {i: artifacts_in_cluster
-                           for i, artifacts_in_cluster in enumerate(self.artifacts_by_cluster)}
-        if len(manual_clusters) > 0:
-            self.hgen_params["clustering_method"] = SupportedClusteringMethod.MANUAL
-        return HGenArgs(dataset_for_sources=self._create_dataset(), manual_clusters=manual_clusters,
-                        source_layer_id=self.SOURCE_LAYER_ID, target_type=self.target_type,
+        args = HGenArgs(dataset_for_sources=self._create_dataset(),
+                        source_layer_id=self.SOURCE_LAYER_ID,
+                        target_type=self.target_type,
                         **self.hgen_params)
+        return args
 
     def _create_dataset(self) -> PromptDataset:
         """

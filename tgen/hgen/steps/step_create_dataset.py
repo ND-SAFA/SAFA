@@ -11,7 +11,7 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
-from tgen.hgen.hgen_util import create_artifact_df_from_generated_artifacts, save_dataset_checkpoint, SAVE_DATASET_DIRNAME
+from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
 from tgen.jobs.trainer_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -54,7 +54,7 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
 
             new_layer_df = CreateHGenDataset._create_layer_df_with_generated_artifacts(args, target_layer_id)
             combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
-            new_trace_df = CreateHGenDataset._create_trace_df_with_generated_artifacts(args, combined_artifact_df)
+            new_trace_df = CreateHGenDataset._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df)
             save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
                                     export_path, filename="generated_dataset_checkpoint")
 
@@ -92,7 +92,8 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         return layer_df
 
     @staticmethod
-    def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs, artifact_df: ArtifactDataFrame) -> TraceDataFrame:
+    def _create_trace_df_with_generated_artifacts(hgen_args: HGenArgs, hgen_state: HGenState,
+                                                  artifact_df: ArtifactDataFrame) -> TraceDataFrame:
         """
         Creates a dataframe of traces including the new trace links between the original lower-level artifacts
         and the newly generated upper-level artifacts
@@ -100,11 +101,11 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
-        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers)
+        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary)
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")
-        trace_predictions: List[TracePredictionEntry] = tracing_job.run().body.prediction_entries
+        trace_predictions: List[TracePredictionEntry] = result.body.prediction_entries
         traces = {}
         for entry in trace_predictions:
             link = EnumDict({

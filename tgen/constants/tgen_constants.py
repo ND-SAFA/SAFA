@@ -1,5 +1,6 @@
 DEFAULT_PARENT_THRESHOLD = 0.9  # The minimum percentile to consider a candidate as true
-DEFAULT_TOP_PREDICTION_MIN_THRESHOLD = 0.75  # The minimum percentile allowed for a top parent prediction.
+DEFAULT_PARENT_MIN_THRESHOLD = 0.75  # The minimum percentile allowed for a top parent prediction.
+DEFAULT_MIN_RANKING_SCORE = 0.5
 DEFAULT_MAX_N_CHILDREN = 30
 DEFAULT_SORTING_ALGORITHM = "vsm"
 GENERATE_SUMMARY_DEFAULT = True
@@ -7,3 +8,5 @@ SUMMARY_TITLE = "# Software Specification"
 DEFAULT_QUERY_TAG = "parent-artifact"
 DEFAULT_RANKING_MODEL = "claude-2.0"
 DEFAULT_SEARCH_MODEL = "claude-instant-v1"
+SEARCH_PARENT_TYPE = "prompt"
+SEARCH_CHILD_TYPE = "artifacts"

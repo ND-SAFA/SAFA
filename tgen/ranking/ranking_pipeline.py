@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List
 
 from tgen.ranking.ranking_args import RankingArgs
@@ -32,6 +33,8 @@ class ArtifactRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         return RankingState()
 
     def run(self) -> Dict[str, List[str]]:
+        if self.args.export_dir is not None:
+            os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
         batched_ranked_children = self.state.processed_ranking_response
         parent2rankings = {source: ranked_children for source, ranked_children in zip(self.args.parent_ids, batched_ranked_children)}

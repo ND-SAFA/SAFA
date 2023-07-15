@@ -9,8 +9,8 @@ class ApiDefinition(BaseObject):
     """
     Defines the dataset received through the API.
     """
-    source_layers: List[Dict[str, str]]
-    target_layers: List[Dict[str, str]]
+    artifact_layers: Dict[str, str]
+    layers: List[Tuple[str, str]]
     true_links: List[Tuple[str, str]] = None
 
     def get_links(self) -> List[Tuple[str, str]]:

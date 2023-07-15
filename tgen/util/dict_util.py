@@ -1,6 +1,10 @@
-from typing import Dict, List, Iterable, Set
+from enum import Enum
+from typing import Dict, Iterable, List, Set, Type, TypeVar
 
+from tgen.util.enum_util import EnumDict
 from tgen.util.list_util import ListUtil
+
+T = TypeVar("T")
 
 
 class DictUtil:
@@ -67,3 +71,14 @@ class DictUtil:
             if key not in keys2filter:
                 output_dict[key] = dict_[key]
         return output_dict
+
+    @staticmethod
+    def create_trace_enum(obj: Type[T], enum_type: Type[Enum]) -> EnumDict:
+        """
+        Create enum dictionary from object.
+        :param obj: The trace entry whose properties are extracted.
+        :param trace_keys: The properties to extract if they exist.
+        :return: EnumDict containing keys found.
+        """
+        trace_keys = [key for key in enum_type if key.value in obj]
+        return EnumDict({k: obj[k.value] for k in trace_keys})

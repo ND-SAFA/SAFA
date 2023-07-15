@@ -1,9 +1,6 @@
-import os.path
 import re
 from typing import Dict, List, Optional, Tuple, Union
 
-from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN, DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, \
-    GENERATE_SUMMARY_DEFAULT
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -22,28 +19,22 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
-                 sorter: str = DEFAULT_SORTING_ALGORITHM, select_top_predictions: bool = True, ranking_args: Dict = None,
-                 layer_ids: Tuple[str, str] = None, generate_summary: bool = GENERATE_SUMMARY_DEFAULT, project_summary: str = None,
-                 max_children_per_query: int = DEFAULT_MAX_N_CHILDREN, model: str = DEFAULT_RANKING_MODEL):
+                 select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
         :param artifact_df: DataFrame containing sources and targets.
         :param sorter: The sorting function to feed big claude with.
+        :param select_top_predictions: Whether to select the top predictions
+        :param layer_ids
         """
         super().__init__()
         assert dataset_creator is None or artifact_df is None, "Cannot define both dataset creator and artifact df."
         self.dataset_creator = dataset_creator
-        self.sorter = sorter
         self.select_top_predictions = select_top_predictions
-        self.ranking_args = ranking_args if ranking_args else {}
         self.artifact_df = artifact_df
         self.layer_ids = layer_ids
-        self.project_name = 'DEFAULT' if self.dataset_creator is None else self.dataset_creator.get_name()
-        self.generate_summary = generate_summary
-        self.project_summary = project_summary
-        self.model = model
-        self.max_children_per_query = max_children_per_query
+        self.ranking_kwargs = kwargs
         if self.artifact_df is not None:
             assert self.layer_ids is not None, "Please define the layers to trace."
 
@@ -53,7 +44,6 @@ class RankingJob(AbstractJob):
         :param kwargs: Additional keyword arguments.
         :return:
         """
-        export_dir = os.path.expanduser(f"~/desktop/checkpoints/{self.project_name}")
         tracing_types, artifact_df, dataset = self.construct_tracing_request()
         artifact_map = DataStructureUtil.create_artifact_map(artifact_df)
         artifact_map = self.process_newlines(artifact_map)
@@ -61,32 +51,35 @@ class RankingJob(AbstractJob):
         # Predict
         global_predictions = []
         for tracing_type in tracing_types:
-            predicted_entries = self.trace_layer(artifact_df, artifact_map, export_dir, tracing_type)
+            predicted_entries = self.trace_layer(artifact_df, artifact_map, tracing_type)
             global_predictions.extend(predicted_entries)
 
         self.optional_eval(dataset, global_predictions)
 
         return TracePredictionOutput(prediction_entries=global_predictions)
 
-    def trace_layer(self, artifact_df: ArtifactDataFrame, artifact_map: Dict[str, str], export_dir, types_to_trace: Tuple[str, str]):
+    def trace_layer(self, artifact_df: ArtifactDataFrame, artifact_map: Dict[str, str], types_to_trace: Tuple[str, str]):
+        """
+        Traces the between the child-parent artifact types.
+        :param artifact_df: The artifact dataframe containing artifacts ids.
+        :param artifact_map: Map of artifact id to content.
+        :param types_to_trace: The child-parent layers being traced.
+        :return:
+        """
         parent_type, child_type = types_to_trace
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
-        pipeline_args = RankingArgs(export_dir=export_dir,  # TODO : make kwargs in constructor relay here
-                                    artifact_map=artifact_map,
+        pipeline_args = RankingArgs(artifact_map=artifact_map,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
-                                    sorter=self.sorter,
-                                    generate_summary=self.generate_summary,
-                                    project_summary=self.project_summary,
-                                    max_children_per_query=self.max_children_per_query,
-                                    model=self.model)
-        os.makedirs(pipeline_args.export_dir, exist_ok=True)
+                                    **self.ranking_kwargs)
         pipeline = ArtifactRankingPipeline(pipeline_args)
         parent2rankings = pipeline.run()
         predicted_entries = RankingUtil.ranking_to_predictions(parent2rankings)
         if self.select_top_predictions:
-            predicted_entries = RankingUtil.select_predictions(predicted_entries, **self.ranking_args)
+            predicted_entries = RankingUtil.select_predictions(predicted_entries,
+                                                               parent_threshold=pipeline_args.parent_primary_threshold,
+                                                               min_threshold=pipeline_args.parent_min_threshold)
         return predicted_entries
 
     def construct_tracing_request(self) -> Tuple[List[Tuple[str, str]], ArtifactDataFrame, Optional[TraceDataset]]:

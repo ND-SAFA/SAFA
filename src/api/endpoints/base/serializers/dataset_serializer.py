@@ -2,39 +2,23 @@ from typing import Dict, List, TypedDict
 
 from rest_framework import serializers
 
+from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.ranking.common.trace_layer import TraceLayer
 
 
 class DatasetPayload(TypedDict):
     """
     Type of payload for a dataset
     """
-    source_layers: List[Dict[str, str]]
-    target_layers: List[Dict[str, str]]
+    artifact_layers: Dict[str, Dict[str, str]]
+    layers: List[TraceLayer]
 
 
-class DatasetSerializer(serializers.Serializer):
-    """
-    Serializes datasets for trace link prediction.
-    """
-    source_layers = serializers.ListSerializer(
-        child=serializers.DictField(
-            child=serializers.CharField(
-                help_text="The artifact body.",
-                allow_blank=True,
-                allow_null=False),
-            help_text="Map of artifact IDs to bodies.",
-            allow_empty=True
-        ),
-        help_text="List of source artifacts layers.",
-        required=True)
-    target_layers = serializers.ListSerializer(
-        child=serializers.DictField(
-            child=serializers.CharField(help_text="The artifact Body"),
-            help_text="Map of artifact IDs to bodies."),
-        help_text="List of target artifacts layers.",
-        required=True)
+class TraceLayerSerializer(AbstractSerializer):
+    parent = serializers.CharField(help_text="The parent type.", allow_blank=False, allow_null=False, required=True)
+    child = serializers.CharField(help_text="The child type.", allow_blank=False, allow_null=False, required=True)
 
     def update(self, **kwargs):
         """
@@ -44,16 +28,33 @@ class DatasetSerializer(serializers.Serializer):
         """
         SerializerUtility.update_error()
 
+    def create(self, validated_data):
+        trace_layer = TraceLayer(parent=validated_data["parent"], child=validated_data["child"])
+        return trace_layer
+
+
+class DatasetSerializer(AbstractSerializer):
+    """
+    Serializes datasets for trace link prediction.
+    """
+    artifact_layers = serializers.DictField(
+        child=serializers.DictField(
+            child=serializers.CharField(help_text="a"),
+            help_text="a"
+        ),
+        help_text="a"
+    )
+    layers = TraceLayerSerializer(many=True, help_text="The layers being traced.")
+
     def create(self, validated_data) -> ApiDefinition:
         """
         Validates dataset payload.
         :param validated_data: The data validated by django.
         :return:
         """
-        SerializerUtility.assert_no_unknown_fields(validated_data, self.fields.fields)
-        SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        n_source_layers = len(validated_data["source_layers"])
-        n_target_layers = len(validated_data["target_layers"])
-        assert n_source_layers == n_target_layers, f"Expected number of source and target layers to match: {n_source_layers} != {n_target_layers}"
-        return ApiDefinition(source_layers=validated_data["source_layers"], target_layers=validated_data["target_layers"],
+        layer_serializer = TraceLayerSerializer(many=True, data=validated_data["layers"])
+        layer_serializer.is_valid(raise_exception=True)
+        layers = layer_serializer.save()
+        return ApiDefinition(artifact_layers=validated_data["artifact_layers"],
+                             layers=layers,
                              true_links=[])

@@ -115,7 +115,7 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
 
             while state["is_running"]:
                 write_logs()
-                threading.Event().wait(1)
+                threading.Event().wait(5)
             thread.join()
 
             endpoint_postprocess(state, result)

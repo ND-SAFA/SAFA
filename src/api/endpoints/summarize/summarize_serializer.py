@@ -1,8 +1,8 @@
+from dataclasses import dataclass
 from typing import List, TypedDict
 
 from rest_framework import serializers
 
-from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 
 
@@ -16,13 +16,12 @@ class SummaryArtifactPayload(TypedDict):
     type: str
 
 
-class SummarizePayload(TypedDict):
+@dataclass
+class SummarizePayload:
     artifacts: List[SummaryArtifactPayload]
-    model: str
-    prompt: str
 
 
-class SummaryArtifactSerializer(AbstractSerializer):
+class SummaryArtifactSerializer(serializers.Serializer):
     """
     Serializes a summary artifact request.
     """
@@ -32,12 +31,24 @@ class SummaryArtifactSerializer(AbstractSerializer):
     type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker],
                                    help_text="The type of chunker to use for segmenting document.")
 
+    def create(self, validated_data):
+        return SummaryArtifactPayload(
+            id=validated_data["id"],
+            name=validated_data["name"],
+            content=validated_data["content"],
+            type=validated_data["type"]
+        )
 
-class SummarizeSerializer(AbstractSerializer):
+
+class SummarizeSerializer(serializers.Serializer):
     """
     Serializes the request for artifact summaries.
     """
 
-    artifacts = serializers.ListSerializer(child=SummaryArtifactSerializer(help_text="Artifact information for summarization."),
-                                           help_text="Map of artifact IDs to bodies.")
-    prompt = serializers.CharField(max_length=512, required=False, help_text="The prompt to use for summarizing artifact.")
+    artifacts = SummaryArtifactSerializer(many=True, help_text="Artifact information for summarization.")
+
+    def create(self, validated_data):
+        summary_serializer = SummaryArtifactSerializer(many=True, data=validated_data["artifacts"])
+        summary_serializer.is_valid(raise_exception=True)
+        summary_artifacts = summary_serializer.save()
+        return SummarizePayload(artifacts=summary_artifacts)

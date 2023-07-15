@@ -15,7 +15,6 @@ if "BROKER_USERNAME" in os.environ:
     BROKER_PASSWORD = os.environ["BROKER_PASSWORD"]
 
     CELERY_BROKER_URL = f"amqp://tgen-rabbitmq:5672/"
-    print("URL:", CELERY_BROKER_URL)
 
     celery = Celery('server',
                     broker=CELERY_BROKER_URL)

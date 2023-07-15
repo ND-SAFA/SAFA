@@ -24,6 +24,8 @@ services:
       - tgen-rabbitmq
     env_file:
       - .env
+    environment:
+      - ENV_MODE=dev
     networks:
       - app_network
 networks:

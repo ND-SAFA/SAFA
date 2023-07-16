@@ -37,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for providing step implementations for parsing flat files
  * to use the project creation worker.
  */
-public class CreateProjectViaFlatFilesJob extends CommitJob {
+public class FlatFileProjectCreationJob extends CommitJob {
 
     /**
      * The initial project version
@@ -60,10 +60,10 @@ public class CreateProjectViaFlatFilesJob extends CommitJob {
      */
     String pathToFiles;
 
-    public CreateProjectViaFlatFilesJob(JobDbEntity jobDbEntity,
-                                        ServiceProvider serviceProvider,
-                                        ProjectVersion projectVersion,
-                                        MultipartFile[] files) {
+    public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
+                                      ServiceProvider serviceProvider,
+                                      ProjectVersion projectVersion,
+                                      MultipartFile[] files) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;

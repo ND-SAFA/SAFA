@@ -8,7 +8,7 @@ import edu.nd.crc.safa.test.features.jobs.base.JobTestService;
 
 import org.junit.jupiter.api.Test;
 
-class TestCreateProjectViaFlatFilesJob extends AbstractUpdateProjectViaFlatFileTest {
+class TestFlatFileProjectCreationJob extends AbstractUpdateProjectViaFlatFileTest {
 
     int N_STEPS = 6;
 

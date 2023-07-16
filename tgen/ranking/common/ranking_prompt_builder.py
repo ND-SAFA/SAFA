@@ -52,8 +52,8 @@ class RankingPromptBuilder:
         self.instructions = format
 
     @builder_method
-    def with_artifact(self, artifact_name: Any, artifact_body: str):
-        self.body += self.format_artifact(artifact_name, artifact_body)
+    def with_artifact(self, artifact_name: Any, artifact_body: str, **kwargs):
+        self.body += self.format_artifact(artifact_name, artifact_body, **kwargs)
 
     @builder_method
     def with_body(self, body: str):
@@ -74,7 +74,7 @@ class RankingPromptBuilder:
         return prompt
 
     @staticmethod
-    def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n"):
+    def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n", name: str = None):
         """
         Formats the artifact as xml.
         :param artifact_name: The artifact id.
@@ -82,6 +82,8 @@ class RankingPromptBuilder:
         :param separator: The separator between artifacts.
         :return: Artifact prompt string.
         """
+        if name:
+            artifact_body = f"{name}: {artifact_body}"
         body = artifact_body.replace("\n\n", "\n")
         return f"## {artifact_name}\n{body}{separator}"
 

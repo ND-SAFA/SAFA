@@ -1,6 +1,6 @@
 from typing import Dict, TypedDict
 
-from tgen.constants.tgen_constants import DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
+from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
@@ -17,7 +17,7 @@ INSTRUCTIONS_GOAL = "# Instructions\nPlease follow the instructions below to cre
                     "\nInstructions: "
 TASKS_DEFINITIONS = [
     "Create a sub-section called `Overview`. Provide a paragraph describing the main functionality of the system.",
-    "Create a sub-sections for each major components in the system. ",
+    "Create a sub-sections for each major components in the system. "
     "For each component, provide a paragraph describing its responsibilities within the system "
     "and the system artifacts that help implement it.",
     "Create a sub-section called `Data Flow` and describe the dependencies between components and how they interact.",
@@ -54,7 +54,7 @@ class ProjectSummaryJob(AbstractJob):
         logger.log_title("Creating project specification.")
         prompt_builder = RankingPromptBuilder(goal=GOAL,
                                               instructions=INSTRUCTIONS,
-                                              body_title="# Software Artifacts")
+                                              body_title=BODY_ARTIFACT_TITLE)
         artifact_ids = self.artifact_map.keys()
         for target_artifact_name in artifact_ids:
             prompt_builder.with_artifact(target_artifact_name, self.artifact_map[target_artifact_name])

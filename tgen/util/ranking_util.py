@@ -84,10 +84,17 @@ class RankingUtil:
         n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
         if n_labels > 1:
             all_link_ids = list(dataset.trace_df.index)
-            link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for entry in
-                        ranking_entries]
-            missing_ids = list(set(all_link_ids).difference(set(link_ids)))
-            ordered_link_ids = link_ids + missing_ids
+            predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
+                                  entry in
+                                  ranking_entries]
+            missing_ids = list(set(all_link_ids).difference(set(predicted_link_ids)))
+            ordered_link_ids = predicted_link_ids + missing_ids
+
+            missing_links = [dataset.trace_df.get_link(t_id) for t_id in missing_ids]
+            missing_links = [t for t in missing_links if t[TraceKeys.LABEL] == 1]
+            missing_links = [{"parent": t[TraceKeys.TARGET],
+                              "child": t[TraceKeys.SOURCE]} for t in missing_links if t[TraceKeys.LABEL] == 1]
+            logger.log_with_title("Missing links", json.dumps(missing_links))
 
             scores = [entry["score"] for entry in ranking_entries]
             missing_scores = [0 for i in missing_ids]

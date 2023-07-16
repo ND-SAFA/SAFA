@@ -1,6 +1,6 @@
 from typing import Dict
 
-from tgen.constants.tgen_constants import SUMMARY_TITLE
+from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, SUMMARY_TITLE
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -45,12 +45,12 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_builder = RankingPromptBuilder(goal=state.ranking_goal,
                                               instructions=state.ranking_instructions,
                                               query=source_body,
-                                              body_title="# Software Artifacts")
+                                              body_title=BODY_ARTIFACT_TITLE)
         if state.project_summary is not None and len(state.project_summary) > 0:
             uses_specification = SUMMARY_TITLE in state.project_summary
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
             prompt_builder.with_context(context_formatted)
         for target_index, target_artifact_name in enumerate(target_names):
-            prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name])
+            prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name], name=target_artifact_name)
         prompt = prompt_builder.get()
         return prompt

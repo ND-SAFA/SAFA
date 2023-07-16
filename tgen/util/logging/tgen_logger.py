@@ -5,7 +5,7 @@ class TGenLogger(Logger):
     """
     Handles Logging for TGEN
     """
-    DEFAULT_LOG_LENGTH = 100
+    DEFAULT_LOG_LENGTH = 150
 
     def log_with_title(self, title: str, message: str) -> None:
         """
@@ -15,7 +15,7 @@ class TGenLogger(Logger):
         :return: None
         """
         message = "" if message is None else message
-        title = TGenLogger.__create_title(title, message)
+        title = TGenLogger.__create_title(title)
         msg = f"{title}\n{message}"
         self.info(msg)
 
@@ -29,8 +29,8 @@ class TGenLogger(Logger):
         self.info(title_formatted)
 
     @staticmethod
-    def __create_title(title: str, message: str = ""):
-        message = "" if message is None else message
-        title_border = '-' * min(max(round(len(title) / 2), 10), TGenLogger.DEFAULT_LOG_LENGTH)
+    def __create_title(title: str):
+        prefix_len = (TGenLogger.DEFAULT_LOG_LENGTH - len(title)) // 2
+        title_border = '-' * prefix_len
         title = f"{title_border} {title} {title_border}"
         return title

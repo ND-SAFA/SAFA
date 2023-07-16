@@ -14,7 +14,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                " Enclose your answer in <function></function>" \
                                "\n2. Find the artifacts who implement the parent's function within the system. " \
                                "Provide the list of artifacts and a description of how it relates to the parent. " \
-                               "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
+                               "Put each entry on different lines and follow the format: ARTIFACT_INDEX - RELATIONSHIP. " \
                                "Enclose your answer in <related></related>." \
                                "\n3. Rank the artifacts from most to least important to the parent's functioning. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \

@@ -10,11 +10,11 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are given a parent software artifact and a list of potential children." \
                        "You task is to find the children of the parent artifact.\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "1. Describe the parent artifact's function in the software system. " \
+                               "1. Describe the parent's component and children. " \
                                " Enclose your answer in <function></function>" \
                                "\n2. Find the artifacts who implement the parent's function within the system. " \
                                "Provide the list of artifacts and a description of how it relates to the parent. " \
-                               "Put each entry on different lines and follow the format: ARTIFACT_INDEX - RELATIONSHIP. " \
+                               "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
                                "Enclose your answer in <related></related>." \
                                "\n3. Rank the artifacts from most to least important to the parent's functioning. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \

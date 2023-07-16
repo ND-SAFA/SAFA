@@ -83,9 +83,9 @@ class RankingPromptBuilder:
         :return: Artifact prompt string.
         """
         if name:
-            artifact_body = f"{name}: {artifact_body}"
+            artifact_body = f"({name}) {artifact_body}"
         body = artifact_body.replace("\n\n", "\n")
-        return f"## {artifact_name}\n{body}{separator}"
+        return f"<artifact>\n\t<id>{artifact_name}</id>\n\t<body>{body}</body>\n</artifact>{separator}"
 
     @staticmethod
     def join_prompts(prompts: List[Optional[str]], delimiter: str):

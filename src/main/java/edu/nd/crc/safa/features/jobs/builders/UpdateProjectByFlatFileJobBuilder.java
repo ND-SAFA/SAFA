@@ -7,7 +7,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaFlatFilesJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -41,7 +41,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
         uploadFlatFiles(this.projectVersion.getProject());
 
         // Step 3 - Create job worker
-        return new FlatFileProjectCreationJob(
+        return new CreateProjectViaFlatFilesJob(
             this.jobDbEntity,
             serviceProvider,
             this.projectVersion,
@@ -55,7 +55,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
 
     @Override
     protected Class<? extends AbstractJob> getJobType() {
-        return FlatFileProjectCreationJob.class;
+        return CreateProjectViaFlatFilesJob.class;
     }
 
     private void uploadFlatFiles(Project project) throws IOException {

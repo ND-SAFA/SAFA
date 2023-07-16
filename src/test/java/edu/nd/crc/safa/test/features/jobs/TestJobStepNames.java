@@ -6,9 +6,9 @@ import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.JobExecutionUtilities;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaFlatFilesJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
-import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
@@ -38,7 +38,7 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testFlatFileProjectCreationSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(FlatFileProjectCreationJob.class);
+        List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaFlatFilesJob.class);
         String[] expectedStepNames = new String[]{
             "Uploading Flat Files",
             "Parsing Files",

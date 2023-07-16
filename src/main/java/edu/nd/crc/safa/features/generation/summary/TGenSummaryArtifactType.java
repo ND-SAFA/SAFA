@@ -31,6 +31,8 @@ public enum TGenSummaryArtifactType {
 
     private static final String[] codeExtensions = new String[]{
         ".c",
+        ".h",
+        ".sh",
         ".cpp",
         ".hpp",
         ".swift",

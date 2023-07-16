@@ -7,7 +7,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
+import edu.nd.crc.safa.features.generation.GenerationApi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +33,7 @@ public class PromptController extends BaseController {
     @PostMapping(AppRoutes.Prompts.COMPLETE)
     public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request,
                                              @Autowired SafaRequestBuilder safaRequestBuilder) {
-        TGen controller = new TGen(safaRequestBuilder);
+        GenerationApi controller = new GenerationApi(safaRequestBuilder);
         return controller.generatePrompt(request);
     }
 }

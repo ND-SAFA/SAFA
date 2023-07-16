@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.utilities.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -55,5 +56,20 @@ public class ProjectChange<T extends IAppEntity> {
     @JsonIgnore
     public List<UUID> getIds(List<T> entities) {
         return entities.stream().map(IAppEntity::getId).collect(Collectors.toList());
+    }
+
+    public String getSummary(String prefix) {
+        List<String> summaries = new ArrayList<>();
+        List<List<T>> entities = List.of(getRemoved(), getAdded(), getModified());
+        List<String> labels = List.of("removed", "added", "modified");
+
+        for (int i = 0; i < entities.size(); i++) {
+            int size = entities.get(i).size();
+            String label = labels.get(i);
+            if (size > 0) {
+                summaries.add(String.format("%s %s %s.", prefix, size, label));
+            }
+        }
+        return StringUtil.join(summaries, "\n");
     }
 }

@@ -26,4 +26,8 @@ public class HGenRequest {
      */
     @NotNull
     List<@Valid String> targetTypes;
+    /**
+     * Optional. Project summary.
+     */
+    String summary;
 }

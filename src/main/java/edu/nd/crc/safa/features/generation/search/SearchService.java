@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.generation.common.TGenDataset;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
+import edu.nd.crc.safa.features.generation.common.TGenLayer;
+import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.graph.ArtifactNode;
 import edu.nd.crc.safa.features.projects.graph.ProjectGraph;
@@ -89,9 +90,10 @@ public class SearchService {
         artifactLayers.put("prompt", promptLayer);
         artifactLayers.put("artifacts", artifactLayer);
 
-        TGenDataset dataset = new TGenDataset(artifactLayers, List.of(List.of("artifacts", "prompt")));
+        TGenLayer layer = new TGenLayer("artifacts", "prompt");
+        TGenDataset dataset = new TGenDataset(artifactLayers, List.of(layer));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
-        TGen tgen = new TGen(this.safaRequestBuilder);
+        GenerationApi tgen = new GenerationApi(this.safaRequestBuilder);
         TGenTraceGenerationResponse response = tgen.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)

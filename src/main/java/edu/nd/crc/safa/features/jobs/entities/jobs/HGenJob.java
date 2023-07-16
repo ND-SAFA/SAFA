@@ -4,10 +4,12 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
+import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.StringUtil;
 
@@ -19,10 +21,6 @@ public class HGenJob extends CommitJob {
      * The request to generate trace links.
      */
     HGenRequest hGenRequest;
-    /**
-     * The entities to generate links for.
-     */
-    ProjectAppEntity projectAppEntity;
     /**
      * The project version to commit summaries and generated links to.
      */
@@ -42,9 +40,20 @@ public class HGenJob extends CommitJob {
         return String.format("Generating artifacts: %s", result);
     }
 
-    @IJobStep(value = "Generating Artifacts", position = 1)
+    @IJobStep(value = "Summarizing Project", position = 1)
+    public void summarizeProject() {
+        Project project = this.projectVersion.getProject();
+        ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
+        ProjectAppEntity projectAppEntity =
+            this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(this.projectVersion);
+        service.generateProjectSummary(project, projectAppEntity.getArtifacts(), this.getDbLogger());
+    }
+
+    @IJobStep(value = "Generating Artifacts", position = 2)
     public void generatingArtifacts() {
         HGenService hGenService = this.serviceProvider.getHGenService();
+        String summary = this.projectVersion.getProject().getSpecification();
+        this.hGenRequest.setSummary(summary);
         ProjectCommit projectCommit = hGenService.generateHierarchy(this.projectVersion, this.hGenRequest);
         this.setProjectCommit(projectCommit);
     }

@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class SummaryService {
             artifact.setType(artifactType);
             artifacts.add(artifact);
         }
-        TGen tgen = new TGen(safaRequestBuilder);
+        GenerationApi tgen = new GenerationApi(safaRequestBuilder);
         TGenSummaryRequest tgenRequest = new TGenSummaryRequest(artifacts);
         TGenSummaryResponse response = tgen.generateSummaries(tgenRequest, jobLogger);
 

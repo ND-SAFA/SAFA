@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
+import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
@@ -41,8 +42,6 @@ import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
-import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
-import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
@@ -90,6 +89,7 @@ public class ServiceProvider {
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
     private final ProjectRetrievalService projectRetrievalService;
+    private final ProjectSummaryService projectSummaryService;
     // Members
     private final ProjectMembershipRepository projectMembershipRepository;
     private final MemberService memberService;
@@ -114,9 +114,6 @@ public class ServiceProvider {
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
     private final TraceLinkRepository traceLinkRepository;
-    // models
-    private final ModelRepository modelRepository;
-    private final ModelProjectRepository modelProjectRepository;
     // Matrix
     private final TraceMatrixRepository traceMatrixRepository;
     // Changes

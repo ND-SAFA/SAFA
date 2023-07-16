@@ -14,11 +14,11 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifactType;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -48,7 +48,7 @@ public class HGenService {
      */
     public ProjectCommit generateHierarchy(ProjectVersion projectVersion, HGenRequest request) {
         List<String> targetTypes = request.getTargetTypes();
-        TGen controller = new TGen(safaRequestBuilder);
+        GenerationApi controller = new GenerationApi(safaRequestBuilder);
 
         List<ArtifactAppEntity> sourceArtifacts = artifactService.getAppEntities(projectVersion);
         List<TGenSummaryArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());

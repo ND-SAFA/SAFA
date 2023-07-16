@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.config;
 
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
-import edu.nd.crc.safa.features.generation.tgen.TGen;
+import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.vsm.VSMController;
 
@@ -25,6 +25,6 @@ public class TraceLinkGenerationConfig {
     @Bean
     @Profile("!test")
     public ITraceGenerationController getTGen(@Autowired SafaRequestBuilder safaRequestBuilder) {
-        return new TGen(safaRequestBuilder);
+        return new GenerationApi(safaRequestBuilder);
     }
 }

@@ -31,7 +31,7 @@ public class ProjectDataStructures {
      */
     public static Map<String, String> createArtifactLayer(List<ArtifactAppEntity> artifacts) {
         Map<String, String> artifactMap = new HashMap<>();
-        artifacts.forEach(a -> artifactMap.put(a.getId().toString(), a.getTraceString()));
+        artifacts.forEach(a -> artifactMap.put(a.getName(), a.getTraceString()));
         return artifactMap;
     }
 }

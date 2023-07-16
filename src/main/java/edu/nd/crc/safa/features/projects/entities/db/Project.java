@@ -49,6 +49,12 @@ public class Project implements Serializable {
         columnDefinition = "mediumtext")
     String description;
 
+    @Lob
+    @Column(name = "specification",
+        nullable = true,
+        columnDefinition = "mediumtext")
+    String specification;
+
     @Column(name = "last_edited")
     private LocalDateTime lastEdited;
 

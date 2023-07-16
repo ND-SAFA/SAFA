@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.tgen;
+package edu.nd.crc.safa.features.generation;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -8,15 +8,19 @@ import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
 import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;
 import edu.nd.crc.safa.features.generation.hgen.TGenHGenRequest;
+import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryRequest;
+import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryResponse;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptRequest;
 import edu.nd.crc.safa.features.generation.prompt.TGenPromptResponse;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryResponse;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
+import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -32,7 +36,7 @@ import org.javatuples.Pair;
  * Responsible for providing an API for predicting trace links via TGEN.
  */
 @AllArgsConstructor
-public class TGen implements ITraceGenerationController {
+public class GenerationApi implements ITraceGenerationController {
 
     private final SafaRequestBuilder safaRequestBuilder;
 
@@ -47,6 +51,19 @@ public class TGen implements ITraceGenerationController {
             return logger.log(message);
         }
         return null;
+    }
+
+    /**
+     * Generates project summary.
+     *
+     * @param request The request containing project artifacts.
+     * @param logger  The job logger.
+     * @return The project summary.
+     */
+    public String generateProjectSummary(ProjectSummaryRequest request, JobLogger logger) {
+        String endpoint = getEndpoint("project-summary");
+        ProjectSummaryResponse response = performTGenJob(endpoint, request, ProjectSummaryResponse.class, logger);
+        return response.getSummary();
     }
 
     /**

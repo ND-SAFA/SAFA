@@ -11,17 +11,17 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.generation.tgen.services.LinkScoreService;
-import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -96,7 +96,14 @@ public class GenerateLinksJob extends CommitJob {
         commitService.performCommit(projectCommit, this.user);
     }
 
-    @IJobStep(value = "Generating links", position = 3)
+    @IJobStep(value = "Summarizing Project", position = 3)
+    public void summarizeProject() {
+        Project project = this.projectVersion.getProject();
+        ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
+        service.generateProjectSummary(project, this.projectAppEntity.getArtifacts(), this.getDbLogger());
+    }
+
+    @IJobStep(value = "Generating links", position = 4)
     public void generateLinks(JobLogger logger) {
         ProjectCommit projectCommit = getProjectCommit();
 
@@ -104,11 +111,12 @@ public class GenerateLinksJob extends CommitJob {
             logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
             TGenDataset tGenDataset = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
+            System.out.println("Dataset:" + tGenDataset);
+            tGenDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
             List<TraceAppEntity> tracePredictions = controller.generateLinks(tGenDataset, this.getDbLogger());
-            LinkVisibilityService.setLinksVisibility(tracePredictions);
-            LinkScoreService.convertLinksToPercentiles(tracePredictions);
+//            LinkVisibilityService.setLinksVisibility(tracePredictions);
             this.generatedTraces = tracePredictions;
 
             logger.log("Generated %d traces.", generatedTraces.size());

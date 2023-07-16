@@ -64,7 +64,7 @@ public class TraceAppEntity implements IAppEntity {
         this.setApprovalStatus(ApprovalStatus.UNREVIEWED);
         this.setScore(score);
         this.setTraceType(TraceType.GENERATED);
-        this.setVisible(false);
+        this.setVisible(true);
         return this;
     }
 

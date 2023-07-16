@@ -73,7 +73,7 @@ public class ProjectService {
                     .collect(Collectors.toList());
                 return new ProjectIdAppEntity(project, members);
             })
-            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited))
+            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
             .collect(Collectors.toList());
     }
 

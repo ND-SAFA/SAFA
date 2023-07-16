@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -27,18 +25,24 @@ public class TGenDataset {
      * List of layers being traced (child -> parent).
      */
     @JsonProperty()
-    List<List<String>> layers;
+    List<TGenLayer> layers;
     /**
      * The trace links between artifacts in all artifact layers.
      */
     @Nullable
     @JsonProperty("true_links")
     List<TGenLink> trueLinks;
+    /**
+     * Optional. Project summary.
+     */
+    @Nullable
+    String summary;
 
     @JsonIgnore
     Map<String, List<String>> layerIds = new HashMap<>();
 
-    public TGenDataset(Map<String, Map<String, String>> artifactLayers, List<List<String>> layers) {
+
+    public TGenDataset(Map<String, Map<String, String>> artifactLayers, List<TGenLayer> layers) {
         this.artifactLayers = artifactLayers;
         this.layers = layers;
     }
@@ -58,12 +62,9 @@ public class TGenDataset {
     @JsonIgnore
     public int getNumOfCandidates() {
         int nCandidates = 0;
-        for (List<String> layer : this.layers) {
-            String childType = layer.get(0);
-            String parentType = layer.get(0);
-
-            Map<String, String> childArtifactMap = this.artifactLayers.get(childType);
-            Map<String, String> parentArtifactMap = this.artifactLayers.get(parentType);
+        for (TGenLayer layer : this.layers) {
+            Map<String, String> childArtifactMap = this.artifactLayers.get(layer.getChild());
+            Map<String, String> parentArtifactMap = this.artifactLayers.get(layer.getParent());
             nCandidates += childArtifactMap.size() * parentArtifactMap.size();
         }
         return nCandidates;

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.generation.tgen;
 import java.util.List;
 
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
-import edu.nd.crc.safa.features.generation.tgen.entities.TGenLink;
+import edu.nd.crc.safa.features.generation.common.TGenLink;
 
 import lombok.Data;
 

@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -136,5 +137,12 @@ public class ProjectCommit {
         mod2entities.put(ModificationType.MODIFIED, projectChange.getModified());
         mod2entities.put(ModificationType.REMOVED, projectChange.getRemoved());
         return mod2entities;
+    }
+
+    public String getSummary() {
+        List<String> logs = new ArrayList<>();
+        logs.add(this.artifacts.getSummary("Artifacts"));
+        logs.add(this.traces.getSummary("Trace Links"));
+        return StringUtil.join(logs, "\n");
     }
 }

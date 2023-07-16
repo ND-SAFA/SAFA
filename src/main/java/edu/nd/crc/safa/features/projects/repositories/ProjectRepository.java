@@ -17,7 +17,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     Project findByProjectId(UUID projectId);
 
     @Query(value =
-        "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
+        "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("
             + "  CAST(j.jiraProjectId AS string), "
             + "   j.orgId, "
             + "   j.lastUpdate, "
@@ -30,7 +30,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     List<InstallationDTO> findJiraInstallationsByProjectId(@Param("projectId") UUID projectId);
 
     @Query(value =
-        "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
+        "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("
             + "  g.repositoryName, "
             + "   '',"  // TODO org ID for github
             + "   g.lastUpdate, "

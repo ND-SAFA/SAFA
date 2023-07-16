@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.TGenLayer;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
@@ -41,7 +42,7 @@ public class TraceGenerationService {
     public static TGenDataset extractPayload(TracingRequest tracingRequest,
                                              ProjectAppEntity projectAppEntity) {
         Map<String, Map<String, String>> artifactLayers = new HashMap<>();
-        List<List<String>> layers = new ArrayList<>();
+        List<TGenLayer> layers = new ArrayList<>();
         for (ArtifactLevelRequest artifactLevelRequest : tracingRequest.getArtifactLevels()) {
             String childType = artifactLevelRequest.getSource();
             String parentType = artifactLevelRequest.getTarget();
@@ -52,7 +53,7 @@ public class TraceGenerationService {
                     return ProjectDataStructures.createArtifactLayer(artifacts);
                 });
             }
-            layers.add(List.of(childType, parentType));
+            layers.add(new TGenLayer(childType, parentType));
         }
         return new TGenDataset(artifactLayers, layers);
     }

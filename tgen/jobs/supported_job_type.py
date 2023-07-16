@@ -1,3 +1,4 @@
+from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob
 from tgen.jobs.composite_jobs.ranking_job import RankingJob
 from tgen.jobs.composite_jobs.tracing_job import TracingJob
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
@@ -18,6 +19,7 @@ from tgen.util.supported_enum import SupportedEnum
 class SupportedJobType(SupportedEnum):
     HUGGING_FACE = HuggingFaceJob
     HGEN = BaseHGenJob
+    PROJECT_SUMMARY = ProjectSummaryJob
     MULTI_LAYER_HGEN = MultiLayerHGenJob
     EXPORT_ARTIFACTS = ExportArtifactsJob
     CREATE_DATASETS = CreateDatasetsJob

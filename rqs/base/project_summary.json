@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PROJECT_SUMMARY",
+          "artifact_reader": {
+            "project_path": "~/desktop/safa/datasets/fend"
+          },
+          "export_path": "~/desktop/SAFA.txt"
+        }
+      ]
+    }
+  ]
+}

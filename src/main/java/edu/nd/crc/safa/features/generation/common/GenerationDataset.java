@@ -12,10 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The dataset used for the generation api.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class TGenDataset {
+public class GenerationDataset {
     /**
      * Map of artifact type to artifact maps.
      */
@@ -42,7 +45,7 @@ public class TGenDataset {
     Map<String, List<String>> layerIds = new HashMap<>();
 
 
-    public TGenDataset(Map<String, Map<String, String>> artifactLayers, List<TGenLayer> layers) {
+    public GenerationDataset(Map<String, Map<String, String>> artifactLayers, List<TGenLayer> layers) {
         this.artifactLayers = artifactLayers;
         this.layers = layers;
     }

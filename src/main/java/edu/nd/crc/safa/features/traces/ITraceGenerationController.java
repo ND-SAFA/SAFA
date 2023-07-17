@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.traces;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -18,5 +18,5 @@ public interface ITraceGenerationController {
      * @param logger          The logger used to store trace logs.
      * @return List of generated trace links.
      */
-    List<TraceAppEntity> generateLinks(TGenDataset tracingRequests, JobLogger logger);
+    List<TraceAppEntity> generateLinks(GenerationDataset tracingRequests, JobLogger logger);
 }

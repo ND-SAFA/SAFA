@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TGenLayer;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
@@ -24,15 +24,15 @@ public class VSMController implements ITraceGenerationController {
      * Generates set of trace links between source and target pairs of artifacts using the
      * vector-space model
      *
-     * @param tGenDataset The dataset to trace.
+     * @param generationDataset The dataset to trace.
      * @return List of trace links.
      */
     @Override
-    public List<TraceAppEntity> generateLinks(TGenDataset tGenDataset, JobLogger jobLogger) {
+    public List<TraceAppEntity> generateLinks(GenerationDataset generationDataset, JobLogger jobLogger) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
-        for (TGenLayer layer : tGenDataset.getLayers()) {
-            Map<String, String> childLayer = tGenDataset.getArtifactLayers().get(layer.getChild());
-            Map<String, String> parentLayer = tGenDataset.getArtifactLayers().get(layer.getParent());
+        for (TGenLayer layer : generationDataset.getLayers()) {
+            Map<String, String> childLayer = generationDataset.getArtifactLayers().get(layer.getChild());
+            Map<String, String> parentLayer = generationDataset.getArtifactLayers().get(layer.getParent());
 
             Map<String, Collection<String>> childTokens = tokenizeArtifactAppEntities(childLayer);
             Map<String, Collection<String>> parentTokens = tokenizeArtifactAppEntities(parentLayer);

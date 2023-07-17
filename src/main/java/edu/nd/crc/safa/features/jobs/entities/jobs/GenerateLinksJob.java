@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
@@ -111,12 +111,12 @@ public class GenerateLinksJob extends CommitJob {
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
             logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
-            TGenDataset tGenDataset = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-            System.out.println("Dataset:" + tGenDataset);
-            tGenDataset.setSummary(this.projectVersion.getProject().getSpecification());
+            GenerationDataset generationDataset = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
+            System.out.println("Dataset:" + generationDataset);
+            generationDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
-            List<TraceAppEntity> tracePredictions = controller.generateLinks(tGenDataset, this.getDbLogger());
+            List<TraceAppEntity> tracePredictions = controller.generateLinks(generationDataset, this.getDbLogger());
             LinkVisibilityService.setLinksVisibility(tracePredictions);
             this.generatedTraces = tracePredictions;
 

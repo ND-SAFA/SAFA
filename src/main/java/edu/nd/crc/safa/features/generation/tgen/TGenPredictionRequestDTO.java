@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.generation.tgen;
 
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +14,5 @@ public class TGenPredictionRequestDTO {
     /**
      * Dataset containing artifacts to predict trace links against.
      */
-    TGenDataset dataset;
+    GenerationDataset dataset;
 }

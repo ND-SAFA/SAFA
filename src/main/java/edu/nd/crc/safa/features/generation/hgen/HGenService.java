@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.GenerationApi;
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifactType;
@@ -53,7 +53,7 @@ public class HGenService {
         List<ArtifactAppEntity> sourceArtifacts = artifactService.getAppEntities(projectVersion);
         List<TGenSummaryArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes);
-        TGenDataset dataset = controller.generateHierarchy(tgenRequest);
+        GenerationDataset dataset = controller.generateHierarchy(tgenRequest);
         ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, dataset, targetTypes);
         projectCommit.setCommitVersion(projectVersion);
 
@@ -69,7 +69,7 @@ public class HGenService {
      * @return The project commit containing generated entities
      */
     private ProjectCommit createHGenCommit(List<ArtifactAppEntity> sourceArtifacts,
-                                           TGenDataset dataset,
+                                           GenerationDataset dataset,
                                            List<String> targetTypes) {
         ProjectCommit projectCommit = new ProjectCommit();
         Map<UUID, ArtifactAppEntity> artifactMap = ProjectDataStructures.createArtifactMap(sourceArtifacts);

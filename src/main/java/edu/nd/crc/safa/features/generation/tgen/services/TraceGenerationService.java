@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TGenLayer;
 import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
@@ -39,8 +39,8 @@ public class TraceGenerationService {
      * @param projectAppEntity The project app entity containing artifacts and links.
      * @return TracingPayload detailing the artifacts and the method to trace with.
      */
-    public static TGenDataset extractPayload(TracingRequest tracingRequest,
-                                             ProjectAppEntity projectAppEntity) {
+    public static GenerationDataset extractPayload(TracingRequest tracingRequest,
+                                                   ProjectAppEntity projectAppEntity) {
         Map<String, Map<String, String>> artifactLayers = new HashMap<>();
         List<TGenLayer> layers = new ArrayList<>();
         for (ArtifactLevelRequest artifactLevelRequest : tracingRequest.getArtifactLevels()) {
@@ -55,20 +55,20 @@ public class TraceGenerationService {
             }
             layers.add(new TGenLayer(childType, parentType));
         }
-        return new TGenDataset(artifactLayers, layers);
+        return new GenerationDataset(artifactLayers, layers);
     }
 
     public List<TraceAppEntity> generateTraceLinks(TraceGenerationRequest traceGenerationRequest,
                                                    ProjectAppEntity projectAppEntity) {
         List<TraceAppEntity> generatedTraces = new ArrayList<>();
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
-            TGenDataset tracingPayload = extractPayload(tracingRequest, projectAppEntity);
+            GenerationDataset tracingPayload = extractPayload(tracingRequest, projectAppEntity);
             generatedTraces.addAll(generateLinksWithMethod(tracingPayload));
         }
         return generatedTraces;
     }
 
-    public List<TraceAppEntity> generateLinksWithMethod(TGenDataset tracingPayload) {
+    public List<TraceAppEntity> generateLinksWithMethod(GenerationDataset tracingPayload) {
         return new ArrayList<>(traceGenerationController.generateLinks(tracingPayload, null));
     }
 

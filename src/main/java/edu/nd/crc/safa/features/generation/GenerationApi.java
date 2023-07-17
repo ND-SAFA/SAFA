@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
-import edu.nd.crc.safa.features.generation.common.TGenDataset;
 import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
@@ -130,7 +130,7 @@ public class GenerationApi implements ITraceGenerationController {
      * @return List of generated traces.
      */
     public List<TraceAppEntity> generateLinks(
-        TGenDataset dataset, JobLogger logger) {
+        GenerationDataset dataset, JobLogger logger) {
         // Step - Build request
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
 

@@ -29,17 +29,24 @@ public class LinkMapUtility {
         return createLinkMap(links, TraceAppEntity::getTargetName);
     }
 
+    /**
+     * Groups trace links by grouper.
+     *
+     * @param links   The links to group.
+     * @param grouper The grouper deciding where each link is placed.
+     * @return Map of group names to links.
+     */
     public static HashMap<String, List<TraceAppEntity>> createLinkMap(List<TraceAppEntity> links,
                                                                       Function<TraceAppEntity, String> grouper) {
-        HashMap<String, List<TraceAppEntity>> child2links = new HashMap<>();
+        HashMap<String, List<TraceAppEntity>> group2links = new HashMap<>();
         links.forEach(t -> {
             String groupName = grouper.apply(t);
-            if (!child2links.containsKey(groupName)) {
-                child2links.put(groupName, new ArrayList<>());
+            if (!group2links.containsKey(groupName)) {
+                group2links.put(groupName, new ArrayList<>());
             }
 
-            child2links.get(groupName).add(t);
+            group2links.get(groupName).add(t);
         });
-        return child2links;
+        return group2links;
     }
 }

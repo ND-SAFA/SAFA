@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearchService {
     private static final String PROMPT_KEY = "PROMPT";
+    private static final String ARTIFACT_KEY = "artifacts";
     private static final double THRESHOLD = 0.5;
     ProjectRetrievalService projectRetrievalService;
     SafaRequestBuilder safaRequestBuilder;
@@ -87,10 +88,10 @@ public class SearchService {
     public SearchResponse searchSourceLayer(Map<String, String> promptLayer,
                                             Map<String, String> artifactLayer, int n) {
         Map<String, Map<String, String>> artifactLayers = new HashMap<>();
-        artifactLayers.put("prompt", promptLayer);
-        artifactLayers.put("artifacts", artifactLayer);
+        artifactLayers.put(PROMPT_KEY, promptLayer);
+        artifactLayers.put(ARTIFACT_KEY, artifactLayer);
 
-        TraceLayer layer = new TraceLayer("artifacts", "prompt");
+        TraceLayer layer = new TraceLayer(ARTIFACT_KEY, PROMPT_KEY);
         GenerationDataset dataset = new GenerationDataset(artifactLayers, List.of(layer));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
         GenerationApi tgen = new GenerationApi(this.safaRequestBuilder);

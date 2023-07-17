@@ -19,8 +19,13 @@ import lombok.NoArgsConstructor;
 public class LinkVisibilityService {
 
     private static final double TIER_ONE_THRESHOLD = 0.90; // 90-100 or top prediction above min score
-    private static final double TOP_PARENT_MIN_SCORE = 0.75; // parent must reach SOME standard
 
+    /**
+     * Selects the top links to make visible.
+     *
+     * @param links Generated links to select top links from.
+     * @return List of modified links. Visible status is done in place.
+     */
     public static List<TraceAppEntity> setLinksVisibility(List<TraceAppEntity> links) {
         links.forEach(t -> t.setVisible(false));
         HashMap<String, List<TraceAppEntity>> child2links = createPredictionMap(links);

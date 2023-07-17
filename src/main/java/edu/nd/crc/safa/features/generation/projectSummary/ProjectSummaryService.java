@@ -21,19 +21,12 @@ public class ProjectSummaryService {
     ProjectRepository projectRepository;
 
     /**
-     * Creates project summary.
+     * Summarizes project and saves summary to project.
      *
-     * @param projectAppEntity The project app entity.
-     * @param jobLogger        Optional. Job logger to store logs under.
-     * @return The project summary.
+     * @param project   The project to store summary under.
+     * @param artifacts The artifacts of the project to summarize.
+     * @param logger    Optional. Job logger to store logs under.
      */
-    public String summarizeProject(List<ArtifactAppEntity> artifacts, JobLogger jobLogger) {
-        Map<String, String> projectArtifactMap = ProjectDataStructures.createArtifactLayer(artifacts);
-        GenerationApi api = new GenerationApi(this.safaRequestBuilder);
-        ProjectSummaryRequest request = new ProjectSummaryRequest(projectArtifactMap);
-        return api.generateProjectSummary(request, jobLogger);
-    }
-
     public void generateProjectSummary(Project project, List<ArtifactAppEntity> artifacts, JobLogger logger) {
         if (project.getSpecification() != null) {
             if (logger != null) {
@@ -48,4 +41,20 @@ public class ProjectSummaryService {
         project.setSpecification(projectSummary);
         projectRepository.save(project);
     }
+
+    /**
+     * Creates project summary.
+     *
+     * @param artifacts The artifacts in the project.
+     * @param jobLogger Optional. Job logger to store logs under.
+     * @return The project summary.
+     */
+    public String summarizeProject(List<ArtifactAppEntity> artifacts, JobLogger jobLogger) {
+        Map<String, String> projectArtifactMap = ProjectDataStructures.createArtifactLayer(artifacts);
+        GenerationApi api = new GenerationApi(this.safaRequestBuilder);
+        ProjectSummaryRequest request = new ProjectSummaryRequest(projectArtifactMap);
+        return api.generateProjectSummary(request, jobLogger);
+    }
+
+
 }

@@ -1,4 +1,5 @@
 import re
+import uuid
 
 
 class StrUtil:
@@ -22,3 +23,16 @@ class StrUtil:
             if args and i >= len(args):
                 updated_args.append('{%s}' % field)
         return string.format(*updated_args, **kwargs)
+
+    @staticmethod
+    def is_uuid(input_string: str) -> bool:
+        """
+        Returns true if given string is uuid. False otherwise.
+        :param input_string: The string to analyze.
+        :return: True if uuid, false otherwise.
+        """
+        try:
+            uuid_obj = uuid.UUID(input_string)
+            return str(uuid_obj) == input_string
+        except ValueError:
+            return False

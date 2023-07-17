@@ -10,13 +10,16 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are given a parent software artifact and a list of potential children." \
                        "You task is to find the children of the parent artifact.\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "1. Concisely describe the functionality of the parent artifact. " \
+                               "1. Concisely describe the functionality of the parent. " \
+                               "List the primary entities and the behavior of the expected functionality. " \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Find the artifacts who directly implement a portion of the parent's functionality. " \
-                               "Provide the list of artifacts and a description of how it relates to the parent. " \
+                               "\n2. Find the artifacts that are directly related in the implementation of the parent artifact. " \
+                               "Only include artifacts that you are confident are directly related to the parent artifact. " \
+                               "Provide the list of artifacts along with a sentence of how they help the parent achieve" \
+                               "the feature they share. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
                                "Enclose your answer in <related></related>." \
-                               "\n3. Rank the artifacts from most to least intersecting with the parent's functionality. " \
+                               "\n3. Rank the artifacts from most to least related to the parent's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related while the last element is the least. " \
                                "Enclose the list in <links></links>."

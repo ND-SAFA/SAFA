@@ -5,6 +5,7 @@ from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.util.str_util import StrUtil
 
 
 class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -50,7 +51,12 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
             uses_specification = SUMMARY_TITLE in state.project_summary
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
             prompt_builder.with_context(context_formatted)
+
+        use_name = not StrUtil.is_uuid(target_names[0])
         for target_index, target_artifact_name in enumerate(target_names):
-            prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name], name=target_artifact_name)
+            kwargs = {}
+            if use_name:
+                kwargs["name"] = target_artifact_name
+            prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name], **kwargs)
         prompt = prompt_builder.get()
         return prompt

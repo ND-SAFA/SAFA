@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.generation.tgen;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
-import edu.nd.crc.safa.features.generation.common.TGenLink;
 
 import lombok.Data;
 
@@ -15,6 +15,6 @@ public class TGenTraceGenerationResponse implements ITGenResponse {
     /**
      * List of links with their predicted similarity score.
      */
-    List<TGenLink> predictions;
+    List<GenerationLink> predictions;
     List<String> logs;
 }

@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class TGenLink {
+public class GenerationLink {
     /**
      * The child name;
      */

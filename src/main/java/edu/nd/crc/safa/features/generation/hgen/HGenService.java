@@ -16,7 +16,7 @@ import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.common.TGenLink;
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifact;
 import edu.nd.crc.safa.features.generation.summary.TGenSummaryArtifactType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -95,7 +95,7 @@ public class HGenService {
      * @param artifactMap The map of source artifacts.
      * @return Trace entities.
      */
-    private List<TraceAppEntity> toTraces(List<TGenLink> links,
+    private List<TraceAppEntity> toTraces(List<GenerationLink> links,
                                           Map<UUID, ArtifactAppEntity> artifactMap) {
         return links.stream().map(t -> {
             String sourceId = t.getSource();

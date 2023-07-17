@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.common.ITGenResponse;
-import edu.nd.crc.safa.features.generation.common.TGenLink;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.generation.hgen.HGenResponse;
@@ -217,7 +217,7 @@ public class GenerationApi implements ITraceGenerationController {
      * @return The trace link entities.
      */
     private List<TraceAppEntity> convertPredictionsToLinks(
-        List<TGenLink> predictions) {
+        List<GenerationLink> predictions) {
         return predictions
             .stream()
             .map(p -> new TraceAppEntity(

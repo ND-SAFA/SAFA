@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.common.TGenLink;
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
@@ -97,7 +97,7 @@ public class SearchService {
         TGenTraceGenerationResponse response = tgen.performSearch(payload, null);
         List<UUID> matchedArtifactIds = response.getPredictions().stream()
             .filter(t -> t.getScore() >= THRESHOLD)
-            .map(TGenLink::getSource)
+            .map(GenerationLink::getSource)
             .map(UUID::fromString)
             .collect(Collectors.toList());
         int maxIndex = Math.min(matchedArtifactIds.size(), n);

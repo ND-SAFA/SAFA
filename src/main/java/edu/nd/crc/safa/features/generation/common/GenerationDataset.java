@@ -34,7 +34,7 @@ public class GenerationDataset {
      */
     @Nullable
     @JsonProperty("true_links")
-    List<TGenLink> trueLinks;
+    List<GenerationLink> trueLinks;
     /**
      * Optional. Project summary.
      */

@@ -19,7 +19,6 @@ import {
   TraceCytoElement,
   TraceLinkSchema,
 } from "@/types";
-import { sanitizeNodeId } from "@/util";
 import { deltaStore, useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
@@ -37,8 +36,8 @@ const definition = computed<TraceCytoElement>(() => ({
     id: props.trace.traceLinkId,
 
     // Reversed to show arrow toward parent.
-    source: sanitizeNodeId(props.trace.targetId),
-    target: sanitizeNodeId(props.trace.sourceId),
+    source: props.trace.targetId,
+    target: props.trace.sourceId,
 
     deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
     faded: props.faded,

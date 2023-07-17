@@ -112,7 +112,8 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
      * @return the created artifact type
      */
     public ArtifactType createArtifactType(Project project, String name, SafaUser user) {
-        return createArtifactType(new ArtifactType(project, name), user);
+        String color = "gradient_" + artifactTypeRepository.countByProject(project);
+        return createArtifactType(new ArtifactType(project, name, color), user);
     }
 
     /**

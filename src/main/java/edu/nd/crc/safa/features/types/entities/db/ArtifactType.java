@@ -69,13 +69,6 @@ public class ArtifactType implements Serializable {
         this.color = color;
     }
 
-    public ArtifactType(Project project, String name) {
-        this.project = project;
-        this.name = name;
-        this.icon = DefaultArtifactTypeIcons.getArtifactIcon(name);
-        this.color = "color" + (int)(Math.random() * 10);
-    }
-
     @Override
     public String toString() {
         return this.name;

@@ -16,4 +16,6 @@ public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, UUI
     Optional<ArtifactType> findByProjectAndNameIgnoreCase(Project project, String name);
 
     List<ArtifactType> findByProject(Project project);
+
+    int countByProject(Project project);
 }

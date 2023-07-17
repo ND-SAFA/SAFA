@@ -33,10 +33,9 @@ import { ref } from "vue";
 import { TracePredictionTabTypes } from "@/types";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, SidebarGrid, PanelCard } from "@/components/common";
-import { TraceLinkGenerator } from "@/components/traceLink";
+import { TraceLinkGenerator, ApprovalTable } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project";
 import { ModelTable } from "./training";
-import { ApprovalTable } from "./approval";
 
 const tabs = tracePredictionTabOptions();
 

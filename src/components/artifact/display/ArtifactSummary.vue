@@ -60,7 +60,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { artifactGenerationApiStore, selectionStore } from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
@@ -107,4 +107,9 @@ function handleSaveSummary(): void {
 function handleDeleteSummary(): void {
   generateConfirmation.value?.clear();
 }
+
+watch(
+  () => artifact.value,
+  () => generateConfirmation.value?.clear()
+);
 </script>

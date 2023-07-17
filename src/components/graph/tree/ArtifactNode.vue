@@ -56,6 +56,7 @@ const definition = computed<ArtifactCytoElement>(() => {
       type: GraphElementType.node,
       graph: GraphMode.tree,
       id,
+
       body: summary || body,
       isCode: !summary && isCodeArtifact(name),
       artifactName: name,

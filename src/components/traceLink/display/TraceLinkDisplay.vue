@@ -2,27 +2,36 @@
   <div>
     <flex-box v-if="!showOnly" full-width y="1" justify="between" :wrap="false">
       <artifact-body-display
+        v-if="sourceArtifact"
         :artifact="sourceArtifact"
         display-title
         display-divider
+        default-expanded
       />
       <separator vertical />
       <artifact-body-display
+        v-if="targetArtifact"
         :artifact="targetArtifact"
         display-title
         display-divider
+        default-expanded
       />
     </flex-box>
 
-    <typography
-      v-else
-      default-expanded
-      t="1"
-      variant="expandable"
-      :value="
-        showOnly === 'source' ? sourceArtifact?.body : targetArtifact?.body
-      "
-    />
+    <flex-box v-else-if="showOnlyArtifact" full-width>
+      <div>
+        <typography
+          variant="caption"
+          :value="showSummary ? 'Summary' : 'Content'"
+        />
+        <artifact-body-display :artifact="showOnlyArtifact" default-expanded />
+      </div>
+      <separator v-if="!!showOnlyArtifact.summary" vertical r="2" />
+      <div v-if="!!showOnlyArtifact.summary">
+        <typography variant="caption" value="Content" />
+        <typography variant="code" :value="showOnlyArtifact.body" l="2" />
+      </div>
+    </flex-box>
   </div>
 </template>
 
@@ -40,10 +49,10 @@ import { computed } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
 import {
-  Typography,
   ArtifactBodyDisplay,
   FlexBox,
   Separator,
+  Typography,
 } from "@/components/common";
 
 const props = defineProps<{
@@ -63,4 +72,9 @@ const sourceArtifact = computed(() =>
 const targetArtifact = computed(() =>
   artifactStore.getArtifactById(props.trace.targetId)
 );
+
+const showOnlyArtifact = computed(() =>
+  props.showOnly === "source" ? sourceArtifact.value : targetArtifact.value
+);
+const showSummary = computed(() => !!showOnlyArtifact.value?.summary);
 </script>

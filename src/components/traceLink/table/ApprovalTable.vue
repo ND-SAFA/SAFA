@@ -8,7 +8,7 @@
       :rows="rows"
       row-key="traceLinkId"
       :loading="loading"
-      default-sort-by="score"
+      default-sort-by="parentName"
       :default-group-by="groupBy"
       default-sort-desc
       :filter-row="filterRow"
@@ -73,7 +73,9 @@
       </template>
 
       <template #body-cell-actions="{ row }">
-        <trace-link-approval v-if="displayActions" :trace="row" />
+        <div @click.stop>
+          <trace-link-approval v-if="displayActions" :trace="row" />
+        </div>
       </template>
 
       <template #body-expanded="{ row }">

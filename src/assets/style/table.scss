@@ -2,7 +2,13 @@
   max-height: 100vh;
 }
 
-.data-table-cell {
-  max-width: 300px;
-  overflow: hidden;
+$sizes: 100, 200, 300;
+
+@each $size in $sizes {
+  .data-table-cell-#{ $size } {
+    min-width: $size * 1px;
+    max-width: $size * 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

@@ -30,7 +30,7 @@
   <flex-box v-else align="center" class="attribute-bar">
     <q-linear-progress
       rounded
-      :value="props.value"
+      :value="progress / 100"
       :color="displayColor"
       :track-color="trackColor"
       size="20px"
@@ -76,23 +76,28 @@ const enumerated = computed(() => props.approvalType || props.deltaType);
 const text = computed(() => {
   if (props.confidenceScore) {
     return String(props.value).slice(0, 4);
-  } else if (enumerated.value || props.value === props.value?.toUpperCase()) {
-    return uppercaseToDisplay(props.value || "");
+  } else if (
+    enumerated.value ||
+    props.value === String(props.value).toUpperCase()
+  ) {
+    return uppercaseToDisplay(String(props.value) || "");
   } else if (props.format) {
-    return camelcaseToDisplay(props.value || "");
+    return camelcaseToDisplay(String(props.value) || "");
   } else if (props.artifactType) {
-    return typeOptionsStore.getArtifactTypeDisplay(props.value);
+    return typeOptionsStore.getArtifactTypeDisplay(String(props.value));
   } else {
-    return props.value;
+    return String(props.value);
   }
 });
 
 const progress = computed(() =>
-  Math.min(Math.ceil(parseFloat(text.value) * 100), 100)
+  Math.min(Math.ceil(parseFloat(String(text.value)) * 100), 100)
 );
 
 const iconId = computed(() =>
-  props.artifactType ? typeOptionsStore.getArtifactTypeIcon(props.value) : ""
+  props.artifactType
+    ? typeOptionsStore.getArtifactTypeIcon(String(props.value))
+    : ""
 );
 
 const typeColor = computed(() =>
@@ -111,7 +116,7 @@ const displayColor = computed(() => {
   } else if (props.artifactType) {
     return typeColor.value;
   } else if (enumerated.value) {
-    return getEnumColor(props.value);
+    return getEnumColor(String(props.value));
   } else {
     return "";
   }

@@ -16,15 +16,14 @@ export function jobStatus(job: JobSchema) {
       switch (job.status) {
         case JobStatus.IN_PROGRESS:
           return (
-            `${job.currentProgress}% ` +
-            `(${timestampToDisplay(job.lastUpdatedAt)})`
+            `${job.currentProgress}% | ` +
+            `${timestampToDisplay(job.lastUpdatedAt)}`
           );
         case JobStatus.COMPLETED:
-          return `Completed: ${timestampToDisplay(job.completedAt)}`;
+          return timestampToDisplay(job.completedAt);
         case JobStatus.CANCELLED:
-          return `Cancelled: ${timestampToDisplay(job.lastUpdatedAt)}`;
         case JobStatus.FAILED:
-          return `Failed: ${timestampToDisplay(job.lastUpdatedAt)}`;
+          return timestampToDisplay(job.lastUpdatedAt);
         default:
           return "";
       }

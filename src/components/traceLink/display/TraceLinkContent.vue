@@ -2,9 +2,11 @@
   <div>
     <panel-card>
       <artifact-body-display
+        v-if="targetArtifact"
         :artifact="targetArtifact"
         display-title
         display-divider
+        default-expanded
         data-cy="panel-trace-link-target"
       />
       <template #actions>
@@ -23,9 +25,11 @@
     </flex-box>
     <panel-card>
       <artifact-body-display
+        v-if="sourceArtifact"
         :artifact="sourceArtifact"
         display-title
         display-divider
+        default-expanded
         data-cy="panel-trace-link-source"
       />
       <template #actions>

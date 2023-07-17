@@ -14,7 +14,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GraphElementType, GraphMode, TimEdgeCytoElement } from "@/types";
-import { getTraceId } from "@/util";
+import { getTraceId, sanitizeNodeId } from "@/util";
 import { useTheme } from "@/hooks";
 import { CyElement3 } from "../base";
 
@@ -31,12 +31,14 @@ const definition = computed<TimEdgeCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
     graph: GraphMode.tim,
-    id: getTraceId(props.sourceType, props.targetType).replace(/ /g, ""),
+    id: sanitizeNodeId(getTraceId(props.sourceType, props.targetType)),
+
     // Reversed to show arrow toward parent.
     sourceType: props.targetType,
     targetType: props.sourceType,
-    source: props.targetType.replace(/ /g, ""),
-    target: props.sourceType.replace(/ /g, ""),
+    source: sanitizeNodeId(props.targetType),
+    target: sanitizeNodeId(props.sourceType),
+
     count: props.count,
     label: props.count === 1 ? `1 Link` : `${props.count} Links`,
     dark: darkMode.value,

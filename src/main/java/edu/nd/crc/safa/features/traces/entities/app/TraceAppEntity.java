@@ -52,7 +52,6 @@ public class TraceAppEntity implements IAppEntity {
         this.isVisible = isVisible;
     }
 
-
     public TraceAppEntity asManualTrace() {
         this.setApprovalStatus(ApprovalStatus.APPROVED);
         this.setScore(1);

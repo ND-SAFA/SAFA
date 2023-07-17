@@ -44,7 +44,6 @@ public class GenerationDataset {
     @JsonIgnore
     Map<String, List<String>> layerIds = new HashMap<>();
 
-
     public GenerationDataset(Map<String, Map<String, String>> artifactLayers, List<TraceLayer> layers) {
         this.artifactLayers = artifactLayers;
         this.layers = layers;

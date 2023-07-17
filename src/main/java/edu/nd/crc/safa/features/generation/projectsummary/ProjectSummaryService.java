@@ -55,6 +55,4 @@ public class ProjectSummaryService {
         ProjectSummaryRequest request = new ProjectSummaryRequest(projectArtifactMap);
         return api.generateProjectSummary(request, jobLogger);
     }
-
-
 }

@@ -7,7 +7,8 @@ public class StringUtil {
     /**
      * Joins elements with delimiter.
      *
-     * @param elements The string elements to join.
+     * @param elements  The string elements to join.
+     * @param delimiter The delimiter used to join strings.
      * @return Single string containing all elements.
      */
     public static String join(List<String> elements, String delimiter) {

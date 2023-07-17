@@ -111,7 +111,8 @@ public class GenerateLinksJob extends CommitJob {
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
             logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
-            GenerationDataset generationDataset = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
+            GenerationDataset generationDataset = TraceGenerationService.extractPayload(tracingRequest,
+                projectAppEntity);
             generationDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();

@@ -197,8 +197,6 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     label: "Description",
     sortable: false,
     align: "left",
-    style:
-      "min-width: 200px; max-width: 200px; overflow: hidden; text-overflow: ellipsis;",
     field: (row) => row.description,
   },
   {

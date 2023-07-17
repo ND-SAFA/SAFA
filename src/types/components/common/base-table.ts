@@ -31,10 +31,6 @@ export interface TableColumn<Row = Record<string, unknown>> {
    */
   classes?: string;
   /**
-   * Any styles to apply.
-   */
-  style?: string;
-  /**
    * A function for formatting the cell text.
    */
   format?(value: unknown): string;

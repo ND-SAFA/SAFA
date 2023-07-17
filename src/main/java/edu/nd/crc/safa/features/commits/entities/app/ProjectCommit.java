@@ -139,6 +139,9 @@ public class ProjectCommit {
         return mod2entities;
     }
 
+    /**
+     * @return A human-readable summaries of the changes in commit.
+     */
     public String getSummary() {
         List<String> logs = new ArrayList<>();
         logs.add(this.artifacts.getSummary("Artifacts"));

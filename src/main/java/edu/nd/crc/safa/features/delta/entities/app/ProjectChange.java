@@ -58,7 +58,13 @@ public class ProjectChange<T extends IAppEntity> {
         return entities.stream().map(IAppEntity::getId).collect(Collectors.toList());
     }
 
-    public String getSummary(String prefix) {
+    /**
+     * Returns human-readable summary of changes.
+     *
+     * @param entityName The name of the entities being changed.
+     * @return String noting the changes.
+     */
+    public String getSummary(String entityName) {
         List<String> summaries = new ArrayList<>();
         List<List<T>> entities = List.of(getRemoved(), getAdded(), getModified());
         List<String> labels = List.of("removed", "added", "modified");
@@ -67,7 +73,7 @@ public class ProjectChange<T extends IAppEntity> {
             int size = entities.get(i).size();
             String label = labels.get(i);
             if (size > 0) {
-                summaries.add(String.format("%s %s %s.", prefix, size, label));
+                summaries.add(String.format("%s %s %s.", entityName, size, label));
             }
         }
         return StringUtil.join(summaries, "\n");

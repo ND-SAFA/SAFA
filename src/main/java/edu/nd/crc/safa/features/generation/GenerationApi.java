@@ -89,6 +89,13 @@ public class GenerationApi implements ITraceGenerationController {
         return sendSummarizeRequest(request, logger);
     }
 
+    /**
+     * Performs summarization request. Decides whether to use sync or async endpoint based on threshold.
+     *
+     * @param payload The request containing artifacts to summarize.
+     * @param logger  Optional. Job logger to store logs under.
+     * @return Summary response.
+     */
     public TGenSummaryResponse sendSummarizeRequest(TGenSummaryRequest payload, JobLogger logger) {
         String predictEndpoint;
 

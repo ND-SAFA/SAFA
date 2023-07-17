@@ -23,7 +23,6 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -141,6 +140,11 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return this;
     }
 
+    public TraceLinkVersion withTraceType(TraceType traceType) {
+        setTraceType(traceType);
+        return this;
+    }
+
     public TraceLinkVersion withManualTraceType() {
         setTraceType(TraceType.MANUAL);
         setApprovalStatus(ApprovalStatus.APPROVED);
@@ -153,46 +157,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return this;
     }
 
-    public TraceLink getTraceLink() {
-        return traceLink;
+    public TraceLinkVersion withScore(double score) {
+        this.setScore(score);
+        return this;
     }
 
-    public void setTraceLink(TraceLink traceLink) {
-        this.traceLink = traceLink;
-    }
-
-    public TraceType getTraceType() {
-        return this.traceType;
-    }
-
-    public void setTraceType(TraceType traceType) {
-        this.traceType = traceType;
-    }
-
-    public double getScore() {
-        return this.score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    public ApprovalStatus getApprovalStatus() {
-        return this.approvalStatus;
-    }
-
-    public void setApprovalStatus(ApprovalStatus approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("mod", this.modificationType);
-        json.put("version", this.projectVersion);
-        json.put("link", this.traceLink.toString());
-        json.put("approved", getApprovalStatus());
-        json.put("type", this.traceType);
-        return json + "\n";
+    public TraceLinkVersion withVisibility(boolean isVisible) {
+        this.setVisible(isVisible);
+        return this;
     }
 
     @Override

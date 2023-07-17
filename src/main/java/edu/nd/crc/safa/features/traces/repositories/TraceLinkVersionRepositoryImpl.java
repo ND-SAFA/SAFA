@@ -53,8 +53,10 @@ public class TraceLinkVersionRepositoryImpl
                 .withProjectVersion(projectVersion)
                 .withTraceLink(traceLink)
                 .withModificationType(ModificationType.REMOVED)
-                .withManualTraceType()
-                .withApprovalStatus(ApprovalStatus.DECLINED);
+                .withTraceType(traceAppEntity.getTraceType())
+                .withApprovalStatus(ApprovalStatus.DECLINED)
+                .withScore(traceAppEntity.getScore())
+                .withVisibility(false);
         }
         return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
             modificationType,

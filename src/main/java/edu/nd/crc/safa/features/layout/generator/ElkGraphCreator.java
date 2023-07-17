@@ -11,7 +11,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.layout.LayoutSettings;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -67,7 +66,7 @@ public class ElkGraphCreator {
                                               List<TraceAppEntity> traces) {
         traces
             .stream()
-            .filter(t -> t.getApprovalStatus() != ApprovalStatus.DECLINED)
+            .filter(TraceAppEntity::isVisible)
             .forEach(t -> {
                 ElkNode sourceNode = name2node.get(t.getSourceId());
                 ElkNode targetNode = name2node.get(t.getTargetId());

@@ -9,7 +9,6 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -25,7 +24,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
 
     @Override
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
-        return getAppEntities(projectVersion, user, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+        return getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
     }
 
     /**
@@ -56,8 +55,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      */
     public List<TraceAppEntity> retrieveActiveTraces(ProjectVersion projectVersion,
                                                      List<UUID> existingArtifactIds) {
-        return retrieveTracesContainingArtifacts(projectVersion, existingArtifactIds,
-            t -> t.getApprovalStatus() != ApprovalStatus.DECLINED && t.isVisible());
+        return retrieveTracesContainingArtifacts(projectVersion, existingArtifactIds, t -> t.isVisible());
     }
 
     public List<TraceAppEntity> retrieveTracesContainingArtifacts(ProjectVersion projectVersion,

@@ -18,7 +18,6 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -87,7 +86,7 @@ public class SyncController extends BaseController {
             case TRACES:
                 List<TraceAppEntity> traces = this.serviceProvider
                     .getTraceService()
-                    .getAppEntities(projectVersion, user, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+                    .getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:

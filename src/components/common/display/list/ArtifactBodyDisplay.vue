@@ -5,15 +5,22 @@
     class="artifact-display"
     @click="emit('click')"
   >
-    <flex-box align="center" justify="between">
+    <flex-box v-if="props.displayTitle" align="center" justify="between">
       <typography :value="props.artifact.name" />
       <attribute-chip artifact-type :value="artifactType" />
     </flex-box>
     <template #subtitle>
       <typography
+        v-if="showSummary"
         variant="expandable"
+        :value="props.artifact.summary"
+        :default-expanded="props.defaultExpanded"
+      />
+      <typography
+        v-else
+        :variant="bodyVariant"
         :value="props.artifact.body"
-        :default-expanded="!!props.displayDivider && !!props.displayTitle"
+        :default-expanded="props.defaultExpanded"
       />
     </template>
   </list-item>
@@ -31,6 +38,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
+import { isCodeArtifact } from "@/util";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { AttributeChip } from "../chip";
@@ -48,4 +56,10 @@ const emit = defineEmits<{
 const artifactType = computed(() =>
   typeOptionsStore.getArtifactTypeDisplay(props.artifact.type)
 );
+
+const bodyVariant = computed(() =>
+  isCodeArtifact(props.artifact?.name || "") ? "code" : "expandable"
+);
+
+const showSummary = computed(() => !!props.artifact?.summary);
 </script>

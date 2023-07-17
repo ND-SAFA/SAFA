@@ -129,16 +129,7 @@ export function versionToString(currentVersion?: VersionSchema): string {
  */
 export function isCodeArtifact(name: string): boolean {
   const codeFileRegex =
-    /\.(js|ts|tsx|vue|java|py|cpp|c|php|html|css|sass|scss|json|yaml|yml|go)$/i;
+    /\.(js|ts|tsx|vue|java|py|cpp|c|php|html|css|sass|scss|json|yaml|yml)$/i;
 
   return codeFileRegex.test(name);
-}
-
-/**
- * Sanitizes the id of a node so it is valid in the DOM.
- * @param id - The artifact id.
- * @return The sanitized artifact id.
- */
-export function sanitizeNodeId(id?: string): string {
-  return id?.replace(/^[^a-z]+|[^\w:.-]+/gi, "") || "";
 }

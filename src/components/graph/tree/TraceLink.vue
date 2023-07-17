@@ -34,11 +34,9 @@ const definition = computed<TraceCytoElement>(() => ({
     type: GraphElementType.edge,
     graph: GraphMode.tree,
     id: props.trace.traceLinkId,
-
     // Reversed to show arrow toward parent.
     source: props.trace.targetId,
     target: props.trace.sourceId,
-
     deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
     faded: props.faded,
     traceType: props.trace.traceType,

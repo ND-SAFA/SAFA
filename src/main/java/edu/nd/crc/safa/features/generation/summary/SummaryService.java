@@ -68,6 +68,7 @@ public class SummaryService {
         if (codeArtifacts.isEmpty()) {
             return new ArrayList<>();
         }
+        // Summaries returned in same order so id is not considered.
         List<TGenSummaryArtifact> summaryArtifacts = codeArtifacts.stream().map(a -> new TGenSummaryArtifact(
             a.getTraceableId(), // avoid using id if artifact is not yet created.
             a.getName(),

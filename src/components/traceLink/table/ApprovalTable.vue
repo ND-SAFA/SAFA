@@ -73,7 +73,9 @@
       </template>
 
       <template #body-cell-actions="{ row }">
-        <trace-link-approval v-if="displayActions" :trace="row" />
+        <div @click.stop>
+          <trace-link-approval v-if="displayActions" :trace="row" />
+        </div>
       </template>
 
       <template #body-expanded="{ row }">

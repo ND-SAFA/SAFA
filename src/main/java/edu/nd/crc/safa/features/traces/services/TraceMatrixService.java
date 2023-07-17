@@ -2,11 +2,12 @@ package edu.nd.crc.safa.features.traces.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.app.TraceMatrixAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
@@ -32,6 +33,16 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
     public Optional<TraceMatrixEntry> getEntry(ProjectVersion projectVersion, ArtifactType sourceType,
                                                ArtifactType targetType) {
         return repo.getByProjectVersionAndSourceTypeAndTargetType(projectVersion, sourceType, targetType);
+    }
+
+    /**
+     * Get the trace matrix entry with the given ID
+     *
+     * @param traceMatrixId The ID of the entry
+     * @return The entry, if it exists
+     */
+    public Optional<TraceMatrixEntry> getEntry(UUID traceMatrixId) {
+        return repo.getById(traceMatrixId);
     }
 
     /**
@@ -68,11 +79,14 @@ public class TraceMatrixService implements IAppEntityService<TraceMatrixAppEntit
     }
 
     /**
-     * Save the entry to the database
+     * Update an entry in the database
      *
      * @param traceMatrixEntry The entry to save
      */
-    public void save(TraceMatrixEntry traceMatrixEntry) {
+    public void updateEntry(TraceMatrixEntry traceMatrixEntry) {
+        if (traceMatrixEntry.getId() == null) {
+            throw new SafaError("Use createEntry() to create a new trace matrix entry");
+        }
         repo.save(traceMatrixEntry);
     }
 

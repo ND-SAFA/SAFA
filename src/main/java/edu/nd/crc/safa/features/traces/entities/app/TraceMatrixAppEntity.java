@@ -1,7 +1,8 @@
-package edu.nd.crc.safa.features.projects.entities.app;
+package edu.nd.crc.safa.features.traces.entities.app;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceMatrixEntry;
 
 import lombok.Data;

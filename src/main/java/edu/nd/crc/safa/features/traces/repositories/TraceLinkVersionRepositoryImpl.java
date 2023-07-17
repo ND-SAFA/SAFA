@@ -171,7 +171,7 @@ public class TraceLinkVersionRepositoryImpl
                 notifyTraceMatrixUpdate(traceMatrixEntry, user);
             }
 
-            traceMatrixService.save(traceMatrixEntry);
+            traceMatrixService.updateEntry(traceMatrixEntry);
         }
     }
 

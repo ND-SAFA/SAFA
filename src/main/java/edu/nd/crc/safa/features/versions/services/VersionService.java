@@ -133,7 +133,7 @@ public class VersionService {
             newEntry.setCount(traceEntry.getCount());
             newEntry.setGeneratedCount(traceEntry.getGeneratedCount());
             newEntry.setApprovedCount(traceEntry.getApprovedCount());
-            traceMatrixService.save(newEntry);
+            traceMatrixService.updateEntry(newEntry);
         }
     }
 }

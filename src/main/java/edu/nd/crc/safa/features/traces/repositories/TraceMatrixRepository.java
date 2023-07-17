@@ -15,5 +15,7 @@ public interface TraceMatrixRepository extends CrudRepository<TraceMatrixEntry, 
                                                                              ArtifactType sourceType,
                                                                              ArtifactType targetType);
 
+    Optional<TraceMatrixEntry> getById(UUID id);
+
     List<TraceMatrixEntry> getByProjectVersion(ProjectVersion projectVersion);
 }

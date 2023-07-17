@@ -154,11 +154,4 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
         projectCommit.getTraces().getAdded().addAll(generatedLinks);
     }
-
-    @Override
-    protected void afterJob(boolean success) throws Exception {
-        if (!success) {
-            this.serviceProvider.getProjectService().deleteProject(this.projectVersion.getProject());
-        }
-    }
 }

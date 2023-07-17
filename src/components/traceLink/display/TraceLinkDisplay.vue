@@ -48,8 +48,12 @@ export default {
 import { computed } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
-import { ArtifactBodyDisplay, FlexBox, Separator } from "@/components/common";
-import Typography from "@/components/common/display/content/Typography.vue";
+import {
+  ArtifactBodyDisplay,
+  FlexBox,
+  Separator,
+  Typography,
+} from "@/components/common";
 
 const props = defineProps<{
   /**

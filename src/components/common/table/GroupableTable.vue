@@ -65,7 +65,6 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { isNumeric } from "rxjs/internal-compatibility";
 import { GroupableTableProps, TableGroupRow, TableRow } from "@/types";
 import { useTableFilter, useVModel } from "@/hooks";
 import GroupableTableRow from "./GroupableTableRow.vue";

@@ -138,12 +138,13 @@ public class TraceLinkVersionRepositoryImpl
     @Override
     public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity,
                               TraceLinkVersion previousVersionEntity, SafaUser user) {
-        ModificationType modificationType = versionEntity.getModificationType();
-        boolean added = modificationType == ModificationType.ADDED;
-        boolean removed = modificationType == ModificationType.REMOVED;
-        boolean modified = modificationType == ModificationType.MODIFIED;
+        ApprovalStatus approvalStatus = versionEntity.getApprovalStatus();
+        boolean added = approvalStatus == ApprovalStatus.APPROVED
+            && (previousVersionEntity == null || previousVersionEntity.getApprovalStatus() != ApprovalStatus.APPROVED);
+        boolean removed = approvalStatus == ApprovalStatus.DECLINED
+            && previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED;
 
-        if (added || removed || modified) {
+        if (added || removed) {
             // TODO this might need to get a table lock somehow if simultaneous updates come in from different sources
 
             ArtifactType sourceType = versionEntity.getTraceLink().getSourceType();
@@ -154,7 +155,7 @@ public class TraceLinkVersionRepositoryImpl
             if (added) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
                 notifyTraceMatrixUpdate(traceMatrixEntry, user);
-            } else if (removed) {
+            } else {
                 updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
 
                 if (traceMatrixEntry.getCount() == 0) {
@@ -163,12 +164,6 @@ public class TraceLinkVersionRepositoryImpl
                 } else {
                     notifyTraceMatrixUpdate(traceMatrixEntry, user);
                 }
-            } else {
-                // To make sure the generated/approved counts are right, remove counts for the previous
-                // version of the entity, and then add in new counts for the updated version
-                updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
-                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
-                notifyTraceMatrixUpdate(traceMatrixEntry, user);
             }
 
             traceMatrixService.updateEntry(traceMatrixEntry);

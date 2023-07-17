@@ -63,4 +63,8 @@ export type TableGroupRow =
        * The number of rows in this group.
        */
       $groupRows: number;
+      /**
+       * The sort index of this row.
+       */
+      $sortIdx: number;
     };

@@ -8,7 +8,7 @@
       :rows="rows"
       row-key="traceLinkId"
       :loading="loading"
-      default-sort-by="score"
+      default-sort-by="parentName"
       :default-group-by="groupBy"
       default-sort-desc
       :filter-row="filterRow"

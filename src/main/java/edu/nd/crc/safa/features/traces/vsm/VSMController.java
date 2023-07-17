@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.common.TGenLayer;
+import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -30,7 +30,7 @@ public class VSMController implements ITraceGenerationController {
     @Override
     public List<TraceAppEntity> generateLinks(GenerationDataset generationDataset, JobLogger jobLogger) {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
-        for (TGenLayer layer : generationDataset.getLayers()) {
+        for (TraceLayer layer : generationDataset.getLayers()) {
             Map<String, String> childLayer = generationDataset.getArtifactLayers().get(layer.getChild());
             Map<String, String> parentLayer = generationDataset.getArtifactLayers().get(layer.getParent());
 

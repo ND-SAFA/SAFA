@@ -28,7 +28,7 @@ public class GenerationDataset {
      * List of layers being traced (child -> parent).
      */
     @JsonProperty()
-    List<TGenLayer> layers;
+    List<TraceLayer> layers;
     /**
      * The trace links between artifacts in all artifact layers.
      */
@@ -45,7 +45,7 @@ public class GenerationDataset {
     Map<String, List<String>> layerIds = new HashMap<>();
 
 
-    public GenerationDataset(Map<String, Map<String, String>> artifactLayers, List<TGenLayer> layers) {
+    public GenerationDataset(Map<String, Map<String, String>> artifactLayers, List<TraceLayer> layers) {
         this.artifactLayers = artifactLayers;
         this.layers = layers;
     }
@@ -65,7 +65,7 @@ public class GenerationDataset {
     @JsonIgnore
     public int getNumOfCandidates() {
         int nCandidates = 0;
-        for (TGenLayer layer : this.layers) {
+        for (TraceLayer layer : this.layers) {
             Map<String, String> childArtifactMap = this.artifactLayers.get(layer.getChild());
             Map<String, String> parentArtifactMap = this.artifactLayers.get(layer.getParent());
             nCandidates += childArtifactMap.size() * parentArtifactMap.size();

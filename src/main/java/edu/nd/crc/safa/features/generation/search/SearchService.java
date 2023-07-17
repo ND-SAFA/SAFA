@@ -13,8 +13,8 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.generation.GenerationApi;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.common.TGenLayer;
 import edu.nd.crc.safa.features.generation.common.TGenLink;
+import edu.nd.crc.safa.features.generation.common.TraceLayer;
 import edu.nd.crc.safa.features.generation.tgen.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.generation.tgen.TGenTraceGenerationResponse;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -90,7 +90,7 @@ public class SearchService {
         artifactLayers.put("prompt", promptLayer);
         artifactLayers.put("artifacts", artifactLayer);
 
-        TGenLayer layer = new TGenLayer("artifacts", "prompt");
+        TraceLayer layer = new TraceLayer("artifacts", "prompt");
         GenerationDataset dataset = new GenerationDataset(artifactLayers, List.of(layer));
         TGenPredictionRequestDTO payload = new TGenPredictionRequestDTO(dataset);
         GenerationApi tgen = new GenerationApi(this.safaRequestBuilder);

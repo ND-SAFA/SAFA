@@ -19,7 +19,7 @@ import {
   GraphElementType,
   GraphMode,
 } from "@/types";
-import { isCodeArtifact } from "@/util";
+import { isCodeArtifact, sanitizeNodeId } from "@/util";
 import {
   useTheme,
   deltaStore,
@@ -55,7 +55,7 @@ const definition = computed<ArtifactCytoElement>(() => {
     data: {
       type: GraphElementType.node,
       graph: GraphMode.tree,
-      id,
+      id: sanitizeNodeId(id),
       body: summary || body,
       isCode: !summary && isCodeArtifact(name),
       artifactName: name,

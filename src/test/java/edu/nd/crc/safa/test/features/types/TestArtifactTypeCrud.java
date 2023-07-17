@@ -16,7 +16,7 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import org.json.JSONObject;
 
 public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
-    ArtifactType artifactType = new ArtifactType(project, Constants.name);
+    ArtifactType artifactType = new ArtifactType(project, Constants.name, "");
 
     protected UUID createEntity() throws Exception {
         JSONObject createdType = SafaRequest

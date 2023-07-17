@@ -139,12 +139,17 @@ public class TraceLinkVersionRepositoryImpl
     public void updateTimInfo(ProjectVersion projectVersion, TraceLinkVersion versionEntity,
                               TraceLinkVersion previousVersionEntity, SafaUser user) {
         ApprovalStatus approvalStatus = versionEntity.getApprovalStatus();
-        boolean added = approvalStatus == ApprovalStatus.APPROVED
-            && (previousVersionEntity == null || previousVersionEntity.getApprovalStatus() != ApprovalStatus.APPROVED);
+
+        boolean added = approvalStatus != ApprovalStatus.DECLINED
+            && (previousVersionEntity == null || previousVersionEntity.getApprovalStatus() == ApprovalStatus.DECLINED);
+
         boolean removed = approvalStatus == ApprovalStatus.DECLINED
             && previousVersionEntity.getApprovalStatus() != ApprovalStatus.DECLINED;
 
-        if (added || removed) {
+        boolean modified = previousVersionEntity != null
+            && versionEntity.getApprovalStatus() != previousVersionEntity.getApprovalStatus();
+
+        if (added || removed || modified) {
             // TODO this might need to get a table lock somehow if simultaneous updates come in from different sources
 
             ArtifactType sourceType = versionEntity.getTraceLink().getSourceType();
@@ -155,7 +160,7 @@ public class TraceLinkVersionRepositoryImpl
             if (added) {
                 updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
                 notifyTraceMatrixUpdate(traceMatrixEntry, user);
-            } else {
+            } else if (removed) {
                 updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
 
                 if (traceMatrixEntry.getCount() == 0) {
@@ -164,6 +169,10 @@ public class TraceLinkVersionRepositoryImpl
                 } else {
                     notifyTraceMatrixUpdate(traceMatrixEntry, user);
                 }
+            } else {
+                updateTraceMatrixEntry(traceMatrixEntry, previousVersionEntity, -1);
+                updateTraceMatrixEntry(traceMatrixEntry, versionEntity, 1);
+                notifyTraceMatrixUpdate(traceMatrixEntry, user);
             }
 
             traceMatrixService.updateEntry(traceMatrixEntry);

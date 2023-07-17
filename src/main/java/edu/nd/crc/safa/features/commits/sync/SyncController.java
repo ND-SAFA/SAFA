@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -112,6 +113,12 @@ public class SyncController extends BaseController {
                     .getModelService()
                     .getUserModels(user);
                 projectAppEntity.setModels(models);
+                break;
+            case TRACE_MATRICES:
+                List<TraceMatrixAppEntity> traceMatrixAppEntities = this.serviceProvider
+                    .getTraceMatrixService()
+                    .getAppEntities(projectVersion, null);
+                projectAppEntity.setTraceMatrices(traceMatrixAppEntities);
                 break;
             default:
                 throw new UnsupportedOperationException("Could not identify entity: " + change.getEntity());

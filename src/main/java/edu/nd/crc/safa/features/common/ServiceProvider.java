@@ -52,6 +52,7 @@ import edu.nd.crc.safa.features.summary.SummaryService;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
@@ -110,6 +111,7 @@ public class ServiceProvider {
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
     private final TraceLinkRepository traceLinkRepository;
+    private final TraceMatrixService traceMatrixService;
     // models
     private final ModelRepository modelRepository;
     private final ModelService modelService;

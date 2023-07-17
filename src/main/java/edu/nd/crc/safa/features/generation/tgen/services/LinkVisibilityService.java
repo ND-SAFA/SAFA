@@ -33,9 +33,7 @@ public class LinkVisibilityService {
                 .collect(Collectors.toList());
             if (selectedLinks.isEmpty() && !childLinks.isEmpty()) {
                 TraceAppEntity topParent = childLinks.get(0);
-                if (topParent.getScore() >= TOP_PARENT_MIN_SCORE) {
-                    selectedLinks.add(topParent);
-                }
+                selectedLinks.add(topParent);
             }
 
             finalLinks.addAll(selectedLinks);

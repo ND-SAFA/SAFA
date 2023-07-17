@@ -142,6 +142,7 @@ public class ProjectCommit {
     /**
      * @return A human-readable summaries of the changes in commit.
      */
+    @JsonIgnore
     public String getSummary() {
         List<String> logs = new ArrayList<>();
         logs.add(this.artifacts.getSummary("Artifacts"));

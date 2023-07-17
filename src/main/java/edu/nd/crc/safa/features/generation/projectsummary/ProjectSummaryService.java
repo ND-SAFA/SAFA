@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.generation.projectSummary;
+package edu.nd.crc.safa.features.generation.projectsummary;
 
 import java.util.List;
 import java.util.Map;

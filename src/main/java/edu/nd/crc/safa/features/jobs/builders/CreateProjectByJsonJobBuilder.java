@@ -3,11 +3,11 @@ package edu.nd.crc.safa.features.jobs.builders;
 import java.util.List;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 /**

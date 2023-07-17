@@ -4,7 +4,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;

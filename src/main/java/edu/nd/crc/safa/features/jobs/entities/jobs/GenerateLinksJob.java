@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
@@ -97,7 +97,7 @@ public class GenerateLinksJob extends CommitJob {
         commitService.performCommit(projectCommit, this.user);
     }
 
-    @IJobStep(value = "Summarizing Project", position = 3)
+    @IJobStep(value = "Summarizing Project", position = 3, requiredGeneration = true)
     public void summarizeProject() {
         Project project = this.projectVersion.getProject();
         ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
@@ -112,7 +112,6 @@ public class GenerateLinksJob extends CommitJob {
             logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
             GenerationDataset generationDataset = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
-            System.out.println("Dataset:" + generationDataset);
             generationDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();

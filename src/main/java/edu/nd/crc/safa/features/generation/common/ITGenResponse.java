@@ -8,6 +8,8 @@ import java.util.List;
 public interface ITGenResponse {
     /**
      * The logs of the job result.
+     *
+     * @return The list of logs
      */
     List<String> getLogs();
 }

@@ -24,7 +24,7 @@ import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectSummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.search.SearchService;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;

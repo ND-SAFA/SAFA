@@ -31,14 +31,21 @@
             v-for="item in items"
             :key="item.entry"
             :subtitle="timestampToDisplay(item.timestamp)"
-            :title="jobApiStore.jobSteps[idx]"
           >
-            <typography
-              v-for="line in item.entry.split('\n')"
-              :key="line"
-              el="p"
-              :value="line"
-            />
+            <q-expansion-item
+              default-opened
+              switch-toggle-side
+              :label="jobApiStore.jobSteps[idx]"
+              class="text-h5"
+            >
+              <typography
+                v-for="line in item.entry.split('\n')"
+                :key="line"
+                el="p"
+                l="3"
+                :value="line"
+              />
+            </q-expansion-item>
           </q-timeline-entry>
         </template>
       </q-timeline>

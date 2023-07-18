@@ -27,7 +27,7 @@ class TestPreTrainingTraceReader(BaseTest):
         lines = FileUtil.read_file(reader.data_file).split(os.linesep)
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     def test_summarization(self, mock_completion: mock.MagicMock):
         """
         Tests that pre-train data can be summarized

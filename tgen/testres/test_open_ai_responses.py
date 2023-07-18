@@ -8,7 +8,7 @@ from tgen.util.attr_dict import AttrDict
 FINE_TUNE_REQUEST = AttrDict({
     "training_file": "training_id",
     "validation_file": "validation_id",
-    "model": "text-davinci-003",
+    "model": "gpt-3.5-turbo",
     "n_epochs": 2,
     "batch_size": 4,
     "learning_rate_multiplier": 0.05,
@@ -20,7 +20,7 @@ FINE_TUNE_REQUEST = AttrDict({
 })
 
 COMPLETION_REQUEST = AttrDict({
-    "model": "text-davinci-003",
+    "model": "gpt-3.5-turbo",
     "prompt": "Say this is a test",
     "max_tokens": 7,
     "temperature": 0,
@@ -72,10 +72,12 @@ COMPLETION_RESPONSE_DICT = AttrDict({
     "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     "object": "text_completion",
     "created": 1589478378,
-    "model": "text-davinci-003",
+    "model": "gpt-3.5-turbo",
     "choices": [
         AttrDict({
-            "text": "\n\nThis is indeed a test",
+            "message": {
+                "content": "\n\nThis is indeed a test"
+            },
             "index": 0,
             "logprobs": AttrDict({"top_logprobs": [
                 AttrDict({
@@ -96,11 +98,12 @@ COMPLETION_RESPONSE_DICT = AttrDict({
 SUMMARY_FORMAT = "Summary of {}"
 
 
-def fake_open_ai_completion(prompt, **args):
+def fake_open_ai_completion(*args, **kwargs):
     choice = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0])
     choice["text"] = SUMMARY_FORMAT
     tags = [SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag]
     tag = None
+    prompt = kwargs["messages"][0]["content"]
     for t in tags:
         if f"<{t}>" in prompt[0]:
             tag = t

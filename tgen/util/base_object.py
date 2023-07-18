@@ -3,7 +3,7 @@ from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Type, Union, get_args
+from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
 
 from typeguard import check_type
 from typing_extensions import get_args
@@ -110,6 +110,8 @@ class BaseObject(ABC):
         elif isinstance(variable, MultiVariable):
             expected_inner_types = get_args(expected_type)
             expected_inner_type = expected_inner_types[0] if len(expected_inner_types) >= 1 else expected_type
+            if hasattr(expected_inner_type, "_name"):
+                expected_inner_type = expected_inner_type.__args__[0]
             val = []
             for i, inner_var in enumerate(variable):
                 inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
@@ -254,9 +256,38 @@ class BaseObject(ABC):
         :return: True if the type of val matches expected_type, False otherwise
         """
         try:
-            if not isinstance(val, UndeterminedVariable):
-                check_type(param_name, val, expected_type)
+            if isinstance(val, UndeterminedVariable):
+                return True
+            if hasattr(expected_type, "_name"):
+                if expected_type._name is None:
+                    type_args = expected_type.__args__
+                    type_args = [t for t in type_args if not hasattr(t, "__name__") or t.__name__ != "NoneType"]
+                    if len(type_args) == 1:
+                        expected_type = [0]
+                    else:
+                        expected_types = [t for t in type_args if isinstance(val, t)]
+                        expected_type = expected_types[0]
+
+                if not hasattr(expected_type, "_name"):
+                    check_type(param_name, val, expected_type)
+                    return True
+
+                if expected_type._name != "List":
+                    check_type(param_name, val, expected_type)
+                    return True
+                child_class = expected_type.__args__[0]
+                if child_class.__class__.__name__ == "_TypedDictMeta":
+                    child_class = dict
+                assert isinstance(val, list), f"Expected value to be list: {val}"
+                for i, child_value in enumerate(val):
+                    check_type(f"{param_name}-{i}", child_value, child_class)
+                return True
+            check_type(param_name, val, expected_type)
         except TypeError as e:
             traceback.print_exc()
             return False
         return True
+
+
+class AT(TypedDict):
+    a: str

@@ -8,6 +8,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.server.api.api_definition import ApiDefinition
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.json_util import JsonUtil
@@ -36,17 +37,18 @@ class ApiExporter(AbstractDatasetExporter):
         self.true_links: List[Dict] = [t for t in links if not np.isnan(t["score"]) and t["score"] > 0]
         for link_id, artifact_row in dataset.artifact_df.itertuples():
             self._add_artifact(artifact_row)
+
         layers = []
         for i, layer_row in dataset.layer_df.iterrows():
             parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
             child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
-            layers.append((child_type, parent_type))
+            layers.append(TraceLayer(parent=parent_type, child=child_type))
 
         definition = ApiDefinition(layers=layers,
                                    artifact_layers=self.generated_layers,
                                    true_links=self.true_links)
         if self.export_path:
-            JsonUtil.save_to_json_file(definition.as_dict(), self.export_path)
+            JsonUtil.save_to_json_file(definition, self.export_path)
 
         return definition
 

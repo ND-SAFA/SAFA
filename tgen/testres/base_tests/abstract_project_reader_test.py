@@ -29,7 +29,7 @@ class AbstractProjectReaderTest(BaseTest):
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
 
-    @mock.patch("openai.Completion.create", )
+    @mock.patch("openai.ChatCompletion.create", )
     def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
         """
         Verifies that entries are properly summarized by reader

@@ -68,15 +68,16 @@ class EntryCreator:
         :param layer_indices: The set of artifacts within type to extract. If none, all sets are used.
         :return: Data used to create entries using EntryCreator.
         """
-
+        key_map = "child" if "source" == type_key else "parent"
+        artifact_layer_map = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
+        traced_layers = TestDataManager.get_path([TestDataManager.Keys.LAYERS])
         entries = []
-        for layer_index, artifact_layer in enumerate(TestDataManager.DATA[TestDataManager.Keys.ARTIFACTS][type_key]):
+        for layer_index, traced_layer in enumerate(traced_layers):
+            layer_name = traced_layer[key_map]
+            layer_artifacts = artifact_layer_map[layer_name]
             layer_entries = []
-            if layer_indices is not None:
-                if layer_index not in layer_indices:
-                    continue
-            for a_id, a_body in artifact_layer.items():
-                layer_entries.append((a_id, a_body))
+            for artifact in layer_artifacts.items():
+                layer_entries.append(artifact)
             entries.append(layer_entries)
         return deepcopy(entries)
 

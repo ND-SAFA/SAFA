@@ -40,8 +40,8 @@ class ObjectCreator:
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
     api_project_reader = {
         "api_definition": {
-            "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
-            "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
+            "artifact_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS]),
+            "layers": TestDataManager.get_path([TestDataManager.Keys.LAYERS]),
             "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
         }
     }

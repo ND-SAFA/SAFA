@@ -1,5 +1,6 @@
 from typing import Dict
 
+from tgen.constants.dataset_constants import NO_CHECK
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -24,6 +25,13 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         super().__init__(overrides)
         self.api_definition = api_definition
+        self.remove_orphans = False
+        self.overrides = {
+            "remove_orphans": False,
+            "allowed_orphans": NO_CHECK,
+            "allowed_missing_sources": 0,
+            "allowed_missing_targets": 0
+        }
 
     def read_project(self) -> TraceDataFramesTypes:
         """

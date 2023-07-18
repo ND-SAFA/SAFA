@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Set
 import pandas as pd
 
 from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -100,7 +100,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: Returns list of orphan artifact ids.
         """
         if self.orphan_artifact_ids is None:
-            self.orphan_artifact_ids = set(self.artifact_df.index).difference(self._get_linked_artifact_ids())
+            linked_artifact_ids = self._get_linked_artifact_ids()
+            self.orphan_artifact_ids = set(self.artifact_df.index).difference(linked_artifact_ids)
         return self.orphan_artifact_ids
 
     def _filter_null_references(self) -> None:
@@ -149,7 +150,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Verifies that orphans lie below a certain threshold.
         :return: None
         """
-        if self.allowed_orphans == NO_CHECK_VALUE:
+        if self.allowed_orphans == NO_CHECK:
             return
         error_msg = f"Found too many orphan artifacts"
         default_msg = f"Number of orphan artifacts"
@@ -246,7 +247,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param label: The label to group error with, if it exists.
         :return: None
         """
-        if max_missing_allowed == NO_CHECK_VALUE:
+        if max_missing_allowed == NO_CHECK:
             return
         error_msg = f"Found too many null references to {label} artifacts ({len(missing_artifact_ids)})"
         default_msg = f"No missing {label} artifacts."

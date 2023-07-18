@@ -30,9 +30,9 @@ from tgen.testres.test_open_ai_responses import fake_open_ai_completion
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.util.enum_util import EnumDict
 from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 
 
 def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):
@@ -151,7 +151,7 @@ class TestHierarchyGeneration(BaseTest):
         expected_entities.extend([layer for i, layer in trace_dataset.layer_df.itertuples()])
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     @mock.patch.object(LLMResponseUtil, "extract_labels")
     def test_create_linked_dataset_for_intra_level_artifacts(self, llm_response_mock: mock.MagicMock, mock_completion: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT

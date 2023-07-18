@@ -24,7 +24,7 @@ class TestPreTrainProjectReader(BaseTest):
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         TestAssertions.assert_lists_have_the_same_vals(self, training_examples, expected_lines)
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     def test_summarization(self, mock_completion: mock.MagicMock):
         """
         Tests that pre-train data can be summarized

@@ -3,7 +3,6 @@ from typing import Dict, List, Tuple
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.api_project_reader import ApiProjectReader
-from tgen.server.api.api_definition import ApiDefinition
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator, LayerEntry, TraceInstruction
@@ -27,12 +26,7 @@ class ApiTestProject(AbstractTestProject):
         """
         :return: Returns project reader with project data as api payload
         """
-        data = {
-            "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
-            "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
-            "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
-        }
-        return ApiProjectReader(ApiDefinition(**data))
+        return TestDataManager.get_project_reader()
 
     @staticmethod
     def get_n_links() -> int:
@@ -69,8 +63,8 @@ class ApiTestProject(AbstractTestProject):
         """
         :return: Returns entries for positive trace links defined in project.
         """
-        trace_data = TestDataManager.DATA[TestDataManager.Keys.TRACES]
-        trace_data: List[TraceInstruction] = [(a_id, a_body, 1) for a_id, a_body in trace_data]
+        trace_data: List[Dict] = TestDataManager.DATA[TestDataManager.Keys.TRACES]
+        trace_data: List[TraceInstruction] = [(t["source"], t["target"], t["label"]) for t in trace_data]
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
@@ -95,21 +89,26 @@ class ApiTestProject(AbstractTestProject):
         """
         :return:Returns expected links between source and target artifacts.
         """
-        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
-        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+        artifact_layer_map = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
         links = []
-        for source_dict, target_dict in zip(sources, targets):
-            for source_id, source_body in source_dict.items():
-                for target_id, target_body in target_dict.items():
-                    links.append((source_id, target_id))
+
+        for trace_layer in TestDataManager.get_path([TestDataManager.Keys.LAYERS]):
+            parent_artifacts = artifact_layer_map[trace_layer["parent"]]
+            child_artifacts = artifact_layer_map[trace_layer["child"]]
+
+            for p_id, p_body in parent_artifacts.items():
+                for c_id, c_body in child_artifacts.items():
+                    links.append((c_id, p_id))
+
         return links
 
     @staticmethod
-    def get_positive_links():
+    def get_positive_links() -> List[Tuple[str, str]]:
         """
         :return: Returns positive trace link entries.
         """
-        return TestDataManager.get_path(TestDataManager.Keys.TRACES)
+        traces = [(t["source"], t["target"]) for t in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
+        return traces
 
     @staticmethod
     def get_negative_links() -> List[Tuple[str, str]]:

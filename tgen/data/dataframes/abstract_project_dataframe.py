@@ -84,7 +84,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
             else:
                 if self.index_name() in row_as_dict:
                     row_as_dict.pop(self.index_name())
-                self.loc[index] = [row_as_dict[col] for col in self.column_names() if col != self.index_name()]
+                self.loc[index] = [row_as_dict.get(col, None) for col in self.column_names() if col != self.index_name()]
         return self.get_row(index)
 
     def get_row(self, index: Any) -> EnumDict:

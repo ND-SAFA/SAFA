@@ -20,18 +20,19 @@ from tgen.util.file_util import FileUtil
 class TestSummarizer(BaseTest):
     CHUNKS = ["The cat in the hat sat", "on a log with a frog and a hog."]
 
-    @mock.patch("openai.Completion.create", )
+    @mock.patch("openai.ChatCompletion.create", )
     def test_summarize_chunks(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         llm_manager = OpenAIManager(OpenAIArgs())
         summarizer = Summarizer(llm_manager, code_or_exceeds_limit_only=False)
         prompts = [summarizer.code_prompt_builder.build(llm_manager.prompt_args,
-            artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT] for chunk in self.CHUNKS]
+                                                        artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT] for chunk in
+                   self.CHUNKS]
         summary = summarizer._summarize_chunks(llm_manager, prompts)[0]
         expected_summary = "".join(SUMMARY_FORMAT.format(chunk) for chunk in self.CHUNKS)
         self.assertEqual(summary, expected_summary)
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     def test_summarize(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         model_name = "code-cushman-002"
@@ -68,7 +69,7 @@ class TestSummarizer(BaseTest):
         orig_content = orig_content.replace("\t", "")
         return orig_content
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     def test_summarize_bulk(self, mock_completion: mock.MagicMock):
         mock_completion.side_effect = fake_open_ai_completion
         model_name = "code-cushman-002"

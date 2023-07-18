@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import List
 
 from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
@@ -11,7 +11,7 @@ class ApiDefinition(BaseObject):
     """
     Defines the dataset received through the API.
     """
-    artifact_layers: Dict[str, Dict[str, str]]
+    artifact_layers: dict  # maps layer names to layer artifact maps.
     layers: List[TraceLayer]
     true_links: List[TracePredictionEntry] = None
 
@@ -20,10 +20,3 @@ class ApiDefinition(BaseObject):
         :return: Returns the trace links defined in API dataset.
         """
         return [] if self.true_links is None else self.true_links
-
-    def as_dict(self) -> Dict:
-        """
-        Returns the definition as a dictionary
-        :return: The definition as a dictionary
-        """
-        return vars(self)

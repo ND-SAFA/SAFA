@@ -5,6 +5,10 @@ from transformers.trainer_utils import PredictionOutput
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.server.api.api_definition import ApiDefinition
+from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 
 
 class TestDataManager:
@@ -13,23 +17,31 @@ class TestDataManager:
         SOURCE = "source"
         TARGET = "target"
         TRACES = "traces"
+        LAYERS = "LAYERS"
 
     DATA = {
         Keys.ARTIFACTS: {
-            Keys.SOURCE: [{"s1": "s_token1",
-                           "s2": "s_token2",
-                           "s3": "s_token3"},
-                          {"s4": "s_token4",
-                           "s5": "s_token5",
-                           "s6": "s_token6"}],
-            Keys.TARGET: [{"t1": "t_token1",
-                           "t2": "t_token2",
-                           "t3": "t_token3"},
-                          {"t4": "t_token4",
-                           "t5": "t_token5",
-                           "t6": "t_token6"}]
+            "source_1": {"s1": "s_token1",
+                         "s2": "s_token2",
+                         "s3": "s_token3"},
+            "source_2": {"s4": "s_token4",
+                         "s5": "s_token5",
+                         "s6": "s_token6"},
+            "target_1": {"t1": "t_token1",
+                         "t2": "t_token2",
+                         "t3": "t_token3"},
+            "target_2": {"t4": "t_token4",
+                         "t5": "t_token5",
+                         "t6": "t_token6"}
         },
-        Keys.TRACES: [("s1", "t1"), ("s2", "t1"), ("s3", "t2"), ("s4", "t4"), ("s4", "t5"), ("s5", "t6")]
+        Keys.LAYERS: [{"parent": "target_1", "child": "source_1"},
+                      {"parent": "target_2", "child": "source_2"}],
+        Keys.TRACES: [{"source": "s1", "target": "t1", "label": 1},
+                      {"source": "s2", "target": "t1", "label": 1},
+                      {"source": "s3", "target": "t2", "label": 1},
+                      {"source": "s4", "target": "t4", "label": 1},
+                      {"source": "s4", "target": "t5", "label": 1},
+                      {"source": "s5", "target": "t6", "label": 1}]
     }
     LINKED_TARGETS = ["t1", "t2", "t4", "t5", "t6"]
 
@@ -123,3 +135,14 @@ class TestDataManager:
                 for artifact_id, artifact_body in artifact_level.items():
                     artifacts[artifact_id] = artifact_body
         return artifacts
+
+    @staticmethod
+    def get_project_reader() -> ApiProjectReader:
+        layers = [TraceLayer(**params) for params in TestDataManager.get_path(TestDataManager.Keys.LAYERS)]
+        links = [TracePredictionEntry(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
+        api_definition = ApiDefinition(
+            artifact_layers=TestDataManager.get_path(TestDataManager.Keys.ARTIFACTS),
+            layers=layers,
+            true_links=links
+        )
+        return ApiProjectReader(api_definition=api_definition)

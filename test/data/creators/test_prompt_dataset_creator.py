@@ -66,8 +66,9 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_entries = []
         ids = set()
         for trace in PromptTestProject.SAFA_PROJECT.get_trace_entries():
-            if trace[TraceKeys.SOURCE.value] not in ids:
-                artifact_entries.append({ArtifactKeys.CONTENT.value: all_artifacts[trace[TraceKeys.SOURCE.value]]})
+            source_name = trace[TraceKeys.SOURCE.value]
+            if source_name not in ids:
+                artifact_entries.append({ArtifactKeys.CONTENT.value: all_artifacts[source_name]})
                 ids.add(trace[TraceKeys.SOURCE.value])
             if trace[TraceKeys.TARGET.value] not in ids:
                 artifact_entries.append({ArtifactKeys.CONTENT.value: all_artifacts[trace[TraceKeys.TARGET.value]]})
@@ -92,14 +93,14 @@ class TestPromptDatasetCreator(BaseTest):
         else:
             PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):
         """
         Verifies that entries are properly summarized by reader
         :return: None
         """
         mock_completion.side_effect = fake_open_ai_completion
-        prompt_dataset: PromptDataset = dataset_creator.create_artifact_df()
+        prompt_dataset: PromptDataset = dataset_creator.create()
         for row in artifacts_entries:
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \

@@ -10,7 +10,7 @@
           },
           "trainer_args": {
             "object_type": "OPENAI",
-            "model": "text-davinci-003"
+            "model": "gpt-3.5-turbo"
           },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {

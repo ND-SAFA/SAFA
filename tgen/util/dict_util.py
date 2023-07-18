@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Iterable, List, Set, Type, TypeVar
+from typing import Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
 from tgen.util.enum_util import EnumDict
 from tgen.util.list_util import ListUtil
@@ -82,3 +82,20 @@ class DictUtil:
         """
         trace_keys = [key for key in enum_type if key.value in obj]
         return EnumDict({k: obj[k.value] for k in trace_keys})
+
+    @staticmethod
+    def convert_iterables_to_lists(obj: Union[Dict, List, Tuple]):
+        """
+        Converts any iterables to to lists.
+        :param obj: The object whose values are converted to lists.
+        :return:
+        """
+        if isinstance(obj, list) or isinstance(obj, tuple):
+            return [DictUtil.convert_iterables_to_lists(i) for i in obj]
+        elif isinstance(obj, dict):
+            new_dict = {}
+            for k, v in obj.items():
+                new_dict[k] = DictUtil.convert_iterables_to_lists(v)
+            return new_dict
+        else:
+            return obj

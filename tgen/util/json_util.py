@@ -18,8 +18,8 @@ class NpEncoder(json.JSONEncoder):
         from tgen.data.tdatasets.trace_dataset import TraceDataset
         if isinstance(obj, TraceDataset):
             from tgen.data.exporters.api_exporter import ApiExporter
-            res = ApiExporter(dataset=obj).export().as_dict()
-            return self.default(res)
+            api_definition = ApiExporter(dataset=obj).export()
+            return self.default(api_definition)
         if isinstance(obj, uuid.UUID):
             return str(obj)
         if isinstance(obj, np.integer):
@@ -156,3 +156,13 @@ class JsonUtil:
             if param in source:
                 entry[param] = source[param]
         return entry
+
+    @staticmethod
+    def as_dict(obj: Any) -> Dict:
+        """
+        Converts object to dictionary using the np encoder.
+        :param obj: The object to encode and decode as json
+        :return: The dictionary of the object.
+        """
+        obj_str = json.dumps(obj, cls=NpEncoder)
+        return json.loads(obj_str)

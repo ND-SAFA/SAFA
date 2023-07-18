@@ -19,8 +19,8 @@ from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_RE
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.train.trainers.llm_trainer_state import LLMTrainerState
+from tgen.util.llm_response_util import LLMResponseUtil
 
 Res = namedtuple("Res", ["id"])
 
@@ -71,7 +71,7 @@ class TestOpenAiTrainer(BaseTest):
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
 
-    @mock.patch("openai.Completion.create")
+    @mock.patch("openai.ChatCompletion.create")
     @mock.patch.object(LLMResponseUtil, "extract_labels")
     def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock, mock_completion_create: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
@@ -84,7 +84,7 @@ class TestOpenAiTrainer(BaseTest):
         classification_prompt_builder = PromptBuilder(prompts=[classification_prompt])
         generation_prompt = QuestionPrompt("Tell me about this artifact: ")
         generation_prompt_builder = PromptBuilder([generation_prompt])
-        
+
         for i, creator in enumerate([classification_prompt_builder, generation_prompt_builder]):
             for type_, dataset_creator in dataset_creators.items():
                 builder = deepcopy(creator)

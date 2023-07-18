@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from tgen.util.base_object import BaseObject
+
 
 @dataclass
-class TraceLayer:
+class TraceLayer(BaseObject):
     """
     Identifies a layer being traced.
     """

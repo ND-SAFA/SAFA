@@ -40,7 +40,7 @@ class TestArtifactProjectReader(BaseTest):
         artifact_df = project_reader.read_project()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
 
-    @mock.patch("openai.Completion.create", )
+    @mock.patch("openai.ChatCompletion.create", )
     def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
         mock_completion.side_effect = fake_open_ai_completion
         project_reader: AbstractProjectReader = test_project.get_project_reader()

@@ -31,7 +31,7 @@ class TestPromptProjectReader(BaseTest):
                 expected_prompts.append(json.loads(line))
         TestAssertions.verify_entities_in_df(self, expected_prompts, prompts_df)
 
-    @mock.patch("openai.Completion.create", )
+    @mock.patch("openai.ChatCompletion.create", )
     def test_summarization(self, mock_completion: mock.MagicMock):
         """
         Tests that project artifacts can be summarized

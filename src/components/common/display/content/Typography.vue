@@ -4,7 +4,7 @@
       v-if="expanded"
       :source="value"
       :class="className"
-      style="text-wrap: normal"
+      style="text-wrap: wrap"
     />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}

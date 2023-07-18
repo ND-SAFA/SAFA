@@ -11,10 +11,9 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You task is to find the children of the parent artifact.\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Concisely describe the functionality of the parent. " \
-                               "List the primary entities and the behavior of the expected functionality. " \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Find the artifacts that are directly related in the implementation of the parent artifact. " \
-                               "Only include artifacts that you are confident are directly related to the parent artifact. " \
+                               "\n2. Find the artifacts that are related to the parent functionality. " \
+                               "Only include artifacts directly related to the parent artifact. " \
                                "Provide the list of artifacts along with a sentence of how they help the parent achieve" \
                                "the feature they share. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \

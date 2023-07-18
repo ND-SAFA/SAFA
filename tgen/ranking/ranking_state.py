@@ -16,7 +16,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Provide a concise 3 word title describing the unique functionality this parent provides to the overall system. " \
                                "Let this be the `value prop`. " \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Select the artifacts from related to the parent's value prop. " \
+                               "\n2. Select the artifacts related to the parent's value prop. " \
                                "Provide the list of artifacts along with a sentence of how they help the parent achieve" \
                                "the shared functionality. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \

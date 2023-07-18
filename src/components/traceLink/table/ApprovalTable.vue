@@ -8,9 +8,8 @@
       :rows="rows"
       row-key="traceLinkId"
       :loading="loading"
-      default-sort-by="parentName"
+      default-sort-by="targetName"
       :default-group-by="groupBy"
-      default-sort-desc
       :filter-row="filterRow"
       :custom-cells="customCells"
       data-cy="table-trace-approval"
@@ -201,6 +200,7 @@ function filterRow(row: FlatTraceLink): boolean {
     sourceSubtree.neighbors.length > 0 && targetSubtree.neighbors.length > 0;
 
   return (
+    !traceApiStore.loadingTraceIds.includes(row.traceLinkId) &&
     (countType.value === TraceCountTypes.all ||
       (countType.value === TraceCountTypes.onlyTraced && bothTraced) ||
       (countType.value === TraceCountTypes.notTraced && !bothTraced)) &&

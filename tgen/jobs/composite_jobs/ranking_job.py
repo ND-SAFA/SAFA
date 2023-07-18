@@ -19,7 +19,7 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
-                 select_top_predictions: bool = False, layer_ids: Tuple[str, str] = None, **kwargs):
+                 select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.

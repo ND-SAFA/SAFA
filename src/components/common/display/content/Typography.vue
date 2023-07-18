@@ -1,6 +1,11 @@
 <template>
   <div v-if="expandable" class="width-100">
-    <markdown v-if="expanded" :source="value" :class="className" />
+    <markdown
+      v-if="expanded"
+      :source="value"
+      :class="className"
+      style="text-wrap: normal"
+    />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>

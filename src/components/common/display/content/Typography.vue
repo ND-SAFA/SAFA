@@ -1,8 +1,6 @@
 <template>
   <div v-if="expandable" class="width-100">
-    <div v-if="expanded" :class="className + ' text-white-space-normal'">
-      {{ value }}
-    </div>
+    <markdown v-if="expanded" :source="value" :class="className" />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
@@ -55,6 +53,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults, watch } from "vue";
+import Markdown from "vue3-markdown-it";
 import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 

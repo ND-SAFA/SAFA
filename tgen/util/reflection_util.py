@@ -138,3 +138,70 @@ class ReflectionUtil:
         """
         values = ReflectionUtil.get_fields(instance, param_scope)
         ReflectionUtil.set_attributes(other, values)
+
+    @staticmethod
+    def get_typed_class(typed_obj: Any) -> List:
+        """
+        Returns the base class and the child class.
+        e.g.
+        Dict[KeyClass, ParentClass] -> Dict, KeyClass, ParentClass
+        List[Class] -> List, Class
+        Optional[Class] -> Class
+        :param typed_obj:
+        :return:
+        """
+        if ReflectionUtil.is_typed_class(typed_obj):
+            origin = typing.get_origin(typed_obj)
+            type_args = ReflectionUtil.get_type_args(typed_obj)
+            if origin is typing.Union:
+                return "union", *type_args
+            elif origin is list:
+                assert len(type_args) == 1, f"Found multiple typed for list: {type_args}"
+                return "list", type_args[0]
+            elif len(type_args) == 1:
+                expected_type = type_args[0]
+            else:
+                expected_types = [t for t in type_args if isinstance(typed_obj, t)]
+                expected_type = expected_types[0]
+
+            return [expected_type]
+        else:
+            return [typed_obj]
+
+    @staticmethod
+    def is_typed_class(class_obj: Type):
+        """
+        Returns whether the class is a typed class. (Optional, List, Dict, Tuple, ect.)
+        :param class_obj: Class to be determined.
+        :return: True is class is typed, false otherwise.
+        """
+        return hasattr(class_obj, "_name")  # TODO: Come up with better hueristc
+
+    @staticmethod
+    def get_type_args(class_obj: Type):
+        """
+        Returns the typed arguments to class.
+        :param class_obj:
+        :return:
+        """
+        assert ReflectionUtil.is_typed_class(class_obj), f"{class_obj} is not a typed class."
+        type_args = class_obj.__args__
+        type_args = [t for t in type_args if not ReflectionUtil.is_none_type(t)]
+        return type_args
+
+    @staticmethod
+    def is_none_type(class_obj):
+        """
+        Heuristically determines if class is none type. This class is unimportable in python.
+        :param class_obj: The class to be determined.
+        :return: True is none type.
+        """
+        return hasattr(class_obj, "__name__") and class_obj.__name__ == "NoneType"
+
+    @staticmethod
+    def is_union(class_obj: Any):
+        """
+        :param class_obj: The class to check.
+        :return: Returns whether class is an optional type.
+        """
+        return typing.get_origin(class_obj) is typing.Union

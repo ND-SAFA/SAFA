@@ -258,30 +258,21 @@ class BaseObject(ABC):
         try:
             if isinstance(val, UndeterminedVariable):
                 return True
-            if hasattr(expected_type, "_name"):
-                if expected_type._name is None:
-                    type_args = expected_type.__args__
-                    type_args = [t for t in type_args if not hasattr(t, "__name__") or t.__name__ != "NoneType"]
-                    if len(type_args) == 1:
-                        expected_type = [0]
-                    else:
-                        expected_types = [t for t in type_args if isinstance(val, t)]
-                        expected_type = expected_types[0]
-
-                if not hasattr(expected_type, "_name"):
-                    check_type(param_name, val, expected_type)
+            if ReflectionUtil.is_typed_class(expected_type):
+                parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
+                if parent_class == "dict":
+                    expected_type = child_classes[0]
+                elif parent_class == "list":
+                    child_type = child_classes[0]
+                    invalid_runs = [v for v in val if not cls._is_type(v, child_type, param_name)]
+                    assert len(invalid_runs) == 0, f"List elements {invalid_runs} was not of type {child_type}."
                     return True
-
-                if expected_type._name != "List":
-                    check_type(param_name, val, expected_type)
+                elif parent_class == "union":
+                    queries = [c for c in child_classes if cls._is_type(val, c, param_name)]
+                    assert len(queries) > 0, f"{val} was not of type: {child_classes}"
                     return True
-                child_class = expected_type.__args__[0]
-                if child_class.__class__.__name__ == "_TypedDictMeta":
-                    child_class = dict
-                assert isinstance(val, list), f"Expected value to be list: {val}"
-                for i, child_value in enumerate(val):
-                    check_type(f"{param_name}-{i}", child_value, child_class)
-                return True
+                else:
+                    expected_type = parent_class
             check_type(param_name, val, expected_type)
         except TypeError as e:
             traceback.print_exc()

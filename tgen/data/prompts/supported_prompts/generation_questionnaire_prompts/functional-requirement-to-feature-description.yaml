@@ -1,16 +1,57 @@
+description:
+- A Feature description is a concise and clear explanation of a specific functionality
+  or aspect of a software development project. It is an essential artifact that helps
+  stakeholders understand the purpose, scope, and requirements of a particular feature.
+  This artifact is different from other software artifacts, such as user stories or
+  use cases, as it focuses on the high-level overview of the feature, its benefits,
+  and its interactions with other components of the system, rather than detailing
+  the step-by-step process or user interactions.
+example:
+- 'Feature: Export Data to CSV
+
+
+  Description: The Export Data to CSV feature allows users to download a CSV file
+  containing the data displayed in the application''s data table. This feature enables
+  users to easily manipulate and analyze the data using external tools, such as spreadsheet
+  software.
+
+
+  Requirements:
+
+  - The user must be able to select the data they want to export.
+
+  - The exported CSV file must include all columns displayed in the data table.
+
+  - The CSV file must be formatted according to the RFC 4180 standard.
+
+  - The user must be able to choose the location where the CSV file will be saved.
+
+
+  Dependencies:
+
+  - Data Table component
+
+
+  Acceptance Criteria:
+
+  - The user can successfully export the selected data to a CSV file.
+
+  - The CSV file contains the correct data and formatting.
+
+  - The user can open the CSV file in a spreadsheet software without any issues.'
 format:
-- 'Description: [Provide a concise and clear description of the feature, highlighting
-  its purpose and functionality.]  Acceptance Criteria: - [List the specific criteria
-  that must be met for the feature to be considered complete and functioning correctly.
-  Use bullet points for clarity and specificity.]'
+- 'Feature: [Feature Name]  Description: [A brief description of the feature and its
+  purpose]  Requirements: - [List of requirements for the feature]  Dependencies:
+  - [List of components or features that this feature depends on]  Acceptance Criteria:
+  - [List of criteria that must be met for the feature to be considered complete]'
 questions:
-- - What is the purpose or goal of the system?
-  - What are the main capabilities or functions of the system?
-  - What types of users will interact with the system?
-  - What tasks can the users perform with the system?
-  - What data or information does the system handle or manage?
-  - What inputs does the system require to function?
-  - What outputs does the system produce?
-  - What interfaces does the system have?
-  - What are the system's non-functional requirements (performance, security, etc.)?
-  - What constraints or limitations does the system have?
+- - What is the overall purpose or goal of the system?
+  - Who are the users or actors that will interact with the system?
+  - What are the key functions or capabilities the system needs to have?
+  - Are there any constraints or limitations that impact the design?
+  - What are the main inputs and outputs for each function?
+  - What data or information does the system need to store or access?
+  - What external systems or interfaces does it need to connect to?
+  - Are there any non-functional requirements like performance, security, etc?
+  - What are the different ways users will interact with the system?
+  - What are the key workflows or use cases the system needs to support?

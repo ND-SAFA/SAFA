@@ -4,7 +4,7 @@ from types import DynamicClassAttribute
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
 from tgen.data.prompts.supported_prompts.hgen_prompts import GENERATION_PROMPT, INSTRUCTION_CREATION_PROMPT, \
-    REFINE_QUESTIONNAIRE, FORMAT_PROMPT, REFINE_PROMPT
+    REFINE_QUESTIONNAIRE, REFINE_PROMPT, FORMAT_QUESTIONNAIRE
 from tgen.data.prompts.supported_prompts.summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.util.supported_enum import SupportedEnum
 
@@ -15,7 +15,7 @@ class SupportedPrompts(SupportedEnum):
     HGEN_GENERATION = GENERATION_PROMPT
     HGEN_REFINEMENT = REFINE_PROMPT
     HGEN_REFINE_QUESTIONNAIRE = REFINE_QUESTIONNAIRE
-    HGEN_FORMAT_PROMPT = FORMAT_PROMPT
+    HGEN_FORMAT_QUESTIONNAIRE = FORMAT_QUESTIONNAIRE
 
     # ---------- TGEN ----------------
     TGEN_CLASSIFICATION = CLASSIFICATION_QUESTIONNAIRE

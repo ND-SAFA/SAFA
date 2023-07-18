@@ -1,3 +1,5 @@
+import re
+
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.data.prompts.question_prompt import QuestionPrompt
@@ -7,20 +9,38 @@ from tgen.util.prompt_util import PromptUtil
 INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must "
                                      "reverse engineer {target_type} from the {source_type}. "
                                      "Consider what information you would need to extract from the system. "
-                                     "Then construct a set of questions about the {source_type} that by answering "
+                                     "Then construct a minimal set of only the most important "
+                                     "questions about the {source_type} that by answering "
                                      "you would be able to create the {target_type}. "
-                                     "Output the questions in a new-line deliminated list. ",
+                                     "Output the questions in a new-line deliminated list containing at most 10 items. ",
                                      PromptResponseManager(response_tag="questions",
-                                                           required_tag_ids=REQUIRE_ALL_TAGS))
+                                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                                           ))
 
-FORMAT_PROMPT = Prompt("Provide an example {target_type} for a software development project. "
-                       "Enclose your {target_type} example in <example></example>. "
-                       "Then, give an example of the typical format for an effective software development {target_type}. "
-                       "Include only the format. ",
-                       response_manager=PromptResponseManager(response_tag="format",
-                                                              required_tag_ids=REQUIRE_ALL_TAGS,
-                                                              formatter=lambda tag, val:
-                                                              PromptUtil.strip_new_lines_and_extra_space(val)))
+DEFINITION_PROMPT = QuestionPrompt(
+    "First, write a brief description of what a {target_type} is in a software development project. "
+    "Focus on what differentiates this artifact from other similar software artifacts. ",
+    response_manager=PromptResponseManager(response_tag="description",
+                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                           formatter=lambda tag, val:
+                                           PromptUtil.strip_new_lines_and_extra_space(val)))
+EXAMPLE_PROMPT = QuestionPrompt(
+    "Then provide an example {target_type} for a software development project. The {target_type} should focus "
+    "on a single feature or functionality. ",
+    response_manager=PromptResponseManager(response_tag="example")
+)
+
+FORMAT_PROMPT = QuestionPrompt(
+    "Finally, use your example to create a template for the typical format for an effective software development {target_type}. "
+    "The template should be generalizable so it can apply to any software project and should exclude any numbering system. "
+    "Include only the format. ",
+    response_manager=PromptResponseManager(response_tag="format",
+                                           required_tag_ids=REQUIRE_ALL_TAGS,
+                                           formatter=lambda tag, val:
+                                           PromptUtil.strip_new_lines_and_extra_space(val)))
+
+FORMAT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[DEFINITION_PROMPT, EXAMPLE_PROMPT, FORMAT_PROMPT],
+                                           enumeration_chars=["-"])
 
 GENERATION_PROMPT = Prompt("You are an engineer working on a software system and your goal is to reverse engineer "
                            "{target_type}s from {source_type}s. You are given a numbered list of descriptions of the "
@@ -28,17 +48,20 @@ GENERATION_PROMPT = Prompt("You are an engineer working on a software system and
 SUMMARY_INSTRUCTIONS = "First, write an in-depth, comprehensive summary " \
                        "describing the system by focusing on any technical details or dependencies needed for the {target_type}s. " \
                        "Exclude details that are generally applicable across systems " \
-                       "and focus only on details that are truly specific to the design and behavior of this particular system. " \
+                       "and focus only on details that are truly specific to the design and behavior of this particular system. "  \
                        "Consider the following in your response: "
-TASK_INSTRUCTIONS = "Then, use this information to determine the main features and " \
+TASK_INSTRUCTIONS = "Then, use your summary to determine the main features and " \
                     "functionality provided by the system to the target audience, " \
                     "and reverse engineer a comprehensive set of {target_type}s from the {source_type} " \
                     "for each of these features and functionality. " \
                     "You may combine related features and functionality into a single {target_type} " \
                     "but each {target_type} should be independent of all others. " \
                     "Provide any technical details that would be necessary to implement the {target_type} " \
-                    "but avoid ambiguous or vague language. " \
-                    "Each {target_type} should use following format '{format}'. " \
+                    "but avoid ambiguous or vague language and do not make up information if it is missing. " \
+                    "Include only information that is contained in the {source_type}. " \
+                    "{description} " \
+                    "Each {target_type} should use a consistent format. " \
+                    "Use the following format as a guideline: '{format}'. " \
                     "Output ALL {target_type} to cover every major feature and functionality."
 
 REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "

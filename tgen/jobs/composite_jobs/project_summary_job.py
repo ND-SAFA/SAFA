@@ -23,7 +23,7 @@ TASKS_DEFINITIONS = [
     "Create a sub-section called `Overview`. Provide a paragraph describing the main functionality of the system.",
     "Create a sub-section called `Features`. Outline the major features of the software system. ",
     "Create a sub-section called `Major Components`. Within it, create sub-sections for each major component in the system. "
-    "For each component, provide a paragraph describing its responsibilities within the system "
+    "For each component, provide a paragraph describing its unique role in the software system "
     "and the system artifacts that help implement it.",
     "Create a sub-section called `Data Flow` and describe the dependencies between major components and how they interact to accomplish the listed features.",
 ]

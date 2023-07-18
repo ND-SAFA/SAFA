@@ -46,7 +46,9 @@ def endpoint(serializer):
                 assert request.method == 'POST', "Only POST accepted for request."
                 payload = ViewUtil.read_request(request, serializer)
                 if isinstance(func, Task):
-                    task = func.delay(payload)
+                    payload_str = json.dumps(payload, cls=NpEncoder)
+                    payload_dict = json.loads(payload_str)
+                    task = func.delay(payload_dict)
                     return JsonResponse({"task_id": task.id}, encoder=NpEncoder)
                 else:
                     response = func(payload)
@@ -102,7 +104,11 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
             state["is_running"] = True
 
             def run_job():
-                response = func(*task_args, **task_kwargs)
+                data, *other_args = task_args
+                s = serializer(data=data)
+                s.is_valid(raise_exception=True)
+                serialized_data = s.save()
+                response = func(serialized_data, *other_args, **task_kwargs)
                 response_str = json.dumps(response, cls=NpEncoder)
                 response_dict = json.loads(response_str)
                 result.update(response_dict)

@@ -154,9 +154,8 @@ CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
 
-
-# if ENV_MODE == "local":
-#     CELERY_TASK_ALWAYS_EAGER = True
+if ENV_MODE == "local":
+    CELERY_TASK_ALWAYS_EAGER = True
 
 
 # Encoder function

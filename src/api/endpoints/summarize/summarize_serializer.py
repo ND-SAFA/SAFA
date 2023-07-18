@@ -21,13 +21,16 @@ class SummarizeRequest:
     artifacts: List[SummaryArtifactPayload]
 
 
+MAX_LENGTH = 10 ** 10
+
+
 class SummaryArtifactSerializer(serializers.Serializer):
     """
     Serializes a summary artifact request.
     """
-    id = serializers.CharField(max_length=100000, help_text="The id of the artifact.")
-    name = serializers.CharField(max_length=100000, help_text="The name of the artifact.")
-    content = serializers.CharField(max_length=100000, help_text="The content to summarize.")
+    id = serializers.CharField(max_length=MAX_LENGTH, help_text="The id of the artifact.")
+    name = serializers.CharField(max_length=MAX_LENGTH, help_text="The name of the artifact.")
+    content = serializers.CharField(max_length=MAX_LENGTH, help_text="The content to summarize.")
     type = serializers.ChoiceField(choices=[(e.name, e.value) for e in SupportedChunker],
                                    help_text="The type of chunker to use for segmenting document.")
 

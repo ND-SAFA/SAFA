@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "api.server.settings"
 
-from api.endpoints.predict.predict_serializer import PredictionPayload
+from api.endpoints.predict.predict_serializer import TraceRequest
 from api.endpoints.predict.predict_view import create_predict_definition
 from api.utils.view_util import ViewUtil
 from tgen.server.api.api_definition import ApiDefinition
@@ -18,7 +18,7 @@ from tgen.util.logging.logger_manager import logger
 
 
 @shared_task
-def predict_test(prediction_payload: PredictionPayload):
+def predict_test(prediction_payload: TraceRequest):
     job_id = uuid.uuid4()
     logger.info(f"Storing result under job id: {job_id}")
 

@@ -39,12 +39,14 @@ class DatasetSerializer(AbstractSerializer):
     """
     artifact_layers = serializers.DictField(
         child=serializers.DictField(
-            child=serializers.CharField(help_text="a"),
-            help_text="a"
+            child=serializers.CharField(help_text="The artifact body."),
+            help_text="Artifact map of artifact type."
         ),
-        help_text="a"
+        help_text="Map of artifact types to artifact maps."
     )
     layers = TraceLayerSerializer(many=True, help_text="The layers being traced.")
+    summary = serializers.CharField(max_length=100000, help_text="Pre-generated project summary.", required=False, allow_null=True,
+                                    allow_blank=False)
 
     def create(self, validated_data) -> ApiDefinition:
         """
@@ -55,6 +57,9 @@ class DatasetSerializer(AbstractSerializer):
         layer_serializer = TraceLayerSerializer(many=True, data=validated_data["layers"])
         layer_serializer.is_valid(raise_exception=True)
         layers = layer_serializer.save()
-        return ApiDefinition(artifact_layers=validated_data["artifact_layers"],
+        artifact_layers = validated_data["artifact_layers"]
+        summary = validated_data.get("summary")
+        return ApiDefinition(artifact_layers=artifact_layers,
                              layers=layers,
-                             true_links=[])
+                             true_links=[],
+                             summary=summary)

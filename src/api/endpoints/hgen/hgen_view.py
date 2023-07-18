@@ -15,10 +15,12 @@ def perform_hgen(request: HGenRequest):
     """
     artifacts = request["artifacts"]
     target_types = request["targetTypes"]
+    summary = request.get("summary")
     base_type, *other_types = target_types
     logger.info(f"Starting HGEN request for: {target_types}")
     base_job = GenerateArtifactsJob(artifacts,
-                                    target_type=base_type)
+                                    target_type=base_type,
+                                    system_summary=summary)
     job = MultiLayerHGenJob(base_job,
                             target_types=other_types)
     hgen_dataset = ViewUtil.run_job(job)

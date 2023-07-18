@@ -8,9 +8,8 @@
       :rows="rows"
       row-key="traceLinkId"
       :loading="loading"
-      default-sort-by="parentName"
+      default-sort-by="targetName"
       :default-group-by="groupBy"
-      default-sort-desc
       :filter-row="filterRow"
       :custom-cells="customCells"
       data-cy="table-trace-approval"

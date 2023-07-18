@@ -7,21 +7,23 @@ from tgen.state.state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "You are a software engineer on a software project. " \
-                       "You are given a parent software artifact and a list of potential children." \
-                       "You task is to find the children of the parent artifact.\n\n"
+                       "You are given a parent software artifact and a list of potential children. " \
+                       "You task is to find the children that help implement or refine the parent functionality." \
+                       "The children are sorted from most to least matching words with the parent. " \
+                       "Consider the top entries of this list." \
+                       "\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "1. Concisely describe the functionality of the parent. " \
-                               "List the primary entities and the behavior of the expected functionality. " \
+                               "1. Concisely describe the unique functionality this parent provides to the overall system. " \
+                               "List what functionality from the software artifacts it would need to accomplish this task. " \
+                               "Provide the functionality from most to least related to the parent's value. " \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Find the artifacts that are directly related in the implementation of the parent artifact. " \
-                               "Only include artifacts that you are confident are directly related to the parent artifact. " \
+                               "\n2. Select the artifacts from most to least related to the parent's functionality. " \
                                "Provide the list of artifacts along with a sentence of how they help the parent achieve" \
-                               "the feature they share. " \
+                               "the shared functionality. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
                                "Enclose your answer in <related></related>." \
-                               "\n3. Rank the artifacts from most to least related to the parent's functionality. " \
-                               "Provide the ranking as comma delimited list of artifact ids where the " \
-                               "first element is the most related while the last element is the least. " \
+                               "\n3. Rank the artifacts by the order in which they provide value to the parent, from most to least. " \
+                               "Provide the ranking as comma delimited list of artifact ids. " \
                                "Enclose the list in <links></links>."
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")

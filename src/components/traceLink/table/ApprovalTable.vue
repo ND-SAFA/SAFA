@@ -201,6 +201,7 @@ function filterRow(row: FlatTraceLink): boolean {
     sourceSubtree.neighbors.length > 0 && targetSubtree.neighbors.length > 0;
 
   return (
+    !traceApiStore.loadingTraceIds.includes(row.traceLinkId) &&
     (countType.value === TraceCountTypes.all ||
       (countType.value === TraceCountTypes.onlyTraced && bothTraced) ||
       (countType.value === TraceCountTypes.notTraced && !bothTraced)) &&

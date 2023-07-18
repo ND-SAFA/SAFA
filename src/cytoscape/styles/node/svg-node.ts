@@ -1,5 +1,5 @@
 import { ArtifactCytoElementData, SvgNodeStyle, SvgStyle } from "@/types";
-import { capitalize } from "@/util";
+import { capitalize, isCodeArtifact } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgStoplight } from "@/cytoscape/styles/node/node-stoplight";
@@ -31,6 +31,9 @@ export function svgNode(
   const outerHeight = outer.height + heightOffset;
   const margin = `${marginTop + heightOffset}px`;
   const dataCy = data.isSelected ? "tree-node-selected" : "tree-node";
+  const artifactName = isCodeArtifact(data.artifactName)
+    ? data.artifactName.split("/").pop() || data.artifactName
+    : data.artifactName;
 
   return `
     <div>
@@ -43,17 +46,17 @@ export function svgNode(
         data-cy-name="${sanitizeText(data.artifactName)}"
       >
         ${svgShape}
-        ${svgTitle(title, y - 18, "type")}
+        ${svgTitle(title, y - 16, "type")}
         ${svgDiv({
           x: x * 2,
           y: y + 10,
           width: width - x * 2,
           color: data.typeColor,
         })}
-        ${svgTitle(data.artifactName, y + 10, "name")}
+        ${svgTitle(artifactName, y + 12, "name", true)}
         ${svgBody(data, truncateLength, {
           x,
-          y: y + 35,
+          y: y + 60,
           width: bodyWidth || width,
           height,
         })}
@@ -80,6 +83,7 @@ export function svgNode(
  * @param title - The title to render.
  * @param y - The y position to start drawing at.
  * @param dataCy - The data cy selector to append.
+ * @param twoLines - Whether to render the title on two lines.
  * @param icon - The icon to render.
  *
  * @return stringified SVG for the node.
@@ -88,18 +92,17 @@ export function svgTitle(
   title: string,
   y: number,
   dataCy: string,
+  twoLines?: boolean,
   icon?: string
 ): string {
   return svgText(
     title,
     {
-      class: icon
-        ? "q-mx-lg text-ellipsis artifact-text"
-        : "q-mx-md text-ellipsis artifact-text",
+      class: icon ? "q-mx-lg artifact-text" : "q-mx-md artifact-text",
       x: 0,
       y,
       width: "100%",
-      height: 26,
+      height: twoLines ? 48 : 26,
       icon,
     },
     dataCy

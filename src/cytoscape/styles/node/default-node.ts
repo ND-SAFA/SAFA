@@ -18,7 +18,7 @@ export function svgDefault(data: ArtifactCytoElementData): string {
       marginTop: 6,
       truncateLength: 90,
       outer,
-      inner: { x: 12, y: 20, width: 180, height: 100 },
+      inner: { x: 12, y: 20, width: 180, height: 70 },
     },
     svgRect({ ...outer, color: data.typeColor }, 8)
   );

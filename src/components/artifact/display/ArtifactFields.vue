@@ -1,7 +1,7 @@
 <template>
   <panel-card>
     <flex-box align="center" justify="between">
-      <div>
+      <div class="overflow-hidden">
         <typography
           ellipsis
           variant="subtitle"

@@ -12,7 +12,7 @@ import { svgDiv, svgTitle } from "./svg-node";
  */
 export function svgTIM(data: TimNodeCytoElementData): string {
   const x = 20;
-  const y = 10;
+  const y = 25;
   const count = data.count == 1 ? "1 Artifact" : `${data.count} Artifacts`;
 
   return `
@@ -33,11 +33,11 @@ export function svgTIM(data: TimNodeCytoElementData): string {
       ${svgTitle(data.artifactType, y, "type")}
       ${svgDiv({
         x,
-        y: y + 37,
+        y: y + 48,
         width: TIM_NODE_WIDTH - x * 2,
         color: data.typeColor,
       })}
-      ${svgTitle(count, y + 50, "count")}
+      ${svgTitle(count, y + 70, "count")}
     </svg>
   `;
 }

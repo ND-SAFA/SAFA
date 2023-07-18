@@ -13,11 +13,10 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "Consider the top entries of this list." \
                        "\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "1. Concisely describe the unique functionality this parent provides to the overall system. " \
-                               "List what functionality from the software artifacts it would need to accomplish this task. " \
-                               "Provide the functionality from most to least related to the parent's value. " \
+                               "1. Provide a concise 3 word title describing the unique functionality this parent provides to the overall system. " \
+                               "Let this be the `value prop`. " \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Select the artifacts from most to least related to the parent's functionality. " \
+                               "\n2. Select the artifacts from related to the parent's value prop. " \
                                "Provide the list of artifacts along with a sentence of how they help the parent achieve" \
                                "the shared functionality. " \
                                "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \

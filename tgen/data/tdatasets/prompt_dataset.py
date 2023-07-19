@@ -222,13 +222,8 @@ class PromptDataset(iDataset):
         :return: The prompt entry
         """
         entry = prompt_builder.build(model_format_args=prompt_args, **prompt_kwargs)
-        if not summarizer:
-            return entry
 
-        if summarizer.exceeds_token_limit(entry[PromptKeys.PROMPT] + entry[PromptKeys.COMPLETION]):
-            # just cut off anything that exceeds the limit
-            chunker = NaturalLanguageChunker(model_name=summarizer.model_for_token_limit, token_limit=summarizer.token_limit)
-            entry[PromptKeys.PROMPT] = chunker.chunk(entry[PromptKeys.PROMPT])[0]
+        # in the future may need to shorten if entry exceeds token limit but generally doesn't exceed limit for current models
         return entry
 
     def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:

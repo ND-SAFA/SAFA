@@ -27,7 +27,7 @@ class PredictionStep(Enum):
 
 
 DEFAULT_MAX_TOKENS = 50000
-DEFAULT_MAX_TOKENS_SMALL = 1000
+DEFAULT_MAX_TOKENS_SMALL = 2000
 
 
 @dataclass
@@ -45,6 +45,7 @@ class HGenState(State):
     generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
     summary: str = None  # The summary of all the source artifacts.
     generation_questionnaire: QuestionnairePrompt = None
+    description_of_artifact: str = None  # describes what the target type is
     format_of_artifacts: str = None  # The format to use for the generated artifacts
 
     """
@@ -126,7 +127,7 @@ class HGenArgs(PipelineArgs, BaseObject):
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
-        self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-3.5-turbo'))
+        self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))
         for e in PredictionStep:
             if e.value not in self.max_tokens:
                 if e in [PredictionStep.NAME, PredictionStep.FORMAT]:

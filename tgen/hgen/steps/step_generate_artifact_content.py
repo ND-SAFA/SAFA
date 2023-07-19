@@ -32,13 +32,14 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         logger.info(f"Generating {args.target_type}s\n")
-        summary_questionnaire, format_of_artifacts = GenerateArtifactContent.construct_questionnaire(args)
+        summary_questionnaire, format_of_artifacts, description_of_artifact = GenerateArtifactContent.construct_questionnaire(args)
 
         source_layer_only_dataset = state.source_dataset
         export_path = os.path.join(state.export_path, "artifact_gen_response.yaml") if state.export_path else None
 
         state.format_of_artifacts = format_of_artifacts
         state.generation_questionnaire = summary_questionnaire
+        state.description_of_artifact = description_of_artifact
 
         task_prompt = Prompt(TASK_INSTRUCTIONS,
                              response_manager=PromptResponseManager(
@@ -46,7 +47,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                                  response_tag=convert_spaces_to_dashes(f"{args.target_type}"))
 
                              )
-        task_prompt.format_value(format=format_of_artifacts)
+        task_prompt.format_value(format=state.format_of_artifacts, description=description_of_artifact)
         prompt_builder = get_prompt_builder_for_generation(args, task_prompt, summary_prompt=summary_questionnaire)
         if args.system_summary:
             overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown('Overview of System:')}"
@@ -69,7 +70,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         state.summary = summary
 
     @staticmethod
-    def construct_questionnaire(hgen_args: HGenArgs) -> Tuple[QuestionnairePrompt, str]:
+    def construct_questionnaire(hgen_args: HGenArgs) -> Tuple[QuestionnairePrompt, str, str]:
         """
         Constructs a questionnaire prompt that is used to generate the new artifacts
         :return: The questionnaire prompt that is used to generate the new artifacts
@@ -77,26 +78,28 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
 
         instructions_prompt: Prompt = SupportedPrompts.HGEN_INSTRUCTIONS.value
         instructions_prompt.response_manager.formatter = lambda tag, val: parse_generated_artifacts(val)
-        format_prompt = SupportedPrompts.HGEN_FORMAT_PROMPT.value
-        questionnaire_content = GenerateArtifactContent._get_content_for_summary_prompt(hgen_args, format_prompt, instructions_prompt)
+        format_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_FORMAT_QUESTIONNAIRE.value
+        questionnaire_content = GenerateArtifactContent._get_content_for_summary_prompt(hgen_args, format_questionnaire,
+                                                                                        instructions_prompt)
         question_id = instructions_prompt.response_manager.response_tag
         questions = questionnaire_content[question_id][0]
         question_prompts = [QuestionPrompt(question) for i, question in enumerate(questions)]
-        format_of_artifacts = questionnaire_content[format_prompt.response_manager.response_tag][0]
+        description_of_artifact = questionnaire_content[format_questionnaire.question_prompts[0].response_manager.response_tag][0]
+        format_of_artifacts = questionnaire_content[format_questionnaire.question_prompts[-1].response_manager.response_tag][0]
         response_manager = PromptResponseManager(response_tag="summary")
         questionnaire_prompt = QuestionnairePrompt(question_prompts=question_prompts,
                                                    enumeration_chars=["-"],
                                                    instructions=SUMMARY_INSTRUCTIONS,
                                                    response_manager=response_manager)
 
-        return questionnaire_prompt, format_of_artifacts
+        return questionnaire_prompt, format_of_artifacts, description_of_artifact
 
     @staticmethod
-    def _get_content_for_summary_prompt(hgen_args: HGenArgs, format_prompt: Prompt, instructions_prompt: Prompt):
+    def _get_content_for_summary_prompt(hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt, instructions_prompt: Prompt):
         """
         Gets the content for the prompt to generate a summary of system
         :param
-        :param format_prompt: The prompt asking for a format for the artifact to be generated
+        :param format_questionnaire: The prompt asking for a format for the artifact to be generated
         :param instructions_prompt: The prompt to get instructions for the summary
         :return: The generated content
         """
@@ -113,10 +116,11 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         else:
             logger.info("Creating questionnaire prompt for generation\n")
             if "title" not in hgen_args.target_type.lower():
-                format_prompt.value += "The format should be for only the body of the {target_type} and should exclude any title. "
+                format_questionnaire.question_prompts[-1].value += \
+                    "The format should be for only the body of the {target_type} and should exclude any title. "
 
             questionnaire_content = {}
-            for prompt, step in [(format_prompt, PredictionStep.FORMAT), (instructions_prompt, PredictionStep.INSTRUCTIONS)]:
+            for prompt, step in [(format_questionnaire, PredictionStep.FORMAT), (instructions_prompt, PredictionStep.INSTRUCTIONS)]:
                 prompt_builder = PromptBuilder(prompts=[prompt])
                 prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
                 predictions = get_predictions(prompt_builder,

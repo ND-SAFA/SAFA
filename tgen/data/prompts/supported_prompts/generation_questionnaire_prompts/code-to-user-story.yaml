@@ -1,30 +1,26 @@
+description:
+- A User story is a concise, informal description of a software feature or functionality,
+  written from the perspective of the end user. It is a key artifact in Agile software
+  development, used to capture and prioritize requirements. User stories differ from
+  other software artifacts, such as use cases or functional specifications, in that
+  they are intentionally brief, focusing on the user's needs and goals, and are typically
+  written in everyday language. They are meant to foster collaboration and communication
+  between the development team and stakeholders, rather than serving as a detailed
+  technical specification.
+example:
+- As a frequent traveler, I want to be able to filter hotel search results by distance
+  from a specific landmark, so that I can find accommodations close to my desired
+  location.
 format:
-- 'As a [user role], I want [a goal] so that [benefit].  Acceptance Criteria: - [Detailed
-  description of the expected behavior or outcome] - [Detailed description of the
-  expected behavior or outcome] - [Detailed description of the expected behavior or
-  outcome] - [Detailed description of the expected behavior or outcome]'
+- As a [type of user], I want to [action or goal] so that [reason or benefit].
 questions:
-- - '- What are the main classes/functions in the code? This will help identify the
-    key components and functionality.'
-  - '- What are the inputs and outputs of the main classes/functions? This will help
-    understand the data flow.'
-  - '- Are there any UI or interface classes? If so, what do they allow the user to
-    do? This will help understand the user interactions.'
-  - '- Are there any database or storage related classes? If so, what data is being
-    stored or retrieved? This will help understand the persistence layer.'
-  - '- Are there any external services or APIs being called? If so, what functionality
-    do they provide? This will reveal any external dependencies.'
-  - '- Are there any configuration files? If so, what customization options do they
-    provide? This highlights any configurable parameters.'
-  - '- Are there any logging or instrumentation statements? If so, what events are
-    being tracked? This provides insight into analytics or telemetry.'
-  - '- What are the dependencies between components and how do they interact? This
-    exposes the overall architecture.'
-  - '- Does the code include any comments, documentation, or domain language? If so,
-    what additional context do they provide? This can indicate the problem space.'
-  - '- What are the different code paths and conditional branches? This highlights
-    the main scenarios.'
-  - '- How is error handling and exceptions managed? This reveals assumptions about
-    failure modes.'
-  - '- What are the unit, integration, and end-to-end tests covering? This points
-    to the critical functionality and use cases.'
+- - What are the main classes/functions in the code?
+  - What are the inputs and outputs of the main functions?
+  - Is there any user interface code and what does it do?
+  - Is there any database or file access code and what does it access?
+  - Are there any configuration or settings files and what do they configure?
+  - Is there logging or error handling code and what does it log/handle?
+  - Does the code appear to follow an MVC or layered architecture pattern?
+  - What external services, APIs, or libraries does the code use and why?
+  - What algorithms or business logic can be inferred from the code?
+  - What user needs might the code address based on its capabilities?

@@ -7,7 +7,6 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/fend",
-              "load_dir": "[OUTPUT_PATH]/hgen/fend/5e203519-8fc8-4c4e-89d1-0df25cad24e8",
               "source_layer_id": "Vue Code",
               "target_type": "Functional Requirement",
               "dataset_creator_for_sources": {
@@ -20,7 +19,7 @@
             }
           },
           "target_types": [
-            "High-Level Feature Description"
+            "Feature Description"
           ]
         }
       ]

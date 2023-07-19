@@ -7,7 +7,6 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/dronology-subtree",
-              "load_dir": "[OUTPUT_PATH]/hgen/dronology-subtree/7e7b06e4-95b7-47c4-aa3d-73eba673dff1",
               "source_layer_id": "Java Code",
               "target_type": "Design Requirement",
               "dataset_creator_for_sources": {

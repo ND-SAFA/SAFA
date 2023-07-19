@@ -133,9 +133,7 @@ class SafaExporter(AbstractDatasetExporter):
                     continue
                 trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
                 trace_link: EnumDict = trace_df.get_link(trace_link_id)
-                #assert trace_link is not None, f"Expected trace (source: {source_id}, target: {target_id}) to exist but it does not"
-                if trace_link is None:
-                    continue
+                assert trace_link is not None, f"Expected trace (source: {source_id}, target: {target_id}) to exist but it does not"
                 score = trace_link[StructuredKeys.Trace.SCORE.value] if TraceKeys.SCORE in trace_link else np.NAN
                 is_tp = trace_link[TraceKeys.LABEL] == 1
                 is_generated = not np.isnan(score)

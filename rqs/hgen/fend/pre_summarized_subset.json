@@ -6,17 +6,14 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "export_dir": "[OUTPUT_PATH]/hgen/fend",
-              "source_layer_id": "Vue Code",
+              "export_dir": "[OUTPUT_PATH]/hgen/fend-subset",
+              "source_layer_id": "Vue",
               "target_type": "Functional Requirement",
               "dataset_creator_for_sources": {
                 "object_type": "PROMPT",
                 "project_reader": {
                   "object_type": "Artifact",
-                  "project_path": "[DATA_PATH]/fend"
-                },
-                "summarizer": {
-                  "code_or_exceeds_limit_only": false
+                  "project_path": "[DATA_PATH]/fend-subset"
                 }
               }
             }

@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, withDefaults, provide, onMounted } from "vue";
-import cytoscape, { CytoscapeOptions, Core } from "cytoscape";
+import { ref, withDefaults, provide, onMounted, onBeforeUnmount } from "vue";
+import cytoscape, { CytoscapeOptions, Core, EventObject } from "cytoscape";
 
 const props = withDefaults(
   defineProps<{
@@ -24,16 +24,51 @@ const props = withDefaults(
   }
 );
 
-// const emit = defineEmits<{
-//   (e: CytoEvent, event: EventObject): void;
-// }>();
-
 const container = ref<HTMLElement | null>(null);
 const instance = ref<Core | undefined>(undefined);
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const resolve = ref<(value: PromiseLike<Core> | Core) => void>(() => {});
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const reject = ref<() => void>(() => {});
+
+const relTransform = ref("");
+
+/**
+ * Initialized cytoscape to be synchronized with this component.
+ */
+function initCy(): void {
+  // Set the container style.
+  container.value?.setAttribute("id", props.id);
+  container.value?.setAttribute("width", "100%");
+  container.value?.setAttribute("style", "min-height: 600px;");
+
+  // Apply lifecycle hooks.
+  if (props.preConfig) props.preConfig(cytoscape);
+
+  // Create cytoscape instance.
+  const cyInstance = cytoscape({ container: container.value, ...props.config });
+
+  instance.value = cyInstance;
+
+  // Resolve the promise with the object created.
+  resolve.value(cyInstance);
+
+  if (props.afterCreated) props.afterCreated(cyInstance);
+}
+
+/**
+ * Adds a listener to track panning and zooming to translate where nodes are displayed.
+ */
+function listenForPanZoom(): void {
+  const onPanZoom = (event: EventObject) => {
+    const pan = event.cy.pan();
+    const zoom = event.cy.zoom();
+
+    relTransform.value = `translate(${pan.x}px,${pan.y}px) scale(${zoom})`;
+  };
+
+  instance.value?.on("pan zoom", onPanZoom);
+}
 
 provide(
   "cy",
@@ -43,30 +78,20 @@ provide(
   })
 );
 
+provide("relTransform", relTransform);
+
+/**
+ * Initialize cytoscape and event handlers on mount.
+ */
 onMounted(() => {
-  // create a vue independent element
-  container.value?.setAttribute("id", props.id);
-  container.value?.setAttribute("width", "100%");
-  container.value?.setAttribute("style", "min-height: 600px;");
+  initCy();
+  listenForPanZoom();
+});
 
-  // apply lifecycle hooks
-  if (props.preConfig) props.preConfig(cytoscape);
-
-  // create cytoscape instance
-  const cyInstance = cytoscape({ container: container.value, ...props.config });
-
-  // register all the component events as cytoscape ones
-  // for (const eventType of Object.values(CytoEvent)) {
-  //   cyInstance?.on(eventType, (event: EventObject) => {
-  //     emit(eventType, event);
-  //   });
-  // }
-
-  instance.value = cyInstance;
-
-  // resolve the promise with the object created
-  resolve.value(cyInstance);
-
-  if (props.afterCreated) props.afterCreated(cyInstance);
+/**
+ * Clean up event handlers on unmount.
+ */
+onBeforeUnmount(() => {
+  instance.value?.off("pan zoom");
 });
 </script>

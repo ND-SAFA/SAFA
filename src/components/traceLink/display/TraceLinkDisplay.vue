@@ -18,24 +18,10 @@
       />
     </flex-box>
 
-    <flex-box v-else-if="showOnlyArtifact" full-width>
-      <div>
-        <typography
-          variant="caption"
-          :value="showSummary ? 'Summary' : 'Content'"
-        />
-        <artifact-body-display
-          :artifact="showOnlyArtifact"
-          default-expanded
-          :full-width="!showSummary"
-        />
-      </div>
-      <separator v-if="showSummary" vertical r="2" />
-      <div v-if="showSummary">
-        <typography variant="caption" value="Content" />
-        <typography variant="code" :value="showOnlyArtifact.body" l="2" />
-      </div>
-    </flex-box>
+    <artifact-content-display
+      v-else-if="showOnlyArtifact"
+      :artifact="showOnlyArtifact"
+    />
   </div>
 </template>
 
@@ -54,9 +40,9 @@ import { TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
 import {
   ArtifactBodyDisplay,
+  ArtifactContentDisplay,
   FlexBox,
   Separator,
-  Typography,
 } from "@/components/common";
 
 const props = defineProps<{
@@ -80,5 +66,4 @@ const targetArtifact = computed(() =>
 const showOnlyArtifact = computed(() =>
   props.showOnly === "source" ? sourceArtifact.value : targetArtifact.value
 );
-const showSummary = computed(() => !!showOnlyArtifact.value?.summary);
 </script>

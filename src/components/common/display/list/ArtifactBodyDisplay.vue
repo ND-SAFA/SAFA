@@ -15,6 +15,7 @@
         variant="expandable"
         :value="props.artifact.summary"
         :default-expanded="props.defaultExpanded"
+        :collapse-length="props.defaultExpanded ? 0 : undefined"
       />
       <typography
         v-else

@@ -14,17 +14,18 @@ example:
   be collapsed into a "hamburger" icon, which, when tapped, expands to display the
   full menu vertically with collapsible submenus for each main menu item.'
 format:
-- 'Design Requirement: [Brief description of the feature or functionality]. [Detailed
-  description of the design aspect, including user interface, architecture, or interaction
-  between components]. [Additional specifications or constraints, if applicable].'
+- 'Design Requirement: The system shall [describe the feature or functionality in
+  detail, including any technical specifications, standards, or protocols that must
+  be followed]. The [feature or functionality] shall [list any specific requirements,
+  such as supported operations, data formats, or security measures].'
 questions:
 - - What are the main functions/classes in the code?
   - What are the key inputs and outputs of these functions/classes?
+  - How do the different functions/classes interact with each other?
+  - Is there a clear separation of concerns in the code structure?
   - What are the main data structures used in the code?
+  - Does the code follow common design patterns? If so, which ones?
+  - What are the dependencies between different modules/packages?
+  - Does the code have clear error handling and logging?
+  - Is there evidence of security considerations in the code?
   - What are the key algorithms implemented in the code?
-  - Are there any major modules/components that can be identified?
-  - What are the relationships and interactions between the main modules/components?
-  - What are the key control flows in the code?
-  - Are there any configuration files or external dependencies?
-  - Are there any hardware/platform specific code sections?
-  - What are the main use cases or features enabled by the code?

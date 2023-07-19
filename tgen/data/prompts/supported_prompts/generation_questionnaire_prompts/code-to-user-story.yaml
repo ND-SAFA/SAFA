@@ -3,23 +3,24 @@ description:
   written from the perspective of the end user. It is a key artifact in Agile software
   development, used to capture and prioritize requirements. User stories differ from
   other software artifacts, such as use cases or functional specifications, in that
-  they are intentionally brief, focusing on the user's needs and goals, rather than
-  providing detailed technical specifications.
+  they are intentionally brief, focusing on the user's needs and goals, and are typically
+  written in everyday language. They are meant to foster collaboration and communication
+  between the development team and stakeholders, rather than serving as a detailed
+  technical specification.
 example:
 - As a frequent traveler, I want to be able to filter hotel search results by distance
   from a specific landmark, so that I can find accommodations close to my desired
   location.
 format:
-- As a [type of user], I want to [desired action or functionality], so that [reason
-  or benefit].
+- As a [type of user], I want to [action or goal] so that [reason or benefit].
 questions:
 - - What are the main classes/functions in the code?
   - What are the inputs and outputs of the main functions?
-  - Is there any user interface code? If so, what can the user do?
-  - Is there any persistence/database code? If so, what data is being stored?
-  - Are there any external services being called? If so, what are they and why?
-  - Is there any business logic code? If so, what rules is it implementing?
-  - Are there any configurations/settings? If so, what can be configured?
-  - Is there logging or analytics code? If so, what events are being tracked?
-  - Is there any authentication/authorization code? If so, what roles exist?
-  - What are the main code flows when the app starts up and when a user takes an action?
+  - Is there any user interface code and what does it do?
+  - Is there any database or file access code and what does it access?
+  - Are there any configuration or settings files and what do they configure?
+  - Is there logging or error handling code and what does it log/handle?
+  - Does the code appear to follow an MVC or layered architecture pattern?
+  - What external services, APIs, or libraries does the code use and why?
+  - What algorithms or business logic can be inferred from the code?
+  - What user needs might the code address based on its capabilities?

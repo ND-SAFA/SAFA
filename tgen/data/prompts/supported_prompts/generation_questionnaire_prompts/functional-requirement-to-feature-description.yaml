@@ -2,56 +2,47 @@ description:
 - A Feature description is a concise and clear explanation of a specific functionality
   or aspect of a software development project. It is an essential artifact that helps
   stakeholders understand the purpose, scope, and requirements of a particular feature.
-  This artifact is different from other software artifacts, such as user stories or
-  use cases, as it focuses on the high-level overview of the feature, its benefits,
-  and its interactions with other components of the system, rather than detailing
-  the step-by-step process or user interactions.
+  This artifact is different from other similar software artifacts, such as user stories
+  or use cases, as it focuses on the functionality itself rather than the user's interaction
+  with the system or the steps to achieve a specific goal. A Feature description typically
+  includes the problem it solves, the proposed solution, and any constraints or dependencies.
 example:
-- 'Feature: Export Data to CSV
+- 'Feature: Export Data as CSV
 
 
-  Description: The Export Data to CSV feature allows users to download a CSV file
-  containing the data displayed in the application''s data table. This feature enables
-  users to easily manipulate and analyze the data using external tools, such as spreadsheet
-  software.
+  Problem: Users need a way to export their data from the application in a format
+  that can be easily imported into other tools, such as spreadsheet applications.
 
 
-  Requirements:
-
-  - The user must be able to select the data they want to export.
-
-  - The exported CSV file must include all columns displayed in the data table.
-
-  - The CSV file must be formatted according to the RFC 4180 standard.
-
-  - The user must be able to choose the location where the CSV file will be saved.
+  Solution: Implement a feature that allows users to export their data as a CSV (Comma
+  Separated Values) file. This feature should be accessible from the main data view
+  and should generate a CSV file containing all the data currently displayed in the
+  application.
 
 
-  Dependencies:
+  Constraints:
 
-  - Data Table component
+  - The exported CSV file must be compatible with popular spreadsheet applications,
+  such as Microsoft Excel and Google Sheets.
 
+  - The export process should not significantly impact the application''s performance.
 
-  Acceptance Criteria:
-
-  - The user can successfully export the selected data to a CSV file.
-
-  - The CSV file contains the correct data and formatting.
-
-  - The user can open the CSV file in a spreadsheet software without any issues.'
+  - The feature should be implemented in a way that allows for future expansion to
+  support additional export formats.'
 format:
-- 'Feature: [Feature Name]  Description: [A brief description of the feature and its
-  purpose]  Requirements: - [List of requirements for the feature]  Dependencies:
-  - [List of components or features that this feature depends on]  Acceptance Criteria:
-  - [List of criteria that must be met for the feature to be considered complete]'
+- 'Feature: [Feature Name]  Problem: [Brief description of the problem the feature
+  is intended to solve]  Solution: [Proposed solution or functionality to address
+  the problem]  Constraints: - [List of constraints or dependencies that may impact
+  the implementation or usage of the feature] - [Additional constraint or dependency]
+  - [Etc.]'
 questions:
 - - What is the overall purpose or goal of the system?
-  - Who are the users or actors that will interact with the system?
-  - What are the key functions or capabilities the system needs to have?
-  - Are there any constraints or limitations that impact the design?
-  - What are the main inputs and outputs for each function?
-  - What data or information does the system need to store or access?
-  - What external systems or interfaces does it need to connect to?
-  - Are there any non-functional requirements like performance, security, etc?
-  - What are the different ways users will interact with the system?
-  - What are the key workflows or use cases the system needs to support?
+  - Who are the primary users of the system?
+  - What are the main tasks the users need to perform with the system?
+  - Are there different types of users with different permissions/access levels?
+  - What are the key inputs and outputs of the system?
+  - Are there any constraints or regulatory requirements that impact the system?
+  - What are the most critical functions or features that enable the key workflows?
+  - What are the priority functions that need to be developed first?
+  - What types of data does the system need to process or store?
+  - What external systems does this system need to integrate with?

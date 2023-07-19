@@ -59,7 +59,8 @@ TASK_INSTRUCTIONS = "Next, use this summary to identify the main features and fu
                     "Each {target_type} should use a consistent format. Use this format as a guideline: " \
                     "{format} " \
                     "Make sure the {target_type} are concise but technically detailed, " \
-                    "avoid ambiguous language, and only include information contained in the {source_type}. "
+                    "avoid ambiguous language, and only include information contained in the {source_type}. " \
+                    "Ensure that all features and functionality are included in the {target_types}s. "
 
 REFINE_PROMPT = Prompt("You are an engineering working on a software system and your goal is to refine "
                        "{target_type}s. You are given a summary of the system: ")

@@ -1,23 +1,23 @@
 description:
-- A Functional requirement is a specific feature or behavior that a software system
-  must possess to meet its intended purpose. It defines what the system is supposed
-  to do and focuses on the functionality of the software. This artifact is different
-  from other software artifacts, such as non-functional requirements, which focus
-  on the quality attributes of the system, like performance, security, and usability.
+- A Functional requirement is a specific feature or functionality that a software
+  system must possess to meet its intended purpose. It describes the expected behavior
+  of the system and focuses on what the system is supposed to do. This artifact is
+  different from other software artifacts, such as non-functional requirements, which
+  focus on how well the system performs its functions, rather than the functions themselves.
 example:
-- The system shall allow users to create, edit, and delete their personal profiles,
-  including their name, email address, and profile picture.
+- 'For an online shopping platform, a Functional requirement could be: "The system
+  shall allow users to add items to their shopping cart, view the contents of the
+  cart, and remove items from the cart."'
 format:
-- 'The system shall [action verb] [object] [condition or additional details], [optional:
-  including/excluding specific elements or features].'
+- '"The system shall [action verb] [object] [condition or additional details]."'
 questions:
 - - What is the overall purpose or goal of the system?
   - Who are the intended users of the system?
-  - What key features or functions is the system intended to have?
-  - What inputs does the system need to operate?
+  - What are the key features and capabilities that the design aims to provide?
+  - What inputs does the system require?
   - What outputs does the system produce?
-  - What are the main components or modules of the system architecture?
-  - How do the different components interact with each other?
-  - What non-functional requirements like performance, security, etc. are important?
-  - What constraints or assumptions exist in the operating environment?
-  - What use cases or user stories would exercise the key functions?
+  - What are the main components and how do they interact?
+  - Are there any constraints or assumptions in the design?
+  - What non-functional requirements like performance, security, etc. are considered?
+  - What use cases or user workflows is the system intended to support?
+  - What external systems or data sources does the design interact with?

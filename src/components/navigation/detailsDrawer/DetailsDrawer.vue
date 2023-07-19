@@ -57,6 +57,7 @@ import {
   ArtifactPanel,
   ArtifactBodyPanel,
   SaveArtifactPanel,
+  ArtifactGenerationPanel,
 } from "@/components/artifact/panels";
 import {
   TraceLinkPanel,
@@ -64,7 +65,6 @@ import {
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
-import { ArtifactGenerationPanel } from "@/components/hgen";
 
 const openState = computed(() => appStore.isDetailsPanelOpen);
 const drawerOpen = computed(() => typeof openState.value === "string");

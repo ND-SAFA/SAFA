@@ -31,8 +31,14 @@
           hint="Generate multiple parent artifacts by clustering these type of artifacts by functionality."
         />
       </div>
-      <artifact-type-input
+      <!--      <artifact-type-input-->
+      <!--        v-model="parentArtifactType"-->
+      <!--        label="Parent Artifact Type"-->
+      <!--        hint="The type of parent artifact to create."-->
+      <!--      />-->
+      <select-input
         v-model="parentArtifactType"
+        :options="generateTypeOptions"
         label="Parent Artifact Type"
         hint="The type of parent artifact to create."
       />
@@ -76,6 +82,14 @@ import {
   ArtifactInput,
   ArtifactTypeInput,
 } from "@/components/common";
+import SelectInput from "@/components/common/input/SelectInput.vue";
+
+const generateTypeOptions = [
+  "User Story",
+  "Functional Requirement",
+  "Feature Description",
+  "Epic",
+];
 
 const mode = ref<"single" | "multiple">("single");
 const childArtifactIds = ref<string[]>([]);

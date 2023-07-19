@@ -1,0 +1,24 @@
+description:
+- A Functional requirement is a specific feature or functionality that a software
+  system must possess to meet its intended purpose. It defines the expected behavior
+  of the system and focuses on what the system is supposed to do. This artifact is
+  different from other software artifacts, such as non-functional requirements, which
+  focus on how well the system performs its functions, rather than the functions themselves.
+example:
+- 'For an online shopping platform, a Functional requirement could be: "The system
+  shall allow users to add items to their shopping cart, view the contents of the
+  cart, and remove items from the cart."'
+format:
+- '"The system shall [action verb] [object] [condition or additional details]."'
+questions:
+- - What are the main functions or methods in the code?
+  - What are the inputs and outputs of these functions?
+  - What data structures are used and manipulated by the code?
+  - Are there any major algorithms implemented in the code?
+  - Does the code interact with any external systems or devices?
+  - Are there any configurations or settings initialized when the code starts up?
+  - Does the code have any logging or outputs that give insight into its behavior?
+  - Are there any obvious features or use cases that can be inferred from method names
+    or comments?
+  - Does the code base include any tests or specs that demonstrate intended functionality?
+  - What exceptions or error conditions are handled by the code?

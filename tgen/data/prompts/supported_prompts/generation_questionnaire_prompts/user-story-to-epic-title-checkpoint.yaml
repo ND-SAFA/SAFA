@@ -4,7 +4,7 @@ description:
   of smaller, related user stories or tasks that together deliver a significant value
   to the end-user. An Epic title is different from other software artifacts, such
   as user stories or tasks, as it represents a larger scope and usually takes multiple
-  sprints or iterations to complete.
+  sprints to complete.
 example:
 - Implement Advanced Search Functionality
 format:

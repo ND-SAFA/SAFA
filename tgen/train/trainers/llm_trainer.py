@@ -84,7 +84,6 @@ class LLMTrainer(AbstractTrainer):
 
         res = self.llm_manager.make_completion_request(completion_type=self.completion_type,
                                                        prompt=list(prompt_df[PromptKeys.PROMPT]))
-
         if isinstance(res, ClassificationResponse):
             output = self._create_classification_output(res, dataset, self.prompt_builder)
         elif isinstance(res, GenerationResponse):

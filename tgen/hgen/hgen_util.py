@@ -169,7 +169,7 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
 
 def get_prompt_builder_for_generation(hgen_args: HGenArgs,
                                       task_prompt: Union[QuestionnairePrompt, Prompt],
-                                      base_prompt: SupportedPrompts = SupportedPrompts.HGEN_GENERATION,
+                                      base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
                                       summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
@@ -180,6 +180,9 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     :param artifact_type: The type of artifact being presented in the prompt
     :return: The prompt builder used for the generations
     """
+    if isinstance(base_prompt, SupportedPrompts):
+        base_prompt = base_prompt.value
+
     generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
                                                                                                        QuestionnairePrompt) \
         else task_prompt.response_manager
@@ -190,7 +193,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt.format_value(artifact_type=artifact_type.upper())
-    prompts = [base_prompt.value, artifact_prompt]
+    prompts = [base_prompt, artifact_prompt]
 
     task_preface = f"{NEW_LINE}{PromptUtil.format_as_markdown('TASKS:')}{NEW_LINE}"
     if summary_prompt:
@@ -211,7 +214,7 @@ def parse_generated_artifacts(res: str) -> List[str]:
     :param res: The response from the model containing the generated artifact content
     :return: The list of the generated artifact content
     """
-    return [re.sub(r'^\d+\.\s', '', content).strip() for content in res.split(NEW_LINE) if len(content) > 1]
+    return [re.sub(r'^\d+\.\s', '', content).strip("-").strip() for content in res.split(NEW_LINE) if len(content) > 1]
 
 
 def convert_spaces_to_dashes(str2convert) -> str:

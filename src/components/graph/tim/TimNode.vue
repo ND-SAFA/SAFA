@@ -3,12 +3,14 @@
     <q-card
       flat
       bordered
-      class="q-px-lg q-py-md"
-      :style="`border-color: ${typeColor}; border-width: 2px; text-align: center`"
+      class="cy-node cy-node-tim q-px-lg q-py-md"
+      :style="cardStyle"
     >
-      <b>{{ props.artifactType }}</b>
-      <q-separator :style="`background-color: ${typeColor}; height: 2px`" />
-      <b>{{ count }} Artifacts</b>
+      <div class="cy-node-title">
+        <typography variant="subtitle" :value="props.artifactType" bold />
+      </div>
+      <separator :style="separatorStyle" class="cy-node-separator q-my-sm" />
+      <typography variant="subtitle" :value="countLabel" />
     </q-card>
   </cy-element3>
 </template>
@@ -27,6 +29,7 @@ import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
 import { sanitizeNodeId } from "@/util";
 import { typeOptionsStore, useTheme } from "@/hooks";
+import { Typography, Separator } from "@/components/common";
 import { CyElement3 } from "../base";
 
 const props = defineProps<{
@@ -39,6 +42,12 @@ const { darkMode } = useTheme();
 
 const typeColor = computed(
   () => typeOptionsStore.getArtifactLevel(props.artifactType)?.color || ""
+);
+const cardStyle = computed(() => `border-color: ${typeColor.value};`);
+const separatorStyle = computed(() => `background-color: ${typeColor.value};`);
+
+const countLabel = computed(() =>
+  props.count === 1 ? "1 Artifact" : `${props.count} Artifacts`
 );
 
 const definition = computed<TimNodeCytoElement>(() => ({

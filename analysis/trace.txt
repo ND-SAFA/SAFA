@@ -1,0 +1,1060 @@
+Processed 605 files (1.6s) (141 warnings)
+
+cypress.config.ts
+cypress/e2e/dataGeneration/customModels/models.cy.ts
+cypress/e2e/dataGeneration/traceLinkPrediction/traceLinkApproval.cy.ts
+cypress/e2e/dataGeneration/traceLinkPrediction/traceLinkApprovalDisplay.cy.ts
+cypress/e2e/dataImportAndExport/projectCreation/bulkProjectCreation.cy.ts
+cypress/e2e/dataImportAndExport/projectCreation/jobStatus.cy.ts
+cypress/e2e/dataImportAndExport/projectCreation/jobSubmission.cy.ts
+cypress/e2e/dataImportAndExport/projectCreation/standardProjectCreation.cy.ts
+cypress/e2e/dataImportAndExport/projectSelection/projectList.cy.ts
+cypress/e2e/dataImportAndExport/projectSelection/projectVersionList.cy.ts
+cypress/e2e/projectManagement/artifactCustomAttributes/customAttributes.cy.ts
+cypress/e2e/projectManagement/artifactCustomAttributes/customAttributesLayout.cy.ts
+cypress/e2e/projectManagement/artifactCustomAttributes/customAttributesValues.cy.ts
+cypress/e2e/projectManagement/projectArtifactTypes/artifactTypeDirections.cy.ts
+cypress/e2e/projectManagement/projectArtifactTypes/artifactTypes.cy.ts
+cypress/e2e/projectManagement/projectArtifacts/artifactDisplay.cy.ts
+cypress/e2e/projectManagement/projectArtifacts/artifactSearch.cy.ts
+cypress/e2e/projectManagement/projectArtifacts/artifacts.cy.ts
+cypress/e2e/projectManagement/projectMembership/projectMembers.cy.ts
+cypress/e2e/projectManagement/projectMembership/projectMembersDisplay.cy.ts
+cypress/e2e/projectManagement/projectTraceLinks/traceLinks.cy.ts
+cypress/e2e/projectManagement/projectVersioning/changeCommits.cy.ts
+cypress/e2e/projectManagement/projectVersioning/projectVersions.cy.ts
+cypress/e2e/projectManagement/projectVersioning/projects.cy.ts
+cypress/e2e/security/authentication/accountCreation.cy.ts
+cypress/e2e/security/authentication/accountEditing.cy.ts
+cypress/e2e/security/authentication/accountLogin.cy.ts
+cypress/e2e/visualization/artifactTable/artifactTableView.cy.ts
+cypress/e2e/visualization/artifactTable/traceMatrixView.cy.ts
+cypress/e2e/visualization/artifactTree/artifactSubtree.cy.ts
+cypress/e2e/visualization/artifactTree/artifactTreeNodesAndEdges.cy.ts
+cypress/e2e/visualization/artifactTree/artifactTreeWindow.cy.ts
+cypress/e2e/visualization/projectDocuments/documents.cy.ts
+cypress/e2e/visualization/projectTIM/timTreeView.cy.ts
+cypress/fixtures/constants/customAttributes.ts
+cypress/fixtures/constants/dataCy.ts
+cypress/fixtures/constants/index.ts
+  cypress/fixtures/constants/customAttributes.ts
+  cypress/fixtures/constants/dataCy.ts
+  cypress/fixtures/constants/project.ts
+  cypress/fixtures/constants/routes.ts
+cypress/fixtures/constants/project.ts
+cypress/fixtures/constants/routes.ts
+cypress/fixtures/data/index.ts
+cypress/fixtures/data/miniProject/fileMap.ts
+  cypress/fixtures/data/miniProject/files.json
+cypress/fixtures/data/miniProject/files.json
+cypress/fixtures/data/miniProject/index.ts
+  cypress/fixtures/data/miniProject/fileMap.ts
+  cypress/fixtures/data/miniProject/files.json
+cypress/fixtures/data/simpleProject/fileMap.ts
+  cypress/fixtures/data/simpleProject/files.json
+cypress/fixtures/data/simpleProject/files.json
+cypress/fixtures/data/simpleProject/index.ts
+  cypress/fixtures/data/simpleProject/fileMap.ts
+  cypress/fixtures/data/simpleProject/files.json
+cypress/fixtures/data/testFiles/fileMap.ts
+  cypress/fixtures/data/testFiles/files.json
+cypress/fixtures/data/testFiles/files.json
+cypress/fixtures/data/testFiles/index.ts
+  cypress/fixtures/data/testFiles/fileMap.ts
+  cypress/fixtures/data/testFiles/files.json
+cypress/fixtures/index.ts
+cypress/support/artifactCommands.ts
+cypress/support/artifactTableCommands.ts
+cypress/support/artifactTreeCommands.ts
+cypress/support/authenticationCommands.ts
+cypress/support/baseCommands.ts
+cypress/support/customAttributesCommands.ts
+cypress/support/dbCommands.ts
+cypress/support/e2e.ts
+  cypress/support/artifactCommands.ts
+  cypress/support/artifactTableCommands.ts
+  cypress/support/artifactTreeCommands.ts
+  cypress/support/authenticationCommands.ts
+  cypress/support/baseCommands.ts
+  cypress/support/customAttributesCommands.ts
+  cypress/support/dbCommands.ts
+  cypress/support/projectCreatorCommands.ts
+  cypress/support/projectDocumentCommands.ts
+  cypress/support/projectSelectionCommands.ts
+  cypress/support/projectSettingCommands.ts
+  cypress/support/shouldCommands.ts
+  cypress/support/timTreeCommands.ts
+  cypress/support/traceLinkCommands.ts
+  cypress/support/traceLinkGenerationCommands.ts
+cypress/support/projectCreatorCommands.ts
+cypress/support/projectDocumentCommands.ts
+cypress/support/projectSelectionCommands.ts
+cypress/support/projectSettingCommands.ts
+cypress/support/shouldCommands.ts
+cypress/support/timTreeCommands.ts
+cypress/support/traceLinkCommands.ts
+cypress/support/traceLinkGenerationCommands.ts
+cypress/types/cypress.d.ts
+src/App.vue
+src/api/endpoints/artifact-api.ts
+src/api/endpoints/artifact-type-api.ts
+src/api/endpoints/attribute-api.ts
+src/api/endpoints/commit-api.ts
+src/api/endpoints/document-api.ts
+src/api/endpoints/entity-retrieval-api.ts
+src/api/endpoints/files-api.ts
+src/api/endpoints/github-api.ts
+src/api/endpoints/hgen-api.ts
+src/api/endpoints/index.ts
+  src/api/endpoints/artifact-api.ts
+  src/api/endpoints/artifact-type-api.ts
+  src/api/endpoints/attribute-api.ts
+  src/api/endpoints/commit-api.ts
+  src/api/endpoints/document-api.ts
+  src/api/endpoints/entity-retrieval-api.ts
+  src/api/endpoints/files-api.ts
+  src/api/endpoints/github-api.ts
+  src/api/endpoints/hgen-api.ts
+  src/api/endpoints/installations-api.ts
+  src/api/endpoints/jira-api.ts
+  src/api/endpoints/job-api.ts
+  src/api/endpoints/layout-api.ts
+  src/api/endpoints/link-api.ts
+  src/api/endpoints/matrix-api.ts
+  src/api/endpoints/model-api.ts
+  src/api/endpoints/parse-api.ts
+  src/api/endpoints/project-api.ts
+  src/api/endpoints/search-api.ts
+  src/api/endpoints/session-api.ts
+  src/api/endpoints/summarization-api.ts
+  src/api/endpoints/sync-api.ts
+  src/api/endpoints/version-api.ts
+  src/api/endpoints/warning-api.ts
+src/api/endpoints/installations-api.ts
+src/api/endpoints/jira-api.ts
+src/api/endpoints/job-api.ts
+src/api/endpoints/layout-api.ts
+src/api/endpoints/link-api.ts
+src/api/endpoints/matrix-api.ts
+src/api/endpoints/model-api.ts
+src/api/endpoints/parse-api.ts
+src/api/endpoints/project-api.ts
+src/api/endpoints/search-api.ts
+src/api/endpoints/session-api.ts
+src/api/endpoints/summarization-api.ts
+src/api/endpoints/sync-api.ts
+src/api/endpoints/version-api.ts
+src/api/endpoints/warning-api.ts
+src/api/index.ts
+src/api/util/auth-http-client.ts
+src/api/util/endpoints.ts
+src/api/util/index.ts
+  src/api/util/auth-http-client.ts
+  src/api/util/endpoints.ts
+src/background.ts
+src/components/account/DeleteAccount.vue
+src/components/account/ExternalLinks.vue
+src/components/account/IntegrationsAccounts.vue
+src/components/account/MyAccount.vue
+src/components/account/ThemeController.vue
+src/components/account/UpdatePassword.vue
+src/components/account/index.ts
+  src/components/account/ExternalLinks.vue
+  src/components/account/MyAccount.vue
+src/components/artifact/display/ArtifactBody.vue
+src/components/artifact/display/ArtifactButtons.vue
+src/components/artifact/display/ArtifactContent.vue
+src/components/artifact/display/ArtifactDocuments.vue
+src/components/artifact/display/ArtifactErrors.vue
+src/components/artifact/display/ArtifactFields.vue
+src/components/artifact/display/ArtifactSummary.vue
+src/components/artifact/display/ArtifactTraces.vue
+src/components/artifact/display/index.ts
+  src/components/artifact/display/ArtifactBody.vue
+  src/components/artifact/display/ArtifactButtons.vue
+  src/components/artifact/display/ArtifactContent.vue
+src/components/artifact/index.ts
+src/components/artifact/panels/ArtifactBodyPanel.vue
+src/components/artifact/panels/ArtifactPanel.vue
+src/components/artifact/panels/SaveArtifactPanel.vue
+src/components/artifact/panels/index.ts
+  src/components/artifact/panels/ArtifactBodyPanel.vue
+  src/components/artifact/panels/ArtifactPanel.vue
+  src/components/artifact/panels/SaveArtifactPanel.vue
+src/components/artifact/save/SaveArtifactButtons.vue
+src/components/artifact/save/SaveArtifactInputs.vue
+src/components/artifact/save/index.ts
+  src/components/artifact/save/SaveArtifactButtons.vue
+  src/components/artifact/save/SaveArtifactInputs.vue
+src/components/artifact/table/ArtifactTable.vue
+src/components/artifact/table/ArtifactTableRowActions.vue
+src/components/artifact/table/index.ts
+  src/components/artifact/table/ArtifactTable.vue
+src/components/attributes/AttributeEditor.vue
+src/components/attributes/AttributeLayoutEditor.vue
+src/components/attributes/AttributeSettings.vue
+src/components/attributes/SaveAttribute.vue
+src/components/attributes/SaveAttributeLayout.vue
+src/components/attributes/index.ts
+  src/components/attributes/AttributeSettings.vue
+src/components/common/button/BackButton.vue
+src/components/common/button/CommitButtons.vue
+src/components/common/button/IconButton.vue
+src/components/common/button/TextButton.vue
+src/components/common/button/TypeButtons.vue
+src/components/common/button/index.ts
+  src/components/common/button/BackButton.vue
+  src/components/common/button/CommitButtons.vue
+  src/components/common/button/IconButton.vue
+  src/components/common/button/TextButton.vue
+  src/components/common/button/TypeButtons.vue
+src/components/common/display/alert/AlertCard.vue
+src/components/common/display/alert/FileFormatAlert.vue
+src/components/common/display/alert/UnderConstructionAlert.vue
+src/components/common/display/alert/index.ts
+  src/components/common/display/alert/AlertCard.vue
+  src/components/common/display/alert/FileFormatAlert.vue
+  src/components/common/display/alert/UnderConstructionAlert.vue
+src/components/common/display/attribute/AttributeDisplay.vue
+src/components/common/display/attribute/AttributeGrid.vue
+src/components/common/display/attribute/AttributeListDisplay.vue
+src/components/common/display/attribute/index.ts
+  src/components/common/display/attribute/AttributeGrid.vue
+  src/components/common/display/attribute/AttributeListDisplay.vue
+src/components/common/display/chip/AttributeChip.vue
+src/components/common/display/chip/Chip.vue
+src/components/common/display/chip/index.ts
+  src/components/common/display/chip/AttributeChip.vue
+  src/components/common/display/chip/Chip.vue
+src/components/common/display/content/FlexBox.vue
+src/components/common/display/content/FlexItem.vue
+src/components/common/display/content/Separator.vue
+src/components/common/display/content/Typography.vue
+src/components/common/display/content/index.ts
+  src/components/common/display/content/FlexBox.vue
+  src/components/common/display/content/FlexItem.vue
+  src/components/common/display/content/Separator.vue
+  src/components/common/display/content/Typography.vue
+src/components/common/display/icon/Icon.vue
+src/components/common/display/icon/SafaIcon.vue
+src/components/common/display/icon/index.ts
+  src/components/common/display/icon/Icon.vue
+  src/components/common/display/icon/SafaIcon.vue
+src/components/common/display/index.ts
+src/components/common/display/list/ArtifactBodyDisplay.vue
+src/components/common/display/list/ExpansionItem.vue
+src/components/common/display/list/List.vue
+src/components/common/display/list/ListItem.vue
+src/components/common/display/list/TabList.vue
+src/components/common/display/list/index.ts
+  src/components/common/display/list/ArtifactBodyDisplay.vue
+  src/components/common/display/list/ExpansionItem.vue
+  src/components/common/display/list/List.vue
+  src/components/common/display/list/ListItem.vue
+  src/components/common/display/list/TabList.vue
+src/components/common/index.ts
+src/components/common/input/ArtifactInput.vue
+src/components/common/input/ArtifactTypeInput.vue
+src/components/common/input/AttributeInput.vue
+src/components/common/input/AttributeListInput.vue
+src/components/common/input/CustomModelInput.vue
+src/components/common/input/FileInput.vue
+src/components/common/input/GenMethodInput.vue
+src/components/common/input/MultiselectInput.vue
+src/components/common/input/PasswordInput.vue
+src/components/common/input/ProjectInput.vue
+src/components/common/input/Searchbar.vue
+src/components/common/input/SelectInput.vue
+src/components/common/input/SwitchInput.vue
+src/components/common/input/TextInput.vue
+src/components/common/input/TypeDirectionInput.vue
+src/components/common/input/TypeIconInput.vue
+src/components/common/input/index.ts
+  src/components/common/input/ArtifactInput.vue
+  src/components/common/input/ArtifactTypeInput.vue
+  src/components/common/input/AttributeListInput.vue
+  src/components/common/input/CustomModelInput.vue
+  src/components/common/input/FileInput.vue
+  src/components/common/input/GenMethodInput.vue
+  src/components/common/input/MultiselectInput.vue
+  src/components/common/input/PasswordInput.vue
+  src/components/common/input/ProjectInput.vue
+  src/components/common/input/Searchbar.vue
+  src/components/common/input/SelectInput.vue
+  src/components/common/input/SwitchInput.vue
+  src/components/common/input/TextInput.vue
+  src/components/common/input/TypeDirectionInput.vue
+  src/components/common/input/TypeIconInput.vue
+src/components/common/layout/DetailsPanel.vue
+src/components/common/layout/PanelCard.vue
+src/components/common/layout/SidebarGrid.vue
+src/components/common/layout/index.ts
+  src/components/common/layout/DetailsPanel.vue
+  src/components/common/layout/PanelCard.vue
+  src/components/common/layout/SidebarGrid.vue
+src/components/common/modals/AppConfirmModal.vue
+src/components/common/modals/Modal.vue
+src/components/common/modals/ServerErrorModal.vue
+src/components/common/modals/index.ts
+  src/components/common/modals/AppConfirmModal.vue
+  src/components/common/modals/Modal.vue
+  src/components/common/modals/ServerErrorModal.vue
+src/components/common/public/CardPage.vue
+src/components/common/public/index.ts
+  src/components/common/public/CardPage.vue
+src/components/common/stepper/Stepper.vue
+src/components/common/stepper/StepperListStep.vue
+src/components/common/stepper/index.ts
+  src/components/common/stepper/Stepper.vue
+  src/components/common/stepper/StepperListStep.vue
+src/components/common/table/DataTable.vue
+src/components/common/table/GroupableTable.vue
+src/components/common/table/GroupableTableHeader.vue
+src/components/common/table/GroupableTableRow.vue
+src/components/common/table/SelectorTable.vue
+src/components/common/table/index.ts
+  src/components/common/table/DataTable.vue
+  src/components/common/table/GroupableTable.vue
+  src/components/common/table/SelectorTable.vue
+src/components/delta/ArtifactDeltaButton.vue
+src/components/delta/ArtifactDeltaDiff.vue
+src/components/delta/ArtifactDeltas.vue
+src/components/delta/DeltaButtonGroup.vue
+src/components/delta/DeltaPanel.vue
+src/components/delta/DeltaPanelNav.vue
+src/components/delta/TraceDeltas.vue
+src/components/delta/index.ts
+  src/components/delta/DeltaPanel.vue
+src/components/document/DocumentPanel.vue
+src/components/document/DocumentSelector.vue
+src/components/document/index.ts
+  src/components/document/DocumentPanel.vue
+  src/components/document/DocumentSelector.vue
+src/components/graph/CytoscapeController.vue
+src/components/graph/GraphFab.vue
+src/components/graph/ProjectTree.vue
+src/components/graph/TimTree.vue
+src/components/graph/base/CyElement.vue
+src/components/graph/base/Cytoscape.vue
+src/components/graph/base/index.ts
+  src/components/graph/base/CyElement.vue
+  src/components/graph/base/Cytoscape.vue
+src/components/graph/index.ts
+  src/components/graph/GraphFab.vue
+  src/components/graph/ProjectTree.vue
+  src/components/graph/TimTree.vue
+src/components/graph/tim/TimLink.vue
+src/components/graph/tim/TimNode.vue
+src/components/graph/tim/index.ts
+  src/components/graph/tim/TimLink.vue
+  src/components/graph/tim/TimNode.vue
+src/components/graph/tree/ArtifactNode.vue
+src/components/graph/tree/TraceLink.vue
+src/components/graph/tree/index.ts
+  src/components/graph/tree/ArtifactNode.vue
+  src/components/graph/tree/TraceLink.vue
+src/components/hgen/ArtifactGenerationPanel.vue
+src/components/hgen/index.ts
+  src/components/hgen/ArtifactGenerationPanel.vue
+src/components/index.ts
+src/components/integrations/IntegrationsStepper.vue
+src/components/integrations/ProjectInstallationsTable.vue
+src/components/integrations/authentication/AuthenticationListItem.vue
+src/components/integrations/authentication/AuthenticationSelector.vue
+src/components/integrations/authentication/GitHubAuthentication.vue
+src/components/integrations/authentication/JiraAuthentication.vue
+src/components/integrations/authentication/index.ts
+  src/components/integrations/authentication/AuthenticationSelector.vue
+  src/components/integrations/authentication/GitHubAuthentication.vue
+  src/components/integrations/authentication/JiraAuthentication.vue
+src/components/integrations/index.ts
+  src/components/integrations/IntegrationsStepper.vue
+  src/components/integrations/ProjectInstallationsTable.vue
+src/components/integrations/organizations/GitHubOrganizationSelector.vue
+src/components/integrations/organizations/JiraOrganizationSelector.vue
+src/components/integrations/organizations/index.ts
+  src/components/integrations/organizations/GitHubOrganizationSelector.vue
+  src/components/integrations/organizations/JiraOrganizationSelector.vue
+src/components/integrations/projects/GitHubProjectSelector.vue
+src/components/integrations/projects/JiraProjectSelector.vue
+src/components/integrations/projects/index.ts
+  src/components/integrations/projects/GitHubProjectSelector.vue
+  src/components/integrations/projects/JiraProjectSelector.vue
+src/components/jobs/JobRow.vue
+src/components/jobs/JobsTable.vue
+src/components/jobs/index.ts
+  src/components/jobs/JobsTable.vue
+src/components/models/TracePredictionTabs.vue
+src/components/models/index.ts
+  src/components/models/TracePredictionTabs.vue
+src/components/models/training/ModelCreatorModal.vue
+src/components/models/training/ModelShareModal.vue
+src/components/models/training/ModelTable.vue
+src/components/models/training/editor/ModelTraining.vue
+src/components/models/training/editor/ModelTrainingCreator.vue
+src/components/models/training/editor/ModelTrainingStep.vue
+src/components/models/training/editor/index.ts
+  src/components/models/training/editor/ModelTraining.vue
+src/components/models/training/editor/steps/ModelDocumentStep.vue
+src/components/models/training/editor/steps/ModelKeywordsStep.vue
+src/components/models/training/editor/steps/ModelProjectStep.vue
+src/components/models/training/editor/steps/ModelRepositoryStep.vue
+src/components/models/training/editor/steps/index.ts
+  src/components/models/training/editor/steps/ModelDocumentStep.vue
+  src/components/models/training/editor/steps/ModelKeywordsStep.vue
+  src/components/models/training/editor/steps/ModelProjectStep.vue
+  src/components/models/training/editor/steps/ModelRepositoryStep.vue
+src/components/models/training/index.ts
+  src/components/models/training/ModelTable.vue
+src/components/navigation/AppNav.vue
+src/components/navigation/PrivatePage.vue
+src/components/navigation/Snackbar.vue
+src/components/navigation/detailsDrawer/DetailsDrawer.vue
+src/components/navigation/detailsDrawer/index.ts
+  src/components/navigation/detailsDrawer/DetailsDrawer.vue
+src/components/navigation/index.ts
+  src/components/navigation/AppNav.vue
+  src/components/navigation/PrivatePage.vue
+src/components/navigation/sidebar/AppNavDrawer.vue
+src/components/navigation/sidebar/NavAccount.vue
+src/components/navigation/sidebar/NavOptions.vue
+src/components/navigation/sidebar/Notifications.vue
+src/components/navigation/sidebar/index.ts
+  src/components/navigation/sidebar/AppNavDrawer.vue
+src/components/navigation/topbar/AppNavBar.vue
+src/components/navigation/topbar/graph/DeltaModeButton.vue
+src/components/navigation/topbar/graph/GraphBar.vue
+src/components/navigation/topbar/graph/GraphButtons.vue
+src/components/navigation/topbar/graph/ModeButtons.vue
+src/components/navigation/topbar/graph/VisibleTypeButtons.vue
+src/components/navigation/topbar/graph/index.ts
+  src/components/navigation/topbar/graph/GraphBar.vue
+src/components/navigation/topbar/header/HeaderBar.vue
+src/components/navigation/topbar/header/LoadingBar.vue
+src/components/navigation/topbar/header/SavingIcon.vue
+src/components/navigation/topbar/header/UpdateButton.vue
+src/components/navigation/topbar/header/index.ts
+  src/components/navigation/topbar/header/HeaderBar.vue
+  src/components/navigation/topbar/header/LoadingBar.vue
+src/components/navigation/topbar/index.ts
+  src/components/navigation/topbar/AppNavBar.vue
+src/components/project/base/ConfirmProjectDelete.vue
+src/components/project/base/ProjectButtons.vue
+src/components/project/base/ProjectDisplay.vue
+src/components/project/base/ProjectFilesInput.vue
+src/components/project/base/ProjectFilesUploader.vue
+src/components/project/base/ProjectIdentifierInput.vue
+src/components/project/base/ProjectIdentifierModal.vue
+src/components/project/base/index.ts
+  src/components/project/base/ConfirmProjectDelete.vue
+  src/components/project/base/ProjectButtons.vue
+  src/components/project/base/ProjectDisplay.vue
+  src/components/project/base/ProjectFilesInput.vue
+  src/components/project/base/ProjectFilesUploader.vue
+  src/components/project/base/ProjectIdentifierInput.vue
+  src/components/project/base/ProjectIdentifierModal.vue
+src/components/project/creator/ProjectCreator.vue
+src/components/project/creator/UploadNewVersion.vue
+src/components/project/creator/VersionCreator.vue
+src/components/project/creator/index.ts
+  src/components/project/creator/ProjectCreator.vue
+  src/components/project/creator/UploadNewVersion.vue
+  src/components/project/creator/VersionCreator.vue
+src/components/project/creator/steps/FilePanel.vue
+src/components/project/creator/steps/FilePanelList.vue
+src/components/project/creator/steps/index.ts
+  src/components/project/creator/steps/FilePanelList.vue
+src/components/project/creator/workflows/ProjectBulkUpload.vue
+src/components/project/creator/workflows/ProjectCreatorStepper.vue
+src/components/project/creator/workflows/index.ts
+  src/components/project/creator/workflows/ProjectBulkUpload.vue
+  src/components/project/creator/workflows/ProjectCreatorStepper.vue
+src/components/project/index.ts
+src/components/project/selector/ProjectLoader.vue
+src/components/project/selector/ProjectVersionStepper.vue
+src/components/project/selector/index.ts
+  src/components/project/selector/ProjectLoader.vue
+  src/components/project/selector/ProjectVersionStepper.vue
+src/components/project/selector/input/ProjectSelector.vue
+src/components/project/selector/input/VersionSelector.vue
+src/components/project/selector/input/index.ts
+  src/components/project/selector/input/ProjectSelector.vue
+  src/components/project/selector/input/VersionSelector.vue
+src/components/project/selector/table/ProjectSelectorTable.vue
+src/components/project/selector/table/VersionSelectorTable.vue
+src/components/project/selector/table/index.ts
+  src/components/project/selector/table/ProjectSelectorTable.vue
+  src/components/project/selector/table/VersionSelectorTable.vue
+src/components/search/ProjectSearchbar.vue
+src/components/search/SearchInputs.vue
+src/components/search/SearchModeInput.vue
+src/components/search/SearchOption.vue
+src/components/search/SearchPromptInput.vue
+src/components/search/index.ts
+  src/components/search/ProjectSearchbar.vue
+src/components/settings/SettingsTabs.vue
+src/components/settings/index.ts
+  src/components/settings/SettingsTabs.vue
+src/components/settings/members/ProjectMemberModal.vue
+src/components/settings/members/ProjectMemberTable.vue
+src/components/settings/members/index.ts
+  src/components/settings/members/ProjectMemberTable.vue
+src/components/tim/ArtifactLevelPanel.vue
+src/components/tim/TraceMatrixPanel.vue
+src/components/tim/index.ts
+  src/components/tim/ArtifactLevelPanel.vue
+  src/components/tim/TraceMatrixPanel.vue
+src/components/traceLink/display/TraceLinkApproval.vue
+src/components/traceLink/display/TraceLinkButtons.vue
+src/components/traceLink/display/TraceLinkContent.vue
+src/components/traceLink/display/TraceLinkDisplay.vue
+src/components/traceLink/display/index.ts
+  src/components/traceLink/display/TraceLinkApproval.vue
+  src/components/traceLink/display/TraceLinkButtons.vue
+  src/components/traceLink/display/TraceLinkContent.vue
+  src/components/traceLink/display/TraceLinkDisplay.vue
+src/components/traceLink/index.ts
+src/components/traceLink/panels/GenerateTraceLinkPanel.vue
+src/components/traceLink/panels/SaveTraceLinkPanel.vue
+src/components/traceLink/panels/TraceLinkPanel.vue
+src/components/traceLink/panels/index.ts
+  src/components/traceLink/panels/GenerateTraceLinkPanel.vue
+  src/components/traceLink/panels/SaveTraceLinkPanel.vue
+  src/components/traceLink/panels/TraceLinkPanel.vue
+src/components/traceLink/save/TraceLinkGenerator.vue
+src/components/traceLink/save/TraceMatrixCreator.vue
+src/components/traceLink/save/index.ts
+  src/components/traceLink/save/TraceLinkGenerator.vue
+  src/components/traceLink/save/TraceMatrixCreator.vue
+src/components/traceLink/table/ApprovalTable.vue
+src/components/traceLink/table/TraceMatrixChip.vue
+src/components/traceLink/table/TraceTable.vue
+src/components/traceLink/table/index.ts
+  src/components/traceLink/table/ApprovalTable.vue
+  src/components/traceLink/table/TraceTable.vue
+src/cytoscape/cy/artifact-tree-cy.ts
+src/cytoscape/cy/index.ts
+  src/cytoscape/cy/artifact-tree-cy.ts
+  src/cytoscape/cy/tim-tree-cy.ts
+src/cytoscape/cy/tim-tree-cy.ts
+src/cytoscape/events/artifact-tree-events.ts
+src/cytoscape/events/cyto-events.ts
+src/cytoscape/events/index.ts
+  src/cytoscape/events/artifact-tree-events.ts
+  src/cytoscape/events/cyto-events.ts
+src/cytoscape/graphs/artifact-graph.ts
+src/cytoscape/graphs/index.ts
+  src/cytoscape/graphs/artifact-graph.ts
+  src/cytoscape/graphs/tim-graph.ts
+src/cytoscape/graphs/tim-graph.ts
+src/cytoscape/hooks/index.ts
+  src/cytoscape/hooks/post-layout.ts
+  src/cytoscape/hooks/pre-layout.ts
+src/cytoscape/hooks/post-layout.ts
+src/cytoscape/hooks/pre-layout.ts
+src/cytoscape/index.ts
+src/cytoscape/layout/artifact-graph-layout.ts
+  src/cytoscape/layout/graph-layout.ts
+  src/cytoscape/layout/tim-klay-settings.ts
+src/cytoscape/layout/graph-layout.ts
+src/cytoscape/layout/index.ts
+  src/cytoscape/layout/artifact-graph-layout.ts
+  src/cytoscape/layout/tim-graph-layout.ts
+  src/cytoscape/layout/tim-klay-settings.ts
+src/cytoscape/layout/tim-graph-layout.ts
+  src/cytoscape/layout/graph-layout.ts
+  src/cytoscape/layout/tim-klay-settings.ts
+src/cytoscape/layout/tim-klay-settings.ts
+src/cytoscape/operations/general.ts
+src/cytoscape/operations/index.ts
+  src/cytoscape/operations/general.ts
+src/cytoscape/plugins/automove/artifact-tree-auto-move-handlers.ts
+src/cytoscape/plugins/automove/index.ts
+  src/cytoscape/plugins/automove/artifact-tree-auto-move-handlers.ts
+src/cytoscape/plugins/context-menu/artifact-tree-context-menu-options.ts
+src/cytoscape/plugins/context-menu/index.ts
+  src/cytoscape/plugins/context-menu/artifact-tree-context-menu-options.ts
+src/cytoscape/plugins/context-menu/menu-options/artifact-tree-menu-options.ts
+  src/cytoscape/plugins/context-menu/menu-options/fta-menu-options.ts
+  src/cytoscape/plugins/context-menu/menu-options/safety-case-menu-option.ts
+src/cytoscape/plugins/context-menu/menu-options/fta-menu-options.ts
+src/cytoscape/plugins/context-menu/menu-options/index.ts
+  src/cytoscape/plugins/context-menu/menu-options/artifact-tree-menu-options.ts
+  src/cytoscape/plugins/context-menu/menu-options/fta-menu-options.ts
+  src/cytoscape/plugins/context-menu/menu-options/safety-case-menu-option.ts
+src/cytoscape/plugins/context-menu/menu-options/safety-case-menu-option.ts
+src/cytoscape/plugins/edge-handles/can-connect.ts
+src/cytoscape/plugins/edge-handles/edge-handles-core.ts
+  src/cytoscape/plugins/edge-handles/on-complete.ts
+src/cytoscape/plugins/edge-handles/index.ts
+  src/cytoscape/plugins/edge-handles/can-connect.ts
+  src/cytoscape/plugins/edge-handles/edge-handles-core.ts
+  src/cytoscape/plugins/edge-handles/options.ts
+src/cytoscape/plugins/edge-handles/on-complete.ts
+src/cytoscape/plugins/edge-handles/options.ts
+src/cytoscape/plugins/index.ts
+src/cytoscape/styles/config/edge-config.ts
+src/cytoscape/styles/config/graph-config.ts
+src/cytoscape/styles/config/index.ts
+  src/cytoscape/styles/config/edge-config.ts
+  src/cytoscape/styles/config/graph-config.ts
+  src/cytoscape/styles/config/node-config.ts
+src/cytoscape/styles/config/node-config.ts
+src/cytoscape/styles/index.ts
+src/cytoscape/styles/node/default-node.ts
+  src/cytoscape/styles/node/node-shapes.ts
+  src/cytoscape/styles/node/svg-node.ts
+src/cytoscape/styles/node/fta-node.ts
+src/cytoscape/styles/node/index.ts
+  src/cytoscape/styles/node/label-html.ts
+src/cytoscape/styles/node/label-html.ts
+  src/cytoscape/styles/node/default-node.ts
+  src/cytoscape/styles/node/fta-node.ts
+  src/cytoscape/styles/node/sc-node.ts
+  src/cytoscape/styles/node/tim-node.ts
+src/cytoscape/styles/node/node-footer.ts
+  src/cytoscape/styles/node/node-helper.ts
+  src/cytoscape/styles/node/node-stoplight.ts
+  src/cytoscape/styles/node/svg-text.ts
+src/cytoscape/styles/node/node-helper.ts
+src/cytoscape/styles/node/node-shapes.ts
+src/cytoscape/styles/node/node-stoplight.ts
+src/cytoscape/styles/node/sc-node.ts
+  src/cytoscape/styles/node/default-node.ts
+  src/cytoscape/styles/node/node-shapes.ts
+  src/cytoscape/styles/node/svg-node.ts
+src/cytoscape/styles/node/svg-node.ts
+  src/cytoscape/styles/node/node-footer.ts
+  src/cytoscape/styles/node/node-helper.ts
+src/cytoscape/styles/node/svg-text.ts
+  src/cytoscape/styles/node/node-helper.ts
+src/cytoscape/styles/node/tim-node.ts
+  src/cytoscape/styles/node/node-shapes.ts
+  src/cytoscape/styles/node/svg-node.ts
+src/cytoscape/styles/stylesheets/edge-styles.ts
+src/cytoscape/styles/stylesheets/index.ts
+  src/cytoscape/styles/stylesheets/edge-styles.ts
+  src/cytoscape/styles/stylesheets/node-styles.ts
+src/cytoscape/styles/stylesheets/node-styles.ts
+src/hooks/api/commit/index.ts
+  src/hooks/api/commit/useArtifactCommitApi.ts
+  src/hooks/api/commit/useCommitApi.ts
+  src/hooks/api/commit/useTraceCommitApi.ts
+src/hooks/api/commit/useArtifactCommitApi.ts
+src/hooks/api/commit/useCommitApi.ts
+src/hooks/api/commit/useTraceCommitApi.ts
+src/hooks/api/core/index.ts
+  src/hooks/api/core/useApi.ts
+  src/hooks/api/core/useSessionApi.ts
+src/hooks/api/core/useApi.ts
+src/hooks/api/core/useSessionApi.ts
+src/hooks/api/data/index.ts
+  src/hooks/api/data/useArtifactApi.ts
+  src/hooks/api/data/useArtifactTypeApi.ts
+  src/hooks/api/data/useDeltaApi.ts
+  src/hooks/api/data/useDocumentApi.ts
+  src/hooks/api/data/useLayoutApi.ts
+  src/hooks/api/data/useSearchApi.ts
+  src/hooks/api/data/useTraceApi.ts
+  src/hooks/api/data/useTraceMatrixApi.ts
+  src/hooks/api/data/useWarningApi.ts
+src/hooks/api/data/useArtifactApi.ts
+src/hooks/api/data/useArtifactTypeApi.ts
+src/hooks/api/data/useDeltaApi.ts
+src/hooks/api/data/useDocumentApi.ts
+src/hooks/api/data/useLayoutApi.ts
+src/hooks/api/data/useSearchApi.ts
+src/hooks/api/data/useTraceApi.ts
+src/hooks/api/data/useTraceMatrixApi.ts
+src/hooks/api/data/useWarningApi.ts
+src/hooks/api/generation/index.ts
+  src/hooks/api/generation/useArtifactGenerationApi.ts
+  src/hooks/api/generation/useModelApi.ts
+  src/hooks/api/generation/useTraceGenerationApi.ts
+src/hooks/api/generation/useArtifactGenerationApi.ts
+src/hooks/api/generation/useModelApi.ts
+src/hooks/api/generation/useTraceGenerationApi.ts
+src/hooks/api/index.ts
+src/hooks/api/integrations/index.ts
+  src/hooks/api/integrations/useGitHubApi.ts
+  src/hooks/api/integrations/useIntegrationsApi.ts
+  src/hooks/api/integrations/useJiraApi.ts
+src/hooks/api/integrations/useGitHubApi.ts
+src/hooks/api/integrations/useIntegrationsApi.ts
+src/hooks/api/integrations/useJiraApi.ts
+src/hooks/api/notifications/index.ts
+  src/hooks/api/notifications/useJobApi.ts
+  src/hooks/api/notifications/useNotificationApi.ts
+  src/hooks/api/notifications/useStompApi.ts
+src/hooks/api/notifications/useJobApi.ts
+  src/hooks/api/notifications/useStompApi.ts
+src/hooks/api/notifications/useNotificationApi.ts
+src/hooks/api/notifications/useStompApi.ts
+src/hooks/api/project/index.ts
+  src/hooks/api/project/useCreateProjectApi.ts
+  src/hooks/api/project/useGetProjectApi.ts
+  src/hooks/api/project/useParseApi.ts
+  src/hooks/api/project/useProjectApi.ts
+  src/hooks/api/project/useSetProjectApi.ts
+src/hooks/api/project/useCreateProjectApi.ts
+src/hooks/api/project/useGetProjectApi.ts
+src/hooks/api/project/useParseApi.ts
+src/hooks/api/project/useProjectApi.ts
+src/hooks/api/project/useSetProjectApi.ts
+src/hooks/api/settings/index.ts
+  src/hooks/api/settings/useAttributeApi.ts
+  src/hooks/api/settings/useMemberApi.ts
+src/hooks/api/settings/useAttributeApi.ts
+src/hooks/api/settings/useMemberApi.ts
+src/hooks/api/version/index.ts
+  src/hooks/api/version/useCreateVersionApi.ts
+  src/hooks/api/version/useGetVersionApi.ts
+src/hooks/api/version/useCreateVersionApi.ts
+src/hooks/api/version/useGetVersionApi.ts
+src/hooks/component/index.ts
+  src/hooks/component/useSaveArtifact.ts
+  src/hooks/component/useSaveAttribute.ts
+  src/hooks/component/useSaveAttributeLayout.ts
+  src/hooks/component/useSaveDocument.ts
+  src/hooks/component/useSaveIdentifier.ts
+  src/hooks/component/useSaveModel.ts
+  src/hooks/component/useSaveProject.ts
+  src/hooks/component/useSaveTrace.ts
+src/hooks/component/useSaveArtifact.ts
+  src/hooks/graph/useSelection.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useDocuments.ts
+src/hooks/component/useSaveAttribute.ts
+src/hooks/component/useSaveAttributeLayout.ts
+  src/hooks/project/useAttributes.ts
+src/hooks/component/useSaveDocument.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useDocuments.ts
+  src/hooks/project/useSubtree.ts
+src/hooks/component/useSaveIdentifier.ts
+src/hooks/component/useSaveModel.ts
+src/hooks/component/useSaveProject.ts
+src/hooks/component/useSaveTrace.ts
+  src/hooks/project/useArtifacts.ts
+src/hooks/composables/index.ts
+  src/hooks/composables/useClasses.ts
+  src/hooks/composables/useMargins.ts
+  src/hooks/composables/useScreen.ts
+  src/hooks/composables/useTableFilter.ts
+  src/hooks/composables/useTheme.ts
+  src/hooks/composables/useVModel.ts
+src/hooks/composables/useClasses.ts
+src/hooks/composables/useMargins.ts
+  src/hooks/composables/useClasses.ts
+src/hooks/composables/useScreen.ts
+src/hooks/composables/useTableFilter.ts
+src/hooks/composables/useTheme.ts
+src/hooks/composables/useVModel.ts
+src/hooks/core/index.ts
+  src/hooks/core/useApp.ts
+  src/hooks/core/useLog.ts
+  src/hooks/core/useSession.ts
+src/hooks/core/useApp.ts
+  src/hooks/core/useLog.ts
+  src/hooks/graph/useSelection.ts
+src/hooks/core/useLog.ts
+src/hooks/core/useSession.ts
+src/hooks/graph/index.ts
+  src/hooks/graph/useLayout.ts
+  src/hooks/graph/useSelection.ts
+src/hooks/graph/useLayout.ts
+src/hooks/graph/useSelection.ts
+  src/hooks/core/useApp.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useSubtree.ts
+  src/hooks/project/useTraces.ts
+  src/hooks/project/useTypeOptions.ts
+src/hooks/index.ts
+src/hooks/project/index.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useAttributes.ts
+  src/hooks/project/useCommits.ts
+  src/hooks/project/useDelta.ts
+  src/hooks/project/useDocuments.ts
+  src/hooks/project/useIntegrations.ts
+  src/hooks/project/useJobs.ts
+  src/hooks/project/useMembers.ts
+  src/hooks/project/useProject.ts
+  src/hooks/project/useSearch.ts
+  src/hooks/project/useSubtree.ts
+  src/hooks/project/useTraceApproval.ts
+  src/hooks/project/useTraces.ts
+  src/hooks/project/useTypeOptions.ts
+  src/hooks/project/useWarnings.ts
+src/hooks/project/useArtifacts.ts
+src/hooks/project/useAttributes.ts
+src/hooks/project/useCommits.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useTraces.ts
+src/hooks/project/useDelta.ts
+  src/hooks/core/useApp.ts
+  src/hooks/graph/useLayout.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useSubtree.ts
+  src/hooks/project/useTraces.ts
+src/hooks/project/useDocuments.ts
+  src/hooks/graph/useLayout.ts
+  src/hooks/project/useArtifacts.ts
+  src/hooks/project/useProject.ts
+  src/hooks/project/useTraces.ts
+src/hooks/project/useIntegrations.ts
+src/hooks/project/useJobs.ts
+src/hooks/project/useMembers.ts
+  src/hooks/project/useProject.ts
+src/hooks/project/useProject.ts
+  src/hooks/core/useLog.ts
+  src/hooks/graph/useSelection.ts
+  src/hooks/project/useAttributes.ts
+  src/hooks/project/useDocuments.ts
+  src/hooks/project/useMembers.ts
+  src/hooks/project/useSubtree.ts
+  src/hooks/project/useTypeOptions.ts
+  src/hooks/project/useWarnings.ts
+src/hooks/project/useSearch.ts
+src/hooks/project/useSubtree.ts
+  src/hooks/project/useArtifacts.ts
+src/hooks/project/useTraceApproval.ts
+src/hooks/project/useTraces.ts
+src/hooks/project/useTypeOptions.ts
+src/hooks/project/useWarnings.ts
+src/main.ts
+src/plugins/index.ts
+  src/plugins/quasar-user-options.ts
+  src/plugins/vue-pinia.ts
+src/plugins/quasar-user-options.ts
+src/plugins/vue-pinia.ts
+src/router/checks.ts
+src/router/hooks.ts
+src/router/index.ts
+  src/router/checks.ts
+  src/router/hooks.ts
+  src/router/router.ts
+  src/router/routes.ts
+src/router/router.ts
+  src/router/routes.ts
+src/router/routes.ts
+src/types/api/base-api.ts
+src/types/api/commit-api.ts
+src/types/api/file-api.ts
+src/types/api/github-api.ts
+src/types/api/index.ts
+  src/types/api/base-api.ts
+  src/types/api/commit-api.ts
+  src/types/api/file-api.ts
+  src/types/api/github-api.ts
+  src/types/api/jira-api.ts
+  src/types/api/job-api.ts
+  src/types/api/layout-api.ts
+  src/types/api/project-api.ts
+  src/types/api/websocket-api.ts
+src/types/api/jira-api.ts
+src/types/api/job-api.ts
+src/types/api/layout-api.ts
+src/types/api/project-api.ts
+src/types/api/websocket-api.ts
+src/types/components/base/index.ts
+  src/types/components/base/props.ts
+  src/types/components/base/types.ts
+src/types/components/base/props.ts
+src/types/components/base/types.ts
+src/types/components/common/alert.ts
+src/types/components/common/attribute.ts
+src/types/components/common/base-table.ts
+src/types/components/common/button.ts
+src/types/components/common/chip.ts
+src/types/components/common/flex.ts
+src/types/components/common/icon.ts
+src/types/components/common/index.ts
+  src/types/components/common/alert.ts
+  src/types/components/common/attribute.ts
+  src/types/components/common/base-table.ts
+  src/types/components/common/button.ts
+  src/types/components/common/chip.ts
+  src/types/components/common/flex.ts
+  src/types/components/common/icon.ts
+  src/types/components/common/input.ts
+  src/types/components/common/layout.ts
+  src/types/components/common/list.ts
+  src/types/components/common/modal.ts
+  src/types/components/common/stepper.ts
+  src/types/components/common/table.ts
+  src/types/components/common/typography.ts
+src/types/components/common/input.ts
+src/types/components/common/layout.ts
+src/types/components/common/list.ts
+src/types/components/common/modal.ts
+src/types/components/common/stepper.ts
+src/types/components/common/table.ts
+src/types/components/common/typography.ts
+src/types/components/delta.ts
+src/types/components/enums.ts
+src/types/components/files.ts
+src/types/components/graph.ts
+src/types/components/index.ts
+  src/types/components/delta.ts
+  src/types/components/enums.ts
+  src/types/components/files.ts
+  src/types/components/graph.ts
+  src/types/components/models.ts
+  src/types/components/navigation.ts
+  src/types/components/project-creator.ts
+  src/types/components/project-view.ts
+  src/types/components/settings.ts
+  src/types/components/traces.ts
+src/types/components/models.ts
+src/types/components/navigation.ts
+src/types/components/project-creator.ts
+src/types/components/project-view.ts
+src/types/components/settings.ts
+src/types/components/traces.ts
+src/types/cytoscape/core/cursor.ts
+src/types/cytoscape/core/cyto-core-graph.ts
+src/types/cytoscape/core/general.ts
+src/types/cytoscape/core/index.ts
+  src/types/cytoscape/core/cursor.ts
+  src/types/cytoscape/core/cyto-core-graph.ts
+  src/types/cytoscape/core/general.ts
+src/types/cytoscape/index.ts
+src/types/cytoscape/layout/igraph-layout.ts
+src/types/cytoscape/layout/index.ts
+  src/types/cytoscape/layout/igraph-layout.ts
+src/types/cytoscape/plugins/automove.ts
+src/types/cytoscape/plugins/context-menus.ts
+src/types/cytoscape/plugins/edge-handles.ts
+src/types/cytoscape/plugins/index.ts
+  src/types/cytoscape/plugins/automove.ts
+  src/types/cytoscape/plugins/context-menus.ts
+  src/types/cytoscape/plugins/edge-handles.ts
+  src/types/cytoscape/plugins/klay.ts
+  src/types/cytoscape/plugins/node-html-label.ts
+src/types/cytoscape/plugins/klay.ts
+src/types/cytoscape/plugins/node-html-label.ts
+src/types/domain/artifact-types.ts
+src/types/domain/artifact.ts
+  src/types/domain/attribute.ts
+  src/types/domain/document.ts
+src/types/domain/attribute.ts
+src/types/domain/authentication.ts
+src/types/domain/delta.ts
+src/types/domain/document.ts
+src/types/domain/files.ts
+src/types/domain/hgen.ts
+src/types/domain/index.ts
+  src/types/domain/artifact-types.ts
+  src/types/domain/artifact.ts
+  src/types/domain/attribute.ts
+  src/types/domain/authentication.ts
+  src/types/domain/delta.ts
+  src/types/domain/document.ts
+  src/types/domain/files.ts
+  src/types/domain/hgen.ts
+  src/types/domain/installations.ts
+  src/types/domain/layout.ts
+  src/types/domain/links.ts
+  src/types/domain/membership.ts
+  src/types/domain/model.ts
+  src/types/domain/project.ts
+  src/types/domain/search.ts
+  src/types/domain/subtree.ts
+  src/types/domain/tim.ts
+  src/types/domain/warning.ts
+src/types/domain/installations.ts
+src/types/domain/layout.ts
+src/types/domain/links.ts
+src/types/domain/membership.ts
+src/types/domain/model.ts
+src/types/domain/project.ts
+src/types/domain/search.ts
+src/types/domain/subtree.ts
+src/types/domain/tim.ts
+src/types/domain/warning.ts
+src/types/hooks/commit.ts
+src/types/hooks/composables.ts
+src/types/hooks/document.ts
+src/types/hooks/filters.ts
+src/types/hooks/general.ts
+src/types/hooks/index.ts
+  src/types/hooks/commit.ts
+  src/types/hooks/composables.ts
+  src/types/hooks/document.ts
+  src/types/hooks/filters.ts
+  src/types/hooks/general.ts
+  src/types/hooks/snackbar.ts
+  src/types/hooks/viewport.ts
+src/types/hooks/snackbar.ts
+src/types/hooks/viewport.ts
+src/types/index.ts
+src/types/missing-modules.d.ts
+src/types/shims/shims-tsx.d.ts
+src/util/artifact-helper.ts
+src/util/commit-builder.ts
+src/util/document-helper.ts
+src/util/enabled-features.ts
+src/util/enum-helper.ts
+src/util/globals.ts
+src/util/icons.ts
+src/util/index.ts
+  src/util/artifact-helper.ts
+  src/util/commit-builder.ts
+  src/util/document-helper.ts
+  src/util/enabled-features.ts
+  src/util/enum-helper.ts
+  src/util/globals.ts
+  src/util/icons.ts
+  src/util/job-helper.ts
+  src/util/object-factory.ts
+  src/util/object-helper.ts
+  src/util/string-helper.ts
+  src/util/sub-tree-operations.ts
+  src/util/table-headers.ts
+  src/util/table-helper.ts
+  src/util/theme.ts
+  src/util/tim-factory.ts
+  src/util/trace-helper.ts
+  src/util/type-checks.ts
+src/util/job-helper.ts
+src/util/object-factory.ts
+src/util/object-helper.ts
+src/util/string-helper.ts
+src/util/sub-tree-operations.ts
+src/util/table-headers.ts
+src/util/table-helper.ts
+src/util/theme.ts
+src/util/tim-factory.ts
+src/util/trace-helper.ts
+src/util/type-checks.ts
+src/views/index.ts
+src/views/private/ArtifactView.vue
+src/views/private/HomeView.vue
+src/views/private/MyAccountView.vue
+src/views/private/ProjectCreatorView.vue
+src/views/private/ProjectSelectorView.vue
+src/views/private/ProjectSettingsView.vue
+src/views/private/SearchView.vue
+src/views/private/TracePredictionView.vue
+src/views/private/UploadStatusView.vue
+src/views/private/index.ts
+  src/views/private/ArtifactView.vue
+  src/views/private/HomeView.vue
+  src/views/private/MyAccountView.vue
+  src/views/private/ProjectCreatorView.vue
+  src/views/private/ProjectSelectorView.vue
+  src/views/private/ProjectSettingsView.vue
+  src/views/private/SearchView.vue
+  src/views/private/TracePredictionView.vue
+  src/views/private/UploadStatusView.vue
+src/views/public/CreateAccountView.vue
+src/views/public/ForgotPasswordView.vue
+src/views/public/LoginView.vue
+src/views/public/ResetPasswordView.vue
+src/views/public/index.ts
+  src/views/public/CreateAccountView.vue
+  src/views/public/ForgotPasswordView.vue
+  src/views/public/LoginView.vue
+  src/views/public/ResetPasswordView.vue
+

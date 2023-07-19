@@ -82,5 +82,10 @@
     "vue-cli-plugin-pinia": "^0.2.3",
     "vue-cli-plugin-quasar": "~5.0.1",
     "vue-loader": "^17.1.1"
+  },
+  "madge": {
+    "baseDir": "./src",
+    "fileExtensions": ["ts", "vue"],
+    "tsConfig": "tsconfig.json"
   }
 }

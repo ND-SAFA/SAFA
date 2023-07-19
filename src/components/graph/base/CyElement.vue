@@ -2,16 +2,13 @@
   <div
     :style="
       isNode
-        ? 'position: absolute; z-index: 1000;' +
+        ? 'position: absolute; z-index: 100;' +
           'webkit-transform-origin: top left; ms-transform-origin: top left; transform-origin: top left; ' +
           style
         : undefined
     "
   >
     <slot />
-    <q-card v-if="isNode" flat bordered class="q-px-lg q-pt-md">
-      <p>{{ props.definition.data.artifactName }}</p>
-    </q-card>
   </div>
 </template>
 

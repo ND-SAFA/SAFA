@@ -156,6 +156,7 @@ public abstract class BaseController {
         SafaUser user = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
             request.accept(user);
+            output.setResult(null);  // Necessary otherwise the request will time out
         });
 
         return output;

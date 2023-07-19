@@ -2,7 +2,7 @@
   <list-item
     :clickable="props.clickable"
     :divider="props.displayDivider"
-    class="artifact-display"
+    :class="props.fullWidth ? 'full-width' : 'artifact-display'"
     @click="emit('click')"
   >
     <flex-box v-if="props.displayTitle" align="center" justify="between">
@@ -15,6 +15,7 @@
         variant="expandable"
         :value="props.artifact.summary"
         :default-expanded="props.defaultExpanded"
+        :collapse-length="props.defaultExpanded ? 0 : undefined"
       />
       <typography
         v-else

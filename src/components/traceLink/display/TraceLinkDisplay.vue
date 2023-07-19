@@ -24,10 +24,14 @@
           variant="caption"
           :value="showSummary ? 'Summary' : 'Content'"
         />
-        <artifact-body-display :artifact="showOnlyArtifact" default-expanded />
+        <artifact-body-display
+          :artifact="showOnlyArtifact"
+          default-expanded
+          :full-width="!showSummary"
+        />
       </div>
-      <separator v-if="!!showOnlyArtifact.summary" vertical r="2" />
-      <div v-if="!!showOnlyArtifact.summary">
+      <separator v-if="showSummary" vertical r="2" />
+      <div v-if="showSummary">
         <typography variant="caption" value="Content" />
         <typography variant="code" :value="showOnlyArtifact.body" l="2" />
       </div>

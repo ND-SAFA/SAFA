@@ -28,6 +28,10 @@ export interface ArtifactListItemProps extends ClickableProps {
    * Whether to default the artifact content to expanded.
    */
   defaultExpanded?: boolean;
+  /**
+   * Whether to expand to full width.
+   */
+  fullWidth?: boolean;
 }
 
 /**

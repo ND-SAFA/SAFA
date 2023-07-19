@@ -245,13 +245,18 @@ class FileUtil:
         return delimiter.join(components)
 
     @staticmethod
-    def find_all_file_paths_that_meet_condition(dir_path: str, condition: Callable = None) -> List[str]:
+    def get_all_paths(dir_path: Union[List[str], str], condition: Callable = None) -> List[str]:
         """
         Reads all code files in directory with allowed extensions.
         :param dir_path: Path to directory where code files live
         :param condition: A callable that returns True if the filepath should be included
         :return: List containing all code file paths.
         """
+        if isinstance(dir_path, list):
+            paths = set()
+            for p in dir_path:
+                paths.update(set(FileUtil.get_all_paths(p)))
+            return list(paths)
         condition = condition if condition is not None else lambda x: True
         file_paths = []
         for subdir, dirs, files in os.walk(dir_path):

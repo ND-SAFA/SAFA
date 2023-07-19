@@ -85,5 +85,5 @@ class GCodeFile(AbstractGithubArtifact):
         :return: List containing all code file paths.
         """
         allowed_code_ext = ALLOWED_CODE_EXTENSIONS if allowed_code_ext is None else allowed_code_ext
-        return FileUtil.find_all_file_paths_that_meet_condition(dir_path,
-                                                                lambda f: GCodeFile.ends_with_allowed_code_ext(f, allowed_code_ext))
+        return FileUtil.get_all_paths(dir_path,
+                                      lambda f: GCodeFile.ends_with_allowed_code_ext(f, allowed_code_ext))

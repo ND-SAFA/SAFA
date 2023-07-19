@@ -51,7 +51,7 @@ SUMMARY_INSTRUCTIONS = "Using the {source_type}, write a comprehensive summary o
 TASK_INSTRUCTIONS = "Next, use this summary to identify the main features and functionality provided by the system. " \
                     "Then, reverse engineer a set of {target_type} that cover each of these features and functionalities. " \
                     "The {target_type} should include some technical details but " \
-                    "avoid directly copying details verbatim from the {source_type}." \
+                    "avoid directly copying details verbatim from the {source_type}. " \
                     "Importantly, the {target_type} should be specific to certain functionalities/features and not too broad. " \
                     "Do not make up any information " \
                     "- all details in the {target_type} must accurately reflect the provided {source_type}. " \

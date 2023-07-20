@@ -114,27 +114,31 @@ class TestSummarizer(BaseTest):
     def test_summarize_bulk_code_or_exceeds_limit_only(self, response_manager: TestResponseManager):
         """
         Tests bulk summaries with code or exceeds limit only.
+        - Verifies that only content over limit is summarized.
         """
-        SUMMARY_1 = "SUMMARY_1"
         MAX_PROMPT_TOKENS = 5
+        token_limit = ModelTokenLimits.get_token_limit_for_model(self.MODEL_NAME)
+        summarizer = self.get_summarizer(
+            max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - MAX_PROMPT_TOKENS,
+            code_or_exceeds_limit_only=True)
+        TEXT_1 = "This is a text is over the token limit"
+        TEXT_2 = "short text"
+        TEXTS = [TEXT_1, TEXT_2]
+        SUMMARY_1 = "SUMMARY_1"
         response_manager.set_responses([
-            "CH",  # Chunk 1 of long prompt, must be 1-2 tokens
-            "TH",  # Chunk 2 of long prompt, Must be 1-2 tokens
-            SUMMARY_1]
-        )
-        llm_manager = OpenAIManager(OpenAIArgs())
-        token_limit = ModelTokenLimits.get_token_limit_for_model(OPEN_AI_MODEL_DEFAULT)
-        summarizer = Summarizer(llm_manager,
-                                max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - MAX_PROMPT_TOKENS,
-                                code_or_exceeds_limit_only=True)
-        text_1 = "This is a text is over the token limit"
-        text_2 = "short text"
-        summaries = summarizer.summarize_bulk(bodies=[text_1, text_2])
+            "CH",  # Summary of chunk 1 for long prompt, must be 1-2 tokens to avoid re-summarization.
+            "TH",  # Summary of chunk 1 for long prompt, must be 1-2 tokens
+            SUMMARY_1  # The re-summarization of the artifact.
+        ])
+        summaries = summarizer.summarize_bulk(bodies=TEXTS)
 
         self.assertEqual(summaries[0], SUMMARY_1)
-        self.assertEqual(summaries[1], text_2)  # shouldn't have summarized
+        self.assertEqual(summaries[1], TEXT_2)  # shouldn't have summarized
 
     def test_create_summarization_prompts(self):
+        """
+        Tests the ability to create prompts for chunks of content.
+        """
         MAX_PROMPT_TOKENS = 5
         token_limit = ModelTokenLimits.get_token_limit_for_model(self.MODEL_NAME)
         summarizer = self.get_summarizer(max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - MAX_PROMPT_TOKENS,

@@ -7,8 +7,8 @@ class TestNaturalLanguageChunker(BaseTest):
 
     def test_chunk(self):
         n_times_limit = 3
-        chunker = NaturalLanguageChunker("ada", token_limit=10)
-        long_text = "Hello " * (n_times_limit*round(chunker.token_limit * TOKENS_2_WORDS_CONVERSION))
+        chunker = NaturalLanguageChunker("ada", max_content_tokens=10)
+        long_text = "Hello " * (n_times_limit * round(chunker.max_content_tokens * TOKENS_2_WORDS_CONVERSION))
         chunks = chunker.chunk(long_text)
         self.assertEqual(len(chunks), n_times_limit)
         self.assertEqual(" ".join(chunks) + " ", long_text)

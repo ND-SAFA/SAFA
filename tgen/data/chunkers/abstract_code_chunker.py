@@ -1,5 +1,5 @@
 import os
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from asyncio.log import logger
 from typing import List, Tuple, Type
 
@@ -7,7 +7,6 @@ from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.util.file_util import FileUtil
 
 
 class AbstractCodeChunker(AbstractChunker, ABC):
@@ -25,7 +24,7 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         except Exception as e:
             msg_end = id_ if id_ else f"starting with {lines[0]}"
             logger.warning(f"Unable to parse file {msg_end}")
-            return NaturalLanguageChunker(model_name=self.model_name, token_limit=self.token_limit).chunk(content)
+            return NaturalLanguageChunker(model_name=self.model_name, max_content_tokens=self.max_content_tokens).chunk(content)
         chunks = self.__chunk_helper(head_node, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks]
 
@@ -68,7 +67,7 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         for child in child_chunks:
             parent_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(p_chunk, lines), self.model_name)
             c_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(child, lines), self.model_name)
-            if (c_tokens + parent_tokens) > self.token_limit:
+            if (c_tokens + parent_tokens) > self.max_content_tokens:
                 break
             p_chunk.end_lineno = child.end_lineno
             p_chunk.body.append(child)

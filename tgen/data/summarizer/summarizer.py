@@ -1,9 +1,9 @@
 import itertools
-from typing import Dict, List, Union
+from typing import Dict, List, Set, Union
 
 import pandas as pd
 
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.constants.deliminator_constants import EMPTY_STRING, SPACE
 from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
@@ -68,17 +68,29 @@ class Summarizer(BaseObject):
                                                                           ids=ids)
         indices2summarize, indices2resummarize, summary_prompts = selective_summary_payload
         logger.info(f"\nSummarizing {len(indices2summarize)} artifacts")
-        summarized_content = self._summarize_selective(bodies, indices2summarize, summary_prompts)
+        summarized_content = self._chunk_and_summarize_selective(contents=bodies,
+                                                                 indices2summarize=indices2summarize,
+                                                                 prompts_for_summaries=summary_prompts)
+        prompts_for_resummarization = self.create_resummarization_chunk_prompts(indices2resummarize, summarized_content)
+        summaries = self._chunk_and_summarize_selective(contents=summarized_content,
+                                                        indices2summarize=indices2resummarize,
+                                                        prompts_for_summaries=prompts_for_resummarization)
+        return summaries
+
+    def create_resummarization_chunk_prompts(self, indices2resummarize: Set[int], summarized_content: List[str]):
+        """
+        Creates prompts enabling some artifacts to be re-summarized.
+        :param indices2resummarize: The indices in content to resummarize.
+        :param summarized_content: List of content global content.
+        :return:
+        """
         prompts_for_resummarization = []
         for i, content in enumerate(summarized_content):
             if i not in indices2resummarize:
                 continue
             resummarization_prompt = self._create_chunk_prompts(content, code_or_above_limit_only=False)
             prompts_for_resummarization.append(resummarization_prompt)
-        summaries = self._summarize_selective(contents=summarized_content,
-                                              indices2summarize=indices2resummarize,
-                                              prompts_for_summaries=prompts_for_resummarization)
-        return summaries
+        return prompts_for_resummarization
 
     def construct_select_summary_payload(self, bodies: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None):
         if chunker_types is None:
@@ -176,7 +188,7 @@ class Summarizer(BaseObject):
         summaries = []
         start_index = 0
         for n in n_chunks_per_summary:
-            summaries.append(EMPTY_STRING.join(batch_responses[start_index: start_index + n]))
+            summaries.append(SPACE.join(batch_responses[start_index: start_index + n]))
             start_index += n
         return summaries
 
@@ -192,7 +204,7 @@ class Summarizer(BaseObject):
         """
         code_or_above_limit_only = self.code_or_above_limit_only if code_or_above_limit_only is None else code_or_above_limit_only
         id_ = '' if not id_ else id_
-        chunker = chunker_type.value(self.model_name, token_limit=self.max_prompt_tokens)
+        chunker = chunker_type.value(self.model_name, max_content_tokens=self.max_prompt_tokens)
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content, id_=id_)
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:
@@ -201,7 +213,10 @@ class Summarizer(BaseObject):
         return [prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
                                      artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
-    def _summarize_selective(self, contents, indices2summarize, prompts_for_summaries) -> List[str]:
+    def _chunk_and_summarize_selective(self,
+                                       contents: List[str],
+                                       indices2summarize: Set[int],
+                                       prompts_for_summaries) -> List[str]:
         """
         Summarizes only the content whose index is in indices2summarize
         :param contents: Contents to summarize

@@ -20,39 +20,43 @@ from tgen.util.file_util import FileUtil
 class TestSummarizer(BaseTest):
     CHUNKS = ["The cat in the hat sat", "on a log with a frog and a hog."]
     CONTENT = " ".join(CHUNKS)
-    TEST_FILE_PATH = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
-    TEST_FILE_CONTENT = FileUtil.read_file(TEST_FILE_PATH)
-    MODEL_NAME = "code-cushman-002"
+    CODE_FILE_PATH = os.path.join(TEST_DATA_DIR, "chunker/test_python.py")
+    CODE_CONTENT = FileUtil.read_file(CODE_FILE_PATH)
+    MODEL_NAME = "gpt-3.5-turbo"
+    MAX_COMPLETION_TOKENS = 500
 
     @mock_openai()
     def test_summarize_chunks(self, response_manager: TestResponseManager):
         """
-        Tests ability to summarize multiple chunks associated with single entity.
+        Tests ability to summarize multiple chunks and combine them.
+        - Verifies that each chunk is summarized.
+        - Verifies that summarized chunks are combined together.
         """
-        response_manager.format = SUMMARY_FORMAT
-        response_manager.set_responses(self.CHUNKS)
+        response_manager.set_responses(["CHUNK_1", "CHUNK_2"])
         summarizer = self.get_summarizer()
         llm_manager = summarizer.llm_manager
         chunk_prompts = self.get_chunk_summary_prompts(llm_manager.prompt_args, summarizer)
         summary = summarizer._summarize_chunks(llm_manager, chunk_prompts)[0]
-        expected_summary = "".join(SUMMARY_FORMAT.format(chunk) for chunk in self.CHUNKS)
+        expected_summary = "CHUNK_1 CHUNK_2"
         self.assertEqual(summary, expected_summary)
 
     @mock_openai()
     def test_summarize(self, response_manager: TestResponseManager):
-        response_manager.set_responses([self.CONTENT])
-        response_manager.format = SUMMARY_FORMAT
-
+        """
+        Tests ability to summarize single artifacts.
+        - Verifies that code is chunked according to model token limit via data manager.
+        - Verifies that summarized chunks are re-summarized.
+        """
+        CODE_SUMMARY = "CODE_SUMMARY"
         summarizer = self.get_summarizer()
+        chunks = self.get_chunks(self.CODE_CONTENT, summarizer)
+        response_manager.set_responses(["CH" for i in chunks] + [CODE_SUMMARY])
+        content_summary = summarizer.summarize_single(content=self.CODE_CONTENT)
+        self.assertEqual(content_summary, CODE_SUMMARY)
 
-        content_summary = summarizer.summarize_single(content=self.CONTENT)
-        expected_summary = SUMMARY_FORMAT.format(self.CONTENT)
-        self.assertEqual(content_summary, expected_summary)
-
-    @mock_openai()
+    @mock_openai(test_expected_responses=False)
     def test_code_or_exceeds_limit_true(self, response_manager: TestResponseManager):
         short_text = "This is a short text under the token limit"
-        response_manager.set_responses([short_text])
         summarizer = self.get_summarizer(code_or_exceeds_limit_only=True, max_completion_tokens=500)
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
@@ -64,13 +68,13 @@ class TestSummarizer(BaseTest):
         # Calculated expected chunks + summary
         max_prompt_tokens = TokenLimitCalculator.calculate_max_prompt_tokens(self.MODEL_NAME,
                                                                              max_completion_tokens=max_completion_tokens)
-        expected_chunks = PythonChunker(self.MODEL_NAME, max_prompt_tokens).chunk(self.TEST_FILE_CONTENT)
+        expected_chunks = PythonChunker(self.MODEL_NAME, max_prompt_tokens).chunk(self.CODE_CONTENT)
         expected_summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
         expected_summary = "".join(expected_summarized_chunks)
 
         response_manager.set_responses(expected_summarized_chunks + [expected_summary])
         summarizer = self.get_summarizer(max_completion_tokens=max_completion_tokens)
-        content_summary = summarizer.summarize_single(self.TEST_FILE_CONTENT, chunker_type=SupportedChunker.PY)
+        content_summary = summarizer.summarize_single(self.CODE_CONTENT, chunker_type=SupportedChunker.PY)
 
         actual_links = content_summary.split("\n")
         expected_lines = content_summary.split("\n")
@@ -82,18 +86,21 @@ class TestSummarizer(BaseTest):
     def test_summarize_bulk(self, response_manager: TestResponseManager):
         """
         Tests ability to summarize in bulk while still using chunkers.
+        - Verifies that content under limit is not summarized
+        - Verifies that content over limit is summarized
+        - Verifies that mix of content under and over limit work well together.
         """
         NL_SUMMARY = "NL_SUMMARY"
         PL_SUMMARY = "PL_SUMMARY"
 
         # data
         nl_content = "Hello, this is a short text."
-        contents = [nl_content, self.TEST_FILE_CONTENT]
+        contents = [nl_content, self.CODE_CONTENT]
         model_name = "gpt-3.5-turbo"
         summarizer = self.get_summarizer(model_name=model_name, code_or_exceeds_limit_only=False)
 
         # Create chunks for responses
-        expected_chunks = PythonChunker(model_name, summarizer.max_prompt_tokens).chunk(self.TEST_FILE_CONTENT)
+        expected_chunks = PythonChunker(model_name, summarizer.max_prompt_tokens).chunk(self.CODE_CONTENT)
         chunk_responses = [f"Chunk {i}" for i in range(len(expected_chunks))]
         responses = [NL_SUMMARY] + chunk_responses + [PL_SUMMARY]
         response_manager.set_responses(responses)
@@ -108,23 +115,29 @@ class TestSummarizer(BaseTest):
         """
         Tests bulk summaries with code or exceeds limit only.
         """
+        SUMMARY_1 = "SUMMARY_1"
+        MAX_PROMPT_TOKENS = 5
+        response_manager.set_responses([
+            "CH",  # Chunk 1 of long prompt, must be 1-2 tokens
+            "TH",  # Chunk 2 of long prompt, Must be 1-2 tokens
+            SUMMARY_1]
+        )
         llm_manager = OpenAIManager(OpenAIArgs())
         token_limit = ModelTokenLimits.get_token_limit_for_model(OPEN_AI_MODEL_DEFAULT)
-        summarizer = Summarizer(llm_manager, max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - 5,
+        summarizer = Summarizer(llm_manager,
+                                max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - MAX_PROMPT_TOKENS,
                                 code_or_exceeds_limit_only=True)
-        long_text = "This is a text is over the token limit"
-        short_text = "short text"
-        summaries = summarizer.summarize_bulk(bodies=[long_text, short_text])
-        expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
-                                    for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)])
-        expected_summary = "".join([SUMMARY_FORMAT.format(chunk)
-                                    for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(expected_summary)])
-        self.assertEqual(summaries[0], expected_summary)
-        self.assertEqual(summaries[1], short_text)  # shouldn't have summarized
+        text_1 = "This is a text is over the token limit"
+        text_2 = "short text"
+        summaries = summarizer.summarize_bulk(bodies=[text_1, text_2])
+
+        self.assertEqual(summaries[0], SUMMARY_1)
+        self.assertEqual(summaries[1], text_2)  # shouldn't have summarized
 
     def test_create_summarization_prompts(self):
-        token_limit = ModelTokenLimits.get_token_limit_for_model(OPEN_AI_MODEL_DEFAULT)
-        summarizer = self.get_summarizer(max_tokens_for_token_limit=token_limit - MAX_TOKENS_BUFFER - 5,
+        MAX_PROMPT_TOKENS = 5
+        token_limit = ModelTokenLimits.get_token_limit_for_model(self.MODEL_NAME)
+        summarizer = self.get_summarizer(max_completion_tokens=token_limit - MAX_TOKENS_BUFFER - MAX_PROMPT_TOKENS,
                                          code_or_exceeds_limit_only=True)
         short_text = "short text"
         prompts = summarizer._create_chunk_prompts(short_text)
@@ -134,7 +147,7 @@ class TestSummarizer(BaseTest):
         prompts = summarizer._create_chunk_prompts(long_text)
         expected_prompts = [summarizer.nl_prompt_builder.build(OpenAIManager.prompt_args,
                                                                artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT]
-                            for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, token_limit=5).chunk(long_text)]
+                            for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, max_content_tokens=5).chunk(long_text)]
         self.assertListEqual(prompts, expected_prompts)
 
         python_code = "x = 1"
@@ -171,3 +184,11 @@ class TestSummarizer(BaseTest):
 
         prompts = [build_prompt(chunk) for chunk in TestSummarizer.CHUNKS]
         return prompts
+
+    @staticmethod
+    def get_chunks(content: str, summarizer: Summarizer, chunker_type: SupportedChunker = SupportedChunker.PY):
+        model = summarizer.model_name
+        max_prompt_tokens = summarizer.max_prompt_tokens
+        expected_chunks = chunker_type.value(model, max_prompt_tokens).chunk(content)
+        expected_summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
+        return expected_summarized_chunks

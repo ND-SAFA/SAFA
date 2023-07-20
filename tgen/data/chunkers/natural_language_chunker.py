@@ -24,7 +24,7 @@ class NaturalLanguageChunker(AbstractChunker):
         n_tokens_for_chunk = 0
         for word in content.split():
             n_tokens_for_chunk += TokenLimitCalculator.estimate_num_tokens(word, self.model_name)
-            if n_tokens_for_chunk > self.token_limit:
+            if n_tokens_for_chunk > self.max_content_tokens:
                 chunks.append(deepcopy(new_chunk))
                 new_chunk = [word]
                 n_tokens_for_chunk = TokenLimitCalculator.estimate_num_tokens(word, self.model_name)

@@ -102,7 +102,7 @@ DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.resp
 from unittest import mock
 
 
-def mock_openai(format: str = None, *outer_args, **outer_kwargs):
+def mock_openai(format: str = None, test_expected_responses: bool = True, *outer_args, **outer_kwargs):
     """
     Automatically mocks open ai
     :param format: The format to encapsulate responses in.
@@ -118,7 +118,10 @@ def mock_openai(format: str = None, *outer_args, **outer_kwargs):
                 test_func(self, response_manager)
             else:
                 test_func(self)
-            assert response_manager.start_index == len(response_manager.responses), f"Response manager had unused responses."
+            if test_expected_responses:
+                n_used = response_manager.start_index
+                n_expected = len(response_manager.responses)
+                assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
 
         if not hasattr(test_func, "__name__"):
             class_name = test_func.__class__.__name__

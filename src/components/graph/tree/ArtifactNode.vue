@@ -13,6 +13,7 @@
       variant="artifact"
       :title="props.artifact.type"
       :subtitle="displayName"
+      :selected="selected"
     >
       <separator
         v-if="showDelta"
@@ -22,10 +23,13 @@
     </node-display>
 
     <node-display
-      v-if="hiddenChildren.length > 0"
+      v-if="showHiddenChildren"
       :color="color"
       variant="footer"
-      @click.stop="handleClickSubtree"
+      :selected="selected"
+      @mouseenter="appStore.isGraphLock = true"
+      @mouseleave="appStore.isGraphLock = false"
+      @click="subtreeStore.showSubtree(id)"
     >
       <flex-box align="center" justify="center" :class="deltaClassName">
         <icon variant="down" size="sm" />
@@ -40,6 +44,60 @@
         />
       </flex-box>
       <q-tooltip :delay="300">Show children</q-tooltip>
+    </node-display>
+
+    <node-display
+      v-if="selected"
+      :color="color"
+      variant="sidebar"
+      :selected="selected"
+      @mouseenter="appStore.isGraphLock = true"
+      @mouseleave="appStore.isGraphLock = false"
+    >
+      <flex-box column>
+        <icon-button
+          tooltip="View related artifacts"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfNeighborhood(props.artifact)"
+        />
+        <icon-button
+          v-if="showHiddenChildren"
+          tooltip="Show subtree"
+          icon="group-open-all"
+          @click="subtreeStore.showSubtree(id)"
+        />
+        <icon-button
+          v-else
+          tooltip="Hide subtree"
+          icon="group-close-all"
+          @click="subtreeStore.hideSubtree(id)"
+        />
+
+        <separator class="full-width q-my-xs" />
+
+        <icon-button
+          tooltip="Add parent"
+          icon="trace"
+          :rotate="-90"
+          @click="
+            appStore.openTraceCreatorTo({
+              type: 'source',
+              artifactId: id,
+            })
+          "
+        />
+        <icon-button
+          tooltip="Add child"
+          icon="trace"
+          :rotate="90"
+          @click="
+            appStore.openTraceCreatorTo({
+              type: 'target',
+              artifactId: id,
+            })
+          "
+        />
+      </flex-box>
     </node-display>
   </cy-element>
 </template>
@@ -72,9 +130,16 @@ import {
   typeOptionsStore,
   layoutStore,
   documentStore,
+  appStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
-import { FlexBox, Icon, Typography, Separator } from "@/components/common";
+import {
+  FlexBox,
+  Icon,
+  Typography,
+  Separator,
+  IconButton,
+} from "@/components/common";
 import { CyElement } from "../base";
 
 const props = defineProps<{
@@ -87,8 +152,14 @@ const { darkMode } = useTheme();
 
 const id = computed(() => props.artifact.id);
 
+const selected = computed(() => selectionStore.isArtifactInSelected(id.value));
+
 const opacity = computed(() => (props.hidden ? 0 : props.faded ? 0.3 : 1));
-const style = computed(() => `opacity: ${opacity.value};`);
+const style = computed(
+  () =>
+    `opacity: ${opacity.value};` +
+    (opacity.value === 1 ? "z-index: 10;" : "z-index: 1;")
+);
 
 const displayName = computed(
   () =>
@@ -103,6 +174,7 @@ const hiddenChildrenLabel = computed(() =>
     ? "1 Hidden"
     : `${hiddenChildren.value.length} Hidden`
 );
+const showHiddenChildren = computed(() => hiddenChildren.value.length > 0);
 
 const deltaState = computed(() => deltaStore.getArtifactDeltaType(id.value));
 const hiddenChildDeltaStates = computed(() =>
@@ -125,8 +197,6 @@ const typeColor = computed(
 const color = computed(() =>
   showDelta.value ? deltaColor.value : typeColor.value
 );
-
-const selected = computed(() => selectionStore.isArtifactInSelected(id.value));
 
 const dataCy = computed(() =>
   selected.value ? "tree-node-selected" : "tree-node"
@@ -182,7 +252,7 @@ function handleAdd(cy: CytoCore): void {
  * or opens a new view of the artifact's subtree if the artifact is already selected.
  */
 function handleSelect(): void {
-  if (selectionStore.selectedArtifactId !== id.value) {
+  if (!selected.value) {
     selectionStore.selectArtifact(id.value);
   } else {
     documentStore.addDocumentOfNeighborhood({
@@ -190,12 +260,5 @@ function handleSelect(): void {
       name: props.artifact.name,
     });
   }
-}
-
-/**
- * Handles clicking on the subtree summary to show the subtree.
- */
-function handleClickSubtree(): void {
-  subtreeStore.showSubtree(id.value);
 }
 </script>

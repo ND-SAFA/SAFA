@@ -42,7 +42,7 @@ const props = defineProps<{
   /**
    * The type of node to display.
    */
-  variant: "tim" | "artifact" | "footer";
+  variant: "tim" | "artifact" | "footer" | "sidebar";
   /**
    * The color of the node to display.
    */
@@ -63,16 +63,22 @@ const props = defineProps<{
    * The body content to display.
    */
   body?: string;
+  /**
+   * Whether the node is selected.
+   */
+  selected?: boolean;
 }>();
 
 const className = computed(
   () =>
     "cy-node-display " +
+    (props.selected ? "cy-node-selected " : "") +
     (props.color.includes("#") ? "" : `bd-${props.color} `) +
     {
       tim: "cy-node-tim q-px-lg q-py-md",
       artifact: "cy-node-artifact q-pa-sm",
       footer: "cy-node-footer q-pa-xs",
+      sidebar: "cy-node-sidebar q-pa-xs",
     }[props.variant]
 );
 

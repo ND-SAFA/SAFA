@@ -76,10 +76,7 @@ const enumerated = computed(() => props.approvalType || props.deltaType);
 const text = computed(() => {
   if (props.confidenceScore) {
     return String(props.value).slice(0, 4);
-  } else if (
-    enumerated.value ||
-    props.value === String(props.value).toUpperCase()
-  ) {
+  } else if (enumerated.value) {
     return uppercaseToDisplay(String(props.value) || "");
   } else if (props.format) {
     return camelcaseToDisplay(String(props.value) || "");

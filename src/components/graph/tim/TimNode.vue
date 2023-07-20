@@ -7,11 +7,29 @@
   >
     <node-display
       separator
-      :color="typeColor"
+      :color="color"
       variant="tim"
       :title="props.artifactType"
       :subtitle="countLabel"
+      :selected="selected"
     />
+
+    <node-display
+      v-if="selected"
+      :color="color"
+      variant="sidebar"
+      :selected="selected"
+      @mouseenter="appStore.isGraphLock = true"
+      @mouseleave="appStore.isGraphLock = false"
+    >
+      <flex-box column>
+        <icon-button
+          tooltip="View artifacts"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfTypes([props.artifactType])"
+        />
+      </flex-box>
+    </node-display>
   </cy-element>
 </template>
 
@@ -29,13 +47,16 @@ import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
+  appStore,
   documentStore,
   selectionStore,
+  subtreeStore,
   typeOptionsStore,
   useTheme,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
+import { FlexBox, IconButton, Separator } from "@/components";
 
 const props = defineProps<{
   artifactType: string;
@@ -45,7 +66,11 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
-const typeColor = computed(
+const selected = computed(
+  () => selectionStore.selectedArtifactLevelType === props.artifactType
+);
+
+const color = computed(
   () => typeOptionsStore.getArtifactLevel(props.artifactType)?.color || ""
 );
 
@@ -61,7 +86,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
 
     artifactType: props.artifactType,
     count: props.count,
-    typeColor: typeColor.value,
+    typeColor: color.value,
     icon: props.icon,
     dark: darkMode.value,
   },
@@ -71,7 +96,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
  * Selects this artifact level.
  */
 function handleSelect(): void {
-  if (selectionStore.selectedArtifactLevelType !== props.artifactType) {
+  if (!selected.value) {
     selectionStore.selectArtifactLevel(props.artifactType);
   } else {
     documentStore.addDocumentOfTypes([props.artifactType]);

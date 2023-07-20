@@ -22,7 +22,7 @@
       <text-button
         text
         block
-        :label="`View ${targetType} & ${sourceType} Artifacts`"
+        label="View Artifacts"
         icon="view-tree"
         @click="handleViewLevel"
       />

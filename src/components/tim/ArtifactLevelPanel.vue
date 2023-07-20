@@ -21,13 +21,6 @@
       <text-button
         text
         block
-        label="View Artifacts"
-        icon="view-tree"
-        @click="handleViewLevel"
-      />
-      <text-button
-        text
-        block
         color="primary"
         label="Generate Parents"
         icon="generateArtifacts"
@@ -76,15 +69,6 @@ const countDisplay = computed(() => {
 const iconId = computed(() =>
   typeOptionsStore.getArtifactTypeIcon(artifactLevelName.value)
 );
-
-/**
- * Switches to tree view and highlights this type level.
- */
-function handleViewLevel(): void {
-  if (!artifactLevel.value) return;
-
-  documentStore.addDocumentOfTypes([artifactLevel.value.name]);
-}
 
 /**
  * Opens the generate artifact panel.

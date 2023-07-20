@@ -219,7 +219,10 @@ export const useSelection = defineStore("selection", {
      * @param targetType - The artifact target type to select.
      */
     selectTraceMatrix(sourceType: string, targetType: string): void {
-      const artifactsInSubtree = [sourceType, targetType] as [string, string];
+      const artifactsInSubtree = [
+        sanitizeNodeId(sourceType),
+        sanitizeNodeId(targetType),
+      ] as [string, string];
 
       this.clearSelections();
       this.selectedTraceMatrixTypes = artifactsInSubtree;

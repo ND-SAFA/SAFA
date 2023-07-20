@@ -55,9 +55,9 @@ function handleSelect(): void {
     selectionStore.selectedTraceMatrixTypes[0] !== props.targetType ||
     selectionStore.selectedTraceMatrixTypes[1] !== props.sourceType
   ) {
-    selectionStore.selectTraceMatrix(props.targetType, props.sourceType);
+    selectionStore.selectTraceMatrix(props.sourceType, props.targetType);
   } else {
-    documentStore.addDocumentOfTypes([props.targetType, props.sourceType]);
+    documentStore.addDocumentOfTypes([props.sourceType, props.targetType]);
   }
 }
 </script>

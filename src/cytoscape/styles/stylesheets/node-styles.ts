@@ -41,12 +41,6 @@ export const nodeStyles: CytoStyleSheet[] = [
       "background-color": NODE_BG_COLOR.DARK,
     },
   },
-  {
-    selector: `${ARTIFACT_NODE_SELECTOR}[?isSelected]`,
-    style: {
-      "border-width": ARTIFACT_SELECTED_BORDER_WIDTH,
-    },
-  },
   // FTA Logic
   {
     selector: `${ARTIFACT_NODE_SELECTOR}[logicType='${FTANodeType.AND}']`,

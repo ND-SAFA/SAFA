@@ -135,7 +135,7 @@ function isTraceLinkFaded(link: TraceLinkSchema): boolean {
  * @param event - The click event.
  */
 function handleClick(event: EventObject): void {
-  if (event.target !== event.cy) return;
+  if (event.target !== event.cy || appStore.isGraphLock) return;
 
   disableDrawMode();
 

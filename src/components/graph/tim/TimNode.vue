@@ -1,5 +1,9 @@
 <template>
-  <cy-element :definition="definition">
+  <cy-element
+    :definition="definition"
+    data-cy="tim-node"
+    :data-cy-name="props.artifactType"
+  >
     <node-display
       separator
       :color="typeColor"

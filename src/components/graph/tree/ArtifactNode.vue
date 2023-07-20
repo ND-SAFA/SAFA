@@ -10,7 +10,7 @@
       :color="color"
       variant="artifact"
       :title="props.artifact.type"
-      :subtitle="props.artifact.name"
+      :subtitle="displayName"
     >
       <separator
         v-if="showDelta"
@@ -82,6 +82,13 @@ const { darkMode } = useTheme();
 
 const opacity = computed(() => (props.hidden ? 0 : props.faded ? 0.3 : 1));
 const style = computed(() => `opacity: ${opacity.value};`);
+
+const displayName = computed(
+  () =>
+    (isCodeArtifact(props.artifact.name) &&
+      props.artifact.name.split("/").pop()) ||
+    props.artifact.name
+);
 
 const hiddenChildren = computed(() =>
   subtreeStore.getHiddenChildren(props.artifact.id)

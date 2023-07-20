@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered :class="className" :style="cardStyle">
-    <div v-if="props.title" class="cy-node-title">
+    <div v-if="props.title" class="cy-node-title" data-cy="tree-node-type">
       <typography variant="subtitle" :value="props.title" bold />
     </div>
 
@@ -10,7 +10,11 @@
       :class="separatorClassName"
     />
 
-    <div v-if="!!props.subtitle" class="cy-node-subtitle">
+    <div
+      v-if="!!props.subtitle"
+      class="cy-node-subtitle"
+      data-cy="tree-node-name"
+    >
       <typography variant="subtitle" :value="props.subtitle" />
     </div>
 

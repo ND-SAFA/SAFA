@@ -5,6 +5,7 @@
     :config="props.cytoCoreGraph.config"
     :pre-config="preConfig"
     :after-created="afterCreated"
+    @click="emit('click', $event)"
   >
     <slot v-if="initialized" name="elements" />
   </cytoscape>
@@ -21,6 +22,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { EventObject } from "cytoscape";
 import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
 import { logStore } from "@/hooks";
 import { Cytoscape } from "./base";
@@ -28,6 +30,10 @@ import { Cytoscape } from "./base";
 const props = defineProps<{
   cytoCoreGraph: CytoCoreGraph;
   id: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "click", event: EventObject): void;
 }>();
 
 const initialized = ref(false);

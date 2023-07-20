@@ -1,5 +1,4 @@
 import { ArtifactTreeAutoMoveHandlers } from "@/cytoscape/plugins";
-import { ArtifactTreeCytoEvents } from "@/cytoscape/events";
 import {
   DefaultPreLayoutHooks,
   DefaultPostLayoutHooks,
@@ -14,7 +13,7 @@ export default class ArtifactGraphLayout extends GraphLayout {
   constructor() {
     super(
       ArtifactTreeAutoMoveHandlers,
-      ArtifactTreeCytoEvents,
+      {},
       TimKlaySettings,
       DefaultPreLayoutHooks,
       DefaultPostLayoutHooks

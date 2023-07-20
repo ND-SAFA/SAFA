@@ -4,6 +4,7 @@
     :cyto-core-graph="artifactTreeGraph"
     :class="className"
     data-cy="view-artifact-tree"
+    @click="handleClick"
   >
     <template v-if="isTreeMode" #elements>
       <artifact-node
@@ -53,7 +54,8 @@ export default {
 <script setup lang="ts">
 import { watch, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { TraceLinkSchema } from "@/types";
+import { EventObject } from "cytoscape";
+import { DetailsOpenState, TraceLinkSchema } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -65,7 +67,7 @@ import {
   typeOptionsStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import { artifactTreeGraph } from "@/cytoscape";
+import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
 import CytoscapeController from "./CytoscapeController.vue";
 import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";
@@ -123,6 +125,28 @@ function isTraceLinkFaded(link: TraceLinkSchema): boolean {
     !nodesInView.value.includes(link.targetId) ||
     !nodesInView.value.includes(link.sourceId)
   );
+}
+
+/**
+ * Handles a click event on the graph.
+ * When a click is registered on the background:
+ * - Draw mode is disabled.
+ * - Selections are cleared if a save panel is not open.
+ * @param event - The click event.
+ */
+function handleClick(event: EventObject): void {
+  if (event.target !== event.cy) return;
+
+  disableDrawMode();
+
+  if (
+    (["document", "saveArtifact", "saveTrace"] as DetailsOpenState[]).includes(
+      appStore.isDetailsPanelOpen
+    )
+  )
+    return;
+
+  selectionStore.clearSelections(true);
 }
 
 onMounted(() => {

@@ -96,6 +96,10 @@ $graph-border-radius: 8px;
     box-shadow: rgba(0, 0, 0, 0.24) 1px 3px 8px !important;
   }
 
+  &:active {
+    cursor: grabbing;
+  }
+
   & > .cy-node-title {
     max-height: 47px;
   }

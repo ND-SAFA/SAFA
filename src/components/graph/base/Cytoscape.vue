@@ -34,6 +34,10 @@ const props = withDefaults(
   }
 );
 
+const emit = defineEmits<{
+  (e: "click", event: EventObject): void;
+}>();
+
 const container = ref<HTMLElement | null>(null);
 const instance = ref<Core | undefined>(undefined);
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -80,6 +84,15 @@ function listenForPanZoom(): void {
   instance.value?.on(CytoEvent.PAN_ZOOM, onPanZoom);
 }
 
+/**
+ * Sets up all event handlers.
+ */
+function listenForEmits(): void {
+  listenForPanZoom();
+
+  instance.value?.on(CytoEvent.CLICK, (event) => emit("click", event));
+}
+
 provide(
   "cy",
   new Promise<Core>((res, rej) => {
@@ -95,13 +108,14 @@ provide("relTransform", relTransform);
  */
 onMounted(() => {
   initCy();
-  listenForPanZoom();
+  listenForEmits();
 });
 
 /**
  * Clean up event handlers on unmount.
  */
 onBeforeUnmount(() => {
-  instance.value?.off("pan zoom");
+  instance.value?.off(CytoEvent.PAN_ZOOM);
+  instance.value?.off(CytoEvent.CLICK);
 });
 </script>

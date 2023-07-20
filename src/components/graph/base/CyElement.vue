@@ -108,6 +108,9 @@ function listenForMove(): void {
   instance.value?.on(CytoEvent.POSITION_BOUNDS, selector.value, onMove);
 }
 
+/**
+ * Sets up all event handlers.
+ */
 function listenForEmits(): void {
   listenForMove();
 

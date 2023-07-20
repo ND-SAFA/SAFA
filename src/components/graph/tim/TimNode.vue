@@ -94,9 +94,7 @@ const definition = computed<TimNodeCytoElement>(() => ({
     id: sanitizeNodeId(props.artifactType),
 
     artifactType: props.artifactType,
-    count: props.count,
-    typeColor: color.value,
-    icon: props.icon,
+
     dark: darkMode.value,
   },
 }));

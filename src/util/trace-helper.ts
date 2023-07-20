@@ -1,5 +1,4 @@
 import {
-  allowedSafetyCaseTypes,
   ApprovalType,
   ArtifactCytoElementData,
   ArtifactSchema,
@@ -67,25 +66,10 @@ export function isLinkAllowedByType(
     "artifactType" in source ? source.artifactType : source.type;
   const targetType =
     "artifactType" in target ? target.artifactType : target.type;
-  const isSourceDefaultArtifact = !source.safetyCaseType && !source.logicType;
-  const isTargetDefaultArtifact = !target.safetyCaseType && !target.logicType;
 
-  if (sourceType === targetType) {
-    return true;
-  } else if (isSourceDefaultArtifact) {
-    return !tim.artifacts[targetType]?.allowedTypes.includes(sourceType);
-  } else if (source.safetyCaseType) {
-    if (isTargetDefaultArtifact) return true;
-    if (target.logicType || !target.safetyCaseType) return false;
-
-    return allowedSafetyCaseTypes[source.safetyCaseType].includes(
-      target.safetyCaseType
-    );
-  } else if (source.logicType) {
-    return isTargetDefaultArtifact;
-  }
-
-  return false;
+  return sourceType === targetType
+    ? true
+    : !tim.artifacts[targetType]?.allowedTypes.includes(sourceType);
 }
 
 /**

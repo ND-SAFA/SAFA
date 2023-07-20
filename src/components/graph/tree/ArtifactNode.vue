@@ -128,7 +128,6 @@ import {
   deltaStore,
   selectionStore,
   subtreeStore,
-  warningStore,
   typeOptionsStore,
   layoutStore,
   documentStore,
@@ -205,12 +204,7 @@ const dataCy = computed(() =>
 );
 
 const definition = computed<ArtifactCytoElement>(() => {
-  const { id, body, summary, type, name, safetyCaseType, logicType } =
-    props.artifact;
-  const warnings = warningStore.artifactWarnings[id] || [];
-  const hiddenChildWarnings = warningStore.getArtifactWarnings(
-    hiddenChildren.value
-  );
+  const { id, type, name } = props.artifact;
 
   return {
     data: {
@@ -218,20 +212,9 @@ const definition = computed<ArtifactCytoElement>(() => {
       graph: GraphMode.tree,
       id,
 
-      body: summary || body,
-      isCode: !summary && isCodeArtifact(name),
       artifactName: name,
-      warnings,
       artifactType: type,
-      artifactDeltaState: deltaState.value,
-      isSelected: selected.value,
-      opacity: opacity.value,
-      typeColor: typeColor.value,
-      hiddenChildren: hiddenChildren.value.length,
-      childWarnings: hiddenChildWarnings,
-      childDeltaStates: hiddenChildDeltaStates.value,
-      safetyCaseType,
-      logicType,
+
       dark: darkMode.value,
     },
   };

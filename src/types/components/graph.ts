@@ -1,10 +1,4 @@
-import {
-  ArtifactDeltaState,
-  WarningSchema,
-  FTANodeType,
-  SafetyCaseType,
-  TraceLinkSchema,
-} from "@/types";
+import { ArtifactDeltaState, TraceLinkSchema } from "@/types";
 
 /**
  * Enumerates the modes of the project graph.
@@ -90,18 +84,6 @@ export interface CytoEdgeData extends CytoElementData {
  */
 export interface ArtifactCytoElementData extends CytoElementData {
   /**
-   * The id of the artifact.
-   */
-  id: string;
-  /**
-   * The content of the artifact.
-   */
-  body: string;
-  /**
-   * Any warnings generated from the artifact.
-   */
-  warnings?: WarningSchema[];
-  /**
    * The name of the artifact.
    */
   artifactName: string;
@@ -109,47 +91,6 @@ export interface ArtifactCytoElementData extends CytoElementData {
    * The type of the artifact.
    */
   artifactType: string;
-  /**
-   * For FTA nodes, the logic type of the artifact.
-   */
-  logicType?: FTANodeType;
-  /**
-   * For safety case nodes, the type of the artifact.
-   */
-  safetyCaseType?: SafetyCaseType;
-  /**
-   * The state of changes to the artifact.
-   */
-  artifactDeltaState: ArtifactDeltaState;
-  /**
-   * Whether the artifact is code.
-   */
-  isCode: boolean;
-  /**
-   * Whether the artifact is selected.
-   */
-  isSelected: boolean;
-  /**
-   * The opacity of this artifact.
-   */
-  opacity: number;
-  /**
-   * The color associated with the type of this artifact.
-   */
-  typeColor: string;
-
-  /**
-   * The number of hidden child elements.
-   */
-  hiddenChildren?: number;
-  /**
-   * The delta states of any hidden children.
-   */
-  childDeltaStates?: ArtifactDeltaState[];
-  /**
-   * Any warnings in child elements.
-   */
-  childWarnings?: WarningSchema[];
 }
 
 /**
@@ -186,18 +127,6 @@ export interface TimNodeCytoElementData extends CytoElementData {
    * The type of the artifact.
    */
   artifactType: string;
-  /**
-   * The number of artifacts of this artifact type.
-   */
-  count: number;
-  /**
-   * The color associated with the type of this artifact.
-   */
-  typeColor: string;
-  /**
-   * The icon for this artifact type.
-   */
-  icon?: string;
 }
 
 /**

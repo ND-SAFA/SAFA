@@ -98,9 +98,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openDetailsPanel("displayArtifactBody");
       });
     },
-    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return !!artifactData?.body;
-    },
   },
   {
     id: "edit-artifact",

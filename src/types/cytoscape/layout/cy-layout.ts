@@ -8,7 +8,7 @@ import { CytoCore, CytoEventHandlers } from "@/types/cytoscape/core";
 /**
  * Defines the layout and event handlers of a graph.
  */
-export interface IGraphLayout {
+export interface CyLayout {
   klaySettings: KlayLayoutSettings | undefined;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];

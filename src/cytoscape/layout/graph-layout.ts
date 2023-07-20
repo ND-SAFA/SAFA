@@ -1,17 +1,26 @@
 import {
   KlayLayoutSettings,
   LayoutHook,
-  IGraphLayout,
+  CyLayout,
   AutoMoveEventHandlers,
   CytoCore,
   CytoEventHandlers,
 } from "@/types";
 import { layoutStore } from "@/hooks";
+import {
+  ArtifactTreeAutoMoveHandlers,
+  DefaultPostLayoutHooks,
+  DefaultPreLayoutHooks,
+  TIMPostLayoutHooks,
+  TIMPreLayoutHooks,
+} from "@/cytoscape";
+import { DefaultEvents } from "@/cytoscape/events";
+import { KlaySettings } from "@/cytoscape/layout/klay-settings";
 
 /**
  * Defines a graph layout.
  */
-export default class GraphLayout implements IGraphLayout {
+export default class GraphLayout implements CyLayout {
   klaySettings: KlayLayoutSettings | undefined;
   preLayoutHooks: LayoutHook[];
   postLayoutHooks: LayoutHook[];
@@ -73,5 +82,31 @@ export default class GraphLayout implements IGraphLayout {
     for (const postHook of this.postLayoutHooks) {
       postHook(cy, this);
     }
+  }
+
+  /**
+   * Creates the artifact graph layout.
+   */
+  static createArtifactLayout(): GraphLayout {
+    return new GraphLayout(
+      ArtifactTreeAutoMoveHandlers,
+      DefaultEvents,
+      KlaySettings,
+      DefaultPreLayoutHooks,
+      DefaultPostLayoutHooks
+    );
+  }
+
+  /**
+   * Creates the TIM graph layout.
+   */
+  static createTimLayout(): GraphLayout {
+    return new GraphLayout(
+      {},
+      DefaultEvents,
+      KlaySettings,
+      TIMPreLayoutHooks,
+      TIMPostLayoutHooks
+    );
   }
 }

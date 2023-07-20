@@ -7,6 +7,7 @@ import {
   TimTraceMatrixSchema,
   TraceLinkSchema,
 } from "@/types";
+import { sanitizeNodeId } from "@/util";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -125,21 +126,6 @@ export const useSelection = defineStore("selection", {
       appStore.closeSidePanels();
     },
     /**
-     * Sets the viewport to the given artifact and its subtree.
-     *
-     * @param artifactId - The artifact id to select and view.
-     */
-    viewArtifactSubtree(artifactId: string): void {
-      this.selectArtifact(artifactId);
-      this.filterGraph({
-        type: "subtree",
-        artifactsInSubtree: [
-          ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
-          artifactId,
-        ],
-      });
-    },
-    /**
      * Moves the viewport such that given set of artifacts is in the middle of the viewport.
      * If no artifacts are given, the entire collection of nodes is centered.
      *
@@ -171,7 +157,13 @@ export const useSelection = defineStore("selection", {
     selectArtifact(artifactId: string): void {
       this.clearSelections();
       this.selectedArtifactId = artifactId;
-      this.centerOnArtifacts([artifactId]);
+      this.filterGraph({
+        type: "subtree",
+        artifactsInSubtree: [
+          ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
+          artifactId,
+        ],
+      });
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -193,10 +185,17 @@ export const useSelection = defineStore("selection", {
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
+      const artifactsInSubtree = [traceLink.sourceId, traceLink.targetId] as [
+        string,
+        string
+      ];
+
       this.clearSelections();
-      this.selectedTraceLinkIds = [traceLink.sourceId, traceLink.targetId];
-      this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
-      this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
+      this.selectedTraceLinkIds = artifactsInSubtree;
+      this.filterGraph({
+        type: "subtree",
+        artifactsInSubtree,
+      });
       appStore.openDetailsPanel("displayTrace");
     },
     /**
@@ -207,7 +206,10 @@ export const useSelection = defineStore("selection", {
     selectArtifactLevel(artifactType: string): void {
       this.clearSelections();
       this.selectedArtifactLevelType = artifactType;
-      this.centerOnArtifacts([artifactType]);
+      this.filterGraph({
+        type: "subtree",
+        artifactsInSubtree: [sanitizeNodeId(artifactType)],
+      });
       appStore.openDetailsPanel("displayArtifactLevel");
     },
     /**
@@ -217,9 +219,14 @@ export const useSelection = defineStore("selection", {
      * @param targetType - The artifact target type to select.
      */
     selectTraceMatrix(sourceType: string, targetType: string): void {
+      const artifactsInSubtree = [sourceType, targetType] as [string, string];
+
       this.clearSelections();
-      this.selectedTraceMatrixTypes = [sourceType, targetType];
-      this.centerOnArtifacts([sourceType, targetType]);
+      this.selectedTraceMatrixTypes = artifactsInSubtree;
+      this.filterGraph({
+        type: "subtree",
+        artifactsInSubtree,
+      });
       appStore.openDetailsPanel("displayTraceMatrix");
     },
     /**
@@ -239,6 +246,7 @@ export const useSelection = defineStore("selection", {
       } else if (filterAction.type === "subtree") {
         this.selectedSubtreeIds = filterAction.artifactsInSubtree;
         this.repositionSelectedSubtree();
+        this.centerOnArtifacts(this.selectedSubtreeIds);
       }
     },
     /**

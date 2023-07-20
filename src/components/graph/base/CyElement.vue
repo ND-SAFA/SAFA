@@ -30,7 +30,7 @@ import {
   Position,
   EventObject,
 } from "cytoscape";
-import { GraphElementType } from "@/types";
+import { CytoEvent, GraphElementType } from "@/types";
 
 const props = defineProps<{
   /**
@@ -41,6 +41,11 @@ const props = defineProps<{
    * Any styles to attach to the positioning wrapper.
    */
   style?: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "click", event: EventObject): void;
+  (e: "add", cy: Core): void;
 }>();
 
 const id = ref<string>(props.definition.data.id || "");
@@ -66,11 +71,15 @@ const style = computed(() =>
  * Creates this element within cytoscape.
  */
 function addElement(): void {
+  if (!instance.value) return;
+
   // Strip observers from the original definition.
   const def = JSON.parse(JSON.stringify(props.definition));
 
   // Add the element to cytoscape.
-  const eles = instance.value?.add(def);
+  const eles = instance.value.add(def);
+
+  emit("add", instance.value);
 
   if (id.value || !eles) return;
 
@@ -96,7 +105,15 @@ function listenForMove(): void {
     }
   };
 
-  instance.value?.on("position bounds", selector.value, onMove);
+  instance.value?.on(CytoEvent.POSITION_BOUNDS, selector.value, onMove);
+}
+
+function listenForEmits(): void {
+  listenForMove();
+
+  instance.value?.on(CytoEvent.CLICK, selector.value, (event) =>
+    emit("click", event)
+  );
 }
 
 /**
@@ -107,7 +124,7 @@ onMounted(() => {
     instance.value = cy;
 
     addElement();
-    listenForMove();
+    listenForEmits();
   });
 });
 
@@ -116,7 +133,8 @@ onMounted(() => {
  */
 onBeforeUnmount(() => {
   instance.value?.remove(selector.value);
-  instance.value?.off("position bounds", selector.value);
+  instance.value?.off(CytoEvent.POSITION_BOUNDS, selector.value);
+  instance.value?.off(CytoEvent.CLICK, selector.value);
 });
 
 /**

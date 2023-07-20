@@ -21,7 +21,7 @@
       <text-button
         text
         block
-        :label="`View ${artifactLevelName} Artifacts`"
+        label="View Artifacts"
         icon="view-tree"
         @click="handleViewLevel"
       />

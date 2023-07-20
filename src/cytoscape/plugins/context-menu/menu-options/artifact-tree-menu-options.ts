@@ -174,17 +174,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
     isVisible: hasValidData,
   },
   {
-    id: "highlight-subtree",
-    content: "Highlight Subtree",
-    tooltipText: "Highlight this artifact's subtree nodes",
-    selector: "node",
-    coreAsWell: false,
-    onClickFunction(event: EventObject): void {
-      handleOnClick(event, ({ id }) => selectionStore.viewArtifactSubtree(id));
-    },
-    isVisible: hasSubtree,
-  },
-  {
     id: "hide-subtree",
     content: "Hide Subtree",
     tooltipText: "Hide all child nodes of this artifact",

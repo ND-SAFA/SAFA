@@ -244,6 +244,10 @@ export enum CytoEvent {
    */
   POSITION = "position",
   /**
+   * When an element changes position.
+   */
+  POSITION_BOUNDS = "position bounds",
+  /**
    * When an element’s data is changed.
    */
   DATA = "data",
@@ -259,6 +263,10 @@ export enum CytoEvent {
    * When a node’s background image is loaded.
    */
   BACKGROUND = "background",
+  /**
+   * When the pan or zoom changes.
+   */
+  PAN_ZOOM = "pan zoom",
 
   /**
    * # Edge Handle Events.

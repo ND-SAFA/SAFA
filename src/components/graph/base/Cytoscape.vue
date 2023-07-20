@@ -16,6 +16,7 @@ export default {
 <script setup lang="ts">
 import { ref, withDefaults, provide, onMounted, onBeforeUnmount } from "vue";
 import cytoscape, { CytoscapeOptions, Core, EventObject } from "cytoscape";
+import { CytoEvent } from "@/types";
 
 const props = withDefaults(
   defineProps<{
@@ -76,7 +77,7 @@ function listenForPanZoom(): void {
     relTransform.value = `translate(${pan.x}px,${pan.y}px) scale(${zoom})`;
   };
 
-  instance.value?.on("pan zoom", onPanZoom);
+  instance.value?.on(CytoEvent.PAN_ZOOM, onPanZoom);
 }
 
 provide(

@@ -3,6 +3,7 @@
     :definition="definition"
     data-cy="tim-node"
     :data-cy-name="props.artifactType"
+    @click="handleSelect"
   >
     <node-display
       separator
@@ -27,7 +28,12 @@ export default {
 import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
 import { sanitizeNodeId } from "@/util";
-import { typeOptionsStore, useTheme } from "@/hooks";
+import {
+  documentStore,
+  selectionStore,
+  typeOptionsStore,
+  useTheme,
+} from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
 
@@ -60,4 +66,15 @@ const definition = computed<TimNodeCytoElement>(() => ({
     dark: darkMode.value,
   },
 }));
+
+/**
+ * Selects this artifact level.
+ */
+function handleSelect(): void {
+  if (selectionStore.selectedArtifactLevelType !== props.artifactType) {
+    selectionStore.selectArtifactLevel(props.artifactType);
+  } else {
+    documentStore.addDocumentOfTypes([props.artifactType]);
+  }
+}
 </script>

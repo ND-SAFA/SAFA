@@ -4,6 +4,8 @@
     :style="style"
     :data-cy="dataCy"
     :data-cy-name="props.artifact.name"
+    @add="handleAdd"
+    @click="handleSelect"
   >
     <node-display
       separator
@@ -23,7 +25,7 @@
       v-if="hiddenChildren.length > 0"
       :color="color"
       variant="footer"
-      @click.stop="subtreeStore.showSubtree(props.artifact.id)"
+      @click.stop="handleClickSubtree"
     >
       <flex-box align="center" justify="center" :class="deltaClassName">
         <icon variant="down" size="sm" />
@@ -56,6 +58,7 @@ import { computed } from "vue";
 import {
   ArtifactCytoElement,
   ArtifactSchema,
+  CytoCore,
   GraphElementType,
   GraphMode,
 } from "@/types";
@@ -67,6 +70,8 @@ import {
   subtreeStore,
   warningStore,
   typeOptionsStore,
+  layoutStore,
+  documentStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Icon, Typography, Separator } from "@/components/common";
@@ -80,6 +85,8 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
+const id = computed(() => props.artifact.id);
+
 const opacity = computed(() => (props.hidden ? 0 : props.faded ? 0.3 : 1));
 const style = computed(() => `opacity: ${opacity.value};`);
 
@@ -90,18 +97,14 @@ const displayName = computed(
     props.artifact.name
 );
 
-const hiddenChildren = computed(() =>
-  subtreeStore.getHiddenChildren(props.artifact.id)
-);
+const hiddenChildren = computed(() => subtreeStore.getHiddenChildren(id.value));
 const hiddenChildrenLabel = computed(() =>
   hiddenChildren.value.length === 1
     ? "1 Hidden"
     : `${hiddenChildren.value.length} Hidden`
 );
 
-const deltaState = computed(() =>
-  deltaStore.getArtifactDeltaType(props.artifact.id)
-);
+const deltaState = computed(() => deltaStore.getArtifactDeltaType(id.value));
 const hiddenChildDeltaStates = computed(() =>
   deltaStore.getArtifactDeltaStates(hiddenChildren.value)
 );
@@ -123,9 +126,7 @@ const color = computed(() =>
   showDelta.value ? deltaColor.value : typeColor.value
 );
 
-const selected = computed(() =>
-  selectionStore.isArtifactInSelected(props.artifact.id)
-);
+const selected = computed(() => selectionStore.isArtifactInSelected(id.value));
 
 const dataCy = computed(() =>
   selected.value ? "tree-node-selected" : "tree-node"
@@ -163,4 +164,38 @@ const definition = computed<ArtifactCytoElement>(() => {
     },
   };
 });
+
+/**
+ * Handles the add event to set this artifact's default position,
+ * and highlight it if it is selected.
+ */
+function handleAdd(cy: CytoCore): void {
+  cy.getElementById(id.value).layout(layoutStore.layoutOptions).run();
+
+  if (id.value !== selectionStore.selectedArtifact?.id) return;
+
+  selectionStore.selectArtifact(id.value);
+}
+
+/**
+ * Selects an artifact and highlights its subtree,
+ * or opens a new view of the artifact's subtree if the artifact is already selected.
+ */
+function handleSelect(): void {
+  if (selectionStore.selectedArtifactId !== id.value) {
+    selectionStore.selectArtifact(id.value);
+  } else {
+    documentStore.addDocumentOfNeighborhood({
+      id: id.value,
+      name: props.artifact.name,
+    });
+  }
+}
+
+/**
+ * Handles clicking on the subtree summary to show the subtree.
+ */
+function handleClickSubtree(): void {
+  subtreeStore.showSubtree(id.value);
+}
 </script>

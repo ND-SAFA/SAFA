@@ -78,6 +78,7 @@
         <icon-button
           tooltip="Add parent"
           icon="trace"
+          color="primary"
           :rotate="-90"
           @click="
             appStore.openTraceCreatorTo({
@@ -89,6 +90,7 @@
         <icon-button
           tooltip="Add child"
           icon="trace"
+          color="primary"
           :rotate="90"
           @click="
             appStore.openTraceCreatorTo({

@@ -1,6 +1,7 @@
 <template>
   <cy-element
     :definition="definition"
+    :style="style"
     data-cy="tim-node"
     :data-cy-name="props.artifactType"
     @click="handleSelect"
@@ -28,6 +29,7 @@
           icon="view-tree"
           @click="documentStore.addDocumentOfTypes([props.artifactType])"
         />
+        <separator class="full-width q-my-xs" />
         <icon-button
           tooltip="Generate parents"
           icon="generateArtifacts"
@@ -61,7 +63,7 @@ import {
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
-import { FlexBox, IconButton } from "@/components";
+import { FlexBox, IconButton, Separator } from "@/components";
 
 const props = defineProps<{
   artifactType: string;
@@ -74,6 +76,8 @@ const { darkMode } = useTheme();
 const selected = computed(
   () => selectionStore.selectedArtifactLevelType === props.artifactType
 );
+
+const style = computed(() => (selected.value ? "z-index: 10;" : "z-index: 1;"));
 
 const color = computed(
   () => typeOptionsStore.getArtifactLevel(props.artifactType)?.color || ""

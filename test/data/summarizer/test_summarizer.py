@@ -25,7 +25,7 @@ class TestSummarizer(BaseTest):
     MODEL_NAME = "gpt-3.5-turbo"
     MAX_COMPLETION_TOKENS = 500
 
-    @mock_openai()
+    @mock_openai
     def test_summarize_chunks(self, response_manager: TestResponseManager):
         """
         Tests ability to summarize multiple chunks and combine them.
@@ -40,7 +40,7 @@ class TestSummarizer(BaseTest):
         expected_summary = "CHUNK_1 CHUNK_2"
         self.assertEqual(summary, expected_summary)
 
-    @mock_openai()
+    @mock_openai
     def test_summarize(self, response_manager: TestResponseManager):
         """
         Tests ability to summarize single artifacts.
@@ -61,7 +61,7 @@ class TestSummarizer(BaseTest):
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
 
-    @mock_openai()
+    @mock_openai
     def test_code_summarization(self, response_manager: TestResponseManager):
         max_completion_tokens = 500
 
@@ -82,7 +82,7 @@ class TestSummarizer(BaseTest):
         for i, (line_a, line_b) in enumerate(zip(actual_links, expected_lines)):
             self.assertEqual(line_a, line_b, msg=f"Line: {i}")
 
-    @mock_openai()
+    @mock_openai
     def test_summarize_bulk(self, response_manager: TestResponseManager):
         """
         Tests ability to summarize in bulk while still using chunkers.
@@ -110,7 +110,7 @@ class TestSummarizer(BaseTest):
         self.assertEqual(NL_SUMMARY, summaries[0])
         self.assertEqual(PL_SUMMARY, summaries[1])
 
-    @mock_openai()
+    @mock_openai
     def test_summarize_bulk_code_or_exceeds_limit_only(self, response_manager: TestResponseManager):
         """
         Tests bulk summaries with code or exceeds limit only.

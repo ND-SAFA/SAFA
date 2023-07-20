@@ -102,7 +102,7 @@ DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.resp
 from unittest import mock
 
 
-def mock_openai(format: str = None, test_expected_responses: bool = True, *outer_args, **outer_kwargs):
+def mock_openai(func=None, format: str = None, test_expected_responses: bool = True, *outer_args, **outer_kwargs):
     """
     Automatically mocks open ai
     :param format: The format to encapsulate responses in.
@@ -123,11 +123,8 @@ def mock_openai(format: str = None, test_expected_responses: bool = True, *outer
                 n_expected = len(response_manager.responses)
                 assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
 
-        if not hasattr(test_func, "__name__"):
-            class_name = test_func.__class__.__name__
-            method_name = test_func._testMethodName
-            raise ValueError(f"{class_name}.{method_name} did not close the decorator (`@mock_openai()`).")
-        wrapper.__name__ = test_func.__name__
+        function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__
+        wrapper.__name__ = function_name
         return wrapper
 
     return decorator

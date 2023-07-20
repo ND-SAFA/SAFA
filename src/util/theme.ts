@@ -157,11 +157,6 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      // Colors.blueLight,
-      // Colors.greenLight,
-      // Colors.orange,
-      // Colors.orangeDark,
-      // Colors.red,
       Colors.gradient1,
       Colors.gradient2,
       Colors.gradient3,

@@ -59,11 +59,13 @@ export const applyOpacityToGeneratedLinks: LayoutHook = (
  * Pre-layout hooks for the artifact tree.
  */
 export const DefaultPreLayoutHooks: LayoutHook[] = [
-  applyArtifactLabels,
+  // applyArtifactLabels,
   applyOpacityToGeneratedLinks,
 ];
 
 /**
  * Pre-layout hooks for the TIM tree.
  */
-export const TIMPreLayoutHooks: LayoutHook[] = [applyTIMLabels];
+export const TIMPreLayoutHooks: LayoutHook[] = [
+  // applyTIMLabels
+];

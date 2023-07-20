@@ -33,7 +33,14 @@ import {
 import { GraphElementType } from "@/types";
 
 const props = defineProps<{
+  /**
+   * The element to display.
+   */
   definition: ElementDefinition;
+  /**
+   * Any styles to attach to the positioning wrapper.
+   */
+  style?: string;
 }>();
 
 const id = ref<string>(props.definition.data.id || "");
@@ -51,7 +58,9 @@ const isNode = computed(
   () => props.definition.data.type === GraphElementType.node
 );
 
-const style = computed(() => (isNode.value ? transformStyle.value : undefined));
+const style = computed(() =>
+  isNode.value ? `${transformStyle.value} ${props.style}` : props.style
+);
 
 /**
  * Creates this element within cytoscape.

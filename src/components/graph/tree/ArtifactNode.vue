@@ -1,11 +1,44 @@
 <template>
-  <cy-element :definition="definition">
+  <cy-element
+    :definition="definition"
+    :style="style"
+    :data-cy="dataCy"
+    :data-cy-name="props.artifact.name"
+  >
     <node-display
-      :color="typeColor"
-      :variant="GraphMode.tree"
+      separator
+      :color="color"
+      variant="artifact"
       :title="props.artifact.type"
       :subtitle="props.artifact.name"
-    />
+    >
+      <separator
+        v-if="showDelta"
+        :color="deltaColor"
+        class="cy-node-delta-chip"
+      />
+    </node-display>
+
+    <node-display
+      v-if="hiddenChildren.length > 0"
+      :color="color"
+      variant="footer"
+      @click.stop="subtreeStore.showSubtree(props.artifact.id)"
+    >
+      <flex-box align="center" justify="center" :class="deltaClassName">
+        <icon variant="down" size="sm" />
+        <typography :value="hiddenChildrenLabel" />
+      </flex-box>
+      <flex-box v-if="showDelta" class="cy-node-delta-chip">
+        <separator
+          v-for="childColor in childDeltaColors"
+          :key="childColor"
+          :color="childColor"
+          class="cy-node-delta-child-chip"
+        />
+      </flex-box>
+      <q-tooltip :delay="300">Show children</q-tooltip>
+    </node-display>
   </cy-element>
 </template>
 
@@ -26,7 +59,7 @@ import {
   GraphElementType,
   GraphMode,
 } from "@/types";
-import { isCodeArtifact } from "@/util";
+import { getEnumColor, isCodeArtifact } from "@/util";
 import {
   useTheme,
   deltaStore,
@@ -36,6 +69,7 @@ import {
   typeOptionsStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
+import { FlexBox, Icon, Typography, Separator } from "@/components/common";
 import { CyElement } from "../base";
 
 const props = defineProps<{
@@ -46,21 +80,57 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
+const opacity = computed(() => (props.hidden ? 0 : props.faded ? 0.3 : 1));
+const style = computed(() => `opacity: ${opacity.value};`);
+
+const hiddenChildren = computed(() =>
+  subtreeStore.getHiddenChildren(props.artifact.id)
+);
+const hiddenChildrenLabel = computed(() =>
+  hiddenChildren.value.length === 1
+    ? "1 Hidden"
+    : `${hiddenChildren.value.length} Hidden`
+);
+
+const deltaState = computed(() =>
+  deltaStore.getArtifactDeltaType(props.artifact.id)
+);
+const hiddenChildDeltaStates = computed(() =>
+  deltaStore.getArtifactDeltaStates(hiddenChildren.value)
+);
+const showDelta = computed(() => deltaStore.inDeltaView);
+const deltaClassName = computed(() =>
+  showDelta.value && hiddenChildren.value.length > 0
+    ? "cy-node-delta-footer"
+    : ""
+);
+const deltaColor = computed(() => getEnumColor(deltaState.value));
+const childDeltaColors = computed(() =>
+  hiddenChildDeltaStates.value.map(getEnumColor)
+);
+
 const typeColor = computed(
   () => typeOptionsStore.getArtifactLevel(props.artifact.type)?.color || ""
+);
+const color = computed(() =>
+  showDelta.value ? deltaColor.value : typeColor.value
+);
+
+const selected = computed(() =>
+  selectionStore.isArtifactInSelected(props.artifact.id)
+);
+
+const dataCy = computed(() =>
+  selected.value ? "tree-node-selected" : "tree-node"
 );
 
 const definition = computed<ArtifactCytoElement>(() => {
   const { id, body, summary, type, name, safetyCaseType, logicType } =
     props.artifact;
   const warnings = warningStore.artifactWarnings[id] || [];
-  const hiddenChildren = subtreeStore.getHiddenChildren(id);
-  const hiddenChildWarnings = warningStore.getArtifactWarnings(hiddenChildren);
-  const hiddenChildDeltaStates =
-    deltaStore.getArtifactDeltaStates(hiddenChildren);
-  const artifactDeltaState = deltaStore.getArtifactDeltaType(id);
-  const isSelected = selectionStore.isArtifactInSelected(id);
-  const opacity = props.hidden ? 0 : props.faded ? 0.3 : 1;
+  const hiddenChildWarnings = warningStore.getArtifactWarnings(
+    hiddenChildren.value
+  );
 
   return {
     data: {
@@ -73,13 +143,13 @@ const definition = computed<ArtifactCytoElement>(() => {
       artifactName: name,
       warnings,
       artifactType: type,
-      artifactDeltaState,
-      isSelected,
-      opacity,
+      artifactDeltaState: deltaState.value,
+      isSelected: selected.value,
+      opacity: opacity.value,
       typeColor: typeColor.value,
-      hiddenChildren: hiddenChildren.length,
+      hiddenChildren: hiddenChildren.value.length,
       childWarnings: hiddenChildWarnings,
-      childDeltaStates: hiddenChildDeltaStates,
+      childDeltaStates: hiddenChildDeltaStates.value,
       safetyCaseType,
       logicType,
       dark: darkMode.value,

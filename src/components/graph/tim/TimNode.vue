@@ -1,8 +1,9 @@
 <template>
   <cy-element :definition="definition">
     <node-display
+      separator
       :color="typeColor"
-      :variant="GraphMode.tim"
+      variant="tim"
       :title="props.artifactType"
       :subtitle="countLabel"
     />

@@ -1,5 +1,5 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element :definition="definition" />
 </template>
 
 <script lang="ts">
@@ -20,7 +20,7 @@ import {
   TraceLinkSchema,
 } from "@/types";
 import { deltaStore, useTheme } from "@/hooks";
-import { CyElement3 } from "../base";
+import { CyElement } from "../base";
 
 const props = defineProps<{
   trace: TraceLinkSchema;

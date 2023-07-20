@@ -1,16 +1,17 @@
 <template>
-  <div
-    :style="
-      isNode
-        ? 'position: absolute; z-index: 100;' +
-          'webkit-transform-origin: top left; ms-transform-origin: top left; transform-origin: top left; ' +
-          style
-        : undefined
-    "
-  >
+  <div class="cy-node-position" :style="style">
     <slot />
   </div>
 </template>
+
+<script lang="ts">
+/**
+ * A wrapper for managing an element within a Cytoscape graph.
+ */
+export default {
+  name: "Cytoscape",
+};
+</script>
 
 <script setup lang="ts">
 import {
@@ -26,7 +27,6 @@ import {
   Selector,
   Core,
   ElementDefinition,
-  CollectionReturnValue,
   Position,
   EventObject,
 } from "cytoscape";
@@ -42,7 +42,7 @@ const instance = ref<Core | undefined>(undefined);
 
 const pos = ref<{ x: number; y: number } | undefined>();
 const absTransform = ref("");
-const style = ref("");
+const transformStyle = ref("");
 
 const cy = inject<Promise<Core>>("cy");
 const relTransform = inject<Ref<string>>("relTransform");
@@ -50,6 +50,8 @@ const relTransform = inject<Ref<string>>("relTransform");
 const isNode = computed(
   () => props.definition.data.type === GraphElementType.node
 );
+
+const style = computed(() => (isNode.value ? transformStyle.value : undefined));
 
 /**
  * Creates this element within cytoscape.
@@ -144,7 +146,7 @@ watch(
   ([abs, rel]) => {
     const transform = `${rel} ${abs}`;
 
-    style.value = `webkit-transform: ${transform}; ms-transform: ${transform}; transform: ${transform};`;
+    transformStyle.value = `webkit-transform: ${transform}; ms-transform: ${transform}; transform: ${transform};`;
   }
 );
 </script>

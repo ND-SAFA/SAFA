@@ -1,5 +1,5 @@
 <template>
-  <cytoscape3
+  <cytoscape
     :id="id"
     class="cy-container bg-neutral"
     :config="props.cytoCoreGraph.config"
@@ -7,7 +7,7 @@
     :after-created="afterCreated"
   >
     <slot v-if="initialized" name="elements" />
-  </cytoscape3>
+  </cytoscape>
 </template>
 
 <script lang="ts">
@@ -23,7 +23,7 @@ export default {
 import { ref } from "vue";
 import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
 import { logStore } from "@/hooks";
-import { Cytoscape3 } from "./base";
+import { Cytoscape } from "./base";
 
 const props = defineProps<{
   cytoCoreGraph: CytoCoreGraph;

@@ -1,5 +1,5 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element :definition="definition" />
 </template>
 
 <script lang="ts">
@@ -16,7 +16,7 @@ import { computed } from "vue";
 import { GraphElementType, GraphMode, TimEdgeCytoElement } from "@/types";
 import { getTraceId, sanitizeNodeId } from "@/util";
 import { useTheme } from "@/hooks";
-import { CyElement3 } from "../base";
+import { CyElement } from "../base";
 
 const props = defineProps<{
   sourceType: string;

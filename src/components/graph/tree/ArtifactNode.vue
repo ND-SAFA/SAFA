@@ -1,5 +1,12 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element :definition="definition">
+    <node-display
+      :color="typeColor"
+      :variant="GraphMode.tree"
+      :title="props.artifact.type"
+      :subtitle="props.artifact.name"
+    />
+  </cy-element>
 </template>
 
 <script lang="ts">
@@ -28,7 +35,8 @@ import {
   warningStore,
   typeOptionsStore,
 } from "@/hooks";
-import { CyElement3 } from "../base";
+import { NodeDisplay } from "@/components/graph/display";
+import { CyElement } from "../base";
 
 const props = defineProps<{
   artifact: ArtifactSchema;
@@ -37,6 +45,10 @@ const props = defineProps<{
 }>();
 
 const { darkMode } = useTheme();
+
+const typeColor = computed(
+  () => typeOptionsStore.getArtifactLevel(props.artifact.type)?.color || ""
+);
 
 const definition = computed<ArtifactCytoElement>(() => {
   const { id, body, summary, type, name, safetyCaseType, logicType } =
@@ -49,7 +61,6 @@ const definition = computed<ArtifactCytoElement>(() => {
   const artifactDeltaState = deltaStore.getArtifactDeltaType(id);
   const isSelected = selectionStore.isArtifactInSelected(id);
   const opacity = props.hidden ? 0 : props.faded ? 0.3 : 1;
-  const typeColor = typeOptionsStore.getArtifactLevel(type)?.color || "";
 
   return {
     data: {
@@ -65,7 +76,7 @@ const definition = computed<ArtifactCytoElement>(() => {
       artifactDeltaState,
       isSelected,
       opacity,
-      typeColor,
+      typeColor: typeColor.value,
       hiddenChildren: hiddenChildren.length,
       childWarnings: hiddenChildWarnings,
       childDeltaStates: hiddenChildDeltaStates,

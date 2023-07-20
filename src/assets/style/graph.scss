@@ -76,7 +76,15 @@ $graph-border-radius: 8px;
 
 // New Graph Nodes
 
-.cy-node {
+.cy-node-position {
+  position: absolute;
+  z-index: 100;
+  webkit-transform-origin: top left;
+  ms-transform-origin: top left;
+  transform-origin: top left;
+}
+
+.cy-node-display {
   border-width: 3px;
   border-radius: 10px;
   overflow: hidden;
@@ -84,13 +92,14 @@ $graph-border-radius: 8px;
 
   &:hover {
     background-color: $color-neutral;
-    filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
+    //filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
   }
 
-  & > .cy-node-title {
+  & > .cy-node-title, & > .cy-node-subtitle {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 65px;
+    text-align: center;
+    max-height: 30px;
   }
 
   & > .cy-node-separator {
@@ -102,9 +111,18 @@ $graph-border-radius: 8px;
     text-align: center;
     width: 252px;
     height: 152px;
+
+    & > .cy-node-title {
+      max-height: 65px;
+    }
   }
 
-  &.cy-node-artifact {
+  &.cy-node-tree {
+    width: 210px;
+    height: 160px;
 
+    & > .cy-node-subtitle, & > .cy-node-title {
+      max-height: 65px;
+    }
   }
 }

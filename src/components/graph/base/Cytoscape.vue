@@ -4,6 +4,15 @@
   </div>
 </template>
 
+<script lang="ts">
+/**
+ * A wrapper for managing a Cytoscape instance.
+ */
+export default {
+  name: "Cytoscape",
+};
+</script>
+
 <script setup lang="ts">
 import { ref, withDefaults, provide, onMounted, onBeforeUnmount } from "vue";
 import cytoscape, { CytoscapeOptions, Core, EventObject } from "cytoscape";

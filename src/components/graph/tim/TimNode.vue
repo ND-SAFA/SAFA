@@ -28,6 +28,12 @@
           icon="view-tree"
           @click="documentStore.addDocumentOfTypes([props.artifactType])"
         />
+        <icon-button
+          tooltip="Generate parents"
+          icon="generateArtifacts"
+          color="primary"
+          @click="appStore.openDetailsPanel('generateArtifact')"
+        />
       </flex-box>
     </node-display>
   </cy-element>
@@ -50,13 +56,12 @@ import {
   appStore,
   documentStore,
   selectionStore,
-  subtreeStore,
   typeOptionsStore,
   useTheme,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
-import { FlexBox, IconButton, Separator } from "@/components";
+import { FlexBox, IconButton } from "@/components";
 
 const props = defineProps<{
   artifactType: string;

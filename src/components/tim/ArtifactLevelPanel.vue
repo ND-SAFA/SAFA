@@ -16,17 +16,6 @@
       <type-direction-input :artifact-level="artifactLevel" />
       <type-icon-input :artifact-level="artifactLevel" />
     </panel-card>
-
-    <panel-card>
-      <text-button
-        text
-        block
-        color="primary"
-        label="Generate Parents"
-        icon="generateArtifacts"
-        @click="handleGenerateParents"
-      />
-    </panel-card>
   </details-panel>
 </template>
 
@@ -41,18 +30,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  appStore,
-  documentStore,
-  selectionStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { selectionStore, typeOptionsStore } from "@/hooks";
 import {
   PanelCard,
   Typography,
   TypeDirectionInput,
   TypeIconInput,
-  TextButton,
   Icon,
   DetailsPanel,
 } from "@/components/common";
@@ -69,13 +52,4 @@ const countDisplay = computed(() => {
 const iconId = computed(() =>
   typeOptionsStore.getArtifactTypeIcon(artifactLevelName.value)
 );
-
-/**
- * Opens the generate artifact panel.
- */
-function handleGenerateParents(): void {
-  if (!artifactLevel.value) return;
-
-  appStore.openDetailsPanel("generateArtifact");
-}
 </script>

@@ -140,9 +140,15 @@ function handleClick(event: EventObject): void {
   disableDrawMode();
 
   if (
-    (["document", "saveArtifact", "saveTrace"] as DetailsOpenState[]).includes(
-      appStore.isDetailsPanelOpen
-    )
+    (
+      [
+        "document",
+        "saveArtifact",
+        "saveTrace",
+        "generateArtifact",
+        "generateTrace",
+      ] as DetailsOpenState[]
+    ).includes(appStore.isDetailsPanelOpen)
   )
     return;
 

@@ -23,13 +23,8 @@ export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[appr
 export const ARTIFACT_WIDTH = 105;
 export const ARTIFACT_HEIGHT = (ARTIFACT_WIDTH * 9) / 16;
 export const ARTIFACT_PADDING = 50;
-export const ARTIFACT_BORDER_WIDTH = 3;
 export const ARTIFACT_BORDER_STYLE = "solid";
-
-export const ARTIFACT_SELECTED_BORDER_WIDTH = 6;
 export const ARTIFACT_FTA_BORDER_WIDTH = 2;
-
-export const ARTIFACT_CHILDREN_HEIGHT = 35;
 
 export const ARTIFACT_SHAPE = {
   DEFAULT: NodePlacement.ROUND_RECTANGLE,

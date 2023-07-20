@@ -1,14 +1,39 @@
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from typing import List
+
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.paths.project_paths import DATAFRAME_PROJECT_PATH
-from tgen.testres.testprojects.api_test_project import ApiTestProject
+from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
+from tgen.testres.testprojects.entry_creator import LayerEntry
 
 
-class DataFrameTestProject(ApiTestProject):
+class DataFrameTestProject(AbstractTestProject):
     """
     Contains safa test project testing details.
     """
+
+    @staticmethod
+    def get_source_entries() -> List[LayerEntry]:
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_target_entries() -> List[LayerEntry]:
+        raise NotImplementedError()
+
+    @classmethod
+    def get_trace_entries(cls) -> LayerEntry:
+        raise NotImplementedError()
+
+    @classmethod
+    def get_layer_mapping_entries(cls) -> LayerEntry:
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_n_links() -> int:
+        return 12
+
+    @classmethod
+    def get_n_positive_links(cls) -> int:
+        return 6
 
     @staticmethod
     def get_project_path() -> str:

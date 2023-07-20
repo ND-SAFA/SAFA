@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator, LayerEntry, LayerInstruction
@@ -49,13 +50,11 @@ class StructuredTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[Dict]:
+    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
         """
         :return: Returns the layer mapping entries in project between source and target.
         """
-        return EntryCreator.create_layer_mapping_entries([
-            ("Requirements", "Regulatory Codes")
-        ])
+        return [TraceLayer(child="Requirements", parent="Regulatory Codes")]
 
     @staticmethod
     def get_source_entries() -> List[LayerEntry]:

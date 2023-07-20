@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.repository_project_reader import RepositoryProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import REPO_ONE_PROJECT_PATH
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
@@ -57,5 +58,5 @@ class RepositoryOneTestProject(AbstractTestProject):
         trace_data = [(a_id, a_body) for a_id, a_body in trace_data]
         return EntryCreator.create_trace_entries(trace_data)
 
-    def get_layer_mapping_entries(cls) -> List[Dict]:
-        return EntryCreator.create_layer_mapping_entries([("Commit", "Issue")])
+    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
+        return [TraceLayer(child="Commit", parent="Issue")]

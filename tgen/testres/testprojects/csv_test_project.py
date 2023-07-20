@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
@@ -64,12 +65,14 @@ class CsvTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[Dict]:
+    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
         """
         :return: Returns layer mapping entries associated with CSV project.
         """
-        return EntryCreator.create_layer_mapping_entries([(CsvProjectReader.get_layer_id(CSVKeys.SOURCE),
-                                                           CsvProjectReader.get_layer_id(CSVKeys.TARGET))])
+        child_type = CsvProjectReader.get_layer_id(CSVKeys.SOURCE)
+        parent_type = CsvProjectReader.get_layer_id(CSVKeys.TARGET)
+        trace_layer = TraceLayer(child=child_type, parent=parent_type)
+        return [trace_layer]
 
     @staticmethod
     def get_n_links() -> int:

@@ -204,7 +204,7 @@ class Summarizer(BaseObject):
         """
         code_or_above_limit_only = self.code_or_above_limit_only if code_or_above_limit_only is None else code_or_above_limit_only
         id_ = '' if not id_ else id_
-        chunker = chunker_type.value(self.model_name, max_content_tokens=self.max_prompt_tokens)
+        chunker = chunker_type.value(self.model_name, max_prompt_tokens=self.max_prompt_tokens)
         assert content is not None, "No content to summarize."
         chunks = chunker.chunk(content=content, id_=id_)
         if code_or_above_limit_only and len(chunks) <= 1 and chunker_type == SupportedChunker.NL:

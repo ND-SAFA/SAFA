@@ -24,7 +24,7 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         except Exception as e:
             msg_end = id_ if id_ else f"starting with {lines[0]}"
             logger.warning(f"Unable to parse file {msg_end}")
-            return NaturalLanguageChunker(model_name=self.model_name, max_content_tokens=self.max_content_tokens).chunk(content)
+            return NaturalLanguageChunker(model_name=self.model_name, max_prompt_tokens=self.max_prompt_tokens).chunk(content)
         chunks = self.__chunk_helper(head_node, lines)
         return [self._get_node_content(chunk, lines) for chunk in chunks]
 
@@ -67,7 +67,7 @@ class AbstractCodeChunker(AbstractChunker, ABC):
         for child in child_chunks:
             parent_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(p_chunk, lines), self.model_name)
             c_tokens = TokenLimitCalculator.estimate_num_tokens(self._get_node_content(child, lines), self.model_name)
-            if (c_tokens + parent_tokens) > self.max_content_tokens:
+            if (c_tokens + parent_tokens) > self.max_prompt_tokens:
                 break
             p_chunk.end_lineno = child.end_lineno
             p_chunk.body.append(child)

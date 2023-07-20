@@ -1,5 +1,3 @@
-from unittest import mock
-
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -15,7 +13,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion, mock_openai
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, mock_openai
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
@@ -94,12 +92,11 @@ class TestPromptDatasetCreator(BaseTest):
             PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
     @mock_openai
-    def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):
+    def verify_summarization(self, dataset_creator, artifacts_entries):
         """
         Verifies that entries are properly summarized by reader
         :return: None
         """
-        mock_completion.side_effect = fake_open_ai_completion
         prompt_dataset: PromptDataset = dataset_creator.create()
         for row in artifacts_entries:
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])

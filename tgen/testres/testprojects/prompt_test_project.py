@@ -1,6 +1,7 @@
 import os
 from typing import Any, Dict, List
 
+from tgen.common.artifact import Artifact
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
@@ -45,17 +46,12 @@ class PromptTestProject:
         return TraceDatasetCreator(project_reader)
 
     @staticmethod
-    def get_safa_artifacts() -> List[Dict]:
+    def get_safa_artifacts() -> List[Artifact]:
         """
         Gets all the artifacts from the safa project
         :return: A list of all artifacts as dicts
         """
-        source_layers = PromptTestProject.SAFA_PROJECT.get_source_entries()
-        target_layers = PromptTestProject.SAFA_PROJECT.get_target_entries()
-        artifacts = []
-        for i, layer in enumerate(source_layers):
-            artifacts.extend(layer)
-            artifacts.extend((target_layers[i]))
+        artifacts = PromptTestProject.SAFA_PROJECT.get_source_entries() + PromptTestProject.SAFA_PROJECT.get_target_entries()
         return artifacts
 
     @staticmethod
@@ -64,8 +60,8 @@ class PromptTestProject:
         Gets all the artifacts from the safa project
         :return: A dictionary mapping artifact ids to their content
         """
-        return {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
-                for artifact in PromptTestProject.get_safa_artifacts()}
+        artifacts = PromptTestProject.get_safa_artifacts()
+        return {a[ArtifactKeys.ID.value]: a[ArtifactKeys.CONTENT.value] for a in artifacts}
 
     @staticmethod
     def verify_prompts_artifacts_project(test_case: BaseTest, prompts_df: PromptDataFrame, **params):
@@ -77,9 +73,15 @@ class PromptTestProject:
         """
         artifacts = PromptTestProject.get_safa_artifacts()
         test_case.assertEqual(len(prompts_df), len(artifacts), **params)
-        for i, row in prompts_df.itertuples():
-            tokens = artifacts[i][ArtifactKeys.CONTENT.value]
-            test_case.assertIn(tokens, row[PromptKeys.PROMPT], **params)
+        for artifact in artifacts:
+            content = artifact[ArtifactKeys.CONTENT.value]
+            found = False
+            for i, row in prompts_df.itertuples():
+                prompt = row[PromptKeys.PROMPT]
+                if content in prompt:
+                    found = True
+                    break
+            test_case.assertTrue(found, msg=f"Could not find artifact: {artifact}")
 
     @staticmethod
     def verify_prompts_safa_project_traces_for_classification(test_case: BaseTest, prompt_df: PromptDataFrame,
@@ -94,11 +96,15 @@ class PromptTestProject:
         test_case.assertEqual(len(trace_df), len(prompt_df), **params)
         artifacts = PromptTestProject.get_artifact_map()
         for i, (link_id, link) in enumerate(trace_df.itertuples()):
-            prompt = prompt_df.get_row(i)[PromptKeys.PROMPT]
             source_id, target_id = link[TraceKeys.SOURCE], link[TraceKeys.TARGET]
-            source, target = artifacts[source_id], artifacts[target_id]
-            test_case.assertIn(target, prompt, **params)
-            test_case.assertIn(source, prompt, **params)
+            source_body, target_body = artifacts[source_id], artifacts[target_id]
+            found = False
+            for j, prompt_row in prompt_df.iterrows():
+                prompt = prompt_row[PromptKeys.PROMPT.value]
+                if target_body in prompt and source_body in prompt:
+                    found = True
+                    break
+            test_case.assertTrue(found, msg=f"Unable to find prompt with {source_id} and {target_id}.")
 
     @staticmethod
     def verify_prompts_safa_project_traces_for_generation(test_case: BaseTest, prompt_df: PromptDataFrame, trace_df: TraceDataFrame,

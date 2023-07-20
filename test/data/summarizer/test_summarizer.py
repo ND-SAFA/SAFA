@@ -151,7 +151,7 @@ class TestSummarizer(BaseTest):
         prompts = summarizer._create_chunk_prompts(long_text)
         expected_prompts = [summarizer.nl_prompt_builder.build(OpenAIManager.prompt_args,
                                                                artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT]
-                            for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, max_content_tokens=5).chunk(long_text)]
+                            for chunk in NaturalLanguageChunker(OPEN_AI_MODEL_DEFAULT, max_prompt_tokens=5).chunk(long_text)]
         self.assertListEqual(prompts, expected_prompts)
 
         python_code = "x = 1"

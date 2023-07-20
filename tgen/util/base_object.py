@@ -79,17 +79,16 @@ class BaseObject(ABC):
             param_value = cls._get_value_of_variable(variable, expected_type)
 
             if isinstance(param_value, ExperimentalVariable):
-                if cls._is_type(param_value, expected_type, param_name):
-                    obj_meta_list[0].init_params[param_name] = param_value
-                else:
-                    experiment_params_list = []
-                    for i, experiment_val in enumerate(param_value):
-                        children_experimental_vars = param_value.experimental_param_names_to_vals[
-                            i] if param_value.experimental_param_names_to_vals else {}
-                        experiment_params_list.extend(
-                            cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
-                                                  children_experimental_vars=children_experimental_vars))
-                    obj_meta_list = experiment_params_list
+                # obj_meta_list[0].init_params[param_name] = param_value
+                experiment_params_list = []
+                for i, experiment_val in enumerate(param_value):
+                    children_experimental_vars = param_value.experimental_param_names_to_vals[
+                        i] if param_value.experimental_param_names_to_vals else {}
+                    experiment_params_list.extend(
+                        cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
+                                              children_experimental_vars=children_experimental_vars))
+                obj_meta_list = experiment_params_list
+
             else:
                 obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_type)
         instances = [cls(**obj_meta.init_params) for obj_meta in obj_meta_list]
@@ -258,7 +257,25 @@ class BaseObject(ABC):
         try:
             if isinstance(val, UndeterminedVariable):
                 return True
+            if isinstance(val, ExperimentalVariable):
+                queries = [v for v in val.value if not cls._is_type(v.value, expected_type, param_name=param_name)]
+                assert len(queries) == 0, f"Expected {queries[0]} to be of type: {expected_type}"
+                return True
+            if isinstance(val, Variable):
+                raise ValueError("Variables are not supported for type checking.")
+
+            if ReflectionUtil.is_typed_dict(expected_type):
+                assert isinstance(val, dict)
+                for field_name, expected_field_type in expected_type.__annotations__.items():
+                    check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
+                return True
+
             if ReflectionUtil.is_typed_class(expected_type):
+                if expected_type._name == "Any":
+                    return True
+                if expected_type._name == "Dict":
+                    check_type(val, expected_type, param_name)
+                    return True
                 parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
                 if parent_class == "dict":
                     expected_type = child_classes[0]
@@ -273,6 +290,7 @@ class BaseObject(ABC):
                     return True
                 else:
                     expected_type = parent_class
+
             check_type(param_name, val, expected_type)
         except TypeError as e:
             traceback.print_exc()

@@ -205,3 +205,11 @@ class ReflectionUtil:
         :return: Returns whether class is an optional type.
         """
         return typing.get_origin(class_obj) is typing.Union
+
+    @staticmethod
+    def is_typed_dict(expected_type: Type):
+        """
+        :param expected_type:
+        :return: Returns true if expected type is a typed dictionary, false otherwise.
+        """
+        return hasattr(expected_type, "__annotations__") and issubclass(expected_type, dict)

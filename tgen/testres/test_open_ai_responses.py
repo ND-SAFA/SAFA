@@ -109,10 +109,10 @@ def mock_openai(func=None, format: str = None, test_expected_responses: bool = T
     :return: The decorated function with open ai mocked.
     """
 
-    def decorator(test_func: Callable):
+    def decorator(test_func: Callable, *test_func_args, **test_func_kwargs):
         @mock.patch("openai.ChatCompletion.create")
         def wrapper(self, mock_completion):
-            response_manager = TestResponseManager(format=format, *outer_args, **outer_kwargs)
+            response_manager = TestResponseManager(format=format, *test_func_args, *outer_args, **test_func_kwargs, **outer_kwargs)
             mock_completion.side_effect = response_manager
             if does_accept(test_func, response_manager):
                 test_func(self, response_manager)

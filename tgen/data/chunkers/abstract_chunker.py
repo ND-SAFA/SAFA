@@ -11,15 +11,15 @@ class AbstractChunker(BaseObject, ABC):
     Handles chunking for python files
     """
 
-    def __init__(self, model_name: str, max_content_tokens: int):
+    def __init__(self, model_name: str, max_prompt_tokens: int):
         """
         Initializes chunker with for a given model.
         :param model_name: The model that will be doing the tokenization
-        :param max_content_tokens: The number of tokens that the model can accept
+        :param max_prompt_tokens: The number of tokens that the model can accept
         :return: The approximate number of tokens
         """
         self.model_name = model_name
-        self.max_content_tokens = max_content_tokens
+        self.max_prompt_tokens = max_prompt_tokens
 
     @abstractmethod
     def chunk(self, content: str, id_: str = None) -> List[str]:
@@ -37,7 +37,7 @@ class AbstractChunker(BaseObject, ABC):
         :return: True if the content exceeds the token limit for the model else False
         """
         n_expected_tokens = TokenLimitCalculator.estimate_num_tokens(content, self.model_name)
-        return n_expected_tokens > self.max_content_tokens
+        return n_expected_tokens > self.max_prompt_tokens
 
     @classmethod
     @overrides(BaseObject)

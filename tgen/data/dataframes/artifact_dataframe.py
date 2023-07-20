@@ -1,5 +1,6 @@
-from typing import Any, Dict, Type
+from typing import Any, Dict, List, Type
 
+from tgen.common.artifact import Artifact
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.util.enum_util import EnumDict
@@ -64,7 +65,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         type2count = dict(counts_df)
         return type2count
 
-    def get_map(self) -> Dict[str, str]:
+    def to_map(self) -> Dict[str, str]:
         """
         :return: Returns map of artifact ids to content.
         """
@@ -73,3 +74,13 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             content = row[ArtifactKeys.CONTENT.value]
             artifact_map[name] = content
         return artifact_map
+
+    def to_artifacts(self) -> List[Artifact]:
+        """
+        Converts entries in data frame to converts.
+        :return: The list of artifacts.
+        """
+        artifacts = [Artifact(id=artifact_id,
+                              content=artifact_row[StructuredKeys.Artifact.CONTENT.value])
+                     for artifact_id, artifact_row in self.iterrows()]
+        return artifacts

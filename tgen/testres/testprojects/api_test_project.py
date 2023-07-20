@@ -1,8 +1,10 @@
 from typing import Dict, List, Tuple
 
+from tgen.common.artifact import Artifact
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator, LayerEntry, TraceInstruction
@@ -33,7 +35,7 @@ class ApiTestProject(AbstractTestProject):
         """
         :return: Returns the number of links after t3 and s6 are removed.
         """
-        return 12  # t3 and s6 are removed
+        return 18  # t3 and s6 are removed
 
     @classmethod
     def get_n_positive_links(cls) -> int:
@@ -44,7 +46,7 @@ class ApiTestProject(AbstractTestProject):
 
     @staticmethod
     @overrides(AbstractTestProject)
-    def get_source_entries() -> List[LayerEntry]:
+    def get_source_entries() -> List[Artifact]:
         """
         :return: Returns entries for source artifacts for layer 1 and 2 and test data manager.
         """
@@ -68,7 +70,7 @@ class ApiTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[Dict]:
+    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
         """
         :return: Returns entries for layer mappings between two layers.
         """

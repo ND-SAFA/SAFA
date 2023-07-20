@@ -81,15 +81,12 @@ class TestDataManager:
 
     @staticmethod
     def create_artifact_dataframe():
-        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
-        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+        artifacts = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
         artifact_df = ArtifactDataFrame()
-        for layer_num, layer_sources in enumerate(sources):
-            for s_id, s_body in layer_sources.items():
-                artifact_df.add_artifact(s_id, s_body, layer_num)
-        for layer_num, layer_targets in enumerate(targets):
-            for t_id, t_body in layer_targets.items():
-                artifact_df.add_artifact(t_id, t_body, layer_num)
+        for artifact_type, artifacts in artifacts.items():
+            for artifact_id, artifact_body in artifacts.items():
+                artifact_df.add_artifact(artifact_id, artifact_body, artifact_type)
+        
         return artifact_df
 
     @staticmethod

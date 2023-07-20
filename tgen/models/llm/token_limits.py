@@ -11,7 +11,7 @@ from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwan
 class ModelTokenLimits(Enum):
     GPT4 = 8192
     GPT432k = 32768
-    GPT35turbo = 4097
+    GPT35TURBO = 4097
     TEXTDAVINCI003 = 4096
     CODEDAVINCI = 8001
     CODECUSHMAN = 2048
@@ -34,7 +34,7 @@ class ModelTokenLimits(Enum):
         Gets the set of open ai models contained in ModelTokenLimits
         :return: The set of open ai models contained in ModelTokenLimits
         """
-        return {ModelTokenLimits.GPT4.name, ModelTokenLimits.GPT432k.name, ModelTokenLimits.GPT35turbo.name,
+        return {ModelTokenLimits.GPT4.name, ModelTokenLimits.GPT432k.name, ModelTokenLimits.GPT35TURBO.name,
                 ModelTokenLimits.TEXTDAVINCI003.name, ModelTokenLimits.CODECUSHMAN.name, ModelTokenLimits.CODEDAVINCI.name}
 
     @staticmethod
@@ -69,14 +69,15 @@ class ModelTokenLimits(Enum):
 class TokenLimitCalculator:
 
     @staticmethod
-    def calculate_token_limit(model_name: str, max_tokens: int = MAX_TOKENS_DEFAULT) -> int:
+    def calculate_max_prompt_tokens(model_name: str, max_completion_tokens: int = MAX_TOKENS_DEFAULT) -> int:
         """
         Gets the token limit for the given model with the given max tokens for completion
-        :param model_name: The name of the model
-        :param max_tokens: The max number of tokens for completion
-        :return: The token limit
+        :param model_name: The name of the model.
+        :param max_completion_tokens: The max number of tokens for completion.
+        :return: The token limit for any incoming prompt.
         """
-        return ModelTokenLimits.get_token_limit_for_model(model_name) - max_tokens - MAX_TOKENS_BUFFER
+        model_token_limit = ModelTokenLimits.get_token_limit_for_model(model_name)
+        return model_token_limit - max_completion_tokens - MAX_TOKENS_BUFFER
 
     @staticmethod
     def estimate_num_tokens(content: str, model_name: str) -> int:

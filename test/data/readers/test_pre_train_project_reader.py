@@ -6,7 +6,7 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion, mock_openai
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 
@@ -24,7 +24,7 @@ class TestPreTrainProjectReader(BaseTest):
         expected_lines = TestMLMPreTrainDatasetCreator.FILE1_LINES + TestMLMPreTrainDatasetCreator.FILE2_LINES
         TestAssertions.assert_lists_have_the_same_vals(self, training_examples, expected_lines)
 
-    @mock.patch("openai.ChatCompletion.create")
+    @mock_openai
     def test_summarization(self, mock_completion: mock.MagicMock):
         """
         Tests that pre-train data can be summarized

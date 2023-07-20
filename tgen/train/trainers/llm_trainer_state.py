@@ -37,6 +37,6 @@ class LLMTrainerState(State):
 
     def __post_init__(self):
         if self.summarizer is None:
-            self.summarizer = Summarizer(self.llm_manager, model_for_token_limit=self.llm_manager.llm_args.model,
+            self.summarizer = Summarizer(self.llm_manager, model_name=self.llm_manager.llm_args.model,
                                          code_or_exceeds_limit_only=False,
-                                         max_tokens_for_token_limit=self.llm_manager.llm_args.get_max_tokens())
+                                         max_completion_tokens=self.llm_manager.llm_args.get_max_tokens())

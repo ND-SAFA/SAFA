@@ -77,7 +77,7 @@ class FolderEntityFormat(AbstractEntityFormat):
             chunker_types.append(SupportedChunker.determine_from_path(file_path))
             contents.append(FileUtil.read_file(file_path))
         if summarizer is not None:
-            contents = summarizer.summarize_bulk(contents=contents, chunker_types=chunker_types, ids=artifact_names)
+            contents = summarizer.summarize_bulk(bodies=contents, chunker_types=chunker_types, ids=artifact_names)
         artifact_names, contents = FolderEntityFormat._remove_empty_contents(artifact_names, contents)
         entries = EnumDict({
             ArtifactKeys.ID: artifact_names,

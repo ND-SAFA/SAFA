@@ -1,4 +1,6 @@
+import inspect
 from copy import deepcopy
+from typing import Callable, List, Union
 
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
@@ -96,31 +98,123 @@ COMPLETION_RESPONSE_DICT = AttrDict({
     })})
 
 SUMMARY_FORMAT = "Summary of {}"
+DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag
+from unittest import mock
 
 
-def fake_open_ai_completion(*args, **kwargs):
-    choice = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0])
-    choice["text"] = SUMMARY_FORMAT
-    tags = [SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag]
+def mock_openai(format: str = None, *outer_args, **outer_kwargs):
+    """
+    Automatically mocks open ai
+    :param format: The format to encapsulate responses in.
+    :return: The decorated function with open ai mocked.
+    """
+
+    def decorator(test_func: Callable):
+        @mock.patch("openai.ChatCompletion.create")
+        def wrapper(self, mock_completion):
+            response_manager = TestResponseManager(format=format, *outer_args, **outer_kwargs)
+            mock_completion.side_effect = response_manager
+            if does_accept(test_func, response_manager):
+                test_func(self, response_manager)
+            else:
+                test_func(self)
+            assert response_manager.start_index == len(response_manager.responses), f"Response manager had unused responses."
+
+        if not hasattr(test_func, "__name__"):
+            class_name = test_func.__class__.__name__
+            method_name = test_func._testMethodName
+            raise ValueError(f"{class_name}.{method_name} did not close the decorator (`@mock_openai()`).")
+        wrapper.__name__ = test_func.__name__
+        return wrapper
+
+    return decorator
+
+
+def create_openai_handler(format: str = None, *args, **kwargs):
+    def handler(*handler_args, **handler_kwargs):
+        def processor(t):
+            if format:
+                return format.format(t)
+            return t
+
+        response_text = TestResponseManager(processor=processor, *args, *handler_args, **kwargs, **handler_kwargs)
+        return response_text
+
+    return handler
+
+
+DEFAULT_RESPONSE = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0]["message"]["content"])
+
+
+class TestResponseManager:
+    def __init__(self, responses: Union[str, List[str]] = None, tags: List[str] = None,
+                 processor: Callable = None, format: str = None):
+        if responses is None:
+            responses = [DEFAULT_RESPONSE]
+        if tags is None:
+            tags = [DEFAULT_SUMMARY_TAG]
+        self.responses = responses
+        self.tags = tags
+        self.processor = processor
+        self.format = format
+        self.n_given = 0
+        self.start_index = 0
+        self.end_index = len(responses)
+
+    def __call__(self, *args, **kwargs):
+        prompts = [m["content"] for m in kwargs["messages"]]
+        n_prompts = len(prompts)
+        responses = self.get_next_response(n_requested=n_prompts)
+        if self.processor is not None:
+            responses = [self.processor(r) for r in responses]
+        if self.format:
+            responses = [self.format.format(r) for r in responses]
+        res = AttrDict({"choices": [AttrDict({"message": {"content": r}}) for r in responses], "id": "id"})
+        self.n_given += n_prompts
+        return res
+
+    def set_responses(self, responses: List[str]):
+        self.responses = responses
+        self.start_index = 0
+
+    def get_next_response(self, n_requested: int = 1) -> List[str]:
+        end_index = self.n_given + n_requested
+        n_responses = len(self.responses)
+        if end_index > n_responses:
+            raise ValueError(f"Ran out of mock responses. Contains only {n_responses} responses.")
+        responses = self.responses[self.start_index: end_index]
+        self.start_index = end_index
+        return responses
+
+
+def process_response_tags(prompts: List[str], tags: List[str]):
     tag = None
-    prompt = kwargs["messages"][0]["content"]
     for t in tags:
-        if f"<{t}>" in prompt[0]:
+        if f"<{t}>" in prompts[0]:
             tag = t
             break
     for prompt_suffix in [AnthropicManager.prompt_args.prompt_suffix, OpenAIManager.prompt_args.prompt_suffix]:
         success = False
-        for p in prompt:
+        for p in prompts:
             if p.endswith(prompt_suffix):
                 success = True
         if success:
-            prompt = ["".join(p.rsplit(prompt_suffix, 1)) for p in prompt]
+            prompts = ["".join(p.rsplit(prompt_suffix, 1)) for p in prompts]
             break
-    tokens = [p.replace("\n", "").split(f"</{tag}>")[-1] for p in prompt]
-    choices = [deepcopy(choice) for _ in tokens]
-    for i, c in enumerate(choices):
-        c['text'] = c['text'].format(tokens[i])
-        if tag:
-            c['text'] = f"<{tag}>{c['text']}</{tag}>"
-    res = AttrDict({"choices": choices, "id": "id"})
-    return res
+    return prompts, tag
+
+
+def does_accept(func, arg):
+    """
+    Check if a given function accepts a given argument.
+    :param func: The function to check.
+    :param arg: The argument to check if it's accepted by the function.
+    :returns: True if the function accepts the argument, False otherwise.
+    """
+    try:
+        for arg_name, arg_parameter in inspect.signature(func).parameters.items():
+            if isinstance(arg, arg_parameter.annotation):
+                return True
+        return False
+    except TypeError:
+        return False

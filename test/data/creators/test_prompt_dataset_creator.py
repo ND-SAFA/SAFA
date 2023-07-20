@@ -15,7 +15,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion, mock_openai
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
@@ -93,7 +93,7 @@ class TestPromptDatasetCreator(BaseTest):
         else:
             PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
-    @mock.patch("openai.ChatCompletion.create")
+    @mock_openai
     def verify_summarization(self, mock_completion: mock.MagicMock, dataset_creator, artifacts_entries):
         """
         Verifies that entries are properly summarized by reader

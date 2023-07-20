@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Type, List
+from typing import List, Type
 
 from tgen.models.llm.token_limits import TokenLimitCalculator
 from tgen.util.base_object import BaseObject
@@ -36,7 +36,8 @@ class AbstractChunker(BaseObject, ABC):
         :param content: The content to check
         :return: True if the content exceeds the token limit for the model else False
         """
-        return TokenLimitCalculator.estimate_num_tokens(content, self.model_name) > self.token_limit
+        n_expected_tokens = TokenLimitCalculator.estimate_num_tokens(content, self.model_name)
+        return n_expected_tokens > self.token_limit
 
     @classmethod
     @overrides(BaseObject)

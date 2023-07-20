@@ -26,7 +26,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import fake_anthropic_completion
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import fake_open_ai_completion, mock_openai
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -151,7 +151,7 @@ class TestHierarchyGeneration(BaseTest):
         expected_entities.extend([layer for i, layer in trace_dataset.layer_df.itertuples()])
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
-    @mock.patch("openai.ChatCompletion.create")
+    @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
     def test_create_linked_dataset_for_intra_level_artifacts(self, llm_response_mock: mock.MagicMock, mock_completion: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT

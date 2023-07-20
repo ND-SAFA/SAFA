@@ -38,7 +38,7 @@ class PreTrainProjectReader(AbstractProjectReader[List]):
             file_content = entity_row[col_name]
             examples = file_content.split(self.DELIMINATOR)
             if self.summarizer is not None:
-                examples = self.summarizer.summarize_bulk(contents=examples)
+                examples = self.summarizer.summarize_bulk(bodies=examples)
             all_examples.extend(examples)
         return all_examples
 

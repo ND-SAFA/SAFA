@@ -6,7 +6,7 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion, mock_openai
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
@@ -40,7 +40,7 @@ class TestArtifactProjectReader(BaseTest):
         artifact_df = project_reader.read_project()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
 
-    @mock.patch("openai.ChatCompletion.create", )
+    @mock_openai
     def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
         mock_completion.side_effect = fake_open_ai_completion
         project_reader: AbstractProjectReader = test_project.get_project_reader()

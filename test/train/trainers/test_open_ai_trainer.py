@@ -15,7 +15,8 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, \
+    fake_open_ai_completion, mock_openai
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -71,7 +72,7 @@ class TestOpenAiTrainer(BaseTest):
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
 
-    @mock.patch("openai.ChatCompletion.create")
+    @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
     def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock, mock_completion_create: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT

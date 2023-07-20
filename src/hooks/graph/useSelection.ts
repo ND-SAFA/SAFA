@@ -130,15 +130,13 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact id to select and view.
      */
     viewArtifactSubtree(artifactId: string): void {
-      const artifactsInSubtree = [
-        ...(subtreeStore.subtreeMap[artifactId]?.subtree || []),
-        artifactId,
-      ];
-
       this.selectArtifact(artifactId);
       this.filterGraph({
         type: "subtree",
-        artifactsInSubtree,
+        artifactsInSubtree: [
+          ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
+          artifactId,
+        ],
       });
     },
     /**

@@ -30,8 +30,9 @@ class ExperimentStep(BaseObject):
         :param comparison_criterion: The criterion used to determine the best job.
         """
         if not isinstance(jobs, ExperimentalVariable):
+            assert isinstance(jobs, list), f"Expected list of jobs but got: {jobs}"
             jobs = ExperimentalVariable(jobs)
-        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
+        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param2als
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
         self.status = Status.NOT_STARTED
         self.best_job = None

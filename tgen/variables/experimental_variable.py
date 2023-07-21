@@ -14,5 +14,5 @@ class ExperimentalVariable(MultiVariable):
         """
         if len(values) > 0 and not isinstance(values[0], Variable):
             values = MultiVariable.from_list(values).value
-        self.experimental_param_names_to_vals = experimental_param_name_to_val
+        self.experimental_param2als = experimental_param_name_to_val
         super().__init__(values)

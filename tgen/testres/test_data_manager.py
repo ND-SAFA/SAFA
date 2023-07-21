@@ -86,7 +86,7 @@ class TestDataManager:
         for artifact_type, artifacts in artifacts.items():
             for artifact_id, artifact_body in artifacts.items():
                 artifact_df.add_artifact(artifact_id, artifact_body, artifact_type)
-        
+
         return artifact_df
 
     @staticmethod
@@ -126,11 +126,10 @@ class TestDataManager:
         :return: map between artifact id to its body.
         """
         artifacts = {}
-        for artifact_type_key in [TestDataManager.Keys.SOURCE, TestDataManager.Keys.TARGET]:
-            artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, artifact_type_key])
-            for artifact_level in artifact_levels:
-                for artifact_id, artifact_body in artifact_level.items():
-                    artifacts[artifact_id] = artifact_body
+        artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
+        for artifact_level, artifacts in artifact_levels.items():
+            for artifact_id, artifact_body in artifacts.items():
+                artifacts[artifact_id] = artifact_body
         return artifacts
 
     @staticmethod

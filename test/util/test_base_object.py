@@ -1,11 +1,10 @@
 from typing import Dict, List, Optional, Union
-from unittest import skip
 
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.server.serializers.experiment_serializer import ExperimentSerializer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.base_object import BaseObject
 from tgen.testres.object_creator import ObjectCreator
+from tgen.util.base_object import BaseObject
 from tgen.util.reflection_util import ReflectionUtil
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
@@ -58,16 +57,13 @@ class TestBaseObject(BaseTest):
 
             self.assertRaises(TypeError, create, "Failed: " + param_name)
 
-    @skip("No serializer")
     def test_nested_specs(self):
         nested_params = {
             "definition": {
                 "a": self.class_params
             }
         }
-        experiment_serializer = ExperimentSerializer(data=nested_params)
-        assert experiment_serializer.is_valid(), experiment_serializer.errors
-        definition_variable = experiment_serializer.save()
+        definition_variable = ExperimentSerializer.create(nested_params)
         outer_class = TestOuterClass.initialize_from_definition(definition_variable)
         self.assert_has_params(outer_class.a, self.class_params)
 
@@ -117,4 +113,3 @@ class TestBaseObject(BaseTest):
 
         for param in [optional_param, nested_list_param, base_object_param]:
             self.assertTrue(ReflectionUtil.is_instance_or_subclass(param, AbstractJob))
-

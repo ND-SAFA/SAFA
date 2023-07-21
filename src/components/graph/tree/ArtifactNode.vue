@@ -31,7 +31,9 @@
       :selected="selected"
       @mouseenter="appStore.isGraphLock = true"
       @mouseleave="appStore.isGraphLock = false"
-      @click="subtreeStore.showSubtree(id)"
+      @click.stop="subtreeStore.showSubtree(id)"
+      @mousedown.stop
+      @mouseup.stop
     >
       <flex-box align="center" justify="center" :class="deltaClassName">
         <icon variant="down" size="sm" />
@@ -55,8 +57,11 @@
       :selected="selected"
       @mouseenter="appStore.isGraphLock = true"
       @mouseleave="appStore.isGraphLock = false"
+      @click.stop
+      @mousedown.stop
+      @mouseup.stop
     >
-      <flex-box column @click.stop>
+      <flex-box column>
         <icon-button
           tooltip="View related artifacts"
           icon="view-tree"

@@ -22,8 +22,11 @@
       :selected="selected"
       @mouseenter="appStore.isGraphLock = true"
       @mouseleave="appStore.isGraphLock = false"
+      @click.stop
+      @mousedown.stop
+      @mouseup.stop
     >
-      <flex-box column @click.stop>
+      <flex-box column>
         <icon-button
           tooltip="View artifacts"
           icon="view-tree"

@@ -2,7 +2,7 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import mock_openai
+from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 

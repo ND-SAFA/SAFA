@@ -142,3 +142,20 @@ class TestDataManager:
             true_links=links
         )
         return ApiProjectReader(api_definition=api_definition)
+
+    @classmethod
+    def get_n_candidates(cls) -> int:
+        """
+        :return: Returns the number of candidates in dataset.
+        """
+        artifacts = cls.DATA[cls.Keys.ARTIFACTS]
+        layers = cls.DATA[cls.Keys.LAYERS]
+        n_candidates_total = 0
+        for trace_layer in layers:
+            parent_type, child_type = trace_layer["parent"], trace_layer["child"]
+
+            parent_artifacts = artifacts[parent_type]
+            child_artifacts = artifacts[child_type]
+            n_candidates = len(parent_artifacts) * len(child_artifacts)
+            n_candidates_total += n_candidates
+        return n_candidates_total

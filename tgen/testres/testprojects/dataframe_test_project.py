@@ -12,11 +12,11 @@ class DataFrameTestProject(AbstractTestProject):
     """
 
     @staticmethod
-    def get_source_entries() -> List[LayerEntry]:
+    def get_source_artifacts() -> List[LayerEntry]:
         raise NotImplementedError()
 
     @staticmethod
-    def get_target_entries() -> List[LayerEntry]:
+    def get_target_artifacts() -> List[LayerEntry]:
         raise NotImplementedError()
 
     @classmethod
@@ -24,7 +24,7 @@ class DataFrameTestProject(AbstractTestProject):
         raise NotImplementedError()
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> LayerEntry:
+    def get_trace_layers(cls) -> LayerEntry:
         raise NotImplementedError()
 
     @staticmethod

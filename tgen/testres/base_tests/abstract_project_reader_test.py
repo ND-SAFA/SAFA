@@ -24,9 +24,10 @@ class AbstractProjectReaderTest(BaseTest):
         """
         project_reader = test_project.get_project_reader()
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
+        layer_entries = test_project.get_layer_entries()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
-        TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
+        TestAssertions.verify_entities_in_df(self, layer_entries, layer_mapping_df)
 
     @mock_openai
     def verify_summarization(self, test_project):
@@ -44,7 +45,7 @@ class AbstractProjectReaderTest(BaseTest):
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
-        TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
+        TestAssertions.verify_entities_in_df(self, test_project.get_trace_layers(), layer_mapping_df)
 
     @staticmethod
     def generate_artifact_entries(artifact_ids: List[int], prefix: str = "None") -> List[Dict]:

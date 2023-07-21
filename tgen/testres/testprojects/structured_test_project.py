@@ -50,14 +50,14 @@ class StructuredTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
+    def get_trace_layers(cls) -> List[TraceLayer]:
         """
         :return: Returns the layer mapping entries in project between source and target.
         """
         return [TraceLayer(child="Requirements", parent="Regulatory Codes")]
 
     @staticmethod
-    def get_source_entries() -> List[LayerEntry]:
+    def get_source_artifacts() -> List[LayerEntry]:
         """
         :return: Return source artifact entries in single layer.
         """
@@ -69,7 +69,7 @@ class StructuredTestProject(AbstractTestProject):
         return EntryCreator.create_artifact_entries([source_artifact_layer])
 
     @staticmethod
-    def get_target_entries() -> List[LayerEntry]:
+    def get_target_artifacts() -> List[LayerEntry]:
         """
         :return: Returns target artifact entries in single layer.
         """

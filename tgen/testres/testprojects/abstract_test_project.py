@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from typing import List
 
+import numpy as np
+
 from tgen.common.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -30,14 +32,14 @@ class AbstractTestProject:
         """
 
     @classmethod
-    def get_source_entries(cls) -> List[Artifact]:
+    def get_source_artifacts(cls) -> List[Artifact]:
         """
         :return: Returns the source artifact entries per artifact layer.
         """
         return cls._get_artifacts_in_layer(StructuredKeys.LayerMapping.SOURCE_TYPE)
 
     @classmethod
-    def get_target_entries(cls) -> List[Artifact]:
+    def get_target_artifacts(cls) -> List[Artifact]:
         """
         :return: Returns the target artifact entries per artifact layer.
         """
@@ -52,17 +54,22 @@ class AbstractTestProject:
         _, trace_df, _ = project_reader.read_project()
         entries = []
         for i, row in trace_df.iterrows():
+            score = row.get(TraceKeys.SCORE.value, None)
+            label = row.get(TraceKeys.LABEL.value, None)
+
+            score = None if np.isnan(score) else score
+            label = None if np.isnan(label) else label
             entry = TracePredictionEntry(
                 source=row[TraceKeys.SOURCE.value],
-                target=row[TraceKeys.SOURCE.value],
-                label=row.get(TraceKeys.LABEL.value, None),
-                score=row.get(TraceKeys.SCORE.value, None)
+                target=row[TraceKeys.TARGET.value],
+                label=label,
+                score=score
             )
             entries.append(entry)
         return entries
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
+    def get_trace_layers(cls) -> List[TraceLayer]:
         """
         :return: Returns layer mapping entries in project.
         """
@@ -70,17 +77,25 @@ class AbstractTestProject:
         artifact_df, trace_df, layer_df = project_reader.read_project()
         layers = []
         for layer_id, layer_row in layer_df.iterrows():
-            layer = TraceLayer(parent=layer_row[StructuredKeys.LayerMapping.TARGET_TYPE.value],
-                               child=layer_row[StructuredKeys.LayerMapping.SOURCE_TYPE].value)
+            parent_type = layer_row[StructuredKeys.LayerMapping.TARGET_TYPE.value]
+            child_type = layer_row[StructuredKeys.LayerMapping.SOURCE_TYPE.value]
+            layer = TraceLayer(parent=parent_type, child=child_type)
             layers.append(layer)
         return layers
+
+    @classmethod
+    def get_layer_entries(cls):
+        layer_entries = [{StructuredKeys.LayerMapping.SOURCE_TYPE.value: l.child,
+                          StructuredKeys.LayerMapping.TARGET_TYPE.value: l.parent}
+                         for l in cls.get_trace_layers()]
+        return layer_entries
 
     @classmethod
     def get_artifact_entries(cls) -> List[Artifact]:
         """
         :return: Returns artifact entries present in project.
         """
-        return cls.get_source_entries() + cls.get_target_entries()
+        return cls.get_source_artifacts() + cls.get_target_artifacts()
 
     @staticmethod
     @abstractmethod

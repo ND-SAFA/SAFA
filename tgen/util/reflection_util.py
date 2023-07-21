@@ -157,7 +157,7 @@ class ReflectionUtil:
         type_args = ReflectionUtil.get_arg_types(typed_obj)
         if origin is typing.Union:
             return "union", *type_args
-        elif isinstance(origin, list):
+        elif origin is list:
             assert len(type_args) == 1, f"Found multiple typed for list: {type_args}"
             return "list", type_args[0]
         elif isinstance(origin, typing.Callable):

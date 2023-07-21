@@ -35,14 +35,14 @@ class CsvTestProject(AbstractTestProject):
         return CsvProjectReader(cls.get_project_path(), overrides={"allowed_orphans": 2})
 
     @staticmethod
-    def get_source_entries() -> List[List[Dict[str, str]]]:
+    def get_source_artifacts() -> List[List[Dict[str, str]]]:
         """
         :return: Returns list of source artifact entries per layer.
         """
         return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE)
 
     @staticmethod
-    def get_target_entries() -> List[List[Dict[str, str]]]:
+    def get_target_artifacts() -> List[List[Dict[str, str]]]:
         """
         :return: Returns list of target artifact entries per layer.
         """
@@ -65,7 +65,7 @@ class CsvTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
+    def get_trace_layers(cls) -> List[TraceLayer]:
         """
         :return: Returns layer mapping entries associated with CSV project.
         """

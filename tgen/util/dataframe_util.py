@@ -60,10 +60,16 @@ class DataFrameUtil:
         """
         query_df = df
         for k, v in query.items():
+            if v is None:
+                continue
+
             if k == df.index.name:
                 query_df = df.loc[[v]]
-            else:
+            elif k in query_df.columns:
                 query_df = query_df[query_df[k] == v]
+            else:
+                raise ValueError(f"{query_df} does not have key: {k}")
+
         return query_df
 
     @staticmethod

@@ -46,7 +46,7 @@ class ApiTestProject(AbstractTestProject):
 
     @staticmethod
     @overrides(AbstractTestProject)
-    def get_source_entries() -> List[Artifact]:
+    def get_source_artifacts() -> List[Artifact]:
         """
         :return: Returns entries for source artifacts for layer 1 and 2 and test data manager.
         """
@@ -54,7 +54,7 @@ class ApiTestProject(AbstractTestProject):
 
     @staticmethod
     @overrides(AbstractTestProject)
-    def get_target_entries() -> List[LayerEntry]:
+    def get_target_artifacts() -> List[LayerEntry]:
         """
         :return: Returns entries for target artifacts for layer 1 and 2 and test data manager.
         """
@@ -70,7 +70,7 @@ class ApiTestProject(AbstractTestProject):
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
-    def get_layer_mapping_entries(cls) -> List[TraceLayer]:
+    def get_trace_layers(cls) -> List[TraceLayer]:
         """
         :return: Returns entries for layer mappings between two layers.
         """

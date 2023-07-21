@@ -51,7 +51,7 @@ class PromptTestProject:
         Gets all the artifacts from the safa project
         :return: A list of all artifacts as dicts
         """
-        artifacts = PromptTestProject.SAFA_PROJECT.get_source_entries() + PromptTestProject.SAFA_PROJECT.get_target_entries()
+        artifacts = PromptTestProject.SAFA_PROJECT.get_source_artifacts() + PromptTestProject.SAFA_PROJECT.get_target_artifacts()
         return artifacts
 
     @staticmethod

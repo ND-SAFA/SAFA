@@ -15,8 +15,8 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, \
-    mock_openai
+from tgen.testres.test_anthropic_responses import mock_openai
+from tgen.testres.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.train.trainers.llm_trainer import LLMTrainer
@@ -74,9 +74,8 @@ class TestOpenAiTrainer(BaseTest):
 
     @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
-    def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock, mock_completion_create: mock.MagicMock):
+    def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
-        mock_completion_create.side_effect = self.fake_completion_create
 
         dataset_creators = self.get_all_dataset_creators()
         dataset_creators.pop("id")
@@ -134,12 +133,6 @@ class TestOpenAiTrainer(BaseTest):
     @staticmethod
     def get_dataset_creator_as_trace_dataset_creator():
         return PromptTestProject.get_trace_dataset_creator()
-
-    def fake_completion_create(self, **params):
-        self.assertGreater(len(params), 0)
-        for param in params:
-            self.assertIn(param, COMPLETION_REQUEST)
-        return fake_open_ai_completion(**params)
 
     def fake_fine_tune_create(self, not_classification: bool = True, **params):
         self.assertGreater(len(params), 0)

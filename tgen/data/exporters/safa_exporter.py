@@ -171,4 +171,4 @@ class SafaExporter(AbstractDatasetExporter):
         :param artifact_type: The artifact type
         :return: A dataframe of artifacts of a given type
         """
-        return DataFrameUtil.query_df(self.get_dataset().artifact_df, {ArtifactKeys.LAYER_ID: artifact_type})
+        return DataFrameUtil.query_df(self.get_dataset().artifact_df, {ArtifactKeys.LAYER_ID.value: artifact_type})

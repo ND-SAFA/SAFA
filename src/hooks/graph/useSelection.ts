@@ -7,7 +7,7 @@ import {
   TimTraceMatrixSchema,
   TraceLinkSchema,
 } from "@/types";
-import { sanitizeNodeId } from "@/util";
+import { LARGE_NODE_COUNT, sanitizeNodeId } from "@/util";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -111,19 +111,36 @@ export const useSelection = defineStore("selection", {
   },
   actions: {
     /**
-     * Clears any selected artifact(s) in artifact tree.
+     * Clears any selected elements in the graph.
+     * Each clear is wrapped in an if-statement to help improve performance on large graphs.
      *
      * @param clearFilter - Whether to clear the filter types.
      */
     clearSelections(clearFilter = false): void {
-      this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
-      this.selectedSubtreeIds = [];
-      this.selectedGroupIds = [];
-      this.selectedArtifactId = "";
-      this.selectedTraceLinkIds = ["", ""];
-      this.selectedArtifactLevelType = "";
-      this.selectedTraceMatrixTypes = ["", ""];
-      appStore.closeSidePanels();
+      if (this.ignoreTypes.length > 0) {
+        this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
+      }
+      if (this.selectedSubtreeIds.length > 0) {
+        this.selectedSubtreeIds = [];
+      }
+      if (this.selectedGroupIds.length > 0) {
+        this.selectedGroupIds = [];
+      }
+      if (this.selectedArtifactId) {
+        this.selectedArtifactId = "";
+      }
+      if (this.selectedTraceLinkIds[0]) {
+        this.selectedTraceLinkIds = ["", ""];
+      }
+      if (this.selectedArtifactLevelType) {
+        this.selectedArtifactLevelType = "";
+      }
+      if (this.selectedTraceMatrixTypes[0]) {
+        this.selectedTraceMatrixTypes = ["", ""];
+      }
+      if (appStore.isDetailsPanelOpen) {
+        appStore.closeSidePanels();
+      }
     },
     /**
      * Moves the viewport such that given set of artifacts is in the middle of the viewport.
@@ -149,17 +166,25 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
-      this.clearSelections();
+      // To improve performance, clear selected trace links and nothing else.
+      this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
-      this.filterGraph({
-        type: "subtree",
-        nodeIds: [
-          ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
-          artifactId,
-        ],
-        centerIds: [artifactId],
-      });
-      this.centerOnArtifacts([artifactId]);
+
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+        // To improve performance, only center on the artifacts on large graphs.
+        this.centerOnArtifacts([artifactId]);
+      } else {
+        // On small graphs, highlight the subtree.
+        this.filterGraph({
+          type: "subtree",
+          nodeIds: [
+            ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
+            artifactId,
+          ],
+          centerIds: [artifactId],
+        });
+      }
+
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -186,12 +211,21 @@ export const useSelection = defineStore("selection", {
         string
       ];
 
-      this.clearSelections();
+      // To improve performance, clear selected artifact and nothing else.
+      this.selectedArtifactId = "";
       this.selectedTraceLinkIds = nodeIds;
-      this.filterGraph({
-        type: "subtree",
-        nodeIds,
-      });
+
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+        // To improve performance, only center on the artifacts on large graphs.
+        this.centerOnArtifacts(nodeIds);
+      } else {
+        // On small graphs, highlight the subtree.
+        this.filterGraph({
+          type: "subtree",
+          nodeIds,
+        });
+      }
+
       appStore.openDetailsPanel("displayTrace");
     },
     /**

@@ -4,7 +4,6 @@
     :style="style"
     data-cy="tim-node"
     :data-cy-name="props.artifactType"
-    @click="handleSelect"
   >
     <node-display
       separator
@@ -13,6 +12,7 @@
       :title="props.artifactType"
       :subtitle="countLabel"
       :selected="selected"
+      @click="handleSelect"
     />
 
     <node-display
@@ -23,7 +23,7 @@
       @mouseenter="appStore.isGraphLock = true"
       @mouseleave="appStore.isGraphLock = false"
     >
-      <flex-box column>
+      <flex-box column @click.stop>
         <icon-button
           tooltip="View artifacts"
           icon="view-tree"

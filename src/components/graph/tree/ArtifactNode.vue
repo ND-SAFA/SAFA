@@ -5,7 +5,6 @@
     :data-cy="dataCy"
     :data-cy-name="props.artifact.name"
     @add="handleAdd"
-    @click="handleSelect"
   >
     <node-display
       separator
@@ -14,6 +13,9 @@
       :title="props.artifact.type"
       :subtitle="displayName"
       :selected="selected"
+      @mousedown="mouseDownTime = new Date().getTime()"
+      @mouseup="mouseUpTime = new Date().getTime()"
+      @click="handleSelect"
     >
       <separator
         v-if="showDelta"
@@ -54,7 +56,7 @@
       @mouseenter="appStore.isGraphLock = true"
       @mouseleave="appStore.isGraphLock = false"
     >
-      <flex-box column>
+      <flex-box column @click.stop>
         <icon-button
           tooltip="View related artifacts"
           icon="view-tree"
@@ -114,7 +116,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   ArtifactCytoElement,
   ArtifactSchema,
@@ -144,22 +146,28 @@ import {
 import { CyElement } from "../base";
 
 const props = defineProps<{
+  artifactsInView: string[];
   artifact: ArtifactSchema;
-  hidden?: boolean;
-  faded?: boolean;
 }>();
 
 const { darkMode } = useTheme();
 
+const mouseDownTime = ref(0);
+const mouseUpTime = ref(0);
+
 const id = computed(() => props.artifact.id);
 
 const selected = computed(() => selectionStore.isArtifactInSelected(id.value));
+const faded = computed(() => !props.artifactsInView.includes(id.value));
+const hidden = computed(() =>
+  subtreeStore.hiddenSubtreeNodes.includes(id.value)
+);
 
-const opacity = computed(() => (props.hidden ? 0 : props.faded ? 0.3 : 1));
+const opacity = computed(() => (hidden.value ? 0 : faded.value ? 0.3 : 1));
 const style = computed(
   () =>
     `opacity: ${opacity.value};` +
-    (opacity.value === 1 ? "z-index: 10;" : "z-index: 1;")
+    (selected.value ? "z-index: 10;" : "z-index: 1;")
 );
 
 const displayName = computed(
@@ -237,6 +245,9 @@ function handleAdd(cy: CytoCore): void {
  * or opens a new view of the artifact's subtree if the artifact is already selected.
  */
 function handleSelect(): void {
+  // Skip any potential drags.
+  if (mouseUpTime.value - mouseDownTime.value > 200) return;
+
   if (!selected.value) {
     selectionStore.selectArtifact(id.value);
   } else {

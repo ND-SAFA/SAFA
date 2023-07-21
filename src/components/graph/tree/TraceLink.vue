@@ -23,11 +23,17 @@ import { deltaStore, selectionStore, useTheme } from "@/hooks";
 import { CyElement } from "../base";
 
 const props = defineProps<{
+  artifactsInView: string[];
   trace: TraceLinkSchema;
-  faded?: boolean;
 }>();
 
 const { darkMode } = useTheme();
+
+const faded = computed(
+  () =>
+    !props.artifactsInView.includes(props.trace.targetId) ||
+    !props.artifactsInView.includes(props.trace.sourceId)
+);
 
 const definition = computed<TraceCytoElement>(() => ({
   data: {
@@ -40,7 +46,7 @@ const definition = computed<TraceCytoElement>(() => ({
     target: props.trace.sourceId,
 
     deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
-    faded: props.faded,
+    faded: faded.value,
     traceType: props.trace.traceType,
     approvalStatus: props.trace.approvalStatus,
     score: props.trace.score,

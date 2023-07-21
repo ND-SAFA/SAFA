@@ -5,7 +5,7 @@ from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from tgen.data.tdatasets.trace_matrix import Query, TraceMatrix
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.train.metrics.metrics_manager import MetricsManager
 
@@ -16,7 +16,7 @@ class TestTraceMatrix(BaseTest):
     N_SOURCES = 2
     SOURCE_ARTIFACTS = ["R1", "R2"]
     TARGET_ARTIFACTS = ["D1", "D2"]
-    LABEL_IDS = [0, 1, 1, 0]
+    LABEL_IDS = [1, 1, 0, 0]
     PREDICTIONS = np.array([[0.3, 0.2], [0.3, 0.6], [0.5, 0.1], [0.1, 0.5]])
     PREDICTION_OUTPUT = PredictionOutput(label_ids=LABEL_IDS, predictions=PREDICTIONS, metrics=["map"])
 
@@ -38,8 +38,8 @@ class TestTraceMatrix(BaseTest):
         """
         Assert that queries containing right number of elements.
         """
-        for source in self.SOURCE_ARTIFACTS:
-            source_queries = self.trace_matrix.query_matrix[source]
+        for target in self.TARGET_ARTIFACTS:
+            source_queries = self.trace_matrix.query_matrix[target]
             source_pred = source_queries.preds
             source_labels = source_queries.links
             self.assertEqual(len(source_pred), self.N_TARGETS)
@@ -50,28 +50,29 @@ class TestTraceMatrix(BaseTest):
         """
         Asserts that source queries containing write scores and labels.
         """
-        source_1 = self.SOURCE_ARTIFACTS[0]
-        source_1_query = self.trace_matrix.query_matrix[source_1]
-        self.assert_query(source_1_query, [False, True], [0, 1])
+        parent1 = self.TARGET_ARTIFACTS[0]
+        parent1_query = self.trace_matrix.query_matrix[parent1]
+        self.assert_query(parent1_query, [False, False], [1, 0])
 
-        source_2 = self.SOURCE_ARTIFACTS[1]
-        source_2_query = self.trace_matrix.query_matrix[source_2]
-        self.assert_query(source_2_query, [False, True], [1, 0])
+        parent2 = self.TARGET_ARTIFACTS[1]
+        parent2_query = self.trace_matrix.query_matrix[parent2]
+        self.assert_query(parent2_query, [True, True], [1, 0])
 
-    def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
+    def assert_query(self, query: Query, expected_greater: List[bool], expected_labels: List[int]) -> None:
         """
         Asserts that queries are above or under threshold and labels have expected values.
-        :param queries: Queries for source artifacts containing predictions and labels.
-        :param expected_greater: List of boolean representing if score is expected to be greater than threshold.
+        :param query: Queries for source artifacts containing predictions and labels.
         :param expected_labels: List of expected values.
         :return: None
         """
-        predictions = queries.preds
-        links = queries.links
+        predictions = query.preds
+        links = query.links
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
-            assertion(predictions[i], self.THRESHOLD)
-            self.assertEqual(links[i][TraceKeys.LABEL], expected_labels[i])
+            score = predictions[i]
+            label = links[i][TraceKeys.LABEL]
+            assertion(score, self.THRESHOLD)
+            self.assertEqual(label, expected_labels[i])
 
     def get_trace_df(self) -> List[TraceDataFrame]:
         """

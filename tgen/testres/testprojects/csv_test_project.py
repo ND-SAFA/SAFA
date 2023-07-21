@@ -5,9 +5,7 @@ from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
 from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
-from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.entry_creator import EntryCreator
 
 
 class CsvTestProject(AbstractTestProject):
@@ -33,36 +31,6 @@ class CsvTestProject(AbstractTestProject):
         :return: Returns csv reader for project.
         """
         return CsvProjectReader(cls.get_project_path(), overrides={"allowed_orphans": 2})
-
-    @staticmethod
-    def get_source_artifacts() -> List[List[Dict[str, str]]]:
-        """
-        :return: Returns list of source artifact entries per layer.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE)
-
-    @staticmethod
-    def get_target_artifacts() -> List[List[Dict[str, str]]]:
-        """
-        :return: Returns list of target artifact entries per layer.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET)
-
-    @classmethod
-    def get_trace_entries(cls) -> List[Dict]:
-        """
-        :return: Returns list of trace entries in project trace data frame..
-        """
-        trace_data = []
-        batch_one, batch_two = cls.get_batch_link_labels()
-        labels = batch_one + batch_two
-        i = 0
-        for batch in cls.BATCH_RANGES:
-            for s_id in batch:
-                for t_id in batch:
-                    trace_data.append((f"s{s_id}", f"t{t_id}", labels[i]))
-                    i += 1
-        return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod
     def get_trace_layers(cls) -> List[TraceLayer]:

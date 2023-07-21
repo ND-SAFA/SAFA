@@ -125,12 +125,12 @@ class TestDataManager:
         """
         :return: map between artifact id to its body.
         """
-        artifacts = {}
+        artifact_map = {}
         artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
-        for artifact_level, artifacts in artifact_levels.items():
-            for artifact_id, artifact_body in artifacts.items():
-                artifacts[artifact_id] = artifact_body
-        return artifacts
+        for level_name, level_map in artifact_levels.items():
+            for artifact_id, artifact_body in level_map.items():
+                artifact_map[artifact_id] = artifact_body
+        return artifact_map
 
     @staticmethod
     def get_project_reader() -> ApiProjectReader:

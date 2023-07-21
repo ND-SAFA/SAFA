@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import tqdm
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
@@ -29,6 +30,7 @@ class TraceMatrix:
         self.query_matrix = {}
         self.parent_ids = []
         self.labels = []
+        self.entries = []
         self.scores = predicted_scores
         self._fill_trace_matrix(trace_df, predicted_scores, link_ids)
         if randomize:
@@ -107,6 +109,7 @@ class TraceMatrix:
             self.parent_ids.append(parent_id)
         self.query_matrix[parent_id].links.append(link)
         self.labels.append(label)
+        self.entries.append(TracePredictionEntry(source=child_id, target=parent_id, score=pred, label=label))
         if pred is not None:
             self.query_matrix[parent_id].preds.append(pred)
 

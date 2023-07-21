@@ -75,20 +75,26 @@ class BaseObject(ABC):
         obj_meta_list = [ObjectMeta()]
 
         for param_name, variable in definition.items():
-            expected_type = param_specs.param_types[param_name] if param_name in param_specs.param_types else None
-            param_value = cls._get_value_of_variable(variable, expected_type)
+            expected_param_type = param_specs.param_types[param_name] if param_name in param_specs.param_types else None
+            param_value = cls._get_value_of_variable(variable, expected_param_type)
 
             if isinstance(param_value, ExperimentalVariable):
                 obj_meta_list[0].init_params[param_name] = param_value
                 experiment_params_list = []
-                for i, experiment_val in enumerate(param_value):
+                for i, inner_variable in enumerate(param_value):
+                    inner_variable_value = cls._get_value_of_variable(inner_variable, expected_param_type)
+
                     children_experimental_vars = param_value.experimental_param2als[i] if param_value.experimental_param2als else {}
-                    expanded_params = cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
+                    expanded_params = cls._add_param_values(obj_meta_list=obj_meta_list,
+                                                            param_name=param_name,
+                                                            param_value=inner_variable_value,
+                                                            expected_type=expected_param_type,
+                                                            is_experimental=True,
                                                             children_experimental_vars=children_experimental_vars)
                     experiment_params_list.extend(expanded_params)
                 obj_meta_list = experiment_params_list
             else:
-                obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_type)
+                obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_param_type)
         instances = []
         for obj_meta in obj_meta_list:
             obj_params = obj_meta.init_params
@@ -210,7 +216,9 @@ class BaseObject(ABC):
             cls._assert_type(param_value, expected_type, param_name)
         for obj_meta in obj_meta_list:
             meta_out = deepcopy(obj_meta)
-            meta_out.add_param(param_name, deepcopy(cls._get_value_of_variable(param_value)),
+            inner_param_value = cls._get_value_of_variable(param_value, expected_type)
+            inner_param_value = deepcopy(inner_param_value)
+            meta_out.add_param(param_name, inner_param_value,
                                is_experimental=is_experimental,
                                children_experimental_vars=children_experimental_vars)
             obj_meta_list_out.append(meta_out)

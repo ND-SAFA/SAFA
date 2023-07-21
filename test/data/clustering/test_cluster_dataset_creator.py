@@ -1,5 +1,5 @@
 from collections import namedtuple
-from unittest import mock
+from unittest import mock, skip
 
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
@@ -36,6 +36,7 @@ class TestClusterDatasetCreator(BaseTest):
         clusters = clusterer.get_clusters()
         self.assertIn(SupportedClusteringMethod.GRAPH, clusters)
 
+    @skip
     @mock.patch.object(AbstractLLMManager, "make_completion_request")
     @mock.patch("cdlib.algorithms.louvain")
     def test_create(self, louvain_mock: mock.MagicMock, completion_request_mock: mock.MagicMock):

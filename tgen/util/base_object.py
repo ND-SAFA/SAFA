@@ -121,7 +121,15 @@ class BaseObject(ABC):
             elif parent_class == "list":
                 if len(child_classes) == 1:
                     expected_child_class = child_classes[0]
-                    val = [cls._get_value_of_variable(v, expected_child_class) for v in variable]
+                    val = []
+                    for v in variable.value:
+                        inner_value = cls._get_value_of_variable(v, expected_child_class)
+                        if isinstance(inner_value, ExperimentalVariable):  # single item turned t
+                            inner_values = [cls._get_value_of_variable(v2, expected_child_class) for v2 in inner_value.value]
+                            val.extend(inner_values)
+                        else:
+                            val.append(inner_value)
+                    return val
                 else:
                     raise TypeError(f"Found more than possible types in class: {child_classes}")
             elif parent_class == "union":
@@ -129,6 +137,7 @@ class BaseObject(ABC):
                 if len(list_type) == 0:
                     raise TypeError(f"Multivariable expected type must be some sort of list. Received: {child_classes}")
                 val = cls._get_value_of_variable(variable, list_type[0])
+                return val
             else:
                 raise TypeError(f"Expected {expected_type} to be list or optional but received: {expected_type}.")
 
@@ -141,7 +150,7 @@ class BaseObject(ABC):
             val = cls._make_child_object(variable, expected_type) if expected_type else None
         elif isinstance(variable, Variable):
             val = variable.value
-        else:
+        else:  # not a variable
             val = variable
         if ReflectionUtil.is_instance_or_subclass(expected_type, Enum) and isinstance(val, str):
             val = get_enum_from_name(expected_type, val)

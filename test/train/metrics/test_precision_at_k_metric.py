@@ -1,8 +1,8 @@
 from typing import List, Type
 
+from test.train.metrics.test_metric_at_k import TestMetricAtK
 from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from test.train.metrics.test_metric_at_k import TestMetricAtK
 
 
 class TestPrecisionAtKMetric(TestMetricAtK):
@@ -32,7 +32,7 @@ class TestPrecisionAtKMetric(TestMetricAtK):
         return PrecisionAtKMetric
 
     @property
-    def metric_name(self):
+    def base_metric_name(self):
         """
         :return: Returns the name of the precision metric within results.
         """

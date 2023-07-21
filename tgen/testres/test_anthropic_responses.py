@@ -1,6 +1,6 @@
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import TestResponseManager
 
 
 def fake_anthropic_completion(prompt, **args):
-    res = fake_open_ai_completion(prompt, **args)
+    res = TestResponseManager(prompt, **args)
     return [{"completion": choice["text"]} for choice in res.choices]

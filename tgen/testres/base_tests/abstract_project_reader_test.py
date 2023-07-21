@@ -1,5 +1,4 @@
 from typing import Dict, List
-from unittest import mock
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
@@ -7,7 +6,7 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, mock_openai
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.train.args.open_ai_args import OpenAIArgs
 
@@ -29,14 +28,13 @@ class AbstractProjectReaderTest(BaseTest):
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
 
-    @mock.patch("openai.ChatCompletion.create", )
-    def verify_summarization(self, mock_completion: mock.MagicMock, test_project):
+    @mock_openai
+    def verify_summarization(self, test_project):
         """
         Verifies that entries are properly summarized by reader
         :param test_project: Project containing entities to compare data frames to.
         :return: None
         """
-        mock_completion.side_effect = fake_open_ai_completion
         project_reader: AbstractProjectReader = test_project.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))

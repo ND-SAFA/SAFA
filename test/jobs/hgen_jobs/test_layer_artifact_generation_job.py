@@ -7,9 +7,9 @@ from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import mock_openai
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
+
 
 @skip("Skipping hgen tests until can fix for update")
 class TestLayerArtifactGenerationJob(BaseJobTest):
@@ -20,9 +20,9 @@ class TestLayerArtifactGenerationJob(BaseJobTest):
 
     CLUSTERS = {"functionality 1": ["s1", "s2"], "functionality 2": ["s3", "s4"]}
 
+    @mock_openai
     @mock.patch.object(AnthropicManager, "make_completion_request_impl", return_value=res)
-    @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)
-    def test_run_success(self, fake_open_ai_completion_mock: mock.MagicMock, fake_anthropic_completion_mock: mock.MagicMock):
+    def test_run_success(self, fake_anthropic_completion_mock: mock.MagicMock):
         """
         Tests that job is completed succesfully.
         """

@@ -271,11 +271,10 @@ class BaseObject(ABC):
                 return True
 
             if ReflectionUtil.is_typed_class(expected_type):
-                if expected_type._name == "Any":
+                expected_type_name = expected_type._name
+                if expected_type_name == "Any":
                     return True
-                if expected_type._name == "Dict":
-                    check_type(val, expected_type, param_name)
-                    return True
+
                 parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
                 if parent_class == "dict":
                     expected_type = child_classes[0]
@@ -287,6 +286,9 @@ class BaseObject(ABC):
                 elif parent_class == "union":
                     queries = [c for c in child_classes if cls._is_type(val, c, param_name)]
                     assert len(queries) > 0, f"{val} was not of type: {child_classes}"
+                    return True
+                elif parent_class == "callable":
+                    check_type(param_name, val, expected_type)
                     return True
                 else:
                     expected_type = parent_class

@@ -140,7 +140,7 @@ class ReflectionUtil:
         ReflectionUtil.set_attributes(other, values)
 
     @staticmethod
-    def get_typed_class(typed_obj: Any) -> List:
+    def get_typed_class(typed_obj: Any) -> typing.Tuple[str, List[Type]]:
         """
         Returns the base class and the child class.
         e.g.
@@ -150,23 +150,20 @@ class ReflectionUtil:
         :param typed_obj:
         :return:
         """
-        if ReflectionUtil.is_typed_class(typed_obj):
-            origin = typing.get_origin(typed_obj)
-            type_args = ReflectionUtil.get_type_args(typed_obj)
-            if origin is typing.Union:
-                return "union", *type_args
-            elif origin is list:
-                assert len(type_args) == 1, f"Found multiple typed for list: {type_args}"
-                return "list", type_args[0]
-            elif len(type_args) == 1:
-                expected_type = type_args[0]
-            else:
-                expected_types = [t for t in type_args if isinstance(typed_obj, t)]
-                expected_type = expected_types[0]
+        if not ReflectionUtil.is_typed_class(typed_obj):
+            raise ValueError("Expected class to be Typed class.")
 
-            return [expected_type]
+        origin = typing.get_origin(typed_obj)
+        type_args = ReflectionUtil.get_arg_types(typed_obj)
+        if origin is typing.Union:
+            return "union", *type_args
+        elif isinstance(origin, list):
+            assert len(type_args) == 1, f"Found multiple typed for list: {type_args}"
+            return "list", type_args[0]
+        elif isinstance(origin, typing.Callable):
+            return "callable", *type_args
         else:
-            return [typed_obj]
+            raise ValueError("Unable ")
 
     @staticmethod
     def is_typed_class(class_obj: Type):
@@ -178,15 +175,16 @@ class ReflectionUtil:
         return hasattr(class_obj, "_name")  # TODO: Come up with better hueristc
 
     @staticmethod
-    def get_type_args(class_obj: Type):
+    def get_arg_types(class_obj: Type):
         """
         Returns the typed arguments to class.
         :param class_obj:
         :return:
         """
         assert ReflectionUtil.is_typed_class(class_obj), f"{class_obj} is not a typed class."
+        if not hasattr(class_obj, "__args__"):
+            return []
         type_args = class_obj.__args__
-        type_args = [t for t in type_args if not ReflectionUtil.is_none_type(t)]
         return type_args
 
     @staticmethod

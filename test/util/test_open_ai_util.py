@@ -1,10 +1,8 @@
-import mock.mock
-
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion, mock_openai
+from tgen.testres.test_open_ai_responses import mock_openai
 from tgen.train.args.open_ai_args import OpenAIArgs
 
 
@@ -14,8 +12,7 @@ class TestOpenAiUtil(BaseTest):
     """
 
     @mock_openai
-    def test_completion_request(self, mock_completion: mock.MagicMock):
-        mock_completion.side_effect = fake_open_ai_completion
+    def test_completion_request(self):
         llm_manager = OpenAIManager(OpenAIArgs())
         res: GenerationResponse = llm_manager.make_completion_request(
             completion_type=LLMCompletionType.GENERATION, prompt=["prompt" for i in range(30)])

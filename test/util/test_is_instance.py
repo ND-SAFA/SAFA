@@ -38,6 +38,7 @@ class TestIsInstance(BaseTest):
     def test_functions(self):
         a: Callable[[str], str] = lambda s: s
         self.negative_test(a, List[str])
+        self.positive_test(a, Callable[[str], str])
         self.positive_test(a, Callable)
 
     def test_optionals(self):

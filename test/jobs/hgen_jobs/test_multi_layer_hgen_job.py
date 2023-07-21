@@ -1,4 +1,6 @@
 import math
+import random
+import re
 import uuid
 from unittest import mock, skip
 
@@ -13,11 +15,8 @@ from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
+from tgen.testres.test_open_ai_responses import mock_openai
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
-import re
-import random
 
 
 def get_res(prompt, **kwargs):
@@ -35,12 +34,13 @@ def get_res(prompt, **kwargs):
                           f'<artifacts>{",".join(group_artifacts)}</artifacts>\n</group>\n\n')
     return [{"completion": "".join(group_tags)}]
 
+
 @skip("Skipping hgen tests until can fix for update")
 class TestMultiLayerHGenJob(BaseJobTest):
     project = GenerationTestProject()
 
+    @mock_openai
     @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=get_res)
-    @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)
     def test_run_success(self, fake_open_ai_completion_mock: mock.MagicMock, fake_anthropic_completion_mock: mock.MagicMock):
         """
         Tests that job is completed succesfully.

@@ -17,6 +17,7 @@ import {
   isLinkAllowedByType,
   preserveObjectKeys,
   removeMatches,
+  sanitizeNodeId,
 } from "@/util";
 import { pinia } from "@/plugins";
 import projectStore from "@/hooks/project/useProject";
@@ -252,8 +253,8 @@ export const useTypeOptions = defineStore("typeOptions", {
     ): TimTraceMatrixSchema | undefined {
       return this.tim.traces.find(
         ({ sourceType, targetType }) =>
-          sourceType.replace(/ /g, "") === source &&
-          targetType.replace(/ /g, "") === target
+          sanitizeNodeId(sourceType) === source &&
+          sanitizeNodeId(targetType) === target
       );
     },
   },

@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div class="overflow-hidden">
     <typography
       bold
+      ellipsis
       color="primary"
       class="q-mr-xs"
       :value="props.artifactLevel.name"

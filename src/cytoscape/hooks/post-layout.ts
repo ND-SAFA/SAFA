@@ -3,7 +3,7 @@ import {
   LayoutHook,
   AutoMoveReposition,
   CytoCore,
-  IGraphLayout,
+  CyLayout,
   CytoEvent,
   ArtifactCytoElementData,
 } from "@/types";
@@ -23,7 +23,7 @@ import { artifactTreeMenuItems } from "@/cytoscape/plugins";
  */
 export function addAutoMoveToNode(
   cy: CytoCore,
-  layout: IGraphLayout,
+  layout: CyLayout,
   node: NodeSingular
 ): void {
   const children = node
@@ -51,7 +51,7 @@ export function addAutoMoveToNode(
  */
 export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
-  layout: IGraphLayout
+  layout: CyLayout
 ): void => {
   cy.automove("destroy");
   cy.nodes().forEach((node) => addAutoMoveToNode(cy, layout, node));
@@ -65,7 +65,7 @@ export const applyAutoMoveEvents: LayoutHook = (
  */
 export const applyCytoEvents: LayoutHook = (
   cy: CytoCore,
-  layout: IGraphLayout
+  layout: CyLayout
 ): void => {
   for (const cytoEvent of Object.values(layout.cytoEventHandlers)) {
     const eventName: string = cytoEvent.events.join(" ");

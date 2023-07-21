@@ -1,5 +1,5 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element :definition="definition" @click="handleSelect" />
 </template>
 
 <script lang="ts">
@@ -19,15 +19,21 @@ import {
   TraceCytoElement,
   TraceLinkSchema,
 } from "@/types";
-import { deltaStore, useTheme } from "@/hooks";
-import { CyElement3 } from "../base";
+import { deltaStore, selectionStore, useTheme } from "@/hooks";
+import { CyElement } from "../base";
 
 const props = defineProps<{
+  artifactsInView: string[];
   trace: TraceLinkSchema;
-  faded?: boolean;
 }>();
 
 const { darkMode } = useTheme();
+
+const faded = computed(
+  () =>
+    !props.artifactsInView.includes(props.trace.targetId) ||
+    !props.artifactsInView.includes(props.trace.sourceId)
+);
 
 const definition = computed<TraceCytoElement>(() => ({
   data: {
@@ -40,7 +46,7 @@ const definition = computed<TraceCytoElement>(() => ({
     target: props.trace.sourceId,
 
     deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
-    faded: props.faded,
+    faded: faded.value,
     traceType: props.trace.traceType,
     approvalStatus: props.trace.approvalStatus,
     score: props.trace.score,
@@ -48,4 +54,11 @@ const definition = computed<TraceCytoElement>(() => ({
   },
   classes: props.trace.sourceId === props.trace.targetId ? "loop" : "",
 }));
+
+/**
+ * Selects this trace link.
+ */
+function handleSelect(): void {
+  selectionStore.selectTraceLink(props.trace);
+}
 </script>

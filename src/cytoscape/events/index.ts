@@ -1,2 +1,6 @@
-export * from "./artifact-tree-events";
-export * from "./cyto-events";
+/**
+ * Events to apply to a created cytoscape instance.
+ */
+export const DefaultEvents = {};
+
+export default { DefaultEvents };

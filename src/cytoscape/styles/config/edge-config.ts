@@ -43,6 +43,7 @@ export const TIM_EDGE_SELECTOR = `edge[graph='${GraphMode.tim}']`;
 export const TIM_EDGE_STYLE = "taxi";
 export const TIM_EDGE_ARROW_SHAPE = "chevron";
 export const TIM_EDGE_X_MARGIN = 10;
-export const TIM_EDGE_FONT_WEIGHT = 600;
+export const TIM_EDGE_FONT_WEIGHT = 400;
 export const TIM_EDGE_FONT_SIZE = 20;
+export const TIM_EDGE_FONT_BG_OPACITY = 0.8;
 export const TIM_EDGE_LOOP_STEP_SIZE = 140;

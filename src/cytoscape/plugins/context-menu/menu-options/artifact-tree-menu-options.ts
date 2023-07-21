@@ -98,9 +98,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openDetailsPanel("displayArtifactBody");
       });
     },
-    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
-      return !!artifactData?.body;
-    },
   },
   {
     id: "edit-artifact",
@@ -172,17 +169,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible: hasValidData,
-  },
-  {
-    id: "highlight-subtree",
-    content: "Highlight Subtree",
-    tooltipText: "Highlight this artifact's subtree nodes",
-    selector: "node",
-    coreAsWell: false,
-    onClickFunction(event: EventObject): void {
-      handleOnClick(event, ({ id }) => selectionStore.viewArtifactSubtree(id));
-    },
-    isVisible: hasSubtree,
   },
   {
     id: "hide-subtree",

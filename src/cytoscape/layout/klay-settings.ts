@@ -11,7 +11,7 @@ import {
 } from "@/cytoscape/styles";
 
 // docs: https://github.com/cytoscape/cytoscape.js-klay
-export const TimKlaySettings: KlayLayoutSettings = {
+export const KlaySettings: KlayLayoutSettings = {
   spacing: LAYOUT_NODE_SPACING,
   direction: LAYOUT_NODE_DIRECTION,
   fixedAlignment: LAYOUT_ALIGNMENT,

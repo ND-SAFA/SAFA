@@ -31,6 +31,7 @@
     <typography
       v-if="hasSummary && !generateApproval"
       default-expanded
+      :collapse-length="0"
       variant="expandable"
       :value="summary"
       data-cy="text-selected-body"

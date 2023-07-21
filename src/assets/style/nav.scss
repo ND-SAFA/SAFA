@@ -79,6 +79,12 @@
     border-color: $color-primary !important;
   }
 
+  .q-field__native > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   &.nav-search {
     min-width: 200px;
     width: 30vw;

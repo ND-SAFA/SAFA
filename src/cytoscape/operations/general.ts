@@ -1,4 +1,4 @@
-import { CyPromise, IGraphLayout, LayoutPayload } from "@/types";
+import { CyPromise, CyLayout, LayoutPayload } from "@/types";
 import { selectionStore } from "@/hooks";
 import { applyAutoMoveEvents } from "@/cytoscape/hooks";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
@@ -113,7 +113,7 @@ export function cyCreateLayout(
  * @param cyPromise - The cy instance.
  */
 export function cyApplyAutomove(
-  layout: IGraphLayout,
+  layout: CyLayout,
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
   cyPromise.then((cy) => {

@@ -1,5 +1,4 @@
 import klay from "cytoscape-klay";
-import nodeHtmlLabel from "cytoscape-node-html-label";
 
 import { CytoCoreGraph } from "@/types";
 import { layoutStore } from "@/hooks";
@@ -25,10 +24,6 @@ export const timGraph: CytoCoreGraph = {
   plugins: [
     {
       initialize: klay,
-      afterInit: () => undefined,
-    },
-    {
-      initialize: nodeHtmlLabel,
       afterInit: () => undefined,
     },
   ],

@@ -162,19 +162,19 @@ export const useSelection = defineStore("selection", {
     },
     /**
      * Sets the given artifact as selected.
+     * To improve performance on large graphs, this function does the following:
+     * - Clear selected trace links and nothing else.
+     * - Only highlight the related artifacts on smaller graphs.
      *
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
-      // To improve performance, clear selected trace links and nothing else.
       this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
 
       if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
-        // To improve performance, only center on the artifacts on large graphs.
         this.centerOnArtifacts([artifactId]);
       } else {
-        // On small graphs, highlight the subtree.
         this.filterGraph({
           type: "subtree",
           nodeIds: [
@@ -203,27 +203,25 @@ export const useSelection = defineStore("selection", {
     /**
      * Sets the given trace links as selected.
      *
+     * To improve performance on large graphs, this function does the following:
+     * - Clear selected artifact and nothing else.
+     * - Only highlight the related artifacts on smaller graphs.
+     *
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
-      const nodeIds = [traceLink.sourceId, traceLink.targetId] as [
-        string,
-        string
+      const nodeIds: [string, string] = [
+        traceLink.sourceId,
+        traceLink.targetId,
       ];
 
-      // To improve performance, clear selected artifact and nothing else.
       this.selectedArtifactId = "";
       this.selectedTraceLinkIds = nodeIds;
 
       if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
-        // To improve performance, only center on the artifacts on large graphs.
         this.centerOnArtifacts(nodeIds);
       } else {
-        // On small graphs, highlight the subtree.
-        this.filterGraph({
-          type: "subtree",
-          nodeIds,
-        });
+        this.filterGraph({ type: "subtree", nodeIds });
       }
 
       appStore.openDetailsPanel("displayTrace");
@@ -256,10 +254,7 @@ export const useSelection = defineStore("selection", {
 
       this.clearSelections();
       this.selectedTraceMatrixTypes = nodeIds;
-      this.filterGraph({
-        type: "subtree",
-        nodeIds,
-      });
+      this.filterGraph({ type: "subtree", nodeIds });
       appStore.openDetailsPanel("displayTraceMatrix");
     },
     /**

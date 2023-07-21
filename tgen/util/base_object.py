@@ -112,22 +112,26 @@ class BaseObject(ABC):
         """
         if isinstance(variable, UndeterminedVariable):
             val = variable
+        elif isinstance(variable, ExperimentalVariable):
+            val = variable
         elif isinstance(variable, MultiVariable):
-            if ReflectionUtil.is_typed_class(expected_type):
-                expected_inner_types = ReflectionUtil.get_arg_types(expected_type)
-                expected_inner_type = expected_inner_types[0] if len(expected_inner_types) >= 1 else expected_type
+            parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
+            if parent_class == "optional":
+                print("HI")
+            elif parent_class == "list":
+                if len(child_classes) == 1:
+                    expected_child_class = child_classes[0]
+                    val = [cls._get_value_of_variable(v, expected_child_class) for v in variable]
+                else:
+                    raise TypeError(f"Found more than possible types in class: {child_classes}")
+            elif parent_class == "union":
+                list_type = [c for c in child_classes if hasattr(c, "_name") and c._name == "List"]
+                if len(list_type) == 0:
+                    raise TypeError(f"Multivariable expected type must be some sort of list. Received: {child_classes}")
+                val = cls._get_value_of_variable(variable, list_type[0])
             else:
-                expected_inner_type = expected_type
-            # if hasattr(expected_inner_type, "_name"):
-            #     expected_inner_type = expected_inner_type.__args__[0]
-            val = []
-            for i, inner_var in enumerate(variable):
-                inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
-                val.append(inner_val)
-            if len(val) == 1 and isinstance(val[0], ExperimentalVariable):
-                val = val.pop()
-            elif isinstance(variable, ExperimentalVariable):
-                val = ExperimentalVariable(val)
+                raise TypeError(f"Expected {expected_type} to be list or optional but received: {expected_type}.")
+
         elif isinstance(variable, TypedDefinitionVariable):
             expected_class = cls._get_expected_class_by_type(expected_type, variable.object_type)
             val = cls._make_child_object(DefinitionVariable(variable), expected_class)
@@ -266,7 +270,7 @@ class BaseObject(ABC):
         try:
             if isinstance(val, UndeterminedVariable):
                 return True
-            
+
             if ReflectionUtil.is_typed_dict(expected_type):
                 assert isinstance(val, dict)
                 for field_name, expected_field_type in expected_type.__annotations__.items():

@@ -12,7 +12,8 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits, TokenLimitCalculator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, TestResponseManager, mock_openai
+from tgen.testres.test_anthropic_responses import mock_openai
+from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, TestResponseManager
 from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.file_util import FileUtil
 

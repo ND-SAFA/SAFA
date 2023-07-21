@@ -101,18 +101,27 @@ SUMMARY_FORMAT = "Summary of {}"
 DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag
 from unittest import mock
 
+library_map = {
+    "openai": "openai.ChatCompletion.create",
+    "anthropic": "AnthropicManager.Client.completion"
+}
 
-def mock_openai(func=None, format: str = None, test_expected_responses: bool = True, *outer_args, **outer_kwargs):
+
+def mock_ai(library: str, response_formatter: Callable, func=None, format: str = None, test_expected_responses: bool = True,
+            *outer_args,
+            **outer_kwargs):
     """
     Automatically mocks open ai
     :param format: The format to encapsulate responses in.
     :return: The decorated function with open ai mocked.
     """
+    library_mock_string = library_map[library]
 
     def decorator(test_func: Callable, *test_func_args, **test_func_kwargs):
-        @mock.patch("openai.ChatCompletion.create")
+        @mock.patch(library_mock_string)
         def wrapper(self, mock_completion):
-            response_manager = TestResponseManager(format=format, *test_func_args, *outer_args, **test_func_kwargs, **outer_kwargs)
+            response_manager = TestResponseManager(format=format, response_formatter=response_formatter, *test_func_args, *outer_args,
+                                                   **test_func_kwargs, **outer_kwargs)
             mock_completion.side_effect = response_manager
             if does_accept(test_func, response_manager):
                 test_func(self, response_manager)
@@ -137,7 +146,7 @@ def create_openai_handler(format: str = None, *args, **kwargs):
                 return format.format(t)
             return t
 
-        response_text = TestResponseManager(processor=processor, *args, *handler_args, **kwargs, **handler_kwargs)
+        response_text = TestResponseManager(response_formatter=processor, *args, *handler_args, **kwargs, **handler_kwargs)
         return response_text
 
     return handler
@@ -147,31 +156,34 @@ DEFAULT_RESPONSE = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0]["message"]["c
 
 
 class TestResponseManager:
-    def __init__(self, responses: Union[str, List[str]] = None, tags: List[str] = None,
-                 processor: Callable = None, format: str = None):
+    def __init__(self,
+                 responses: Union[str, List[str]] = None,
+                 tags: List[str] = None,
+                 response_formatter: Callable = None,
+                 format: str = None):
         if responses is None:
             responses = [DEFAULT_RESPONSE]
         if tags is None:
             tags = [DEFAULT_SUMMARY_TAG]
         self.responses = responses
         self.tags = tags
-        self.processor = processor
+        self.response_formatter = response_formatter
         self.format = format
         self.n_given = 0
         self.start_index = 0
         self.end_index = len(responses)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> List[str]:
         prompts = [m["content"] for m in kwargs["messages"]]
         n_prompts = len(prompts)
         responses = self.get_next_response(n_requested=n_prompts)
-        if self.processor is not None:
-            responses = [self.processor(r) for r in responses]
+        if self.response_formatter is not None:
+            responses = [self.response_formatter(r) for r in responses]
         if self.format:
             responses = [self.format.format(r) for r in responses]
-        res = AttrDict({"choices": [AttrDict({"message": {"content": r}}) for r in responses], "id": "id"})
         self.n_given += n_prompts
-        return res
+        formatted_response = self.response_formatter(responses)
+        return formatted_response
 
     def set_responses(self, responses: List[str]):
         self.responses = responses

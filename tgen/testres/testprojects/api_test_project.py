@@ -1,14 +1,8 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
-from tgen.common.artifact import Artifact
-from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.readers.api_project_reader import ApiProjectReader
-from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.entry_creator import EntryCreator, LayerEntry, TraceInstruction
-from tgen.util.override import overrides
 
 
 class ApiTestProject(AbstractTestProject):
@@ -43,48 +37,6 @@ class ApiTestProject(AbstractTestProject):
         :return: Returns number of positive links defined for project
         """
         return len(TestDataManager.DATA[TestDataManager.Keys.TRACES])
-
-    @staticmethod
-    @overrides(AbstractTestProject)
-    def get_source_artifacts() -> List[Artifact]:
-        """
-        :return: Returns entries for source artifacts for layer 1 and 2 and test data manager.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE)
-
-    @staticmethod
-    @overrides(AbstractTestProject)
-    def get_target_artifacts() -> List[LayerEntry]:
-        """
-        :return: Returns entries for target artifacts for layer 1 and 2 and test data manager.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET)
-
-    @classmethod
-    def get_trace_entries(cls) -> List[Dict]:
-        """
-        :return: Returns entries for positive trace links defined in project.
-        """
-        trace_data: List[Dict] = TestDataManager.DATA[TestDataManager.Keys.TRACES]
-        trace_data: List[TraceInstruction] = [(t["source"], t["target"], t["label"]) for t in trace_data]
-        return EntryCreator.create_trace_entries(trace_data)
-
-    @classmethod
-    def get_trace_layers(cls) -> List[TraceLayer]:
-        """
-        :return: Returns entries for layer mappings between two layers.
-        """
-        layer_mapping_data = [
-            (
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, 0),
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, 0)
-            ),
-            (
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, 1),
-                ApiProjectReader.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, 1)
-            )
-        ]
-        return EntryCreator.create_layer_mapping_entries(layer_mapping_data)
 
     @classmethod
     def get_expected_links(self) -> List[Tuple[str, str]]:

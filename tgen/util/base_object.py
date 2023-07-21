@@ -281,11 +281,13 @@ class BaseObject(ABC):
                 elif parent_class == "list":
                     child_type = child_classes[0]
                     invalid_runs = [v for v in val if not cls._is_type(v, child_type, param_name)]
-                    assert len(invalid_runs) == 0, f"List elements {invalid_runs} was not of type {child_type}."
+                    if len(invalid_runs) > 0:
+                        raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
                     return True
                 elif parent_class == "union":
                     queries = [c for c in child_classes if cls._is_type(val, c, param_name)]
-                    assert len(queries) > 0, f"{val} was not of type: {child_classes}"
+                    if len(queries) == 0:
+                        raise TypeError(f"{val} was not of type: {child_classes}")
                     return True
                 elif parent_class == "callable":
                     check_type(param_name, val, expected_type)

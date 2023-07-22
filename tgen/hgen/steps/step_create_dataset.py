@@ -17,7 +17,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
-from tgen.jobs.composite_jobs.ranking_job import RankingJob
+from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 

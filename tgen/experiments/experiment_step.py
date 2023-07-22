@@ -31,8 +31,8 @@ class ExperimentStep(BaseObject):
         """
         if not isinstance(jobs, ExperimentalVariable):
             assert isinstance(jobs, list), f"Expected list of jobs but got: {jobs}"
-            jobs = ExperimentalVariable(jobs)
-        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param2als
+            jobs = ExperimentalVariable(jobs, using_jobs=True)
+        experimental_vars = jobs.experimental_param2val
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
         self.status = Status.NOT_STARTED
         self.best_job = None

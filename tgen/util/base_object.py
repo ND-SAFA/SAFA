@@ -84,7 +84,7 @@ class BaseObject(ABC):
                 for i, inner_variable in enumerate(param_value):
                     inner_variable_value = cls._get_value_of_variable(inner_variable, expected_param_type)
 
-                    children_experimental_vars = param_value.experimental_param2als[i] if param_value.experimental_param2als else {}
+                    children_experimental_vars = param_value.experimental_param2val[i] if param_value.experimental_param2val else {}
                     expanded_params = cls._add_param_values(obj_meta_list=obj_meta_list,
                                                             param_name=param_name,
                                                             param_value=inner_variable_value,
@@ -98,12 +98,8 @@ class BaseObject(ABC):
         instances = []
         for obj_meta in obj_meta_list:
             obj_params = obj_meta.init_params
-            try:
-                new_obj = cls(**obj_params)
-                instances.append(new_obj)
-            except Exception as e:
-                print(e)
-                raise e
+            new_obj = cls(**obj_params)
+            instances.append(new_obj)
         experimental_vars = [obj_meta.experimental_vars for obj_meta in obj_meta_list]
         return instances.pop() if len(instances) == 1 else ExperimentalVariable(instances,
                                                                                 experimental_param_name_to_val=experimental_vars)

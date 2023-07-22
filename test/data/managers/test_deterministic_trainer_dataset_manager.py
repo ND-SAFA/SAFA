@@ -31,7 +31,7 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             if dataset_role in expected_dataset_roles[1:]:
                 self.assertListEqual(sorted(dataset.get_pos_link_ids()), sorted(datasets2[dataset_role].get_pos_link_ids()))
 
-    def create_dataset_manager(self, dataset_roles: List[DatasetRole]):
+    def create_dataset_manager(self, dataset_roles: List[DatasetRole], trainer_index: int = -1):
         args = ObjectCreator.get_definition(TrainerDatasetManager)
         dataset_creators = {
             DatasetRole.EVAL: ("eval_dataset_creator", self.eval_dataset_creator_definition),
@@ -44,4 +44,5 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         args["random_seed"] = 10
         args["output_dir"] = TEST_OUTPUT_DIR
         experiment_vars: ExperimentalVariable = ObjectCreator.create(DeterministicTrainerDatasetManager, override=True, **args)
-        return experiment_vars.get_values_of_all_variables()[-1]
+        trainers = experiment_vars.value
+        return trainers[trainer_index]

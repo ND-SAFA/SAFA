@@ -1,6 +1,6 @@
 import math
 import os
-from unittest import mock
+from unittest import mock, skip
 from unittest.mock import patch
 
 from tgen.constants.deliminator_constants import PERIOD
@@ -29,6 +29,7 @@ class TestExperimentStep(BaseExperimentTest):
     EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
+    @skip
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):

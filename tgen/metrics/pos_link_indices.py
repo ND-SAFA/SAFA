@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 The True Link Indices metric measures the index at which true links in a software traceability 

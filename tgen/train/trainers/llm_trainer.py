@@ -13,16 +13,16 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.state.state_manager import StateManager
 from tgen.train.args.open_ai_args import OpenAIParams
-from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.abstract_trainer import AbstractTrainer
+from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.util.llm_response_util import LLMResponseUtil
 from tgen.util.logging.logger_manager import logger
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
-from tgen.state.state_manager import StateManager
 
 
 class LLMTrainer(AbstractTrainer):

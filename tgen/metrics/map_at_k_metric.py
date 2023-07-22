@@ -1,14 +1,15 @@
 from typing import Dict
 
 import datasets
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import average_precision_score
 
-from tgen.constants.metric_constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.util.logging.logger_manager import logger
+from tgen.constants.metric_constants import K_METRIC_DEFAULT
+from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
-Calculates the optimal threshold for predictions.
+Mean Average Precision@K metric measures the average precision over k for recommendations shown for 
+different links and averages them over all queries in the data.
 """
 
 _KWARGS_DESCRIPTION = """
@@ -17,7 +18,7 @@ Args:
     references (`list` of `int`): Ground truth labels.
     k (int): considers only the subset of recommendations from rank 1 through k
 Returns:
-    threshold (`float`): Mean Average Precision@K score. 
+    map_at_k (`float` or `int`): Mean Average Precision@K score. 
 """
 
 _CITATION = """
@@ -25,35 +26,31 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class PrecisionAtRecallMetric(AbstractTraceMetric):
-    name = "precision_at_recall_95"
+class MapAtKMetric(AbstractTraceMetric):
+    name = "map@k"
 
     # TODO
-    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> Dict:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrix, **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
-         and averages them over all queries in the dataset.
+         and averages them over all queries in the data.
         :param predictions: predicted labels
         :param labels: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        precisions, recalls, thresholds = precision_recall_curve(references, predictions)
+        results = {}
 
-        max_precision = 0
-        threshold = None
-        for index in range(len(recalls) - 1):
-            t = thresholds[index]
-            p = precisions[index]
-            r = recalls[index]
-            if r >= UPPER_RECALL_THRESHOLD and p > max_precision:
-                threshold = t
-                max_precision = p
+        def calculate_ap(labels, preds):
+            return average_precision_score(labels, preds)
 
-        if threshold is None:
-            logger.warning(f"Could not find threshold under {UPPER_RECALL_THRESHOLD} recall.")
-        return {"precision_at_recall_95": max_precision, "best_threshold": threshold}
+        for k in K_METRIC_DEFAULT:
+            score = trace_matrix.calculate_query_metric_at_k(calculate_ap, k, default_value=0)
+            metric_name = self.name.replace("k", str(k))
+            results[metric_name] = score
+
+        return results
 
     def _info(self) -> datasets.MetricInfo:
         """

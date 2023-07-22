@@ -3,9 +3,6 @@ import uuid
 
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.status import Status
 
 

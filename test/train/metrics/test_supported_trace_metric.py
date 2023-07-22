@@ -1,8 +1,8 @@
 import mock
 from mock import patch
 
+from tgen.metrics import get_metric_path
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.train.metrics.supported_trace_metric import get_metric_path
 
 
 class TestSupportedTraceMetric(BaseTest):

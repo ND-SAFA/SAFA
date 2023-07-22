@@ -10,7 +10,7 @@ from tgen.constants.hugging_face_constants import EVALUATION_STRATEGY_DEFAULT, E
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
     SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     USE_BALANCED_BATCHES_DEFAULT
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.util.base_object import BaseObject
 from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.enum_util import FunctionalWrapper

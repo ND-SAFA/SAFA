@@ -22,9 +22,9 @@ from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamel
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.metrics.metrics_manager import MetricsManager
+from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.ranking.common.utils import extract_tracing_requests
-from tgen.train.metrics.metrics_manager import MetricsManager
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.train.trace_output.stage_eval import Metrics
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trace_output.trace_train_output import TraceTrainOutput

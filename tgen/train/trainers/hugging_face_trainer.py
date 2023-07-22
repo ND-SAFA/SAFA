@@ -12,9 +12,9 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
+from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager
 from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy

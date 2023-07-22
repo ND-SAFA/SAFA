@@ -1,12 +1,9 @@
 from typing import Dict
 
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-
 import datasets
 
-from tgen.constants.metric_constants import THRESHOLD_DEFAULT
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
 
 _DESCRIPTION = """
 Specificity metric calculates the number of true negatives over all predicted negatives.

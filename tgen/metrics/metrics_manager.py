@@ -7,7 +7,7 @@ from scipy.special import softmax
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
+from tgen.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
 from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 

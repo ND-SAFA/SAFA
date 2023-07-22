@@ -6,8 +6,8 @@ from transformers.trainer_utils import PredictionOutput
 
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_matrix import Query, TraceMatrix
+from tgen.metrics.metrics_manager import MetricsManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.train.metrics.metrics_manager import MetricsManager
 
 
 class TestTraceMatrix(BaseTest):

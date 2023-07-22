@@ -6,7 +6,6 @@ import numpy as np
 from sklearn.preprocessing import minmax_scale, scale
 
 from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
-from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
@@ -15,8 +14,8 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
+from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.single_layer.single_layer_model import SingleLayerModel, predict, train
-from tgen.train.metrics.metrics_manager import MetricsManager
 from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.file_util import FileUtil

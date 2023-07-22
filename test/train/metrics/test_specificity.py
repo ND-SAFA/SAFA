@@ -1,10 +1,10 @@
 from typing import List, Type
 
-from test.train.metrics.test_supported_trace_metric import TestSupportedTraceMetric
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.train.metrics.specificity_metric import SpecificityMetric
 import numpy as np
+
+from test.train.metrics.test_supported_trace_metric import TestSupportedTraceMetric
+from tgen.metrics import AbstractTraceMetric
+from tgen.metrics.specificity_metric import SpecificityMetric
 
 
 class TestSpecificityMetric(TestSupportedTraceMetric):

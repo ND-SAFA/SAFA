@@ -3,18 +3,18 @@ from typing import List, Type
 
 from datasets import Metric, list_metrics
 
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.train.metrics.average_true_links_metrics import AverageTrueLinksMetric
-from tgen.train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
-from tgen.train.metrics.f1_metric import FMetric
-from tgen.train.metrics.lag_metric import LagMetric
-from tgen.train.metrics.map_at_k_metric import MapAtKMetric
-from tgen.train.metrics.map_metric import MapMetric
-from tgen.train.metrics.pos_link_indices import PositiveLinkIndices
-from tgen.train.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
-from tgen.train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from tgen.train.metrics.precision_metric import ClassificationMetrics
-from tgen.train.metrics.specificity_metric import SpecificityMetric
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.average_true_links_metrics import AverageTrueLinksMetric
+from tgen.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
+from tgen.metrics.f1_metric import FMetric
+from tgen.metrics.lag_metric import LagMetric
+from tgen.metrics.map_at_k_metric import MapAtKMetric
+from tgen.metrics.map_metric import MapMetric
+from tgen.metrics.pos_link_indices import PositiveLinkIndices
+from tgen.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
+from tgen.metrics.precision_at_threshold_metric import PrecisionAtKMetric
+from tgen.metrics.precision_metric import ClassificationMetrics
+from tgen.metrics.specificity_metric import SpecificityMetric
 from tgen.util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"

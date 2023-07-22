@@ -5,7 +5,7 @@ import numpy as np
 
 from tgen.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 LAG measures the number of false positives necessary to read 

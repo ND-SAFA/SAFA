@@ -5,7 +5,7 @@ from sklearn.metrics import average_precision_score
 
 from tgen.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Mean Average Precision@K metric measures the average precision over k for recommendations shown for 

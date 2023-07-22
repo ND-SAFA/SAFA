@@ -3,8 +3,8 @@ from typing import List, Type
 from sklearn.metrics import average_precision_score
 
 from test.train.metrics.test_metric_at_k import TestMetricAtK
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.train.metrics.map_at_k_metric import MapAtKMetric
+from tgen.metrics import AbstractTraceMetric
+from tgen.metrics.map_at_k_metric import MapAtKMetric
 
 
 class TestMapAtK(TestMetricAtK):

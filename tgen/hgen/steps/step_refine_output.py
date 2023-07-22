@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Dict
+from typing import List
 
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -8,7 +8,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
 from tgen.hgen.hgen_util import get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 
 class RefineArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):

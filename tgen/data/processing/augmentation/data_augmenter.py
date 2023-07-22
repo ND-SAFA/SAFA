@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple, Type
 
+from tgen.common.util.override import overrides
 from tgen.data.processing.abstract_data_processor import AbstractDataProcessor
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from tgen.util.override import overrides
 
 
 class DataAugmenter(AbstractDataProcessor):

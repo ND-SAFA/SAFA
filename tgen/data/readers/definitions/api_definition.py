@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
+from tgen.common.util.base_object import BaseObject
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.ranking.common.trace_layer import TraceLayer
-from tgen.util.base_object import BaseObject
 
 
 @dataclass

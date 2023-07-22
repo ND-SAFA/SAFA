@@ -10,7 +10,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class TestPreTrainingTraceReader(BaseTest):

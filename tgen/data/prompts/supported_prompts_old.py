@@ -1,15 +1,15 @@
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedPromptsOld(SupportedEnum):
     """
     Enumerates supported prompts used for completion tasks.
     """
-    
+
     UAV_SYSTEM_REQUIREMENT = [Prompt("Given a summary of python code, write a system-level requirement\n "
                                      "The requirements should reference physical world entities related to the UAV systems, "
                                      "be numbered system level requirements and use the 'shall' format:"),

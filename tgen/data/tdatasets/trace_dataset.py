@@ -9,6 +9,9 @@ import torch
 from datasets import Dataset
 from tqdm import tqdm
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -23,9 +26,6 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
-from tgen.util.enum_util import EnumDict
-from tgen.util.logging.logger_manager import logger
-from tgen.util.thread_util import ThreadUtil
 
 
 class TraceDataset(iDataset):

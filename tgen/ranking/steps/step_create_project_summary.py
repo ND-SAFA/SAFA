@@ -2,7 +2,7 @@ from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob, Proj
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 
 class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):

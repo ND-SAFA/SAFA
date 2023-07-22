@@ -3,14 +3,14 @@ from collections import namedtuple
 import openai
 from openai.openai_object import OpenAIObject
 
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.logging.tgen_tqdm import tgen_tqdm
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.util.logging.logger_manager import logger
-from tgen.util.logging.tgen_tqdm import tgen_tqdm
 
 if not IS_TEST:
     assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \

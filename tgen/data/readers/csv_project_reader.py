@@ -3,6 +3,12 @@ from typing import Dict
 
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.dataset_constants import NO_CHECK
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -10,12 +16,6 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.enum_util import EnumDict
-from tgen.util.file_util import FileUtil
-from tgen.util.list_util import ListUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.thread_util import ThreadUtil
 
 
 class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):

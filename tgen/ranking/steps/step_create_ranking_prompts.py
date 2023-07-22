@@ -1,11 +1,11 @@
 from typing import Dict
 
+from tgen.common.util.str_util import StrUtil
 from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, SUMMARY_TITLE
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.str_util import StrUtil
 
 
 class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):

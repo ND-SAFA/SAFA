@@ -1,7 +1,7 @@
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.vsm_trainer import VSMTrainer
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedTrainer(SupportedEnum):

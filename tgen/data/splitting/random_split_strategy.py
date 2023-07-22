@@ -1,9 +1,9 @@
 from typing import Tuple
 
+from tgen.common.util.override import overrides
 from tgen.data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from tgen.data.splitting.abstract_trace_split_strategy import AbstractTraceSplitStrategy
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.util.override import overrides
 
 
 class RandomSplitStrategy(AbstractTraceSplitStrategy):

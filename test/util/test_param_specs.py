@@ -1,5 +1,5 @@
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.param_specs import ParamSpecs
 
 
 class TestClassOne:

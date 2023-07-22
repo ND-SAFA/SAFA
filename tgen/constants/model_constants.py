@@ -1,7 +1,7 @@
+from tgen.common.util.enum_util import FunctionalWrapper
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.util.enum_util import FunctionalWrapper
 
 
 class DefaultLLMManager:

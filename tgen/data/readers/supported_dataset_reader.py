@@ -1,5 +1,4 @@
-from enum import Enum
-
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
@@ -9,7 +8,6 @@ from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
 from tgen.data.readers.repository_project_reader import RepositoryProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedDatasetReader(SupportedEnum):

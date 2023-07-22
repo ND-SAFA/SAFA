@@ -1,7 +1,7 @@
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.enum_util import EnumDict
 
 
 class TestPromptDataFrame(BaseTest):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from tgen.util.dict_util import DictUtil
+from tgen.common.util.dict_util import DictUtil
 
 
 class TestDictUtil(TestCase):

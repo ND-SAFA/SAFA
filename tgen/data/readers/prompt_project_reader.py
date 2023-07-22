@@ -1,8 +1,8 @@
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.util.file_util import FileUtil
-from tgen.util.json_util import JsonUtil
 
 
 class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):

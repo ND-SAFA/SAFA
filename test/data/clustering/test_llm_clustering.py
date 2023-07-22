@@ -15,7 +15,7 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
-from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
 class TestLLMClustering(BaseTest):

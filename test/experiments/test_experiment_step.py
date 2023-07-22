@@ -3,6 +3,8 @@ import os
 from unittest import mock, skip
 from unittest.mock import patch
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.status import Status
 from tgen.constants.deliminator_constants import PERIOD
 from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
@@ -20,8 +22,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.util.file_util import FileUtil
-from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable
 
 

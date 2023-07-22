@@ -1,5 +1,5 @@
+from tgen.common.util.list_util import ListUtil
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.dict_util import ListUtil
 
 
 class TestListUtil(BaseTest):

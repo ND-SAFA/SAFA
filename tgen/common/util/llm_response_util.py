@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 
 from bs4 import BeautifulSoup, Tag
 
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 
 class LLMResponseUtil:

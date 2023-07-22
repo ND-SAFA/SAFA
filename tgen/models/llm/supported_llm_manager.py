@@ -1,6 +1,6 @@
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedLLMManager(SupportedEnum):

@@ -1,18 +1,15 @@
 import os
 import shutil
-from copy import copy
-from copy import deepcopy
+from copy import copy, deepcopy
 from dataclasses import dataclass
 from inspect import getfullargspec
 from os.path import splitext
-from typing import Callable, Dict, Set, Type, Union, get_type_hints
-from typing import IO, List, Tuple
+from typing import Callable, Dict, IO, List, Set, Tuple, Type, Union, get_type_hints
 
-from tgen.util.json_util import JsonUtil
+from tgen.common.util.json_util import JsonUtil
 
 
 class FileUtilTest:
-
     class InnerClass:
         TEST = 1
 

@@ -2,12 +2,11 @@ from typing import Any, Dict, List
 
 import pandas as pd
 
-from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.util.enum_util import EnumDict
 
 
 class SummarizeArtifactsJob(AbstractJob):

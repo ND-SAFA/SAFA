@@ -1,9 +1,9 @@
 from typing import Type
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.util.enum_util import EnumDict
 
 
 class PromptDataFrame(AbstractProjectDataFrame):

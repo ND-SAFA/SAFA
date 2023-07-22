@@ -3,10 +3,10 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Union
 from uuid import UUID
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.status import Status
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.util.base_object import BaseObject
-from tgen.util.json_util import JsonUtil
-from tgen.util.status import Status
 
 
 @dataclass
@@ -63,7 +63,7 @@ class JobResult(BaseObject):
             return "No experimental vars."
         printable = {}
         for name, val in self.experimental_vars.items():
-            from tgen.util.base_object import BaseObject
+            from tgen.common.util.base_object import BaseObject
             if not isinstance(val, BaseObject) and not isinstance(val, HuggingFaceArgs):
                 printable[name] = val
         return repr(printable)

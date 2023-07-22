@@ -3,6 +3,7 @@ from typing import List, Type
 
 from datasets import Metric, list_metrics
 
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.metrics.average_true_links_metrics import AverageTrueLinksMetric
 from tgen.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
@@ -15,7 +16,6 @@ from tgen.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
 from tgen.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from tgen.metrics.precision_metric import ClassificationMetrics
 from tgen.metrics.specificity_metric import SpecificityMetric
-from tgen.util.supported_enum import SupportedEnum
 
 metric_suffix = "Metric"
 

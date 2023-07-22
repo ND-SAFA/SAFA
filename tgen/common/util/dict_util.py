@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
-from tgen.util.enum_util import EnumDict
-from tgen.util.list_util import ListUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.list_util import ListUtil
 
 T = TypeVar("T")
 

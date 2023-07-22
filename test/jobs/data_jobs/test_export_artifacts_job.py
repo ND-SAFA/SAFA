@@ -8,7 +8,7 @@ from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.export_artifacts_job import ExportArtifactsJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.testres.object_creator import ObjectCreator
 
 

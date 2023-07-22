@@ -4,6 +4,9 @@ from typing import Tuple
 import bs4
 from yaml.constructor import SafeConstructor
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.prompts.prompt import Prompt
@@ -17,9 +20,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
 from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation, parse_generated_artifacts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.prompt_util import PromptUtil
 
 
 class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):

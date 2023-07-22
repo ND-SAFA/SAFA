@@ -1,12 +1,12 @@
 from enum import Enum, auto
 from typing import Union
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.override import overrides
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.prompts.prompt import Prompt
-from tgen.util.enum_util import EnumDict
-from tgen.util.override import overrides
-from tgen.util.prompt_util import PromptUtil
 
 
 class ArtifactPrompt(Prompt):

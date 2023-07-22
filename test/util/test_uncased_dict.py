@@ -1,6 +1,5 @@
+from tgen.common.util.uncased_dict import UncasedDict
 from tgen.testres.base_tests.base_test import BaseTest
-
-from tgen.util.uncased_dict import UncasedDict
 
 
 class TestUncasedDict(BaseTest):

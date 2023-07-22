@@ -4,7 +4,7 @@ from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
-from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 

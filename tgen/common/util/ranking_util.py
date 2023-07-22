@@ -8,8 +8,8 @@ from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.util.list_util import ListUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.logging.logger_manager import logger
 
 
 class RankingUtil:

@@ -21,8 +21,8 @@ from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.state_manager import StateManager
-from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.logging.logger_manager import logger
 
 
 class LLMTrainer(AbstractTrainer):

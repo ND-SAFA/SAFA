@@ -6,7 +6,7 @@ from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class TestMLMPreTrainDatasetCreator(BaseTest):

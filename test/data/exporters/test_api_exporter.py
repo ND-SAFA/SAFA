@@ -1,6 +1,8 @@
 import os
 from typing import List
 
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.exporters.api_exporter import ApiExporter
 from tgen.data.readers.api_project_reader import ApiProjectReader
@@ -8,8 +10,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.api_test_project import ApiTestProject
-from tgen.util.dict_util import DictUtil
-from tgen.util.json_util import JsonUtil
 
 
 class TestApiExporter(BaseTest):

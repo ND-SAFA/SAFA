@@ -6,6 +6,8 @@ from unittest import skip
 import mock
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.json_util import JsonUtil
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
@@ -22,8 +24,6 @@ from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.json_util import JsonUtil
 
 
 class TestResponse:

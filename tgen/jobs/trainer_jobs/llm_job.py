@@ -1,5 +1,6 @@
 from typing import Union
 
+from tgen.common.util.override import overrides
 from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -12,7 +13,6 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.util.override import overrides
 
 
 class LLMJob(AbstractTrainerJob):

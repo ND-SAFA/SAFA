@@ -3,6 +3,8 @@ import uuid
 from copy import deepcopy
 from unittest import mock, skip
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -29,8 +31,6 @@ from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import mock_anthropic, mock_openai
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.util.enum_util import EnumDict
-from tgen.util.llm_response_util import LLMResponseUtil
 
 
 def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):

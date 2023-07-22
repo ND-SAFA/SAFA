@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from tgen.common.util.override import overrides
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.core.trainers.vsm_trainer import VSMTrainer
@@ -9,7 +10,6 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.models.model_manager import ModelManager
-from tgen.util.override import overrides
 
 
 class VSMJob(AbstractTrainerJob):

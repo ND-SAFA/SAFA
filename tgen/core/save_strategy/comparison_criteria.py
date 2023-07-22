@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Union
 
+from tgen.common.util.base_object import BaseObject
 from tgen.core.save_strategy.abstract_save_strategy import ComparisonFunction, SupportedComparisonFunction
-from tgen.util.base_object import BaseObject
 
 
 @dataclass

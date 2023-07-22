@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class AbstractChunker(BaseObject, ABC):

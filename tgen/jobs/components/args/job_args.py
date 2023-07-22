@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
+from tgen.common.util.base_object import BaseObject
 from tgen.constants.job_constants import SAVE_DATASET_SPLITS_DEFAULT, SAVE_OUTPUT_DEFAULT
-from tgen.util.base_object import BaseObject
 
 
 @dataclass

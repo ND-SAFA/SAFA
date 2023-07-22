@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional
 from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.state.pipeline.pipeline_args import PipelineArgs
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 
 
 @dataclass

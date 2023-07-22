@@ -1,11 +1,11 @@
-from enum import auto, Enum
+from enum import Enum, auto
 from typing import List
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
-from tgen.util.enum_util import EnumDict
-from tgen.util.override import overrides
 
 
 class MultiArtifactPrompt(Prompt):
@@ -66,7 +66,7 @@ class MultiArtifactPrompt(Prompt):
         """
         numbered_format = "{}. {}"
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i+1, artifact_prompt.build(artifact=artifact))
+        formatted_artifacts = [numbered_format.format(i + 1, artifact_prompt.build(artifact=artifact))
                                for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
@@ -96,4 +96,3 @@ class MultiArtifactPrompt(Prompt):
         elif self.build_method.NUMBERED:
             return "1. {artifact1} " \
                    "2. {artifact2} ..."
-

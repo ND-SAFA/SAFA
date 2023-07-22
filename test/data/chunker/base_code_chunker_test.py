@@ -3,7 +3,7 @@ from collections import Callable, Counter
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class BaseCodeChunkerTest:

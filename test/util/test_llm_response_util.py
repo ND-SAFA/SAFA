@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 
 
 class TestLLMResponseUtil(BaseTest):

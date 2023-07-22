@@ -6,7 +6,7 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class ExportArtifactsJob(AbstractJob):

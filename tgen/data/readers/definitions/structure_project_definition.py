@@ -1,8 +1,8 @@
 import os
 from typing import Dict
 
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from tgen.util.json_util import JsonUtil
 
 
 class StructureProjectDefinition(AbstractProjectDefinition):

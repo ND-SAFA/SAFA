@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 
-from tgen.util.reflection_util import ReflectionUtil
-from tgen.util.uncased_dict import UncasedDict
+from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.uncased_dict import UncasedDict
 
 
 class NpEncoder(json.JSONEncoder):
@@ -35,7 +35,7 @@ class NpEncoder(json.JSONEncoder):
             return self.default(instance_fields)
         if isinstance(obj, Enum):
             return obj.name
-        from tgen.util.base_object import BaseObject
+        from tgen.common.util.base_object import BaseObject
         if isinstance(obj, BaseObject):
             obj_fields = ReflectionUtil.get_fields(obj)
             new_fields = {}

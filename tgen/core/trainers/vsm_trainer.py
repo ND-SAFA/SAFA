@@ -10,6 +10,8 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -29,8 +31,6 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.ranking.common.utils import extract_tracing_requests
-from tgen.util.logging.logger_manager import logger
-from tgen.util.override import overrides
 
 SimilarityMatrix = Union[csr_matrix, np.array]
 

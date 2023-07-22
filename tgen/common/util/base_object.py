@@ -8,10 +8,10 @@ from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
 from typeguard import check_type
 from typing_extensions import get_args
 
-from tgen.util.enum_util import get_enum_from_name
-from tgen.util.logging.logger_manager import logger
-from tgen.util.param_specs import ParamSpecs
-from tgen.util.reflection_util import ReflectionUtil
+from tgen.common.util.enum_util import get_enum_from_name
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.param_specs import ParamSpecs
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.multi_variable import MultiVariable

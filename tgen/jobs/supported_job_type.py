@@ -1,3 +1,4 @@
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob
 from tgen.jobs.composite_jobs.ranking_job import RankingJob
 from tgen.jobs.composite_jobs.tracing_job import TracingJob
@@ -13,7 +14,6 @@ from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedJobType(SupportedEnum):

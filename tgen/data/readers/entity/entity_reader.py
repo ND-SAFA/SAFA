@@ -3,14 +3,14 @@ from typing import Dict, Generic, Optional, Tuple, TypeVar
 
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.json_util import JsonUtil
-from tgen.util.logging.logger_manager import logger
 
 EntityType = TypeVar("EntityType")
 

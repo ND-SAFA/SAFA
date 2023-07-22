@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from tgen.util.logging.log_capture import LogCapture
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.log_capture import LogCapture
+from tgen.common.util.logging.logger_manager import logger
 
 
 def perform_log(log_message):

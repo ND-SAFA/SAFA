@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import Dict
 
+from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.override import overrides
 from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, \
     LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.util.dataclass_util import DataclassUtil
-from tgen.util.override import overrides
 
 
 class OpenAIParams:

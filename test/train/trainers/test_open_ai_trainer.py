@@ -21,7 +21,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 
 Res = namedtuple("Res", ["id"])
 

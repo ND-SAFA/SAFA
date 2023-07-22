@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, IO, List, Tuple, Union
 import yaml
 
 from tgen.constants.deliminator_constants import F_SLASH
-from tgen.util.json_util import JsonUtil
+from tgen.common.util.json_util import JsonUtil
 
 
 class FileUtil:

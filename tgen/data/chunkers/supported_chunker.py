@@ -1,9 +1,9 @@
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.chunkers.dummy_code_chunker import DummyCodeChunker
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
-from tgen.util.file_util import FileUtil
-from tgen.util.supported_enum import SupportedEnum
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",

@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict, List, Union
 
+from tgen.common.util.base_object import BaseObject
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.core.args.open_ai_args import OpenAIArgs
@@ -15,7 +16,6 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
-from tgen.util.base_object import BaseObject
 
 
 class PredictionStep(Enum):

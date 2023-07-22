@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, List
 
-from tgen.util.reflection_util import ReflectionUtil
+from tgen.common.util.reflection_util import ReflectionUtil
 
 
 class SupportedEnum(Enum):

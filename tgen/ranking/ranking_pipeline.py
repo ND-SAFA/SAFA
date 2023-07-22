@@ -9,7 +9,6 @@ from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
 from tgen.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.util.file_util import FileUtil
 
 
 class ArtifactRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):

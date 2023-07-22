@@ -6,7 +6,7 @@ from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):

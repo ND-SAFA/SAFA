@@ -1,9 +1,9 @@
 import uuid
 
+from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.status import Status
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.dataclass_util import DataclassUtil
-from tgen.util.status import Status
 
 
 class TestDataclasssUtil(BaseTest):

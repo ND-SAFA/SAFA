@@ -2,10 +2,10 @@ import inspect
 from copy import deepcopy
 from typing import Callable, List, Union
 
+from tgen.common.util.attr_dict import AttrDict
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.attr_dict import AttrDict
 
 FINE_TUNE_REQUEST = AttrDict({
     "training_file": "training_id",

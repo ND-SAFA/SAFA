@@ -3,7 +3,7 @@ from typing import Generic, List, Type, TypeVar
 
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)

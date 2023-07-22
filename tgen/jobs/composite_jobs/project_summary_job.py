@@ -7,9 +7,9 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
-from tgen.util.file_util import FileUtil
-from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.logging.logger_manager import logger
 
 GOAL = "# Task\nBelow is the set of software artifacts of a software system. " \
        "Read through each artifact and reasoning about what the system is doing."

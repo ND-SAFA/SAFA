@@ -1,5 +1,6 @@
 from typing import Callable, Dict, List
 
+from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -8,7 +9,6 @@ from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.fake_project_reader import FakeProjectReader
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
-from tgen.util.status import Status
 
 GenericSorter = Callable[
     [List[str], List[str], Dict], Dict[str, str]]  # source names, target names, artifact map -> sorted target names

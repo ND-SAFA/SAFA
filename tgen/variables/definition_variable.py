@@ -1,6 +1,6 @@
 from typing import Dict
 
-from tgen.util.uncased_dict import UncasedDict
+from tgen.common.util.uncased_dict import UncasedDict
 from tgen.variables.variable import Variable
 
 

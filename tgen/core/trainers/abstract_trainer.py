@@ -2,13 +2,13 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class AbstractTrainer(BaseObject):

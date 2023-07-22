@@ -7,12 +7,12 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import PERIOD
 from tgen.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
 from tgen.models.model_properties import ModelArchitectureType, ModelSize, ModelTask
-from tgen.util.base_object import BaseObject
-from tgen.util.logging.logger_manager import logger
-from tgen.util.override import overrides
 
 LAYER = List[Parameter]
 

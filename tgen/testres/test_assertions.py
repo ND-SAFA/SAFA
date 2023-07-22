@@ -3,15 +3,15 @@ from unittest import TestCase
 
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.json_util import JsonUtil
-from tgen.util.status import Status
 
 
 class TestAssertions:

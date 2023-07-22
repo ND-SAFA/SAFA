@@ -3,8 +3,8 @@ from typing import Dict, List
 
 from github import PullRequest
 
+from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.data.github.gartifacts.gissue import GIssue
-from tgen.util.date_time_util import DateTimeUtil
 
 
 class GPull(GIssue):

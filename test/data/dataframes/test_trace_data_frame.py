@@ -1,6 +1,6 @@
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.enum_util import EnumDict
 
 
 class TestTraceDataFrame(BaseTest):
@@ -24,7 +24,7 @@ class TestTraceDataFrame(BaseTest):
 
     def test_to_dict(self):
         df = TraceDataFrame(EnumDict({TraceKeys.SOURCE: ["s1", "s1"], TraceKeys.TARGET: ["t1", "t1"],
-                                        TraceKeys.LABEL: [0, 1]}))
+                                      TraceKeys.LABEL: [0, 1]}))
         without_dups = df.to_dict(orient="index")
         self.assertSize(1, without_dups)
 

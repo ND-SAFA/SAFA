@@ -1,6 +1,6 @@
 from pynvml import nvmlDeviceGetHandleByIndex, nvmlDeviceGetMemoryInfo, nvmlInit
 
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 
 class MemoryUtil:

@@ -7,7 +7,7 @@ from comment_parser.comment_parser import UnsupportedError
 from tgen.constants.path_constants import JAVA_KEYWORDS_PATH
 from tgen.constants.deliminator_constants import NEW_LINE, SPACE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 
 class ExtractCodeIdentifiersStep(AbstractDataProcessingStep):

@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import Any
 
+from tgen.common.util.base_object import BaseObject
 from tgen.models.model_manager import ModelManager
-from tgen.util.base_object import BaseObject
 
 
 class iDataset(BaseObject):

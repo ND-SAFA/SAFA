@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List, Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import SPACE
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class ProcessingOrder(enum.Enum):

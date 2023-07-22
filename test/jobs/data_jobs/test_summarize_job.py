@@ -1,5 +1,6 @@
 from unittest import mock
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -11,7 +12,6 @@ from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.test_anthropic_responses import mock_anthropic
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.util.enum_util import EnumDict
 
 
 class TestSummarizeJob(BaseJobTest):

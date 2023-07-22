@@ -8,14 +8,14 @@ from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
+from tgen.common.util.logging.logger_config import LoggerConfig
+from tgen.common.util.logging.logger_manager import LoggerManager
 from tgen.constants.environment_constants import DELETE_TEST_OUTPUT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
-from tgen.util.logging.logger_config import LoggerConfig
-from tgen.util.logging.logger_manager import LoggerManager
 
 
 class BaseTest(TestCase):
@@ -136,5 +136,3 @@ class BaseTest(TestCase):
         layer_ids = [1 for i in range(n_artifacts)]
         return ArtifactDataFrame(
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
-
-

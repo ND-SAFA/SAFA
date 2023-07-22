@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
+from tgen.common.util.base_object import BaseObject
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.base_object import BaseObject
 
 
 class Parent:

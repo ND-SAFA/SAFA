@@ -1,5 +1,6 @@
 from typing import Any
 
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -9,7 +10,6 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.dataframe_util import DataFrameUtil
 
 
 class InitializeDatasetStepAbstract(AbstractPipelineStep[HGenArgs, HGenState]):

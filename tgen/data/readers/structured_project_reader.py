@@ -3,6 +3,10 @@ from typing import Dict
 
 import pandas as pd
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -13,10 +17,6 @@ from tgen.data.readers.definitions.abstract_project_definition import AbstractPr
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
 from tgen.data.readers.entity.entity_reader import EntityReader
-from tgen.util.enum_util import EnumDict
-from tgen.util.file_util import FileUtil
-from tgen.util.json_util import JsonUtil
-from tgen.util.logging.logger_manager import logger
 
 
 class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):

@@ -1,7 +1,7 @@
 from typing import List
 
+from tgen.common.util.attr_dict import AttrDict
 from tgen.testres.test_open_ai_responses import mock_ai
-from tgen.util.attr_dict import AttrDict
 
 
 def mock_anthropic(func=None, *args, **kwargs):

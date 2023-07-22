@@ -3,6 +3,7 @@ from typing import Union
 
 from transformers.data.data_collator import DataCollatorForLanguageModeling
 
+from tgen.common.util.override import overrides
 from tgen.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
 from tgen.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
@@ -16,7 +17,6 @@ from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
-from tgen.util.override import overrides
 
 
 class HuggingFaceJob(AbstractTrainerJob):

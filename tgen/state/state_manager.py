@@ -1,9 +1,9 @@
 from copy import deepcopy
 from typing import Any, Generic, Optional, TypeVar
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.state.state import State
-from tgen.util.base_object import BaseObject
-from tgen.util.dataclass_util import DataclassUtil
 
 StateType = TypeVar("StateType", bound=State)
 

@@ -3,6 +3,11 @@ from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.constants.deliminator_constants import COMMA, NEW_LINE
@@ -14,11 +19,6 @@ from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.dict_util import ListUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.reflection_util import ReflectionUtil
-from tgen.util.thread_util import ThreadUtil
 
 
 class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):

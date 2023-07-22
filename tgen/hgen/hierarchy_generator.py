@@ -1,14 +1,13 @@
 import os
 import uuid
 
+from tgen.common.util.base_object import BaseObject
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.steps.step_create_dataset import CreateHGenDataset
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContent
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStepAbstract
-from tgen.hgen.steps.step_refine_output import RefineArtifactContent
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.util.base_object import BaseObject
 
 
 class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):

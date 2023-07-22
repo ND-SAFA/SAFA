@@ -1,5 +1,7 @@
 from typing import Dict, List, Union
 
+from tgen.common.util.data_structure_util import DataStructureUtil
+from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
@@ -18,8 +20,6 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
-from tgen.util.data_structure_util import DataStructureUtil
-from tgen.util.ranking_util import RankingUtil
 
 
 class TracingJob(AbstractJob):

@@ -1,11 +1,11 @@
 from typing import Dict, List, Union
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
-from tgen.util.enum_util import EnumDict
 
 
 class GenerateArtifactsJob(BaseHGenJob):

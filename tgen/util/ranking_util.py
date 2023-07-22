@@ -2,12 +2,12 @@ import json
 from typing import Dict, List
 
 from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.list_util import ListUtil
 from tgen.util.logging.logger_manager import logger
 

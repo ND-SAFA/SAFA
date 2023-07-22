@@ -1,6 +1,7 @@
 import os
 
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.chunkers.supported_chunker import SupportedChunker
@@ -14,7 +15,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, TestResponseManager
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.file_util import FileUtil
 
 

@@ -3,12 +3,12 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.server.api.api_definition import ApiDefinition
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 
 
 class TestDataManager:

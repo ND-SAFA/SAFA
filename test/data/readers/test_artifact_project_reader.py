@@ -1,3 +1,4 @@
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
@@ -8,7 +9,6 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestArtifactProjectReader(BaseTest):

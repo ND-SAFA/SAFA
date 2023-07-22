@@ -3,6 +3,9 @@ import uuid
 from copy import deepcopy
 from unittest import mock, skip
 
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -26,9 +29,6 @@ from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_anthropic_responses import mock_anthropic, mock_openai
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.util.enum_util import EnumDict
 from tgen.util.llm_response_util import LLMResponseUtil
 

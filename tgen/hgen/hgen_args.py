@@ -4,6 +4,8 @@ from typing import Dict, List, Union
 
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -13,8 +15,6 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.base_object import BaseObject
 
 

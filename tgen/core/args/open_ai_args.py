@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
-    LEARNING_RATE_MULTIPLIER_DEFAULT, LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT
+from tgen.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, \
+    LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
+from tgen.core.args.abstract_llm_args import AbstractLLMArgs
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.dataclass_util import DataclassUtil
 from tgen.util.override import overrides
 
@@ -71,7 +71,7 @@ class OpenAIArgs(AbstractLLMArgs):
                     pos_class = choices[0]
                     break
             assert pos_class is not None, "Expected prompt creator to define `pos_class`"
-            params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator._format_completion(pos_class, self.prompt_args,)
+            params[OpenAIParams.CLASSIFICATION_POSITIVE_CLASS] = prompt_creator._format_completion(pos_class, self.prompt_args, )
             params[OpenAIParams.COMPUTE_CLASSIFICATION_METRICS] = True
         return params
 

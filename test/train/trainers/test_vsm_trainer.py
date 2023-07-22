@@ -1,6 +1,8 @@
 import uuid
 from typing import Dict
 
+from tgen.core.trace_output.stage_eval import Metrics
+from tgen.core.trainers.vsm_trainer import VSMTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.job_result import JobResult
@@ -8,8 +10,6 @@ from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.train.trace_output.stage_eval import Metrics
-from tgen.train.trainers.vsm_trainer import VSMTrainer
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 

@@ -4,9 +4,9 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
-from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
+from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.util.reflection_util import ReflectionUtil
 from tgen.util.uncased_dict import UncasedDict
 

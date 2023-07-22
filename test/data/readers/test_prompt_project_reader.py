@@ -1,6 +1,7 @@
 import json
 import os
 
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
@@ -10,7 +11,6 @@ from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestPromptProjectReader(BaseTest):

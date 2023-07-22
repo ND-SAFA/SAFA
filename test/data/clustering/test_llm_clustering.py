@@ -1,6 +1,8 @@
 from copy import deepcopy
 from unittest import mock
 
+from tgen.core.args.anthropic_args import AnthropicArgs
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.clustering.llm_clustering import LLMClustering
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -13,8 +15,6 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
-from tgen.train.args.anthropic_args import AnthropicArgs
-from tgen.train.args.open_ai_args import OpenAIArgs
 from tgen.util.llm_response_util import LLMResponseUtil
 
 

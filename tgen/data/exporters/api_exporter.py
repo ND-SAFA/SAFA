@@ -3,6 +3,7 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerKeys
@@ -10,7 +11,6 @@ from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporte
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.server.api.api_definition import ApiDefinition
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.json_util import JsonUtil
 
 

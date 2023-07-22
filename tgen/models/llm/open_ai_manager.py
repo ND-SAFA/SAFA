@@ -4,12 +4,11 @@ import openai
 from openai.openai_object import OpenAIObject
 
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
+from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.train.args.open_ai_args import OpenAIArgs, OpenAIParams
-from tgen.util.list_util import ListUtil
 from tgen.util.logging.logger_manager import logger
 from tgen.util.logging.tgen_tqdm import tgen_tqdm
 

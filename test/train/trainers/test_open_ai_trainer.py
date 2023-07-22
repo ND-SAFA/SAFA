@@ -3,6 +3,9 @@ from copy import deepcopy
 from typing import Dict, List
 from unittest import mock
 
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -18,9 +21,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.util.llm_response_util import LLMResponseUtil
 
 Res = namedtuple("Res", ["id"])

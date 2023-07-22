@@ -2,6 +2,7 @@ import os
 import uuid
 from typing import List
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
@@ -14,7 +15,6 @@ from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import SAVE_DATASET_DIRNAME, create_artifact_df_from_generated_artifacts, save_dataset_checkpoint
 from tgen.jobs.composite_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.dataframe_util import DataFrameUtil
 from tgen.util.enum_util import EnumDict
 from tgen.util.logging.logger_manager import logger

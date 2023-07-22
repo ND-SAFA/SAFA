@@ -2,9 +2,9 @@ from typing import List, Optional, Union
 
 from transformers.trainer_utils import TrainOutput
 
-from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trace_output.stage_eval import StageEval
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.core.trace_output.stage_eval import StageEval
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 
 
 class TraceTrainOutput(AbstractTraceOutput):

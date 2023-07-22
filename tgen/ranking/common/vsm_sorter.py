@@ -1,14 +1,13 @@
 from typing import Callable, Dict, List
 
+from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
-from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.fake_project_reader import FakeProjectReader
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
-from tgen.train.trace_output.trace_train_output import TraceTrainOutput
 from tgen.util.status import Status
 
 GenericSorter = Callable[

@@ -1,6 +1,7 @@
 from unittest import skip
 
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -19,7 +20,6 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
 
 
 class TestPromptDatasetCreator(BaseTest):

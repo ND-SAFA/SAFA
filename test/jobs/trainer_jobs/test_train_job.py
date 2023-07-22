@@ -2,9 +2,11 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-
 from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
 from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -16,9 +18,6 @@ from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -46,7 +45,7 @@ class TestTrainJob(BaseJobTest):
         job = self._get_job(deterministic=True)
         self.assertIsInstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager)
         self.assertEqual(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR,
-                                                                                      job.trainer_dataset_manager.dataset_name))
+                                                                                     job.trainer_dataset_manager.dataset_name))
 
     def _get_job(self, deterministic: bool = False, use_llama: bool = False) -> HuggingFaceJob:
         dataset_param = UNDERSCORE.join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Union
 from uuid import UUID
 
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.util.base_object import BaseObject
 from tgen.util.json_util import JsonUtil
 from tgen.util.status import Status

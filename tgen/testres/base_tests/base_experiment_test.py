@@ -1,15 +1,13 @@
 import json
 import os
 import random
-import uuid
 
+from tgen.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trainers.trainer_task import TrainerTask
+from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.constants.experiment_constants import OUTPUT_FILENAME
-from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.supported_job_type import SupportedJobType
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.definition_variable import DefinitionVariable
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.multi_variable import MultiVariable

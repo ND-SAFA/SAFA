@@ -5,11 +5,11 @@ import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 
+from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
-from tgen.train.trace_output.stage_eval import Metrics, TracePredictions
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 
 warnings.filterwarnings('ignore')
 ArtifactQuery = Dict[str, List[TraceDataFrame]]

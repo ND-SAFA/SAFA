@@ -4,12 +4,12 @@ from typing import List
 import numpy as np
 
 from tgen.common.artifact import Artifact
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.ranking.common.trace_layer import TraceLayer
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 
 
 class AbstractTestProject:

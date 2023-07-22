@@ -5,11 +5,10 @@ from typing import Any, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
-from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
@@ -18,7 +17,6 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.enum_util import EnumDict
 from tgen.util.file_util import FileUtil
 

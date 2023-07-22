@@ -8,20 +8,20 @@ from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.core.save_strategy.metric_save_strategy import MetricSaveStrategy
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_train_output import TraceTrainOutput
+from tgen.core.trainers.abstract_trainer import AbstractTrainer
+from tgen.core.wandb.trace_callback import TraceCallback
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.data_key import DataKey
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
-from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
-from tgen.train.save_strategy.metric_save_strategy import MetricSaveStrategy
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.train.wandb.trace_callback import TraceCallback
 from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 

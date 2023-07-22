@@ -1,14 +1,13 @@
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.components.args.job_args import JobArgs
-
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
-from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelTask
-from tgen.testres.test_assertions import TestAssertions
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
+from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
-from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.testres.test_assertions import TestAssertions
 
 
 class TestMLMPreTrainJob(BaseJobTest):

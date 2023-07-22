@@ -5,17 +5,17 @@ from transformers.data.data_collator import DataCollatorForLanguageModeling
 
 from tgen.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
 from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.core.trace_output.trace_train_output import TraceTrainOutput
+from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.override import overrides
 
 

@@ -6,8 +6,8 @@ from typing import Callable, Iterable, List, Union
 import numpy as np
 from tqdm import tqdm
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.train.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])

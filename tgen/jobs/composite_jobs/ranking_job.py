@@ -1,14 +1,14 @@
 import re
 from typing import Dict, List, Optional, Tuple, Union
 
+from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
-from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.util.data_structure_util import DataStructureUtil
 from tgen.util.ranking_util import RankingUtil
 

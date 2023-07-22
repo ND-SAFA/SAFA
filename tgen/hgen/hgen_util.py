@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Set, Type, Union
 import pandas as pd
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
@@ -26,8 +28,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 from tgen.util.dict_util import DictUtil
 from tgen.util.file_util import FileUtil
 from tgen.util.logging.logger_manager import logger

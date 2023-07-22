@@ -3,8 +3,8 @@ import os
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.wandb.Wandb import Wandb
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.wandb.Wandb import Wandb
 
 
 class TraceCallback(WandbCallback):

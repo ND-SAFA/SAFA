@@ -2,8 +2,8 @@ from typing import Dict
 
 from tgen.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT
-from tgen.train.args.abstract_llm_args import AbstractLLMArgs
-from tgen.train.trainers.trainer_task import TrainerTask
+from tgen.core.args.abstract_llm_args import AbstractLLMArgs
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.util.dataclass_util import DataclassUtil
 
 

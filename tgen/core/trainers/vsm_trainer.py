@@ -11,6 +11,10 @@ from sklearn.metrics import pairwise_distances
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.core.trace_output.stage_eval import Metrics
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_train_output import TraceTrainOutput
+from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -25,10 +29,6 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.ranking.common.utils import extract_tracing_requests
-from tgen.train.trace_output.stage_eval import Metrics
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
 from tgen.util.logging.logger_manager import logger
 from tgen.util.override import overrides
 

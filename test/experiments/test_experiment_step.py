@@ -5,6 +5,9 @@ from unittest.mock import patch
 
 from tgen.constants.deliminator_constants import PERIOD
 from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
@@ -17,9 +20,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.util.file_util import FileUtil
 from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable

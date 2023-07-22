@@ -58,13 +58,15 @@ class TestPromptDataset(BaseTest):
         llm_manager = OpenAIManager(OpenAIArgs())
         prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
         prompt_builder = PromptBuilder([prompt])
-        prompts_df = PromptDataFrame(artifact_prompt_dataset._generate_prompts_entries_from_artifact_per_prompt(prompt_builder,
-                                                                                                                prompt_args=llm_manager.prompt_args,
-                                                                                                                summarizer=Summarizer(
-                                                                                                                    llm_manager)))
+        prompt_entries = artifact_prompt_dataset._generate_prompts_entries_from_artifact_per_prompt(prompt_builder,
+                                                                                                    prompt_args=llm_manager.prompt_args,
+                                                                                                    summarizer=Summarizer(llm_manager))
+        prompts_df = PromptDataFrame(prompt_entries)
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
-                self.assertLessEqual(len(prompts_df.get_row(i)[PromptKeys.PROMPT].split()), token_limit)
+                prompt = prompts_df.get_row(i)[PromptKeys.PROMPT]
+                prompt_words = prompt.split()
+                self.assertLessEqual(len(prompt_words), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()

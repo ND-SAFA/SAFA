@@ -102,5 +102,5 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         args["augmenter"] = ObjectCreator.augmenter_definition
         managers: ExperimentalVariable = ObjectCreator.create(TrainerDatasetManager, **args)
         if not experiment:
-            managers = managers.get_values_of_all_variables()[-1]
+            managers = managers[-1]
         return managers

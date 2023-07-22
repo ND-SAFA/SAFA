@@ -5,15 +5,15 @@ from typing import Type, Union
 from api.endpoints.base.views.endpoint import async_endpoint, endpoint
 from api.endpoints.predict.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.dataset_constants import NO_CHECK
 from tgen.constants.tgen_constants import DEFAULT_SEARCH_FILTER, DEFAULT_SEARCH_MODEL, SEARCH_CHILD_TYPE, SEARCH_PARENT_TYPE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.jobs.composite_jobs.ranking_job import RankingJob
-from tgen.jobs.composite_jobs.tracing_job import TracingJob
-from tgen.util.json_util import NpEncoder
-from tgen.util.logging.logger_manager import logger
+from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 

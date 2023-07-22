@@ -3,10 +3,10 @@ import os.path
 from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.completion.completion_serializer import CompletionPayload, CompletionSerializer
 from api.utils.model_util import ModelUtil
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.reflection_util import ReflectionUtil
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 

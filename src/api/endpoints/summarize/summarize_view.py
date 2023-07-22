@@ -1,11 +1,11 @@
 from api.endpoints.base.views.endpoint import async_endpoint, endpoint
 from api.endpoints.summarize.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from api.utils.view_util import ViewUtil
+from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.train.args.anthropic_args import AnthropicArgs
 
 
 @endpoint(SummarizeSerializer)

@@ -9,9 +9,9 @@ from rest_framework.views import APIView
 
 from api.endpoints.base.docs.doc_generator import autodoc
 from api.utils.view_util import ViewUtil
-from tgen.util.json_util import NpEncoder
-from tgen.util.logging.log_capture import LogCapture
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.log_capture import LogCapture
+from tgen.common.util.logging.logger_manager import logger
 
 
 def endpoint(serializer):

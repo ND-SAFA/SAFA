@@ -1,8 +1,8 @@
 from api.endpoints.base.views.endpoint import async_endpoint
 from api.endpoints.project_summary.project_summary_serializer import ProjectSummaryRequest, \
     ProjectSummarySerializer
-from tgen.jobs.composite_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
-from tgen.util.status import Status
+from tgen.common.util.status import Status
+from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 
 
 @async_endpoint(ProjectSummarySerializer)

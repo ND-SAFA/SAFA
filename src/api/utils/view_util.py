@@ -5,8 +5,8 @@ from uuid import UUID
 from django.http import HttpRequest
 from rest_framework import serializers
 
+from tgen.common.util.status import Status
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.util.status import Status
 
 
 class ViewUtil:

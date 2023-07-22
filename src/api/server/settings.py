@@ -15,6 +15,8 @@ import sys
 
 from kombu.serialization import register
 
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.logger_manager import logger
 from .paths import load_paths
 
 load_paths()
@@ -22,8 +24,6 @@ load_paths()
 from pathlib import Path
 
 from dotenv import load_dotenv
-from tgen.util.json_util import NpEncoder
-from tgen.util.logging.logger_manager import logger
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

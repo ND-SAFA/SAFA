@@ -1,9 +1,9 @@
 from api.endpoints.base.views.endpoint import async_endpoint
 from api.endpoints.hgen.hgen_serializer import HGenRequest, HGenSerializer
 from api.utils.view_util import ViewUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
-from tgen.util.logging.logger_manager import logger
 
 
 @async_endpoint(HGenSerializer)

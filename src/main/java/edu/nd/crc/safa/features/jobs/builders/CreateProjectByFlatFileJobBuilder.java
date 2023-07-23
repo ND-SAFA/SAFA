@@ -36,9 +36,8 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     @Override
     protected AbstractJob constructJobForWork() throws IOException {
         String uploadLocation = ProjectPaths.Storage.createTemporaryDirectory();
-        String projectPath = ProjectPaths.Storage.getStorageRelativePath(uploadLocation);
         FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
-        fileUploadService.uploadFilesToServer(projectPath, Arrays.asList(files));
+        fileUploadService.uploadFilesToServer(uploadLocation, Arrays.asList(files));
 
         // Step 3 - Create job worker
         return new FlatFileProjectCreationJob(

@@ -40,7 +40,8 @@ public class ProjectPaths {
         }
 
         public static String getPathToProjectFile(Project project, String fileName) throws IOException {
-            return getPathToProjectFile(project.getProjectId().toString(), fileName);
+            String projectPath = Storage.projectPath(project, false);
+            return getPathToProjectFile(projectPath, fileName);
         }
 
         public static String getPathToProjectFile(String projectFolder, String fileName) throws IOException {
@@ -48,7 +49,8 @@ public class ProjectPaths {
         }
 
         public static String uploadedProjectFilePath(Project project, String fileName) throws IOException {
-            return uploadedProjectFilePath(project.getProjectId().toString(), fileName);
+            String projectPath = Storage.projectPath(project, false);
+            return uploadedProjectFilePath(projectPath, fileName);
         }
 
         public static String uploadedProjectFilePath(String projectFolder, String fileName) throws IOException {
@@ -56,11 +58,12 @@ public class ProjectPaths {
         }
 
         public static String projectUploadsPath(Project project, boolean createIfEmpty) throws IOException {
-            return projectUploadsPath(project.getProjectId().toString(), createIfEmpty);
+            String projectPath = Storage.projectPath(project, createIfEmpty);
+            return projectUploadsPath(projectPath, createIfEmpty);
         }
 
         public static String projectUploadsPath(String projectFolder, boolean createIfEmpty) throws IOException {
-            String path = FileUtilities.buildPath(Storage.projectPath(projectFolder, createIfEmpty), "uploaded");
+            String path = FileUtilities.buildPath(projectFolder, "uploaded");
             FileUtilities.createDirectoryIfEmpty(path, createIfEmpty);
             return path;
         }

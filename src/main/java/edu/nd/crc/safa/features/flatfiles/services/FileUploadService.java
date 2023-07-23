@@ -33,7 +33,7 @@ public class FileUploadService {
      * @throws SafaError Throws error if error occurs while creating necessary directory structure or writing to disk.
      */
     public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError, IOException {
-        String pathToStorage = ProjectPaths.Storage.projectUploadsPath(project, true);
+        String pathToStorage = ProjectPaths.Storage.projectPath(project, true);
         uploadFilesToServer(pathToStorage, requestFiles);
     }
 

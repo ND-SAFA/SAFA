@@ -2,6 +2,7 @@ package edu.nd.crc.safa.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -30,6 +31,12 @@ public class ProjectPaths {
             String pathToTemporary = FileUtilities.buildPath(Storage.PATH, randomId);
             Files.createDirectories(Paths.get(pathToTemporary));
             return pathToTemporary;
+        }
+
+        public static String getStorageRelativePath(String fullPath) {
+            Path path = Path.of(fullPath);
+            Path storagePath = Path.of(PATH);
+            return storagePath.relativize(path).toString();
         }
 
         public static String getPathToProjectFile(Project project, String fileName) throws IOException {

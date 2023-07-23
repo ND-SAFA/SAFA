@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,9 +86,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     private void createProject() throws IOException {
         this.projectVersion = createProject(user, projectName, projectDescription);
-
-        String projectPath = ProjectPaths.Storage.projectUploadsPath(this.projectVersion.getProject(), true);
-        Files.move(Path.of(this.pathToFiles), Path.of(projectPath));
+        String projectPath = ProjectPaths.Storage.projectPath(this.projectVersion.getProject(), true);
+        Files.move(Path.of(this.pathToFiles), Path.of(projectPath), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)

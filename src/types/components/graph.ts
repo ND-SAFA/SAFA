@@ -107,7 +107,7 @@ export interface TraceCytoElementData
   /**
    * The state of changes to the trace link.
    */
-  deltaType: ArtifactDeltaState;
+  deltaType?: ArtifactDeltaState;
   /**
    * Whether to fade this trace link.
    */

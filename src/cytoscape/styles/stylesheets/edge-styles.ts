@@ -62,6 +62,14 @@ export const edgeStyles: CytoStyleSheet[] = [
   },
   // Trace Link Delta
   {
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.NO_CHANGE}']`,
+    style: {
+      "target-arrow-color": EDGE_COLOR.NO_CHANGE,
+      "source-arrow-color": EDGE_COLOR.NO_CHANGE,
+      "line-color": EDGE_COLOR.NO_CHANGE,
+    },
+  },
+  {
     selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.ADDED}']`,
     style: {
       "target-arrow-color": EDGE_COLOR.ADDED,

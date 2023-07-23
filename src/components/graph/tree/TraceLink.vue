@@ -45,7 +45,9 @@ const definition = computed<TraceCytoElement>(() => ({
     source: props.trace.targetId,
     target: props.trace.sourceId,
 
-    deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
+    deltaType: deltaStore.inDeltaView
+      ? deltaStore.getTraceDeltaType(props.trace.traceLinkId)
+      : undefined,
     faded: faded.value,
     traceType: props.trace.traceType,
     approvalStatus: props.trace.approvalStatus,

@@ -14,6 +14,7 @@ export const EDGE_COLOR = {
   ADDED: ThemeColors.added,
   MODIFIED: ThemeColors.modified,
   REMOVED: ThemeColors.removed,
+  NO_CHANGE: ThemeColors.unchanged,
 };
 
 export const EDGE_SHAPE = {

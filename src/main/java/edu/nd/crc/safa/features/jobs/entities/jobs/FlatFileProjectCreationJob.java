@@ -32,6 +32,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -91,7 +92,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)
-    public void initJobData() throws SafaError, IOException {
+    public void initJobData(JobLogger jobLogger) throws SafaError, IOException {
         if (this.projectVersion == null) {
             createProject();
         }
@@ -99,17 +100,26 @@ public class FlatFileProjectCreationJob extends CommitJob {
         Project project = this.projectVersion.getProject();
         this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);
-        parseTimFile();
+        parseTimFile(jobLogger);
     }
 
-    private void parseTimFile() throws IOException {
+    private void parseTimFile(JobLogger jobLogger) throws IOException {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project.");
         }
 
-        JSONObject timFileJson = JsonFileUtilities.readJSONFile(this.pathToTIMFile);
+        JSONObject timFileJson = tryParseTim(jobLogger);
         TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
         this.flatFileParser = new FlatFileParser(timFileParser);
+    }
+
+    private JSONObject tryParseTim(JobLogger jobLogger) throws IOException {
+        try {
+            return JsonFileUtilities.readJSONFile(this.pathToTIMFile);
+        } catch (JSONException | IOException e) {
+            jobLogger.log("Error parsing TIM file: " + e.getMessage());
+            throw e;
+        }
     }
 
     @IJobStep(value = "Parsing Files", position = 2)

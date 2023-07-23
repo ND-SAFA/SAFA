@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,11 +27,11 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONObject;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for providing step implementations for parsing flat files
@@ -41,35 +42,60 @@ public class FlatFileProjectCreationJob extends CommitJob {
     /**
      * The initial project version
      */
-    ProjectVersion projectVersion;
-    /**
-     * The files being parsed into a project.
-     */
-    MultipartFile[] files;
+    private ProjectVersion projectVersion;
+
     /**
      * Path to Tim file upload.
      */
-    String pathToTIMFile;
+    private String pathToTIMFile;
+
     /**
      * The parser used to parse time file.
      */
-    FlatFileParser flatFileParser;
+    private FlatFileParser flatFileParser;
+
     /**
      * Path to uploaded files.
      */
-    String pathToFiles;
+    private String pathToFiles;
+
+    private String projectName;
+    private String projectDescription;
+    private SafaUser user;
 
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
-                                      ProjectVersion projectVersion,
-                                      MultipartFile[] files) {
+                                      ProjectVersion projectVersion) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
-        this.files = files;
+    }
+
+    public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
+                                      ServiceProvider serviceProvider,
+                                      SafaUser user,
+                                      String projectName,
+                                      String projectDescription,
+                                      String uploadedFilesPath) {
+        super(jobDbEntity, serviceProvider);
+        this.projectName = projectName;
+        this.projectDescription = projectDescription;
+        this.pathToFiles = uploadedFilesPath;
+        this.user = user;
+    }
+
+    private void createProject() throws IOException {
+        this.projectVersion = createProject(user, projectName, projectDescription);
+
+        String projectPath = ProjectPaths.Storage.projectUploadsPath(this.projectVersion.getProject(), true);
+        Files.move(Path.of(this.pathToFiles), Path.of(projectPath));
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)
     public void initJobData() throws SafaError, IOException {
+        if (this.projectVersion == null) {
+            createProject();
+        }
+
         Project project = this.projectVersion.getProject();
         this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);

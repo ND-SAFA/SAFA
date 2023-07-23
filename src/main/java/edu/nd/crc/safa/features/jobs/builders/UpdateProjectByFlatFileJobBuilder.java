@@ -44,8 +44,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
         return new FlatFileProjectCreationJob(
             this.jobDbEntity,
             serviceProvider,
-            this.projectVersion,
-            files);
+            this.projectVersion);
     }
 
     @Override

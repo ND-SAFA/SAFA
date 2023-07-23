@@ -34,11 +34,24 @@ public class FileUploadService {
      */
     public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError, IOException {
         String pathToStorage = ProjectPaths.Storage.projectUploadsPath(project, true);
+        uploadFilesToServer(pathToStorage, requestFiles);
+    }
+
+    /**
+     * Uploads given files to disk and associates them with given project.
+     *
+     * @param pathToStorage The base path of the upload.
+     * @param requestFiles  The files being stored on the server.
+     * @throws SafaError Throws error if error occurs while creating necessary directory structure or writing to disk.
+     */
+    public void uploadFilesToServer(String pathToStorage, List<MultipartFile> requestFiles)
+        throws SafaError, IOException {
+
         FileUtilities.clearOrCreateDirectory(pathToStorage);
 
         for (MultipartFile requestFile : requestFiles) {
             try {
-                String pathToFile = ProjectPaths.Storage.uploadedProjectFilePath(project,
+                String pathToFile = ProjectPaths.Storage.uploadedProjectFilePath(pathToStorage,
                     requestFile.getOriginalFilename());
                 Path pathToUploadedFile = Paths.get(pathToFile);
                 File newFile = new File(pathToUploadedFile.toString());

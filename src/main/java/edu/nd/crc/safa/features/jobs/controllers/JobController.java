@@ -8,6 +8,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
@@ -93,6 +94,18 @@ public class JobController extends BaseController {
             serviceProvider,
             versionId, files);
         return updateProjectByFlatFileJobBuilder.perform();
+    }
+
+    @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
+    @ResponseStatus(HttpStatus.CREATED)
+    public JobAppEntity flatFileProjectCreationJob(@RequestParam MultipartFile[] files,
+                                                   @RequestParam String name,
+                                                   @RequestParam String description)
+        throws Exception {
+
+        CreateProjectByFlatFileJobBuilder jobBuilder = new CreateProjectByFlatFileJobBuilder(
+            serviceProvider, files, safaUserService.getCurrentUser(), name, description);
+        return jobBuilder.perform();
     }
 
     /**

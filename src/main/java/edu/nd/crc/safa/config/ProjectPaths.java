@@ -33,21 +33,37 @@ public class ProjectPaths {
         }
 
         public static String getPathToProjectFile(Project project, String fileName) throws IOException {
-            return FileUtilities.buildPath(Storage.projectPath(project, true), fileName);
+            return getPathToProjectFile(project.getProjectId().toString(), fileName);
+        }
+
+        public static String getPathToProjectFile(String projectFolder, String fileName) throws IOException {
+            return FileUtilities.buildPath(Storage.projectPath(projectFolder, true), fileName);
         }
 
         public static String uploadedProjectFilePath(Project project, String fileName) throws IOException {
-            return FileUtilities.buildPath(projectUploadsPath(project, true), fileName);
+            return uploadedProjectFilePath(project.getProjectId().toString(), fileName);
+        }
+
+        public static String uploadedProjectFilePath(String projectFolder, String fileName) throws IOException {
+            return FileUtilities.buildPath(projectUploadsPath(projectFolder, true), fileName);
         }
 
         public static String projectUploadsPath(Project project, boolean createIfEmpty) throws IOException {
-            String path = FileUtilities.buildPath(Storage.projectPath(project, createIfEmpty), "uploaded");
+            return projectUploadsPath(project.getProjectId().toString(), createIfEmpty);
+        }
+
+        public static String projectUploadsPath(String projectFolder, boolean createIfEmpty) throws IOException {
+            String path = FileUtilities.buildPath(Storage.projectPath(projectFolder, createIfEmpty), "uploaded");
             FileUtilities.createDirectoryIfEmpty(path, createIfEmpty);
             return path;
         }
 
         public static String projectPath(Project project, boolean createIfEmpty) throws IOException {
-            String pathToLocalStorage = FileUtilities.buildPath(Storage.PATH, project.getProjectId().toString());
+            return projectPath(project.getProjectId().toString(), createIfEmpty);
+        }
+
+        public static String projectPath(String projectFolder, boolean createIfEmpty) throws IOException {
+            String pathToLocalStorage = FileUtilities.buildPath(Storage.PATH, projectFolder);
             FileUtilities.createDirectoryIfEmpty(pathToLocalStorage, createIfEmpty);
             return pathToLocalStorage;
         }

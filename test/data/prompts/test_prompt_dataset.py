@@ -1,7 +1,6 @@
 import os
 from collections import Callable
 from typing import Dict, List
-from unittest import skip
 
 import mock
 import pandas as pd
@@ -30,7 +29,6 @@ class TestResponse:
     id = "id_from_res"
 
 
-@skip
 class TestPromptDataset(BaseTest):
     DATASET_FAIL_MSG = "Dataset with param {} failed."
     EXCEEDS_TOKEN_LIMIT_ARTIFACT = "3"
@@ -47,23 +45,27 @@ class TestPromptDataset(BaseTest):
             return False
         return True
 
+    def test_get_generation_method(self):
+        llm_manager = OpenAIManager(OpenAIArgs())
+        prompt_builder = PromptBuilder([])
+        artifact_prompt_dataset: PromptDataset = self.get_prompt_dataset_from_artifact_df()
+        generation_method = artifact_prompt_dataset._get_generation_method(llm_manager.prompt_args, prompt_builder)
+        print("hi")
+
     @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
-    @mock.patch.object(Summarizer, "summarize_single")
     @mock.patch.object(AbstractChunker, "exceeds_token_limit")
-    def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock,
-                              summarize_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):
+    def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):
         token_limit = 5
         token_limit_mock.return_value = token_limit + MAX_TOKENS_BUFFER + MAX_TOKENS_DEFAULT
         exceeds_token_limit_mock.side_effect = self.fake_exceeds_token_limit
-        summarize_mock.side_effect = self.fake_summarize
-        artifact_prompt_dataset = self.get_dataset_from_artifact_df()
+        artifact_prompt_dataset: PromptDataset = self.get_prompt_dataset_from_artifact_df()
+
         llm_manager = OpenAIManager(OpenAIArgs())
-        prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
+        prompt = QuestionPrompt("Tell me about this artifact: {artifact}")
         prompt_builder = PromptBuilder([prompt])
-        prompt_entries = artifact_prompt_dataset._generate_prompts_entries_from_artifact_per_prompt(prompt_builder,
-                                                                                                    prompt_args=llm_manager.prompt_args,
-                                                                                                    summarizer=Summarizer(llm_manager))
-        prompts_df = PromptDataFrame(prompt_entries)
+        prompts_df = artifact_prompt_dataset.get_prompt_dataframe(prompt_builder=prompt_builder,
+                                                                  prompt_args=llm_manager.prompt_args)
+
         for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
             if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
                 prompt = prompts_df.get_row(i)[PromptKeys.PROMPT]
@@ -161,14 +163,14 @@ class TestPromptDataset(BaseTest):
 
     @staticmethod
     def get_prompt_datasets() -> Dict[str, PromptDataset]:
-        datasets = {"artifact": TestPromptDataset.get_dataset_from_artifact_df(),
+        datasets = {"artifact": TestPromptDataset.get_prompt_dataset_from_artifact_df(),
                     "prompt": TestPromptDataset.get_dataset_from_prompt_df(),
                     "dataset": TestPromptDataset.get_dataset_with_trace_dataset(),
                     "id": TestPromptDataset.get_dataset_with_project_file_id()}
         return datasets
 
     @staticmethod
-    def get_dataset_from_artifact_df():
+    def get_prompt_dataset_from_artifact_df() -> PromptDataset:
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         artifacts_df = artifact_project_reader.read_project()
         return PromptDataset(artifact_df=artifacts_df)

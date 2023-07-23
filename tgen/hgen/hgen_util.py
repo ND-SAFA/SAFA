@@ -188,7 +188,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
         else task_prompt.response_manager
     generation_step_response_manager.formatter = lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(val)
 
-    artifact_prompt = MultiArtifactPrompt(prompt_start=PromptUtil.format_as_markdown("{artifact_type}S:"),
+    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown("{artifact_type}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type

@@ -126,8 +126,10 @@ class PromptBuilder:
                                    requires_all_artifacts=False)
         for prompt in self._prompts:
             if isinstance(prompt, MultiArtifactPrompt):
-                self.config.requires_trace_per_prompt = prompt.type == MultiArtifactPrompt.DataType.TRACES
-                self.config.requires_all_artifacts = prompt.type == MultiArtifactPrompt.DataType.ARTIFACT
+                if prompt.data_type == MultiArtifactPrompt.DataType.TRACES:
+                    self.config.requires_trace_per_prompt = True
+                if prompt.data_type == MultiArtifactPrompt.DataType.ARTIFACT:
+                    self.config.requires_all_artifacts = True
             elif isinstance(prompt, ArtifactPrompt):
                 self.config.requires_artifact_per_prompt = True
         return self.config

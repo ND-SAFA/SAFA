@@ -173,11 +173,11 @@ class VSMTrainer(AbstractTrainer):
             dataset = trainer_dataset_manager[dataset_role]
             if dataset is None:
                 continue
-            for artifact_id, artifact_row in dataset.artifact_df.iterrows():
+            for artifact_id, artifact_row in dataset.artifact_df.itertuples():
                 if artifact_id not in artifacts_seen:
                     artifacts_seen.add(artifact_id)
                     artifact_ids.append(artifact_id)
-                    artifact_bodies.append(artifact_row[ArtifactKeys.CONTENT.value])
+                    artifact_bodies.append(artifact_row[ArtifactKeys.CONTENT])
 
         artifact_bodies = data_cleaner.run(list(artifact_bodies))
         return {a_id: a_body for a_id, a_body in zip(artifact_ids, artifact_bodies)}

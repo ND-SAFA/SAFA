@@ -81,6 +81,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: The list of artifacts.
         """
         artifacts = [Artifact(id=artifact_id,
-                              content=artifact_row[StructuredKeys.Artifact.CONTENT.value])
-                     for artifact_id, artifact_row in self.iterrows()]
+                              content=artifact_row[StructuredKeys.Artifact.CONTENT])
+                     for artifact_id, artifact_row in self.itertuples()]
         return artifacts

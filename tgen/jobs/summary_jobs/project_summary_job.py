@@ -1,5 +1,8 @@
 from typing import Dict, TypedDict
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
@@ -7,9 +10,6 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
 
 GOAL = "# Task\nBelow is the set of software artifacts of a software system. " \
        "Read through each artifact and reasoning about what the system is doing."
@@ -83,6 +83,6 @@ class ProjectSummaryJob(AbstractJob):
     def create_artifact_map(reader: ArtifactProjectReader) -> Dict[str, str]:
         artifact_map: Dict[str, str] = {}
         artifact_df = reader.read_project()
-        for artifact_id, artifact_row in artifact_df.iterrows():
-            artifact_map[artifact_id] = artifact_row[ArtifactKeys.CONTENT.value]
+        for artifact_id, artifact_row in artifact_df.itertuples():
+            artifact_map[artifact_id] = artifact_row[ArtifactKeys.CONTENT]
         return artifact_map

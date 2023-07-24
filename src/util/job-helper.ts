@@ -1,6 +1,6 @@
 import { IconVariant, JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, timestampToDisplay } from "@/util/string-helper";
-import { getJobStatusColor } from "@/util/theme";
+import { getEnumColor } from "@/util/theme";
 
 /**
  * Returns helpful display information about a job.
@@ -29,7 +29,7 @@ export function jobStatus(job: JobSchema) {
       }
     },
     status: () => enumToDisplay(job.status || ""),
-    color: () => getJobStatusColor(job.status || ""),
+    color: () => getEnumColor(job.status || ""),
     icon: (): IconVariant => {
       switch (job.status) {
         case JobStatus.CANCELLED:

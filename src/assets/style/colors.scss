@@ -102,3 +102,19 @@ $color-node-generated: var(--q-nodeGenerated);
 .text-nodeGenerated {
   color: $color-node-generated !important;
 }
+
+.text-added {
+  color: $color-added !important;
+}
+
+.text-modified {
+  color: $color-modified !important;
+}
+
+.text-removed {
+  color: $color-removed !important;
+}
+
+.text-unchanged {
+  color: $color-unchanged !important;
+}

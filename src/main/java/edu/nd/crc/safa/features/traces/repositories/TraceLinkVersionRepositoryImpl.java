@@ -128,7 +128,8 @@ public class TraceLinkVersionRepositoryImpl
             trace.getApprovalStatus(),
             trace.getScore(),
             trace.getTraceType(),
-            trace.isVisible()
+            trace.isVisible(),
+            trace.getExplanation()
         );
     }
 

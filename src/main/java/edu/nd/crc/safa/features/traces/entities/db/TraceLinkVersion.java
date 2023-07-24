@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -76,7 +77,9 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     @Column(name = "is_visible")
     boolean isVisible = true;
-    @Column
+
+    @Lob
+    @Column(columnDefinition = "text")
     String explanation;
 
     public TraceLinkVersion() {
@@ -117,7 +120,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.modificationType = modificationType;
         traceLinkVersion.traceLink = traceLink;
         traceLinkVersion.explanation = traceAppEntity.getExplanation();
-
+        System.out.println("Trace link version:" + traceLinkVersion);
         return traceLinkVersion;
     }
 

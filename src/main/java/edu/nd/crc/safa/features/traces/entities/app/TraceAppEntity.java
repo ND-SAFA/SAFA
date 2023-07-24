@@ -42,7 +42,9 @@ public class TraceAppEntity implements IAppEntity {
                           ApprovalStatus approvalStatus,
                           double score,
                           TraceType traceType,
-                          boolean isVisible) {
+                          boolean isVisible,
+                          String explanation
+    ) {
         this(sourceName, targetName);
         this.score = score;
         this.traceLinkId = traceLinkId;
@@ -51,6 +53,7 @@ public class TraceAppEntity implements IAppEntity {
         this.approvalStatus = approvalStatus;
         this.traceType = traceType;
         this.isVisible = isVisible;
+        this.explanation = explanation;
     }
 
     public TraceAppEntity asManualTrace() {

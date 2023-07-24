@@ -52,7 +52,7 @@ public class HGenService {
 
         List<ArtifactAppEntity> sourceArtifacts = artifactService.getAppEntities(projectVersion);
         List<TGenSummaryArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
-        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes);
+        TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes, request.getSummary());
         GenerationDataset dataset = controller.generateHierarchy(tgenRequest);
         ProjectCommit projectCommit = createHGenCommit(sourceArtifacts, dataset, targetTypes);
         projectCommit.setCommitVersion(projectVersion);

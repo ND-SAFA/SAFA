@@ -59,14 +59,20 @@ public class FlatFileProjectCreationJob extends CommitJob {
      * Path to uploaded files.
      */
     String pathToFiles;
+    /**
+     * Whether code artifacts should be summarized if no summary exists.
+     */
+    boolean shouldSummarize;
 
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
                                       ProjectVersion projectVersion,
-                                      MultipartFile[] files) {
+                                      MultipartFile[] files,
+                                      boolean shouldSummarize) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
         this.files = files;
+        this.shouldSummarize = shouldSummarize;
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)
@@ -132,6 +138,9 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Summarizing Code Artifacts", position = 3)
     public void summarizeCodeArtifacts() {
+        if (!this.shouldSummarize) {
+            return;
+        }
         ProjectCommit projectCommit = this.getProjectCommit();
         List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();
         SummaryService summaryService = this.serviceProvider.getSummaryService();

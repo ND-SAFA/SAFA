@@ -45,7 +45,9 @@ public class HGenJob extends CommitJob {
         Project project = this.projectVersion.getProject();
         ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
         ProjectAppEntity projectAppEntity =
-            this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(this.projectVersion);
+            this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(
+                this.jobDbEntity.getUser(),
+                this.projectVersion);
         service.generateProjectSummary(project, projectAppEntity.getArtifacts(), this.getDbLogger());
     }
 

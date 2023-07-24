@@ -62,7 +62,7 @@ public class GenerationApi implements ITraceGenerationController {
      */
     public String generateProjectSummary(ProjectSummaryRequest request, JobLogger logger) {
         String endpoint = getEndpoint("project-summary");
-        ProjectSummaryResponse response = performTGenJob(endpoint, request, ProjectSummaryResponse.class, logger);
+        ProjectSummaryResponse response = performJob(endpoint, request, ProjectSummaryResponse.class, logger);
         return response.getSummary();
     }
 
@@ -75,7 +75,7 @@ public class GenerationApi implements ITraceGenerationController {
      */
     public HGenResponse generateHierarchy(TGenHGenRequest request) {
         String summarizeEndpoint = getEndpoint("hgen");
-        return this.performTGenJob(summarizeEndpoint, request, HGenResponse.class, null);
+        return this.performJob(summarizeEndpoint, request, HGenResponse.class, null);
     }
 
     /**
@@ -106,7 +106,7 @@ public class GenerationApi implements ITraceGenerationController {
             return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenSummaryResponse.class);
         } else {
             predictEndpoint = getEndpoint("summarize");
-            return this.performTGenJob(predictEndpoint, payload, TGenSummaryResponse.class, logger);
+            return this.performJob(predictEndpoint, payload, TGenSummaryResponse.class, logger);
         }
     }
 
@@ -119,7 +119,7 @@ public class GenerationApi implements ITraceGenerationController {
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
         String generatePromptEndpoint = getEndpoint("complete");
-        return this.performTGenJob(generatePromptEndpoint, request, TGenPromptResponse.class, null);
+        return this.performJob(generatePromptEndpoint, request, TGenPromptResponse.class, null);
     }
 
     /**
@@ -155,7 +155,7 @@ public class GenerationApi implements ITraceGenerationController {
             return this.safaRequestBuilder.sendPost(predictEndpoint, payload, TGenTraceGenerationResponse.class);
         } else {
             predictEndpoint = getEndpoint("predict");
-            return this.performTGenJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
+            return this.performJob(predictEndpoint, payload, TGenTraceGenerationResponse.class, logger);
         }
     }
 
@@ -175,10 +175,10 @@ public class GenerationApi implements ITraceGenerationController {
      * @param <T>           The generic for the job result class.
      * @return Parsed TGEN response if job is successful.
      */
-    private <T extends ITGenResponse> T performTGenJob(String endpoint,
-                                                       Object payload,
-                                                       Class<T> responseClass,
-                                                       JobLogger logger) {
+    private <T extends ITGenResponse> T performJob(String endpoint,
+                                                   Object payload,
+                                                   Class<T> responseClass,
+                                                   JobLogger logger) {
         TGenTask task = this.safaRequestBuilder.sendPost(endpoint, payload, TGenTask.class);
         String statusEndpoint = getEndpoint("status");
         String resultEndpoint = getEndpoint("results");
@@ -220,10 +220,13 @@ public class GenerationApi implements ITraceGenerationController {
         List<GenerationLink> predictions) {
         return predictions
             .stream()
-            .map(p -> new TraceAppEntity(
-                p.getSource(),
-                p.getTarget()
-            ).asGeneratedTrace(p.getScore())).collect(Collectors.toList());
+            .map(p ->
+                new TraceAppEntity(
+                    p.getSource(),
+                    p.getTarget())
+                    .asGeneratedTrace(p.getScore())
+                    .withExplanation(p.getExplanation()))
+            .collect(Collectors.toList());
     }
 
     /**

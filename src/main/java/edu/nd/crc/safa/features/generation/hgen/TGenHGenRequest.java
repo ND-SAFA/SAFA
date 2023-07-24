@@ -23,4 +23,8 @@ public class TGenHGenRequest {
      * The type of artifacts to generate.
      */
     List<String> targetTypes;
+    /**
+     * The project summary.
+     */
+    String summary;
 }

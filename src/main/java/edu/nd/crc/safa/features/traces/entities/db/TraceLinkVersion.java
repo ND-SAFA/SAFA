@@ -76,6 +76,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     @Column(name = "is_visible")
     boolean isVisible = true;
+    @Column
+    String explanation;
 
     public TraceLinkVersion() {
         this.traceType = TraceType.GENERATED;
@@ -114,6 +116,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.projectVersion = projectVersion;
         traceLinkVersion.modificationType = modificationType;
         traceLinkVersion.traceLink = traceLink;
+        traceLinkVersion.explanation = traceAppEntity.getExplanation();
 
         return traceLinkVersion;
     }

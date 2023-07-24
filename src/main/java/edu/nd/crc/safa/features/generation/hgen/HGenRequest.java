@@ -25,7 +25,7 @@ public class HGenRequest {
      * The target type of artifact to create.
      */
     @NotNull
-    List<@Valid String> targetTypes;
+    @Valid List<@Valid String> targetTypes;
     /**
      * Optional. Project summary.
      */

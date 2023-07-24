@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LinkVisibilityService {
 
-    private static final double TIER_ONE_THRESHOLD = 0.90; // 90-100 or top prediction above min score
+    private static final double TIER_ONE_THRESHOLD = 0.85; // 90-100 or top prediction above min score
 
     /**
      * Selects the top links to make visible.

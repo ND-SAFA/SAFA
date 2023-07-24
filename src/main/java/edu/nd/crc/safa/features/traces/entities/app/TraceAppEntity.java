@@ -27,6 +27,7 @@ public class TraceAppEntity implements IAppEntity {
     double score;
     TraceType traceType;
     boolean isVisible = true;
+    String explanation;
 
     public TraceAppEntity(String sourceName, String targetName) {
         this.sourceName = sourceName;
@@ -70,6 +71,11 @@ public class TraceAppEntity implements IAppEntity {
     public TraceAppEntity betweenArtifacts(String sourceName, String targetName) {
         this.setSourceName(sourceName);
         this.setTargetName(targetName);
+        return this;
+    }
+
+    public TraceAppEntity withExplanation(String explanation) {
+        this.explanation = explanation;
         return this;
     }
 

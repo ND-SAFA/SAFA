@@ -88,10 +88,13 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws Exception {
+                                                 @RequestParam MultipartFile[] files,
+                                                 @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
         UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
             serviceProvider,
-            versionId, files);
+            versionId,
+            files,
+            shouldSummarize);
         return updateProjectByFlatFileJobBuilder.perform();
     }
 

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.generation.projectsummary;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.SafaRequestBuilder;
@@ -50,6 +51,7 @@ public class ProjectSummaryService {
      * @return The project summary.
      */
     public String summarizeProject(List<ArtifactAppEntity> artifacts, JobLogger jobLogger) {
+        artifacts = artifacts.stream().filter(a -> a.getTraceString().length() > 0).collect(Collectors.toList());
         Map<String, String> projectArtifactMap = ProjectDataStructures.createArtifactLayer(artifacts);
         GenerationApi api = new GenerationApi(this.safaRequestBuilder);
         ProjectSummaryRequest request = new ProjectSummaryRequest(projectArtifactMap);

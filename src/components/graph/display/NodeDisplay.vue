@@ -44,7 +44,6 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ThemeColor } from "@/types";
-import { appStore } from "@/hooks";
 import { Separator, Typography } from "@/components/common";
 
 const props = defineProps<{
@@ -110,10 +109,6 @@ const cardStyle = computed(() =>
 );
 const separatorStyle = computed(() =>
   props.color.includes("#") ? `background-color: ${props.color};` : undefined
-);
-
-const isNodeDecoration = computed(
-  () => props.variant === "sidebar" || props.variant === "footer"
 );
 
 /**

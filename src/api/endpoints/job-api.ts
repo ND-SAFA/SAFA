@@ -2,6 +2,25 @@ import { JobLogSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
+ * Creates a project from the given flat files.
+ *
+ * @param formData - Form data containing the project files.
+ * @return The created project.
+ */
+export async function createProjectUploadJob(
+  formData: FormData
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(
+    Endpoint.createProjectThroughFlatFiles,
+    {
+      method: "POST",
+      body: formData,
+    },
+    { setJsonContentType: false }
+  );
+}
+
+/**
  * Updates an existing project from the given flat files.
  *
  * @param versionId - The project version to update.

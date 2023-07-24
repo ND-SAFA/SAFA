@@ -35,4 +35,3 @@ pnpm-debug.log*
 distrib
 tests_output
 *.log
-*.png

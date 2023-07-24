@@ -15,6 +15,14 @@
 
 .icon-safa {
   animation: fadeIn 1s;
+
+  &.clickable {
+    height: 42pt;
+  }
+
+  & > * {
+    fill: $color-primary;
+  }
 }
 
 // Navigation - Searchbar

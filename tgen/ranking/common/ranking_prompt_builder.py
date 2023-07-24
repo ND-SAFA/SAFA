@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.constants.deliminator_constants import NEW_LINE, TAB
 from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
 
 DEFAULT_BODY_TITLE = "# Software Artifacts"
@@ -86,7 +86,7 @@ class RankingPromptBuilder:
         if name:
             artifact_body = f"({name}) {artifact_body}"
         body = artifact_body.replace(f"{NEW_LINE}{NEW_LINE}", f"{NEW_LINE}")
-        return f"<artifact>\n\t<id>{artifact_name}</id>\n\t<body>{body}</body>\n</artifact>{separator}"
+        return f"<artifact>{NEW_LINE}{TAB}<id>{artifact_name}</id>{NEW_LINE}{TAB}<body>{body}</body>{NEW_LINE}</artifact>{separator}"
 
     @staticmethod
     def join_prompts(prompts: List[Optional[str]], delimiter: str):

@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-
-from tgen.common.util.base_object import BaseObject
+from typing import TypedDict
 
 
 @dataclass
-class TraceLayer(BaseObject):
+class TraceLayer(TypedDict):
     """
     Identifies a layer being traced.
     """

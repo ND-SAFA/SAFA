@@ -24,20 +24,22 @@ class MultiArtifactPrompt(Prompt):
         TRACES = auto()
         ARTIFACT = auto()
 
-    def __init__(self, prompt_start: str = EMPTY_STRING,
+    def __init__(self, prompt_prefix: str = EMPTY_STRING,
                  build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
                  data_type: DataType = DataType.ARTIFACT):
         """
-        Constructor for making a prompt from many artifacts
-        :param build_method: The method to build the prompt (determines prompt format)
+        Constructor for making a prompt containing many artifacts.
+        :param prompt_prefix: The prefix to attach to prompt.
+        :param build_method: The method to build the prompt (determines prompt format).
         :param include_ids: If True, includes artifact ids
+        :param data_type:
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
-        self.type = data_type
-        super().__init__(value=prompt_start)
+        self.data_type = data_type
+        super().__init__(value=prompt_prefix)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:

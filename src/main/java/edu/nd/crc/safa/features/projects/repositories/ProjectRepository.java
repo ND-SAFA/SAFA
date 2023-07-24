@@ -32,7 +32,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     @Query(value =
         "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("
             + "  g.repositoryName, "
-            + "   '',"  // TODO org ID for github
+            + "   g.owner,"
             + "   g.lastUpdate, "
             + "   'GITHUB') "
             + "FROM Project p "

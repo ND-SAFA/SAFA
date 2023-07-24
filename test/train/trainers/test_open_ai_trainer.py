@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import Dict, List
 from unittest import mock
 
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
@@ -18,10 +19,9 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_anthropic_responses import mock_openai
-from tgen.testres.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.common.util.llm_response_util import LLMResponseUtil
 
 Res = namedtuple("Res", ["id"])
 

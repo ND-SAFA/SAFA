@@ -1,5 +1,6 @@
 import os
 
+from tgen.common.util.file_util import FileUtil
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
@@ -13,9 +14,9 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits, TokenLimitCalculator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.testres.test_anthropic_responses import mock_openai
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, TestResponseManager
-from tgen.common.util.file_util import FileUtil
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestResponseManager
 
 
 class TestSummarizer(BaseTest):

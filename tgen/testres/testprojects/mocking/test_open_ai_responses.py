@@ -1,6 +1,6 @@
 import inspect
 from copy import deepcopy
-from typing import Callable, List, Union
+from typing import List
 
 from tgen.common.util.attr_dict import AttrDict
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -99,104 +99,13 @@ COMPLETION_RESPONSE_DICT = AttrDict({
 
 SUMMARY_FORMAT = "Summary of {}"
 DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag
-from unittest import mock
 
 library_map = {
     "openai": "openai.ChatCompletion.create",
     "anthropic": "AnthropicManager.Client.completion"
 }
 
-
-def mock_ai(library: str, response_formatter: Callable, func=None, format: str = None, test_expected_responses: bool = True,
-            *outer_args,
-            **outer_kwargs):
-    """
-    Automatically mocks open ai
-    :param format: The format to encapsulate responses in.
-    :return: The decorated function with open ai mocked.
-    """
-    library_mock_string = library_map[library]
-
-    def decorator(test_func: Callable, *test_func_args, **test_func_kwargs):
-        @mock.patch(library_mock_string)
-        def wrapper(self, mock_completion):
-            response_manager = TestResponseManager(format=format, response_formatter=response_formatter, *test_func_args, *outer_args,
-                                                   **test_func_kwargs, **outer_kwargs)
-            mock_completion.side_effect = response_manager
-            if does_accept(test_func, response_manager):
-                test_func(self, response_manager)
-            else:
-                test_func(self)
-            if test_expected_responses:
-                n_used = response_manager.start_index
-                n_expected = len(response_manager.responses)
-                assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
-
-        function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__
-        wrapper.__name__ = function_name
-        return wrapper
-
-    return decorator
-
-
-def create_openai_handler(format: str = None, *args, **kwargs):
-    def handler(*handler_args, **handler_kwargs):
-        def processor(t):
-            if format:
-                return format.format(t)
-            return t
-
-        response_text = TestResponseManager(response_formatter=processor, *args, *handler_args, **kwargs, **handler_kwargs)
-        return response_text
-
-    return handler
-
-
 DEFAULT_RESPONSE = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0]["message"]["content"])
-
-
-class TestResponseManager:
-    def __init__(self,
-                 responses: Union[str, List[str]] = None,
-                 tags: List[str] = None,
-                 response_formatter: Callable = None,
-                 format: str = None):
-        if responses is None:
-            responses = [DEFAULT_RESPONSE]
-        if tags is None:
-            tags = [DEFAULT_SUMMARY_TAG]
-        self.responses = responses
-        self.tags = tags
-        self.response_formatter = response_formatter
-        self.format = format
-        self.n_given = 0
-        self.start_index = 0
-        self.end_index = len(responses)
-
-    def __call__(self, *args, **kwargs) -> List[str]:
-        prompts = [m["content"] for m in kwargs["messages"]]
-        n_prompts = len(prompts)
-        responses = self.get_next_response(n_requested=n_prompts)
-        if self.response_formatter is not None:
-            responses = [self.response_formatter(r) for r in responses]
-        if self.format:
-            responses = [self.format.format(r) for r in responses]
-        self.n_given += n_prompts
-        formatted_response = self.response_formatter(responses)
-        return formatted_response
-
-    def set_responses(self, responses: List[str]):
-        self.responses = responses
-        self.start_index = 0
-
-    def get_next_response(self, n_requested: int = 1) -> List[str]:
-        end_index = self.n_given + n_requested
-        n_responses = len(self.responses)
-        if end_index > n_responses:
-            raise ValueError(f"Ran out of mock responses. Contains only {n_responses} responses.")
-        responses = self.responses[self.start_index: end_index]
-        self.start_index = end_index
-        return responses
 
 
 def process_response_tags(prompts: List[str], tags: List[str]):

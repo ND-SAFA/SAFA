@@ -15,10 +15,10 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_anthropic_responses import mock_openai
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 

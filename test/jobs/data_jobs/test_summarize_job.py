@@ -10,8 +10,8 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_anthropic_responses import mock_anthropic
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic
 
 
 class TestSummarizeJob(BaseJobTest):

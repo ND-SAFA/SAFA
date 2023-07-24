@@ -28,8 +28,8 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.test_anthropic_responses import mock_anthropic, mock_openai
 from tgen.testres.test_assertions import TestAssertions
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic, mock_openai
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 

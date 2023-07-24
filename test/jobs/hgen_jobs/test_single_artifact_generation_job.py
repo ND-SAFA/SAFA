@@ -6,8 +6,8 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_anthropic_responses import mock_anthropic, mock_openai
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic, mock_openai
 
 
 @skip("Skipping hgen tests until can fix for update")

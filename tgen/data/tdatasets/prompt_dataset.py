@@ -123,7 +123,7 @@ class PromptDataset(iDataset):
         """
         if self.prompt_df is None or (prompt_builder and prompt_args):
             generation_method = self._get_generation_method(prompt_args, prompt_builder)
-            prompt_entries = generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args, summarizer=summarizer)
+            prompt_entries = generation_method(prompt_builder=prompt_builder, prompt_args=prompt_args)
             self.prompt_df = PromptDataFrame(prompt_entries)
         return self.prompt_df
 

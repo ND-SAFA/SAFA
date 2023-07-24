@@ -15,21 +15,15 @@ import sys
 
 from kombu.serialization import register
 
-REPO_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..")
-REPO_PATH = os.path.normpath(REPO_PATH)
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.logger_manager import logger
+from .paths import load_paths
 
-API_PATH = os.path.join(REPO_PATH, "src")
-TGEN_PATH = os.path.join(REPO_PATH, "tgen")
-
-sys.path.append(TGEN_PATH)
-sys.path.append(API_PATH)
-
-print("PATHS ADDED:", [TGEN_PATH, API_PATH])
+load_paths()
 
 from pathlib import Path
 
 from dotenv import load_dotenv
-from tgen.util.json_util import NpEncoder
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -150,6 +144,8 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOW_ALL_ORIGINS = True
 
+ENV_MODE = os.environ.get("ENV_MODE", "local")
+logger.info(f"Running in {ENV_MODE} mode")
 """
 Celery Configuration Options
 """
@@ -157,6 +153,9 @@ CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
+
+if ENV_MODE == "local":
+    CELERY_TASK_ALWAYS_EAGER = True
 
 
 # Encoder function

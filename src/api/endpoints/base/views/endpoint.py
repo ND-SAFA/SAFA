@@ -1,3 +1,4 @@
+import json
 import threading
 from typing import Any, Callable, Dict, Optional
 
@@ -8,9 +9,9 @@ from rest_framework.views import APIView
 
 from api.endpoints.base.docs.doc_generator import autodoc
 from api.utils.view_util import ViewUtil
-from tgen.util.json_util import NpEncoder
-from tgen.util.logging.log_capture import LogCapture
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.log_capture import LogCapture
+from tgen.common.util.logging.logger_manager import logger
 
 
 def endpoint(serializer):
@@ -45,13 +46,15 @@ def endpoint(serializer):
                 assert request.method == 'POST', "Only POST accepted for request."
                 payload = ViewUtil.read_request(request, serializer)
                 if isinstance(func, Task):
-                    task = func.delay(payload)
+                    payload_str = json.dumps(payload, cls=NpEncoder)
+                    payload_dict = json.loads(payload_str)
+                    task = func.delay(payload_dict)
                     return JsonResponse({"task_id": task.id}, encoder=NpEncoder)
                 else:
                     response = func(payload)
                     if isinstance(response, JsonResponse):
                         return response
-                    return JsonResponse(response, encoder=NpEncoder)
+                    return JsonResponse(response, encoder=NpEncoder, safe=False)
 
         return APIDecorator.as_view()
 
@@ -101,10 +104,17 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
             state["is_running"] = True
 
             def run_job():
-                result.update(func(*task_args, **task_kwargs))
+                data, *other_args = task_args
+                s = serializer(data=data)
+                s.is_valid(raise_exception=True)
+                serialized_data = s.save()
+                response = func(serialized_data, *other_args, **task_kwargs)
+                response_str = json.dumps(response, cls=NpEncoder)
+                response_dict = json.loads(response_str)
+                result.update(response_dict)
                 state["is_running"] = False
 
-            logger.info(f"Welcome to TGEN. Beginning job: {current_task.request.id}")
+            logger.info(f"Beginning job: {current_task.request.id}")
             thread = threading.Thread(target=run_job)
             thread.start()
 
@@ -115,7 +125,7 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
 
             while state["is_running"]:
                 write_logs()
-                threading.Event().wait(1)
+                threading.Event().wait(5)
             thread.join()
 
             endpoint_postprocess(state, result)

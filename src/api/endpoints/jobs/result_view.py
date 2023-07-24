@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.base.views.endpoint import endpoint
-from tgen.util.status import Status
+from tgen.common.util.status import Status
 
 
 class ResultPayload(TypedDict):
@@ -31,12 +31,19 @@ def get_task_status(result):
         raise Exception(f"Status is unknown:{result.status}")
 
 
+def try_get_logs(async_result: AsyncResult):
+    try:
+        return async_result["logs"]
+    except:
+        return []
+
+
 @endpoint(ResultSerializer)
 def get_status(payload: ResultPayload):
     task_id = payload["task_id"]
     result = AsyncResult(task_id)
     results_obj = result.result
-    logs = results_obj["logs"] if results_obj is not None else []
+    logs = try_get_logs(results_obj)
     status, message = get_task_status(result)
     return JsonResponse({"status": status, "message": message, "logs": logs})
 

@@ -60,7 +60,7 @@ def get_schema_for_field(field: serializers.Field):
         return get_serializer_swagger_info(field.__class__)['request_body']
 
     if field.help_text is None:
-        raise Exception(f"{field.field_name} is missing help text.")
+        raise Exception(f"{field.__class__.__name__} is missing help text.")
 
     parent_fields = [serializers.ListField, serializers.ListSerializer, serializers.DictField]
     if any([isinstance(field, p) for p in parent_fields]):

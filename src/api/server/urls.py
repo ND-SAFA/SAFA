@@ -24,7 +24,8 @@ from api.endpoints.completion.completion_view import perform_completion
 from api.endpoints.hgen.hgen_view import perform_hgen
 from api.endpoints.jobs.result_view import get_result, get_status
 from api.endpoints.predict.predict_view import perform_prediction, perform_search
-from api.endpoints.summarize.summarize_view import perform_summarization
+from api.endpoints.project_summary.project_summary_view import perform_project_summary
+from api.endpoints.summarize.summarize_view import perform_summarization_job, perform_summarization_sync
 
 HOME_PAGE_CONTENT = "Welcome to SAFA's trace generation server! This server is responsible for all things generation."
 
@@ -52,7 +53,9 @@ urlpatterns = [
     path('predict/', perform_prediction),
     path('predict-sync/', perform_search),
     path('complete/', perform_completion),
-    path('summarize/', perform_summarization),
+    path('project-summary/', perform_project_summary),
+    path('summarize/', perform_summarization_job),
+    path('summarize-sync/', perform_summarization_sync),
     path('hgen/', perform_hgen),
     path('status/', get_status),
     path('results/', get_result)

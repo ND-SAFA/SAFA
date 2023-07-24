@@ -3,13 +3,10 @@ import os.path
 from api.endpoints.base.views.endpoint import endpoint
 from api.endpoints.completion.completion_serializer import CompletionPayload, CompletionSerializer
 from api.utils.model_util import ModelUtil
-from tgen.data.prompts.generation_prompt_creator import GenerationPromptCreator
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.models.llm.llm_responses import SupportedLLMResponses
-from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.util.reflection_util import ReflectionUtil
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -29,15 +26,7 @@ def complete_prompt(model: str, prompt: str, llm_manager: AbstractLLMManager, **
         prompt_args = AnthropicManager.prompt_args
     else:
         raise Exception("Unknown LLM library:" + llm_manager.__class__.__name__)
-    prompt_creator = GenerationPromptCreator(prompt_args=prompt_args)
-    formatted_prompt = prompt_creator.format_prompt(prompt)
-
-    llm_response: SupportedLLMResponses = llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
-                                                                              prompt=[formatted_prompt],
-                                                                              model=model,
-                                                                              **params)
-    model_response = llm_response.batch_responses[0]
-    return model_response
+    raise NotImplemented("Completion endpoint is under construction!")
 
 
 @endpoint(CompletionSerializer)

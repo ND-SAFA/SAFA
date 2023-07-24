@@ -12,14 +12,15 @@ COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
 ## Step - Copy source and build files
-COPY /tgen/tgen/ /app/tgen/
-COPY /src/api/ /app/api/
+COPY tgen/tgen/ /app/tgen/
+COPY src/api/ /app/api/
 
 ### Step - Collect static files
 WORKDIR /app
 RUN python3 api/manage.py collectstatic --noinput
 
 ### COPy
+RUN cat /app/tgen/ranking/__init__.py
 
 # Finalize
 EXPOSE 80

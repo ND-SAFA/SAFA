@@ -1,8 +1,6 @@
-from typing import Generic, TypeVar
+from typing import Dict, Generic, TypeVar
 
 from rest_framework import serializers
-
-from api.utils.serializer_utility import SerializerUtility
 
 PayloadType = TypeVar("PayloadType")
 
@@ -13,16 +11,7 @@ class AbstractSerializer(serializers.Serializer, Generic[PayloadType]):
     """
 
     def update(self, instance, validated_data):
-        """
-        Not implemented. Throws error if called.
-        """
-        SerializerUtility.update_error()
+        raise NotImplementedError(f"Update is not implemented on {self.__class__.__name__}.")
 
-    def create(self, validated_data) -> PayloadType:
-        """
-        Recursively creates child data. Under construction, currently non-functional.
-        :param validated_data: The data created.
-        :return: The validated data.
-        """
-        data = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        return data
+    def create(self, validated_data: Dict):
+        return validated_data

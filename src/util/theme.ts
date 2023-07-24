@@ -11,17 +11,17 @@ export enum Colors {
   white = "#FFFFFF",
   black = "#1E1E1E",
 
-  grey = "#36405A",
-  greyLight = "lightgrey",
+  grey = "#41533F",
   greyLightest = "#EDEFEB",
   greyDark = "#333",
 
   green = "#55A630",
-  greenDark = "#2B9348",
+  greenDark = "#488E27",
 
-  blue = "#0062FF",
+  blue = "#3055A6",
 
-  red = "#E3502B",
+  red = "#A63055",
+  redLight = "#D51552",
 
   orange = "#fb8500",
 
@@ -44,6 +44,7 @@ export const ThemeColors = {
   secondary: Colors.green,
   accent: Colors.green,
   error: Colors.red,
+  errorDark: Colors.redLight,
 
   whiteBg: Colors.white,
   lightBg: Colors.greyLightest,
@@ -109,7 +110,7 @@ export const darkPalette: Record<string, string> = {
 
   info: ThemeColors.primary,
   warning: ThemeColors.warning,
-  negative: ThemeColors.error,
+  negative: ThemeColors.errorDark,
   positive: ThemeColors.added,
 
   text: ThemeColors.darkText,

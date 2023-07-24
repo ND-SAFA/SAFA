@@ -15,6 +15,7 @@ export default {
 import { computed, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { MessageType, SnackbarMessage } from "@/types";
+import { getEnumColor } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common";
 
@@ -28,18 +29,7 @@ const hasErrors = computed(() => errors.value.length > 0);
 const isErrorOpen = computed(() => appStore.isErrorDisplayOpen);
 const showAction = computed(() => messageType.value === MessageType.update);
 
-const messageColor = computed(() => {
-  switch (messageType.value) {
-    case MessageType.warning:
-      return "warning";
-    case MessageType.error:
-      return "negative";
-    case MessageType.success:
-      return "positive";
-    default:
-      return "primary";
-  }
-});
+const messageColor = computed(() => getEnumColor(messageType.value));
 
 function buildNotification() {
   const actions = [];

@@ -3,6 +3,7 @@ import {
   ArtifactDeltaState,
   DeltaType,
   JobStatus,
+  MessageType,
   ThemeColor,
 } from "@/types";
 
@@ -176,21 +177,27 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | DeltaType | string
+  state: ApprovalType | ArtifactDeltaState | DeltaType | MessageType | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case MessageType.success:
     case "added":
       return "added";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case MessageType.info:
+    case MessageType.update:
     case "modified":
       return "modified";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case MessageType.error:
     case "removed":
       return "removed";
+    case MessageType.warning:
+      return "warning";
     default:
       return "unchanged";
   }

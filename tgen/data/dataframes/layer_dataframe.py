@@ -1,9 +1,9 @@
 from typing import List, Tuple, Type
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.util.enum_util import EnumDict
-from tgen.util.logging.logger_manager import logger
 
 LayerKeys = StructuredKeys.LayerMapping
 

@@ -1,12 +1,12 @@
 from copy import deepcopy
 from string import ascii_uppercase
-from typing import List, Dict, Any, Union
+from typing import Any, Dict, List, Union
 
-from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.util.override import overrides
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.util.override import overrides
 
 
 class QuestionnairePrompt(Prompt):

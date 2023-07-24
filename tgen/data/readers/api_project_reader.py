@@ -1,13 +1,15 @@
 from typing import Dict
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.constants.dataset_constants import NO_CHECK
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.server.api.api_definition import ApiDefinition
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.enum_util import EnumDict
 
 
 class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
@@ -23,44 +25,66 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         super().__init__(overrides)
         self.api_definition = api_definition
+        self.remove_orphans = False
+        self.overrides = {
+            "remove_orphans": False,
+            "allowed_orphans": NO_CHECK,
+            "allowed_missing_sources": 0,
+            "allowed_missing_targets": 0
+        }
 
     def read_project(self) -> TraceDataFramesTypes:
         """
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.
         """
-        artifact_map = {}
-        layer_mapping = []
+        artifact_df = self.create_artifact_df()
+        layer_mapping_df = self.create_layer_df()
+        trace_df = self.create_trace_df()
 
-        source_layers = self.api_definition.source_layers
-        target_layers = self.api_definition.target_layers
-        links = self.api_definition.get_links()
-
-        for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
-            source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE.value, i)
-            target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE.value, i)
-            artifact_map = self.add_artifact_layer(source_layer, source_layer_id, artifact_map)
-            artifact_map = self.add_artifact_layer(target_layer, target_layer_id, artifact_map)
-            layer_mapping.append(EnumDict({
-                StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
-                StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
-            }))
-
-        trace_df_entries = []
-        for source_id, target_id in links:
-            trace_df_entries.append(EnumDict({
-                StructuredKeys.Trace.SOURCE: source_id,
-                StructuredKeys.Trace.TARGET: target_id,
-                StructuredKeys.Trace.LABEL: 1
-            }))
-
-        artifact_df = ArtifactDataFrame(artifact_map)
         if self.summarizer is not None:
             artifact_df = self.summarizer.summarize_dataframe(artifact_df, col2summarize=StructuredKeys.Artifact.CONTENT.value,
                                                               col2use4chunker=StructuredKeys.Artifact.LAYER_ID.value)
-        trace_df = TraceDataFrame(trace_df_entries)
-        layer_mapping_df = LayerDataFrame(layer_mapping)
+
         return artifact_df, trace_df, layer_mapping_df
+
+    def create_trace_df(self):
+        links = self.api_definition.get_links()
+        trace_df_entries = []
+
+        for trace_entry in links:
+            trace_enum = DictUtil.create_trace_enum(trace_entry, StructuredKeys.Trace)
+            trace_df_entries.append(trace_enum)
+        trace_df = TraceDataFrame(trace_df_entries)
+        return trace_df
+
+    def create_artifact_df(self) -> ArtifactDataFrame:
+        """
+        Creates artifact data frame containing all layers of api definition.
+        :return: Artifact data frame.
+        """
+        global_artifact_map = {}
+        for artifact_type, artifact_map in self.api_definition.artifact_layers.items():
+            global_artifact_map = self.add_artifact_layer(artifact_map, artifact_type, global_artifact_map)
+        return ArtifactDataFrame(global_artifact_map)
+
+    def create_layer_df(self) -> LayerDataFrame:
+        """
+        Create layer data frame from api definition.
+        :return: Data frame containing layers being traced.
+        """
+        layer_mapping = []
+        for layer in self.api_definition.layers:
+            parent_type = layer.parent
+            child_type = layer.child
+
+            layer_mapping.append(EnumDict({
+                StructuredKeys.LayerMapping.SOURCE_TYPE: child_type,
+                StructuredKeys.LayerMapping.TARGET_TYPE: parent_type
+            }))
+
+        layer_mapping_df = LayerDataFrame(layer_mapping)
+        return layer_mapping_df
 
     def get_project_name(self) -> str:
         """

@@ -4,29 +4,27 @@ from typing import Dict
 
 import mock
 
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trace_output.stage_eval import Metrics
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.job_result import JobResult
+from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.metrics.metrics_manager import MetricsManager
-from tgen.train.trace_output.stage_eval import Metrics
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestHuggingFaceTrainer(BaseTraceTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    TARGET_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
-    SOURCE_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
 
-    EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
+    EXPECTED_PREDICTION_SIZE = TestDataManager.get_n_candidates()
     TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]],
                               ["f", ["f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]

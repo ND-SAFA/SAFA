@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import List
 
-from tgen.util.base_object import BaseObject
+from tgen.common.util.base_object import BaseObject
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.ranking.common.trace_layer import TraceLayer
 
 
 @dataclass
@@ -9,19 +11,12 @@ class ApiDefinition(BaseObject):
     """
     Defines the dataset received through the API.
     """
-    source_layers: List[Dict[str, str]]
-    target_layers: List[Dict[str, str]]
-    true_links: List[Tuple[str, str]] = None
+    artifact_layers: dict  # maps layer names to layer artifact maps.
+    layers: List[TraceLayer]
+    true_links: List[TracePredictionEntry] = None
 
-    def get_links(self) -> List[Tuple[str, str]]:
+    def get_links(self) -> List[TracePredictionEntry]:
         """
         :return: Returns the trace links defined in API dataset.
         """
         return [] if self.true_links is None else self.true_links
-
-    def as_dict(self) -> Dict:
-        """
-        Returns the definition as a dictionary
-        :return: The definition as a dictionary
-        """
-        return vars(self)

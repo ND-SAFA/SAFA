@@ -1,6 +1,9 @@
 from typing import Any, List, Optional
 
-DEFAULT_BODY_TITLE = "# Artifacts"
+from tgen.constants.deliminator_constants import NEW_LINE, TAB
+from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
+
+DEFAULT_BODY_TITLE = "# Software Artifacts"
 
 
 def builder_method(func):
@@ -19,8 +22,8 @@ def builder_method(func):
 
 class RankingPromptBuilder:
 
-    def __init__(self, goal: str = "", query: str = "", instructions: str = "", body_title: str = DEFAULT_BODY_TITLE,
-                 section_delimiter: str = "\n\n"):
+    def __init__(self, goal: str = "", query: str = "", instructions: str = "",
+                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n", query_tag: str = DEFAULT_QUERY_TAG):
         """
         Builder for prompts with tasks.
         """
@@ -31,6 +34,7 @@ class RankingPromptBuilder:
         self.body_title = body_title
         self.body = ""
         self.context = ""
+        self.query_tag = query_tag
 
     @builder_method
     def with_query(self, query: str):
@@ -49,8 +53,8 @@ class RankingPromptBuilder:
         self.instructions = format
 
     @builder_method
-    def with_artifact(self, artifact_name: Any, artifact_body: str):
-        self.body += self.format_artifact(artifact_name, artifact_body)
+    def with_artifact(self, artifact_name: Any, artifact_body: str, **kwargs):
+        self.body += self.format_artifact(artifact_name, artifact_body, **kwargs)
 
     @builder_method
     def with_body(self, body: str):
@@ -64,13 +68,14 @@ class RankingPromptBuilder:
         """
         :return: Builds and returns prompt.
         """
+        query_formatted = f"<{self.query_tag}>\n{self.query}\n</{self.query_tag}>" if self.query else self.query
         body = self.join_prompts([self.body_title, self.body], "\n\n")
-        items = [self.goal + self.query, body, self.context, self.instructions]
+        items = [self.goal + query_formatted, self.context, body, self.instructions]
         prompt = self.join_prompts(items, self.section_delimiter)
         return prompt
 
     @staticmethod
-    def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n"):
+    def format_artifact(artifact_name: str, artifact_body: str, separator: str = "\n\n", name: str = None):
         """
         Formats the artifact as xml.
         :param artifact_name: The artifact id.
@@ -78,8 +83,10 @@ class RankingPromptBuilder:
         :param separator: The separator between artifacts.
         :return: Artifact prompt string.
         """
-        body = artifact_body.replace("\n\n", "\n")
-        return f"<artifact><id>{artifact_name}</id><body>{body}</body></artifact>{separator}"
+        if name:
+            artifact_body = f"({name}) {artifact_body}"
+        body = artifact_body.replace(f"{NEW_LINE}{NEW_LINE}", f"{NEW_LINE}")
+        return f"<artifact>{NEW_LINE}{TAB}<id>{artifact_name}</id>{NEW_LINE}{TAB}<body>{body}</body>{NEW_LINE}</artifact>{separator}"
 
     @staticmethod
     def join_prompts(prompts: List[Optional[str]], delimiter: str):

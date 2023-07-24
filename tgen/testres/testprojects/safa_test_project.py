@@ -1,13 +1,21 @@
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.paths.project_paths import SAFA_PROJECT_PATH
-from tgen.testres.testprojects.api_test_project import ApiTestProject
+from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 
 
-class SafaTestProject(ApiTestProject):
+class SafaTestProject(AbstractTestProject):
     """
     Contains safa test project testing details.
     """
+
+    @staticmethod
+    def get_n_links() -> int:
+        return 18
+
+    @classmethod
+    def get_n_positive_links(cls) -> int:
+        return 6
 
     @staticmethod
     def get_project_path() -> str:
@@ -21,4 +29,6 @@ class SafaTestProject(ApiTestProject):
         """
         :return: Returns structured project reader for project
         """
-        return StructuredProjectReader(SAFA_PROJECT_PATH, overrides={"allowed_orphans": 2, "remove_orphans": True})
+        return StructuredProjectReader(SAFA_PROJECT_PATH, overrides={
+            "allowed_orphans": 2, "remove_orphans": False
+        })

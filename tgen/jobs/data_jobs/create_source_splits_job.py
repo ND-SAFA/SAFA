@@ -5,6 +5,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -14,9 +17,6 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.list_util import ListUtil
-from tgen.util.logging.logger_manager import logger
 
 
 class CreateSourceSplitsJob(AbstractJob):
@@ -46,7 +46,7 @@ class CreateSourceSplitsJob(AbstractJob):
             source_name, target_name = self.get_layer_types(layer_mapping_row)
             task_name = f"task_{layer_mapping_i}"
 
-            artifacts_to_split = DataFrameUtil.query_df(dataset.artifact_df, {StructuredKeys.Artifact.LAYER_ID: source_name})
+            artifacts_to_split = DataFrameUtil.query_df(dataset.artifact_df, {StructuredKeys.Artifact.LAYER_ID.value: source_name})
             split_id_batches = self.get_artifact_ids_in_splits(artifacts_to_split, self.splits)
             all_split_ids = set(ListUtil.flatten(split_id_batches))
 

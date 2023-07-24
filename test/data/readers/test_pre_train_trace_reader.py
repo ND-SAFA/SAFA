@@ -1,6 +1,7 @@
 import os
-from unittest import mock
 
+from tgen.common.util.file_util import FileUtil
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
@@ -8,9 +9,8 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.util.file_util import FileUtil
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 
 
 class TestPreTrainingTraceReader(BaseTest):
@@ -27,12 +27,11 @@ class TestPreTrainingTraceReader(BaseTest):
         lines = FileUtil.read_file(reader.data_file).split(os.linesep)
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
-    @mock.patch("openai.Completion.create")
-    def test_summarization(self, mock_completion: mock.MagicMock):
+    @mock_openai
+    def test_summarization(self):
         """
         Tests that pre-train data can be summarized
         """
-        mock_completion.side_effect = fake_open_ai_completion
         reader: PreTrainTraceReader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))

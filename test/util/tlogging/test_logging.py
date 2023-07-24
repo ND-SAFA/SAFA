@@ -2,8 +2,8 @@ from logging import FileHandler
 from unittest import skip
 
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 
 
 class TestLogging(BaseTest):

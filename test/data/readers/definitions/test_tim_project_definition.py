@@ -1,12 +1,12 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from tgen.constants.dataset_constants import NO_CHECK_VALUE
+from tgen.common.util.json_util import JsonUtil
+from tgen.constants.dataset_constants import NO_CHECK
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.json_util import JsonUtil
 
 
 class TestTimProjectDefinition(BaseTest):
@@ -51,7 +51,7 @@ class TestTimProjectDefinition(BaseTest):
             **TimProjectDefinition.get_flattened_conversions()
         },
         StructuredKeys.OVERRIDES: {
-            "allowed_orphans": NO_CHECK_VALUE
+            "allowed_orphans": NO_CHECK
         }
     }
 

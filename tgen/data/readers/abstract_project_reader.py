@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Type, TypeVar, Generic, Tuple, Optional
+from typing import Dict, Generic, Optional, Tuple, Type, TypeVar
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 ProjectData = TypeVar("ProjectData")
 TraceDataFramesTypes = Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]

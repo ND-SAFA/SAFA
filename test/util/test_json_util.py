@@ -1,14 +1,13 @@
+import json
 import os
 
-from tgen.jobs.components.job_result import JobResult
+from tgen.common.util.json_util import JsonUtil
+from tgen.core.save_strategy.save_strategy_stage import SaveStrategyStage
+from tgen.core.trace_output.stage_eval import StageEval
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.train.save_strategy.save_strategy_stage import SaveStrategyStage
-from tgen.train.trace_output.stage_eval import StageEval
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trace_output.trace_train_output import TraceTrainOutput
-from tgen.util.json_util import JsonUtil
-import json
 
 
 class TestJsonUtil(BaseTest):
@@ -73,7 +72,7 @@ class TestJsonUtil(BaseTest):
                                               prediction_output=eval_prediction_output)
         output_json = JsonUtil.to_dict(trace_train_output)
         resulting_keys = list(output_json.keys())
-        expected_keys = ["global_step", "training_loss", "metrics","val_metrics", "prediction_output", "training_time"]
+        expected_keys = ["global_step", "training_loss", "metrics", "val_metrics", "prediction_output", "training_time"]
         self.assertSetEqual(set(expected_keys), set(resulting_keys))
         self.assertEqual(t_loss, output_json["training_loss"])
         # Verify evaluations

@@ -1,11 +1,12 @@
 import os
 
 from dotenv import load_dotenv
+
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
-from tgen.train.args.open_ai_args import OpenAIArgs
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.hgen_jobs.hgen_job import HGenJob
-from tgen.train.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer import LLMTrainer
 
 DO_SUMMARIZE = True
 USE_DATASET_CREATOR_FOR_SOURCES = False
@@ -48,11 +49,12 @@ if __name__ == "__main__":
         dataset_creator_for_sources = None
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=PromptDatasetCreator(
             project_reader=ArtifactProjectReader(project_path=project_path), summarizer=summarizer))
-        tgen_trainer = LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager, prompt_builder=PromptBuilder(), #TODO make prompts
-                                  llm_manager=tgen_llm_manager, completion_type=LLMCompletionType.CLASSIFICATION))
+        tgen_trainer = LLMTrainer(LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager, prompt_builder=PromptBuilder(),
+                                                  # TODO make prompts
+                                                  llm_manager=tgen_llm_manager, completion_type=LLMCompletionType.CLASSIFICATION))
 
     args = HGenArgs(
-                    source_layer_id="Code", tgen_trainer=tgen_trainer,
-                    dataset_creator_for_sources=dataset_creator_for_sources)
+        source_layer_id="Code", tgen_trainer=tgen_trainer,
+        dataset_creator_for_sources=dataset_creator_for_sources)
     job = HGenJob(hgen_args=args, llm_manager=hgen_llm_manager, export_path=export_path)
     job_result = job.run()

@@ -1,5 +1,5 @@
+from tgen.common.util.override import overrides
 from tgen.data.hub.abstract_hub_id import AbstractHubId
-from tgen.util.override import overrides
 
 
 class TrainControllerHubId(AbstractHubId):

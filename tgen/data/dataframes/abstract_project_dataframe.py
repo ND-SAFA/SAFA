@@ -7,11 +7,11 @@ import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
-from tgen.util import enum_util
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.enum_util import EnumDict
-from tgen.util.logging.logger_manager import logger
-from tgen.util.override import overrides
+from tgen.common.util import enum_util
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
 
 
 class AbstractProjectDataFrame(pd.DataFrame):
@@ -84,7 +84,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
             else:
                 if self.index_name() in row_as_dict:
                     row_as_dict.pop(self.index_name())
-                self.loc[index] = [row_as_dict[col] for col in self.column_names() if col != self.index_name()]
+                self.loc[index] = [row_as_dict.get(col, None) for col in self.column_names() if col != self.index_name()]
         return self.get_row(index)
 
     def get_row(self, index: Any) -> EnumDict:

@@ -1,8 +1,9 @@
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, List, Type
 
+from tgen.common.artifact import Artifact
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.util.enum_util import EnumDict
 
 ArtifactKeys = StructuredKeys.Artifact
 
@@ -55,23 +56,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.filter_by_row(lambda r: r[ArtifactKeys.LAYER_ID.value] == type_name)
 
-    def get_parent_child_types(self) -> Tuple[str, str]:
-        """
-        Returns the artifacts types of the parent and child artifacts.
-        :return: Parent type and child type.
-        """
-
-        type2count = self.get_type_counts()
-        n_types = len(type2count)
-        if n_types > 2:
-            raise NotImplementedError("Multi-layer tracing is under construction.")
-        if n_types < 2:
-            raise ValueError(f"Expected to find two types of artifacts, only found: {n_types}")
-        n_parents = min(type2count.values())
-        parent_type = [t for t, c in type2count.items() if c == n_parents][0]
-        child_type = [t for t, c in type2count.items() if c != n_parents][0]
-        return parent_type, child_type
-
     def get_type_counts(self) -> Dict[str, str]:
         """
         Returns how many artifacts of each type exist in data frame.
@@ -81,7 +65,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         type2count = dict(counts_df)
         return type2count
 
-    def get_map(self) -> Dict[str, str]:
+    def to_map(self) -> Dict[str, str]:
         """
         :return: Returns map of artifact ids to content.
         """
@@ -90,3 +74,13 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             content = row[ArtifactKeys.CONTENT.value]
             artifact_map[name] = content
         return artifact_map
+
+    def to_artifacts(self) -> List[Artifact]:
+        """
+        Converts entries in data frame to converts.
+        :return: The list of artifacts.
+        """
+        artifacts = [Artifact(id=artifact_id,
+                              content=artifact_row[StructuredKeys.Artifact.CONTENT])
+                     for artifact_id, artifact_row in self.itertuples()]
+        return artifacts

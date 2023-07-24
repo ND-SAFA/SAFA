@@ -3,8 +3,12 @@ from typing import Dict, List, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
+from tgen.server.api.api_definition import ApiDefinition
 
 
 class TestDataManager:
@@ -13,23 +17,31 @@ class TestDataManager:
         SOURCE = "source"
         TARGET = "target"
         TRACES = "traces"
+        LAYERS = "LAYERS"
 
     DATA = {
         Keys.ARTIFACTS: {
-            Keys.SOURCE: [{"s1": "s_token1",
-                           "s2": "s_token2",
-                           "s3": "s_token3"},
-                          {"s4": "s_token4",
-                           "s5": "s_token5",
-                           "s6": "s_token6"}],
-            Keys.TARGET: [{"t1": "t_token1",
-                           "t2": "t_token2",
-                           "t3": "t_token3"},
-                          {"t4": "t_token4",
-                           "t5": "t_token5",
-                           "t6": "t_token6"}]
+            "source_1": {"s1": "s_token1",
+                         "s2": "s_token2",
+                         "s3": "s_token3"},
+            "source_2": {"s4": "s_token4",
+                         "s5": "s_token5",
+                         "s6": "s_token6"},
+            "target_1": {"t1": "t_token1",
+                         "t2": "t_token2",
+                         "t3": "t_token3"},
+            "target_2": {"t4": "t_token4",
+                         "t5": "t_token5",
+                         "t6": "t_token6"}
         },
-        Keys.TRACES: [("s1", "t1"), ("s2", "t1"), ("s3", "t2"), ("s4", "t4"), ("s4", "t5"), ("s5", "t6")]
+        Keys.LAYERS: [{"parent": "target_1", "child": "source_1"},
+                      {"parent": "target_2", "child": "source_2"}],
+        Keys.TRACES: [{"source": "s1", "target": "t1", "label": 1},
+                      {"source": "s2", "target": "t1", "label": 1},
+                      {"source": "s3", "target": "t2", "label": 1},
+                      {"source": "s4", "target": "t4", "label": 1},
+                      {"source": "s4", "target": "t5", "label": 1},
+                      {"source": "s5", "target": "t6", "label": 1}]
     }
     LINKED_TARGETS = ["t1", "t2", "t4", "t5", "t6"]
 
@@ -69,15 +81,12 @@ class TestDataManager:
 
     @staticmethod
     def create_artifact_dataframe():
-        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
-        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+        artifacts = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
         artifact_df = ArtifactDataFrame()
-        for layer_num, layer_sources in enumerate(sources):
-            for s_id, s_body in layer_sources.items():
-                artifact_df.add_artifact(s_id, s_body, layer_num)
-        for layer_num, layer_targets in enumerate(targets):
-            for t_id, t_body in layer_targets.items():
-                artifact_df.add_artifact(t_id, t_body, layer_num)
+        for artifact_type, artifacts in artifacts.items():
+            for artifact_id, artifact_body in artifacts.items():
+                artifact_df.add_artifact(artifact_id, artifact_body, artifact_type)
+
         return artifact_df
 
     @staticmethod
@@ -116,10 +125,37 @@ class TestDataManager:
         """
         :return: map between artifact id to its body.
         """
-        artifacts = {}
-        for artifact_type_key in [TestDataManager.Keys.SOURCE, TestDataManager.Keys.TARGET]:
-            artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, artifact_type_key])
-            for artifact_level in artifact_levels:
-                for artifact_id, artifact_body in artifact_level.items():
-                    artifacts[artifact_id] = artifact_body
-        return artifacts
+        artifact_map = {}
+        artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
+        for level_name, level_map in artifact_levels.items():
+            for artifact_id, artifact_body in level_map.items():
+                artifact_map[artifact_id] = artifact_body
+        return artifact_map
+
+    @staticmethod
+    def get_project_reader() -> ApiProjectReader:
+        layers = [TraceLayer(**params) for params in TestDataManager.get_path(TestDataManager.Keys.LAYERS)]
+        links = [TracePredictionEntry(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
+        api_definition = ApiDefinition(
+            artifact_layers=TestDataManager.get_path(TestDataManager.Keys.ARTIFACTS),
+            layers=layers,
+            true_links=links
+        )
+        return ApiProjectReader(api_definition=api_definition)
+
+    @classmethod
+    def get_n_candidates(cls) -> int:
+        """
+        :return: Returns the number of candidates in dataset.
+        """
+        artifacts = cls.DATA[cls.Keys.ARTIFACTS]
+        layers = cls.DATA[cls.Keys.LAYERS]
+        n_candidates_total = 0
+        for trace_layer in layers:
+            parent_type, child_type = trace_layer["parent"], trace_layer["child"]
+
+            parent_artifacts = artifacts[parent_type]
+            child_artifacts = artifacts[child_type]
+            n_candidates = len(parent_artifacts) * len(child_artifacts)
+            n_candidates_total += n_candidates
+        return n_candidates_total

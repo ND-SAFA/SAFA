@@ -25,7 +25,7 @@ class TestDataAugmenterFromDefinition(BaseTest):
 
     def test_experiment(self):
         data_augmenters: ExperimentalVariable = ObjectCreator.create(DataAugmenter)
-        n_a = len(data_augmenters[0].value.steps)
-        n_b = len(data_augmenters[1].value.steps)
+        n_a = len(data_augmenters[0].steps)
+        n_b = len(data_augmenters[1].steps)
         self.assertEqual(n_a, 0)
         self.assertEqual(n_b, 1)

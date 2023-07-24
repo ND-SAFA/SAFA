@@ -3,10 +3,9 @@ from typing import Dict, List, Tuple
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
-from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.entry_creator import EntryCreator
 
 
 class CsvTestProject(AbstractTestProject):
@@ -33,43 +32,15 @@ class CsvTestProject(AbstractTestProject):
         """
         return CsvProjectReader(cls.get_project_path(), overrides={"allowed_orphans": 2})
 
-    @staticmethod
-    def get_source_entries() -> List[List[Dict[str, str]]]:
-        """
-        :return: Returns list of source artifact entries per layer.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE)
-
-    @staticmethod
-    def get_target_entries() -> List[List[Dict[str, str]]]:
-        """
-        :return: Returns list of target artifact entries per layer.
-        """
-        return EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET)
-
     @classmethod
-    def get_trace_entries(cls) -> List[Dict]:
-        """
-        :return: Returns list of trace entries in project trace data frame..
-        """
-        trace_data = []
-        batch_one, batch_two = cls.get_batch_link_labels()
-        labels = batch_one + batch_two
-        i = 0
-        for batch in cls.BATCH_RANGES:
-            for s_id in batch:
-                for t_id in batch:
-                    trace_data.append((f"s{s_id}", f"t{t_id}", labels[i]))
-                    i += 1
-        return EntryCreator.create_trace_entries(trace_data)
-
-    @classmethod
-    def get_layer_mapping_entries(cls) -> List[Dict]:
+    def get_trace_layers(cls) -> List[TraceLayer]:
         """
         :return: Returns layer mapping entries associated with CSV project.
         """
-        return EntryCreator.create_layer_mapping_entries([(CsvProjectReader.get_layer_id(CSVKeys.SOURCE),
-                                                           CsvProjectReader.get_layer_id(CSVKeys.TARGET))])
+        child_type = CsvProjectReader.get_layer_id(CSVKeys.SOURCE)
+        parent_type = CsvProjectReader.get_layer_id(CSVKeys.TARGET)
+        trace_layer = TraceLayer(child=child_type, parent=parent_type)
+        return [trace_layer]
 
     @staticmethod
     def get_n_links() -> int:

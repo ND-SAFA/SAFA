@@ -3,11 +3,11 @@ from abc import ABC, abstractmethod
 from unittest import mock
 from unittest.mock import patch
 
+from tgen.common.util.status import Status
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
-from tgen.util.status import Status
 
 
 class BaseJobTest(BaseTraceTest, ABC):

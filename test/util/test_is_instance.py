@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
+from tgen.common.util.base_object import BaseObject
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.util.base_object import BaseObject
 
 
 class Parent:
@@ -38,6 +38,7 @@ class TestIsInstance(BaseTest):
     def test_functions(self):
         a: Callable[[str], str] = lambda s: s
         self.negative_test(a, List[str])
+        self.positive_test(a, Callable[[str], str])
         self.positive_test(a, Callable)
 
     def test_optionals(self):

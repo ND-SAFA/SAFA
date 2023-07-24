@@ -1,10 +1,12 @@
-from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
+from tgen.common.util.base_object import BaseObject
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -14,9 +16,6 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 from tgen.state.state import State
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.abstract_trainer import AbstractTrainer
-from tgen.util.base_object import BaseObject
 
 
 class PredictionStep(Enum):
@@ -126,7 +125,6 @@ class HGenArgs(PipelineArgs, BaseObject):
         assert self.tgen_trainer or self.dataset_creator_for_sources or self.dataset_for_sources, \
             "Must provide either a dataset creator to make a dataset with traces between artifacts of the source layer, " \
             "a trace generation trainer to create one or a cluster dataset creator containing the traces dataset."
-        self.target_type = self.target_type.capitalize()
         self.llm_managers = {e.value: (self.hgen_llm_manager_best if e != PredictionStep.NAME
                                        else self.hgen_llm_manager_efficient) for e in PredictionStep}
         self.llm_managers[PredictionStep.FORMAT.value] = OpenAIManager(OpenAIArgs(model='gpt-4-0314'))

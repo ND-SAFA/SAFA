@@ -5,9 +5,9 @@ from typing import Any, Iterable, List, Tuple
 
 from typing_extensions import Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):

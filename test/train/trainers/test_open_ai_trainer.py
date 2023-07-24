@@ -3,6 +3,10 @@ from copy import deepcopy
 from typing import Dict, List
 from unittest import mock
 
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -15,12 +19,9 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.test_open_ai_responses import COMPLETION_REQUEST, FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT, fake_open_ai_completion
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 
 Res = namedtuple("Res", ["id"])
 
@@ -71,11 +72,10 @@ class TestOpenAiTrainer(BaseTest):
             trainer = self.get_llm_trainer(dataset_creator, [DatasetRole.TRAIN], prompt_builder=prompt_builder)
             res = trainer.perform_training()
 
-    @mock.patch("openai.Completion.create")
+    @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
-    def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock, mock_completion_create: mock.MagicMock):
+    def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
-        mock_completion_create.side_effect = self.fake_completion_create
 
         dataset_creators = self.get_all_dataset_creators()
         dataset_creators.pop("id")
@@ -84,7 +84,7 @@ class TestOpenAiTrainer(BaseTest):
         classification_prompt_builder = PromptBuilder(prompts=[classification_prompt])
         generation_prompt = QuestionPrompt("Tell me about this artifact: ")
         generation_prompt_builder = PromptBuilder([generation_prompt])
-        
+
         for i, creator in enumerate([classification_prompt_builder, generation_prompt_builder]):
             for type_, dataset_creator in dataset_creators.items():
                 builder = deepcopy(creator)
@@ -133,12 +133,6 @@ class TestOpenAiTrainer(BaseTest):
     @staticmethod
     def get_dataset_creator_as_trace_dataset_creator():
         return PromptTestProject.get_trace_dataset_creator()
-
-    def fake_completion_create(self, **params):
-        self.assertGreater(len(params), 0)
-        for param in params:
-            self.assertIn(param, COMPLETION_REQUEST)
-        return fake_open_ai_completion(**params)
 
     def fake_fine_tune_create(self, not_classification: bool = True, **params):
         self.assertGreater(len(params), 0)

@@ -3,10 +3,10 @@ from typing import List, Tuple, Type, TypeVar
 
 from sklearn.model_selection import train_test_split
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
+from tgen.common.util.random_util import RandomUtil
 from tgen.data.creators.abstract_dataset_creator import DatasetType
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
-from tgen.util.random_util import RandomUtil
 
 GenericDatum = TypeVar("GenericData")
 GenericData = List[GenericDatum]

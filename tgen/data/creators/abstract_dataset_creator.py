@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.tdatasets.idataset import iDataset
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 DatasetType = TypeVar("DatasetType", bound=iDataset)
 

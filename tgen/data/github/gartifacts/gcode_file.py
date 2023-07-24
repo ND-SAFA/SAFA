@@ -1,10 +1,10 @@
 import os
 from typing import Callable, Dict, Iterable, Set, Union
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.github_constants import ALLOWED_CODE_EXTENSIONS
-from tgen.util.file_util import FileUtil
-from tgen.util.override import overrides
 
 
 class GCodeFile(AbstractGithubArtifact):
@@ -85,5 +85,5 @@ class GCodeFile(AbstractGithubArtifact):
         :return: List containing all code file paths.
         """
         allowed_code_ext = ALLOWED_CODE_EXTENSIONS if allowed_code_ext is None else allowed_code_ext
-        return FileUtil.find_all_file_paths_that_meet_condition(dir_path,
-                                                                lambda f: GCodeFile.ends_with_allowed_code_ext(f, allowed_code_ext))
+        return FileUtil.get_all_paths(dir_path,
+                                      lambda f: GCodeFile.ends_with_allowed_code_ext(f, allowed_code_ext))

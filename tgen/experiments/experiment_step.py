@@ -2,19 +2,19 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.json_util import JsonUtil
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.status import Status
 from tgen.constants.deliminator_constants import UNDERSCORE
 from tgen.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
+from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.wandb.Wandb import Wandb
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.wandb.Wandb import Wandb
-from tgen.util.base_object import BaseObject
-from tgen.util.dict_util import ListUtil
-from tgen.util.file_util import FileUtil
-from tgen.util.json_util import JsonUtil
-from tgen.util.status import Status
 from tgen.variables.experimental_variable import ExperimentalVariable
 
 
@@ -30,8 +30,9 @@ class ExperimentStep(BaseObject):
         :param comparison_criterion: The criterion used to determine the best job.
         """
         if not isinstance(jobs, ExperimentalVariable):
-            jobs = ExperimentalVariable(jobs)
-        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
+            assert isinstance(jobs, list), f"Expected list of jobs but got: {jobs}"
+            jobs = ExperimentalVariable(jobs, using_jobs=True)
+        experimental_vars = jobs.experimental_param2val
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
         self.status = Status.NOT_STARTED
         self.best_job = None
@@ -183,10 +184,11 @@ class ExperimentStep(BaseObject):
             job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTrainerJob):
                 model_path = os.path.join(job_base_path, "models")
-                setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
-                setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                if hasattr(job, "trainer_args") and job.trainer_args is not None:
+                    setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
+                    setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                    setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.job_args, "output_dir", model_path)
-                setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
                     setattr(job.trainer_dataset_manager, "output_dir", output_dir)
                     setattr(job.trainer_dataset_manager, "random_seed", job.job_args.random_seed)

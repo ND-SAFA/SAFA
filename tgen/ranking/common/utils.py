@@ -41,7 +41,7 @@ def extract_tracing_requests(artifact_df: ArtifactDataFrame, layers: List[Tuple[
     :return:
     """
     requests = []
-    artifact_map = artifact_df.get_map()
+    artifact_map = artifact_df.to_map()
     for child_type, parent_type in layers:
         parent_df = artifact_df.get_type(parent_type)
         child_df = artifact_df.get_type(child_type)

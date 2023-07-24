@@ -3,6 +3,11 @@ import uuid
 from copy import deepcopy
 from unittest import mock, skip
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.core.args.open_ai_args import OpenAIArgs
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
 from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -19,20 +24,13 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.test_anthropic_responses import fake_anthropic_completion
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import fake_open_ai_completion
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic, mock_openai
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
-from tgen.train.args.open_ai_args import OpenAIArgs
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.util.enum_util import EnumDict
-from tgen.util.llm_response_util import LLMResponseUtil
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
 
 
 def fake_clustering(artifact_df: TraceDataset, cluster_method: SupportedClusteringMethod, **kwargs):
@@ -66,12 +64,11 @@ class TestHierarchyGeneration(BaseTest):
             trainer_dataset_manager = TestHierarchyGeneration.get_trainer_dataset_manager(trace_dataset_creator)
             return trainer_dataset_manager[DatasetRole.EVAL]
 
+    @mock_openai
+    @mock_anthropic
     @mock.patch.object(ClusterDatasetCreator, "get_clusters")
-    @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=fake_anthropic_completion)
-    @mock.patch.object(OpenAIManager, "make_completion_request_impl", side_effect=fake_open_ai_completion)
     @mock.patch.object(LLMResponseUtil, "extract_labels")
-    def test_run(self, llm_response_mock: mock.MagicMock, mock_completion_open_ai: mock.MagicMock,
-                 mock_completion_anthr: mock.MagicMock, mock_cluster: mock.MagicMock):
+    def test_run(self, llm_response_mock: mock.MagicMock, mock_cluster: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
 
         dataset_creators = [self.get_dataset_creator_with_artifact_project_reader(),
@@ -151,11 +148,10 @@ class TestHierarchyGeneration(BaseTest):
         expected_entities.extend([layer for i, layer in trace_dataset.layer_df.itertuples()])
         TestAssertions.verify_entities_in_df(self, expected_entities, layer_df)
 
-    @mock.patch("openai.Completion.create")
+    @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
-    def test_create_linked_dataset_for_intra_level_artifacts(self, llm_response_mock: mock.MagicMock, mock_completion: mock.MagicMock):
+    def test_create_linked_dataset_for_intra_level_artifacts(self, llm_response_mock: mock.MagicMock):
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
-        mock_completion.side_effect = fake_open_ai_completion
         artifact_df = PromptTestProject.get_artifact_project_reader().read_project()
         layer_id = artifact_df[ArtifactKeys.LAYER_ID][0]
         hgen = self.get_hierarchy_generator(self.get_tgen_trainer(self.get_dataset_creator_with_trace_dataset_creator()),

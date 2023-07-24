@@ -1,17 +1,19 @@
 from enum import Enum, auto
 from typing import Union
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.override import overrides
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.prompts.prompt import Prompt
-from tgen.util.enum_util import EnumDict
-from tgen.util.override import overrides
-from tgen.util.prompt_util import PromptUtil
 
 
 class ArtifactPrompt(Prompt):
     """
-    Responsible for formatting and parsing of presenting a artifact in a prompt
+    Responsible for formatting and parsing of presenting a single artifact in a prompt.
+    --- Examples ---
+    Please rank the following children based on the parent artifact: <artifact></artifact>
     """
 
     class BuildMethod(Enum):
@@ -21,16 +23,16 @@ class ArtifactPrompt(Prompt):
         XML = auto()
         BASE = auto()
 
-    def __init__(self, prompt_start: str = EMPTY_STRING,
-                 build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
+    def __init__(self, prompt_start: str = EMPTY_STRING, build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
         """
         Constructor for making a prompt from an artifact
         :param build_method: The method to build the prompt (determines prompt format)
         :param include_id: If True, includes the id of the artifact
         """
         self.build_method = build_method
-        self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
-                              self.BuildMethod.BASE: self._build_as_base}
+        self.build_methods = {
+            self.BuildMethod.XML: self._build_as_xml,
+            self.BuildMethod.BASE: self._build_as_base}
         self.include_id = include_id
         super().__init__(value=prompt_start)
 
@@ -43,13 +45,13 @@ class ArtifactPrompt(Prompt):
         :return: The formatted prompt
         """
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
-        if self.build_method in self.build_methods:
-            artifact = self.build_methods[self.build_method](artifact_id=artifact.get(ArtifactKeys.ID.value, EMPTY_STRING),
-                                                             artifact_body=artifact[ArtifactKeys.CONTENT],
-                                                             include_id=self.include_id)
-            return f"{prompt}{artifact}"
-        else:
+        if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
+        build_method = self.build_methods[self.build_method]
+        artifact_id = artifact.get(ArtifactKeys.ID.value, EMPTY_STRING)
+        content = artifact[ArtifactKeys.CONTENT]
+        artifact = build_method(artifact_id=artifact_id, artifact_body=content, include_id=self.include_id)
+        return f"{prompt}{artifact}"
 
     @staticmethod
     def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:

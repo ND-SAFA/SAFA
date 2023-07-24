@@ -4,7 +4,7 @@ from test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrai
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class TestFileUtil(BaseTest):
@@ -79,7 +79,6 @@ class TestFileUtil(BaseTest):
             FileUtil.safe_open_w(os.path.join(base_dir, filename))
             FileUtil.safe_open_w(os.path.join(nested_dir, filename))
 
-        file_paths = FileUtil.find_all_file_paths_that_meet_condition(base_dir, lambda x: "2" in x)
+        file_paths = FileUtil.get_all_paths(base_dir, lambda x: "2" in x)
         self.assertIn(os.path.join(base_dir, files[1]), file_paths)
         self.assertIn(os.path.join(nested_dir, files[1]), file_paths)
-

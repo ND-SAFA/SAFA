@@ -17,7 +17,8 @@ class RemoveNonAlphaCharsStep(AbstractDataProcessingStep):
         :param kwargs: Additional arguments, currently ignored.
         :return:
         """
-        return [RemoveNonAlphaCharsStep.remove_non_alphanumeric_characters(s) for s in data_entries]
+        result = [RemoveNonAlphaCharsStep.remove_non_alphanumeric_characters(s) for s in data_entries]
+        return result
 
     @staticmethod
     def remove_non_alphanumeric_characters(doc):

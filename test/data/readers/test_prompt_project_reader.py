@@ -1,7 +1,7 @@
 import json
 import os
-from unittest import mock
 
+from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
@@ -9,8 +9,8 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.test_open_ai_responses import SUMMARY_FORMAT, fake_open_ai_completion
-from tgen.train.args.open_ai_args import OpenAIArgs
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 
 
 class TestPromptProjectReader(BaseTest):
@@ -31,12 +31,11 @@ class TestPromptProjectReader(BaseTest):
                 expected_prompts.append(json.loads(line))
         TestAssertions.verify_entities_in_df(self, expected_prompts, prompts_df)
 
-    @mock.patch("openai.Completion.create", )
-    def test_summarization(self, mock_completion: mock.MagicMock):
+    @mock_openai
+    def test_summarization(self):
         """
         Tests that project artifacts can be summarized
         """
-        mock_completion.side_effect = fake_open_ai_completion
         project_reader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))

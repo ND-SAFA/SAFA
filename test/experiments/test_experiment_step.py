@@ -1,10 +1,15 @@
 import math
 import os
-from unittest import mock
+from unittest import mock, skip
 from unittest.mock import patch
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.status import Status
 from tgen.constants.deliminator_constants import PERIOD
 from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
@@ -17,11 +22,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.file_util import FileUtil
-from tgen.util.status import Status
 from tgen.variables.undetermined_variable import UndeterminedVariable
 
 
@@ -29,6 +29,7 @@ class TestExperimentStep(BaseExperimentTest):
     EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
+    @skip
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):

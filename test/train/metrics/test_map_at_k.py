@@ -2,9 +2,9 @@ from typing import List, Type
 
 from sklearn.metrics import average_precision_score
 
-from tgen.train.metrics.abstract_trace_metric import AbstractTraceMetric
-from tgen.train.metrics.map_at_k_metric import MapAtKMetric
 from test.train.metrics.test_metric_at_k import TestMetricAtK
+from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
+from tgen.metrics.map_at_k_metric import MapAtKMetric
 
 
 class TestMapAtK(TestMetricAtK):
@@ -29,7 +29,7 @@ class TestMapAtK(TestMetricAtK):
         self.assert_correctness()
 
     @property
-    def metric_name(self) -> str:
+    def base_metric_name(self) -> str:
         return "map"
 
     @property

@@ -1,13 +1,13 @@
 import os
 import random
 import uuid
-from typing import List, Tuple, Generic
+from typing import List
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):

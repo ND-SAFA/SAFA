@@ -1,7 +1,7 @@
+from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.train.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.train.save_strategy.comparison_criteria import ComparisonCriterion
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 
 PRECISION_METRIC_NAME = SupportedTraceMetric.PRECISION_AT_K.name
 

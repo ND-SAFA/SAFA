@@ -2,10 +2,10 @@ import os
 from abc import abstractmethod
 from typing import Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class AbstractDatasetExporter(BaseObject):

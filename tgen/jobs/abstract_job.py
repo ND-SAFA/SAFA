@@ -10,16 +10,16 @@ from typing import Any, Dict, Type
 import torch
 import wandb
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
+from tgen.common.util.random_util import RandomUtil
+from tgen.common.util.status import Status
 from tgen.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
-from tgen.util.base_object import BaseObject
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.override import overrides
-from tgen.util.random_util import RandomUtil
-from tgen.util.status import Status
 
 
 class AbstractJob(threading.Thread, BaseObject):

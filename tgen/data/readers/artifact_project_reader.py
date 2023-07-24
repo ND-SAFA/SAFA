@@ -1,9 +1,9 @@
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.util.logging.logger_manager import logger
-from tgen.util.override import overrides
 
 
 class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):

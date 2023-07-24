@@ -1,15 +1,15 @@
 import os
 from typing import Dict, Type
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_config import LoggerConfig
+from tgen.common.util.logging.logger_manager import LoggerManager, logger
 from tgen.constants.path_constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from tgen.experiments.experiment import Experiment
 from tgen.scripts.modules.experiment_types import ExperimentTypes
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_reader import ScriptOutputReader
 from tgen.testres.object_creator import ObjectCreator
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_config import LoggerConfig
-from tgen.util.logging.logger_manager import LoggerManager, logger
 
 
 class ScriptRunner:

@@ -1,7 +1,7 @@
 from typing import Dict, Union
 
+from tgen.common.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
-from tgen.util.override import overrides
 
 
 class GLink(AbstractGithubArtifact):

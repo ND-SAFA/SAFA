@@ -2,9 +2,9 @@ from typing import Dict, List
 
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.util.dataframe_util import DataFrameUtil
 
 
 class TestDataFrameUtil(BaseTest):

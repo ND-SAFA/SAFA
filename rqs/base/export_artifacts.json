@@ -5,13 +5,10 @@
         {
           "object_type": "EXPORT_ARTIFACTS",
           "job_args": {},
-          "model_manager": {
-            "model_path": "[MODEL]"
-          },
-          "train_dataset_creator": {
+          "trace_dataset_creator": {
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "[DATA_PATH]/[PROJECT_NAME]"
+              "project_path": "[DATA_PATH]/fend"
             }
           }
         }

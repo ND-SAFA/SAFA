@@ -5,8 +5,8 @@ from datasets import DownloadConfig, DownloadManager
 from tgen.constants.dataset_constants import CACHE_DIR_NAME
 from tgen.constants.path_constants import DATA_PATH_PARAM
 from tgen.data.hub.abstract_hub_id import AbstractHubId
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
 
 
 class TraceDatasetDownloader:

@@ -1,4 +1,5 @@
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.common.util.logging.logger_manager import logger
 
 
 class CSVExporter(AbstractDatasetExporter):
@@ -18,3 +19,4 @@ class CSVExporter(AbstractDatasetExporter):
         """
         df = self.get_dataset().to_dataframe()
         df.to_csv(self.export_path, index=include_index)
+        logger.info(f"Exported data frame to: {self.export_path}")

@@ -9,7 +9,7 @@ from tgen.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class TestPreTrainSplitStrategy(BaseTraceTest):

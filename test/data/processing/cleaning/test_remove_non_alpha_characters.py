@@ -1,7 +1,7 @@
 from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_FILE_PATH
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class TestRemoveNonAlphaChars(BaseTest):

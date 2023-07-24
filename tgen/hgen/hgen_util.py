@@ -6,7 +6,13 @@ from typing import Any, Dict, List, Set, Type, Union
 
 import pandas as pd
 
+from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.core.trainers.llm_trainer import LLMTrainer
+from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from tgen.data.exporters.csv_exporter import CSVExporter
@@ -26,12 +32,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.train.trainers.llm_trainer import LLMTrainer
-from tgen.train.trainers.llm_trainer_state import LLMTrainerState
-from tgen.util.dict_util import DictUtil
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.prompt_util import PromptUtil
 
 TASK_PREFACE = f"{NEW_LINE} # TASKS:{NEW_LINE}"
 SAVE_DATASET_DIRNAME = "final_generated_dataset"
@@ -188,7 +188,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
         else task_prompt.response_manager
     generation_step_response_manager.formatter = lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(val)
 
-    artifact_prompt = MultiArtifactPrompt(prompt_start=PromptUtil.format_as_markdown("{artifact_type}S:"),
+    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown("{artifact_type}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type

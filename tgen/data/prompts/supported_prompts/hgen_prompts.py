@@ -1,10 +1,8 @@
-import re
-
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.util.prompt_util import PromptUtil
 
 INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must reverse engineer "
                                      "{target_type} from the {source_type}. "

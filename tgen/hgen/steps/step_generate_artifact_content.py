@@ -4,6 +4,9 @@ from typing import Tuple
 import bs4
 from yaml.constructor import SafeConstructor
 
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.constants.path_constants import GENERATION_QUESTIONNAIRE_PROMPTS_PATH
 from tgen.data.prompts.prompt import Prompt
@@ -11,15 +14,12 @@ from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_prompt_builder_for_generation, get_predictions, parse_generated_artifacts
-from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation, parse_generated_artifacts
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
-from tgen.util.file_util import FileUtil
-from tgen.util.logging.logger_manager import logger
-from tgen.util.prompt_util import PromptUtil
 
 
 class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -35,7 +35,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         summary_questionnaire, format_of_artifacts, description_of_artifact = GenerateArtifactContent.construct_questionnaire(args)
 
         source_layer_only_dataset = state.source_dataset
-        export_path = state.export_path
+        export_path = os.path.join(state.export_path, "artifact_gen_response.yaml") if state.export_path else None
 
         state.format_of_artifacts = format_of_artifacts
         state.generation_questionnaire = summary_questionnaire
@@ -62,7 +62,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                                                  response_prompt_ids={task_prompt.id, summary_questionnaire.id},
                                                  tags_for_response={generated_artifacts_tag, summary_tag},
                                                  return_first=False,
-                                                 export_path=os.path.join(export_path, "artifact_gen_response.yaml"))[0]
+                                                 export_path=export_path)[0]
         generated_artifact_content = generation_predictions[generated_artifacts_tag]
         summary = generation_predictions[summary_tag][0]
 
@@ -84,7 +84,8 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         question_id = instructions_prompt.response_manager.response_tag
         questions = questionnaire_content[question_id][0]
         question_prompts = [QuestionPrompt(question) for i, question in enumerate(questions)]
-        description_of_artifact = questionnaire_content[format_questionnaire.question_prompts[0].response_manager.response_tag][0]
+        artifact_description_tag = format_questionnaire.question_prompts[0].response_manager.response_tag
+        artifact_description = questionnaire_content[artifact_description_tag][0]
         format_of_artifacts = questionnaire_content[format_questionnaire.question_prompts[-1].response_manager.response_tag][0]
         response_manager = PromptResponseManager(response_tag="summary")
         questionnaire_prompt = QuestionnairePrompt(question_prompts=question_prompts,
@@ -92,7 +93,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                                                    instructions=SUMMARY_INSTRUCTIONS,
                                                    response_manager=response_manager)
 
-        return questionnaire_prompt, format_of_artifacts, description_of_artifact
+        return questionnaire_prompt, format_of_artifacts, artifact_description
 
     @staticmethod
     def _get_content_for_summary_prompt(hgen_args: HGenArgs, format_questionnaire: QuestionnairePrompt, instructions_prompt: Prompt):

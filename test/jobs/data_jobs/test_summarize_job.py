@@ -1,5 +1,6 @@
 from unittest import mock
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -8,11 +9,9 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_anthropic_responses import fake_anthropic_completion
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.util.enum_util import EnumDict
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic
 
 
 class TestSummarizeJob(BaseJobTest):
@@ -21,9 +20,8 @@ class TestSummarizeJob(BaseJobTest):
 
     @mock.patch.object(PythonChunker, "chunk", side_effect=lambda content, **kwargs: ["python " + content])
     @mock.patch.object(JavaChunker, "chunk", side_effect=lambda content, **kwargs: ["java " + content])
-    @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=fake_anthropic_completion)
-    def test_run_success(self, fake_open_ai_completion_mock: mock.MagicMock, fake_java_chunk: mock.MagicMock,
-                         fake_python_chunk: mock.MagicMock):
+    @mock_anthropic
+    def test_run_success(self, fake_java_chunk: mock.MagicMock, fake_python_chunk: mock.MagicMock):
         """
         Tests that job is completed succesfully.
         """

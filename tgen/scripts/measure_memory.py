@@ -3,7 +3,7 @@ import sys
 
 from dotenv import load_dotenv
 
-from tgen.util.logging.logger_manager import logger
+from tgen.common.util.logging.logger_manager import logger
 
 load_dotenv()
 

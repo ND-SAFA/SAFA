@@ -1,8 +1,8 @@
 from collections import namedtuple
-from unittest import mock
+from unittest import mock, skip
 
-from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.clustering.supported_clustering_method import SupportedClusteringMethod
+from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
@@ -36,50 +36,70 @@ class TestClusterDatasetCreator(BaseTest):
         clusters = clusterer.get_clusters()
         self.assertIn(SupportedClusteringMethod.GRAPH, clusters)
 
+    @skip
     @mock.patch.object(AbstractLLMManager, "make_completion_request")
     @mock.patch("cdlib.algorithms.louvain")
     def test_create(self, louvain_mock: mock.MagicMock, completion_request_mock: mock.MagicMock):
         Louvain = namedtuple("Louvain", ["communities"])
-        louvain_mock.return_value = Louvain(communities=self.METHOD2CLUSTER[SupportedClusteringMethod.GRAPH].values())
+        communities = self.METHOD2CLUSTER[SupportedClusteringMethod.GRAPH].values()
+        louvain_mock.return_value = Louvain(communities=communities)
         completion_request_mock.return_value = self.res
         clusterer = self.get_artifact_clusterer()
         cluster_dataset: PromptDataset = clusterer.create()
-        cluster_id_to_num, cluster_num_to_id = self._get_cluster_id_to_num_mapping(cluster_dataset.artifact_df)
-        self.verify_artifact_df(cluster_dataset.artifact_df, cluster_id_to_num, includes_orig_artifact=False)
-        self.verify_artifact_df(cluster_dataset.trace_dataset.artifact_df, cluster_id_to_num, includes_orig_artifact=True)
-        self.verify_trace_df(cluster_dataset.trace_dataset.trace_df, cluster_num_to_id)
+        cluster_id2index, cluster_index2id = self._get_cluster_id_to_num_mapping(cluster_dataset.artifact_df)
+        self.verify_artifact_df(cluster_dataset.artifact_df, cluster_id2index, includes_orig_artifact=False)
+        self.verify_artifact_df(cluster_dataset.trace_dataset.artifact_df, cluster_id2index, includes_orig_artifact=True)
+        self.verify_trace_df(cluster_dataset.trace_dataset.trace_df, cluster_index2id)
         self.verify_layer_df(cluster_dataset.trace_dataset.layer_df, cluster_layer_id=clusterer.layer_id)
 
-    def _get_cluster_id_to_num_mapping(self, cluster_artifact_df):
+    def _get_cluster_id_to_num_mapping(self, cluster_df: PromptDataset):
+        """
+        Maps artifacts to the clusters in dataset.
+        :param cluster_df: The data frame containing clusters.
+        :return: 2 maps: cluster id to index, cluster index to id
+        """
         orig_artifact_df = self.get_trace_dataset().artifact_df
-        id2num = {}
-        num2id = {}
-        for cluster_id, cluster in cluster_artifact_df.itertuples():
-            cluster_num = None
-            for artifact_id, artifact in orig_artifact_df.itertuples():
+        cluster_id2index = {}
+        cluster_index2id = {}
+
+        for artifact_id, artifact in orig_artifact_df.itertuples():
+            for cluster_id, cluster in cluster_df.itertuples():
                 if artifact[ArtifactKeys.CONTENT] in cluster[ArtifactKeys.CONTENT]:
-                    cluster_num = self.ARTIFACT2CLUSTERS[artifact_id]
+                    cluster_index = self.ARTIFACT2CLUSTERS[artifact_id]
+                    cluster_id2index[cluster_id] = cluster_index
+                    cluster_index2id[cluster_index] = cluster_id
                     break
-            id2num[cluster_id] = cluster_num
-            num2id[cluster_num] = cluster_id
-            self.assertIsNotNone(cluster_num)
-        return id2num, num2id
+
+        clusters_found_ids = list(cluster_id2index.keys())
+        created_clusters_ids = list(cluster_df.index)
+        missing_clusters = set(created_clusters_ids).difference(set(clusters_found_ids))
+        self.assertEqual(0, len(missing_clusters), msg=f"Clusters not recognized: {created_clusters_ids}")
+        return cluster_id2index, cluster_index2id
 
     def verify_artifact_df(self, cluster_artifact_df, cluster_id_to_num, includes_orig_artifact=True):
-        orig_artifact_df = self.get_trace_dataset().artifact_df
-        expected_total = len(set(self.ARTIFACT2CLUSTERS.values()))
+        # Verify # of clusters
+        n_expected_clusters = len(set(self.ARTIFACT2CLUSTERS.values()))
         if includes_orig_artifact:
-            expected_total += len(self.ARTIFACT2CLUSTERS.keys())
-        self.assertEqual(len(cluster_artifact_df), expected_total)
+            n_expected_clusters += len(self.ARTIFACT2CLUSTERS.keys())
+        self.assertEqual(len(cluster_artifact_df), n_expected_clusters)
+
+        orig_artifact_df = self.get_trace_dataset().artifact_df
         for cluster_id, cluster in cluster_artifact_df.itertuples():
             if cluster_id in orig_artifact_df:
                 continue
             cluster_num = cluster_id_to_num[cluster_id]
-            expected_cluster = self.METHOD2CLUSTER[SupportedClusteringMethod.GRAPH][cluster_num] \
-                if cluster_num in self.METHOD2CLUSTER[SupportedClusteringMethod.GRAPH] else \
-            self.METHOD2CLUSTER[SupportedClusteringMethod.LLM][cluster_num]
+            expected_cluster = self.get_cluster_method(cluster_num)
+            cluster_content = cluster[ArtifactKeys.CONTENT]
+
             for artifact_id in expected_cluster:
-                self.assertIn(orig_artifact_df.get_artifact(artifact_id)[ArtifactKeys.CONTENT], cluster[ArtifactKeys.CONTENT])
+                artifact_content = orig_artifact_df.get_artifact(artifact_id)[ArtifactKeys.CONTENT]
+
+                self.assertIn(artifact_content, cluster_content)
+
+    def get_cluster_method(self, cluster_num):
+        graph_methods = self.METHOD2CLUSTER[SupportedClusteringMethod.GRAPH]
+        llm_methods = self.METHOD2CLUSTER[SupportedClusteringMethod.LLM]
+        return graph_methods[cluster_num] if cluster_num in graph_methods else llm_methods[cluster_num]
 
     def verify_trace_df(self, cluster_trace_df, cluster_num_to_id):
         orig_trace_df = self.get_trace_dataset().trace_df

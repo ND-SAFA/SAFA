@@ -6,7 +6,6 @@
           "object_type": "MULTI_LAYER_HGEN",
           "starting_hgen_job": {
             "hgen_args": {
-              "loader": "[OUTPUT_PATH]/hgen/bend/51ba682e-0321-4189-96ff-395f16d5221a",
               "export_dir": "[OUTPUT_PATH]/hgen/test",
               "source_layer_id": "Java",
               "target_type": "Design Requirement",

@@ -10,10 +10,10 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
-ARTIFACT_TYPE = "source_type_{}"
+ARTIFACT_TYPE = "source_{}"
 SPLITS = [0.2, 0.2]
 
 
@@ -41,7 +41,7 @@ class TestCreateSourceSplits(BaseJobTest):
             for stage in stages:
                 stage_path = os.path.join(TEST_OUTPUT_DIR, task_name, stage)
                 assert os.path.exists(stage_path)
-                stage_path = os.path.join(stage_path, ARTIFACT_TYPE.format(layer_mapping_i) + ".csv")
+                stage_path = os.path.join(stage_path, ARTIFACT_TYPE.format(layer_mapping_i + 1) + ".csv")
                 df = pd.read_csv(stage_path)
                 df[ArtifactKeys.LAYER_ID.value] = [ARTIFACT_TYPE for i in range(len(df.index))]
                 artifact_df = ArtifactDataFrame(df)

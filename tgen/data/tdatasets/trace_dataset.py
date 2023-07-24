@@ -9,10 +9,13 @@ import torch
 from datasets import Dataset
 from tqdm import tqdm
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.logging.logger_manager import logger
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.dataset_constants import TRACE_THRESHOLD
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -23,9 +26,6 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
-from tgen.util.enum_util import EnumDict
-from tgen.util.logging.logger_manager import logger
-from tgen.util.thread_util import ThreadUtil
 
 
 class TraceDataset(iDataset):
@@ -52,8 +52,14 @@ class TraceDataset(iDataset):
         self._pos_link_ids, self._neg_link_ids = pos_link_ids, neg_link_ids
         trace_df.drop_duplicates()
         trace_df = TraceDataFrame(trace_df.sample(frac=1))
-        self.trace_matrix = TraceMatrix(trace_df, randomize=randomize)
+        self.__trace_matrix = None
+        self.randomize = randomize
         self.trace_df = trace_df
+
+    def get_trace_matrix(self) -> TraceMatrix:
+        if self.__trace_matrix is None:
+            self.__trace_matrix = TraceMatrix(self.trace_df, randomize=self.randomize)
+        return self.__trace_matrix
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Dataset:
         """
@@ -363,6 +369,18 @@ class TraceDataset(iDataset):
         :return:  None (links are automatically set in current instance).
         """
         self._neg_link_ids = self._resize_data(self._neg_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def get_parent_child_types(self) -> List[Tuple[str, str]]:
+        """
+        Returns the artifacts types of the parent and child artifacts per tracing request.
+        :return: Parent type and child type.
+        """
+        tracing_types = []
+        for _, layer_row in self.layer_df.iterrows():
+            parent_type = layer_row[LayerKeys.TARGET_TYPE.value]
+            child_type = layer_row[LayerKeys.SOURCE_TYPE.value]
+            tracing_types.append((parent_type, child_type))
+        return tracing_types
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

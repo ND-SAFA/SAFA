@@ -2,7 +2,7 @@ from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.select_question_prompt import SelectQuestionPrompt
-from tgen.util.list_util import ListUtil
+from tgen.common.util.list_util import ListUtil
 
 SOURCE_COMPONENT_LABEL = "subsystem_one"
 TARGET_COMPONENT_LABEL = "subsystem_two"

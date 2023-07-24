@@ -1,3 +1,4 @@
+from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
@@ -6,7 +7,6 @@ from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.test_assertions import TestAssertions
-from tgen.train.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -28,5 +28,5 @@ class TestVSMJob(BaseJobTest):
 
     def _assert_success(self, job: VSMJob, job_result: JobResult):
         eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]
-        output : TracePredictionOutput = job_result.body
+        output: TracePredictionOutput = job_result.body
         TestAssertions.verify_prediction_output(self, output, eval_dataset, base_score=0.0)

@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Generic, List, Type, TypeVar
 
-from tgen.state.state import State
 from tgen.state.pipeline.pipeline_args import PipelineArgs
+from tgen.state.state import State
+from tgen.common.util.logging.logger_manager import logger
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=PipelineArgs)
@@ -37,6 +38,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         for step in self.steps:
             step.run(self.args, self.state)
+            logger.info(f"Finished step: {step.__class__.__name__}")
 
     @abstractmethod
     def init_state(self) -> StateType:

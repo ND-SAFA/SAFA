@@ -3,7 +3,7 @@ from collections import Callable, Counter
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.chunkers.chunked_node import ChunkedNode
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil
 
 
 class BaseCodeChunkerTest:
@@ -15,7 +15,7 @@ class BaseCodeChunkerTest:
         :param test: The test calling the method
         :param chunker: Chunker to test
         """
-        words = "word" * (chunker.token_limit * 2)
+        words = "word" * (chunker.max_prompt_tokens * 2)
         test.assertTrue(chunker.exceeds_token_limit(words))
         test.assertFalse(chunker.exceeds_token_limit("word"))
 
@@ -26,7 +26,7 @@ class BaseCodeChunkerTest:
         :param test: The test calling the method
         :param chunker: Chunker to test
         """
-        words = "word " * chunker.token_limit
+        words = "word " * chunker.max_prompt_tokens
         lines = words.split()
         class_def = ChunkedNode(lineno=1, end_lineno=len(lines) - 1, type="Class")
         orig_content = chunker._get_node_content(class_def, lines)
@@ -90,7 +90,7 @@ class BaseCodeChunkerTest:
             test.fail(f"The following differences were found between the original content and the chunked content\n {differences}")
         extra_tokens = []
         for i, chunk in enumerate(chunks):
-            extra_token_count = TokenLimitCalculator.estimate_num_tokens(chunk, test.MODEL) - chunker.token_limit
+            extra_token_count = TokenLimitCalculator.estimate_num_tokens(chunk, test.MODEL) - chunker.max_prompt_tokens
             if extra_token_count >= 100:
                 extra_tokens.append(extra_token_count)
         if len(extra_tokens) > 0:

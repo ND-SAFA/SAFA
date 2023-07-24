@@ -1,3 +1,4 @@
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.jobs.data_jobs.download_repository_job import DownloadRepositoryJob
@@ -7,17 +8,18 @@ from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.model_jobs.create_model_job import CreateModelJob
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
+from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob
+from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
-from tgen.jobs.trainer_jobs.ranking_job import RankingJob
-from tgen.jobs.trainer_jobs.tracing_job import TracingJob
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
-from tgen.util.supported_enum import SupportedEnum
 
 
 class SupportedJobType(SupportedEnum):
     HUGGING_FACE = HuggingFaceJob
     HGEN = BaseHGenJob
+    PROJECT_SUMMARY = ProjectSummaryJob
     MULTI_LAYER_HGEN = MultiLayerHGenJob
     EXPORT_ARTIFACTS = ExportArtifactsJob
     CREATE_DATASETS = CreateDatasetsJob
@@ -25,7 +27,7 @@ class SupportedJobType(SupportedEnum):
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
     LLM = LLMJob
-    TRACE = TracingJob
+    TRACING = TracingJob
     RANKING = RankingJob
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob

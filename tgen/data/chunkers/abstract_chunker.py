@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Type, List
+from typing import List, Type
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
 from tgen.models.llm.token_limits import TokenLimitCalculator
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
 
 
 class AbstractChunker(BaseObject, ABC):
@@ -11,15 +11,15 @@ class AbstractChunker(BaseObject, ABC):
     Handles chunking for python files
     """
 
-    def __init__(self, model_name: str, token_limit: int):
+    def __init__(self, model_name: str, max_prompt_tokens: int):
         """
         Initializes chunker with for a given model.
         :param model_name: The model that will be doing the tokenization
-        :param token_limit: The number of tokens that the model can accept
+        :param max_prompt_tokens: The number of tokens that the model can accept
         :return: The approximate number of tokens
         """
         self.model_name = model_name
-        self.token_limit = token_limit
+        self.max_prompt_tokens = max_prompt_tokens
 
     @abstractmethod
     def chunk(self, content: str, id_: str = None) -> List[str]:
@@ -36,7 +36,8 @@ class AbstractChunker(BaseObject, ABC):
         :param content: The content to check
         :return: True if the content exceeds the token limit for the model else False
         """
-        return TokenLimitCalculator.estimate_num_tokens(content, self.model_name) > self.token_limit
+        n_expected_tokens = TokenLimitCalculator.estimate_num_tokens(content, self.model_name)
+        return n_expected_tokens > self.max_prompt_tokens
 
     @classmethod
     @overrides(BaseObject)

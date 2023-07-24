@@ -1,7 +1,9 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
+from tgen.common.artifact import Artifact
 from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
 
 ArtifactInstruction = Tuple[Any, str]
@@ -39,18 +41,16 @@ class EntryCreator:
         return entry
 
     @staticmethod
-    def create_layer_mapping_entries(layer_mappings: List[ArtifactInstruction]) -> LayerEntry:
+    def create_layer_mapping_entries(layer_mappings: List[ArtifactInstruction]) -> List[TraceLayer]:
         """
         Creates layer mapping in structured dataset format.
         :param layer_mappings: List of source and target types to map together.
         :return: List of layer mapping entries.
         """
-        return [{StructuredKeys.LayerMapping.SOURCE_TYPE.value: s_type,
-                 StructuredKeys.LayerMapping.TARGET_TYPE.value: t_type}
-                for s_type, t_type in layer_mappings]
+        return [TraceLayer(child=s_type, parent=t_type) for s_type, t_type in layer_mappings]
 
     @staticmethod
-    def get_entries_in_type(type_key: TestDataManager.Keys, layers_to_include: List[int] = None) -> List[LayerEntry]:
+    def get_entries_in_type(type_key: TestDataManager.Keys, layers_to_include: List[int] = None) -> List[Artifact]:
         """
         Returns entries associated with type existing in data manager.
         :param type_key: The key to access artifacts in artifact type.
@@ -68,27 +68,28 @@ class EntryCreator:
         :param layer_indices: The set of artifacts within type to extract. If none, all sets are used.
         :return: Data used to create entries using EntryCreator.
         """
-
+        key_map = "child" if "source" == type_key else "parent"
+        artifact_layer_map = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS])
+        traced_layers = TestDataManager.get_path([TestDataManager.Keys.LAYERS])
         entries = []
-        for layer_index, artifact_layer in enumerate(TestDataManager.DATA[TestDataManager.Keys.ARTIFACTS][type_key]):
+        for layer_index, traced_layer in enumerate(traced_layers):
+            layer_name = traced_layer[key_map]
+            layer_artifacts = artifact_layer_map[layer_name]
             layer_entries = []
-            if layer_indices is not None:
-                if layer_index not in layer_indices:
-                    continue
-            for a_id, a_body in artifact_layer.items():
-                layer_entries.append((a_id, a_body))
+            for artifact in layer_artifacts.items():
+                layer_entries.append(artifact)
             entries.append(layer_entries)
         return deepcopy(entries)
 
     @staticmethod
-    def create_artifact_entries(artifact_layers: List[LayerInstruction]) -> List[List[Entry]]:
+    def create_artifact_entries(artifact_layers: List[Dict[str, str]]) -> List[Artifact]:
         """
         Creates artifact entries by extracting id and body from items.
         :param artifact_layers: Items containing artifact ids and body per layer.
         :return: artifact entries created.
         """
-        return [
-            [{
-                StructuredKeys.Artifact.ID.value: a_id,
-                StructuredKeys.Artifact.CONTENT.value: a_body
-            } for a_id, a_body in artifact_items] for artifact_items in artifact_layers]
+        artifacts = []
+        for artifact_items in artifact_layers:
+            for a_id, a_body in artifact_items:
+                artifacts.append(Artifact(id=id, content=a_body))
+        return artifacts

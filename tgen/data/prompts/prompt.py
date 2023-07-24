@@ -1,9 +1,9 @@
 import uuid
-from typing import Dict, Any
+from typing import Any, Dict
 
+from tgen.common.util.str_util import StrUtil
 from tgen.constants.deliminator_constants import SPACE
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
-from tgen.util.str_util import StrUtil
 
 
 class Prompt:

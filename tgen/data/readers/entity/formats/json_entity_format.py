@@ -2,9 +2,9 @@ from typing import List
 
 import pandas as pd
 
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.summarizer.summarizer import Summarizer
-from tgen.util.json_util import JsonUtil
 
 
 class JsonEntityFormat(AbstractEntityFormat):

@@ -1,21 +1,21 @@
 import os
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Optional, Type, Union, Dict
+from typing import Any, Dict, Optional, Type, Union
 
+from tgen.common.util.base_object import BaseObject
+from tgen.common.util.override import overrides
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
+from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.models.model_manager import ModelManager
-from tgen.train.trace_output.abstract_trace_output import AbstractTraceOutput
-from tgen.train.trainers.hugging_face_trainer import HuggingFaceTrainer
-from tgen.train.trainers.trainer_task import TrainerTask
-from tgen.util.base_object import BaseObject
-from tgen.util.override import overrides
-from tgen.util.reflection_util import ReflectionUtil
 from tgen.variables.definition_variable import DefinitionVariable
 
 

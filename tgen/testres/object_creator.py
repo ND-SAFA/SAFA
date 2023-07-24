@@ -2,6 +2,8 @@ from copy import deepcopy
 from typing import Dict, Type, TypeVar
 
 from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -16,8 +18,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.train.args.hugging_face_args import HuggingFaceArgs
-from tgen.train.trainers.trainer_task import TrainerTask
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 ObjectType = TypeVar("ObjectType")
@@ -40,8 +40,8 @@ class ObjectCreator:
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
     api_project_reader = {
         "api_definition": {
-            "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
-            "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
+            "artifact_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS]),
+            "layers": TestDataManager.get_path([TestDataManager.Keys.LAYERS]),
             "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
         }
     }

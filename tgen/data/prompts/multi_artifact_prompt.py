@@ -1,11 +1,11 @@
-from enum import auto, Enum
+from enum import Enum, auto
 from typing import List
 
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
-from tgen.util.enum_util import EnumDict
-from tgen.util.override import overrides
 
 
 class MultiArtifactPrompt(Prompt):
@@ -24,20 +24,22 @@ class MultiArtifactPrompt(Prompt):
         TRACES = auto()
         ARTIFACT = auto()
 
-    def __init__(self, prompt_start: str = EMPTY_STRING,
+    def __init__(self, prompt_prefix: str = EMPTY_STRING,
                  build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
                  data_type: DataType = DataType.ARTIFACT):
         """
-        Constructor for making a prompt from many artifacts
-        :param build_method: The method to build the prompt (determines prompt format)
+        Constructor for making a prompt containing many artifacts.
+        :param prompt_prefix: The prefix to attach to prompt.
+        :param build_method: The method to build the prompt (determines prompt format).
         :param include_ids: If True, includes artifact ids
+        :param data_type:
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
-        self.type = data_type
-        super().__init__(value=prompt_start)
+        self.data_type = data_type
+        super().__init__(value=prompt_prefix)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
@@ -66,7 +68,7 @@ class MultiArtifactPrompt(Prompt):
         """
         numbered_format = "{}. {}"
         artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
-        formatted_artifacts = [numbered_format.format(i+1, artifact_prompt.build(artifact=artifact))
+        formatted_artifacts = [numbered_format.format(i + 1, artifact_prompt.build(artifact=artifact))
                                for i, artifact in enumerate(artifacts)]
         return NEW_LINE.join(formatted_artifacts)
 
@@ -96,4 +98,3 @@ class MultiArtifactPrompt(Prompt):
         elif self.build_method.NUMBERED:
             return "1. {artifact1} " \
                    "2. {artifact2} ..."
-

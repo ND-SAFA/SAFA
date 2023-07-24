@@ -4,6 +4,10 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
+from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -11,10 +15,6 @@ from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporte
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.util.dataframe_util import DataFrameUtil
-from tgen.util.enum_util import EnumDict
-from tgen.util.file_util import FileUtil
-from tgen.util.override import overrides
 
 
 class SafaExporter(AbstractDatasetExporter):
@@ -171,4 +171,4 @@ class SafaExporter(AbstractDatasetExporter):
         :param artifact_type: The artifact type
         :return: A dataframe of artifacts of a given type
         """
-        return DataFrameUtil.query_df(self.get_dataset().artifact_df, {ArtifactKeys.LAYER_ID: artifact_type})
+        return DataFrameUtil.query_df(self.get_dataset().artifact_df, {ArtifactKeys.LAYER_ID.value: artifact_type})

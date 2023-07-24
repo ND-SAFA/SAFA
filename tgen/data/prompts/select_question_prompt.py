@@ -1,9 +1,9 @@
 from typing import Callable, Dict
 
+from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.util.override import overrides
 
 
 class SelectQuestionPrompt(QuestionPrompt):

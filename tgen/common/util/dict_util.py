@@ -77,7 +77,7 @@ class DictUtil:
         """
         Create enum dictionary from object.
         :param obj: The trace entry whose properties are extracted.
-        :param trace_keys: The properties to extract if they exist.
+        :param enum_type: The properties to extract if they exist.
         :return: EnumDict containing keys found.
         """
         trace_keys = [key for key in enum_type if key.value in obj]

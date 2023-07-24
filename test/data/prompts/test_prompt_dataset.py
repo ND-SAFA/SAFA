@@ -45,13 +45,6 @@ class TestPromptDataset(BaseTest):
             return False
         return True
 
-    def test_get_generation_method(self):
-        llm_manager = OpenAIManager(OpenAIArgs())
-        prompt_builder = PromptBuilder([])
-        artifact_prompt_dataset: PromptDataset = self.get_prompt_dataset_from_artifact_df()
-        generation_method = artifact_prompt_dataset._get_generation_method(llm_manager.prompt_args, prompt_builder)
-        print("hi")
-
     @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
     @mock.patch.object(AbstractChunker, "exceeds_token_limit")
     def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):

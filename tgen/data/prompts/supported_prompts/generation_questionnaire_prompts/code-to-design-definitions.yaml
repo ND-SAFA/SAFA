@@ -1,29 +1,72 @@
+description:
+- A Design Definitions is a software development artifact that provides a detailed
+  and structured description of a specific feature or functionality within a software
+  project. It outlines the requirements, constraints, and design decisions made during
+  the development process. This artifact is different from other software artifacts,
+  such as requirements documents or technical specifications, as it focuses on the
+  design rationale and the reasoning behind the chosen solution, rather than just
+  listing the requirements or describing the implementation details.
+example:
+- '
+
+  Design Definitions: User Authentication
+
+
+  1. Overview
+
+  The user authentication feature allows users to securely log in to the application
+  using their email address and password.
+
+
+  2. Requirements
+
+  - Users must provide a valid email address and password to log in.
+
+  - The system must verify the provided credentials against the user database.
+
+  - If the credentials are valid, the user is granted access to the application.
+
+  - If the credentials are invalid, the user is presented with an error message.
+
+
+  3. Design Decisions
+
+  - We have chosen to use the bcrypt hashing algorithm for storing and verifying passwords,
+  as it provides a good balance between security and performance.
+
+  - We will implement a rate-limiting mechanism to prevent brute-force attacks on
+  user accounts.
+
+
+  4. Constraints
+
+  - The user authentication feature must comply with the GDPR and other relevant data
+  protection regulations.
+
+  - The feature must be compatible with the existing user database schema.
+
+
+  5. Future Enhancements
+
+  - Support for two-factor authentication (2FA) can be added in a future release to
+  further enhance security.
+
+  '
 format:
-- '- Each design definition should be numbered. - Each design definition should have
-  a clear and concise description. - Bullet points should be used to list specific
-  requirements or considerations. - The design definitions should cover different
-  aspects of the software development project, such as user interface, database, security,
-  performance, and integration.'
+- Overview - Brief description of the feature or functionality.  Requirements - List
+  of requirements that the feature or functionality must fulfill.  Design Decisions
+  - Explanation of the design choices made and the rationale behind them.  Constraints
+  - List of constraints or limitations that the feature or functionality must adhere
+  to.  Future Enhancements - Optional section for potential improvements or additions
+  to the feature or functionality in future releases.
 questions:
-- - '- What are the main classes/components in the code and what are their responsibilities?'
-  - '- How are the classes/components related to each other? What are the key interactions
-    and dependencies between them?'
-  - '- What are the key functions/methods in each class/component? What is their purpose?'
-  - '- What are the major data structures and how are they used by different classes/components?'
-  - '- Is there a clear separation of concerns in the code? Are components loosely
-    coupled?'
-  - '- What are the key algorithms used and where are they implemented?'
-  - '- What are the major control flows in the code? What triggers certain actions/flows?'
-  - '- Are there any major cross-cutting concerns like logging, configuration, security
-    etc? How are they implemented?'
-  - '- What are the external interfaces/APIs exposed by the system? What are their
-    inputs and outputs?'
-  - '- How is concurrency handled in the system, if applicable?'
-  - '- How is error handling implemented? Are there global exception handling policies?'
-  - '- What are the key configuration options and how are they handled?'
-  - '- Is there use of any design patterns? If so, what and where?'
-  - '- Does the code follow any architecture principles like SOLID, DRY etc?'
-  - '- What are the key dependencies and how are they managed?'
-  - '- What build/deployment mechanisms are implemented?'
-  - '- What testing frameworks/capabilities are included?'
-  - '- What documentation is available for understanding the code structure and flow?'
+- - What are the main components/modules in the codebase?
+  - What are the key functions/methods in each component?
+  - What are the inputs and outputs of each key function?
+  - How do the components interact with each other?
+  - Is there a main control flow or architecture apparent in the code?
+  - Are there any major data structures that are used throughout?
+  - Does the code interface with any external systems/libraries?
+  - Are there any config files or resources that the code depends on?
+  - What are the main algorithms implemented in the code?
+  - What are the key abstractions in the codebase?

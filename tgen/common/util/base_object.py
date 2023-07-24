@@ -119,7 +119,7 @@ class BaseObject(ABC):
         elif isinstance(variable, MultiVariable):
             parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
             if parent_class == "optional":
-                print("HI")
+                raise NotImplementedError()
             elif parent_class == "list":
                 if len(child_classes) == 1:
                     expected_child_class = child_classes[0]

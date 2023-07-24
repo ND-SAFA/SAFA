@@ -1,46 +1,40 @@
 <template>
   <div>
-    <panel-card>
+    <panel-card :title="title">
+      <template #title-actions>
+        <attribute-chip v-if="!!score" confidence-score :value="score" />
+      </template>
+
+      <div v-if="!!explanation">
+        <typography variant="caption" value="Explanation" />
+        <typography
+          :value="explanation"
+          variant="expandable"
+          default-expanded
+        />
+      </div>
+
+      <typography variant="caption" value="Parent" />
       <artifact-body-display
         v-if="targetArtifact"
         :artifact="targetArtifact"
         display-title
-        display-divider
         default-expanded
+        clickable
         data-cy="panel-trace-link-target"
+        @click="handleViewTarget"
       />
-      <template #actions>
-        <text-button
-          text
-          label="View Artifact"
-          data-cy="button-trace-target"
-          icon="artifact"
-          @click="handleViewTarget"
-        />
-      </template>
-    </panel-card>
-    <flex-box justify="center" align="center" b="4">
-      <icon size="md" :rotate="270" variant="trace" color="primary" />
-      <attribute-chip v-if="!!score" confidence-score :value="score" />
-    </flex-box>
-    <panel-card>
+
+      <typography variant="caption" value="Child" />
       <artifact-body-display
         v-if="sourceArtifact"
         :artifact="sourceArtifact"
         display-title
-        display-divider
         default-expanded
+        clickable
         data-cy="panel-trace-link-source"
+        @click="handleViewSource"
       />
-      <template #actions>
-        <text-button
-          text
-          label="View Artifact"
-          data-cy="button-trace-source"
-          icon="artifact"
-          @click="handleViewSource"
-        />
-      </template>
     </panel-card>
   </div>
 </template>
@@ -60,11 +54,9 @@ import { TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
   ArtifactBodyDisplay,
-  FlexBox,
   AttributeChip,
   PanelCard,
-  TextButton,
-  Icon,
+  Typography,
 } from "@/components/common";
 
 const traceLink = computed(() => selectionStore.selectedTraceLink);
@@ -76,10 +68,20 @@ const targetArtifact = computed(() =>
   artifactStore.getArtifactById(traceLink.value?.targetId || "")
 );
 
+const generated = computed(
+  () => traceLink.value?.traceType === TraceType.GENERATED
+);
+
 const score = computed(() =>
-  traceLink.value?.traceType === TraceType.GENERATED
-    ? String(traceLink.value.score)
-    : ""
+  generated.value ? String(traceLink.value?.score) : ""
+);
+
+const title = computed(() =>
+  generated.value ? "Generated Link" : "Manual Link"
+);
+
+const explanation = computed(() =>
+  generated.value ? traceLink.value?.explanation : undefined
 );
 
 /**

@@ -13,8 +13,6 @@
       :title="props.artifact.type"
       :subtitle="displayName"
       :selected="selected"
-      @mousedown="mouseDownTime = new Date().getTime()"
-      @mouseup="mouseUpTime = new Date().getTime()"
       @click="handleSelect"
     >
       <separator
@@ -29,9 +27,7 @@
       :color="color"
       variant="footer"
       :selected="selected"
-      @mouseenter="appStore.isGraphLock = true"
-      @mouseleave="appStore.isGraphLock = false"
-      @click.stop="subtreeStore.showSubtree(id)"
+      @click="subtreeStore.showSubtree(id)"
       @mousedown.stop
       @mouseup.stop
     >
@@ -55,9 +51,6 @@
       :color="color"
       variant="sidebar"
       :selected="selected"
-      @mouseenter="appStore.isGraphLock = true"
-      @mouseleave="appStore.isGraphLock = false"
-      @click.stop
       @mousedown.stop
       @mouseup.stop
     >
@@ -121,7 +114,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   ArtifactCytoElement,
   ArtifactSchema,
@@ -156,9 +149,6 @@ const props = defineProps<{
 }>();
 
 const { darkMode } = useTheme();
-
-const mouseDownTime = ref(0);
-const mouseUpTime = ref(0);
 
 const id = computed(() => props.artifact.id);
 
@@ -250,9 +240,6 @@ function handleAdd(cy: CytoCore): void {
  * or opens a new view of the artifact's subtree if the artifact is already selected.
  */
 function handleSelect(): void {
-  // Skip any potential drags.
-  if (mouseUpTime.value - mouseDownTime.value > 200) return;
-
   if (!selected.value) {
     selectionStore.selectArtifact(id.value);
   } else {

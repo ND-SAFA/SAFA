@@ -102,7 +102,7 @@ const className = computed(() => {
  * @param event - The click event.
  */
 function handleClick(event: EventObject): void {
-  if (event.target !== event.cy || appStore.isGraphLock) return;
+  if (event.target !== event.cy) return;
 
   disableDrawMode();
 
@@ -144,7 +144,6 @@ watch(
     appStore.onLoadStart();
 
     setTimeout(() => {
-      appStore.isGraphLock = false;
       layoutStore.resetLayout();
       appStore.onLoadEnd();
     }, 200);
@@ -154,7 +153,6 @@ watch(
 watch(
   () => isTreeMode.value,
   () => {
-    appStore.isGraphLock = false;
     layoutStore.resetLayout();
   }
 );

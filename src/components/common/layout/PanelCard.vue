@@ -14,7 +14,6 @@
             variant="subtitle"
             el="h2"
             :value="props.title"
-            :color="props.color"
           />
         </flex-box>
         <slot name="title-actions" />

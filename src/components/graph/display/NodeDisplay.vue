@@ -1,5 +1,13 @@
 <template>
-  <q-card flat bordered :class="className" :style="cardStyle">
+  <q-card
+    flat
+    bordered
+    :class="className"
+    :style="cardStyle"
+    @mousedown="mouseDownTime = new Date().getTime()"
+    @mouseup="mouseUpTime = new Date().getTime()"
+    @click="handleClick"
+  >
     <div v-if="props.title" class="cy-node-title" data-cy="tree-node-type">
       <typography variant="subtitle" :value="props.title" bold />
     </div>
@@ -34,7 +42,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ThemeColor } from "@/types";
 import { Separator, Typography } from "@/components/common";
 
@@ -69,6 +77,13 @@ const props = defineProps<{
   selected?: boolean;
 }>();
 
+const emit = defineEmits<{
+  (event: "click"): void;
+}>();
+
+const mouseDownTime = ref(0);
+const mouseUpTime = ref(0);
+
 const className = computed(
   () =>
     "cy-node-display " +
@@ -95,4 +110,13 @@ const cardStyle = computed(() =>
 const separatorStyle = computed(() =>
   props.color.includes("#") ? `background-color: ${props.color};` : undefined
 );
+
+/**
+ * Handles a click event, as long as it isn't a drag event.
+ */
+function handleClick(): void {
+  if (mouseUpTime.value - mouseDownTime.value > 200) return;
+
+  emit("click");
+}
 </script>

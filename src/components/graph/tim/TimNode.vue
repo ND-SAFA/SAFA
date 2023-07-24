@@ -20,9 +20,6 @@
       :color="color"
       variant="sidebar"
       :selected="selected"
-      @mouseenter="appStore.isGraphLock = true"
-      @mouseleave="appStore.isGraphLock = false"
-      @click.stop
       @mousedown.stop
       @mouseup.stop
     >

@@ -25,10 +25,6 @@ export const useApp = defineStore("app", {
      */
     isSaving: false,
     /**
-     * If true, the graph will not handle any events.
-     */
-    isGraphLock: false,
-    /**
      * Whether the app is currently saving.
      */
     runUpdate: undefined as (() => Promise<void>) | undefined,

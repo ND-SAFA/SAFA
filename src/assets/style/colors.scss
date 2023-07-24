@@ -13,13 +13,10 @@ $color-background: var(--q-background);
 $color-selected: var(--q-selected);
 
 $color-added: var(--q-added);
-$color-added-bg: var(--q-addedBg);
 $color-modified: var(--q-modified);
-$color-modified-bg: var(--q-modifiedBg);
 $color-removed: var(--q-removed);
-$color-removed-bg: var(--q-removedBg);
 $color-flagged: var(--q-flagged);
-$color-flagged-bg: var(--q-flaggedBg);
+$color-unchanged: var(--q-unchanged);
 
 $color-node-default: var(--q-nodeDefault);
 $color-node-generated: var(--q-nodeGenerated);
@@ -36,6 +33,22 @@ $color-node-generated: var(--q-nodeGenerated);
 
 .bg-neutral {
   background-color: $color-neutral !important;
+}
+
+.bg-added {
+  background-color: $color-added !important;
+}
+
+.bg-modified {
+  background-color: $color-modified !important;
+}
+
+.bg-removed {
+  background-color: $color-removed !important;
+}
+
+.bg-unchanged {
+  background-color: $color-unchanged !important;
 }
 
 // Border Palette Tags
@@ -58,6 +71,22 @@ $color-node-generated: var(--q-nodeGenerated);
 
 .bd-warning {
   border: 1px solid $color-warning !important;
+}
+
+.bd-added {
+  border: 1px solid $color-added !important;
+}
+
+.bd-modified {
+  border: 1px solid $color-modified !important;
+}
+
+.bd-removed {
+  border: 1px solid $color-removed !important;
+}
+
+.bd-unchanged {
+  border: 1px solid $color-unchanged !important;
 }
 
 // Text Palette Tags

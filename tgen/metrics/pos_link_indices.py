@@ -1,9 +1,10 @@
-from typing import Dict, List
+from typing import Dict
 
 import datasets
 import numpy as np
 import pandas as pd
 
+from tgen.common.util.dict_util import DictUtil
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -44,19 +45,7 @@ class PositiveLinkIndices(AbstractTraceMetric):
                     pos_link_indices.append(i)
             return pd.Series(pos_link_indices).value_counts().to_dict()
 
-        def joining(list_of_dicts: List[Dict]):
-            global_dict = {}
-
-            for d in list_of_dicts:
-                for k, v in d.items():
-                    if k in global_dict:
-                        global_dict[k] += v
-                    else:
-                        global_dict[k] = v
-
-            return global_dict
-
-        avg_positive_link_index = trace_matrix.calculate_query_metric(compute, joining_function=joining)
+        avg_positive_link_index = trace_matrix.calculate_query_metric(compute, joining_function=DictUtil.joining)
         avg_positive_link_index = dict(sorted(avg_positive_link_index.items(), key=lambda x: x[0]))
 
         return {

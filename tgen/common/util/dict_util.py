@@ -99,3 +99,21 @@ class DictUtil:
             return new_dict
         else:
             return obj
+
+    @staticmethod
+    def joining(list_of_dicts: List[Dict]) -> Dict:
+        """
+        Aggregates the values of dictionaries.
+        :param list_of_dicts: The list of dictionaries to overlap.
+        :return: Single dictionary with aggregated values.
+        """
+        global_dict = {}
+
+        for d in list_of_dicts:
+            for k, v in d.items():
+                if k in global_dict:
+                    global_dict[k] += v
+                else:
+                    global_dict[k] = v
+
+        return global_dict

@@ -1,6 +1,7 @@
 import os
 
 from tgen.common.util.file_util import FileUtil
+from tgen.constants.deliminator_constants import NEW_LINE, SPACE, TAB
 from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
@@ -78,8 +79,8 @@ class TestSummarizer(BaseTest):
         summarizer = self.get_summarizer(max_completion_tokens=max_completion_tokens)
         content_summary = summarizer.summarize_single(self.CODE_CONTENT, chunker_type=SupportedChunker.PY)
 
-        actual_links = content_summary.split("\n")
-        expected_lines = content_summary.split("\n")
+        actual_links = content_summary.split(NEW_LINE)
+        expected_lines = content_summary.split(NEW_LINE)
         self.assertEqual(len(actual_links), len(expected_lines))
         for i, (line_a, line_b) in enumerate(zip(actual_links, expected_lines)):
             self.assertEqual(line_a, line_b, msg=f"Line: {i}")
@@ -176,9 +177,9 @@ class TestSummarizer(BaseTest):
 
     @staticmethod
     def _remove_irrelevant_chars(orig_content):
-        orig_content = orig_content.replace("\n", "")
-        orig_content = orig_content.replace(" ", "")
-        orig_content = orig_content.replace("\t", "")
+        orig_content = orig_content.replace(NEW_LINE, "")
+        orig_content = orig_content.replace(SPACE, "")
+        orig_content = orig_content.replace(TAB, "")
         return orig_content
 
     @staticmethod

@@ -1,6 +1,8 @@
 import logging
 from typing import List
 
+from tgen.constants.deliminator_constants import NEW_LINE
+
 global tqdm_log_capture
 
 
@@ -27,7 +29,7 @@ class LogCapture(logging.Handler):
         self.logs = []
         self.current_entry = ""
 
-    def get_log(self, delimiter: str = "\n") -> str:
+    def get_log(self, delimiter: str = NEW_LINE) -> str:
         """
         Returns single log containing all captured logs.
         :param delimiter: The delimiter used between log statements.

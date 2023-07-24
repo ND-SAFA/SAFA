@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import List
 
 from tgen.common.util.attr_dict import AttrDict
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
@@ -30,7 +31,7 @@ COMPLETION_REQUEST = AttrDict({
     "n": 1,
     "stream": False,
     "logprobs": None,
-    "stop": "\n"
+    "stop": NEW_LINE
 })
 
 FINE_TUNE_RESPONSE_DICT = AttrDict({

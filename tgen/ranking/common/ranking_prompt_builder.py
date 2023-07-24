@@ -1,5 +1,6 @@
 from typing import Any, List, Optional
 
+from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
 
 DEFAULT_BODY_TITLE = "# Software Artifacts"
@@ -84,7 +85,7 @@ class RankingPromptBuilder:
         """
         if name:
             artifact_body = f"({name}) {artifact_body}"
-        body = artifact_body.replace("\n\n", "\n")
+        body = artifact_body.replace(f"{NEW_LINE}{NEW_LINE}", f"{NEW_LINE}")
         return f"<artifact>\n\t<id>{artifact_name}</id>\n\t<body>{body}</body>\n</artifact>{separator}"
 
     @staticmethod

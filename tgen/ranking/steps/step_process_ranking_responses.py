@@ -1,10 +1,11 @@
 from typing import Dict, List
 
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.constants.deliminator_constants import DASH, NEW_LINE
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
 from tgen.state.state import State
-from tgen.common.util.llm_response_util import LLMResponseUtil
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
@@ -127,10 +128,10 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         :param index_translations: The names to use instead of indices.
         :return: Dictionary mapping artifact index to explanation
         """
-        elements = explanations.split("\n")
+        elements = explanations.split(NEW_LINE)
         elements = [e.strip() for e in elements]
         elements = [e for e in elements if len(e) > 0]
-        elements = [e.split("-") for e in elements]
+        elements = [e.split(DASH) for e in elements]
         elements = {e[0].strip(): e[1].strip() for e in elements}
         elements = {int(a_id): e for a_id, e in elements.items()}
         elements = {index_translations[a_id]: e for a_id, e in elements.items()}

@@ -59,7 +59,7 @@ export const ThemeColors = {
   modified: Colors.blue,
   removed: Colors.red,
   warning: Colors.orange,
-  unchanged: Colors.greyLight,
+  unchanged: Colors.grey,
 
   nodeDefault: Colors.brownDark,
   nodeGenerated: Colors.brown,

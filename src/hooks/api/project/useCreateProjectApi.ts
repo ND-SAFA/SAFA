@@ -3,9 +3,6 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import { IOHandlerCallback, ProjectSchema } from "@/types";
 import {
-  createVersionApiStore,
-  getProjectApiStore,
-  getVersionApiStore,
   integrationsStore,
   jobApiStore,
   projectSaveStore,
@@ -16,7 +13,7 @@ import {
   createGitHubProject,
   createJiraProject,
   createProjectCreationJob,
-  saveProject,
+  createProjectUploadJob,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -62,8 +59,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    *
    * @param project - The project to create.
    * @param files - The files to upload.
-   * @param onSuccess - Called if the action is successful.
-   * @param onError - Called if the action fails.
+   * @param callbacks - The callbacks to use on success, error, and complete.
    */
   async function handleBulkImport(
     project: Pick<
@@ -71,29 +67,29 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
       "projectId" | "name" | "description" | "projectVersion"
     >,
     files: File[],
-    { onSuccess, onError }: IOHandlerCallback
+    callbacks: IOHandlerCallback
   ): Promise<void> {
     await createProjectApi.handleRequest(
-      () => saveProject(project),
-      {
-        onSuccess: async (project) => {
-          if (files.length === 0) {
-            getProjectApiStore.addProject(project);
+      async () => {
+        const formData = new FormData();
 
-            await getVersionApiStore.handleLoad(
-              project.projectVersion?.versionId || ""
-            );
-          } else {
-            await createVersionApiStore.handleImport(
-              project.projectId,
-              project.projectVersion?.versionId || "",
-              files,
-              true
-            );
-          }
-          onSuccess?.();
+        formData.append("name", project.name);
+        formData.append("description", project.description);
+
+        files.forEach((file: File) => {
+          formData.append("files", file);
+        });
+
+        const job = await createProjectUploadJob(formData);
+
+        await jobApiStore.handleCreate(job);
+      },
+      {
+        ...callbacks,
+        onComplete: async () => {
+          await navigateTo(Routes.UPLOAD_STATUS);
+          callbacks.onSuccess?.();
         },
-        onError,
       },
       {
         useAppLoad: true,

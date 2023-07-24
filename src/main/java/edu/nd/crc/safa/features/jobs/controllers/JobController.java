@@ -80,16 +80,18 @@ public class JobController extends BaseController {
     /**
      * Parses given job payload by the jobType and returns the job created.
      *
-     * @param versionId The project version to save the entities to.
-     * @param files     The flat files to be parsed and uploaded.
+     * @param versionId       The project version to save the entities to.
+     * @param files           The flat files to be parsed and uploaded.
+     * @param shouldSummarize Whether to sumarize code artifacts on upload.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
     @PostMapping(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files,
-                                                 @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
+    public JobAppEntity flatFileProjectUpdateJob(
+        @PathVariable UUID versionId,
+        @RequestParam MultipartFile[] files,
+        @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
         UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
             serviceProvider,
             versionId,

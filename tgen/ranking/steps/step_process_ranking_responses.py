@@ -44,8 +44,9 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
 
         ranked_children_list = [[] for _ in range(len(args.parent_ids))]
         ranked_children_explanations = [None] * len(args.parent_ids)
+        parent2index: Dict[str, int] = {p: i for i, p in enumerate(args.parent_ids)}
         for parent_name, prompt_response in zip(args.parent_ids, batch_response.batch_responses):
-            parent_index = args.parent_ids.index(parent_name)
+            parent_index = parent2index[parent_name]
             related_children = state.sorted_parent2children[parent_name]
 
             # content = LLMResponseUtil.parse(prompt_response, "context")

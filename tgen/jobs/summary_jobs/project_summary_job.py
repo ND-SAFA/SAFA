@@ -12,7 +12,7 @@ from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 
 GOAL = "# Task\nBelow is the set of software artifacts of a software system. " \
-       "Read through each artifact and reasoning about what the system is doing."
+       "Read through each artifact and reason about what the system is doing."
 INSTRUCTIONS_GOAL = "# Instructions\nPlease follow the instructions below to create brief software specification document " \
                     "describing the behavior of the system. " \
                     "Exclude details that are generally applicable across systems " \

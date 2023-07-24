@@ -13,7 +13,7 @@ export enum Colors {
 
   grey = "#36405A",
   greyLight = "lightgrey",
-  greyLightest = "#F6FAF4",
+  greyLightest = "#EDEFEB",
   greyDark = "#333",
 
   green = "#55A630",

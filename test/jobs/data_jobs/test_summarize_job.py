@@ -21,8 +21,7 @@ class TestSummarizeJob(BaseJobTest):
     @mock.patch.object(PythonChunker, "chunk", side_effect=lambda content, **kwargs: ["python " + content])
     @mock.patch.object(JavaChunker, "chunk", side_effect=lambda content, **kwargs: ["java " + content])
     @mock_anthropic
-    def test_run_success(self, fake_open_ai_completion_mock: mock.MagicMock, fake_java_chunk: mock.MagicMock,
-                         fake_python_chunk: mock.MagicMock):
+    def test_run_success(self, fake_java_chunk: mock.MagicMock, fake_python_chunk: mock.MagicMock):
         """
         Tests that job is completed succesfully.
         """

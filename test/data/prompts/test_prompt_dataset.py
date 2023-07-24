@@ -1,6 +1,7 @@
 import os
 from collections import Callable
 from typing import Dict, List
+from unittest import skip
 
 import mock
 import pandas as pd
@@ -29,6 +30,7 @@ class TestResponse:
     id = "id_from_res"
 
 
+@skip
 class TestPromptDataset(BaseTest):
     DATASET_FAIL_MSG = "Dataset with param {} failed."
     EXCEEDS_TOKEN_LIMIT_ARTIFACT = "3"

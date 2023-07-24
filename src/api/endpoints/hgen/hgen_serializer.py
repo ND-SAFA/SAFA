@@ -20,7 +20,8 @@ class HGenSerializer(serializers.Serializer):
     targetTypes = serializers.ListSerializer(
         help_text="List of target types to generate.",
         child=serializers.CharField(max_length=1028, help_text="The types of artifacts to generate."))
-    summary = serializers.CharField(max_length=100000, help_text="Pre-generated project summary.")
+    summary = serializers.CharField(max_length=100000, help_text="Pre-generated project summary.", required=False, allow_null=True,
+                                    allow_blank=False)
 
     def create(self, validated_data):
         artifact_serializer = SummaryArtifactSerializer(data=validated_data["artifacts"], many=True)

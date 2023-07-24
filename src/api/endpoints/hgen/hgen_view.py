@@ -15,7 +15,7 @@ def perform_hgen(request: HGenRequest):
     """
     artifacts = request["artifacts"]
     target_types = request["targetTypes"]
-    summary = request.get("summary")
+    summary = request.get("summary", None)
     base_type, *other_types = target_types
     logger.info(f"Starting HGEN request for: {target_types}")
     base_job = GenerateArtifactsJob(artifacts,

@@ -39,12 +39,12 @@
     }
 
     &:hover:after {
-      border-color: $color-modified !important;
+      border-color: $color-primary !important;
     }
   }
 
   &.q-field--highlighted > .q-field__inner > .q-field__control:after {
-    border-color: $color-modified !important;
+    border-color: $color-primary !important;
   }
 }
 
@@ -57,12 +57,12 @@
     border-top-left-radius: 0;
 
     &:hover:after {
-      border-color: $color-modified !important;
+      border-color: $color-primary !important;
     }
   }
 
   &.q-field--highlighted > .q-field__inner > .q-field__control:after {
-    border-color: $color-modified !important;
+    border-color: $color-primary !important;
   }
 }
 

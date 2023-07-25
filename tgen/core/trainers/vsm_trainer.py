@@ -4,6 +4,7 @@ from typing import Dict, Iterable, List, Tuple, Union
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
+from scipy.stats import percentileofscore
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
@@ -16,7 +17,7 @@ from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry,
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -128,12 +129,14 @@ class VSMTrainer(AbstractTrainer):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
 
-                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score)
+                link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
+                label = eval_dataset.trace_df.get_link(link_id)[TraceKeys.LABEL]
+                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
         self.convert_to_percentiles(prediction_entries)
         if self.select_predictions:
-            prediction_entries = RankingUtil.select_predictions(prediction_entries, parent_threshold=0.8)
+            prediction_entries = RankingUtil.select_predictions(prediction_entries)
         metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)
@@ -218,8 +221,14 @@ class VSMTrainer(AbstractTrainer):
             parent2preds[parent_id].append(p)
 
         for parent, preds in parent2preds.items():
-            preds = sorted(preds, key=lambda p: p["score"], reverse=True)
-            n_preds = len(preds)
-            scores = RankingUtil.assign_scores_to_targets(n_preds)
-            for p, s in zip(preds, scores):
-                p["score"] = s
+            scores = [p["score"] for p in preds]
+            percentiles = VSMTrainer.get_percentiles(scores)
+            for p, percentile in zip(preds, percentiles):
+                p["score"] = percentile
+
+    @staticmethod
+    def get_percentiles(scores: List[float]):
+        scores_sorted = sorted(scores)
+        s = pd.Series(scores)
+        percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
+        return list(percentiles)

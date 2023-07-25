@@ -110,13 +110,13 @@ class RankingUtil:
     def select_predictions(trace_predictions: List[TracePredictionEntry],
                            parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
                            min_threshold: float = DEFAULT_PARENT_MIN_THRESHOLD,
-                           classify_scores: bool = False) -> List[TracePredictionEntry]:
+                           top_n: int = None) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.
         :param parent_threshold: The minimum percentile for a child to be linked to a parent.
         :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
-        :param classify_scores: Whether to convert scores to classification labels.
+        :param top_n: Whether to convert scores to classification labels.
         :return: List of selected predictions.
         """
         children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
@@ -124,13 +124,16 @@ class RankingUtil:
 
         for child, trace_predictions in children2entry.items():
             sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-            selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
-            top_parent = sorted_entries[0]
-            if len(selected_entries) == 0 and top_parent[StructuredKeys.SCORE] >= min_threshold:
-                selected_entries.append(top_parent)
+            if top_n is not None:
+                selected_entries = sorted_entries[:top_n]
+            else:
+                selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
+                top_parent = sorted_entries[0]
+                if len(selected_entries) == 0:
+                    selected_entries.append(top_parent)
             predictions.extend(selected_entries)
 
-        if classify_scores:
+        if top_n:
             for p in predictions:
                 p["score"] = 1
         return predictions

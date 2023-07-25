@@ -9,16 +9,17 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "Below is a project you created. " \
                        "You task is to find the children of each in the system parent artifact." \
                        "This task is separated so that you are focusing on a single parent at a time. " \
-                       "Below is the parent software artifact and a list of potential children." \
+                       "Below is the parent software artifact and a list of potential children formatted in XML." \
                        "\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Concisely describe the functionality of the parent within the context of the system. " \
                                "Describe the system functionality that lies directly within the responsibility of the parent." \
                                "Enclose your answer in <function></function>" \
-                               "\n2. List the children who provide a function for the parent." \
-                               "Provide the list of children artifacts along with a sentence describing how it " \
-                               "helps the parent achieve its functionality. " \
+                               "\n2. Read each potential children artifacts in order. " \
+                               "If the artifact provides a function for the parent or references " \
+                               "provide its ID and a sentence describing how it helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \
+                               "Work through one artifact at a time so that the IDs are in ascending order. " \
                                "Enclose your answer in <related></related>." \
                                "\n3. Rank children from most to least related to the parent's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \

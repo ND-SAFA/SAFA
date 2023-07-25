@@ -8,6 +8,7 @@ $color-negative: var(--q-negative);
 $color-warning: var(--q-warning);
 
 $color-text: var(--q-text);
+$color-caption: var(--q-textCaption);
 $color-neutral: var(--q-neutral);
 $color-background: var(--q-background);
 $color-selected: var(--q-selected);
@@ -93,6 +94,10 @@ $color-node-generated: var(--q-nodeGenerated);
 
 .text-text {
   color: $color-text !important;
+}
+
+.text-textCaption {
+  color: $color-caption !important;
 }
 
 .text-nodeDefault {

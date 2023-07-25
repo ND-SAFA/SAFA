@@ -12,8 +12,10 @@ export enum Colors {
   black = "#1E1E1E",
 
   grey = "#41533F",
+  greyLight = "#bdbdbd",
   greyLightest = "#EDEFEB",
-  greyDark = "#333",
+  greyDark = "#616161",
+  greyDarkest = "#333",
 
   green = "#55A630",
   greenDark = "#488E27",
@@ -49,11 +51,13 @@ export const ThemeColors = {
   whiteBg: Colors.white,
   lightBg: Colors.greyLightest,
   lightText: Colors.grey,
+  lightTextCaption: Colors.greyDark,
   lightSelected: Colors.greyLightest,
 
   blackBg: Colors.black,
-  darkBg: Colors.greyDark,
+  darkBg: Colors.greyDarkest,
   darkText: Colors.white,
+  darkTextCaption: Colors.greyLight,
   darkSelected: Colors.greyLightest,
 
   added: Colors.green,
@@ -86,6 +90,7 @@ export const lightPalette: Record<string, string> = {
   positive: ThemeColors.added,
 
   text: ThemeColors.lightText,
+  textCaption: ThemeColors.lightTextCaption,
   neutral: ThemeColors.whiteBg,
   background: ThemeColors.lightBg,
   selected: ThemeColors.lightSelected,
@@ -114,6 +119,7 @@ export const darkPalette: Record<string, string> = {
   positive: ThemeColors.added,
 
   text: ThemeColors.darkText,
+  textCaption: ThemeColors.darkTextCaption,
   neutral: ThemeColors.blackBg,
   background: ThemeColors.darkBg,
   selected: ThemeColors.darkSelected,

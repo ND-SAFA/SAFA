@@ -21,6 +21,8 @@ INSTRUCTIONS_GOAL = "# Instructions\nPlease follow the instructions below to cre
                     "\nInstructions: "
 TASKS_DEFINITIONS = [
     "Create a sub-section called `Overview`. Provide a paragraph describing the main functionality of the system.",
+    "Create a sub-section called `Entities`. Enumerate and define each of the major entities in the system. "
+    "Also include a paragraph describing how the entities interact with each other.",
     "Create a sub-section called `Features`. Outline the major features of the software system. ",
     "Create a sub-section called `Major Components`. Within it, create a sub-section for each sub-system. "
     "For each sub-system, provide a paragraph describing its unique role in the overall system. "

@@ -15,7 +15,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Concisely describe the functionality of the parent within the context of the system. " \
                                "Describe the system functionality that lies directly within the responsibility of the parent." \
                                "Enclose your answer in <function></function>" \
-                               "\n2. List the children who lie directly within the scope of parent's functionality." \
+                               "\n2. List the children who provide a function for the parent." \
                                "Provide the list of children artifacts along with a sentence describing how it " \
                                "helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \

@@ -6,22 +6,25 @@ from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.state.state import State
 
 DEFAULT_RANKING_GOAL = "# Task\n\n" \
-                       "You are a software engineer on a software project. " \
-                       "You are given a parent software artifact and a list of potential children." \
-                       "You task is to find the children of the parent artifact.\n\n"
+                       "Below is a project you created. " \
+                       "You task is to find the children of each in the system parent artifact." \
+                       "This task is separated so that you are focusing on a single parent at a time. " \
+                       "Below is the parent software artifact and a list of potential children." \
+                       "\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "1. Concisely describe the functionality of the parent. " \
                                " Focus on the unique job of the parent in the context of the system." \
                                "Enclose your answer in <function></function>" \
-                               "\n2. List all artifacts that help implement the parent functionality. " \
-                               "Provide the list of artifacts along with a sentence describing how the artifact helps the parent. " \
-                               "Put each entry on different lines and follow the format: ID - RELATIONSHIP. " \
-                               "Enclose your answer in <related></related>." \
-                               "\n3. Rank the artifacts from most to least helpful to the implementation of parent's functionality. " \
+                               "\n2. Rank all the artifacts from most to least related to the parent's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related while the last element is the least. " \
-                               "Enclose the list in <links></links>."
-
+                               "Enclose the list in <links></links>." \
+                               "\n3. Extract the artifacts that implement the parent functionality. " \
+                               "Select only the primary children of the parent. " \
+                               "Provide the list of children artifacts along with a sentence describing how it " \
+                               "helps the parent achieve its functionality. " \
+                               "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \
+                               "Enclose your answer in <related></related>."
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 

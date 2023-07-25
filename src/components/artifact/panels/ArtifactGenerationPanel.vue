@@ -31,19 +31,14 @@
           hint="Generate multiple parent artifacts by clustering these type of artifacts by functionality."
         />
       </div>
-      <!--      <artifact-type-input-->
-      <!--        v-model="parentArtifactType"-->
-      <!--        label="Parent Artifact Type"-->
-      <!--        hint="The type of parent artifact to create."-->
-      <!--      />-->
-      <select-input
-        v-model="parentArtifactType"
+      <multiselect-input
+        v-model="parentArtifactTypes"
         :options="generateTypeOptions"
-        label="Parent Artifact Type"
-        hint="The type of parent artifact to create."
+        label="Parent Artifact Types"
+        hint="The type of parent artifacts to create. If multiple are selected, each type will be sequentially generated based on the past type."
       />
 
-      <flex-box full-width justify="end" t="2">
+      <flex-box full-width justify="end" t="3">
         <text-button
           :disabled="!canGenerate"
           :loading="artifactGenerationApiStore.artifactGenLoading"
@@ -81,8 +76,8 @@ import {
   TextButton,
   ArtifactInput,
   ArtifactTypeInput,
+  MultiselectInput,
 } from "@/components/common";
-import SelectInput from "@/components/common/input/SelectInput.vue";
 
 const generateTypeOptions = [
   "User Story",
@@ -94,13 +89,17 @@ const generateTypeOptions = [
 const mode = ref<"single" | "multiple">("single");
 const childArtifactIds = ref<string[]>([]);
 const childArtifactType = ref<string>("");
-const parentArtifactType = ref<string>("");
+const parentArtifactTypes = ref<string[]>([]);
 
 const canGenerate = computed(() => {
   if (mode.value === "single") {
-    return childArtifactIds.value.length > 0 && parentArtifactType.value !== "";
+    return (
+      childArtifactIds.value.length > 0 && parentArtifactTypes.value.length > 0
+    );
   } else {
-    return childArtifactType.value !== "" && parentArtifactType.value !== "";
+    return (
+      childArtifactType.value !== "" && parentArtifactTypes.value.length > 0
+    );
   }
 });
 
@@ -137,7 +136,7 @@ function handleReset(): void {
     childArtifactType.value = "";
   }
 
-  parentArtifactType.value = "";
+  parentArtifactTypes.value = [];
 }
 
 /**
@@ -148,14 +147,14 @@ function handleGenerate(): void {
     mode.value === "single"
       ? {
           artifacts: childArtifactIds.value,
-          targetType: parentArtifactType.value,
+          targetTypes: parentArtifactTypes.value,
           clusters: [childArtifactIds.value],
         }
       : {
           artifacts: artifactStore
             .getArtifactsByType(childArtifactType.value)
             .map(({ id }) => id),
-          targetType: parentArtifactType.value,
+          targetTypes: parentArtifactTypes.value,
         };
 
   artifactGenerationApiStore.handleGenerateArtifacts(config, {

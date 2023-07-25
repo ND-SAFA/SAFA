@@ -39,7 +39,7 @@ class VSMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, vectorizer: CountVectorizer = TfidfVectorizer,
-                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None):
+                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None, select_predictions: bool = True):
         """
         Initializes trainer with the datasets used for training + eval
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
@@ -54,6 +54,7 @@ class VSMTrainer(AbstractTrainer):
         self.model = vectorizer(strip_accents="ascii")
         self.metrics = metrics
         self.artifact_map = VSMTrainer.create_clean_artifact_map(self.trainer_dataset_manager, steps)
+        self.select_predictions = select_predictions
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
@@ -131,8 +132,9 @@ class VSMTrainer(AbstractTrainer):
                 prediction_entries.append(prediction_entry)
 
         self.convert_to_percentiles(prediction_entries)
-        selected_entries = RankingUtil.select_predictions(prediction_entries, parent_threshold=0.8)
-        metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, selected_entries)
+        if self.select_predictions:
+            prediction_entries = RankingUtil.select_predictions(prediction_entries, parent_threshold=0.8)
+        metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)
         return trace_prediction_output

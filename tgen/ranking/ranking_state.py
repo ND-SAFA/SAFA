@@ -20,7 +20,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \
                                "Enclose your answer in <related></related>." \
-                               "\n3. Rank all the artifacts from most to least related to the parent's functionality. " \
+                               "\n3. Rank children from most to least related to the parent's functionality. " \
                                "Provide the ranking as comma delimited list of artifact ids where the " \
                                "first element is the most related while the last element is the least. " \
                                "Enclose the list in <links></links>."

@@ -22,10 +22,12 @@ INSTRUCTIONS_GOAL = "# Instructions\nPlease follow the instructions below to cre
 TASKS_DEFINITIONS = [
     "Create a sub-section called `Overview`. Provide a paragraph describing the main functionality of the system.",
     "Create a sub-section called `Features`. Outline the major features of the software system. ",
-    "Create a sub-section called `Major Components`. Within it, create sub-sections for each major component in the system. "
-    "For each component, provide a paragraph describing its unique role in the software system "
-    "and the system artifacts that help implement it.",
-    "Create a sub-section called `Data Flow` and describe the dependencies between major components and how they interact to accomplish the listed features.",
+    "Create a sub-section called `Major Components`. Within it, create a sub-section for each sub-system. "
+    "For each sub-system, provide a paragraph describing its unique role in the overall system. "
+    "List system artifacts that are directly linked to that component. All child artifacts should have at least one parent. "
+    "Most children artifact should have a single parent and few will have many.",
+    "Create a sub-section called `Data Flow` and describe the dependencies between major sub-systems and components. "
+    "Highlight how they interact to accomplish the listed features.",
 ]
 FORMAT = "\n\n" \
          "Enclose your response in <summary></summary>."

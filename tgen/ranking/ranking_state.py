@@ -12,19 +12,19 @@ DEFAULT_RANKING_GOAL = "# Task\n\n" \
                        "Below is the parent software artifact and a list of potential children." \
                        "\n\n"
 DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
-                               "1. Concisely describe the functionality of the parent. " \
-                               " Focus on the unique job of the parent in the context of the system." \
+                               "1. Concisely describe the functionality of the parent within the context of the system. " \
+                               "Describe the system functionality that lies directly within the responsibility of the parent." \
                                "Enclose your answer in <function></function>" \
-                               "\n2. Rank all the artifacts from most to least related to the parent's functionality. " \
-                               "Provide the ranking as comma delimited list of artifact ids where the " \
-                               "first element is the most related while the last element is the least. " \
-                               "Enclose the list in <links></links>." \
-                               "\n3. Extract the artifacts that implement the parent functionality. " \
-                               "Select only the primary children of the parent. " \
+                               "\n2. List the children who lie directly within the scope of parent's functionality." \
                                "Provide the list of children artifacts along with a sentence describing how it " \
                                "helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \
-                               "Enclose your answer in <related></related>."
+                               "Enclose your answer in <related></related>." \
+                               "\n3. Rank all the artifacts from most to least related to the parent's functionality. " \
+                               "Provide the ranking as comma delimited list of artifact ids where the " \
+                               "first element is the most related while the last element is the least. " \
+                               "Enclose the list in <links></links>."
+
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
 

@@ -19,9 +19,7 @@ if [ $? -eq 0 ]; then
   echo "Docker image build successful! Starting $container_name ..."
 
   # Run the Docker container
-  docker-compose up -d $container_name
-
-  echo "Docker container started!"
+  docker-compose --env-file .env up -d $container_name && echo "Docker container started!"
 else
   echo "Docker image build failed!"
   exit 1

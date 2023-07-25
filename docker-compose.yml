@@ -22,8 +22,6 @@ services:
       - 4000:80
     depends_on:
       - tgen-rabbitmq
-    env_file:
-      - .env
     environment:
       - ENV_MODE=dev
     networks:

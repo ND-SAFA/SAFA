@@ -1,4 +1,3 @@
-import json
 import time
 from typing import Dict, Iterable, List, Tuple, Union
 
@@ -8,13 +7,12 @@ from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
-from transformers.trainer_utils import PredictionOutput
 
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
+from tgen.common.util.ranking_util import RankingUtil
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
 from tgen.core.trace_output.stage_eval import Metrics
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -114,7 +112,8 @@ class VSMTrainer(AbstractTrainer):
         :return: The output from the prediction
         """
         tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
-        predictions, source_target_pairs, link_ids = [], [], []
+        prediction_entries = []
+
         for tracing_request in tracing_requests:
             parent_artifacts = self.get_artifacts(tracing_request.parent_ids)
             child_artifacts = self.get_artifacts(tracing_request.child_ids)
@@ -128,18 +127,13 @@ class VSMTrainer(AbstractTrainer):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
 
-                predictions.append(similarity_score)
-                source_target_pairs.append((child_id, parent_id))  # source, target
-                link_ids.append(link_id)
+                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score)
+                prediction_entries.append(prediction_entry)
 
-        metrics = None
-        if eval_dataset.trace_df.get_label_count(1) > 0:
-            metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
-                if self.metrics else None
-            logger.log_with_title("VSM Metrics", json.dumps(metrics))
-        prediction_output = PredictionOutput(predictions=predictions, label_ids=None, metrics=metrics)
-        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output,
-                                                        source_target_pairs=source_target_pairs,
+        self.convert_to_percentiles(prediction_entries)
+        selected_entries = RankingUtil.select_predictions(prediction_entries, parent_threshold=0.8)
+        metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, selected_entries)
+        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)
         return trace_prediction_output
 
@@ -211,3 +205,19 @@ class VSMTrainer(AbstractTrainer):
         :return: None
         """
         pass
+
+    @staticmethod
+    def convert_to_percentiles(predictions: List[TracePredictionEntry]):
+        parent2preds = {}
+        for p in predictions:
+            parent_id = p["target"]
+            if parent_id not in parent2preds:
+                parent2preds[parent_id] = []
+            parent2preds[parent_id].append(p)
+
+        for parent, preds in parent2preds.items():
+            preds = sorted(preds, key=lambda p: p["score"], reverse=True)
+            n_preds = len(preds)
+            scores = RankingUtil.assign_scores_to_targets(n_preds)
+            for p, s in zip(preds, scores):
+                p["score"] = s

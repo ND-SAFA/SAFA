@@ -9,7 +9,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -28,7 +28,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader, data_cleaner: DataCleaner = None,
-                 remove_orphans: bool = True,
+                 remove_orphans: bool = REMOVE_ORPHANS_DEFAULT,
                  allowed_missing_sources: int = ALLOWED_MISSING_SOURCES_DEFAULT,
                  allowed_missing_targets: int = ALLOWED_MISSING_TARGETS_DEFAULT,
                  allowed_orphans: int = ALLOWED_ORPHANS_DEFAULT):

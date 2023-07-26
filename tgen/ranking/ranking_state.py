@@ -16,8 +16,11 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "Describe the system functionality that lies directly within the responsibility of the parent." \
                                "Enclose your answer in <function></function>" \
                                "\n2. Read each potential children artifacts in order. " \
-                               "If the artifact provides a function for the parent or references " \
-                               "provide its ID and a sentence describing how it helps the parent achieve its functionality. " \
+                               "Decide whether the artifact is related to the parent or not. " \
+                               "Use a loose definition of related in this step. " \
+                               "Please each artifact entry on a new line and answer as: ID - Answer" \
+                               "\n3. For each related artifact, " \
+                               "provide a sentence describing how it helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \
                                "Work through one artifact at a time so that the IDs are in ascending order. " \
                                "Enclose your answer in <related></related>." \

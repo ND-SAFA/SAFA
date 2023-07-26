@@ -18,7 +18,7 @@ DEFAULT_RANKING_INSTRUCTIONS = "# Instructions\n" \
                                "\n2. Read each potential children artifacts in order. " \
                                "Decide whether the artifact is related to the parent or not. " \
                                "Use a loose definition of related in this step. " \
-                               "Please each artifact entry on a new line and answer as: ID - Answer" \
+                               "Format your answer as: ID - Yes/No. Enclose your answer in <classification></classification>." \
                                "\n3. For each related artifact, " \
                                "provide a sentence describing how it helps the parent achieve its functionality. " \
                                "Put each entry on different lines and follow the format: ID - DESCRIPTION. " \

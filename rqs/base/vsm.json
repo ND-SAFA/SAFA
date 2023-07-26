@@ -12,14 +12,14 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa-vsm-testing"
+                "project_path": "~/desktop/joc-vsm-testing"
               }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa-vsm-testing"
+                "project_path": "~/desktop/joc-vsm-testing"
               }
             }
           }

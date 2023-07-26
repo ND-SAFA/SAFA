@@ -61,13 +61,13 @@
           @click="documentStore.addDocumentOfNeighborhood(props.artifact)"
         />
         <icon-button
-          v-if="showHiddenChildren"
+          v-if="showHiddenChildren && hasSubtree"
           tooltip="Show subtree"
           icon="group-open-all"
           @click="subtreeStore.showSubtree(id)"
         />
         <icon-button
-          v-else
+          v-else-if="hasSubtree"
           tooltip="Hide subtree"
           icon="group-close-all"
           @click="subtreeStore.hideSubtree(id)"
@@ -172,6 +172,9 @@ const displayName = computed(
     props.artifact.name
 );
 
+const hasSubtree = computed(
+  () => subtreeStore.getChildren(id.value).length > 0
+);
 const hiddenChildren = computed(() => subtreeStore.getHiddenChildren(id.value));
 const hiddenChildrenLabel = computed(() =>
   hiddenChildren.value.length === 1

@@ -57,7 +57,7 @@ import {
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
-import { typeOptionsStore } from "@/hooks";
+import { typeOptionsStore, useTheme } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { Icon } from "../icon";
 import Chip from "./Chip.vue";
@@ -70,6 +70,8 @@ const emit = defineEmits<{
    */
   (e: "remove"): void;
 }>();
+
+const { darkMode } = useTheme();
 
 const enumerated = computed(() => props.approvalType || props.deltaType);
 
@@ -140,9 +142,14 @@ const trackColor = computed(() => {
   }
 });
 
-const chipClassName = computed(() =>
-  enumerated.value
-    ? "q-mr-sm bg-neutral attribute-chip"
-    : "qmr-sm bd-primary bg-neutral attribute-chip"
+const bgClassName = computed(() =>
+  darkMode.value ? "bg-background " : "bg-neutral "
+);
+
+const chipClassName = computed(
+  () =>
+    "q-mr-sm attribute-chip " +
+    bgClassName.value +
+    (enumerated.value ? "" : "bd-primary")
 );
 </script>

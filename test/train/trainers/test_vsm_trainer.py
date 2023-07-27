@@ -15,7 +15,7 @@ from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 class TestVSMTrainer(BaseTraceTest):
     EXPECTED_PREDICTION_SIZE = TestDataManager.get_n_candidates()
-    TEST_METRIC_DEFINITION = [["accuracy", ["accuracy"]], ["map", ["map"]],
+    TEST_METRIC_DEFINITION = [["map", ["map"]],
                               ["f", ["f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]
 

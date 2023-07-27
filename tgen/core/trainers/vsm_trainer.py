@@ -136,8 +136,8 @@ class VSMTrainer(AbstractTrainer):
                 prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
-        self.convert_to_percentiles(prediction_entries)
         if self.select_predictions:
+            self.convert_to_percentiles(prediction_entries)
             prediction_entries = RankingUtil.select_predictions(prediction_entries)
         metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,

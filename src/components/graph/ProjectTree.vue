@@ -19,6 +19,7 @@
         :trace="traceLink"
         :artifacts-in-view="artifactsInView"
       />
+      <cy-context-menu />
     </template>
     <template v-else #elements>
       <tim-node
@@ -67,6 +68,7 @@ import {
 import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
 import CytoscapeController from "./CytoscapeController.vue";
+import { CyContextMenu } from "./base";
 import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";
 

@@ -9,7 +9,7 @@
  * A wrapper for managing an element within a Cytoscape graph.
  */
 export default {
-  name: "Cytoscape",
+  name: "CyElement",
 };
 </script>
 

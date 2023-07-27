@@ -18,12 +18,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: .env
     ports:
       - 4000:80
     depends_on:
       - tgen-rabbitmq
-    environment:
-      - ENV_MODE=dev
     networks:
       - app_network
 networks:

@@ -120,7 +120,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.modificationType = modificationType;
         traceLinkVersion.traceLink = traceLink;
         traceLinkVersion.explanation = traceAppEntity.getExplanation();
-        System.out.println("Trace link version:" + traceLinkVersion);
         return traceLinkVersion;
     }
 
@@ -143,11 +142,6 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
 
     public TraceLinkVersion withTraceLink(TraceLink traceLink) {
         setTraceLink(traceLink);
-        return this;
-    }
-
-    public TraceLinkVersion withTraceType(TraceType traceType) {
-        setTraceType(traceType);
         return this;
     }
 

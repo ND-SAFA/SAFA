@@ -42,7 +42,6 @@ public abstract class CommitJob extends AbstractJob {
         super(jobDbEntity, serviceProvider);
         this.projectService = serviceProvider.getProjectService();
         this.versionService = serviceProvider.getVersionService();
-
         this.projectCommit = projectCommit;
     }
 
@@ -86,7 +85,7 @@ public abstract class CommitJob extends AbstractJob {
         Project project = new Project(name, description);
         projectService.saveProjectWithUserAsOwner(project, owner);
 
-        createdProjectVersion = versionService.createInitialProjectVersion(project);
+        this.createdProjectVersion = versionService.createInitialProjectVersion(project);
         projectCommit = new ProjectCommit(createdProjectVersion, false);
         return createdProjectVersion;
     }
@@ -97,5 +96,9 @@ public abstract class CommitJob extends AbstractJob {
             this.getDbLogger().log("Job failed, deleting job.");
             projectService.deleteProject(createdProjectVersion.getProject());
         }
+    }
+
+    protected void setCreatedProjectVersion(ProjectVersion projectVersion) {
+        this.createdProjectVersion = projectVersion;
     }
 }

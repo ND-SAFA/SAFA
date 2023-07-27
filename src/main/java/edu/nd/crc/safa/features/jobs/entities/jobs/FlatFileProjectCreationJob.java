@@ -73,6 +73,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.projectVersion = projectVersion;
         this.files = files;
         this.shouldSummarize = shouldSummarize;
+        this.setCreatedProjectVersion(projectVersion);
     }
 
     @IJobStep(value = "Uploading Flat Files", position = 1)

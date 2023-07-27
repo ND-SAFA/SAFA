@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.eclipse.elk.core.options.CoreOptions;
+import org.eclipse.elk.core.options.HierarchyHandling;
 import org.eclipse.elk.graph.ElkGraphFactory;
 import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
@@ -82,6 +83,7 @@ public class ElkGraphCreator {
 
         elkNode.setDimensions(LayoutSettings.ARTIFACT_WIDTH, LayoutSettings.ARTIFACT_HEIGHT);
         elkNode.setProperty(CoreOptions.ALGORITHM, LAYOUT_ALGORITHM);
+        elkNode.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN);
 
         return elkNode;
     }

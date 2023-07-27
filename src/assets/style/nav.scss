@@ -50,6 +50,7 @@
 
 .nav-search-prompt {
   width: 600px;
+  min-width: 130px !important;
   max-width: 40vw;
 
   & > .q-field__inner > .q-field__control {

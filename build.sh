@@ -19,7 +19,7 @@ if [ $? -eq 0 ]; then
   echo "Docker image build successful! Starting $container_name ..."
 
   # Run the Docker container
-  docker run --env-file .env -d --name $container_name $container_name
+  docker run --env-file .env -p 4000:80 -d --name $container_name $container_name
 else
   echo "Docker image build failed!"
   exit 1

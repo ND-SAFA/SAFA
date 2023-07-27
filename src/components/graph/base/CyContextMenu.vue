@@ -1,9 +1,16 @@
 <template>
-  <div
-    v-if="display"
-    id="cy-context-menu"
-    :style="'background-color: red; width: 5px; height: 5px;' + style"
-  >
+  <div v-if="display" id="cy-context-menu" :style="style">
+    <div
+      style="
+        background-color: red;
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      "
+    ></div>
     <slot />
   </div>
 </template>

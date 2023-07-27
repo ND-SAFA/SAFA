@@ -1,6 +1,6 @@
 <template>
   <q-tr :props="props.quasarProps" class="cursor-pointer" @click="handleExpand">
-    <q-td>
+    <q-td class="data-table-cell-300">
       <icon-button
         tooltip="Toggle expand"
         :icon="props.expanded ? 'down' : 'up'"
@@ -34,6 +34,7 @@
   </q-tr>
   <q-tr v-show="props.expanded" :props="props.quasarProps">
     <q-td colspan="100%">
+      <typography variant="caption" :value="props.job.name" />
       <stepper
         minimal
         dense-labels

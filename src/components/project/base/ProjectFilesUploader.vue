@@ -91,6 +91,7 @@ async function handleCreate() {
     {
       onSuccess: () => {
         selectedFiles.value = [];
+        identifierSaveStore.resetIdentifier();
         emit("submit");
       },
     }

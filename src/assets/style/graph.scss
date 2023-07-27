@@ -7,6 +7,11 @@ $graph-border-radius: 8px;
   min-height: inherit !important;
 }
 
+.cy-container {
+  overflow: hidden;
+  position: relative;
+}
+
 .artifact-view {
   opacity: 0;
 
@@ -27,47 +32,98 @@ $graph-border-radius: 8px;
 
 // Graph Nodes
 
-.artifact-svg-wrapper {
-  // Node Border
-  //.artifact-border { fill: $color-node-default; }
-  &.artifact-svg-delta-ADDED > .artifact-border { fill: $color-added; }
-  &.artifact-svg-delta-MODIFIED > .artifact-border { fill: $color-modified; }
-  &.artifact-svg-delta-REMOVED > .artifact-border { fill: $color-removed; }
-  .artifact-border.artifact-warning { fill: $color-flagged; }
-
-  // Node Background
-  .artifact-svg { fill: $color-background; }
-  .artifact-svg.artifact-warning { fill: $color-flagged-bg; }
-
-  // Node Divider
-  &.artifact-svg-delta-ADDED > .artifact-svg-div { stroke: $color-added; }
-  &.artifact-svg-delta-MODIFIED > .artifact-svg-div { stroke: $color-modified; }
-  &.artifact-svg-delta-REMOVED > .artifact-svg-div { stroke: $color-removed; }
-
-  // Node Highlight
-  &:hover > .artifact-svg {
-    fill: $color-neutral;
-    filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
-  }
-
-    // Node Highlight Border
-  &.artifact-svg-delta-NO_CHANGE:hover > .artifact-border {
-    fill: $color-primary;
-  }
-
-    // Node Highlight Divider
-  &.artifact-svg-delta-NO_CHANGE:hover > .artifact-svg-div {
-    stroke: $color-primary;
-  }
+.cy-node-position {
+  position: absolute;
+  z-index: 1;
+  webkit-transform-origin: top left;
+  ms-transform-origin: top left;
+  transform-origin: top left;
 }
 
-.artifact-text.text-body-1 {
-  display: block;
-  text-align: center;
-  font-weight: 800 !important;
-  font-size: 1.2rem !important;
-}
+.cy-node-display {
+  border-width: 3px !important;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: $color-background;
+  cursor: pointer;
 
-.tim-svg-wrapper {
-  margin-top: 7px;
+  &:hover, &.cy-node-selected {
+    background-color: $color-neutral;
+    box-shadow: rgba(0, 0, 0, 0.24) 1px 3px 8px !important;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  & > .cy-node-title {
+    max-height: 47px;
+  }
+
+  & > .cy-node-subtitle {
+    max-height: 71px;
+  }
+
+  & > .cy-node-title, & > .cy-node-subtitle {
+    border-radius: 0px !important;
+    overflow: hidden;
+    text-align: center;
+
+    & > span {
+      text-overflow: ellipsis;
+      line-height: 20px !important;
+    }
+  }
+
+  & > .cy-node-separator {
+    height: 3px;
+    border-radius: 1px;
+  }
+
+  &.cy-node-tim {
+    text-align: center;
+    width: 252px;
+    height: 152px;
+  }
+
+  &.cy-node-artifact {
+    width: 206px;
+    height: 160px;
+  }
+
+  &.cy-node-sidebar {
+    position: absolute;
+    left: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &.cy-node-footer {
+    position: inherit;
+    width: 206px;
+    height: 40px;
+    margin-top: 4px
+  }
+
+  & > .cy-node-delta-footer {
+    position: absolute;
+    top: 0;
+    left: 28%;
+  }
+
+  & > .cy-node-delta-chip {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 98%;
+    height: 10px;
+    border-radius: 5px;
+
+    & > .cy-node-delta-child-chip {
+      height: 10px;
+      border-radius: 5px;
+      width: 32.5%;
+      margin-right: 2px;
+    }
+  }
 }

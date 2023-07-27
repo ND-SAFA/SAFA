@@ -1,4 +1,3 @@
-import nodeHtmlLabel from "cytoscape-node-html-label";
 import klay from "cytoscape-klay";
 import automove from "cytoscape-automove";
 import contextMenus from "cytoscape-context-menus";
@@ -33,10 +32,6 @@ export const artifactTreeGraph: CytoCoreGraph = {
   },
   saveCy: artifactTreeResolveCy,
   plugins: [
-    {
-      initialize: nodeHtmlLabel,
-      afterInit: () => undefined,
-    },
     {
       initialize: klay,
       afterInit: () => undefined,

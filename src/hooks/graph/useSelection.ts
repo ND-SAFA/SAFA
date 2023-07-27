@@ -7,6 +7,7 @@ import {
   TimTraceMatrixSchema,
   TraceLinkSchema,
 } from "@/types";
+import { LARGE_NODE_COUNT, sanitizeNodeId } from "@/util";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -110,36 +111,36 @@ export const useSelection = defineStore("selection", {
   },
   actions: {
     /**
-     * Clears any selected artifact(s) in artifact tree.
+     * Clears any selected elements in the graph.
+     * Each clear is wrapped in an if-statement to help improve performance on large graphs.
      *
      * @param clearFilter - Whether to clear the filter types.
      */
     clearSelections(clearFilter = false): void {
-      this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
-      this.selectedSubtreeIds = [];
-      this.selectedGroupIds = [];
-      this.selectedArtifactId = "";
-      this.selectedTraceLinkIds = ["", ""];
-      this.selectedArtifactLevelType = "";
-      this.selectedTraceMatrixTypes = ["", ""];
-      appStore.closeSidePanels();
-    },
-    /**
-     * Sets the viewport to the given artifact and its subtree.
-     *
-     * @param artifactId - The artifact id to select and view.
-     */
-    viewArtifactSubtree(artifactId: string): void {
-      const artifactsInSubtree = [
-        ...(subtreeStore.subtreeMap[artifactId]?.subtree || []),
-        artifactId,
-      ];
-
-      this.selectArtifact(artifactId);
-      this.filterGraph({
-        type: "subtree",
-        artifactsInSubtree,
-      });
+      if (this.ignoreTypes.length > 0) {
+        this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
+      }
+      if (this.selectedSubtreeIds.length > 0) {
+        this.selectedSubtreeIds = [];
+      }
+      if (this.selectedGroupIds.length > 0) {
+        this.selectedGroupIds = [];
+      }
+      if (this.selectedArtifactId) {
+        this.selectedArtifactId = "";
+      }
+      if (this.selectedTraceLinkIds[0]) {
+        this.selectedTraceLinkIds = ["", ""];
+      }
+      if (this.selectedArtifactLevelType) {
+        this.selectedArtifactLevelType = "";
+      }
+      if (this.selectedTraceMatrixTypes[0]) {
+        this.selectedTraceMatrixTypes = ["", ""];
+      }
+      if (appStore.isDetailsPanelOpen) {
+        appStore.closeSidePanels();
+      }
     },
     /**
      * Moves the viewport such that given set of artifacts is in the middle of the viewport.
@@ -160,20 +161,30 @@ export const useSelection = defineStore("selection", {
       );
     },
     /**
-     * Repositions the currently selected subtree of artifacts.
-     */
-    repositionSelectedSubtree(): void {
-      cyIfNotAnimated(() => this.centerOnArtifacts(this.selectedSubtreeIds));
-    },
-    /**
      * Sets the given artifact as selected.
+     * To improve performance on large graphs, this function does the following:
+     * - Clear selected trace links and nothing else.
+     * - Only highlight the related artifacts on smaller graphs.
      *
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
-      this.clearSelections();
+      this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
-      this.centerOnArtifacts([artifactId]);
+
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+        this.centerOnArtifacts([artifactId]);
+      } else {
+        this.filterGraph({
+          type: "subtree",
+          nodeIds: [
+            ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
+            artifactId,
+          ],
+          centerIds: [artifactId],
+        });
+      }
+
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -192,13 +203,27 @@ export const useSelection = defineStore("selection", {
     /**
      * Sets the given trace links as selected.
      *
+     * To improve performance on large graphs, this function does the following:
+     * - Clear selected artifact and nothing else.
+     * - Only highlight the related artifacts on smaller graphs.
+     *
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
-      this.clearSelections();
-      this.selectedTraceLinkIds = [traceLink.sourceId, traceLink.targetId];
-      this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
-      this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
+      const nodeIds: [string, string] = [
+        traceLink.sourceId,
+        traceLink.targetId,
+      ];
+
+      this.selectedArtifactId = "";
+      this.selectedTraceLinkIds = nodeIds;
+
+      if (artifactStore.currentArtifacts.length > LARGE_NODE_COUNT) {
+        this.centerOnArtifacts(nodeIds);
+      } else {
+        this.filterGraph({ type: "subtree", nodeIds });
+      }
+
       appStore.openDetailsPanel("displayTrace");
     },
     /**
@@ -209,7 +234,10 @@ export const useSelection = defineStore("selection", {
     selectArtifactLevel(artifactType: string): void {
       this.clearSelections();
       this.selectedArtifactLevelType = artifactType;
-      this.centerOnArtifacts([artifactType]);
+      this.filterGraph({
+        type: "subtree",
+        nodeIds: [sanitizeNodeId(artifactType)],
+      });
       appStore.openDetailsPanel("displayArtifactLevel");
     },
     /**
@@ -219,9 +247,14 @@ export const useSelection = defineStore("selection", {
      * @param targetType - The artifact target type to select.
      */
     selectTraceMatrix(sourceType: string, targetType: string): void {
+      const nodeIds = [
+        sanitizeNodeId(sourceType),
+        sanitizeNodeId(targetType),
+      ] as [string, string];
+
       this.clearSelections();
-      this.selectedTraceMatrixTypes = [sourceType, targetType];
-      this.centerOnArtifacts([sourceType, targetType]);
+      this.selectedTraceMatrixTypes = nodeIds;
+      this.filterGraph({ type: "subtree", nodeIds });
       appStore.openDetailsPanel("displayTraceMatrix");
     },
     /**
@@ -239,17 +272,12 @@ export const useSelection = defineStore("selection", {
           );
         }
       } else if (filterAction.type === "subtree") {
-        this.selectedSubtreeIds = filterAction.artifactsInSubtree;
-        this.repositionSelectedSubtree();
+        this.selectedSubtreeIds = filterAction.nodeIds;
+
+        cyIfNotAnimated(() =>
+          this.centerOnArtifacts(filterAction.centerIds || filterAction.nodeIds)
+        );
       }
-    },
-    /**
-     * Adds an artifact to the current selection.
-     *
-     * @param artifactId - The artifact to add.
-     */
-    addToSelectedGroup(artifactId: string): void {
-      this.selectedGroupIds = [...this.selectedGroupIds, artifactId];
     },
     /**
      * Returns whether an artifact is within those selected.

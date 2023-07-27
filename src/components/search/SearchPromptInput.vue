@@ -167,7 +167,7 @@ watch(
       artifacts.length === 1 &&
       typeof artifacts[0] === "object"
     ) {
-      selectionStore.viewArtifactSubtree(artifacts[0].id);
+      selectionStore.selectArtifact(artifacts[0].id);
     } else {
       selectionStore.clearSelections();
     }

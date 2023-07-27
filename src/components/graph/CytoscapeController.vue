@@ -1,13 +1,14 @@
 <template>
-  <cytoscape3
+  <cytoscape
     :id="id"
     class="cy-container bg-neutral"
     :config="props.cytoCoreGraph.config"
     :pre-config="preConfig"
     :after-created="afterCreated"
+    @click="emit('click', $event)"
   >
     <slot v-if="initialized" name="elements" />
-  </cytoscape3>
+  </cytoscape>
 </template>
 
 <script lang="ts">
@@ -21,13 +22,18 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { EventObject } from "cytoscape";
 import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
 import { logStore } from "@/hooks";
-import { Cytoscape3 } from "./base";
+import { Cytoscape } from "./base";
 
 const props = defineProps<{
   cytoCoreGraph: CytoCoreGraph;
   id: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "click", event: EventObject): void;
 }>();
 
 const initialized = ref(false);

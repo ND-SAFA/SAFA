@@ -9,7 +9,7 @@
     :row-key="props.rowKey"
     :loading="props.loading"
     :expanded="props.expandable ? expandedRows : undefined"
-    :sort="(r) => r"
+    :sort="handleSort"
     separator="cell"
   >
     <template #top="scope">
@@ -108,18 +108,34 @@ const groupedRows = computed(() => {
     rowsByGroup[group] = [...(rowsByGroup[group] || []), row];
   });
 
-  return Object.entries(rowsByGroup)
-    .map(([$groupValue, rows]) => [
-      {
-        id: `${groupBy.value}::${$groupValue}`,
-        $groupValue,
-        $groupBy: groupBy.value,
-        $groupRows: rows.length,
-      },
-      ...rows,
-    ])
-    .reduce((acc, cur) => [...acc, ...cur], []);
+  let sortIdx = 0;
+
+  return Object.entries(rowsByGroup).flatMap(([$groupValue, rows]) => [
+    {
+      id: `${groupBy.value}::${$groupValue}`,
+      [String(props.rowKey)]: `${groupBy.value}::${$groupValue}`,
+      $groupValue,
+      $groupBy: groupBy.value,
+      $groupRows: rows.length,
+      $sortIdx: sortIdx++,
+    },
+    ...rows.map((row) => ({ ...row, $sortIdx: sortIdx++ })),
+  ]);
 });
+
+/**
+ * Handles sorting of rows.
+ * @param rows - The rows to sort.
+ * @returns The sorted rows.
+ */
+function handleSort(rows: TableRow[]): TableRow[] {
+  const getSortIndex = (row: TableRow): number =>
+    typeof row.$sortIdx === "number" ? row.$sortIdx : 0;
+
+  return rows.sort(
+    (before, after) => getSortIndex(before) - getSortIndex(after)
+  );
+}
 
 watch(
   () => groupBy.value,

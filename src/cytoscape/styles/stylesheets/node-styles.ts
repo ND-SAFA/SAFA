@@ -7,7 +7,6 @@ import {
   ARTIFACT_HEIGHT,
   ARTIFACT_NODE_SELECTOR,
   ARTIFACT_PADDING,
-  ARTIFACT_SELECTED_BORDER_WIDTH,
   ARTIFACT_SHAPE,
   ARTIFACT_WIDTH,
   NODE_BORDER_WIDTH,
@@ -39,12 +38,6 @@ export const nodeStyles: CytoStyleSheet[] = [
     selector: `${ARTIFACT_NODE_SELECTOR}[?dark]`,
     style: {
       "background-color": NODE_BG_COLOR.DARK,
-    },
-  },
-  {
-    selector: `${ARTIFACT_NODE_SELECTOR}[?isSelected]`,
-    style: {
-      "border-width": ARTIFACT_SELECTED_BORDER_WIDTH,
     },
   },
   // FTA Logic

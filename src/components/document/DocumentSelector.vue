@@ -108,8 +108,6 @@ const document = computed({
 
 const disabled = computed(() => deltaStore.inDeltaView);
 
-console.log(disabled.value);
-
 /**
  * Returns whether a document can be saved.
  * @param doc - The document to check.

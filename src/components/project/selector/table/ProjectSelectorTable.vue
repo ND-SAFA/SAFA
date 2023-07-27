@@ -53,7 +53,11 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IdentifierSchema, ProjectRole } from "@/types";
-import { projectExpandedColumns, projectNameColumn } from "@/util";
+import {
+  actionsColumn,
+  projectExpandedColumns,
+  projectNameColumn,
+} from "@/util";
 import {
   getProjectApiStore,
   identifierSaveStore,
@@ -101,7 +105,7 @@ const selectedItems = computed({
 
 const columns = computed(() =>
   props.minimal
-    ? [projectNameColumn]
+    ? [projectNameColumn, actionsColumn]
     : [projectNameColumn, ...projectExpandedColumns]
 );
 

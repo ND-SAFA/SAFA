@@ -57,6 +57,10 @@ export interface TraceLinkSchema extends LinkSchema {
    * The type of trace.
    */
   traceType: TraceType;
+  /**
+   * The explanation of why a trace link was generated.
+   */
+  explanation?: string;
 }
 
 /**

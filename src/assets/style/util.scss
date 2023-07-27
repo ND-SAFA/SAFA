@@ -59,3 +59,11 @@
     opacity: 1;
   }
 }
+
+// Sticky
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

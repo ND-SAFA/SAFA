@@ -3,22 +3,21 @@ import { defineStore } from "pinia";
 import { LayoutOptions, NodeSingular } from "cytoscape";
 import {
   LayoutPositionsSchema,
-  IGraphLayout,
+  CyLayout,
   LayoutPayload,
   PositionSchema,
   GraphMode,
 } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import {
-  ArtifactGraphLayout,
   artifactTreeCyPromise,
   cyApplyAutomove,
   cyCreateLayout,
   cyResetTim,
   cyResetTree,
   disableDrawMode,
-  TimGraphLayout,
   timTreeCyPromise,
+  GraphLayout,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
 import { appStore } from "@/hooks/core";
@@ -41,7 +40,7 @@ export const useLayout = defineStore("layout", {
     /**
      * The current graph layout.
      */
-    layout: undefined as IGraphLayout | undefined,
+    layout: undefined as CyLayout | undefined,
     /**
      * The current view mode of the graph.
      */
@@ -125,7 +124,7 @@ export const useLayout = defineStore("layout", {
      * Generates a new layout if in TIM view, or if no positions are set.
      */
     setArtifactTreeLayout(): void {
-      const layout = new ArtifactGraphLayout();
+      const layout = GraphLayout.createArtifactLayout();
       const payload = { layout, cyPromise: artifactTreeCyPromise };
       const generateLayout =
         this.mode === GraphMode.tim ||
@@ -137,7 +136,7 @@ export const useLayout = defineStore("layout", {
      * Resets the graph layout of the TIM tree.
      */
     setTimTreeLayout(): void {
-      const layout = new TimGraphLayout();
+      const layout = GraphLayout.createTimLayout();
       const payload = { layout, cyPromise: timTreeCyPromise };
 
       this.setGraphLayout(payload, true);

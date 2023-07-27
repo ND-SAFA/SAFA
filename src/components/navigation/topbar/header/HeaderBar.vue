@@ -1,7 +1,13 @@
 <template>
   <div class="full-width">
-    <flex-box full-width :wrap="false" justify="between" align="center" y="2">
-      <flex-box align="center">
+    <flex-box
+      full-width
+      :wrap="smallWindow"
+      justify="between"
+      align="center"
+      y="2"
+    >
+      <flex-box align="center" :y="smallWindow ? '2' : ''">
         <project-selector />
         <version-selector />
       </flex-box>
@@ -30,6 +36,7 @@ export default {
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { computed } from "vue";
+import { useScreen } from "@/hooks";
 import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
@@ -38,6 +45,8 @@ import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();
+
+const { smallWindow } = useScreen();
 
 const graphVisible = computed(() => currentRoute.path === Routes.ARTIFACT);
 </script>

@@ -2,26 +2,25 @@
   <div>
     <flex-box v-if="!showOnly" full-width y="1" justify="between" :wrap="false">
       <artifact-body-display
+        v-if="sourceArtifact"
         :artifact="sourceArtifact"
         display-title
         display-divider
+        default-expanded
       />
       <separator vertical />
       <artifact-body-display
+        v-if="targetArtifact"
         :artifact="targetArtifact"
         display-title
         display-divider
+        default-expanded
       />
     </flex-box>
 
-    <typography
-      v-else
-      default-expanded
-      t="1"
-      variant="expandable"
-      :value="
-        showOnly === 'source' ? sourceArtifact?.body : targetArtifact?.body
-      "
+    <artifact-content-display
+      v-else-if="showOnlyArtifact"
+      :artifact="showOnlyArtifact"
     />
   </div>
 </template>
@@ -40,8 +39,8 @@ import { computed } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
 import {
-  Typography,
   ArtifactBodyDisplay,
+  ArtifactContentDisplay,
   FlexBox,
   Separator,
 } from "@/components/common";
@@ -62,5 +61,9 @@ const sourceArtifact = computed(() =>
 );
 const targetArtifact = computed(() =>
   artifactStore.getArtifactById(props.trace.targetId)
+);
+
+const showOnlyArtifact = computed(() =>
+  props.showOnly === "source" ? sourceArtifact.value : targetArtifact.value
 );
 </script>

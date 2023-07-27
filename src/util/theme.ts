@@ -3,6 +3,7 @@ import {
   ArtifactDeltaState,
   DeltaType,
   JobStatus,
+  MessageType,
   ThemeColor,
 } from "@/types";
 
@@ -10,79 +11,69 @@ export enum Colors {
   white = "#FFFFFF",
   black = "#1E1E1E",
 
-  greyDarkest = "#272727",
-  greyDark = "#333",
-  grey = "#36405A",
-  greyLight = "#94969e",
-  greyLightest = "#F0F5FF",
+  grey = "#41533F",
+  greyLight = "#bdbdbd",
+  greyLightest = "#EDEFEB",
+  greyDark = "#616161",
+  greyDarkest = "#333",
 
-  green = "#00AD69",
-  greenLight = "#6CD8A9",
-  greenLightest = "#A9F6D5",
-  greenDark = "#188958",
+  green = "#55A630",
+  greenDark = "#488E27",
 
-  blue = "#5975B8",
-  blueLight = "#729FCF",
-  blueLightest = "#B0D6FF",
-  blueDark = "#204184",
+  blue = "#3055A6",
 
-  red = "#E11F26",
-  redLight = "#E27171",
-  redLightest = "#FFA5A5",
-  redDark = "#AF001E",
+  red = "#A63055",
+  redLight = "#D51552",
 
-  orange = "#F5B53F",
-  orangeLight = "#FFD592",
-  orangeDark = "#DD8300",
+  orange = "#fb8500",
 
-  brownLight = "#DCBA82",
-  brownDark = "#CD9291",
+  brown = "#b6ad90",
+  brownDark = "#a68a64",
 
-  gradient1 = "#9EF01A",
-  gradient2 = "#77D241",
-  gradient3 = "#4FB468",
-  gradient4 = "#28958F",
-  gradient5 = "#0077B6",
+  gradient1 = "#81C644",
+  gradient2 = "#61AD73",
+  gradient3 = "#4194A2",
+  gradient4 = "#207BD0",
+  gradient5 = "#0062FF",
 }
 
 /**
  * Defines all colors in the theme.
  */
 export const ThemeColors = {
-  primary: Colors.blue,
-  primaryDark: Colors.blueLight,
-  secondary: Colors.orange,
-  accent: Colors.orangeLight,
+  primary: Colors.greenDark,
+  primaryDark: Colors.green,
+  secondary: Colors.green,
+  accent: Colors.green,
   error: Colors.red,
+  errorDark: Colors.redLight,
 
   whiteBg: Colors.white,
   lightBg: Colors.greyLightest,
   lightText: Colors.grey,
+  lightTextCaption: Colors.greyDark,
   lightSelected: Colors.greyLightest,
 
   blackBg: Colors.black,
-  darkBg: Colors.greyDark,
+  darkBg: Colors.greyDarkest,
   darkText: Colors.white,
+  darkTextCaption: Colors.greyLight,
   darkSelected: Colors.greyLightest,
 
   added: Colors.green,
-  addedBg: Colors.greenLightest,
-  addedBd: Colors.greenDark,
-
   modified: Colors.blue,
-  modifiedBg: Colors.blueLightest,
-  modifiedBd: Colors.blueDark,
-
   removed: Colors.red,
-  removedBg: Colors.redLightest,
-  removedBd: Colors.redDark,
-
   warning: Colors.orange,
-  warningBg: Colors.orangeLight,
-  warningBd: Colors.orangeDark,
+  unchanged: Colors.grey,
 
   nodeDefault: Colors.brownDark,
-  nodeGenerated: Colors.brownLight,
+  nodeGenerated: Colors.brown,
+
+  nodeGradient1: Colors.gradient1,
+  nodeGradient2: Colors.gradient2,
+  nodeGradient3: Colors.gradient3,
+  nodeGradient4: Colors.gradient4,
+  nodeGradient5: Colors.gradient5,
 };
 
 /**
@@ -99,18 +90,16 @@ export const lightPalette: Record<string, string> = {
   positive: ThemeColors.added,
 
   text: ThemeColors.lightText,
+  textCaption: ThemeColors.lightTextCaption,
   neutral: ThemeColors.whiteBg,
   background: ThemeColors.lightBg,
   selected: ThemeColors.lightSelected,
 
   added: ThemeColors.added,
-  addedBg: ThemeColors.addedBg,
   modified: ThemeColors.modified,
-  modifiedBg: ThemeColors.modifiedBg,
   removed: ThemeColors.removed,
-  removedBg: ThemeColors.removedBg,
-  flagged: ThemeColors.warningBd,
-  flaggedBg: ThemeColors.warningBg,
+  flagged: ThemeColors.warning,
+  unchanged: ThemeColors.unchanged,
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
@@ -126,28 +115,26 @@ export const darkPalette: Record<string, string> = {
 
   info: ThemeColors.primary,
   warning: ThemeColors.warning,
-  negative: ThemeColors.error,
+  negative: ThemeColors.errorDark,
   positive: ThemeColors.added,
 
   text: ThemeColors.darkText,
+  textCaption: ThemeColors.darkTextCaption,
   neutral: ThemeColors.blackBg,
   background: ThemeColors.darkBg,
   selected: ThemeColors.darkSelected,
 
   added: ThemeColors.added,
-  addedBg: ThemeColors.addedBg,
   modified: ThemeColors.modified,
-  modifiedBg: ThemeColors.modifiedBg,
   removed: ThemeColors.removed,
-  removedBg: ThemeColors.removedBg,
+  flagged: ThemeColors.warning,
+  unchanged: ThemeColors.unchanged,
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
 };
 
-const typeColorMap: Record<string, string> = {
-  "": Colors.blue,
-};
+const typeColorMap: Record<string, string> = {};
 
 /**
  * Returns the color for the given type.
@@ -157,21 +144,16 @@ const typeColorMap: Record<string, string> = {
 export function getTypeColor(type = ""): string {
   if (!typeColorMap[type]) {
     const remainingColors = [
-      // Colors.blueLight,
-      // Colors.greenLight,
-      // Colors.orange,
-      // Colors.orangeDark,
-      // Colors.red,
-      Colors.gradient1,
-      Colors.gradient2,
-      Colors.gradient3,
-      Colors.gradient4,
-      Colors.gradient5,
+      ThemeColors.nodeGradient1,
+      ThemeColors.nodeGradient2,
+      ThemeColors.nodeGradient3,
+      ThemeColors.nodeGradient4,
+      ThemeColors.nodeGradient5,
     ].filter((color) => !Object.values(typeColorMap).includes(color));
 
     typeColorMap[type] =
       remainingColors.length === 0
-        ? Colors.blue
+        ? ThemeColors.primary
         : remainingColors[Math.floor(Math.random() * remainingColors.length)];
   }
 
@@ -202,23 +184,29 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | DeltaType | string
+  state: ApprovalType | ArtifactDeltaState | DeltaType | MessageType | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case MessageType.success:
     case "added":
-      return "positive";
+      return "added";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case MessageType.info:
+    case MessageType.update:
     case "modified":
-      return "primary";
+      return "modified";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case MessageType.error:
     case "removed":
-      return "negative";
+      return "removed";
+    case MessageType.warning:
+      return "warning";
     default:
-      return "";
+      return "unchanged";
   }
 }
 

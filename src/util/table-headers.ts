@@ -24,34 +24,37 @@ export const actionsColumn: TableColumn<
 > = {
   name: "actions",
   label: "Actions",
-  field: () => "",
   sortable: false,
   align: "left",
+  field: () => "",
 };
 
 export const artifactColumns: TableColumn<FlatArtifact>[] = [
   {
     name: "name",
     label: "Name",
-    field: (row) => row.name,
     sortable: true,
     align: "left",
+    classes: "data-table-cell-200",
+    field: (row) => row.name,
   },
   {
     name: "type",
     label: "Type",
-    field: (row) => row.type,
     sortable: true,
     align: "left",
+    classes: "data-table-cell-200",
+    field: (row) => row.type,
   },
 ];
 
 export const artifactDeltaColumn: TableColumn<FlatArtifact> = {
   name: "deltaType",
   label: "Delta State",
-  field: () => "",
   sortable: true,
   align: "left",
+  classes: "data-table-cell-200",
+  field: () => "",
 };
 
 export const artifactAttributesColumns: (
@@ -63,7 +66,7 @@ export const artifactAttributesColumns: (
     field: (row: FlatArtifact) => (row[key] === undefined ? "" : row[key]),
     sortable: true,
     align: "left",
-    classes: "data-table-cell",
+    classes: "data-table-cell-200",
   }));
 
 export const artifactMatrixColumns: (
@@ -86,7 +89,7 @@ export const jobColumns: TableColumn<JobSchema>[] = [
   },
   {
     name: "currentProgress",
-    label: "Progress",
+    label: "Last Updated",
     align: "left",
     field: (job) => job.currentProgress,
   },
@@ -188,6 +191,7 @@ export const projectNameColumn: TableColumn<IdentifierSchema> = {
   label: "Name",
   sortable: true,
   align: "left",
+  classes: "data-table-cell-200",
   field: (row) => row.name,
 };
 
@@ -197,6 +201,7 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     label: "Description",
     sortable: false,
     align: "left",
+    classes: "data-table-cell-200",
     field: (row) => row.description,
   },
   {
@@ -204,6 +209,7 @@ export const projectExpandedColumns: TableColumn<IdentifierSchema>[] = [
     label: "Owner",
     sortable: false,
     align: "left",
+    classes: "data-table-cell-200",
     field: (row) => row.owner,
   },
   actionsColumn,

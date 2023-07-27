@@ -1,12 +1,12 @@
 <template>
-  <cytoscape-controller
+  <cytoscape
     id="cytoscape-artifact"
-    :cyto-core-graph="artifactTreeGraph"
+    :graph="artifactTreeGraph"
     :class="className"
     data-cy="view-artifact-tree"
     @click="handleClick"
   >
-    <template v-if="isTreeMode" #elements>
+    <template v-if="isTreeMode">
       <artifact-node
         v-for="artifact in artifacts"
         :key="artifact.id"
@@ -21,7 +21,7 @@
       />
       <cy-context-menu />
     </template>
-    <template v-else #elements>
+    <template v-else>
       <tim-node
         v-for="level in Object.values(tim.artifacts)"
         :key="level.typeId"
@@ -38,7 +38,7 @@
         :generated="matrix.generatedCount > 0"
       />
     </template>
-  </cytoscape-controller>
+  </cytoscape>
 </template>
 
 <script lang="ts">
@@ -67,8 +67,7 @@ import {
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
-import CytoscapeController from "./CytoscapeController.vue";
-import { CyContextMenu } from "./base";
+import { CyContextMenu, Cytoscape } from "./base";
 import { ArtifactNode, TraceLink } from "./tree";
 import { TimNode, TimLink } from "./tim";
 

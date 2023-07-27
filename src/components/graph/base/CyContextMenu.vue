@@ -12,8 +12,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { Core } from "cytoscape";
+// import { inject } from "vue";
+// import { Core } from "cytoscape";
 
-const cy = inject<Promise<Core>>("cy");
+// const cy = inject<Promise<Core>>("cy");
 </script>

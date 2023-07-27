@@ -12,6 +12,7 @@ from sklearn.metrics import pairwise_distances
 from tgen.common.util.override import overrides
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.constants.tgen_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
@@ -40,7 +41,8 @@ class VSMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, vectorizer: CountVectorizer = TfidfVectorizer,
-                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None, select_predictions: bool = True):
+                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None,
+                 select_predictions: bool = DEFAULT_VSM_SELECT_PREDICTION):
         """
         Initializes trainer with the datasets used for training + eval
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting

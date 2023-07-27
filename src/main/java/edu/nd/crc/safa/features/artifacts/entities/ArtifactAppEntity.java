@@ -114,4 +114,18 @@ public class ArtifactAppEntity implements IAppEntity {
             return this.body;
         }
     }
+
+    /**
+     * Attempts to create a unique identifier from the id or name of the artifact.
+     *
+     * @return Returns some unique identifier to artifact.
+     */
+    @JsonIgnore
+    public String getTraceableId() {
+        if (this.id != null) {
+            return this.id.toString();
+        } else {
+            return this.name;
+        }
+    }
 }

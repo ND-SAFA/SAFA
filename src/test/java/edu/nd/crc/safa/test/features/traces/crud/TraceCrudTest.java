@@ -24,7 +24,9 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
         null,
         ApprovalStatus.UNREVIEWED,
         0.5,
-        TraceType.GENERATED
+        TraceType.GENERATED,
+        true,
+        null
     );
 
     @Override

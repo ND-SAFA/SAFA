@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -56,7 +57,7 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
     public Pair<TraceAppEntity, String> parseRecord(JSONObject entityRecord) {
         try {
             //TODO : make this the default logic for parsing json records with specified generic class
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = ObjectMapperConfig.create();
             TraceAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), TraceAppEntity.class);
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {

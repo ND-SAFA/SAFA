@@ -13,11 +13,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import javax.servlet.http.Cookie;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -170,16 +170,16 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public <T> T getWithResponseParser(Function<String, T> responseParser,
                                        ResultMatcher resultMatcher) throws Exception {
         return getWithResponseParser(
-                responseParser,
-                resultMatcher,
-                SafaRequest.authorizationToken
+            responseParser,
+            resultMatcher,
+            SafaRequest.authorizationToken
         );
     }
 
     public <T> T getWithResponseParser(Function<String, T> responseParser) throws Exception {
         return getWithResponseParser(
-                responseParser,
-                status().is2xxSuccessful()
+            responseParser,
+            status().is2xxSuccessful()
         );
     }
 
@@ -197,14 +197,14 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public <T> T getAsType(TypeReference<T> typeReference) throws Exception {
         return getWithResponseParser(
-                string -> this.jacksonParse(string, typeReference),
-                status().is2xxSuccessful()
+            string -> this.jacksonParse(string, typeReference),
+            status().is2xxSuccessful()
         );
     }
 
     private <T> T jacksonParse(String string, TypeReference<T> typeReference) {
         try {
-            return new ObjectMapper().readValue(string, typeReference);
+            return ObjectMapperConfig.create().readValue(string, typeReference);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

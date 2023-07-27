@@ -10,17 +10,20 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
+import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.summary.SummaryService;
+import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.generation.tgen.services.LinkVisibilityService;
+import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
-import edu.nd.crc.safa.features.models.ITraceGenerationController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.summary.SummaryService;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -82,29 +85,40 @@ public class GenerateLinksJob extends CommitJob {
             .getProjectAppEntity(user, this.projectVersion);
     }
 
-    @IJobStep(value = "Summarizing code artifacts.", position = 2)
+    @IJobStep(value = "Summarizing Code Artifacts", position = 2)
     public void createArtifactSummaries() {
         SummaryService summaryService = this.serviceProvider.getSummaryService();
-        List<ArtifactAppEntity> codeArtifacts =
-            summaryService.summarizeCodeArtifacts(this.projectAppEntity.getArtifacts());
+        List<ArtifactAppEntity> modifiedArtifacts =
+            summaryService.addSummariesToCode(this.projectAppEntity.getArtifacts());
         CommitService commitService = this.serviceProvider.getCommitService();
         ProjectCommit projectCommit = new ProjectCommit();
         projectCommit.setCommitVersion(this.projectVersion);
-        projectCommit.addArtifacts(ModificationType.MODIFIED, codeArtifacts);
+        projectCommit.addArtifacts(ModificationType.MODIFIED, modifiedArtifacts);
         commitService.performCommit(projectCommit, this.user);
     }
 
-    @IJobStep(value = "Generating links", position = 3)
+    @IJobStep(value = "Summarizing Project", position = 3, requiredGeneration = true)
+    public void summarizeProject() {
+        Project project = this.projectVersion.getProject();
+        ProjectSummaryService service = this.serviceProvider.getProjectSummaryService();
+        service.generateProjectSummary(project, this.projectAppEntity.getArtifacts(), this.getDbLogger());
+    }
+
+    @IJobStep(value = "Generating links", position = 4)
     public void generateLinks(JobLogger logger) {
         ProjectCommit projectCommit = getProjectCommit();
 
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
             logger.log("Running tracing request:Levels: %s", tracingRequest.getArtifactLevels());
 
-            TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
+            GenerationDataset generationDataset = TraceGenerationService.extractPayload(tracingRequest,
+                projectAppEntity);
+            generationDataset.setSummary(this.projectVersion.getProject().getSpecification());
 
             ITraceGenerationController controller = this.serviceProvider.getTraceGenerationController();
-            this.generatedTraces = controller.generateLinks(tracingPayload, this.getDbLogger());
+            List<TraceAppEntity> tracePredictions = controller.generateLinks(generationDataset, this.getDbLogger());
+            LinkVisibilityService.setLinksVisibility(tracePredictions);
+            this.generatedTraces = tracePredictions;
 
             logger.log("Generated %d traces.", generatedTraces.size());
 

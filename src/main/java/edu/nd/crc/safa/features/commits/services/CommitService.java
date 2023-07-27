@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -62,6 +63,13 @@ public class CommitService {
             projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
         }
 
+        // Step - Mark decline trace links as invisible
+        projectCommit
+            .getTraces()
+            .getModified()
+            .stream()
+            .filter(t -> t.getApprovalStatus() == ApprovalStatus.DECLINED)
+            .forEach(t -> t.setVisible(false));
         // Step - Commit artifact
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,

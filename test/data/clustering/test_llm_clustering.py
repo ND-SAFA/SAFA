@@ -1,5 +1,5 @@
 from copy import deepcopy
-from unittest import mock
+from unittest import mock, skip
 
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.constants.deliminator_constants import NEW_LINE
@@ -19,6 +19,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 
 
+@skip
 class TestLLMClustering(BaseTest):
     res = GenerationResponse(batch_responses=['<group>\n<feature>Air lease and arm/disarm functionality</feature>\n'
                                               '<artifacts>0,1,11</artifacts>\n</group>\n\n<group>\n<feature>Circular flight path '

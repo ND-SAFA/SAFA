@@ -46,7 +46,8 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
             this.user,
             this.projectName,
             this.projectDescription,
-            uploadLocation);
+            uploadLocation,
+            false);
     }
 
     @Override

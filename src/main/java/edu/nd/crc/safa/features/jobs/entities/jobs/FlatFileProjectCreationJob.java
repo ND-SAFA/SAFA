@@ -65,7 +65,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     /**
      * Whether code artifacts should be summarized if no summary exists.
      */
-    boolean shouldSummarize;
+    private final boolean shouldSummarize;
 
     private String projectName;
     private String projectDescription;

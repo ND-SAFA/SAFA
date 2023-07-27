@@ -8,6 +8,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
@@ -17,7 +18,6 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -81,18 +81,23 @@ public class JobController extends BaseController {
     /**
      * Parses given job payload by the jobType and returns the job created.
      *
-     * @param versionId The project version to save the entities to.
-     * @param files     The flat files to be parsed and uploaded.
+     * @param versionId       The project version to save the entities to.
+     * @param files           The flat files to be parsed and uploaded.
+     * @param shouldSummarize Whether to sumarize code artifacts on upload.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
     @PostMapping(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws Exception {
+    public JobAppEntity flatFileProjectUpdateJob(
+        @PathVariable UUID versionId,
+        @RequestParam MultipartFile[] files,
+        @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
         UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
             serviceProvider,
-            versionId, files);
+            versionId,
+            files,
+            shouldSummarize);
         return updateProjectByFlatFileJobBuilder.perform();
     }
 

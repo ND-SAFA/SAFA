@@ -42,6 +42,7 @@ class TestJobStepNames extends ApplicationBaseTest {
         String[] expectedStepNames = new String[]{
             "Uploading Flat Files",
             "Parsing Files",
+            "Summarizing Code Artifacts",
             "Generating Trace Links",
             "Committing Entities",
             "Done"

@@ -53,8 +53,8 @@ public class TraceLinkVersionRepositoryImpl
                 .withProjectVersion(projectVersion)
                 .withTraceLink(traceLink)
                 .withModificationType(ModificationType.REMOVED)
-                .withManualTraceType()
-                .withApprovalStatus(ApprovalStatus.DECLINED);
+                .withApprovalStatus(ApprovalStatus.DECLINED)
+                .withVisibility(false);
         }
         return TraceLinkVersion.createLinkWithVersionAndModificationAndTraceAppEntity(projectVersion,
             modificationType,
@@ -127,7 +127,9 @@ public class TraceLinkVersionRepositoryImpl
             targetArtifact.getArtifactId(),
             trace.getApprovalStatus(),
             trace.getScore(),
-            trace.getTraceType()
+            trace.getTraceType(),
+            trace.isVisible(),
+            trace.getExplanation()
         );
     }
 

@@ -18,6 +18,8 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
+import edu.nd.crc.safa.features.generation.summary.SummaryService;
+import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -26,7 +28,6 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -61,15 +62,22 @@ public class FlatFileProjectCreationJob extends CommitJob {
      */
     private String pathToFiles;
 
+    /**
+     * Whether code artifacts should be summarized if no summary exists.
+     */
+    boolean shouldSummarize;
+
     private String projectName;
     private String projectDescription;
     private SafaUser user;
 
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
                                       ServiceProvider serviceProvider,
-                                      ProjectVersion projectVersion) {
+                                      ProjectVersion projectVersion,
+                                      boolean shouldSummarize) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(projectVersion, true));
         this.projectVersion = projectVersion;
+        this.shouldSummarize = shouldSummarize;
     }
 
     public FlatFileProjectCreationJob(JobDbEntity jobDbEntity,
@@ -77,12 +85,14 @@ public class FlatFileProjectCreationJob extends CommitJob {
                                       SafaUser user,
                                       String projectName,
                                       String projectDescription,
-                                      String uploadedFilesPath) {
+                                      String uploadedFilesPath,
+                                      boolean shouldSummarize) {
         super(jobDbEntity, serviceProvider);
         this.projectName = projectName;
         this.projectDescription = projectDescription;
         this.pathToFiles = uploadedFilesPath;
         this.user = user;
+        this.shouldSummarize = shouldSummarize;
     }
 
     private void createProject() throws IOException {
@@ -165,7 +175,19 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(value = "Generating Trace Links", position = 3)
+    @IJobStep(value = "Summarizing Code Artifacts", position = 3)
+    public void summarizeCodeArtifacts() {
+        if (!this.shouldSummarize) {
+            return;
+        }
+        ProjectCommit projectCommit = this.getProjectCommit();
+        List<ArtifactAppEntity> newArtifacts = projectCommit.getArtifacts().getAdded();
+        SummaryService summaryService = this.serviceProvider.getSummaryService();
+        summaryService.addSummariesToCode(newArtifacts, this.getDbLogger());
+        projectCommit.getArtifacts().setAdded(newArtifacts);
+    }
+
+    @IJobStep(value = "Generating Trace Links", position = 4)
     public void generatingTraces(JobLogger logger) {
         ProjectCommit projectCommit = getProjectCommit();
 

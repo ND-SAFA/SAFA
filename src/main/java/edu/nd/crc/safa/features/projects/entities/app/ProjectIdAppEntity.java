@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,10 @@ public class ProjectIdAppEntity {
      * List of member on project.
      */
     List<ProjectMemberAppEntity> members;
+    /**
+     * Last edited.
+     */
+    LocalDateTime lastEdited;
 
     public ProjectIdAppEntity(Project project, List<ProjectMemberAppEntity> members) {
         this.projectId = project.getProjectId().toString();
@@ -44,6 +49,7 @@ public class ProjectIdAppEntity {
         this.description = project.getDescription();
         this.members = members;
         this.owner = getProjectOwner();
+        this.lastEdited = project.getLastEdited();
     }
 
     private String getProjectOwner() {

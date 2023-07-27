@@ -22,4 +22,19 @@ public class ProjectDataStructures {
         artifacts.forEach(a -> artifactMap.put(a.getId(), a));
         return artifactMap;
     }
+
+    /**
+     * Creates map of artifact to tracing content.
+     *
+     * @param artifacts List of artifacts to include in layer.
+     * @return Map of artifact id to content.
+     */
+    public static Map<String, String> createArtifactLayer(List<ArtifactAppEntity> artifacts) {
+        Map<String, String> artifactMap = new HashMap<>();
+        artifacts
+            .stream()
+            .filter(a -> a.getTraceString().length() > 0)
+            .forEach(a -> artifactMap.put(a.getName(), a.getTraceString()));
+        return artifactMap;
+    }
 }

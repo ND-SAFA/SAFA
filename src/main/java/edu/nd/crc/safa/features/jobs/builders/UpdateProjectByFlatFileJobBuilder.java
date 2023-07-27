@@ -28,12 +28,19 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
      */
     MultipartFile[] files;
 
+    /**
+     * Whether the code artifacts should be summarized if no summary exists
+     */
+    boolean shouldSummarize;
+
     public UpdateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider,
                                              UUID versionId,
-                                             MultipartFile[] files) {
+                                             MultipartFile[] files,
+                                             boolean shouldSummarize) {
         super(serviceProvider);
         this.projectVersion = this.serviceProvider.getProjectVersionRepository().findByVersionId(versionId);
         this.files = files;
+        this.shouldSummarize = shouldSummarize;
     }
 
     @Override
@@ -44,7 +51,8 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
         return new FlatFileProjectCreationJob(
             this.jobDbEntity,
             serviceProvider,
-            this.projectVersion);
+            this.projectVersion,
+            this.shouldSummarize);
     }
 
     @Override

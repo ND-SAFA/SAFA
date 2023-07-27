@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.github.utils.GithubControllerUtils;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaGithubBuilder;
@@ -17,7 +18,6 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +48,7 @@ public class GithubController extends BaseController {
      * Creates a job that imports a GitHub repository into a new SAFA project.
      *
      * @param repositoryName The name of the repository to import.
-     * @param owner The owner of the repository to import.
+     * @param owner          The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return A {@link JobAppEntity} representing the import job.
      */
@@ -76,8 +76,8 @@ public class GithubController extends BaseController {
      * already been previously imported.
      *
      * @param repositoryName The name of the repository to import.
-     * @param versionId The ID of the project version to import into.
-     * @param owner The owner of the repository to import.
+     * @param versionId      The ID of the project version to import into.
+     * @param owner          The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return Information about the started job
      */
@@ -107,8 +107,8 @@ public class GithubController extends BaseController {
      * not previously had that repository imported into it.
      *
      * @param repositoryName The name of the repository to import.
-     * @param versionId The ID of the project version to import into.
-     * @param owner The owner of the repository to import.
+     * @param versionId      The ID of the project version to import into.
+     * @param owner          The owner of the repository to import.
      * @param importSettings The settings for the import. All fields are optional.
      * @return Information about the started job
      */

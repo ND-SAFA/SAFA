@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.test.builders;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -72,7 +73,7 @@ public class CommitBuilder {
     }
 
     public JSONObject asJson() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         String commitString = objectMapper.writeValueAsString(this.projectCommit);
         return new JSONObject(commitString);
     }
@@ -82,12 +83,12 @@ public class CommitBuilder {
     }
 
     private ArtifactAppEntity asArtifactAppEntity(JSONObject json) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         return objectMapper.readValue(json.toString(), ArtifactAppEntity.class);
     }
 
     private TraceAppEntity asTraceAppEntity(JSONObject json) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         return objectMapper.readValue(json.toString(), TraceAppEntity.class);
     }
 }

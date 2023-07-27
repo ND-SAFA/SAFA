@@ -48,6 +48,9 @@ const emit = defineEmits<{
   (e: "add", cy: Core): void;
 }>();
 
+const cy = inject<Promise<Core>>("cy");
+const relTransform = inject<Ref<string>>("relTransform");
+
 const id = ref<string>(props.definition.data.id || "");
 const selector = ref<Selector>(`#${id.value}`);
 const instance = ref<Core | undefined>(undefined);
@@ -55,9 +58,6 @@ const instance = ref<Core | undefined>(undefined);
 const pos = ref<{ x: number; y: number } | undefined>();
 const absTransform = ref("");
 const transformStyle = ref("");
-
-const cy = inject<Promise<Core>>("cy");
-const relTransform = inject<Ref<string>>("relTransform");
 
 const isNode = computed(
   () => props.definition.data.type === GraphElementType.node

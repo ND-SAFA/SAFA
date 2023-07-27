@@ -40,12 +40,12 @@ export const artifactTreeGraph: CytoCoreGraph = {
       initialize: automove,
       afterInit: () => undefined,
     },
-    {
-      initialize: contextMenus,
-      afterInit(cy: CytoCore): void {
-        cy.contextMenus(artifactTreeContextMenuOptions);
-      },
-    },
+    // {
+    //   initialize: contextMenus,
+    //   afterInit(cy: CytoCore): void {
+    //     cy.contextMenus(artifactTreeContextMenuOptions);
+    //   },
+    // },
     {
       initialize: edgehandles,
       afterInit(cy: CytoCore): Promise<void> {

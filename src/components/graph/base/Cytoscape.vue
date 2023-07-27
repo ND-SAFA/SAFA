@@ -1,6 +1,9 @@
 <template>
   <div :id="id" ref="container" :class="className">
     <slot v-if="initialized" />
+    <cy-context-menu v-if="initialized">
+      <slot name="context-menu" />
+    </cy-context-menu>
   </div>
 </template>
 
@@ -18,6 +21,7 @@ import { ref, provide, onMounted, onBeforeUnmount, computed } from "vue";
 import cytoscape, { EventObject } from "cytoscape";
 import { CytoCore, CytoCoreGraph, CytoEvent } from "@/types";
 import { logStore } from "@/hooks";
+import CyContextMenu from "./CyContextMenu.vue";
 
 const props = defineProps<{
   id: string;

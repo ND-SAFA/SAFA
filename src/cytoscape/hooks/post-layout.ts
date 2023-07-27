@@ -140,7 +140,7 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
   centerViewOnNode,
   applyAutoMoveEvents,
   applyCytoEvents,
-  dynamicVisibilityHookForContextMenuItems,
+  // dynamicVisibilityHookForContextMenuItems,
 ];
 
 /**

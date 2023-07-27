@@ -17,7 +17,7 @@ class VSMJob(AbstractTrainerJob):
     Handles VSM training + prediction
     """
 
-    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, job_args: JobArgs = None, metrics: List[str] = None):
+    def __init__(self, trainer_dataset_manager: TrainerDatasetManager, job_args: JobArgs = None, metrics: List[str] = None, **kwargs):
         """
         Handles VSM training + prediction
         :param job_args: the arguments for the job
@@ -30,6 +30,7 @@ class VSMJob(AbstractTrainerJob):
                          trainer_args=None, job_args=job_args, task=TrainerTask.TRAIN)
         self.metrics = metrics
         self._trainer: Optional[VSMTrainer] = None
+        self.trainer_kwargs = kwargs
 
     @overrides(AbstractTrainerJob)
     def _run(self) -> TraceTrainOutput:
@@ -50,5 +51,6 @@ class VSMJob(AbstractTrainerJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = VSMTrainer(trainer_dataset_manager=self.trainer_dataset_manager, metrics=self.metrics)
+            self._trainer = VSMTrainer(trainer_dataset_manager=self.trainer_dataset_manager, metrics=self.metrics,
+                                       **self.trainer_kwargs)
         return self._trainer

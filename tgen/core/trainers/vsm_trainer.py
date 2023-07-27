@@ -1,24 +1,24 @@
-import json
 import time
 from typing import Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
+from scipy.stats import percentileofscore
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
-from transformers.trainer_utils import PredictionOutput
 
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
+from tgen.common.util.ranking_util import RankingUtil
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.constants.tgen_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.core.trace_output.stage_eval import Metrics
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -41,7 +41,8 @@ class VSMTrainer(AbstractTrainer):
     """
 
     def __init__(self, trainer_dataset_manager: TrainerDatasetManager, vectorizer: CountVectorizer = TfidfVectorizer,
-                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None):
+                 metrics: List[str] = None, steps: List[AbstractDataProcessingStep] = None,
+                 select_predictions: bool = DEFAULT_VSM_SELECT_PREDICTION):
         """
         Initializes trainer with the datasets used for training + eval
         :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
@@ -56,6 +57,7 @@ class VSMTrainer(AbstractTrainer):
         self.model = vectorizer(strip_accents="ascii")
         self.metrics = metrics
         self.artifact_map = VSMTrainer.create_clean_artifact_map(self.trainer_dataset_manager, steps)
+        self.select_predictions = select_predictions
         super().__init__(trainer_dataset_manager=trainer_dataset_manager, trainer_args=None)
 
     @overrides(AbstractTrainer)
@@ -114,7 +116,8 @@ class VSMTrainer(AbstractTrainer):
         :return: The output from the prediction
         """
         tracing_requests = extract_tracing_requests(eval_dataset.artifact_df, eval_dataset.layer_df.as_list())
-        predictions, source_target_pairs, link_ids = [], [], []
+        prediction_entries = []
+
         for tracing_request in tracing_requests:
             parent_artifacts = self.get_artifacts(tracing_request.parent_ids)
             child_artifacts = self.get_artifacts(tracing_request.child_ids)
@@ -128,18 +131,16 @@ class VSMTrainer(AbstractTrainer):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
 
-                predictions.append(similarity_score)
-                source_target_pairs.append((child_id, parent_id))  # source, target
-                link_ids.append(link_id)
+                link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
+                label = eval_dataset.trace_df.get_link(link_id)[TraceKeys.LABEL]
+                prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
+                prediction_entries.append(prediction_entry)
 
-        metrics = None
-        if eval_dataset.trace_df.get_label_count(1) > 0:
-            metrics = self.eval(eval_dataset.trace_df, predictions, link_ids, self.metrics) \
-                if self.metrics else None
-            logger.log_with_title("VSM Metrics", json.dumps(metrics))
-        prediction_output = PredictionOutput(predictions=predictions, label_ids=None, metrics=metrics)
-        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output,
-                                                        source_target_pairs=source_target_pairs,
+        if self.select_predictions:
+            self.convert_to_percentiles(prediction_entries)
+            prediction_entries = RankingUtil.select_predictions(prediction_entries)
+        metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, prediction_entries)
+        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)
         return trace_prediction_output
 
@@ -211,3 +212,35 @@ class VSMTrainer(AbstractTrainer):
         :return: None
         """
         pass
+
+    @staticmethod
+    def convert_to_percentiles(predictions: List[TracePredictionEntry]) -> None:
+        """
+        Converts the scores into percentiles.
+        :param predictions: The trace predictions containing scores.
+        :return: None
+        """
+        parent2preds = {}
+        for p in predictions:
+            parent_id = p["target"]
+            if parent_id not in parent2preds:
+                parent2preds[parent_id] = []
+            parent2preds[parent_id].append(p)
+
+        for parent, preds in parent2preds.items():
+            scores = [p["score"] for p in preds]
+            percentiles = VSMTrainer.get_percentiles(scores)
+            for p, percentile in zip(preds, percentiles):
+                p["score"] = percentile
+
+    @staticmethod
+    def get_percentiles(scores: List[float]) -> List[float]:
+        """
+        Converts scores to percentiles.
+        :param scores: The scores to convert.
+        :return: List of percentiles.
+        """
+        scores_sorted = sorted(scores)
+        s = pd.Series(scores)
+        percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
+        return list(percentiles)

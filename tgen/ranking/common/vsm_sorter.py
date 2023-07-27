@@ -34,7 +34,7 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
     dataset_creator = TraceDatasetCreator(FakeProjectReader(artifact_df=artifact_df, layer_df=layer_df))
 
     trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=dataset_creator)
-    vsm_job = VSMJob(trainer_dataset_manager=trainer_dataset_manager)
+    vsm_job = VSMJob(trainer_dataset_manager=trainer_dataset_manager, select_predictions=False)
     job_result = vsm_job.run()
     assert job_result.status == Status.SUCCESS, f"Sorting using VSM failed. {job_result.body}"
     vsm_result: TraceTrainOutput = job_result.body

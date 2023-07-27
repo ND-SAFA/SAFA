@@ -18,11 +18,17 @@ class LLMResponseUtil:
         :param raise_exception: if True, raises an exception if parsing fails
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
-        tags = BeautifulSoup(res, features="lxml").findAll(tag_name)
+        soup = BeautifulSoup(res, 'html.parser')
 
         try:
-            assert len(tags) > 0, f"Missing expected tag {tag_name}"
-            content = [tag.contents[0] for tag in tags] if not is_nested else [LLMResponseUtil._parse_children(tag) for tag in tags]
+            assert tag_name in res, f"Missing expected tag {tag_name}"
+            if is_nested:
+                tags = soup.findAll(tag_name)
+                content = [LLMResponseUtil._parse_children(tag) for tag in tags]
+            else:
+                query = soup.find(tag_name)
+                content = query.decode_contents()
+                content = [content]
         except (AssertionError, IndexError):
             error = f"Unable to parse {tag_name}"
             logger.exception(error)

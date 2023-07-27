@@ -1,6 +1,8 @@
 import json
 from typing import Dict, List
 
+from tgen.common.util.list_util import ListUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -8,8 +10,6 @@ from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.logging.logger_manager import logger
 
 
 class RankingUtil:
@@ -44,7 +44,7 @@ class RankingUtil:
         :return:
         """
         children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
-        scores = RankingUtil.assign_scores_to_targets(ranked_children_ids, min_score=min_score)
+        scores = RankingUtil.assign_scores_to_targets(len(ranked_children_ids), min_score=min_score)
         predicted_entries = []
         for i in range(len(ranked_children_ids)):
             child_id = ranked_children_ids[i]
@@ -62,14 +62,14 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def assign_scores_to_targets(ranked_targets: List[str], min_score=0.5) -> List[float]:
+    def assign_scores_to_targets(n_items: int, min_score=0.5) -> List[float]:
         """
         Assigns scores to ranked targets from 1 to min score incrementing linearly.
-        :param ranked_targets: The ranked targets.
+        :param n_items: The number of items to assign scores for.
         :param min_score: The score of the last ranked artifact.
         :return: List of scores.
         """
-        return ListUtil.create_step_list(len(ranked_targets), min_score=min_score)
+        return ListUtil.create_step_list(n_items, min_score=min_score)
 
     @staticmethod
     def calculate_ranking_metrics(dataset: TraceDataset, ranking_entries: List[TracePredictionEntry]):
@@ -109,12 +109,14 @@ class RankingUtil:
     @staticmethod
     def select_predictions(trace_predictions: List[TracePredictionEntry],
                            parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
-                           min_threshold: float = DEFAULT_PARENT_MIN_THRESHOLD) -> List[TracePredictionEntry]:
+                           min_threshold: float = DEFAULT_PARENT_MIN_THRESHOLD,
+                           top_n: int = None) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.
         :param parent_threshold: The minimum percentile for a child to be linked to a parent.
         :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
+        :param top_n: Whether to convert scores to classification labels.
         :return: List of selected predictions.
         """
         children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
@@ -122,11 +124,18 @@ class RankingUtil:
 
         for child, trace_predictions in children2entry.items():
             sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-            selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
-            top_parent = sorted_entries[0]
-            if len(selected_entries) == 0 and top_parent[StructuredKeys.SCORE] >= min_threshold:
-                selected_entries.append(top_parent)
+            if top_n is not None:
+                selected_entries = sorted_entries[:top_n]
+            else:
+                selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
+                top_parent = sorted_entries[0]
+                if len(selected_entries) == 0:
+                    selected_entries.append(top_parent)
             predictions.extend(selected_entries)
+
+        if top_n:
+            for p in predictions:
+                p["score"] = 1
         return predictions
 
     @staticmethod

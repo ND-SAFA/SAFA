@@ -30,7 +30,7 @@ class TestVSMTrainer(BaseTraceTest):
 
     def get_custom_trace_trainer(self, dataset_container_args: Dict = None):
         trainer_dataset_manager = self.create_trainer_dataset_manager(dataset_container_args)
-        return VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=self.TEST_METRICS_NAMES)
+        return VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=self.TEST_METRICS_NAMES, select_predictions=False)
 
     def assert_metrics(self, metrics: Metrics):
         """

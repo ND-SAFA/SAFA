@@ -212,7 +212,12 @@ class VSMTrainer(AbstractTrainer):
         pass
 
     @staticmethod
-    def convert_to_percentiles(predictions: List[TracePredictionEntry]):
+    def convert_to_percentiles(predictions: List[TracePredictionEntry]) -> None:
+        """
+        Converts the scores into percentiles.
+        :param predictions: The trace predictions containing scores.
+        :return: None
+        """
         parent2preds = {}
         for p in predictions:
             parent_id = p["target"]
@@ -227,7 +232,12 @@ class VSMTrainer(AbstractTrainer):
                 p["score"] = percentile
 
     @staticmethod
-    def get_percentiles(scores: List[float]):
+    def get_percentiles(scores: List[float]) -> List[float]:
+        """
+        Converts scores to percentiles.
+        :param scores: The scores to convert.
+        :return: List of percentiles.
+        """
         scores_sorted = sorted(scores)
         s = pd.Series(scores)
         percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100

@@ -24,7 +24,7 @@ class TestVSMJob(BaseJobTest):
             }
         }, override=False)
         return VSMJob(trainer_dataset_manager=trainer_dataset_manager, job_args=job_args,
-                      metrics=ObjectCreator.trainer_args_definition["metrics"])
+                      metrics=ObjectCreator.trainer_args_definition["metrics"], select_predictions=False)
 
     def _assert_success(self, job: VSMJob, job_result: JobResult):
         eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]

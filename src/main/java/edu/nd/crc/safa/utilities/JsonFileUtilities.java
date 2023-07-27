@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,7 +66,7 @@ public interface JsonFileUtilities {
                                           String paramName) throws JsonProcessingException {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         for (Object entity : entities) {
             String entityContent = objectMapper.writeValueAsString(entity);
             jsonArray.put(new JSONObject(entityContent));
@@ -81,7 +82,8 @@ public interface JsonFileUtilities {
      * @return JSON representation of object
      */
     static JSONObject toJson(Object object) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
+        objectMapper.findAndRegisterModules();
         return wrapReturnValue(() -> {
             String objectJsonString = objectMapper.writeValueAsString(object);
             return new JSONObject(objectJsonString);
@@ -89,7 +91,7 @@ public interface JsonFileUtilities {
     }
 
     static JSONArray toJsonArray(Object object) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         return wrapReturnValue(() -> {
             String objectJsonString = objectMapper.writeValueAsString(object);
             return new JSONArray(objectJsonString);
@@ -105,7 +107,7 @@ public interface JsonFileUtilities {
      * @return Instance of specified class.
      */
     static <T> T parse(String jsonString, Class<T> exportClass) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         return wrapReturnValue(() -> objectMapper.readValue(jsonString, exportClass));
     }
 
@@ -118,7 +120,7 @@ public interface JsonFileUtilities {
      * @return Instance of specified class.
      */
     static <T> T parse(String jsonString, TypeReference<T> exportClass) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
         JSONObject jsonObject = jsonString.length() == 0 ? new JSONObject() : new JSONObject(jsonString);
         return wrapReturnValue(() -> objectMapper.readValue(jsonObject.toString(), exportClass));
     }

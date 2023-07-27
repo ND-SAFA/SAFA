@@ -6,10 +6,10 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
@@ -47,7 +47,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
-        SafaUser applicationUser = new ObjectMapper().readValue(req.getInputStream(), SafaUser.class);
+        SafaUser applicationUser = ObjectMapperConfig.create().readValue(req.getInputStream(), SafaUser.class);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
             applicationUser.getEmail(),
             applicationUser.getPassword(),

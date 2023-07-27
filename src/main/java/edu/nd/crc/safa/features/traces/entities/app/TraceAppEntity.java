@@ -26,6 +26,13 @@ public class TraceAppEntity implements IAppEntity {
     ApprovalStatus approvalStatus;
     double score;
     TraceType traceType;
+    boolean isVisible = true;
+    String explanation;
+
+    public TraceAppEntity(String sourceName, String targetName) {
+        this.sourceName = sourceName;
+        this.targetName = targetName;
+    }
 
     public TraceAppEntity(UUID traceLinkId,
                           String sourceName,
@@ -34,15 +41,19 @@ public class TraceAppEntity implements IAppEntity {
                           UUID targetId,
                           ApprovalStatus approvalStatus,
                           double score,
-                          TraceType traceType) {
+                          TraceType traceType,
+                          boolean isVisible,
+                          String explanation
+    ) {
+        this(sourceName, targetName);
+        this.score = score;
         this.traceLinkId = traceLinkId;
-        this.sourceName = sourceName;
         this.sourceId = sourceId;
-        this.targetName = targetName;
         this.targetId = targetId;
         this.approvalStatus = approvalStatus;
-        this.score = score;
         this.traceType = traceType;
+        this.isVisible = isVisible;
+        this.explanation = explanation;
     }
 
     public TraceAppEntity asManualTrace() {
@@ -56,12 +67,18 @@ public class TraceAppEntity implements IAppEntity {
         this.setApprovalStatus(ApprovalStatus.UNREVIEWED);
         this.setScore(score);
         this.setTraceType(TraceType.GENERATED);
+        this.setVisible(true);
         return this;
     }
 
     public TraceAppEntity betweenArtifacts(String sourceName, String targetName) {
         this.setSourceName(sourceName);
         this.setTargetName(targetName);
+        return this;
+    }
+
+    public TraceAppEntity withExplanation(String explanation) {
+        this.explanation = explanation;
         return this;
     }
 

@@ -145,7 +145,9 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
             null,
             ApprovalStatus.APPROVED,
             1,
-            TraceType.MANUAL
+            TraceType.MANUAL,
+            true,
+            null
         );
         static DocumentAppEntity document = new DocumentAppEntity(
             null,

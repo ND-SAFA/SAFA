@@ -4,8 +4,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.config.TraceLinkGenerationConfig;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStepImplementation;
@@ -20,12 +22,14 @@ public interface JobExecutionUtilities {
      */
     static <T extends AbstractJob> List<JobStepImplementation> getSteps(Class<T> jobClass) {
         List<JobStepImplementation> jobSteps = new ArrayList<>();
+        boolean isTest = TraceLinkGenerationConfig.isTestEnvironment();
         for (Method method : jobClass.getMethods()) {
             IJobStep jobStep = method.getAnnotation(IJobStep.class);
-            if (jobStep != null) {
-                JobStepImplementation stepImplementation = new JobStepImplementation(jobStep, method);
-                jobSteps.add(stepImplementation);
+            if (jobStep == null || (isTest && jobStep.requiredGeneration())) {
+                continue;
             }
+            JobStepImplementation stepImplementation = new JobStepImplementation(jobStep, method);
+            jobSteps.add(stepImplementation);
         }
 
         JobStepImplementation[] stepImpls = new JobStepImplementation[jobSteps.size()];
@@ -34,7 +38,10 @@ public interface JobExecutionUtilities {
             int index = getStepIndex(position, jobSteps.size());
             stepImpls[index] = stepImplementation;
         }
-        return Arrays.asList(stepImpls);
+        // Removes omitted steps due to usage of generational features.
+        return Arrays.stream(stepImpls)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -45,10 +52,11 @@ public interface JobExecutionUtilities {
      * @return List of string names representing job steps.
      */
     static <T extends AbstractJob> List<String> getJobStepNames(Class<T> jobClass) {
-        return getSteps(jobClass)
-            .stream()
-            .map(jobStepImplementation -> jobStepImplementation.getAnnotation().value())
-            .collect(Collectors.toList());
+        List<JobStepImplementation> steps = getSteps(jobClass);
+        List<IJobStep> annotations =
+            steps.stream().map(JobStepImplementation::getAnnotation).collect(Collectors.toList());
+        List<String> jobNames = annotations.stream().map(IJobStep::value).collect(Collectors.toList());
+        return jobNames;
     }
 
     static int getStepIndex(int position, int size) {

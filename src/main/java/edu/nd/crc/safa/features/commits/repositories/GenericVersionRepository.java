@@ -215,7 +215,8 @@ public abstract class GenericVersionRepository<
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
-                Pair<VersionEntity, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, appEntity);
+                Pair<VersionEntity, CommitError> commitResponse =
+                    this.commitAppEntityToProjectVersion(projectVersion, appEntity);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
@@ -447,7 +448,8 @@ public abstract class GenericVersionRepository<
     protected abstract VersionEntity instantiateVersionEntityWithModification(ProjectVersion projectVersion,
                                                                               ModificationType modificationType,
                                                                               BaseEntity baseEntity,
-                                                                              AppEntity appEntity) throws JsonProcessingException;
+                                                                              AppEntity appEntity)
+        throws JsonProcessingException;
 
     /**
      * Returns the type of project entity this version repository corresponds to.

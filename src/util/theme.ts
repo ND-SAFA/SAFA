@@ -43,7 +43,7 @@ export enum Colors {
 export const ThemeColors = {
   primary: Colors.greenDark,
   primaryDark: Colors.green,
-  secondary: Colors.green,
+  secondary: Colors.brownDark,
   accent: Colors.green,
   error: Colors.red,
   errorDark: Colors.redLight,

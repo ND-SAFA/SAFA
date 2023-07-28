@@ -102,28 +102,46 @@ $graph-border-radius: 8px;
     position: inherit;
     width: 206px;
     height: 40px;
-    margin-top: 4px
-  }
+    margin-top: 4px;
 
-  & > .cy-node-delta-footer {
-    position: absolute;
-    top: 0;
-    left: 28%;
-  }
+    & > .cy-node-delta-footer {
+      position: absolute;
+      top: 0;
+      left: 28%;
+    }
 
-  & > .cy-node-delta-chip {
-    position: absolute;
-    bottom: 2px;
-    left: 2px;
-    width: 98%;
-    height: 10px;
-    border-radius: 5px;
-
-    & > .cy-node-delta-child-chip {
+    & > .cy-node-delta-chip {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      width: 98%;
       height: 10px;
       border-radius: 5px;
-      width: 32.5%;
-      margin-right: 2px;
+
+      & > .cy-node-delta-child-chip {
+        height: 10px;
+        border-radius: 5px;
+        width: 32.5%;
+        margin-right: 2px;
+      }
     }
   }
+
+  &.cy-node-menu {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Context Menu
+
+.cy-menu-position {
+  z-index: 1000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
 }

@@ -41,7 +41,9 @@
     <template v-if="isTreeMode" #context-menu>
       <artifact-menu />
     </template>
-    <template v-else #context-menu> </template>
+    <template v-else #context-menu>
+      <tim-menu />
+    </template>
   </cytoscape>
 </template>
 
@@ -73,7 +75,7 @@ import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
-import { TimNode, TimLink } from "./tim";
+import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
 

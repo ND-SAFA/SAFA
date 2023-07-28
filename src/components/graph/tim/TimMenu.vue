@@ -8,23 +8,9 @@
   >
     <flex-box>
       <icon-button
-        tooltip="Create artifact"
-        icon="create-artifact"
-        @click="
-          appStore.openArtifactCreatorTo({ isNewArtifact: true });
-          handleCloseMenu();
+        :tooltip="
+          drawMode ? 'Cancel draw mode' : 'Draw artifact type direction'
         "
-      />
-      <icon-button
-        tooltip="Create trace link"
-        icon="create-trace"
-        @click="
-          appStore.openDetailsPanel('saveTrace');
-          handleCloseMenu();
-        "
-      />
-      <icon-button
-        :tooltip="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? 'cancel' : 'trace'"
         @click="
           toggleDrawMode();
@@ -56,10 +42,10 @@
 
 <script lang="ts">
 /**
- * Renders a context menu for the artifact tree.
+ * Renders a context menu for the tim tree.
  */
 export default {
-  name: "ArtifactMenu",
+  name: "TimMenu",
 };
 </script>
 
@@ -72,7 +58,7 @@ import { NodeDisplay } from "../display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 
-const drawMode = computed(() => appStore.isCreateLinkEnabled);
-
 const display = computed(() => sessionStore.isEditor(projectStore.project));
+
+const drawMode = computed(() => appStore.isCreateLinkEnabled);
 </script>

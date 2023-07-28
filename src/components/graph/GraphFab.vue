@@ -21,19 +21,29 @@
         label="Generate Trace Links"
         icon="mdi-chart-timeline-variant-shimmer"
         class="bg-neutral"
+        color="primary"
         data-cy="button-fab-generate-trace"
         @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
-        v-if="isTreeMode"
         outline
-        :label="drawMode ? 'Cancel Trace Link' : 'Draw Trace Link'"
+        label="Generate Artifacts"
+        icon="mdi-monitor-shimmer"
+        class="bg-neutral"
+        color="primary"
+        data-cy="button-fab-generate-artifact"
+        @click="appStore.openDetailsPanel('generateArtifact')"
+      />
+      <q-fab-action
+        outline
+        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
         :icon="drawMode ? 'mdi-close' : 'mdi-ray-start-arrow'"
         class="bg-neutral"
         data-cy="button-fab-draw-trace"
         @click="toggleDrawMode"
       />
       <q-fab-action
+        v-if="isTreeMode"
         outline
         label="Create Trace Link"
         icon="mdi-ray-start-end"
@@ -41,16 +51,8 @@
         data-cy="button-fab-create-trace"
         @click="appStore.openDetailsPanel('saveTrace')"
       />
-
       <q-fab-action
-        outline
-        label="Generate Artifacts"
-        icon="mdi-monitor-shimmer"
-        class="bg-neutral"
-        data-cy="button-fab-generate-artifact"
-        @click="appStore.openDetailsPanel('generateArtifact')"
-      />
-      <q-fab-action
+        v-if="isTreeMode"
         outline
         label="Create Artifact"
         icon="mdi-folder-plus-outline"
@@ -59,6 +61,13 @@
         @click="appStore.openArtifactCreatorTo({ isNewArtifact: true })"
       />
     </q-fab>
+    <icon-button
+      v-if="drawMode"
+      icon="cancel"
+      tooltip="Cancel draw mode"
+      class="q-ml-sm"
+      @click="disableDrawMode"
+    />
   </q-page-sticky>
 </template>
 
@@ -74,7 +83,8 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
-import { toggleDrawMode } from "@/cytoscape";
+import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
+import IconButton from "@/components/common/button/IconButton.vue";
 
 const open = ref(false);
 const fabPos = ref([18, 18]);

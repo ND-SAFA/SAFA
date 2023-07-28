@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky
-    v-if="doDisplay"
+    v-if="display"
     position="bottom-left"
     :offset="fabPos"
     class="artifact-fab"
@@ -10,9 +10,9 @@
       v-touch-pan.prevent.mouse="handleMoveFab"
       direction="up"
       vertical-actions-align="left"
-      :color="isCreateLinkEnabled ? 'secondary' : 'primary'"
+      :color="drawMode ? 'secondary' : 'primary'"
       active-icon="mdi-close"
-      :icon="isCreateLinkEnabled ? 'mdi-ray-start-arrow' : 'mdi-plus'"
+      :icon="drawMode ? 'mdi-ray-start-arrow' : 'mdi-plus'"
       :disable="draggingFab"
       data-cy="button-fab-toggle"
     >
@@ -22,16 +22,16 @@
         icon="mdi-chart-timeline-variant-shimmer"
         class="bg-neutral"
         data-cy="button-fab-generate-trace"
-        @click="handleGenerateTraceLink"
+        @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
         v-if="isTreeMode"
         outline
-        :label="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
-        :icon="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
+        :label="drawMode ? 'Cancel Trace Link' : 'Draw Trace Link'"
+        :icon="drawMode ? 'mdi-close' : 'mdi-ray-start-arrow'"
         class="bg-neutral"
         data-cy="button-fab-draw-trace"
-        @click="handleDrawTraceLink"
+        @click="toggleDrawMode"
       />
       <q-fab-action
         outline
@@ -39,7 +39,7 @@
         icon="mdi-ray-start-end"
         class="bg-neutral"
         data-cy="button-fab-create-trace"
-        @click="handleAddTraceLink"
+        @click="appStore.openDetailsPanel('saveTrace')"
       />
 
       <q-fab-action
@@ -48,7 +48,7 @@
         icon="mdi-monitor-shimmer"
         class="bg-neutral"
         data-cy="button-fab-generate-artifact"
-        @click="handleGenerateArtifact"
+        @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
         outline
@@ -56,7 +56,7 @@
         icon="mdi-folder-plus-outline"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
-        @click="handleAddArtifact"
+        @click="appStore.openArtifactCreatorTo({ isNewArtifact: true })"
       />
     </q-fab>
   </q-page-sticky>
@@ -74,7 +74,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
-import { disableDrawMode, enableDrawMode } from "@/cytoscape";
+import { toggleDrawMode } from "@/cytoscape";
 
 const open = ref(false);
 const fabPos = ref([18, 18]);
@@ -83,10 +83,10 @@ const draggingFab = ref(false);
 const isTreeMode = computed(
   () => !appStore.isLoading && layoutStore.isTreeMode
 );
-const isCreateLinkEnabled = computed(() => appStore.isCreateLinkEnabled);
-const isEditor = computed(() => sessionStore.isEditor(projectStore.project));
-const doDisplay = computed(
-  () => projectStore.isProjectDefined && isEditor.value
+const drawMode = computed(() => appStore.isCreateLinkEnabled);
+const display = computed(
+  () =>
+    projectStore.isProjectDefined && sessionStore.isEditor(projectStore.project)
 );
 
 /**
@@ -101,44 +101,5 @@ function handleMoveFab(ev: {
   draggingFab.value = ev.isFirst !== true && ev.isFinal !== true;
 
   fabPos.value = [fabPos.value[0] + ev.delta.x, fabPos.value[1] - ev.delta.y];
-}
-
-/**
- * Opens the add artifact modal.
- */
-function handleAddArtifact(): void {
-  appStore.openArtifactCreatorTo({ isNewArtifact: true });
-}
-
-/**
- * Opens the add trace link modal.
- */
-function handleAddTraceLink(): void {
-  appStore.openDetailsPanel("saveTrace");
-}
-
-/**
- * Enables the trace link creator.
- */
-function handleDrawTraceLink(): void {
-  if (isCreateLinkEnabled.value) {
-    disableDrawMode();
-  } else {
-    enableDrawMode();
-  }
-}
-
-/**
- * Opens the generate trace link panel.
- */
-function handleGenerateTraceLink(): void {
-  appStore.openDetailsPanel("generateTrace");
-}
-
-/**
- * Opens the generate artifact panel.
- */
-function handleGenerateArtifact(): void {
-  appStore.openDetailsPanel("generateArtifact");
 }
 </script>

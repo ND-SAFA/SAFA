@@ -1,0 +1,78 @@
+<template>
+  <node-display
+    v-if="display"
+    variant="menu"
+    color="primary"
+    @mousedown.stop
+    @mouseup.stop
+  >
+    <flex-box>
+      <icon-button
+        tooltip="Create artifact"
+        icon="create-artifact"
+        @click="
+          appStore.openArtifactCreatorTo({ isNewArtifact: true });
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        tooltip="Generate artifacts"
+        icon="generate-artifacts"
+        color="primary"
+        @click="
+          appStore.openDetailsPanel('generateArtifact');
+          handleCloseMenu();
+        "
+      />
+      <separator vertical class="q-mx-xs" />
+      <icon-button
+        tooltip="Create trace link"
+        icon="create-trace"
+        @click="
+          appStore.openDetailsPanel('saveTrace');
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        :tooltip="drawMode ? 'Cancel Trace Link' : 'Draw Trace Link'"
+        :icon="drawMode ? 'cancel' : 'trace'"
+        @click="
+          toggleDrawMode();
+          handleCloseMenu();
+        "
+      />
+      <icon-button
+        tooltip="Generate trace links"
+        icon="generate-traces"
+        color="primary"
+        @click="
+          appStore.openDetailsPanel('generateTrace');
+          handleCloseMenu();
+        "
+      />
+    </flex-box>
+  </node-display>
+</template>
+
+<script lang="ts">
+/**
+ * Renders a context menu for the artifact tree.
+ */
+export default {
+  name: "ArtifactMenu",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, inject } from "vue";
+import { appStore, projectStore, sessionStore } from "@/hooks";
+import { toggleDrawMode } from "@/cytoscape";
+import { FlexBox, IconButton, Separator } from "@/components/common";
+import { NodeDisplay } from "../display";
+
+const handleCloseMenu = inject<() => void>("menu-close");
+
+const drawMode = computed(() => appStore.isCreateLinkEnabled);
+
+const display = computed(() => sessionStore.isEditor(projectStore.project));
+</script>

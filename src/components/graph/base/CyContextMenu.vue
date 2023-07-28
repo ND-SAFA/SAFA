@@ -1,11 +1,6 @@
 <template>
   <div v-if="display" :style="style" class="cy-menu-position">
-    <div
-      style="background-color: red; width: 16px; height: 16px"
-      class="cy-menu-display"
-    >
-      <slot />
-    </div>
+    <slot />
   </div>
 </template>
 
@@ -19,7 +14,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  computed,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  ref,
+} from "vue";
 import { Core, EventObject } from "cytoscape";
 import { CytoEvent } from "@/types";
 
@@ -33,10 +35,18 @@ const style = ref("");
 const display = computed(() => !!pos.value);
 
 /**
+ * Closes the context menu.
+ */
+function handleMenuClose() {
+  pos.value = undefined;
+  style.value = "";
+}
+
+/**
  * Sets up all event handlers.
  */
 function listenForEmits(): void {
-  const onRightClick = (event: EventObject) => {
+  const handleRightClick = (event: EventObject) => {
     const oldPos = pos.value;
     const newPos = event.renderedPosition;
 
@@ -49,14 +59,11 @@ function listenForEmits(): void {
     }
   };
 
-  const onOffClick = () => {
-    pos.value = undefined;
-    style.value = "";
-  };
-
-  instance.value?.on(CytoEvent.CXT_TAP, onRightClick);
-  instance.value?.on(CytoEvent.CLICK, onOffClick);
+  instance.value?.on(CytoEvent.CXT_TAP, handleRightClick);
+  instance.value?.on(CytoEvent.CLICK, handleMenuClose);
 }
+
+provide("menu-close", handleMenuClose);
 
 /**
  * Listen for right click events to create the context menu.

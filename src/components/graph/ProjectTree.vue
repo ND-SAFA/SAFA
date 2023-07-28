@@ -37,6 +37,11 @@
         :generated="matrix.generatedCount > 0"
       />
     </template>
+
+    <template v-if="isTreeMode" #context-menu>
+      <artifact-menu />
+    </template>
+    <template v-else #context-menu> </template>
   </cytoscape>
 </template>
 
@@ -67,7 +72,7 @@ import {
 import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
 import { Cytoscape } from "./base";
-import { ArtifactNode, TraceLink } from "./tree";
+import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink } from "./tim";
 
 const currentRoute = useRoute();

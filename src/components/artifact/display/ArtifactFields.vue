@@ -6,11 +6,12 @@
           v-if="isCode"
           variant="caption"
           :value="codePath"
+          el="h1"
           ellipsis
           data-cy="text-selected-name"
         />
-        <typography el="h1" variant="subtitle" :value="displayName" ellipsis />
-        <q-tooltip>{{ name }}</q-tooltip>
+        <typography variant="subtitle" :value="displayName" ellipsis />
+        <q-tooltip>{{ displayName }}</q-tooltip>
       </flex-box>
       <attribute-chip
         artifact-type
@@ -19,7 +20,7 @@
       />
     </flex-box>
 
-    <separator b="2" t="1" />
+    <separator b="2" />
 
     <typography variant="caption" value="Body" />
     <typography
@@ -69,7 +70,7 @@ const variant = computed(() =>
 const isCode = computed(() => isCodeArtifact(name.value));
 
 const codePath = computed(() =>
-  isCode.value ? name.value.split("/").slice(0, -1).join("/") : undefined
+  isCode.value ? name.value.split("/").slice(0, -1).join("/") : ""
 );
 
 const displayName = computed(

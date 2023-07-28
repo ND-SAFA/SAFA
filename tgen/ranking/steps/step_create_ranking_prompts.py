@@ -25,7 +25,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
 
         prompts = []
         for p_name in parent_names:
-            prompt = CreateRankingPrompts.create_prompts(artifact_map, p_name, state, args.max_children_per_query)
+            prompt = CreateRankingPrompts.create_prompts(artifact_map, p_name, args, state, args.max_children_per_query)
             prompts.append(prompt)
 
         state.ranking_prompts = prompts
@@ -33,19 +33,22 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
     @staticmethod
     def create_prompts(artifact_map: Dict[str, str],
                        parent_id: str,
+                       args: RankingArgs,
                        state: RankingState, max_children: int = None) -> str:
         """
         Creates ranking prompt for parent artifact.
         :param artifact_map: Map of artifact id to body.
         :param parent_id: The id of the parent to create prompt for.
+        :param args: The configuration of the ranking pipeline.
         :param state: The state of the current ranking run.
         :return: The ranking prompt.
         """
         target_names = state.sorted_parent2children[parent_id][:max_children]
         source_body = artifact_map[parent_id]
-        prompt_builder = RankingPromptBuilder(goal=state.ranking_goal,
-                                              instructions=state.ranking_instructions,
+        prompt_builder = RankingPromptBuilder(goal=args.ranking_goal,
+                                              instructions=args.ranking_instructions,
                                               query=source_body,
+                                              query_tag=args.query_tag,
                                               body_title=BODY_ARTIFACT_TITLE)
         if state.project_summary is not None and len(state.project_summary) > 0:
             uses_specification = SUMMARY_TITLE in state.project_summary

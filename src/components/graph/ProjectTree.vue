@@ -111,7 +111,9 @@ const className = computed(() => {
 function handleClick(event: EventObject): void {
   if (event.target !== event.cy) return;
 
-  disableDrawMode();
+  if (appStore.isCreateLinkEnabled) {
+    disableDrawMode();
+  }
 
   if (
     (

@@ -43,8 +43,12 @@ const display = computed(() => !!pos.value);
  * Closes the context menu.
  */
 function handleCloseMenu() {
-  pos.value = undefined;
-  style.value = "";
+  if (pos.value) {
+    pos.value = undefined;
+  }
+  if (style.value) {
+    style.value = "";
+  }
 }
 
 /**
@@ -88,6 +92,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   instance.value?.off(CytoEvent.CXT_TAP);
   instance.value?.off(CytoEvent.CLICK);
+  instance.value?.off(CytoEvent.PAN_ZOOM);
 });
 
 watch(() => layoutStore.mode, handleCloseMenu);

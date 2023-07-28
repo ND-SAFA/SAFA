@@ -3,7 +3,7 @@
     <text-button
       text
       label="View Content"
-      icon="artifact"
+      icon="code"
       data-cy="button-artifact-body"
       @click="handleViewBody"
     />

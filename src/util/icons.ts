@@ -58,6 +58,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-account-circle";
     case "search":
       return "mdi-magnify";
+    case "code":
+      return "mdi-code-json";
     case "create-artifact":
       return "mdi-folder-plus-outline";
     case "create-trace":

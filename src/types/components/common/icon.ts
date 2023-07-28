@@ -25,6 +25,7 @@ export type IconVariant =
   | "back"
   | "account"
   | "search"
+  | "code"
   | "create-artifact"
   | "create-trace"
   | "generate"

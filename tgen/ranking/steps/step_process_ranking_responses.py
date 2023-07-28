@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.constants.deliminator_constants import DASH, NEW_LINE
+from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_EXPLANATION_TAG
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
@@ -10,7 +11,6 @@ from tgen.state.state import State
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
 RESPONSE_PROCESSING_STEPS = [
-    lambda r: LLMResponseUtil.parse(r, "links")[0],
     lambda s: s.replace("ID:", ""),
     lambda s: s.split(",")
 ]
@@ -49,11 +49,14 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             parent_index = parent2index[parent_name]
             related_children = state.sorted_parent2children[parent_name]
 
-            # content = LLMResponseUtil.parse(prompt_response, "context")
-            related = LLMResponseUtil.parse(prompt_response, "related")[0]
-            explanations = ProcessRankingResponses.read_explanations(related, related_children)
+            if f"<{DEFAULT_RANKING_EXPLANATION_TAG}>" in prompt_response:
+                related = LLMResponseUtil.parse(prompt_response, DEFAULT_RANKING_EXPLANATION_TAG)[0]
+                explanations = ProcessRankingResponses.read_explanations(related, related_children)
+            else:
+                explanations = {}
 
-            response_list = ProcessRankingResponses.convert_response_to_list(prompt_response)  # string response into list
+            links = LLMResponseUtil.parse(prompt_response, args.links_tag)[0]
+            response_list = ProcessRankingResponses.convert_response_to_list(links)  # string response into list
             artifact_indices = ProcessRankingResponses.parse_artifact_indices(response_list)  # processes each artifact id
             prompt_ranked_children = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_children)
             prompt_ranked_children = ProcessRankingResponses.remove_duplicate_ids(prompt_ranked_children)

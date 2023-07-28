@@ -21,9 +21,14 @@ import {
   onMounted,
   provide,
   ref,
+  watch,
 } from "vue";
 import { Core, EventObject } from "cytoscape";
+import { useRoute } from "vue-router";
 import { CytoEvent } from "@/types";
+import { layoutStore } from "@/hooks";
+
+const currentRoute = useRoute();
 
 const cy = inject<Promise<Core>>("cy");
 
@@ -37,7 +42,7 @@ const display = computed(() => !!pos.value);
 /**
  * Closes the context menu.
  */
-function handleMenuClose() {
+function handleCloseMenu() {
   pos.value = undefined;
   style.value = "";
 }
@@ -60,10 +65,11 @@ function listenForEmits(): void {
   };
 
   instance.value?.on(CytoEvent.CXT_TAP, handleRightClick);
-  instance.value?.on(CytoEvent.CLICK, handleMenuClose);
+  instance.value?.on(CytoEvent.CLICK, handleCloseMenu);
+  instance.value?.on(CytoEvent.PAN_ZOOM, handleCloseMenu);
 }
 
-provide("menu-close", handleMenuClose);
+provide("menu-close", handleCloseMenu);
 
 /**
  * Listen for right click events to create the context menu.
@@ -83,4 +89,7 @@ onBeforeUnmount(() => {
   instance.value?.off(CytoEvent.CXT_TAP);
   instance.value?.off(CytoEvent.CLICK);
 });
+
+watch(() => layoutStore.mode, handleCloseMenu);
+watch(() => currentRoute.path, handleCloseMenu);
 </script>

@@ -1,5 +1,6 @@
 <template>
   <list-item
+    dense
     :clickable="props.clickable"
     :divider="props.displayDivider"
     :class="props.fullWidth ? 'full-width' : 'artifact-display'"

@@ -1,5 +1,5 @@
 <template>
-  <flex-box full-width>
+  <flex-box full-width :column="!isCode">
     <div style="min-width: 400px">
       <typography
         variant="caption"
@@ -13,7 +13,11 @@
     </div>
     <div v-if="showSummary">
       <typography variant="caption" value="Content" />
-      <typography variant="code" :value="props.artifact.body" l="2" />
+      <typography
+        :variant="isCode ? 'code' : 'expandable'"
+        :value="props.artifact.body"
+        l="3"
+      />
     </div>
   </flex-box>
 </template>
@@ -31,6 +35,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactSchema } from "@/types";
+import { isCodeArtifact } from "@/util";
 import { ArtifactBodyDisplay, FlexBox, Typography } from "@/components";
 
 const props = defineProps<{
@@ -41,4 +46,6 @@ const props = defineProps<{
 }>();
 
 const showSummary = computed(() => !!props.artifact.summary);
+
+const isCode = computed(() => isCodeArtifact(props.artifact.name));
 </script>

@@ -2,6 +2,8 @@ import json
 import os.path
 from typing import Type, Union
 
+from api.constants.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, DEFAULT_SEARCH_LINK_TAG, \
+    DEFAULT_SEARCH_QUERY_TAG
 from api.endpoints.base.views.endpoint import async_endpoint, endpoint
 from api.endpoints.predict.predict_serializer import PredictionSerializer, TraceRequest
 from api.utils.view_util import ViewUtil
@@ -50,4 +52,9 @@ def perform_search(prediction_payload: TraceRequest):
                                project_summary=summary,
                                max_children_per_query=DEFAULT_SEARCH_FILTER,
                                model=DEFAULT_SEARCH_MODEL,
+                               select_top_predictions=False,
+                               ranking_goal=DEFAULT_SEARCH_GOAL,
+                               ranking_instructions=DEFAULT_SEARCH_INSTRUCTIONS,
+                               query_tag=DEFAULT_SEARCH_QUERY_TAG,
+                               links_tag=DEFAULT_SEARCH_LINK_TAG,
                                layer_ids=[SEARCH_PARENT_TYPE, SEARCH_CHILD_TYPE])

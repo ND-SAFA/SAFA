@@ -127,3 +127,21 @@ $graph-border-radius: 8px;
     }
   }
 }
+
+// Context Menu
+
+.cy-menu-position {
+  z-index: 1000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+
+  & > .cy-menu-display {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

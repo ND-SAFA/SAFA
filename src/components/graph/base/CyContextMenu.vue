@@ -1,17 +1,11 @@
 <template>
-  <div v-if="display" id="cy-context-menu" :style="style">
+  <div v-if="display" :style="style" class="cy-menu-position">
     <div
-      style="
-        background-color: red;
-        width: 16px;
-        height: 16px;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      "
-    ></div>
-    <slot />
+      style="background-color: red; width: 16px; height: 16px"
+      class="cy-menu-display"
+    >
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -49,12 +43,8 @@ function listenForEmits(): void {
     if (oldPos?.x !== newPos.x || oldPos?.y !== newPos.y) {
       pos.value = { ...newPos };
       style.value = `
-        z-index: 1000;
-        position: absolute;
         left: ${newPos.x}px;
         top: ${newPos.y}px;
-        right: auto;
-        bottom: auto;
       `;
     }
   };

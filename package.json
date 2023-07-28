@@ -30,7 +30,6 @@
     "core-js": "^3.29.0",
     "cytoscape": "^3.23.0",
     "cytoscape-automove": "^1.10.3",
-    "cytoscape-context-menus": "^4.1.0",
     "cytoscape-edgehandles": "^4.0.1",
     "cytoscape-klay": "^3.1.4",
     "file-saver": "^2.0.5",

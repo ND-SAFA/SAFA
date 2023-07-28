@@ -6,7 +6,7 @@
       text
       color="primary"
       :loading="artifactGenerationApiStore.summaryGenLoading"
-      :icon="hasSummary ? 'graph-refresh' : 'add'"
+      :icon="hasSummary ? 'graph-refresh' : 'generate'"
       :label="hasSummary ? 'Resummarize' : 'Summarize'"
       @click="handleGenerateSummary"
     />

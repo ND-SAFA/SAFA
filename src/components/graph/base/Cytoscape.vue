@@ -1,6 +1,9 @@
 <template>
-  <div ref="container">
-    <slot />
+  <div :id="id" ref="container" :class="className">
+    <slot v-if="initialized" />
+    <cy-context-menu v-if="initialized">
+      <slot name="context-menu" />
+    </cy-context-menu>
   </div>
 </template>
 
@@ -14,38 +17,71 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, withDefaults, provide, onMounted, onBeforeUnmount } from "vue";
-import cytoscape, { CytoscapeOptions, Core, EventObject } from "cytoscape";
-import { CytoEvent } from "@/types";
+import { ref, provide, onMounted, onBeforeUnmount, computed } from "vue";
+import cytoscape, { EventObject } from "cytoscape";
+import { CytoCore, CytoCoreGraph, CytoEvent } from "@/types";
+import { logStore } from "@/hooks";
+import CyContextMenu from "./CyContextMenu.vue";
 
-const props = withDefaults(
-  defineProps<{
-    id?: string;
-    config: CytoscapeOptions;
-    preConfig?: (cy: typeof cytoscape) => void;
-    afterCreated?: (cy: Core) => void;
-  }>(),
-  {
-    id: "cytoscape-div",
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    preConfig: () => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    afterCreated: () => {},
-  }
-);
+const props = defineProps<{
+  id: string;
+  graph: CytoCoreGraph;
+  class?: string;
+}>();
 
 const emit = defineEmits<{
   (e: "click", event: EventObject): void;
 }>();
 
+const initialized = ref(false);
 const container = ref<HTMLElement | null>(null);
-const instance = ref<Core | undefined>(undefined);
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const resolve = ref<(value: PromiseLike<Core> | Core) => void>(() => {});
+const instance = ref<CytoCore | undefined>(undefined);
+const resolve = ref<(value: PromiseLike<CytoCore> | CytoCore) => void>(
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  () => {}
+);
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const reject = ref<() => void>(() => {});
 
 const relTransform = ref("");
+
+const className = computed(
+  () => `cy-container bg-neutral ${props.class || ""}`
+);
+
+/**
+ * Initializes all plugins.
+ */
+function beforeCreated(core: typeof cytoscape) {
+  props.graph.plugins.forEach((plugin) => {
+    try {
+      plugin.initialize(core);
+    } catch (e) {
+      logStore.onDevError(`Plugin installation error: ${e}`);
+    }
+  });
+}
+
+/**
+ * Finalizes all plugins.
+ */
+async function afterCreated(core: CytoCore) {
+  if (props.graph.saveCy) {
+    props.graph.saveCy(core);
+  } else {
+    logStore.onDevError(
+      `Unable to save cytoscape instance in: ${props.graph.name}`
+    );
+  }
+
+  props.graph.plugins.forEach((plugin) => {
+    plugin.afterInit(core);
+  });
+
+  props.graph.afterInit(core);
+
+  initialized.value = true;
+}
 
 /**
  * Initialized cytoscape to be synchronized with this component.
@@ -57,17 +93,20 @@ function initCy(): void {
   container.value?.setAttribute("style", "min-height: 600px;");
 
   // Apply lifecycle hooks.
-  if (props.preConfig) props.preConfig(cytoscape);
+  beforeCreated(cytoscape);
 
   // Create cytoscape instance.
-  const cyInstance = cytoscape({ container: container.value, ...props.config });
+  const cyInstance = cytoscape({
+    container: container.value,
+    ...props.graph.config,
+  }) as CytoCore;
 
   instance.value = cyInstance;
 
+  afterCreated(cyInstance);
+
   // Resolve the promise with the object created.
   resolve.value(cyInstance);
-
-  if (props.afterCreated) props.afterCreated(cyInstance);
 }
 
 /**
@@ -95,7 +134,7 @@ function listenForEmits(): void {
 
 provide(
   "cy",
-  new Promise<Core>((res, rej) => {
+  new Promise<CytoCore>((res, rej) => {
     resolve.value = res;
     reject.value = rej;
   })

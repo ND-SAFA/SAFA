@@ -13,6 +13,7 @@
       dense
       size="sm"
       color="textCaption"
+      :class="buttonClassName"
       @click.stop="expanded = !expanded"
     >
       {{ expandLabel }}
@@ -97,6 +98,8 @@ const props = withDefaults(defineProps<TypographyProps>(), {
 });
 
 const { darkMode } = useTheme();
+
+const buttonClassName = useMargins(props);
 
 const className = useMargins(props, () => [
   [props.variant === "large", "text-h3"],

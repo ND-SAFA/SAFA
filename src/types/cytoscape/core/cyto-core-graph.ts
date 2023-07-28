@@ -1,4 +1,4 @@
-import { CytoscapeOptions } from "cytoscape";
+import cytoscape, { CytoscapeOptions } from "cytoscape";
 import { CytoCore } from "@/types/cytoscape/core";
 
 /**
@@ -22,16 +22,11 @@ export type ResolveCy =
 export type CyPromise = Promise<CytoCore>;
 
 /**
- * A generic function type using a CytoCore instance.
- */
-export type CytoCoreAction = (cy: CytoCore) => void;
-
-/**
- * Defines an plugin to be used on cytoscape
+ * Defines a plugin to be used on cytoscape
  */
 export interface CytoCorePlugin {
-  initialize: CytoCoreAction;
-  afterInit: CytoCoreAction;
+  initialize: (cy: typeof cytoscape) => void;
+  afterInit: (cy: CytoCore) => void;
 }
 
 /**
@@ -58,5 +53,5 @@ export interface CytoCoreGraph {
    * Handler for performing any actions once all plugins and elements have
    * been setup in cytoscape instance.
    */
-  afterInit: CytoCoreAction;
+  afterInit: (cy: CytoCore) => void;
 }

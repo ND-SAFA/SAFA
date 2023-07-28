@@ -32,7 +32,7 @@
         <separator class="full-width q-my-xs" />
         <icon-button
           tooltip="Generate parents"
-          icon="generateArtifacts"
+          icon="generate-artifacts"
           color="primary"
           @click="appStore.openDetailsPanel('generateArtifact')"
         />

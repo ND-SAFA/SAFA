@@ -5,35 +5,21 @@ import {
   Layouts,
   Stylesheet,
 } from "cytoscape";
-import { ArtifactCytoElementData, TimNodeCytoElementData } from "@/types";
 import {
   AutoMoveOptions,
   AutoMoveRule,
-  CytoContextMenu,
   EdgeHandleCore,
   EdgeHandlersOptions,
-  HtmlDefinition,
   KlayLayoutOptions,
-  ContextMenuOptions,
 } from "@/types/cytoscape";
 import { CytoEvent } from "@/types/cytoscape/core/events";
-
-/**
- * The HtmlDefinitions used with in the application.
- */
-type AppHtmlDefinitions = (
-  | HtmlDefinition<ArtifactCytoElementData>
-  | HtmlDefinition<TimNodeCytoElementData>
-)[];
 
 /**
  * Defines CytoCore, an application specific definition of cytoscape defining
  * interfaces with the plugin made available.
  */
 export interface CytoCore extends Core {
-  nodeHtmlLabel(defs: AppHtmlDefinitions): void;
   automove(input: string | AutoMoveOptions): AutoMoveRule;
-  contextMenus(options: ContextMenuOptions | "get"): CytoContextMenu;
   layout(l: LayoutOptions | KlayLayoutOptions): Layouts;
   edgehandles(opts: EdgeHandlersOptions): EdgeHandleCore;
 }

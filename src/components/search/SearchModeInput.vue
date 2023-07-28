@@ -31,13 +31,19 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { SearchMode } from "@/types";
 import { searchModeOptions } from "@/util";
-import { searchStore } from "@/hooks";
+import { projectStore, searchStore, sessionStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";
 
-const modeOptions = searchModeOptions();
+const displayEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
+const modeOptions = computed(() =>
+  displayEditing.value ? searchModeOptions() : [searchModeOptions()[2]]
+);
 
 /**
  * Clear the search data when the mode changes.

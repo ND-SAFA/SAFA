@@ -73,9 +73,10 @@
           @click="subtreeStore.hideSubtree(id)"
         />
 
-        <separator class="full-width q-my-xs" />
+        <separator v-if="displayEditing" class="full-width q-my-xs" />
 
         <icon-button
+          v-if="displayEditing"
           tooltip="Add parent"
           icon="trace"
           color="primary"
@@ -88,6 +89,7 @@
           "
         />
         <icon-button
+          v-if="displayEditing"
           tooltip="Add child"
           icon="trace"
           color="primary"
@@ -132,6 +134,8 @@ import {
   layoutStore,
   documentStore,
   appStore,
+  sessionStore,
+  projectStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import {
@@ -149,6 +153,10 @@ const props = defineProps<{
 }>();
 
 const { darkMode } = useTheme();
+
+const displayEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const id = computed(() => props.artifact.id);
 

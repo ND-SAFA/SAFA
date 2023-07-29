@@ -49,7 +49,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             parent_index = parent2index[parent_name]
             related_children = state.sorted_parent2children[parent_name]
 
-            if f"<{DEFAULT_RANKING_EXPLANATION_TAG}>" in prompt_response:
+            if f"NOT<{DEFAULT_RANKING_EXPLANATION_TAG}>" in prompt_response:
                 related = LLMResponseUtil.parse(prompt_response, DEFAULT_RANKING_EXPLANATION_TAG)[0]
                 explanations = ProcessRankingResponses.read_explanations(related, related_children)
             else:

@@ -4,10 +4,11 @@ from typing import Any, Dict, List, Optional
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import DEFAULT_LINKS_TAG, DEFAULT_MAX_N_CHILDREN, DEFAULT_PARENT_MIN_THRESHOLD, \
+from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN, DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_QUERY_TAG, DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
-from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS
+    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
+from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
+    DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 
@@ -62,6 +63,10 @@ class RankingArgs(PipelineArgs):
     """
     project_summary: str = None
     """
+    The path to load a project summary from
+    """
+    project_summary_path: str = "~/desktop/hgen/summaries/project/safa.txt"
+    """
     The model used to rank
     """
     model: str = DEFAULT_RANKING_MODEL
@@ -76,19 +81,19 @@ class RankingArgs(PipelineArgs):
     """
     The goal of the ranking prompt. The top portion.
     """
-    ranking_goal: str = DEFAULT_RANKING_GOAL
+    ranking_goal: str = DEFAULT_SEARCH_GOAL
     """
     The detailed task instructions. The bottom portion. 
     """
-    ranking_instructions: str = DEFAULT_RANKING_INSTRUCTIONS
+    ranking_instructions: str = DEFAULT_SEARCH_INSTRUCTIONS
     """
     The tag used to encapsulate the parent or query string.
     """
-    query_tag: str = DEFAULT_QUERY_TAG
+    query_tag: str = DEFAULT_SEARCH_QUERY_TAG
     """
     The tag used to contain the final ranked artifact ids.
     """
-    links_tag: str = DEFAULT_LINKS_TAG
+    links_tag: str = DEFAULT_SEARCH_LINK_TAG
 
     def save(self, obj: Any, file_name: str) -> str:
         """

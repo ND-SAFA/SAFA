@@ -1,6 +1,6 @@
 DEFAULT_PARENT_THRESHOLD = 0.8  # The minimum percentile to consider a candidate as true
-DEFAULT_PARENT_MIN_THRESHOLD = 0.75  # The minimum percentile allowed for a top parent prediction.
-DEFAULT_MIN_RANKING_SCORE = DEFAULT_PARENT_MIN_THRESHOLD
+DEFAULT_PARENT_MIN_THRESHOLD = 0.5  # The minimum percentile allowed for a top parent prediction.
+DEFAULT_MIN_RANKING_SCORE = 0
 DEFAULT_MAX_N_CHILDREN = 50
 DEFAULT_SORTING_ALGORITHM = "vsm"
 BODY_ARTIFACT_TITLE = "# Software Artifacts\nBelow are the artifact of the software system."

@@ -62,7 +62,7 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def assign_scores_to_targets(n_items: int, min_score=0.5) -> List[float]:
+    def assign_scores_to_targets(n_items: int, min_score=DEFAULT_MIN_RANKING_SCORE) -> List[float]:
         """
         Assigns scores to ranked targets from 1 to min score incrementing linearly.
         :param n_items: The number of items to assign scores for.

@@ -53,7 +53,7 @@ class RankingArgs(PipelineArgs):
     """
     The maximum number of tokens per source artifacts.
     """
-    n_completion_tokens = 1000
+    n_completion_tokens = 10000
     """
     Whether to generate a project summary.
     """
@@ -65,7 +65,7 @@ class RankingArgs(PipelineArgs):
     """
     The path to load a project summary from
     """
-    project_summary_path: str = "~/desktop/hgen/summaries/project/safa.txt"
+    project_summary_path: str = None
     """
     The model used to rank
     """

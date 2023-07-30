@@ -25,7 +25,7 @@ class RankingArgs(PipelineArgs):
     """
     Path to export various checkpoints
     """
-    export_dir: str = None
+    export_dir: str = "~/desktop/hgen/checkpoints/safa"
     """
     Optional.List of children ids to compare to each parent.
     """
@@ -65,7 +65,7 @@ class RankingArgs(PipelineArgs):
     """
     The path to load a project summary from
     """
-    project_summary_path: str = None
+    project_summary_path: str = "~/desktop/hgen/summaries/project/safa.txt"
     """
     The model used to rank
     """
@@ -103,7 +103,21 @@ class RankingArgs(PipelineArgs):
         :return: Path of file.
         """
         if self.export_dir is not None:
-            export_path = os.path.join(self.export_dir, file_name)
+            self.export_dir = os.path.expanduser(self.export_dir)
+            os.makedirs(self.export_dir, exist_ok=True)
+            export_path = self.get_path(file_name)
             FileUtil.write_yaml(obj, export_path)
             logger.info(f"Saved object to: {export_path}")
             return export_path
+
+    def get_path(self, file_name: str):
+        """
+        Returns path to file in run.
+        :param file_name: The name of the file.
+        :return: Path to file in output directory.
+        """
+        if self.export_dir is None:
+            return None
+        path = os.path.join(self.export_dir, file_name)
+        path = os.path.expanduser(path)
+        return path

@@ -130,7 +130,9 @@ class RankingUtil:
                 selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
                 top_parent = sorted_entries[0]
                 if len(selected_entries) == 0:
-                    selected_entries.append(top_parent)
+                    selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.8][:3]
+                    if len(selected_entries) == 0:
+                        selected_entries.append(top_parent)
             predictions.extend(selected_entries)
 
         if top_n:

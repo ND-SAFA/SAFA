@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.deliminator_constants import DASH, NEW_LINE
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -48,66 +49,38 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             parent_index = parent2index[parent_name]
             related_children = state.sorted_parent2children[parent_name]
 
-            # Step - Parse
+            # Step - Parse and clean
+            ID_INDEX = 0
+            SUMMARY_INDEX = 1
+            EXPLANATION_INDEX = 2
+            SCORE_INDEX = 3
+
             explanation = LLMResponseUtil.parse(prompt_response, "explanation")[0]
             entries = explanation.split("\n")
             entries = [e for e in entries if len(e) > 0]
             entry_pieces = [e.split("|") for e in entries]
             entry_pieces = [[e.strip() for e in entry] for entry in entry_pieces]
-            entry_pieces = [(e[0], float(e[1]), e[2]) for e in entry_pieces]
-            entry_pieces = sorted(entry_pieces, key=lambda e: e[1], reverse=True)
-            artifact_indices = [e[0] for e in entry_pieces]
-            artifact_explanations = [e[2] for e in entry_pieces]
+            parsed_entries = []
+            for e in entry_pieces:
+                try:
+                    artifact_index = int(e[ID_INDEX])
+                    artifact_summary = e[SUMMARY_INDEX]
+                    artifact_explanation = e[EXPLANATION_INDEX]
+                    artifact_score = float(e[SCORE_INDEX])
+                    parsed_entries.append((artifact_index, artifact_summary, artifact_explanation, artifact_score))
+                except:
+                    logger.info(f"Unable to parse: {e}")
 
-            # Step Translate and cleanup
-            prompt_ranked_children = ProcessRankingResponses.translate_indices_to_ids(artifact_indices, related_children)
-            prompt_ranked_children = ProcessRankingResponses.remove_duplicate_ids(prompt_ranked_children)
+            # Step - Translate
+            entry_pieces = sorted(parsed_entries, key=lambda e: (e[SCORE_INDEX], -e[ID_INDEX]), reverse=True)
+            artifact_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
+            artifact_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]
 
-            ranked_children_list[parent_index].extend(prompt_ranked_children)
+            # Step - Store results
+            ranked_children_list[parent_index].extend(artifact_ids)
             ranked_children_explanations[parent_index] = artifact_explanations
 
         return ranked_children_list, ranked_children_explanations
-
-    @staticmethod
-    def translate_indices_to_ids(artifact_indices: List[str], related_targets: List[str]):
-        """
-        Translates artifact indices to ids.
-        :param artifact_indices: The indices of the artifacts to translate.
-        :param related_targets: The target corresponding to indices.
-        :return: The translated artifact ids.
-        """
-        artifact_indices = list(filter(lambda i: len(i) > 0, artifact_indices))
-        artifact_indices = list(map(lambda i: int(i), artifact_indices))
-        artifact_indices = list(filter(lambda i: i < len(related_targets), artifact_indices))
-        artifact_indices = list(map(lambda i: related_targets[i], artifact_indices))
-        return artifact_indices
-
-    @staticmethod
-    def parse_artifact_indices(raw_artifact_ids: List[str]):
-        """
-        Performs post-processing on artifact indices.
-        :param raw_artifact_ids: The raw ranking responses.
-        :return: Processed ids.
-        """
-        response = []
-        for raw_artifact_id in raw_artifact_ids:
-            processed = raw_artifact_id
-            for s in ID_PROCESSING_STEPS:
-                processed = s(processed)
-            response.append(processed)
-        return response
-
-    @staticmethod
-    def convert_response_to_list(r: str):
-        """
-        Converts string of indices into list of indices.
-        :param r: The response string.
-        :return: List of ids.
-        """
-        processed = r
-        for s in RESPONSE_PROCESSING_STEPS:
-            processed = s(processed)
-        return processed
 
     @staticmethod
     def remove_duplicate_ids(artifact_ids: List[str]):

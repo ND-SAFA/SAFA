@@ -53,7 +53,7 @@ class RankingArgs(PipelineArgs):
     """
     The maximum number of tokens per source artifacts.
     """
-    n_completion_tokens = 10000
+    n_completion_tokens = 20000
     """
     Whether to generate a project summary.
     """

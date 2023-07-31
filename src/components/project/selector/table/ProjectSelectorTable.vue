@@ -3,8 +3,8 @@
     v-model:selected="selectedItems"
     :minimal="props.minimal"
     addable
-    editable
-    :deletable="isDeletable"
+    :editable="sessionStore.isEditor"
+    :deletable="sessionStore.isOwner"
     :loading="getProjectApiStore.loading"
     :columns="columns"
     :rows="rows"
@@ -12,9 +12,9 @@
     item-name="Project"
     data-cy="table-project"
     @refresh="handleReload"
-    @row:add="handleOpenAdd"
-    @row:edit="handleOpenEdit"
-    @row:delete="handleOpenDelete"
+    @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"
+    @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
+    @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
     <template #cell-actions="{ row }">
       <icon-button
@@ -103,38 +103,6 @@ function handleReload() {
   selected.value = undefined;
 
   getProjectApiStore.handleReload();
-}
-
-/**
- * Returns whether a project is deletable.
- * @param project - The project to check.
- * @return Whether it can be deleted.
- */
-function isDeletable(project: IdentifierSchema): boolean {
-  return sessionStore.isOwner(project);
-}
-
-/**
- * Opens the add project modal.
- */
-function handleOpenAdd() {
-  identifierSaveStore.selectIdentifier(undefined, "save");
-}
-
-/**
- * Opens the edit project modal.
- * @param project - The project to edit.
- */
-function handleOpenEdit(project: IdentifierSchema) {
-  identifierSaveStore.selectIdentifier(project, "save");
-}
-
-/**
- * Opens the delete project modal.
- * @param project - The project to delete.
- */
-function handleOpenDelete(project: IdentifierSchema) {
-  identifierSaveStore.selectIdentifier(project, "delete");
 }
 
 /**

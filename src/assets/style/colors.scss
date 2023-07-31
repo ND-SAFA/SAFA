@@ -100,6 +100,22 @@ $color-node-generated: var(--q-nodeGenerated);
   color: $color-caption !important;
 }
 
+.text-added {
+    color: $color-added !important;
+}
+
+.text-modified {
+    color: $color-modified !important;
+}
+
+.text-removed {
+    color: $color-removed !important;
+}
+
+.text-warning {
+    color: $color-warning !important;
+}
+
 .text-nodeDefault {
   color: $color-node-default !important;
 }

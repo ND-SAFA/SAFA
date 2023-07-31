@@ -20,7 +20,7 @@
       />
     </flex-box>
 
-    <separator b="2" />
+    <separator b="2" t="1" />
 
     <typography variant="caption" value="Body" />
     <typography

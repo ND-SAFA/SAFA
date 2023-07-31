@@ -1,7 +1,12 @@
 <template>
   <div v-if="isSaving">
-    <q-circular-progress color="primary" indeterminate size="md" />
-    <icon color="primary" variant="saving" class="nav-saving-icon" />
+    <q-circular-progress
+      color="primary"
+      indeterminate
+      size="md"
+      class="nav-saving-icon"
+    />
+    <icon color="primary" variant="saving" />
     <q-tooltip> Saving... </q-tooltip>
   </div>
 </template>

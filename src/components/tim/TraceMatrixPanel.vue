@@ -11,13 +11,22 @@
 
     <panel-card>
       <flex-box align="center" justify="between" class="overflow-hidden">
-        <div class="overflow-hidden">
+        <div class="overflow-hidden" data-cy="text-selected-name">
+          <typography variant="caption" value="From" />
           <typography
             ellipsis
             variant="subtitle"
             el="h1"
-            :value="name"
-            data-cy="text-selected-name"
+            class="q-my-none"
+            :value="sourceType"
+          />
+          <typography variant="caption" value="To" />
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            class="q-my-none"
+            :value="targetType"
           />
           <q-tooltip>{{ name }}</q-tooltip>
         </div>
@@ -30,7 +39,7 @@
         />
       </flex-box>
 
-      <separator b="2" />
+      <separator b="2" t="1" />
 
       <typography variant="caption" value="Total Trace Links" />
       <typography el="p" :value="totalCount" />

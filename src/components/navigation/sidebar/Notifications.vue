@@ -21,10 +21,10 @@
             v-for="job in recentJobs"
             :key="job.id"
             dense
-            :clickable="!!job.completedEntityId"
+            clickable
             :title="job.name"
             :subtitle="job.steps[job.currentStep]"
-            @click="getVersionApiStore.handleLoad(job.completedEntityId || '')"
+            @click="handleClickJob(job)"
           >
             <template #icon>
               <q-circular-progress
@@ -101,8 +101,9 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { JobStatus, MessageType } from "@/types";
+import { JobSchema, JobStatus, MessageType } from "@/types";
 import { getVersionApiStore, jobStore, logStore } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { Typography, Icon, List, ListItem } from "@/components/common";
 
 const viewedMessages = ref(0);
@@ -131,5 +132,17 @@ const color = computed(() => (inProgressJobs.value ? "primary" : "secondary"));
  */
 function handleClearNewMessages() {
   viewedMessages.value = notifications.value.length;
+}
+
+/**
+ * WHen a job is clicked, open the project if the job is completed, or open the upload status page.
+ * @param job - The job to open.
+ */
+function handleClickJob(job: JobSchema) {
+  if (job.completedEntityId) {
+    getVersionApiStore.handleLoad(job.completedEntityId);
+  } else {
+    navigateTo(Routes.UPLOAD_STATUS);
+  }
 }
 </script>

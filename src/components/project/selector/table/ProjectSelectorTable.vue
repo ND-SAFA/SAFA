@@ -31,11 +31,6 @@
         @close="deleteOpen = false"
         @confirm="handleConfirmDelete"
       />
-      <project-identifier-modal
-        :open="saveOpen"
-        @close="saveOpen = false"
-        @save="handleConfirmSave"
-      />
     </template>
   </selector-table>
 </template>
@@ -66,7 +61,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
+import { ConfirmProjectDelete } from "../../base";
 
 const props = defineProps<{
   /**
@@ -90,7 +85,6 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const saveOpen = ref(false);
 const deleteOpen = ref(false);
 
 const selectedItems = computed({
@@ -133,8 +127,7 @@ function isDeletable(project: IdentifierSchema): boolean {
  * Opens the add project modal.
  */
 function handleOpenAdd() {
-  identifierSaveStore.baseIdentifier = undefined;
-  saveOpen.value = true;
+  identifierSaveStore.selectIdentifier(undefined, "save");
 }
 
 /**
@@ -161,13 +154,6 @@ function handleOpenDelete(project: IdentifierSchema) {
 function handleConfirmDelete() {
   deleteOpen.value = false;
   selectedItems.value = [];
-}
-
-/**
- * Closes the save project modal.
- */
-function handleConfirmSave() {
-  saveOpen.value = false;
 }
 
 /**

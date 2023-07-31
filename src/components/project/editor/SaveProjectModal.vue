@@ -2,16 +2,16 @@
   <modal
     size="md"
     :loading="projectApiStore.saveProjectLoading"
-    :open="props.open"
+    :open="open"
     :title="modalTitle"
     data-cy="modal-project-edit"
-    @close="handleCancel"
+    @close="handleClose"
   >
     <project-files-uploader
       v-if="showUpload"
       data-cy-name="input-project-name-modal"
       data-cy-description="input-project-description-modal"
-      @submit="handleCancel"
+      @submit="handleClose"
     />
     <project-identifier-input
       v-else
@@ -37,26 +37,23 @@
  * A modal for creating or editing a project.
  */
 export default {
-  name: "ProjectIdentifierModal",
+  name: "SaveProjectModal",
 };
 </script>
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { projectApiStore, identifierSaveStore } from "@/hooks";
+import { PanelType } from "@/types";
+import {
+  projectApiStore,
+  identifierSaveStore,
+  appStore,
+  getProjectApiStore,
+} from "@/hooks";
 import { Modal, TextButton } from "@/components/common";
-import ProjectFilesUploader from "./ProjectFilesUploader.vue";
-import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
+import { ProjectFilesUploader, ProjectIdentifierInput } from "../base";
 
-const props = defineProps<{
-  open: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: "close"): void;
-  (e: "save"): void;
-}>();
-
+const open = computed(() => appStore.isProjectCreatorOpen);
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 const isUpdate = computed(() => identifierSaveStore.isUpdate);
 const showUpload = computed(() => !identifierSaveStore.isUpdate);
@@ -66,7 +63,7 @@ const modalTitle = computed(() =>
 );
 
 watch(
-  () => props.open,
+  () => open.value,
   (open) => {
     if (!open) return;
 
@@ -75,18 +72,22 @@ watch(
 );
 
 /**
- * Cancels the project saving.
+ * Closes the save project panel.
  */
-function handleCancel(): void {
-  emit("close");
+function handleClose(): void {
+  appStore.closePanel(PanelType.projectSaver);
 }
 
 /**
- * Confirms the project saving.
+ * Saves the project being edited.
  */
 function handleSave(): void {
   projectApiStore.handleSave({
-    onSuccess: () => emit("save"),
+    onSuccess: async () => {
+      handleClose();
+
+      await getProjectApiStore.handleReload();
+    },
   });
 }
 </script>

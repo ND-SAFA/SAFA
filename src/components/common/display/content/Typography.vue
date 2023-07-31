@@ -3,7 +3,7 @@
     <markdown
       v-if="expanded"
       :source="value"
-      :class="className + ' text-wrap'"
+      :class="className + ' text-white-space-normal'"
     />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
@@ -119,7 +119,7 @@ const className = useMargins(props, () => [
   ["bold", "text-bold"],
   ["small", "text-sm"],
   ["large", "text-lg"],
-  ["wrap", "text-wrap"],
+  ["wrap", "text-white-space-normal"],
   ["class", props.class],
 ]);
 

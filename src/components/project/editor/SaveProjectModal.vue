@@ -42,7 +42,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { PanelType } from "@/types";
 import {
   projectApiStore,
@@ -60,15 +60,6 @@ const showUpload = computed(() => !identifierSaveStore.isUpdate);
 const canSave = computed(() => identifierSaveStore.canSave);
 const modalTitle = computed(() =>
   isUpdate.value ? "Edit Project" : "Create Project"
-);
-
-watch(
-  () => open.value,
-  (open) => {
-    if (!open) return;
-
-    identifierSaveStore.resetIdentifier();
-  }
 );
 
 /**

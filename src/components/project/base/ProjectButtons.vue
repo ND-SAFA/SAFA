@@ -29,11 +29,6 @@
       data-cy="button-settings-delete"
       @click="handleDelete"
     />
-    <confirm-project-delete
-      :open="isDeleteOpen"
-      @close="isDeleteOpen = false"
-      @confirm="isDeleteOpen = false"
-    />
   </flex-box>
 </template>
 
@@ -47,7 +42,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   identifierSaveStore,
   projectApiStore,
@@ -55,9 +50,6 @@ import {
   sessionStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
-import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
-
-const isDeleteOpen = ref(false);
 
 const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
 

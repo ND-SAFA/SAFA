@@ -25,13 +25,6 @@
         @click="handleLeave(row)"
       />
     </template>
-    <template #bottom>
-      <confirm-project-delete
-        :open="deleteOpen"
-        @close="deleteOpen = false"
-        @confirm="handleConfirmDelete"
-      />
-    </template>
   </selector-table>
 </template>
 
@@ -61,7 +54,6 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ConfirmProjectDelete } from "../../base";
 
 const props = defineProps<{
   /**
@@ -85,7 +77,6 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const deleteOpen = ref(false);
 
 const selectedItems = computed({
   get() {
@@ -135,8 +126,7 @@ function handleOpenAdd() {
  * @param project - The project to edit.
  */
 function handleOpenEdit(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  saveOpen.value = true;
+  identifierSaveStore.selectIdentifier(project, "save");
 }
 
 /**
@@ -144,16 +134,7 @@ function handleOpenEdit(project: IdentifierSchema) {
  * @param project - The project to delete.
  */
 function handleOpenDelete(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  deleteOpen.value = true;
-}
-
-/**
- * Closes the delete project modal.
- */
-function handleConfirmDelete() {
-  deleteOpen.value = false;
-  selectedItems.value = [];
+  identifierSaveStore.selectIdentifier(project, "delete");
 }
 
 /**

@@ -37,7 +37,7 @@
  * A modal for creating new versions.
  */
 export default {
-  name: "VersionCreator",
+  name: "CreateVersionModal",
 };
 </script>
 

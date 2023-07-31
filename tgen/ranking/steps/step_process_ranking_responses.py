@@ -72,6 +72,7 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                     logger.info(f"Unable to parse: {e}")
 
             # Step - Translate
+            parsed_entries = [e for e in parsed_entries if e[SCORE_INDEX] > 1]
             entry_pieces = sorted(parsed_entries, key=lambda e: (e[SCORE_INDEX], -e[ID_INDEX]), reverse=True)
             artifact_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
             artifact_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]

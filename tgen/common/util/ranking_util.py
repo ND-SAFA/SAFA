@@ -127,12 +127,19 @@ class RankingUtil:
             if top_n is not None:
                 selected_entries = sorted_entries[:top_n]
             else:
-                selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
-                top_parent = sorted_entries[0]
-                if len(selected_entries) == 0:
-                    selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.8][:3]
-                    if len(selected_entries) == 0:
-                        selected_entries.append(top_parent)
+                selected_entries = []
+                t1_preds, t2_preds, t3_preds = [], [], []
+
+                t1_preds = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.8]
+                t2_preds = [s for s in sorted_entries if 0.7 <= s[StructuredKeys.SCORE] < 0.8]
+                t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
+                if len(t1_preds) > 0:
+                    selected_entries = t1_preds
+                elif len(t2_preds):
+                    selected_entries = t2_preds
+                else:
+                    selected_entries = t3_preds
+
             predictions.extend(selected_entries)
 
         if top_n:

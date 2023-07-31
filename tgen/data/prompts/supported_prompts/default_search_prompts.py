@@ -15,25 +15,25 @@ DEFAULT_SEARCH_INSTRUCTIONS = "# Instructions\n---\n" \
                               "\n- Description of existing system functionality relevant to the search query functionality. " \
                               "\nUse your knowledge of the system's capabilities to infer what the search query is likely referring to. " \
                               "Enclose your answer in <query-summary></query-summary>" \
-                              "\n\n2. Starting with the artifact with ID 0, " \
-                              "sequentially analyze each artifact and provide the following information as formatted below:" \
-                              "\nFormat: ID | SUMMARY | EXPLANATION | SCORE" \
-                              "\n- For `ID` provide the ID of artifact currently being processed." \
-                              "\n- For `SUMMARY` extract the parts of the artifact's functionality relevant to your response to (1)." \
-                              "\n- For `EXPLANATION` describe how the artifact's functionality contributes to the fulfillment of the search query" \
-                              " as described in your response to (1)." \
-                              "\n- For `SCORE` provide a number from 1-10 representing how relevant the artifact functionality's " \
+                              "\n\n2. Provide the following information for each artifact as formatted below:" \
+                              "\n    Format: ID | SUMMARY | EXPLANATION | SCORE" \
+                              "\n    - For `ID` provide the ID of artifact currently being processed." \
+                              "\n    - For `SUMMARY` summarize the relevant parts of the artifact's functionality in the context of your response to (1)." \
+                              "\n    - For `EXPLANATION` detail what part of the artifact's functionality contributes to the " \
+                              "fulfillment of the query's functionality and what how it does it." \
+                              "\n    - For `SCORE` provide a number from 1-10 representing how relevant the artifact functionality's " \
                               "is to the functionality described in your response to (1). " \
                               "Specifically, the score should be a number from 1-10. " \
                               "Use the following guidelines to extrapolate the correct score:" \
-                              "\n    * 10 = Artifact performs core search query functionality" \
-                              "\n    * 8 = Artifact performs an essential function to the search query functionality" \
-                              "\n    * 4 = Related to supporting (auxiliary) functionality of search query." \
-                              "\n    * 1 = Related to distant or unrelated functionality of search query." \
+                              "\n        * 10 = Artifact performs the query's core functionality" \
+                              "\n        * 8 = Artifact performs an essential function to the query's functionality" \
+                              "\n        * 4 = Artifact performs functionality indirectly related to query's functionality" \
+                              "\n        * 1 = Related to distant or unrelated functionality of search query." \
                               "\n    Base your score on how directly each artifact contributes to or enables the functionality " \
                               "described in your answer to (1)." \
-                              "\nWork through each artifact in sequential order and make sure to include every artifact." \
-                              "Provide each artifact's entry on a single line in the format specified." \
+                              "\nIMPORTANT: For question (2), work through each artifact sequentially starting with ID 0. " \
+                              "Include an entry for each artifact. " \
+                              "Provide each artifact's entry on a single line in the format specified. " \
                               "Enclose your answer in <explanation></explanation>."
 DEFAULT_SEARCH_QUERY_TAG = "query"
 DEFAULT_SEARCH_LINK_TAG = "search-results"

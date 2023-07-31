@@ -11,6 +11,8 @@ from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_S
     DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
+CURRENT_PROJECT = os.environ["CURRENT_PROJECT"]
+
 
 @dataclass
 class RankingArgs(PipelineArgs):
@@ -25,7 +27,7 @@ class RankingArgs(PipelineArgs):
     """
     Path to export various checkpoints
     """
-    export_dir: str = "~/desktop/hgen/checkpoints/safa"
+    export_dir: str = f"~/desktop/hgen/checkpoints/{CURRENT_PROJECT}"
     """
     Optional.List of children ids to compare to each parent.
     """
@@ -65,7 +67,7 @@ class RankingArgs(PipelineArgs):
     """
     The path to load a project summary from
     """
-    project_summary_path: str = "~/desktop/hgen/summaries/project/safa.txt"
+    project_summary_path: str = f"~/desktop/hgen/summaries/project/{CURRENT_PROJECT}.txt"
     """
     The model used to rank
     """

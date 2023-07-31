@@ -111,7 +111,9 @@ import {
   artifactStore,
   attributesStore,
   deltaStore,
+  projectStore,
   selectionStore,
+  sessionStore,
   subtreeStore,
   typeOptionsStore,
 } from "@/hooks";
@@ -139,6 +141,10 @@ const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
 const typeOptions = computed(() => typeOptionsStore.artifactTypes);
@@ -149,7 +155,7 @@ const columns = computed(() => [
   ...artifactColumns,
   ...(inDeltaView.value ? [artifactDeltaColumn] : []),
   ...artifactAttributesColumns(attributesStore.attributes),
-  actionsColumn,
+  ...(displayActions.value ? [actionsColumn] : []),
 ]);
 
 const rows = computed(() => artifactStore.flatArtifacts);

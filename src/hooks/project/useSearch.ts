@@ -17,7 +17,7 @@ export const useSearch = defineStore("search", {
     /**
      * The type of information to predict traces to.
      */
-    mode: searchModeOptions()[0],
+    mode: searchModeOptions()[2],
     /**
      * The selected search items, used as the search artifacts and types.
      */

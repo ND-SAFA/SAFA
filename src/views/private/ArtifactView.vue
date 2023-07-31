@@ -29,7 +29,7 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { tableViewTabOptions } from "@/util";
-import { layoutStore } from "@/hooks";
+import { layoutStore, projectStore, sessionStore } from "@/hooks";
 import {
   ArtifactTable,
   PrivatePage,
@@ -40,8 +40,14 @@ import {
   ApprovalTable,
 } from "@/components";
 
-const tabs = tableViewTabOptions();
-const tab = ref(tabs[0].id);
+const displayEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
+const tabs = computed(() =>
+  displayEditing.value ? tableViewTabOptions() : [tableViewTabOptions()[0]]
+);
+const tab = ref(tabs.value[0].id);
 
 const isTableMode = computed(() => layoutStore.isTableMode);
 </script>

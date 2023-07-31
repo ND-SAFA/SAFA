@@ -3,6 +3,7 @@
     <panel-card :title="parentTitle">
       <template #title-actions>
         <text-button
+          v-if="displayActions"
           text
           label="Link Parent"
           icon="add"
@@ -48,6 +49,7 @@
     <panel-card :title="childTitle">
       <template #title-actions>
         <text-button
+          v-if="displayActions"
           text
           label="Link Child"
           icon="add"
@@ -107,7 +109,9 @@ import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import {
   appStore,
   artifactStore,
+  projectStore,
   selectionStore,
+  sessionStore,
   subtreeStore,
   traceStore,
 } from "@/hooks";
@@ -120,6 +124,10 @@ import {
   List,
   ListItem,
 } from "@/components/common";
+
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

@@ -45,7 +45,7 @@
               v-if="canEdit(opt.name)"
               v-close-popup
               small
-              icon="more"
+              icon="edit"
               :tooltip="`Edit ${opt.name}`"
               data-cy="button-document-select-edit"
               @click="handleEditOpen(opt)"

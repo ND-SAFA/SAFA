@@ -54,6 +54,12 @@ public class ProjectGraph {
         }
     }
 
+    /**
+     * Return whether a trace link should be displayed
+     *
+     * @param trace The trace link
+     * @return Whether we should display the trace
+     */
     private boolean traceLinkIsVisible(TraceAppEntity trace) {
         return trace.isVisible()
             && (trace.getTraceType() == TraceType.MANUAL || trace.getApprovalStatus() != ApprovalStatus.DECLINED);

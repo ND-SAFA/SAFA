@@ -92,24 +92,24 @@ public class JobController extends BaseController {
     public JobAppEntity flatFileProjectUpdateJob(
         @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files,
-        @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
-        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
-            serviceProvider,
-            versionId,
-            files,
-            shouldSummarize);
-        return updateProjectByFlatFileJobBuilder.perform();
+        @RequestParam(required = false, defaultValue = "false") boolean shouldSummarize) throws Exception {
+
+        UpdateProjectByFlatFileJobBuilder jobBuilder = new UpdateProjectByFlatFileJobBuilder(
+            serviceProvider, versionId, files, shouldSummarize);
+        return jobBuilder.perform();
     }
 
     @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
     @ResponseStatus(HttpStatus.CREATED)
-    public JobAppEntity flatFileProjectCreationJob(@RequestParam MultipartFile[] files,
-                                                   @RequestParam String name,
-                                                   @RequestParam String description)
+    public JobAppEntity flatFileProjectCreationJob(
+        @RequestParam MultipartFile[] files,
+        @RequestParam String name,
+        @RequestParam String description,
+        @RequestParam(required = false, defaultValue = "false") boolean shouldSummarize)
         throws Exception {
 
         CreateProjectByFlatFileJobBuilder jobBuilder = new CreateProjectByFlatFileJobBuilder(
-            serviceProvider, files, safaUserService.getCurrentUser(), name, description);
+            serviceProvider, files, safaUserService.getCurrentUser(), name, description, shouldSummarize);
         return jobBuilder.perform();
     }
 

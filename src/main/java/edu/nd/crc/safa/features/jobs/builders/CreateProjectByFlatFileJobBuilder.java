@@ -25,12 +25,15 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
     private final String projectName;
     private final String projectDescription;
 
-    public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, MultipartFile[] files,
-                                             SafaUser user, String projectName, String projectDescription) {
+    private final boolean shouldSummarize;
+
+    public CreateProjectByFlatFileJobBuilder(ServiceProvider serviceProvider, MultipartFile[] files, SafaUser user,
+                                             String projectName, String projectDescription, boolean shouldSummarize) {
         super(serviceProvider, user);
         this.files = files;
         this.projectName = projectName;
         this.projectDescription = projectDescription;
+        this.shouldSummarize = shouldSummarize;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class CreateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
             this.projectName,
             this.projectDescription,
             uploadLocation,
-            false);
+            this.shouldSummarize);
     }
 
     @Override

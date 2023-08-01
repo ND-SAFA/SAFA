@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -20,7 +19,6 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceMatrixAppEntity;
-import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.types.entities.TypeAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -89,7 +87,7 @@ public class SyncController extends BaseController {
             case TRACES:
                 List<TraceAppEntity> traces = this.serviceProvider
                     .getTraceService()
-                    .getAppEntities(projectVersion, user, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+                    .getAppEntities(projectVersion, user, TraceAppEntity::isVisible);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:
@@ -107,12 +105,6 @@ public class SyncController extends BaseController {
                     .getWarningService()
                     .retrieveWarningsInProjectVersion(projectVersion);
                 projectAppEntity.setWarnings(warnings);
-                break;
-            case MODELS:
-                List<ModelAppEntity> models = this.serviceProvider
-                    .getModelService()
-                    .getUserModels(user);
-                projectAppEntity.setModels(models);
                 break;
             case TRACE_MATRICES:
                 List<TraceMatrixAppEntity> traceMatrixAppEntities = this.serviceProvider

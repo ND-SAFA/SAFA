@@ -252,7 +252,7 @@ public class TestTim extends ApplicationBaseTest {
     }
 
     private TraceAppEntity createTrace(String sourceName, String targetName, ApprovalStatus status, TraceType type) {
-        return new TraceAppEntity(null, sourceName, null, targetName, null, status, 1, type);
+        return new TraceAppEntity(null, sourceName, null, targetName, null, status, 1, type, true, "");
     }
 
     private void createLinks(ProjectVersion version) {

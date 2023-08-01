@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
@@ -21,7 +22,6 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -76,8 +76,9 @@ public class TestCustomAttributes extends ApplicationBaseTest {
         JSONArray artifactsJson = resultJson.getJSONArray("artifacts");
         assertNotNull(artifactsJson);
 
-        List<ArtifactAppEntity> result = new ObjectMapper()
-            .readValue(artifactsJson.toString(), new TypeReference<>(){});
+        List<ArtifactAppEntity> result = ObjectMapperConfig.create()
+            .readValue(artifactsJson.toString(), new TypeReference<>() {
+            });
         assertEquals(1, result.size());
 
         ArtifactAppEntity parsedEntity = result.get(0);

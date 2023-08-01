@@ -18,7 +18,10 @@ import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntityCreator;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -38,6 +41,7 @@ public class CommitService {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final NotificationService notificationService;
+    private final ProjectRepository projectRepository;
 
     /**
      * Saves entities in commit to specified project version.
@@ -59,6 +63,13 @@ public class CommitService {
             projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
         }
 
+        // Step - Mark decline trace links as invisible
+        projectCommit
+            .getTraces()
+            .getModified()
+            .stream()
+            .filter(t -> t.getApprovalStatus() == ApprovalStatus.DECLINED)
+            .forEach(t -> t.setVisible(false));
         // Step - Commit artifact
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,
@@ -75,6 +86,11 @@ public class CommitService {
             failOnError,
             user);
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
+
+        // Step - Update project last edited
+        Project project = projectVersion.getProject();
+        project.setLastEdited();
+        this.projectRepository.save(project);
 
         // Step - Add errors
         errors.addAll(traceResponse.getValue1());

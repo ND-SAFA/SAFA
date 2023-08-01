@@ -7,7 +7,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.installations.app.InstallationDTO;
+import edu.nd.crc.safa.features.installations.InstallationDTO;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 
 import io.swagger.v3.oas.annotations.Operation;

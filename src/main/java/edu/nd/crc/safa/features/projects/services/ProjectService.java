@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.projects.services;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,7 @@ public class ProjectService {
                     .collect(Collectors.toList());
                 return new ProjectIdAppEntity(project, members);
             })
+            .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
             .collect(Collectors.toList());
     }
 
@@ -89,7 +91,7 @@ public class ProjectService {
      * Sets authorized user as project owner and saves project.
      *
      * @param project The project to set user as owner
-     * @param user The user to set as owner
+     * @param user    The user to set as owner
      */
     public void saveProjectWithUserAsOwner(Project project, SafaUser user) {
         this.projectRepository.save(project);
@@ -110,7 +112,7 @@ public class ProjectService {
      * The authorized user to be an owner to given project.
      *
      * @param project The project the current user will be owner in.
-     * @param user The user to set as owner
+     * @param user    The user to set as owner
      */
     public void setUserAsOwner(Project project, SafaUser user) {
         ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);

@@ -7,11 +7,10 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.generation.tgen.entities.ArtifactLevelRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.generation.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -121,7 +120,9 @@ class TestLinkApproval extends AbstractTraceTest {
             projectVersion,
             generatedLink.getTraceLink());
         assertThat(declinedLinkQuery).isPresent();
-        assertThat(declinedLinkQuery.get().getApprovalStatus()).isEqualTo(ApprovalStatus.DECLINED);
+        TraceLinkVersion declinedLink = declinedLinkQuery.get();
+        assertThat(declinedLink.getApprovalStatus()).isEqualTo(ApprovalStatus.DECLINED);
+        assertThat(declinedLink.isVisible()).isFalse();
     }
 
     /**
@@ -156,7 +157,6 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Create tracing request
         TracingRequest tracingRequest = new TracingRequest();
         tracingRequest.setArtifactLevels(List.of(artifactLevelRequest));
-        tracingRequest.setMethod(BaseGenerationModels.VSM);
 
         // Step - Create trace generation request
         TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();

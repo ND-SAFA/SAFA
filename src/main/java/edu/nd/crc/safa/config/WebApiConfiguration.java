@@ -69,7 +69,7 @@ public class WebApiConfiguration {
 
     @Bean
     public WebClient webClient() {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = ObjectMapperConfig.create();
 
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

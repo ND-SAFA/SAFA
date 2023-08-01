@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlRepositoryResponse;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
@@ -16,7 +17,6 @@ import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
@@ -84,17 +84,17 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         );
 
         Mockito.when(serviceMock.getDiffBetweenOldCommitAndHead(
-                Mockito.any(GithubAccessCredentials.class),
-                Mockito.any(String.class),
-                Mockito.any(String.class),
-                Mockito.any(String.class)
+            Mockito.any(GithubAccessCredentials.class),
+            Mockito.any(String.class),
+            Mockito.any(String.class),
+            Mockito.any(String.class)
         )).thenReturn(
             this.readResourceFile(DIFF_RESPONSE_FILE, GithubCommitDiffResponseDTO.class)
         );
 
         GithubFileBlobDTO file = new GithubFileBlobDTO();
         Mockito.when(serviceMock.getBlobInformation(Mockito.any(), Mockito.any()))
-                .thenReturn(file);
+            .thenReturn(file);
     }
 
     protected void mockRepositoryFindByUser() {
@@ -117,7 +117,7 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         try {
             File file = new ClassPathResource(filepath).getFile();
 
-            return new ObjectMapper().readValue(file, clazz);
+            return ObjectMapperConfig.create().readValue(file, clazz);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.projects.entities.app;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -18,7 +19,6 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -36,6 +36,8 @@ import lombok.Data;
 @Data
 public class ProjectAppEntity implements IAppEntity {
     private UUID projectId;
+
+    private LocalDateTime lastEdited;
 
     @NotNull
     private String name;
@@ -69,8 +71,6 @@ public class ProjectAppEntity implements IAppEntity {
 
     private Map<UUID, LayoutPosition> layout;
 
-    private List<ModelAppEntity> models;
-
     private List<CustomAttributeAppEntity> attributes;
 
     private List<AttributeLayoutAppEntity> attributeLayouts;
@@ -90,11 +90,11 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
         this.layout = new Hashtable<>();
-        this.models = new ArrayList<>();
         this.attributes = new ArrayList<>();
         this.attributeLayouts = new ArrayList<>();
         this.subtrees = new HashMap<>();
         this.traceMatrices = new ArrayList<>();
+        this.lastEdited = LocalDateTime.now();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -107,13 +107,13 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
                             Map<UUID, LayoutPosition> layout,
-                            List<ModelAppEntity> models,
                             List<CustomAttributeAppEntity> attributes,
                             List<AttributeLayoutAppEntity> attributeLayouts,
                             Map<UUID, SubtreeAppEntity> subtrees,
                             List<TraceMatrixAppEntity> traceMatrices) {
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
+        this.lastEdited = project.getLastEdited();
         this.name = project.getName();
         this.description = project.getDescription();
         this.projectVersion = projectVersion;
@@ -126,7 +126,6 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = warnings;
         this.errors = errors;
         this.layout = layout;
-        this.models = models;
         this.attributes = attributes;
         this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;

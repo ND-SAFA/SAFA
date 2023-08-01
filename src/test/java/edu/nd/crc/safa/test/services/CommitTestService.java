@@ -3,6 +3,7 @@ package edu.nd.crc.safa.test.services;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
  * Responsible for providing utilities related to committing
  */
 public class CommitTestService {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = ObjectMapperConfig.create();
 
     public ProjectCommit commit(CommitBuilder commitBuilder) throws Exception {
         ProjectCommit commitRequest = commitBuilder.get();

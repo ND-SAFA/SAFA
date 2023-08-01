@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
@@ -96,7 +97,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      * Gets a row for the output file based on the given artifact.
      *
      * @param artifact The artifact to output.
-     * @param headers The list of headers (used to determine the order of the items to output).
+     * @param headers  The list of headers (used to determine the order of the items to output).
      * @return A list of strings corresponding to entries in this row of the CSV file.
      */
     private String[] getArtifactRow(ArtifactAppEntity artifact, String[] headers) {
@@ -111,8 +112,9 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     /**
      * Retrieves the value of the given column for the given artifact.
+     *
      * @param artifact The artifact
-     * @param header The column in the CSV file we are trying to get the value of
+     * @param header   The column in the CSV file we are trying to get the value of
      * @return The value of that column
      */
     private String getValueOfColumn(ArtifactAppEntity artifact, String header) {
@@ -199,7 +201,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      */
     private Map<String, JsonNode> getCustomAttributes(CSVRecord entityRecord) throws JsonProcessingException {
         Map<String, JsonNode> recordAttributes = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperConfig.create();
 
         for (Map.Entry<String, String> entry : entityRecord.toMap().entrySet()) {
             String key = entry.getKey();
@@ -240,12 +242,13 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
      * Gets the JsonNode value of a custom attribute value.
      *
      * @param objectMapper The object mapper for reading JSON values.
-     * @param value The string value of the custom attribute.
+     * @param value        The string value of the custom attribute.
      * @return The parsed JSON value of the custom attribute.
      * @throws JsonProcessingException If the JSON is invalid.
      */
     private JsonNode getCustomAttributeValue(ObjectMapper objectMapper, String value) throws JsonProcessingException {
-        TypeReference<JsonNode> type = new TypeReference<>(){};
+        TypeReference<JsonNode> type = new TypeReference<>() {
+        };
 
         try {
             return objectMapper.readValue(value, type);

@@ -20,8 +20,6 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
@@ -67,7 +65,6 @@ public class ProjectRetrievalService {
     private final ArtifactPositionService artifactPositionService;
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-    private final ModelService modelService;
     private final AttributeService attributeService;
     private final AttributeLayoutService attributeLayoutService;
     private final SafaUserService safaUserService;
@@ -78,7 +75,7 @@ public class ProjectRetrievalService {
      * the given version. Further, gathers the list of project members at the time of being called.
      *
      * @param projectVersion The point in the project whose entities are being retrieved.
-     * @param user The user making the request
+     * @param user           The user making the request
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
     public ProjectAppEntity getProjectAppEntity(SafaUser user, ProjectVersion projectVersion) {
@@ -103,18 +100,16 @@ public class ProjectRetrievalService {
         // Artifact warnings
         Map<UUID, List<RuleName>> warnings
             = this.warningService.retrieveWarningsForAppEntities(projectVersion.getProject(), entities);
-        
+
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
-
-        List<ModelAppEntity> models = this.modelService.getUserModels(user);
 
         List<CustomAttributeAppEntity> attributes = this.attributeService
             .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
 
         List<AttributeLayoutAppEntity> attributeLayouts =
             this.attributeLayoutService.getAppEntities(projectVersion, user);
-        
+
         ProjectGraph graph = new ProjectGraph(entities);
         Map<UUID, SubtreeAppEntity> subtrees = graph.getSubtreeInfo();
 
@@ -131,7 +126,6 @@ public class ProjectRetrievalService {
             warnings,
             errors,
             layout,
-            models,
             attributes,
             attributeLayouts,
             subtrees,
@@ -153,7 +147,7 @@ public class ProjectRetrievalService {
      * Retrieves artifact and trace links in given version.
      *
      * @param projectVersion The version of the entities to retrieve.
-     * @param user The user making the request
+     * @param user           The user making the request
      * @return {@link ProjectEntities} Artifacts and trace links at given version.
      */
     public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion, SafaUser user) {

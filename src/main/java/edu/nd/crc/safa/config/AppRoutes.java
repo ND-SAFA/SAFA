@@ -106,6 +106,7 @@ public class AppRoutes {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
         public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+        public static final String ADD_BATCH = GET_GENERATED_LINKS_IN_PROJECT_VERSION + "/add-batch";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -151,9 +152,9 @@ public class AppRoutes {
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
+        public static final String GET_PROJECTS = ROOT;
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
-        public static final String GET_PROJECTS = ROOT;
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Membership {

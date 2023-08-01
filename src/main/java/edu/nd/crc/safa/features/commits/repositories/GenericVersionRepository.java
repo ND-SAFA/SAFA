@@ -33,29 +33,29 @@ import org.springframework.dao.DataIntegrityViolationException;
 /**
  * Implements the generic logic for retrieving, creating, and modifying versioned entities.
  *
- * @param <V> The versioned entity.
+ * @param <VersionEntity> The versioned entity.
  */
 public abstract class GenericVersionRepository<
-    B extends IBaseEntity,
-    V extends IVersionEntity<A>,
-    A extends IAppEntity>
-    implements IVersionRepository<V, A> {
+    BaseEntity extends IBaseEntity,
+    VersionEntity extends IVersionEntity<AppEntity>,
+    AppEntity extends IAppEntity>
+    implements IVersionRepository<VersionEntity, AppEntity> {
 
     VersionCalculator versionCalculator = new VersionCalculator();
 
-    protected abstract V save(V versionEntity);
+    protected abstract VersionEntity save(VersionEntity versionEntity);
 
     @Override
-    public List<A> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
-        List<V> versionEntities = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
+    public List<AppEntity> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
+        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
         return versionEntities.stream()
             .map(this::retrieveAppEntityFromVersionEntity)
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<A> retrieveAppEntitiesByProject(Project project) {
-        List<V> versions = retrieveVersionEntitiesByProject(project);
+    public List<AppEntity> retrieveAppEntitiesByProject(Project project) {
+        List<VersionEntity> versions = retrieveVersionEntitiesByProject(project);
         return versions.stream()
             .map(this::retrieveAppEntityFromVersionEntity)
             .collect(Collectors.toList());
@@ -68,8 +68,8 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public List<V> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
-        Map<UUID, List<V>> entityHashTable =
+    public List<VersionEntity> retrieveVersionEntitiesByProjectVersion(ProjectVersion projectVersion) {
+        Map<UUID, List<VersionEntity>> entityHashTable =
             this.groupEntityVersionsByEntityId(projectVersion);
         return this.calculateVersionEntitiesAtProjectVersion(projectVersion, entityHashTable);
     }
@@ -81,16 +81,16 @@ public abstract class GenericVersionRepository<
      * @return list of artifact bodies in project at given version
      */
     @Override
-    public Optional<V> findVersionEntityByProjectVersionAndBaseEntityId(
+    public Optional<VersionEntity> findVersionEntityByProjectVersionAndBaseEntityId(
         ProjectVersion projectVersion,
         UUID entityId) {
-        List<V> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject())
+        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject())
             .stream()
             .filter(versionEntity -> versionEntity.getBaseEntityId().equals(entityId))
             .collect(Collectors.toList());
-        Map<UUID, List<V>> entityHashTable = new HashMap<>();
+        Map<UUID, List<VersionEntity>> entityHashTable = new HashMap<>();
         entityHashTable.put(entityId, versionEntities);
-        List<V> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
+        List<VersionEntity> currentVersionQuery = this.calculateVersionEntitiesAtProjectVersion(projectVersion,
             entityHashTable);
         return currentVersionQuery.isEmpty() ? Optional.empty() : Optional.of(currentVersionQuery.get(0));
     }
@@ -105,19 +105,19 @@ public abstract class GenericVersionRepository<
      * @return String representing parser error if one occurred.
      */
     @Override
-    public Pair<V, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                A appEntity, SafaUser user) {
-        VersionEntityAction<V> versionEntityAction = () -> {
-            B b = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
+    public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
+                                                                            AppEntity appEntity, SafaUser user) {
+        VersionEntityAction<VersionEntity> versionEntityAction = () -> {
+            BaseEntity baseEntity = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
 
-            V versionEntity = this.instantiateVersionEntityFromAppEntity(
+            VersionEntity versionEntity = this.instantiateVersionEntityFromAppEntity(
                 projectVersion,
-                b,
+                baseEntity,
                 appEntity);
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity, user);
-                UUID baseEntityId = b.getBaseEntityId();
+                UUID baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
 
@@ -128,19 +128,19 @@ public abstract class GenericVersionRepository<
     }
 
     @Override
-    public Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
+    public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
         UUID baseEntityId,
         SafaUser user) {
 
-        VersionEntityAction<V> versionEntityAction = () -> {
-            Optional<B> baseEntityOptional = this.findBaseEntityById(baseEntityId);
+        VersionEntityAction<VersionEntity> versionEntityAction = () -> {
+            Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
             if (baseEntityOptional.isPresent()) {
-                B b = baseEntityOptional.get();
-                V removedVersionEntity = this.instantiateVersionEntityFromAppEntity(
+                BaseEntity baseEntity = baseEntityOptional.get();
+                VersionEntity removedVersionEntity = this.instantiateVersionEntityFromAppEntity(
                     projectVersion,
-                    b,
+                    baseEntity,
                     null);
                 this.createOrUpdateVersionEntity(removedVersionEntity, user);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
@@ -152,41 +152,41 @@ public abstract class GenericVersionRepository<
     }
 
     @Override
-    public EntityDelta<A> calculateEntityDelta(
+    public EntityDelta<AppEntity> calculateEntityDelta(
         ProjectVersion baselineVersion,
         ProjectVersion targetVersion) {
         Project project = baselineVersion.getProject();
-        Map<UUID, A> addedEntities = new HashMap<>();
-        Map<UUID, ModifiedEntity<A>> modifiedEntities = new HashMap<>();
-        Map<UUID, A> removedEntities = new HashMap<>();
+        Map<UUID, AppEntity> addedEntities = new HashMap<>();
+        Map<UUID, ModifiedEntity<AppEntity>> modifiedEntities = new HashMap<>();
+        Map<UUID, AppEntity> removedEntities = new HashMap<>();
 
-        List<B> projectArtifacts = this.retrieveBaseEntitiesByProject(project);
+        List<BaseEntity> projectArtifacts = this.retrieveBaseEntitiesByProject(project);
 
-        for (B b : projectArtifacts) {
-            Triplet<V, V, ModificationType> delta = this
+        for (BaseEntity baseEntity : projectArtifacts) {
+            Triplet<VersionEntity, VersionEntity, ModificationType> delta = this
                 .calculateDeltaEntityBetweenProjectVersions(
-                    b,
+                    baseEntity,
                     baselineVersion,
                     targetVersion);
             ModificationType modificationType = delta.getValue2();
             if (modificationType == null) {
                 continue;
             }
-            UUID baseEntityId = b.getBaseEntityId();
+            UUID baseEntityId = baseEntity.getBaseEntityId();
 
             switch (modificationType) {
                 case ADDED:
-                    A appEntity = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
+                    AppEntity appEntity = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
                     addedEntities.put(baseEntityId, appEntity);
                     break;
                 case MODIFIED:
-                    A appBefore = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
-                    A appAfter = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
-                    ModifiedEntity<A> modifiedEntity = new ModifiedEntity<>(appBefore, appAfter);
+                    AppEntity appBefore = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
+                    AppEntity appAfter = this.retrieveAppEntityFromVersionEntity(delta.getValue1());
+                    ModifiedEntity<AppEntity> modifiedEntity = new ModifiedEntity<>(appBefore, appAfter);
                     modifiedEntities.put(baseEntityId, modifiedEntity);
                     break;
                 case REMOVED:
-                    A appRemoved = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
+                    AppEntity appRemoved = this.retrieveAppEntityFromVersionEntity(delta.getValue0());
                     removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
@@ -207,34 +207,35 @@ public abstract class GenericVersionRepository<
      */
 
     @Override
-    public List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
+    public List<Pair<VersionEntity, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
-        List<A> appEntities,
+        List<AppEntity> appEntities,
         boolean asCompleteSet,
         SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
-        List<Pair<V, CommitError>> response = appEntities
+        List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
-            .map(a -> {
-                Pair<V, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, a, user);
+            .map(appEntity -> {
+                Pair<VersionEntity, CommitError> commitResponse =
+                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
-                    a.setId(baseEntityId);
+                    appEntity.setId(baseEntityId);
                 }
                 return commitResponse;
             })
             .collect(Collectors.toList());
 
         if (asCompleteSet) { // calculates deleted entities if this is complete set
-            List<Pair<V, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
+            List<Pair<VersionEntity, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
                     projectVersion.getProject())
                 .stream()
-                .filter(b -> !processedAppEntities.contains(b.getBaseEntityId()))
-                .map(b -> this.deleteVersionEntityByBaseEntityId(
+                .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
+                .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
                     projectVersion,
-                    b.getBaseEntityId(),
+                    baseEntity.getBaseEntityId(),
                     user))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
@@ -243,12 +244,12 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private void createOrUpdateVersionEntity(V versionEntity, SafaUser user) throws SafaError {
+    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user) throws SafaError {
         try {
             this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
                 versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
 
-            Optional<V> previousEntity =
+            Optional<VersionEntity> previousEntity =
                 findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
                     versionEntity.getBaseEntityId());
 
@@ -264,15 +265,15 @@ public abstract class GenericVersionRepository<
         }
     }
 
-    private Triplet<V, V, ModificationType> calculateDeltaEntityBetweenProjectVersions(
-        B b,
+    private Triplet<VersionEntity, VersionEntity, ModificationType> calculateDeltaEntityBetweenProjectVersions(
+        BaseEntity baseEntity,
         ProjectVersion baseVersion,
         ProjectVersion targetVersion) {
-        List<V> bodies = this.retrieveVersionEntitiesByBaseEntity(b);
+        List<VersionEntity> bodies = this.retrieveVersionEntitiesByBaseEntity(baseEntity);
 
-        V beforeEntity = this.versionCalculator.getEntityAtVersion(bodies,
+        VersionEntity beforeEntity = this.versionCalculator.getEntityAtVersion(bodies,
             baseVersion, IVersionEntity::getProjectVersion);
-        V afterEntity = this.versionCalculator.getEntityAtVersion(bodies,
+        VersionEntity afterEntity = this.versionCalculator.getEntityAtVersion(bodies,
             targetVersion, IVersionEntity::getProjectVersion);
 
         ModificationType modificationType = this
@@ -280,15 +281,15 @@ public abstract class GenericVersionRepository<
         return new Triplet<>(beforeEntity, afterEntity, modificationType);
     }
 
-    private Pair<V, CommitError> commitErrorHandler(ProjectVersion projectVersion,
-                                                    VersionEntityAction<V> versionEntityAction,
-                                                    UUID entityName,
-                                                    ProjectEntity projectEntity) {
+    private Pair<VersionEntity, CommitError> commitErrorHandler(ProjectVersion projectVersion,
+                                                                VersionEntityAction<VersionEntity> versionEntityAction,
+                                                                UUID entityName,
+                                                                ProjectEntity projectEntity) {
         String errorDescription = null;
-        V versionEntity = null;
+        VersionEntity versionEntity = null;
         CommitError commitError = null;
         try {
-            Optional<V> versionEntityOptional = versionEntityAction.action();
+            Optional<VersionEntity> versionEntityOptional = versionEntityAction.action();
             if (versionEntityOptional.isPresent()) {
                 versionEntity = versionEntityOptional.get();
             } else {
@@ -315,8 +316,8 @@ public abstract class GenericVersionRepository<
      * @param targetEntity The entity whose changes are compared against the base content.
      * @return The type of change occurring to base in order to reach target entity.
      */
-    private ModificationType calculateModificationType(V baseEntity,
-                                                       V targetEntity) {
+    private ModificationType calculateModificationType(VersionEntity baseEntity,
+                                                       VersionEntity targetEntity) {
         if (baseEntity == null || targetEntity == null) {
             if (baseEntity == targetEntity) {
                 return null;
@@ -347,14 +348,14 @@ public abstract class GenericVersionRepository<
      * @param nameToVersionEntityMap Contains artifact names as keys and their associated version entities as values.
      * @return List of version entities as showing up in given project version.
      */
-    private List<V> calculateVersionEntitiesAtProjectVersion(
+    private List<VersionEntity> calculateVersionEntitiesAtProjectVersion(
         ProjectVersion projectVersion,
-        Map<UUID, List<V>> nameToVersionEntityMap) {
-        List<V> entityVersionsAtProjectVersion = new ArrayList<>();
+        Map<UUID, List<VersionEntity>> nameToVersionEntityMap) {
+        List<VersionEntity> entityVersionsAtProjectVersion = new ArrayList<>();
 
-        for (Map.Entry<UUID, List<V>> entry : nameToVersionEntityMap.entrySet()) {
-            V latest = null;
-            for (V body : entry.getValue()) {
+        for (Map.Entry<UUID, List<VersionEntity>> entry : nameToVersionEntityMap.entrySet()) {
+            VersionEntity latest = null;
+            for (VersionEntity body : entry.getValue()) {
                 if (body.getProjectVersion().isLessThanOrEqualTo(projectVersion)
                     && (latest == null || body.getProjectVersion().isGreaterThan(latest.getProjectVersion()))) {
                     latest = body;
@@ -368,29 +369,29 @@ public abstract class GenericVersionRepository<
         return entityVersionsAtProjectVersion;
     }
 
-    private Map<UUID, List<V>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
-        List<V> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
+    private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
+        List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
         return versionCalculator.groupEntityVersionsByEntityId(versionEntities, IVersionEntity::getBaseEntityId);
     }
 
-    private V instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
-                                                    B b,
-                                                    A appEntity) throws JsonProcessingException {
+    private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
+                                                                BaseEntity baseEntity,
+                                                                AppEntity appEntity) throws JsonProcessingException {
         ModificationType modificationType = this
-            .calculateModificationTypeForAppEntity(projectVersion, b, appEntity);
+            .calculateModificationTypeForAppEntity(projectVersion, baseEntity, appEntity);
 
         return this.instantiateVersionEntityWithModification(
             projectVersion,
             modificationType,
-            b,
+            baseEntity,
             appEntity);
     }
 
     private ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
-                                                                   B b,
-                                                                   A appEntity) {
-        V previousBody = versionCalculator
-            .getEntityBeforeVersion(this.retrieveVersionEntitiesByBaseEntity(b),
+                                                                   BaseEntity baseEntity,
+                                                                   AppEntity appEntity) {
+        VersionEntity previousBody = versionCalculator
+            .getEntityBeforeVersion(this.retrieveVersionEntitiesByBaseEntity(baseEntity),
                 projectVersion,
                 IVersionEntity::getProjectVersion);
         if (previousBody == null) {
@@ -413,25 +414,25 @@ public abstract class GenericVersionRepository<
      * @param project The project whose entities are retrieved.
      * @return Returns all versions of the base entities in a project.
      */
-    public abstract List<V> retrieveVersionEntitiesByProject(Project project);
+    public abstract List<VersionEntity> retrieveVersionEntitiesByProject(Project project);
 
     /**
      * @param entity The base entities whose versions are retrieved
      * @return List of versions associated with given base entities.
      */
-    protected abstract List<V> retrieveVersionEntitiesByBaseEntity(B entity);
+    protected abstract List<VersionEntity> retrieveVersionEntitiesByBaseEntity(BaseEntity entity);
 
     /**
      * @param project The project whose entities are retrieved.
      * @return Returns list of base entities existing in project.
      */
-    protected abstract List<B> retrieveBaseEntitiesByProject(Project project);
+    protected abstract List<BaseEntity> retrieveBaseEntitiesByProject(Project project);
 
     /**
      * @param baseEntityId The name of the base entity.
      * @return Returns the base entity in given project with given name.
      */
-    protected abstract Optional<B> findBaseEntityById(UUID baseEntityId);
+    protected abstract Optional<BaseEntity> findBaseEntityById(UUID baseEntityId);
 
     /**
      * Creates or updates any entities related to AppEntity and returns the corresponding base entity.
@@ -441,8 +442,9 @@ public abstract class GenericVersionRepository<
      * @param user The user doing the operation
      * @return Returns the base entity associated with given app entity.
      */
-    protected abstract B createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                       A artifactAppEntity, SafaUser user) throws SafaError;
+    protected abstract BaseEntity createOrUpdateRelatedEntities(ProjectVersion projectVersion,
+                                                                AppEntity artifactAppEntity, SafaUser user)
+        throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing
@@ -450,14 +452,15 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion   The project version where version entity is created.
      * @param modificationType The type of change required to move from last commit to given app entity.
-     * @param b                The base entity represented by app entity.
+     * @param baseEntity       The base entity represented by app entity.
      * @param appEntity        The app entity whose content is being compared to previous commits.
      * @return The version entity for saving the app entity content to project version.
      */
-    protected abstract V instantiateVersionEntityWithModification(ProjectVersion projectVersion,
-                                                                  ModificationType modificationType,
-                                                                  B b,
-                                                                  A appEntity) throws JsonProcessingException;
+    protected abstract VersionEntity instantiateVersionEntityWithModification(ProjectVersion projectVersion,
+                                                                              ModificationType modificationType,
+                                                                              BaseEntity baseEntity,
+                                                                              AppEntity appEntity)
+        throws JsonProcessingException;
 
     /**
      * Returns the type of project entity this version repository corresponds to.
@@ -473,5 +476,5 @@ public abstract class GenericVersionRepository<
      * @param versionEntity The version entity being saved.
      * @return Optional possibly containing existing version entity.
      */
-    protected abstract Optional<V> findExistingVersionEntity(V versionEntity);
+    protected abstract Optional<VersionEntity> findExistingVersionEntity(VersionEntity versionEntity);
 }

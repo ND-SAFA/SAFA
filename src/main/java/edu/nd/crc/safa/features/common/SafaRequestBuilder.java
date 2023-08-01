@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Service
 public class SafaRequestBuilder {
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper = ObjectMapperConfig.create();
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 60 * 60; // 1 Hour
 

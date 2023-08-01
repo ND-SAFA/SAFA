@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -23,7 +24,6 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.json.JSONObject;
 
 /**
  * Responsible for marking each trace link in each project.
@@ -75,6 +75,13 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     @Column(name = "score")
     double score;
 
+    @Column(name = "is_visible")
+    boolean isVisible = true;
+
+    @Lob
+    @Column(columnDefinition = "text")
+    String explanation;
+
     public TraceLinkVersion() {
         this.traceType = TraceType.GENERATED;
         this.approvalStatus = ApprovalStatus.UNREVIEWED;
@@ -107,11 +114,12 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         traceLinkVersion.approvalStatus = traceAppEntity.getApprovalStatus() == null
             ? getDefaultApprovalStatus(traceLinkVersion.traceType) :
             traceAppEntity.getApprovalStatus();
+        traceLinkVersion.isVisible = traceAppEntity.isVisible();
         traceLinkVersion.score = traceAppEntity.getScore() == 0 ? traceLinkVersion.score : traceAppEntity.getScore();
         traceLinkVersion.projectVersion = projectVersion;
         traceLinkVersion.modificationType = modificationType;
         traceLinkVersion.traceLink = traceLink;
-
+        traceLinkVersion.explanation = traceAppEntity.getExplanation();
         return traceLinkVersion;
     }
 
@@ -149,46 +157,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
         return this;
     }
 
-    public TraceLink getTraceLink() {
-        return traceLink;
+    public TraceLinkVersion withScore(double score) {
+        this.setScore(score);
+        return this;
     }
 
-    public void setTraceLink(TraceLink traceLink) {
-        this.traceLink = traceLink;
-    }
-
-    public TraceType getTraceType() {
-        return this.traceType;
-    }
-
-    public void setTraceType(TraceType traceType) {
-        this.traceType = traceType;
-    }
-
-    public double getScore() {
-        return this.score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    public ApprovalStatus getApprovalStatus() {
-        return this.approvalStatus;
-    }
-
-    public void setApprovalStatus(ApprovalStatus approvalStatus) {
-        this.approvalStatus = approvalStatus;
-    }
-
-    public String toString() {
-        JSONObject json = new JSONObject();
-        json.put("mod", this.modificationType);
-        json.put("version", this.projectVersion);
-        json.put("link", this.traceLink.toString());
-        json.put("approved", getApprovalStatus());
-        json.put("type", this.traceType);
-        return json + "\n";
+    public TraceLinkVersion withVisibility(boolean isVisible) {
+        this.setVisible(isVisible);
+        return this;
     }
 
     @Override
@@ -215,7 +191,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
                 other.traceLink.targetArtifact.getName(),
                 other.traceType,
                 other.approvalStatus,
-                other.score
+                other.score,
+                other.isVisible
             );
         }
         return false;
@@ -228,7 +205,8 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
             other.getTargetName(),
             other.getTraceType(),
             other.getApprovalStatus(),
-            other.getScore()
+            other.getScore(),
+            other.isVisible()
         );
     }
 
@@ -236,12 +214,14 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
                                    String targetName,
                                    TraceType traceType,
                                    ApprovalStatus approvalStatus,
-                                   double score) {
+                                   double score,
+                                   boolean isVisible) {
         return this.traceLink.sourceArtifact.getName().equals(sourceName)
             && this.traceLink.targetArtifact.getName().equals(targetName)
             && this.traceType == traceType
             && this.approvalStatus == approvalStatus
-            && areEqualWithDelta(this.score, score, 0.001);
+            && areEqualWithDelta(this.score, score, 0.001)
+            && this.isVisible == isVisible;
     }
 
     private boolean areEqualWithDelta(double a, double b, double delta) {

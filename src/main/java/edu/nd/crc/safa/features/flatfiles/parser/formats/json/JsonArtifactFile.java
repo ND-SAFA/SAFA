@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -56,7 +57,7 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
     @Override
     public Pair<ArtifactAppEntity, String> parseRecord(JSONObject entityRecord) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = ObjectMapperConfig.create();
             ArtifactAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), ArtifactAppEntity.class);
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {

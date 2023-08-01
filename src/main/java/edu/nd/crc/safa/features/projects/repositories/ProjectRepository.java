@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.projects.repositories;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.installations.app.InstallationDTO;
+import edu.nd.crc.safa.features.installations.InstallationDTO;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +17,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     Project findByProjectId(UUID projectId);
 
     @Query(value =
-        "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
+        "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("
             + "  CAST(j.jiraProjectId AS string), "
             + "   j.orgId, "
             + "   j.lastUpdate, "
@@ -30,9 +30,9 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     List<InstallationDTO> findJiraInstallationsByProjectId(@Param("projectId") UUID projectId);
 
     @Query(value =
-        "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
+        "SELECT new edu.nd.crc.safa.features.installations.InstallationDTO("
             + "  g.repositoryName, "
-            + "   '',"  // TODO org ID for github
+            + "   g.owner,"
             + "   g.lastUpdate, "
             + "   'GITHUB') "
             + "FROM Project p "

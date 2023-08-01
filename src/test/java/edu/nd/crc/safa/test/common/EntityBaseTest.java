@@ -23,7 +23,6 @@ import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -97,5 +96,4 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected AttributeSystemServiceProvider attributeSystemServiceProvider;
 
-    ObjectMapper objectMapper = new ObjectMapper();
 }

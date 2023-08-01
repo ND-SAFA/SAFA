@@ -22,11 +22,15 @@ import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
+import edu.nd.crc.safa.features.generation.hgen.HGenService;
+import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.search.SearchService;
+import edu.nd.crc.safa.features.generation.summary.SummaryService;
+import edu.nd.crc.safa.features.generation.tgen.services.TraceGenerationService;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
-import edu.nd.crc.safa.features.hgen.HGenService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -37,9 +41,6 @@ import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
-import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
-import edu.nd.crc.safa.features.models.repositories.ModelRepository;
-import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
@@ -47,9 +48,7 @@ import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.rules.services.WarningService;
-import edu.nd.crc.safa.features.search.SearchService;
-import edu.nd.crc.safa.features.summary.SummaryService;
-import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
@@ -89,6 +88,7 @@ public class ServiceProvider {
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
     private final ProjectRetrievalService projectRetrievalService;
+    private final ProjectSummaryService projectSummaryService;
     // Members
     private final ProjectMembershipRepository projectMembershipRepository;
     private final MemberService memberService;
@@ -107,15 +107,12 @@ public class ServiceProvider {
     private final AttributeValueService attributeValueService;
     private final AttributeLayoutService attributeLayoutService;
     //Traces
+    private final ITraceGenerationController traceGenerationController;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
     private final TraceLinkRepository traceLinkRepository;
     private final TraceMatrixService traceMatrixService;
-    // models
-    private final ModelRepository modelRepository;
-    private final ModelService modelService;
-    private final ModelProjectRepository modelProjectRepository;
     // Changes
     private final ProjectVersionRepository projectVersionRepository;
     private final CommitErrorRepository commitErrorRepository;

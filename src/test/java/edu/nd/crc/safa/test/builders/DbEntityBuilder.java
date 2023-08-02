@@ -331,6 +331,14 @@ public class DbEntityBuilder extends AbstractBuilder {
                                         String sourceName,
                                         String targetName,
                                         int projectVersionIndex) {
+        this.newTraceLinkWithReturn(projectName, sourceName, targetName, projectVersionIndex);
+        return this;
+    }
+
+    public TraceLinkVersion newTraceLinkWithReturn(String projectName,
+                                                   String sourceName,
+                                                   String targetName,
+                                                   int projectVersionIndex) {
         Artifact source = this.getArtifact(projectName, sourceName);
         Artifact target = this.getArtifact(projectName, targetName);
         TraceLink traceLink = new TraceLink(source, target);
@@ -342,8 +350,7 @@ public class DbEntityBuilder extends AbstractBuilder {
             .withModificationType(ModificationType.ADDED)
             .withManualTraceType();
         traceLinkVersion.setApprovalStatus(ApprovalStatus.APPROVED);
-        this.traceLinkVersionRepository.save(traceLinkVersion);
-        return this;
+        return this.traceLinkVersionRepository.save(traceLinkVersion);
     }
 
     public DbEntityBuilder newGeneratedTraceLink(String projectName,

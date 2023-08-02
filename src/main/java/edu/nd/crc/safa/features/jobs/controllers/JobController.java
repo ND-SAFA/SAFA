@@ -9,6 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
@@ -80,9 +81,9 @@ public class JobController extends BaseController {
     /**
      * Parses given job payload by the jobType and returns the job created.
      *
-     * @param versionId       The project version to save the entities to.
-     * @param files           The flat files to be parsed and uploaded.
-     * @param shouldSummarize Whether to sumarize code artifacts on upload.
+     * @param versionId The project version to save the entities to.
+     * @param files     The flat files to be parsed and uploaded.
+     * @param summarize Whether to summarize code artifacts on upload.
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
@@ -91,13 +92,36 @@ public class JobController extends BaseController {
     public JobAppEntity flatFileProjectUpdateJob(
         @PathVariable UUID versionId,
         @RequestParam MultipartFile[] files,
-        @RequestParam(required = false, defaultValue = "true") boolean shouldSummarize) throws Exception {
-        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
-            serviceProvider,
-            versionId,
-            files,
-            shouldSummarize);
-        return updateProjectByFlatFileJobBuilder.perform();
+        @RequestParam(required = false, defaultValue = "false") boolean summarize)
+        throws Exception {
+
+        UpdateProjectByFlatFileJobBuilder jobBuilder = new UpdateProjectByFlatFileJobBuilder(
+            serviceProvider, versionId, files, summarize);
+        return jobBuilder.perform();
+    }
+
+    /**
+     * Create a new project via flat file upload.
+     *
+     * @param files The flat files to be parsed and uploaded.
+     * @param name The name of the new project
+     * @param description The description for the new project
+     * @param summarize Whether to summarize code artifacts on upload.
+     * @return The current status of the job created.
+     * @throws SafaError Throws error if job failed to start or is under construction.
+     */
+    @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
+    @ResponseStatus(HttpStatus.CREATED)
+    public JobAppEntity flatFileProjectCreationJob(
+        @RequestParam MultipartFile[] files,
+        @RequestParam String name,
+        @RequestParam String description,
+        @RequestParam(required = false, defaultValue = "false") boolean summarize)
+        throws Exception {
+
+        CreateProjectByFlatFileJobBuilder jobBuilder = new CreateProjectByFlatFileJobBuilder(
+            serviceProvider, files, safaUserService.getCurrentUser(), name, description, summarize);
+        return jobBuilder.perform();
     }
 
     /**

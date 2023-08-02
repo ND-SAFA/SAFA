@@ -52,7 +52,6 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder {
             this.jobDbEntity,
             serviceProvider,
             this.projectVersion,
-            files,
             this.shouldSummarize);
     }
 

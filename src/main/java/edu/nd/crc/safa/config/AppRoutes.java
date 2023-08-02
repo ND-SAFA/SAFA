@@ -119,8 +119,10 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Projects {
-            public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + AppRoutes.Projects.ROOT;
-            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
+            public static final String PROJECT_JOBS_ROOT = JOBS_PREFIX + AppRoutes.Projects.ROOT;
+            public static final String CREATE_PROJECT_VIA_JSON = PROJECT_JOBS_ROOT;
+            public static final String PROJECT_BULK_UPLOAD = PROJECT_JOBS_ROOT + "/upload";
+            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = PROJECT_JOBS_ROOT + "/versions/{versionId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

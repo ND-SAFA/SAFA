@@ -2,6 +2,7 @@ package edu.nd.crc.safa.test.features.projects.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -10,6 +11,9 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SubtreeAppEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
@@ -50,6 +54,16 @@ public class TestSubtreeGeneration extends ApplicationBaseTest {
                 .newTraceLink(projectName, child2.getName(), middle.getName(), 0)
                 .newTraceLink(projectName, middle.getName(), parent1.getName(), 0)
                 .newTraceLink(projectName, middle.getName(), parent2.getName(), 0);
+
+        TraceLinkVersion hiddenLink1 = dbEntityBuilder
+            .newTraceLinkWithReturn(projectName, parent1.getName(), middle.getName(), 0);
+        TraceLinkVersion hiddenLink2 = dbEntityBuilder
+            .newTraceLinkWithReturn(projectName, parent2.getName(), middle.getName(), 0);
+
+        hiddenLink1.setVisible(false);
+        hiddenLink2.setTraceType(TraceType.GENERATED);
+        hiddenLink2.setApprovalStatus(ApprovalStatus.DECLINED);
+        traceLinkVersionRepository.saveAll(List.of(hiddenLink1, hiddenLink2));
 
         ProjectAppEntity project = projectRetrievalService.getProjectAppEntity(currentUser, version);
         Map<UUID, SubtreeAppEntity> subtrees = project.getSubtrees();

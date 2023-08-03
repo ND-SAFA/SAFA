@@ -1,16 +1,23 @@
 <template>
   <svg
-    version="1.0"
     xmlns="http://www.w3.org/2000/svg"
     width="100%"
     height="80pt"
-    viewBox="0 0 1872.000000 529.000000"
+    viewBox="0 0 1950.000000 529.000000"
     preserveAspectRatio="xMidYMid meet"
     :class="className"
     @click="emit('click')"
   >
+    <foreignObject width="30%" height="100%">
+      <img
+        :src="safaLogo"
+        alt="SAFA"
+        style="width: 100% !important; position: relative; top: -5%"
+        @click="emit('click')"
+      />
+    </foreignObject>
     <g
-      transform="translate(0.000000,529.000000) scale(0.100000,-0.100000)"
+      transform="translate(300.000000, 540.000000) scale(0.1000000,-0.1000000)"
       fill="#000000"
       stroke="none"
     >
@@ -61,6 +68,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { SafaIconProps } from "@/types";
+import safaLogo from "@/assets/images/safa_logo_small.png";
 
 const props = defineProps<SafaIconProps>();
 

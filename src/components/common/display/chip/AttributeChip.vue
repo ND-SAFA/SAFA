@@ -21,7 +21,7 @@
     />
     <typography
       ellipsis
-      color="text"
+      :color="enumerated ? displayColor : 'text'"
       :small="text.length >= 15"
       :l="iconVisible ? '1' : ''"
       :value="text"

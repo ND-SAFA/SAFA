@@ -12,6 +12,12 @@
         label="Create an empty project"
         data-cy="toggle-create-empty-project"
       />
+      <br />
+      <switch-input
+        v-model="summarize"
+        label="Generate artifact summaries"
+        data-cy="toggle-create-summarize"
+      />
       <project-files-input
         v-if="!emptyFiles"
         v-model="selectedFiles"
@@ -64,6 +70,7 @@ const emit = defineEmits<{
 
 const selectedFiles = ref<File[]>([]);
 const emptyFiles = ref(false);
+const summarize = ref(false);
 
 const identifier = computed(() => identifierSaveStore.editedIdentifier);
 
@@ -88,6 +95,7 @@ async function handleCreate() {
   await createProjectApiStore.handleBulkImport(
     identifier.value,
     selectedFiles.value,
+    summarize.value,
     {
       onSuccess: () => {
         selectedFiles.value = [];

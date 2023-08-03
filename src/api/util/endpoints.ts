@@ -40,6 +40,7 @@ export enum Endpoint {
 
   // Jobs
   createProjectJob = "jobs/projects",
+  createProjectThroughFlatFiles = "jobs/projects/upload",
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",

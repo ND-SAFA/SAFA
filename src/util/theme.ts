@@ -184,22 +184,31 @@ export function getScoreColor(score: number | string): ThemeColor {
  * @return The color.
  */
 export function getEnumColor(
-  state: ApprovalType | ArtifactDeltaState | DeltaType | MessageType | string
+  state:
+    | ApprovalType
+    | ArtifactDeltaState
+    | DeltaType
+    | MessageType
+    | JobStatus
+    | string
 ): ThemeColor {
   switch (state) {
     case ArtifactDeltaState.ADDED:
     case ApprovalType.APPROVED:
+    case JobStatus.COMPLETED:
     case MessageType.success:
     case "added":
       return "added";
     case ArtifactDeltaState.MODIFIED:
     case ApprovalType.UNREVIEWED:
+    case JobStatus.IN_PROGRESS:
     case MessageType.info:
     case MessageType.update:
     case "modified":
       return "modified";
     case ArtifactDeltaState.REMOVED:
     case ApprovalType.DECLINED:
+    case JobStatus.FAILED:
     case MessageType.error:
     case "removed":
       return "removed";
@@ -207,24 +216,5 @@ export function getEnumColor(
       return "warning";
     default:
       return "unchanged";
-  }
-}
-
-/**
- * Returns the color of a job status.
- *
- * @param status - The job status to get the color of.
- * @returns The display color.
- */
-export function getJobStatusColor(status: JobStatus): ThemeColor {
-  switch (status) {
-    case JobStatus.COMPLETED:
-      return "primary";
-    case JobStatus.IN_PROGRESS:
-      return "secondary";
-    case JobStatus.FAILED:
-      return "negative";
-    default:
-      return "";
   }
 }

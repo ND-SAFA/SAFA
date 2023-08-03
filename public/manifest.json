@@ -6,16 +6,16 @@
   "background_color": "#FFFFFF",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#5975B8",
+  "theme_color": "#488E27",
   "description": "SAFA",
   "icons": [
     {
       "src": "/favicon.ico",
       "type": "image/x-icon",
-      "sizes": "48x48"
+      "sizes": "16x16"
     },
     {
-      "src": "/SAFA-large.svg",
+      "src": "/SAFA-full.png",
       "type": "image/x-icon",
       "sizes": "196x150"
     }

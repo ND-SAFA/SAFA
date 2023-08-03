@@ -141,16 +141,32 @@
   &-open {
     padding-left: 10px;
     padding-right: 10px;
-
-    img {
-      width: 200px !important;
-    }
   }
 }
 
 .nav-account {
   position: absolute;
   bottom: 0;
+}
+
+#logo-safa {
+  .cls-2, .cls-3 {
+    fill: none;
+    stroke: $color-primary;
+    stroke-miterlimit: 10;
+  }
+
+  .cls-2 {
+    stroke-width: 4px;
+  }
+
+  .cls-3 {
+    stroke-width: 10px;
+  }
+
+  circle {
+    r: 6px;
+  }
 }
 
 // Navigation - Notifications

@@ -9,12 +9,12 @@
     />
     <typography secondary value="Traces To" />
     <div>
-      <chip
+      <attribute-chip
         v-for="type in allowedTypes"
         :key="type"
-        outlined
+        :value="getTypeLabel(type)"
+        artifact-type
         :removable="allowEditing"
-        :label="getTypeLabel(type)"
         data-cy="chip-type-direction"
         @remove="handleDelete(type)"
       />
@@ -42,6 +42,7 @@ import {
   typeOptionsStore,
 } from "@/hooks";
 import { Typography, Chip } from "@/components/common/display";
+import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
 const props = defineProps<ArtifactLevelInputProps>();
 

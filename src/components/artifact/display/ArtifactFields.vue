@@ -1,16 +1,18 @@
 <template>
   <panel-card>
     <flex-box align="center" justify="between">
-      <div class="overflow-hidden">
+      <flex-box column>
         <typography
-          ellipsis
-          variant="subtitle"
+          v-if="isCode"
+          variant="caption"
+          :value="codePath"
           el="h1"
-          :value="name"
+          ellipsis
           data-cy="text-selected-name"
         />
-        <q-tooltip>{{ name }}</q-tooltip>
-      </div>
+        <typography variant="subtitle" :value="displayName" ellipsis />
+        <q-tooltip>{{ displayName }}</q-tooltip>
+      </flex-box>
       <attribute-chip
         artifact-type
         :value="type"
@@ -18,7 +20,7 @@
       />
     </flex-box>
 
-    <separator b="2" />
+    <separator b="2" t="1" />
 
     <typography variant="caption" value="Body" />
     <typography
@@ -63,5 +65,15 @@ const type = computed(() => artifact.value?.type || "");
 const body = computed(() => artifact.value?.body.trim() || "");
 const variant = computed(() =>
   isCodeArtifact(artifact.value?.name || "") ? "code" : "expandable"
+);
+
+const isCode = computed(() => isCodeArtifact(name.value));
+
+const codePath = computed(() =>
+  isCode.value ? name.value.split("/").slice(0, -1).join("/") : ""
+);
+
+const displayName = computed(
+  () => (isCode.value && name.value.split("/").pop()) || name.value
 );
 </script>

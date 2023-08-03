@@ -1,12 +1,21 @@
 <template>
   <list-item
+    dense
     :clickable="props.clickable"
     :divider="props.displayDivider"
     :class="props.fullWidth ? 'full-width' : 'artifact-display'"
     @click="emit('click')"
   >
     <flex-box v-if="props.displayTitle" align="center" justify="between">
-      <typography :value="props.artifact.name" />
+      <flex-box column>
+        <typography
+          v-if="isCode"
+          variant="caption"
+          :value="codePath"
+          ellipsis
+        />
+        <typography :value="displayName" ellipsis />
+      </flex-box>
       <attribute-chip artifact-type :value="artifactType" />
     </flex-box>
     <template #subtitle>
@@ -53,6 +62,20 @@ const emit = defineEmits<{
    */
   (e: "click"): void;
 }>();
+
+const isCode = computed(() => isCodeArtifact(props.artifact.name));
+
+const codePath = computed(() =>
+  isCode.value
+    ? props.artifact.name.split("/").slice(0, -1).join("/")
+    : undefined
+);
+
+const displayName = computed(
+  () =>
+    (isCode.value && props.artifact.name.split("/").pop()) ||
+    props.artifact.name
+);
 
 const artifactType = computed(() =>
   typeOptionsStore.getArtifactTypeDisplay(props.artifact.type)

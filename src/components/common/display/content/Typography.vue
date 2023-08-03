@@ -3,8 +3,7 @@
     <markdown
       v-if="expanded"
       :source="value"
-      :class="className"
-      style="text-wrap: wrap"
+      :class="className + ' text-white-space-normal'"
     />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
@@ -13,7 +12,8 @@
       flat
       dense
       size="sm"
-      color="grey-8"
+      color="textCaption"
+      :class="buttonClassName"
       @click.stop="expanded = !expanded"
     >
       {{ expandLabel }}
@@ -28,7 +28,7 @@
       <pre v-if="expanded" v-highlightjs :class="className">
         <code>{{value}}</code>
       </pre>
-      <div v-else :class="className + ' text-grey-8'">
+      <div v-else :class="className + ' text-textCaption'">
         Code is hidden to save space.
       </div>
     </div>
@@ -36,7 +36,7 @@
       flat
       size="sm"
       dense
-      color="grey-8"
+      color="textCaption"
       @click.stop="expanded = !expanded"
     >
       {{ expandLabel }}
@@ -99,12 +99,14 @@ const props = withDefaults(defineProps<TypographyProps>(), {
 
 const { darkMode } = useTheme();
 
+const buttonClassName = useMargins(props);
+
 const className = useMargins(props, () => [
   [props.variant === "large", "text-h3"],
   [props.variant === "title", "text-h4"],
   [props.variant === "subtitle", "text-h5"],
   [props.variant === "small", "text-subtitle2"],
-  [props.variant === "caption", "text-caption text-grey-8"],
+  [props.variant === "caption", "text-caption text-textCaption"],
   [props.variant === "code", "text-body1"],
   [props.variant === "body" || props.variant === "expandable", "text-body1"],
   [props.el === "a", "text-primary"],
@@ -113,11 +115,11 @@ const className = useMargins(props, () => [
   ["inheritColor", "inherit-color"],
   ["error", "text-negative"],
   ["ellipsis", "text-ellipsis"],
-  ["secondary", "text-grey-8"],
+  ["secondary", "text-textCaption"],
   ["bold", "text-bold"],
   ["small", "text-sm"],
   ["large", "text-lg"],
-  ["wrap", "text-wrap"],
+  ["wrap", "text-white-space-normal"],
   ["class", props.class],
 ]);
 

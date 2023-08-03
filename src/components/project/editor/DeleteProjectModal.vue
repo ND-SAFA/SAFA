@@ -1,11 +1,11 @@
 <template>
   <modal
     :loading="projectApiStore.deleteProjectLoading"
-    :open="props.open"
+    :open="open"
     title="Delete Project"
     subtitle="Are you sure you want to delete this project? Type in the project's name to confirm deletion."
     data-cy="modal-project-delete"
-    @close="handleCancel"
+    @close="handleClose"
   >
     <text-input
       v-model="confirmText"
@@ -30,26 +30,24 @@
  * A modal for confirming project deletion.
  */
 export default {
-  name: "ConfirmProjectDelete",
+  name: "DeleteProjectModal",
 };
 </script>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { projectApiStore, identifierSaveStore } from "@/hooks";
+import { ref, computed } from "vue";
+import { PanelType } from "@/types";
+import {
+  projectApiStore,
+  identifierSaveStore,
+  appStore,
+  getProjectApiStore,
+} from "@/hooks";
 import { Modal, TextInput, TextButton } from "@/components/common";
-
-const props = defineProps<{
-  open: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: "confirm"): void;
-  (e: "close"): void;
-}>();
 
 const confirmText = ref("");
 
+const open = computed(() => appStore.isProjectDeleterOpen);
 const projectName = computed(
   () => identifierSaveStore.baseIdentifier?.name || ""
 );
@@ -57,18 +55,11 @@ const label = computed(() => `Type "${projectName.value}"`);
 const canDelete = computed(() => confirmText.value === projectName.value);
 
 /**
- * Clears the modal data.
+ * Clears the modal data and closes the modal.
  */
-function handleClear(): void {
+function handleClose(): void {
   confirmText.value = "";
-}
-
-/**
- * Cancels the project deletion.
- */
-function handleCancel(): void {
-  emit("close");
-  handleClear();
+  appStore.closePanel(PanelType.projectDeleter);
 }
 
 /**
@@ -76,19 +67,11 @@ function handleCancel(): void {
  */
 function handleConfirm(): void {
   projectApiStore.handleDeleteProject({
-    onSuccess: () => {
-      emit("confirm");
-      handleClear();
+    onSuccess: async () => {
+      handleClose();
+
+      await getProjectApiStore.handleReload();
     },
   });
 }
-
-watch(
-  () => props.open,
-  (open) => {
-    if (!open) return;
-
-    handleClear();
-  }
-);
 </script>

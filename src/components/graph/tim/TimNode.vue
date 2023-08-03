@@ -29,10 +29,11 @@
           icon="view-tree"
           @click="documentStore.addDocumentOfTypes([props.artifactType])"
         />
-        <separator class="full-width q-my-xs" />
+        <separator v-if="displayEditing" class="full-width q-my-xs" />
         <icon-button
+          v-if="displayEditing"
           tooltip="Generate parents"
-          icon="generateArtifacts"
+          icon="generate-artifacts"
           color="primary"
           @click="appStore.openDetailsPanel('generateArtifact')"
         />
@@ -57,7 +58,9 @@ import { sanitizeNodeId } from "@/util";
 import {
   appStore,
   documentStore,
+  projectStore,
   selectionStore,
+  sessionStore,
   typeOptionsStore,
   useTheme,
 } from "@/hooks";
@@ -72,6 +75,10 @@ const props = defineProps<{
 }>();
 
 const { darkMode } = useTheme();
+
+const displayEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const selected = computed(
   () => selectionStore.selectedArtifactLevelType === props.artifactType

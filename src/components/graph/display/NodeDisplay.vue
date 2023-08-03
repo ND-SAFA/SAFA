@@ -50,7 +50,7 @@ const props = defineProps<{
   /**
    * The type of node to display.
    */
-  variant: "tim" | "artifact" | "footer" | "sidebar";
+  variant: "tim" | "artifact" | "footer" | "sidebar" | "menu";
   /**
    * The color of the node to display.
    */
@@ -94,6 +94,7 @@ const className = computed(
       artifact: "cy-node-artifact q-pa-sm",
       footer: "cy-node-footer q-pa-xs",
       sidebar: "cy-node-sidebar q-pa-xs",
+      menu: "cy-node-menu q-pa-xs",
     }[props.variant]
 );
 

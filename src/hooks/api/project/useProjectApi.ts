@@ -35,7 +35,7 @@ export const useProjectApi = defineStore("projectApi", () => {
    * @param callbacks - Callbacks for the action.
    */
   async function handleSave(
-    callbacks: IOHandlerCallback<ProjectSchema>
+    callbacks: IOHandlerCallback<ProjectSchema> = {}
   ): Promise<void> {
     const identifier = identifierSaveStore.editedIdentifier;
 

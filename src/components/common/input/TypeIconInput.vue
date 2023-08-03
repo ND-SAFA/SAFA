@@ -7,6 +7,7 @@
       :value="props.artifactLevel.name"
     />
     <typography secondary value="Icon" />
+    <br />
     <q-btn-toggle
       v-model="icon"
       flat

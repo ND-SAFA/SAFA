@@ -1,12 +1,10 @@
 import klay from "cytoscape-klay";
 import automove from "cytoscape-automove";
-import contextMenus from "cytoscape-context-menus";
 import edgehandles from "cytoscape-edgehandles";
 
 import { CytoCore, CytoCoreGraph } from "@/types";
 import { artifactTreeCyPromise, artifactTreeResolveCy } from "@/cytoscape/cy";
 import {
-  artifactTreeContextMenuOptions,
   artifactTreeEdgeHandleOptions,
   setEdgeHandlesCore,
 } from "@/cytoscape/plugins";
@@ -39,12 +37,6 @@ export const artifactTreeGraph: CytoCoreGraph = {
     {
       initialize: automove,
       afterInit: () => undefined,
-    },
-    {
-      initialize: contextMenus,
-      afterInit(cy: CytoCore): void {
-        cy.contextMenus(artifactTreeContextMenuOptions);
-      },
     },
     {
       initialize: edgehandles,

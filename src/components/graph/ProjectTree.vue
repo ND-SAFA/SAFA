@@ -1,12 +1,12 @@
 <template>
-  <cytoscape-controller
+  <cytoscape
     id="cytoscape-artifact"
-    :cyto-core-graph="artifactTreeGraph"
+    :graph="artifactTreeGraph"
     :class="className"
     data-cy="view-artifact-tree"
     @click="handleClick"
   >
-    <template v-if="isTreeMode" #elements>
+    <template v-if="isTreeMode">
       <artifact-node
         v-for="artifact in artifacts"
         :key="artifact.id"
@@ -20,7 +20,7 @@
         :artifacts-in-view="artifactsInView"
       />
     </template>
-    <template v-else #elements>
+    <template v-else>
       <tim-node
         v-for="level in Object.values(tim.artifacts)"
         :key="level.typeId"
@@ -37,7 +37,14 @@
         :generated="matrix.generatedCount > 0"
       />
     </template>
-  </cytoscape-controller>
+
+    <template v-if="isTreeMode" #context-menu>
+      <artifact-menu />
+    </template>
+    <template v-else #context-menu>
+      <tim-menu />
+    </template>
+  </cytoscape>
 </template>
 
 <script lang="ts">
@@ -66,9 +73,9 @@ import {
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
-import CytoscapeController from "./CytoscapeController.vue";
-import { ArtifactNode, TraceLink } from "./tree";
-import { TimNode, TimLink } from "./tim";
+import { Cytoscape } from "./base";
+import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
+import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
 
@@ -104,7 +111,9 @@ const className = computed(() => {
 function handleClick(event: EventObject): void {
   if (event.target !== event.cy) return;
 
-  disableDrawMode();
+  if (appStore.isCreateLinkEnabled) {
+    disableDrawMode();
+  }
 
   if (
     (

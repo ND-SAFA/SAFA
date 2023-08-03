@@ -60,12 +60,15 @@
       :align="idx === 0 ? 'start' : 'end'"
       :class="column.classes"
     >
-      <icon-button
-        v-if="idx === 0 && props.expandable"
-        tooltip="Toggle expand"
-        :icon="props.expand ? 'up' : 'down'"
-        class="q-mr-sm"
-      />
+      <span @click.stop>
+        <icon-button
+          v-if="idx === 0 && props.expandable"
+          tooltip="Toggle expand"
+          :icon="props.expand ? 'up' : 'down'"
+          class="q-mr-sm"
+          @click="rowExpanded = !rowExpanded"
+        />
+      </span>
       <slot
         v-if="!!slots[`body-cell-${column.name}`]"
         :name="`body-cell-${column.name}`"

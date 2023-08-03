@@ -9,34 +9,27 @@
       />
     </flex-box>
     <panel-card>
-      <cytoscape-controller
+      <cytoscape
         id="cytoscape-tim"
-        :cyto-core-graph="timGraph"
+        :graph="timGraph"
         :class="className"
+        data-cy="view-tim-tree"
       >
-        <template #elements>
-          <tim-node
-            v-for="{ type, count } in artifacts"
-            :key="type"
-            :count="count"
-            :artifact-type="type"
-          />
-          <tim-link
-            v-for="{
-              name,
-              sourceType,
-              targetType,
-              count,
-              isGenerated,
-            } in traces"
-            :key="name"
-            :count="count"
-            :target-type="targetType"
-            :source-type="sourceType"
-            :generated="isGenerated"
-          />
-        </template>
-      </cytoscape-controller>
+        <tim-node
+          v-for="{ type, count } in artifacts"
+          :key="type"
+          :count="count"
+          :artifact-type="type"
+        />
+        <tim-link
+          v-for="{ name, sourceType, targetType, count, isGenerated } in traces"
+          :key="name"
+          :count="count"
+          :target-type="targetType"
+          :source-type="sourceType"
+          :generated="isGenerated"
+        />
+      </cytoscape>
     </panel-card>
   </div>
 </template>
@@ -57,7 +50,7 @@ import { appStore, layoutStore, projectSaveStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import { FlexBox, TextButton } from "@/components/common";
 import PanelCard from "@/components/common/layout/PanelCard.vue";
-import CytoscapeController from "./CytoscapeController.vue";
+import { Cytoscape } from "./base";
 import { TimNode, TimLink } from "./tim";
 
 const props = defineProps<{

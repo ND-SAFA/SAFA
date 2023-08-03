@@ -12,7 +12,7 @@
       <img
         :src="safaLogo"
         alt="SAFA"
-        style="width: 100% !important; position: relative; top: -5%"
+        :style="iconStyle"
         @click="emit('click')"
       />
     </foreignObject>
@@ -68,7 +68,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { SafaIconProps } from "@/types";
-import safaLogo from "@/assets/images/safa_logo_small.png";
+import safaLogoSmall from "@/assets/images/safa_logo_small.png";
+import safaLogoLarge from "@/assets/images/safa_logo_large.png";
 
 const props = defineProps<SafaIconProps>();
 
@@ -88,4 +89,14 @@ const className = computed(() => {
 
   return classNames;
 });
+
+const safaLogo = computed(() =>
+  props.clickable ? safaLogoSmall : safaLogoLarge
+);
+
+const iconStyle = computed(() =>
+  props.clickable
+    ? "width: 100% !important; position: relative; top: -5%"
+    : "width: 100% !important; position: relative; top: 10%"
+);
 </script>

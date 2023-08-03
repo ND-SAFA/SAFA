@@ -59,6 +59,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
    *
    * @param project - The project to create.
    * @param files - The files to upload.
+   * @param summarize - Whether to summarize artifacts.
    * @param callbacks - The callbacks to use on success, error, and complete.
    */
   async function handleBulkImport(
@@ -67,6 +68,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
       "projectId" | "name" | "description" | "projectVersion"
     >,
     files: File[],
+    summarize: boolean,
     callbacks: IOHandlerCallback
   ): Promise<void> {
     await createProjectApi.handleRequest(
@@ -75,6 +77,7 @@ export const useCreateProjectApi = defineStore("createProjectApi", () => {
 
         formData.append("name", project.name);
         formData.append("description", project.description);
+        formData.append("summarize", summarize.toString());
 
         files.forEach((file: File) => {
           formData.append("files", file);

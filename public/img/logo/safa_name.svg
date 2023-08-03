@@ -4,7 +4,13 @@
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="1872.000000pt" height="529.000000pt" viewBox="0 0 1872.000000 529.000000"
  preserveAspectRatio="xMidYMid meet">
-
+    <defs>
+        <style>
+            path {
+            fill: #488E27;
+            }
+        </style>
+    </defs>
 <g transform="translate(0.000000,529.000000) scale(0.100000,-0.100000)"
 fill="#000000" stroke="none">
 <path d="M3505 3951 c-234 -57 -430 -228 -518 -451 -64 -163 -64 -367 0 -530

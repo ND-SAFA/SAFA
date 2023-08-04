@@ -7,11 +7,8 @@ import {
   TraceLinkSchema,
   TraceMatrixSchema,
 } from "@/types";
-<<<<<<< HEAD
-import { timStore } from "@/hooks";
-=======
 import { LARGE_NODE_COUNT, sanitizeNodeId } from "@/util";
->>>>>>> development
+import { timStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,

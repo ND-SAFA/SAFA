@@ -74,7 +74,8 @@ public class CommitService {
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,
             projectCommit.getArtifacts(),
-            failOnError);
+            failOnError,
+            user);
         errors = new ArrayList<>(artifactResponse.getValue1()); // linter wants it like this for some reason
         ProjectChange<ArtifactAppEntity> artifactChanges = artifactResponse.getValue0();
 
@@ -82,7 +83,8 @@ public class CommitService {
         Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(
             projectVersion,
             projectCommit.getTraces(),
-            failOnError);
+            failOnError,
+            user);
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
 
         // Step - Update project last edited
@@ -113,25 +115,31 @@ public class CommitService {
     private Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> commitArtifactChanges(
         ProjectVersion projectVersion,
         ProjectChange<ArtifactAppEntity> artifacts,
-        boolean failOnError) throws SafaError {
+        boolean failOnError,
+        SafaUser user) throws SafaError {
+
         return commitEntityChanges(
             projectVersion,
             artifacts,
             this.artifactVersionRepository,
             this.artifactVersionRepository::retrieveAppEntityFromVersionEntity,
-            failOnError);
+            failOnError,
+            user);
     }
 
     private Pair<ProjectChange<TraceAppEntity>, List<CommitError>> commitTraceChanges(
         ProjectVersion projectVersion,
         ProjectChange<TraceAppEntity> traces,
-        boolean failOnError) throws SafaError {
+        boolean failOnError,
+        SafaUser user) throws SafaError {
+
         return commitEntityChanges(
             projectVersion,
             traces,
             this.traceLinkVersionRepository,
             this.traceLinkVersionRepository::retrieveAppEntityFromVersionEntity,
-            failOnError);
+            failOnError,
+            user);
     }
 
     /**
@@ -141,6 +149,7 @@ public class CommitService {
      * @param projectChange           The entities that are being touched.
      * @param versionEntityRepository The IVersionRepository used for this entity.
      * @param iAppEntityCreator       The constructor for creating app entities from version entities.
+     * @param user                    The user making the change
      * @param <A>                     The entity used on the application side.
      * @param <V>                     The entity used for version control.
      * @return ProjectChange containing processed entities.
@@ -153,7 +162,8 @@ public class CommitService {
         ProjectChange<A> projectChange,
         IVersionRepository<V, A> versionEntityRepository,
         IAppEntityCreator<A, V> iAppEntityCreator,
-        boolean failOnError
+        boolean failOnError,
+        SafaUser user
     ) throws SafaError {
         ProjectChange<A> change = new ProjectChange<>();
         List<CommitError> commitErrors;
@@ -161,11 +171,12 @@ public class CommitService {
         // Define actions
         CommitAction<A, V> saveOrModifyAction = a ->
             versionEntityRepository.commitAppEntityToProjectVersion(
-                projectVersion, a);
+                projectVersion, a, user);
         CommitAction<A, V> deleteAction = a ->
             versionEntityRepository.deleteVersionEntityByBaseEntityId(
                 projectVersion,
-                a.getId());
+                a.getId(),
+                user);
 
         // Commit added entities
         EntityParsingResult<A, CommitError> addedResponse = commitActionOnAppEntities(

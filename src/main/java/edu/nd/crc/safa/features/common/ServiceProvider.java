@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
@@ -52,9 +51,9 @@ import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.features.traces.services.TraceMatrixService;
 import edu.nd.crc.safa.features.traces.services.TraceService;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
@@ -96,7 +95,6 @@ public class ServiceProvider {
     // Versions
     private final VersionService versionService;
     // Types
-    private final ArtifactTypeRepository artifactTypeRepository;
     private final TypeService typeService;
     // Artifact
     private final ArtifactRepository artifactRepository;
@@ -114,8 +112,7 @@ public class ServiceProvider {
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
     private final TraceLinkRepository traceLinkRepository;
-    // Matrix
-    private final TraceMatrixRepository traceMatrixRepository;
+    private final TraceMatrixService traceMatrixService;
     // Changes
     private final ProjectVersionRepository projectVersionRepository;
     private final CommitErrorRepository commitErrorRepository;

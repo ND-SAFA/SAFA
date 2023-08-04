@@ -71,9 +71,9 @@ public class ProjectChanger {
         List<TraceAppEntity> traces = projectEntities.getTraces();
         List<Pair<ArtifactVersion, CommitError>> artifactResponse = serviceProvider
             .getArtifactVersionRepository()
-            .commitAllAppEntitiesToProjectVersion(projectVersion, artifacts, true);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, artifacts, true, user);
         List<Pair<TraceLinkVersion, CommitError>> traceResponse = serviceProvider.getTraceLinkVersionRepository()
-            .commitAllAppEntitiesToProjectVersion(projectVersion, traces, true);
+            .commitAllAppEntitiesToProjectVersion(projectVersion, traces, true, user);
         saveCommitErrors(artifactResponse, ProjectEntity.ARTIFACTS);
         saveCommitErrors(traceResponse, ProjectEntity.TRACES);
 

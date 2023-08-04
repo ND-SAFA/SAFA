@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -105,11 +106,9 @@ public abstract class GenericVersionRepository<
      */
     @Override
     public Pair<VersionEntity, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                                            AppEntity appEntity) {
+                                                                            AppEntity appEntity, SafaUser user) {
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
-            BaseEntity baseEntity = this.createOrUpdateRelatedEntities(
-                projectVersion,
-                appEntity);
+            BaseEntity baseEntity = this.createOrUpdateRelatedEntities(projectVersion, appEntity, user);
 
             VersionEntity versionEntity = this.instantiateVersionEntityFromAppEntity(
                 projectVersion,
@@ -117,7 +116,7 @@ public abstract class GenericVersionRepository<
                 appEntity);
 
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
-                createOrUpdateVersionEntity(versionEntity);
+                createOrUpdateVersionEntity(versionEntity, user);
                 UUID baseEntityId = baseEntity.getBaseEntityId();
                 appEntity.setId(baseEntityId);
             }
@@ -131,7 +130,9 @@ public abstract class GenericVersionRepository<
     @Override
     public Pair<VersionEntity, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        UUID baseEntityId) {
+        UUID baseEntityId,
+        SafaUser user) {
+
         VersionEntityAction<VersionEntity> versionEntityAction = () -> {
             Optional<BaseEntity> baseEntityOptional = this.findBaseEntityById(baseEntityId);
 
@@ -141,7 +142,7 @@ public abstract class GenericVersionRepository<
                     projectVersion,
                     baseEntity,
                     null);
-                this.createOrUpdateVersionEntity(removedVersionEntity);
+                this.createOrUpdateVersionEntity(removedVersionEntity, user);
                 return removedVersionEntity == null ? Optional.empty() : Optional.of(removedVersionEntity);
             } else {
                 return Optional.empty();
@@ -209,14 +210,15 @@ public abstract class GenericVersionRepository<
     public List<Pair<VersionEntity, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
         List<AppEntity> appEntities,
-        boolean asCompleteSet) {
+        boolean asCompleteSet,
+        SafaUser user) {
 
         List<UUID> processedAppEntities = new ArrayList<>();
         List<Pair<VersionEntity, CommitError>> response = appEntities
             .stream()
             .map(appEntity -> {
                 Pair<VersionEntity, CommitError> commitResponse =
-                    this.commitAppEntityToProjectVersion(projectVersion, appEntity);
+                    this.commitAppEntityToProjectVersion(projectVersion, appEntity, user);
                 if (commitResponse.getValue1() == null) {
                     UUID baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
@@ -233,7 +235,8 @@ public abstract class GenericVersionRepository<
                 .filter(baseEntity -> !processedAppEntities.contains(baseEntity.getBaseEntityId()))
                 .map(baseEntity -> this.deleteVersionEntityByBaseEntityId(
                     projectVersion,
-                    baseEntity.getBaseEntityId()))
+                    baseEntity.getBaseEntityId(),
+                    user))
                 .collect(Collectors.toList());
             response.addAll(removedVersionEntities);
         }
@@ -241,12 +244,18 @@ public abstract class GenericVersionRepository<
         return response;
     }
 
-    private void createOrUpdateVersionEntity(VersionEntity versionEntity) throws SafaError {
+    private void createOrUpdateVersionEntity(VersionEntity versionEntity, SafaUser user) throws SafaError {
         try {
-            this.findExistingVersionEntity(versionEntity)
-                .ifPresent(existingVersionEntity ->
-                    versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
+            this.findExistingVersionEntity(versionEntity).ifPresent(existingVersionEntity ->
+                versionEntity.setVersionEntityId(existingVersionEntity.getVersionEntityId()));
+
+            Optional<VersionEntity> previousEntity =
+                findVersionEntityByProjectVersionAndBaseEntityId(versionEntity.getProjectVersion(),
+                    versionEntity.getBaseEntityId());
+
             this.save(versionEntity);
+
+            this.updateTimInfo(versionEntity.getProjectVersion(), versionEntity, previousEntity.orElse(null), user);
         } catch (Exception e) {
             e.printStackTrace();
             UUID baseEntityId = versionEntity.getBaseEntityId();
@@ -430,10 +439,12 @@ public abstract class GenericVersionRepository<
      *
      * @param projectVersion    The project version associated with given app entity.
      * @param artifactAppEntity The application entity whose sub entities are being created.
+     * @param user The user doing the operation
      * @return Returns the base entity associated with given app entity.
      */
     protected abstract BaseEntity createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                                AppEntity artifactAppEntity) throws SafaError;
+                                                                AppEntity artifactAppEntity, SafaUser user)
+        throws SafaError;
 
     /**
      * Creates an entity version with content of app entity and containing

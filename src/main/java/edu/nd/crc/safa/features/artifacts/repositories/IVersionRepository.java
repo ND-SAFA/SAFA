@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.javatuples.Pair;
@@ -78,11 +79,12 @@ public interface IVersionRepository<
      *
      * @param projectVersion The project version to save the changes to.
      * @param a              The app entity whose state is saved.
+     * @param user           The user doing the update
      * @return String representing error message if one occurred.
      * @throws SafaError Throws error if saving changes fails.
      */
     Pair<V, CommitError> commitAppEntityToProjectVersion(ProjectVersion projectVersion,
-                                                         A a) throws SafaError;
+                                                         A a, SafaUser user) throws SafaError;
 
     /**
      * Saves given application entities to given version, saving removal entities for entities present in previous
@@ -91,24 +93,28 @@ public interface IVersionRepository<
      * @param projectVersion The project version whose changes are committed to.
      * @param appEntities    The app entities whose states are saved.
      * @param asCompleteSet  Whether entities create entire set of entities in project.
+     * @param user The user making the change
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
     List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
         List<A> appEntities,
-        boolean asCompleteSet) throws SafaError;
+        boolean asCompleteSet,
+        SafaUser user) throws SafaError;
 
     /**
      * Deletes entity version with given name and commits to given project version.
      *
      * @param projectVersion The project version associated with committed removal.
      * @param baseEntityName The name of the base entity whose removal is committed to given version.
+     * @param user The user making the change
      * @return CommitError if error occurred while deleting entity, null otherwise.
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        UUID baseEntityName);
+        UUID baseEntityName,
+        SafaUser user);
 
     /**
      * Calculates and returns the delta between the versions
@@ -120,4 +126,14 @@ public interface IVersionRepository<
      */
     EntityDelta<A> calculateEntityDelta(ProjectVersion baselineVersion,
                                         ProjectVersion targetVersion);
+
+    /**
+     * Update TIM related information as needed for a given entity update.
+     *
+     * @param projectVersion The version the update is happening in
+     * @param versionEntity The newly updated entity
+     * @param originalVersionEntity The previous version of the entity, if it exists (for calculating differences)
+     * @param user The user doing the change
+     */
+    void updateTimInfo(ProjectVersion projectVersion, V versionEntity, V originalVersionEntity, SafaUser user);
 }

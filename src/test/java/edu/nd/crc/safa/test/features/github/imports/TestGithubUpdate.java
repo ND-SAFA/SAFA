@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.github.base.AbstractGithubTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;

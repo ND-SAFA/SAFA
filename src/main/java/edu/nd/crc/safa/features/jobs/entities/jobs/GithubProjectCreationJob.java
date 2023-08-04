@@ -33,8 +33,8 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
-import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.graphql.entities.EdgeNode;
@@ -283,7 +283,8 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     private ArtifactType createArtifactType(Project project, String artifactTypeName) {
-        ArtifactType artifactType = serviceProvider.getTypeService().createArtifactType(project, artifactTypeName);
+        ArtifactType artifactType = serviceProvider.getTypeService()
+            .createArtifactType(project, artifactTypeName, user);
         List<AttributePositionAppEntity> attributePositions = List.of(
             new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
         );

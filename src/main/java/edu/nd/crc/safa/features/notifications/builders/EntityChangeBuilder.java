@@ -135,6 +135,22 @@ public class EntityChangeBuilder {
         return withEntityDelete(Change.Entity.MODELS, List.of(modelId));
     }
 
+    public EntityChangeBuilder withTraceMatrixUpdate(UUID matrixId) {
+        return withTraceMatricesUpdate(List.of(matrixId));
+    }
+
+    public EntityChangeBuilder withTraceMatricesUpdate(List<UUID> matrixIds) {
+        return withEntityUpdate(Change.Entity.TRACE_MATRICES, matrixIds);
+    }
+
+    public EntityChangeBuilder withTraceMatrixDelete(UUID matrixId) {
+        return withTraceMatricesDelete(List.of(matrixId));
+    }
+
+    public EntityChangeBuilder withTraceMatricesDelete(List<UUID> matrixIds) {
+        return withEntityDelete(Change.Entity.TRACE_MATRICES, matrixIds);
+    }
+
     private EntityChangeBuilder withEntityUpdate(Change.Entity entity, List<UUID> entityIds) {
         return withEntityUpdate(entity, entityIds, true);
     }

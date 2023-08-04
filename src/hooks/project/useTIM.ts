@@ -81,7 +81,7 @@ export const useTIM = defineStore("tim", {
         this.artifactTypes = [
           ...this.artifactTypes,
           {
-            id: "",
+            typeId: "",
             name: type,
             icon: defaultTypeIcon,
             color: "base",
@@ -98,7 +98,7 @@ export const useTIM = defineStore("tim", {
     deleteArtifactTypes(removedTypeIds: string[]): void {
       const preservedArtifactTypes = removeMatches(
         this.artifactTypes,
-        "id",
+        "typeId",
         removedTypeIds
       );
 

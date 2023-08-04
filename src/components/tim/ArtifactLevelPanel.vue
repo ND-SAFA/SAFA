@@ -35,8 +35,8 @@
       title="Type Options"
       data-cy="panel-artifact-type-options"
     >
-      <type-direction-input :artifact-level="artifactLevel" />
-      <type-icon-input :artifact-level="artifactLevel" />
+      <type-direction-input :artifact-type="artifactLevel" />
+      <type-icon-input :artifact-type="artifactLevel" />
     </panel-card>
   </details-panel>
 </template>

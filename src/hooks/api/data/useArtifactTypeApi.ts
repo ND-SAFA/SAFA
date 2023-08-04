@@ -16,7 +16,7 @@ export const useArtifactTypeApi = defineStore("artifactTypeApi", () => {
   async function handleSave(artifactType: ArtifactTypeSchema): Promise<void> {
     await artifactTypeApi.handleRequest(
       async () => {
-        const updatedArtifactType = artifactType.id
+        const updatedArtifactType = artifactType.typeId
           ? await editArtifactType(projectStore.projectId, artifactType)
           : await createArtifactType(projectStore.projectId, artifactType);
 

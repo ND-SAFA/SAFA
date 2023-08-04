@@ -57,7 +57,7 @@ import {
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
-import { typeOptionsStore, useTheme } from "@/hooks";
+import { timStore, useTheme } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { Icon } from "../icon";
 import Chip from "./Chip.vue";
@@ -83,7 +83,7 @@ const text = computed(() => {
   } else if (props.format) {
     return camelcaseToDisplay(String(props.value) || "");
   } else if (props.artifactType) {
-    return typeOptionsStore.getArtifactTypeDisplay(String(props.value));
+    return timStore.getTypeName(String(props.value));
   } else {
     return String(props.value);
   }
@@ -94,14 +94,12 @@ const progress = computed(() =>
 );
 
 const iconId = computed(() =>
-  props.artifactType
-    ? typeOptionsStore.getArtifactTypeIcon(String(props.value))
-    : ""
+  props.artifactType ? timStore.getTypeIcon(String(props.value)) : ""
 );
 
 const typeColor = computed(() =>
   props.artifactType
-    ? typeOptionsStore.tim.artifacts[props.value]?.color || "primary"
+    ? timStore.getTypeColor(String(props.value), true)
     : "primary"
 );
 

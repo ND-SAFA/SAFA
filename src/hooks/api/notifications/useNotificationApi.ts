@@ -19,13 +19,13 @@ import {
   projectStore,
   subtreeStore,
   traceStore,
-  typeOptionsStore,
   logStore,
   stompApiStore,
   setProjectApiStore,
   getVersionApiStore,
   jobApiStore,
   warningApiStore,
+  timStore,
 } from "@/hooks";
 import { router } from "@/router";
 import { Endpoint, fillEndpoint, getChanges } from "@/api";
@@ -55,7 +55,10 @@ export const useNotificationApi = defineStore("notificationApi", () => {
         return setProjectApiStore.handleClear();
       case EntityType.TYPES:
         // (entityIds = type id)
-        typeOptionsStore.removeArtifactTypes(change.entityIds);
+        timStore.deleteArtifactTypes(change.entityIds);
+        break;
+      case EntityType.TRACE_MATRICES:
+        timStore.deleteTraceMatrices(change.entityIds);
         break;
       case EntityType.DOCUMENT:
         // (entityIds = document id)
@@ -123,7 +126,10 @@ export const useNotificationApi = defineStore("notificationApi", () => {
       case EntityType.VERSION:
         return getVersionApiStore.handleLoad(versionId);
       case EntityType.TYPES:
-        typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);
+        timStore.addOrUpdateArtifactTypes(project.artifactTypes);
+        break;
+      case EntityType.TRACE_MATRICES:
+        timStore.addOrUpdateTraceMatrices(project.traceMatrices);
         break;
       case EntityType.DOCUMENT:
         await documentStore.updateDocuments(project.documents);

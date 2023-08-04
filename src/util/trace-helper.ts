@@ -3,8 +3,8 @@ import {
   ArtifactCytoElementData,
   ArtifactSchema,
   LinkSchema,
-  TimSchema,
   TraceLinkSchema,
+  TraceMatrixSchema,
   TraceType,
 } from "@/types";
 
@@ -54,13 +54,13 @@ export function matchTrace(
  *
  * @param source - The source artifact.
  * @param target - The target artifact.
- * @param tim - Information on the allowed links between types.
+ * @param traceMatrices - The existing links between types.
  * @return Whether the link is allowed.
  */
 export function isLinkAllowedByType(
   source: ArtifactSchema | ArtifactCytoElementData,
   target: ArtifactSchema | ArtifactCytoElementData,
-  tim: TimSchema
+  traceMatrices: TraceMatrixSchema[]
 ): boolean {
   const sourceType =
     "artifactType" in source ? source.artifactType : source.type;
@@ -69,7 +69,10 @@ export function isLinkAllowedByType(
 
   return sourceType === targetType
     ? true
-    : !tim.artifacts[targetType]?.allowedTypes.includes(sourceType);
+    : !traceMatrices.find(
+        (matrix) =>
+          matrix.sourceType === targetType && matrix.targetType === sourceType
+      );
 }
 
 /**

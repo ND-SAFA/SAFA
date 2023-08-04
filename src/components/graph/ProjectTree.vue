@@ -22,14 +22,14 @@
     </template>
     <template v-else>
       <tim-node
-        v-for="level in Object.values(tim.artifacts)"
-        :key="level.typeId"
-        :count="level.count"
-        :artifact-type="level.name"
-        :icon="level.icon"
+        v-for="type in artifactTypes"
+        :key="type.id"
+        :count="type.count"
+        :artifact-type="type.name"
+        :icon="type.icon"
       />
       <tim-link
-        v-for="matrix in tim.traces"
+        v-for="matrix in traceMatrices"
         :key="matrix.sourceType + matrix.targetType"
         :count="matrix.count"
         :target-type="matrix.targetType"
@@ -69,7 +69,7 @@ import {
   deltaStore,
   selectionStore,
   layoutStore,
-  typeOptionsStore,
+  timStore,
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
@@ -89,7 +89,8 @@ const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces
 );
 
-const tim = computed(() => typeOptionsStore.tim);
+const artifactTypes = computed(() => timStore.artifactTypes);
+const traceMatrices = computed(() => timStore.traceMatrices);
 
 const className = computed(() => {
   if (!isInView.value) {

@@ -56,12 +56,12 @@ import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
+  timStore,
   appStore,
   documentStore,
   projectStore,
   selectionStore,
   sessionStore,
-  typeOptionsStore,
   useTheme,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
@@ -86,9 +86,7 @@ const selected = computed(
 
 const style = computed(() => (selected.value ? "z-index: 10;" : "z-index: 1;"));
 
-const color = computed(
-  () => typeOptionsStore.getArtifactLevel(props.artifactType)?.color || ""
-);
+const color = computed(() => timStore.getTypeColor(props.artifactType));
 
 const countLabel = computed(() =>
   props.count === 1 ? "1 Artifact" : `${props.count} Artifacts`

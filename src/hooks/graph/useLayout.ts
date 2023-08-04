@@ -8,7 +8,6 @@ import {
   PositionSchema,
   GraphMode,
 } from "@/types";
-import { typeOptionsStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyApplyAutomove,
@@ -167,26 +166,6 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
-    },
-    /**
-     * Switches the layout to tree mode, and only displays the listed types.
-     *
-     * @param visibleTypes - The types to display.
-     */
-    viewTreeTypes(visibleTypes: string[]): void {
-      const hiddenTypes = typeOptionsStore.artifactTypes.filter(
-        (type) => !visibleTypes.includes(type)
-      );
-
-      this.mode = GraphMode.tree;
-
-      hiddenTypes.forEach((ignoreType) => {
-        selectionStore.filterGraph({
-          type: "ignore",
-          action: "add",
-          ignoreType,
-        });
-      });
     },
   },
 });

@@ -13,7 +13,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TimArtifactLevelSchema } from "@/types";
+import { ArtifactTypeSchema } from "@/types";
 import { selectionStore } from "@/hooks";
 import { TypeButtons } from "@/components/common";
 
@@ -23,7 +23,7 @@ const hiddenTypes = computed(() => selectionStore.ignoreTypes);
  * Toggles whether a type is visible.
  * @param option - The type to toggle.
  */
-function handleClick(option: TimArtifactLevelSchema) {
+function handleClick(option: ArtifactTypeSchema) {
   const hidden = hiddenTypes.value.find((type) => type === option.name);
 
   selectionStore.filterGraph({

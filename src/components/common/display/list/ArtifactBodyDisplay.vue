@@ -49,7 +49,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
 import { isCodeArtifact } from "@/util";
-import { typeOptionsStore } from "@/hooks";
+import { timStore } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { AttributeChip } from "../chip";
 import ListItem from "./ListItem.vue";
@@ -63,8 +63,9 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const isCode = computed(() => isCodeArtifact(props.artifact.name));
+const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 
+const isCode = computed(() => isCodeArtifact(props.artifact.name));
 const codePath = computed(() =>
   isCode.value
     ? props.artifact.name.split("/").slice(0, -1).join("/")
@@ -75,10 +76,6 @@ const displayName = computed(
   () =>
     (isCode.value && props.artifact.name.split("/").pop()) ||
     props.artifact.name
-);
-
-const artifactType = computed(() =>
-  typeOptionsStore.getArtifactTypeDisplay(props.artifact.type)
 );
 
 const bodyVariant = computed(() =>

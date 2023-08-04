@@ -1,11 +1,6 @@
 import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
 
 /**
- * Enumerates the allowed trace link directions between artifact types.
- */
-export type ArtifactTypeDirections = Record<string, string[]>;
-
-/**
  * Enumerates types of panels.
  */
 export enum PanelType {

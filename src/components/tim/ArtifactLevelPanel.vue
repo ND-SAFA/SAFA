@@ -35,8 +35,8 @@
       title="Type Options"
       data-cy="panel-artifact-type-options"
     >
-      <type-direction-input :artifact-level="artifactLevel" />
-      <type-icon-input :artifact-level="artifactLevel" />
+      <type-direction-input :artifact-type="artifactLevel" />
+      <type-icon-input :artifact-type="artifactLevel" />
     </panel-card>
   </details-panel>
 </template>
@@ -53,11 +53,11 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  timStore,
   documentStore,
   projectStore,
   selectionStore,
   sessionStore,
-  typeOptionsStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -85,7 +85,7 @@ const countDisplay = computed(() => {
   return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
 
-const iconId = computed(() => typeOptionsStore.getArtifactTypeIcon(name.value));
+const iconId = computed(() => timStore.getTypeIcon(name.value));
 
 /**
  * Switches to tree view and highlights this artifact level.

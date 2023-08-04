@@ -130,12 +130,12 @@ import {
   deltaStore,
   selectionStore,
   subtreeStore,
-  typeOptionsStore,
   layoutStore,
   documentStore,
   appStore,
   sessionStore,
   projectStore,
+  timStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import {
@@ -206,9 +206,7 @@ const childDeltaColors = computed(() =>
   hiddenChildDeltaStates.value.map(getEnumColor)
 );
 
-const typeColor = computed(
-  () => typeOptionsStore.getArtifactLevel(props.artifact.type)?.color || ""
-);
+const typeColor = computed(() => timStore.getTypeColor(props.artifact.type));
 const color = computed(() =>
   showDelta.value ? deltaColor.value : typeColor.value
 );

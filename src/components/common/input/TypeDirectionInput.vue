@@ -5,18 +5,18 @@
       ellipsis
       color="primary"
       class="q-mr-xs"
-      :value="props.artifactLevel.name"
+      :value="props.artifactType.name"
     />
     <typography secondary value="Traces To" />
     <div>
       <attribute-chip
-        v-for="type in allowedTypes"
-        :key="type"
-        :value="getTypeLabel(type)"
+        v-for="name in allowedTypes"
+        :key="name"
+        :value="getTypeLabel(name)"
         artifact-type
         :removable="allowEditing"
         data-cy="chip-type-direction"
-        @remove="handleDelete(type)"
+        @remove="handleDelete(name)"
       />
       <chip v-if="allowedTypes.length === 0" outlined label="Any Type" />
     </div>
@@ -38,8 +38,8 @@ import { ArtifactLevelInputProps } from "@/types";
 import {
   projectStore,
   sessionStore,
+  timStore,
   traceMatrixApiStore,
-  typeOptionsStore,
 } from "@/hooks";
 import { Typography, Chip } from "@/components/common/display";
 import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
@@ -50,7 +50,11 @@ const allowEditing = computed(() =>
   sessionStore.isEditor(projectStore.project)
 );
 
-const allowedTypes = computed(() => props.artifactLevel.allowedTypes);
+const allowedTypes = computed(() =>
+  timStore.traceMatrices
+    .filter(({ sourceType }) => sourceType === props.artifactType.name)
+    .map(({ targetType }) => targetType)
+);
 
 /**
  * Converts an artifact type to a title case name.
@@ -58,14 +62,14 @@ const allowedTypes = computed(() => props.artifactLevel.allowedTypes);
  * @return The type display name.
  */
 function getTypeLabel(type: string) {
-  return typeOptionsStore.getArtifactTypeDisplay(type);
+  return timStore.getTypeName(type);
 }
 
 /**
  * Removes an artifact type direction.
- * @param removedType - The type to remove.
+ * @param removedType - The type name to remove.
  */
 function handleDelete(removedType: string) {
-  traceMatrixApiStore.handleDeleteDirection(props.artifactLevel, removedType);
+  traceMatrixApiStore.handleDeleteTypes(props.artifactType.name, removedType);
 }
 </script>

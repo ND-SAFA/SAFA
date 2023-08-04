@@ -51,3 +51,14 @@ export function disableDrawMode(): void {
   edgeHandlesCore.disable();
   appStore.disableDrawLink();
 }
+
+/**
+ * Toggles edge drawing mode.
+ */
+export function toggleDrawMode(): void {
+  if (appStore.isCreateLinkEnabled) {
+    disableDrawMode();
+  } else {
+    enableDrawMode();
+  }
+}

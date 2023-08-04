@@ -18,6 +18,7 @@ import {
   TIM_EDGE_FONT_SIZE,
   TIM_EDGE_LOOP_STEP_SIZE,
   NODE_BG_COLOR,
+  TIM_EDGE_FONT_BG_OPACITY,
 } from "@/cytoscape/styles/config";
 
 export const edgeStyles: CytoStyleSheet[] = [
@@ -60,6 +61,14 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   // Trace Link Delta
+  {
+    selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.NO_CHANGE}']`,
+    style: {
+      "target-arrow-color": EDGE_COLOR.NO_CHANGE,
+      "source-arrow-color": EDGE_COLOR.NO_CHANGE,
+      "line-color": EDGE_COLOR.NO_CHANGE,
+    },
+  },
   {
     selector: `${ARTIFACT_EDGE_SELECTOR}[deltaType='${ArtifactDeltaState.ADDED}']`,
     style: {
@@ -155,7 +164,7 @@ export const edgeStyles: CytoStyleSheet[] = [
       "line-color": EDGE_COLOR.DEFAULT,
       "font-weight": TIM_EDGE_FONT_WEIGHT,
       "font-size": TIM_EDGE_FONT_SIZE,
-      "text-background-opacity": 0.5,
+      "text-background-opacity": TIM_EDGE_FONT_BG_OPACITY,
       "text-background-color": NODE_BG_COLOR.LIGHT,
       label: "data(label)",
     },

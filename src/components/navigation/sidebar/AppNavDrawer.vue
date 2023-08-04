@@ -12,7 +12,7 @@
       full-width
       justify="between"
       align="center"
-      y="3"
+      y="2"
       class="nav-sidebar-header-open"
     >
       <safa-icon clickable :hidden="!sidebarOpen" @click="handleLogoClick" />

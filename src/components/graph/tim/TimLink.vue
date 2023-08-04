@@ -1,5 +1,5 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element :definition="definition" @click="handleSelect" />
 </template>
 
 <script lang="ts">
@@ -14,9 +14,9 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GraphElementType, GraphMode, TimEdgeCytoElement } from "@/types";
-import { getTraceId } from "@/util";
-import { useTheme } from "@/hooks";
-import { CyElement3 } from "../base";
+import { getTraceId, sanitizeNodeId } from "@/util";
+import { documentStore, selectionStore, useTheme } from "@/hooks";
+import { CyElement } from "../base";
 
 const props = defineProps<{
   sourceType: string;
@@ -31,12 +31,14 @@ const definition = computed<TimEdgeCytoElement>(() => ({
   data: {
     type: GraphElementType.edge,
     graph: GraphMode.tim,
-    id: getTraceId(props.sourceType, props.targetType).replace(/ /g, ""),
+    id: sanitizeNodeId(getTraceId(props.sourceType, props.targetType)),
+
     // Reversed to show arrow toward parent.
     sourceType: props.targetType,
     targetType: props.sourceType,
-    source: props.targetType.replace(/ /g, ""),
-    target: props.sourceType.replace(/ /g, ""),
+    source: sanitizeNodeId(props.targetType),
+    target: sanitizeNodeId(props.sourceType),
+
     count: props.count,
     label: props.count === 1 ? `1 Link` : `${props.count} Links`,
     dark: darkMode.value,
@@ -44,4 +46,18 @@ const definition = computed<TimEdgeCytoElement>(() => ({
   },
   classes: props.sourceType === props.targetType ? "loop" : "",
 }));
+
+/**
+ * Selects this trace matrix.
+ */
+function handleSelect(): void {
+  if (
+    selectionStore.selectedTraceMatrixTypes[0] !== props.targetType ||
+    selectionStore.selectedTraceMatrixTypes[1] !== props.sourceType
+  ) {
+    selectionStore.selectTraceMatrix(props.sourceType, props.targetType);
+  } else {
+    documentStore.addDocumentOfTypes([props.sourceType, props.targetType]);
+  }
+}
 </script>

@@ -1,18 +1,8 @@
 import { EventObject, NodeSingular } from "cytoscape";
-import {
-  LayoutHook,
-  AutoMoveReposition,
-  CytoCore,
-  IGraphLayout,
-  CytoEvent,
-  ArtifactCytoElementData,
-} from "@/types";
-import { isArtifactData } from "@/util";
+import { LayoutHook, AutoMoveReposition, CytoCore, CyLayout } from "@/types";
 import { selectionStore } from "@/hooks";
 import { timTreeCyPromise } from "@/cytoscape/cy";
 import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
-import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
 /**
  * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.
@@ -23,7 +13,7 @@ import { artifactTreeMenuItems } from "@/cytoscape/plugins";
  */
 export function addAutoMoveToNode(
   cy: CytoCore,
-  layout: IGraphLayout,
+  layout: CyLayout,
   node: NodeSingular
 ): void {
   const children = node
@@ -51,7 +41,7 @@ export function addAutoMoveToNode(
  */
 export const applyAutoMoveEvents: LayoutHook = (
   cy: CytoCore,
-  layout: IGraphLayout
+  layout: CyLayout
 ): void => {
   cy.automove("destroy");
   cy.nodes().forEach((node) => addAutoMoveToNode(cy, layout, node));
@@ -65,7 +55,7 @@ export const applyAutoMoveEvents: LayoutHook = (
  */
 export const applyCytoEvents: LayoutHook = (
   cy: CytoCore,
-  layout: IGraphLayout
+  layout: CyLayout
 ): void => {
   for (const cytoEvent of Object.values(layout.cytoEventHandlers)) {
     const eventName: string = cytoEvent.events.join(" ");
@@ -96,43 +86,6 @@ export const centerViewOnNode: LayoutHook = (): void => {
   }
 };
 
-let initDynamic = true;
-
-/**
- * Attaches hook to every right click on the cytoscape instance enabling
- * the dynamic showing of context menu items through lambda `isVisible`.
- *
- * @param cy The cytoscape instance
- */
-export const dynamicVisibilityHookForContextMenuItems = (
-  cy: CytoCore
-): void => {
-  if (!initDynamic) return;
-
-  initDynamic = false;
-
-  cy.on(CytoEvent.CXT_TAP, (event: EventObject) => {
-    const data = event.target.data();
-    const artifactData: ArtifactCytoElementData | undefined = isArtifactData(
-      data
-    )
-      ? data
-      : undefined;
-    const contextMenuInstance = cy.contextMenus("get");
-
-    artifactTreeMenuItems.forEach((menuItem: MenuItem) => {
-      if (
-        menuItem.isVisible !== undefined &&
-        menuItem.isVisible(artifactData)
-      ) {
-        contextMenuInstance.showMenuItem(menuItem.id);
-      } else {
-        contextMenuInstance.hideMenuItem(menuItem.id);
-      }
-    });
-  });
-};
-
 /**
  * Post layout hooks for the artifact tree.
  */
@@ -140,7 +93,6 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
   centerViewOnNode,
   applyAutoMoveEvents,
   applyCytoEvents,
-  dynamicVisibilityHookForContextMenuItems,
 ];
 
 /**

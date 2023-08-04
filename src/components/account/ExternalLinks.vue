@@ -24,9 +24,7 @@ import { PanelCard, FlexBox, TextButton } from "@/components/common";
  * Routes the user to the feedback page.
  */
 function handleFeedback(): void {
-  window.open(
-    "https://www.notion.so/nd-safa/b73d1a8bfe0345f8b4d72daa1ceaf934?v=6e5d2439907a428fa1db2671a5eaa0b6"
-  );
+  window.open("https://forms.gle/4Laakdrgg2F2W6FE9");
 }
 
 /**

@@ -5,6 +5,8 @@
     <details-drawer v-if="isLoggedIn" />
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
+    <save-project-modal />
+    <delete-project-modal />
   </div>
 </template>
 
@@ -21,6 +23,7 @@ export default {
 import { computed } from "vue";
 import { logStore, sessionStore } from "@/hooks";
 import { AppConfirmModal } from "@/components/common";
+import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";

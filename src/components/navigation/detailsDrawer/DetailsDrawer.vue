@@ -5,7 +5,7 @@
     :model-value="drawerOpen"
     :breakpoint="0"
     :width="width"
-    class="bg-background"
+    :class="className"
   >
     <div class="q-pa-sm q-mb-md bg-background">
       <flex-box justify="between" align="center">
@@ -44,7 +44,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, selectionStore, useScreen } from "@/hooks";
 import {
   IconButton,
   Typography,
@@ -57,6 +57,7 @@ import {
   ArtifactPanel,
   ArtifactBodyPanel,
   SaveArtifactPanel,
+  ArtifactGenerationPanel,
 } from "@/components/artifact/panels";
 import {
   TraceLinkPanel,
@@ -64,10 +65,15 @@ import {
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
 import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
-import { ArtifactGenerationPanel } from "@/components/hgen";
+
+const { smallWindow } = useScreen();
 
 const openState = computed(() => appStore.isDetailsPanelOpen);
 const drawerOpen = computed(() => typeof openState.value === "string");
+
+const className = computed(
+  () => `bg-background nav-panel nav-panel-${openState.value}`
+);
 
 const title = computed(() => {
   switch (openState.value) {
@@ -99,9 +105,10 @@ const title = computed(() => {
 });
 
 const width = computed(() => {
-  if (openState.value === "displayTrace") {
-    return 500;
+  if (smallWindow.value) {
+    return 400;
   } else if (
+    openState.value === "displayTrace" ||
     openState.value === "displayArtifact" ||
     openState.value === "saveArtifact"
   ) {

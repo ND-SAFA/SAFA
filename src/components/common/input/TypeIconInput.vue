@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="overflow-hidden">
     <typography
       bold
       color="primary"
@@ -7,6 +7,7 @@
       :value="props.artifactType.name"
     />
     <typography secondary value="Icon" />
+    <br />
     <q-btn-toggle
       v-model="icon"
       flat

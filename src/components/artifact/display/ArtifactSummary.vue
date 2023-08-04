@@ -2,15 +2,15 @@
   <flex-box justify="between" align="center">
     <typography variant="caption" value="Summary" />
     <text-button
-      v-if="!generateApproval"
+      v-if="!generateApproval && displayActions"
       text
       color="primary"
       :loading="artifactGenerationApiStore.summaryGenLoading"
-      :icon="hasSummary ? 'graph-refresh' : 'add'"
+      :icon="hasSummary ? 'graph-refresh' : 'generate'"
       :label="hasSummary ? 'Resummarize' : 'Summarize'"
       @click="handleGenerateSummary"
     />
-    <q-card v-else bordered>
+    <q-card v-else-if="displayActions" bordered>
       <text-button text icon="save" label="Save" @click="handleSaveSummary" />
       <text-button
         text
@@ -31,6 +31,7 @@
     <typography
       v-if="hasSummary && !generateApproval"
       default-expanded
+      :collapse-length="0"
       variant="expandable"
       :value="summary"
       data-cy="text-selected-body"
@@ -60,10 +61,19 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { artifactGenerationApiStore, selectionStore } from "@/hooks";
+import { computed, watch } from "vue";
+import {
+  artifactGenerationApiStore,
+  projectStore,
+  selectionStore,
+  sessionStore,
+} from "@/hooks";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import TextInput from "@/components/common/input/TextInput.vue";
+
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 
@@ -107,4 +117,9 @@ function handleSaveSummary(): void {
 function handleDeleteSummary(): void {
   generateConfirmation.value?.clear();
 }
+
+watch(
+  () => artifact.value,
+  () => generateConfirmation.value?.clear()
+);
 </script>

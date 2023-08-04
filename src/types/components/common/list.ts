@@ -24,6 +24,14 @@ export interface ArtifactListItemProps extends ClickableProps {
    * Whether to display a divider between the content.
    */
   displayDivider?: boolean;
+  /**
+   * Whether to default the artifact content to expanded.
+   */
+  defaultExpanded?: boolean;
+  /**
+   * Whether to expand to full width.
+   */
+  fullWidth?: boolean;
 }
 
 /**

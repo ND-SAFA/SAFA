@@ -1,7 +1,35 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <panel-card :title="`${sourceType} to ${targetType}`">
-      <template #title-actions>
+    <flex-box v-if="displayActions" b="2">
+      <text-button
+        text
+        label="View Artifacts"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
+    </flex-box>
+
+    <panel-card>
+      <flex-box align="center" justify="between" class="overflow-hidden">
+        <div class="overflow-hidden" data-cy="text-selected-name">
+          <typography variant="caption" value="From" />
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            class="q-my-none"
+            :value="sourceType"
+          />
+          <typography variant="caption" value="To" />
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            class="q-my-none"
+            :value="targetType"
+          />
+          <q-tooltip>{{ name }}</q-tooltip>
+        </div>
         <icon
           class="q-mx-xs"
           size="sm"
@@ -9,23 +37,16 @@
           variant="trace"
           :rotate="-90"
         />
-      </template>
+      </flex-box>
+
+      <separator b="2" t="1" />
+
       <typography variant="caption" value="Total Trace Links" />
       <typography el="p" :value="totalCount" />
       <typography variant="caption" value="Generated Trace Links" />
       <typography el="p" :value="generatedCount" />
       <typography variant="caption" value="Approved Trace Links" />
       <typography el="p" :value="approvedCount" />
-    </panel-card>
-
-    <panel-card>
-      <text-button
-        text
-        block
-        :label="`View ${targetType} & ${sourceType} Artifacts`"
-        icon="view-tree"
-        @click="handleViewLevel"
-      />
     </panel-card>
   </details-panel>
 </template>
@@ -41,19 +62,32 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { documentStore, selectionStore } from "@/hooks";
+import {
+  documentStore,
+  projectStore,
+  selectionStore,
+  sessionStore,
+} from "@/hooks";
 import {
   PanelCard,
   Typography,
   TextButton,
   Icon,
   DetailsPanel,
+  FlexBox,
+  Separator,
 } from "@/components/common";
+
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 
 const sourceType = computed(() => traceMatrix.value?.sourceType || "");
 const targetType = computed(() => traceMatrix.value?.targetType || "");
+
+const name = computed(() => `${sourceType.value} to ${targetType.value}`);
 
 const totalCount = computed(() => {
   const count = traceMatrix.value?.count || 0;

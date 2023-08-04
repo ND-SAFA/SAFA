@@ -2,6 +2,7 @@ import { RouteRecordRaw } from "vue-router";
 import {
   ArtifactView,
   CreateAccountView,
+  DemoView,
   ForgotPasswordView,
   HomeView,
   LoginView,
@@ -32,6 +33,8 @@ export enum Routes {
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
   SEARCH = "/search",
+
+  DEMO = "/demo",
 }
 
 /**
@@ -137,6 +140,15 @@ export const routes: Array<RouteRecordRaw> = [
     component: SearchView,
     meta: {
       requiresProject: true,
+    },
+  },
+  // Demo
+  {
+    path: Routes.DEMO,
+    name: "SAFA Demo",
+    component: DemoView,
+    meta: {
+      isPublic: true,
     },
   },
 ];

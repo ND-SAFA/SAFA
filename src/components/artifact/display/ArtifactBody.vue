@@ -5,7 +5,7 @@
       label="View Artifact"
       b="2"
       icon="artifact"
-      @click="handleViewArtifact"
+      @click="appStore.openDetailsPanel('displayArtifact')"
     />
     <panel-card>
       <typography
@@ -41,11 +41,4 @@ const body = computed(() => artifact.value?.body.trim() || "");
 const variant = computed(() =>
   isCodeArtifact(artifact.value?.name || "") ? "code" : "expandable"
 );
-
-/**
- * Displays the entire artifact.
- */
-function handleViewArtifact(): void {
-  appStore.openDetailsPanel("displayArtifact");
-}
 </script>

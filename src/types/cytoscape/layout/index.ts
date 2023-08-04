@@ -1,1 +1,1 @@
-export * from "./igraph-layout";
+export * from "./cy-layout";

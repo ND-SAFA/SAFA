@@ -1,24 +1,45 @@
 <template>
   <div v-if="expandable" class="width-100">
-    <div v-if="expanded" :class="className + ' text-white-space-normal'">
-      {{ value }}
-    </div>
+    <markdown
+      v-if="expanded"
+      :source="value"
+      :class="className + ' text-white-space-normal'"
+    />
     <div v-else :class="className + ' text-ellipsis text-expanded'">
       {{ value }}
     </div>
-    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
-      {{ expanded ? "See Less" : "See More" }}
+    <q-btn
+      flat
+      dense
+      size="sm"
+      color="textCaption"
+      :class="buttonClassName"
+      @click.stop="expanded = !expanded"
+    >
+      {{ expandLabel }}
     </q-btn>
   </div>
   <div v-else-if="variant === 'code'" class="width-100">
-    <pre v-if="expanded" v-highlightjs :class="className">
-      <code>{{value}}</code>
-    </pre>
-    <div v-else :class="className + ' text-grey-8'">
-      Code is hidden to save space.
+    <div class="flex nowrap overflow-auto">
+      <q-btn flat dense @click.stop="expanded = !expanded">
+        <q-separator vertical class="q-mx-xs" />
+        <q-tooltip :delay="300"> {{ expandLabel }} </q-tooltip>
+      </q-btn>
+      <pre v-if="expanded" v-highlightjs :class="className">
+        <code>{{value}}</code>
+      </pre>
+      <div v-else :class="className + ' text-textCaption'">
+        Code is hidden to save space.
+      </div>
     </div>
-    <q-btn flat size="sm" color="grey-8" @click.stop="expanded = !expanded">
-      {{ expanded ? "See Less" : "See More" }}
+    <q-btn
+      flat
+      size="sm"
+      dense
+      color="textCaption"
+      @click.stop="expanded = !expanded"
+    >
+      {{ expandLabel }}
     </q-btn>
   </div>
   <span v-else-if="el === 'span'" :class="className">
@@ -55,6 +76,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults, watch } from "vue";
+import Markdown from "vue3-markdown-it";
 import { TypographyProps } from "@/types";
 import { useMargins, useTheme } from "@/hooks";
 
@@ -77,12 +99,14 @@ const props = withDefaults(defineProps<TypographyProps>(), {
 
 const { darkMode } = useTheme();
 
+const buttonClassName = useMargins(props);
+
 const className = useMargins(props, () => [
   [props.variant === "large", "text-h3"],
   [props.variant === "title", "text-h4"],
   [props.variant === "subtitle", "text-h5"],
   [props.variant === "small", "text-subtitle2"],
-  [props.variant === "caption", "text-caption text-grey-8"],
+  [props.variant === "caption", "text-caption text-textCaption"],
   [props.variant === "code", "text-body1"],
   [props.variant === "body" || props.variant === "expandable", "text-body1"],
   [props.el === "a", "text-primary"],
@@ -91,11 +115,11 @@ const className = useMargins(props, () => [
   ["inheritColor", "inherit-color"],
   ["error", "text-negative"],
   ["ellipsis", "text-ellipsis"],
-  ["secondary", "text-grey-8"],
+  ["secondary", "text-textCaption"],
   ["bold", "text-bold"],
   ["small", "text-sm"],
   ["large", "text-lg"],
-  ["wrap", "text-wrap"],
+  ["wrap", "text-white-space-normal"],
   ["class", props.class],
 ]);
 
@@ -106,6 +130,8 @@ const expanded = ref(
 );
 
 const expandable = computed(() => props.variant === "expandable");
+
+const expandLabel = computed(() => (expanded.value ? "See Less" : "See More"));
 
 /**
  * Collapse the text if it changes and is too long.

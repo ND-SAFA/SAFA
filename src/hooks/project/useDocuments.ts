@@ -8,7 +8,12 @@ import {
   GraphMode,
   ArtifactSchema,
 } from "@/types";
-import { createDocument, isTableDocument, removeMatches } from "@/util";
+import {
+  createDocument,
+  DEFAULT_VIEW_NAME,
+  isTableDocument,
+  removeMatches,
+} from "@/util";
 import { subtreeStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import layoutStore from "../graph/useLayout";
@@ -90,7 +95,7 @@ export const useDocuments = defineStore("documents", {
       } = project;
 
       const defaultDocument = createDocument({
-        name: "Default",
+        name: DEFAULT_VIEW_NAME,
         project,
         artifactIds: artifacts.map(({ id }) => id),
         layout,

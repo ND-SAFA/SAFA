@@ -13,7 +13,7 @@ export interface GenerateArtifactSchema {
   /**
    * The type of parent artifact to generate.
    */
-  targetType: string;
+  targetTypes: string[];
   /**
    * The clusters of artifact ids to generate a parent artifact for.
    * If empty, artifacts will automatically be clustered.

@@ -41,7 +41,7 @@ export interface AttributeChipProps
   /**
    * The chip text.
    */
-  value: string;
+  value: string | number;
   /**
    * If true, the chip text will be converted from "camelCase" to "Display Case".
    */

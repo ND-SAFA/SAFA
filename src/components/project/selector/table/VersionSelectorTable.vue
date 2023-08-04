@@ -11,15 +11,15 @@
     item-name="Project"
     data-cy="table-version"
     @refresh="handleReload"
-    @row:add="handleOpenAdd"
-    @row:delete="handleOpenDelete"
+    @row:add="addOpen = true"
+    @row:delete="handleDelete"
   >
     <template #bottom>
-      <version-creator
+      <create-version-modal
         :open="addOpen"
         :project="props.project"
         @close="addOpen = false"
-        @create="handleConfirmAdd"
+        @create="handleAdd"
       />
     </template>
   </selector-table>
@@ -45,7 +45,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable } from "@/components/common";
-import { VersionCreator } from "@/components/project/creator";
+import { CreateVersionModal } from "@/components/project/creator";
 
 const props = defineProps<{
   /**
@@ -114,16 +114,9 @@ function handleReload() {
 }
 
 /**
- * Opens the add version modal.
- */
-function handleOpenAdd() {
-  addOpen.value = true;
-}
-
-/**
  * Closes the add version modal and adds the created version.
  */
-function handleConfirmAdd(version: VersionSchema) {
+function handleAdd(version: VersionSchema) {
   versions.value = [version, ...versions.value];
   addOpen.value = false;
 }
@@ -132,7 +125,7 @@ function handleConfirmAdd(version: VersionSchema) {
  * Attempts to delete the version.
  * @param version - The version to delete.
  */
-function handleOpenDelete(version: VersionSchema) {
+function handleDelete(version: VersionSchema) {
   projectApiStore.handleDeleteVersion(version, {
     onSuccess: () => {
       versions.value = versions.value.filter(

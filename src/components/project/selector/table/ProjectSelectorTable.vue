@@ -3,8 +3,8 @@
     v-model:selected="selectedItems"
     :minimal="props.minimal"
     addable
-    editable
-    :deletable="isDeletable"
+    :editable="sessionStore.isEditor"
+    :deletable="sessionStore.isOwner"
     :loading="getProjectApiStore.loading"
     :columns="columns"
     :rows="rows"
@@ -12,9 +12,9 @@
     item-name="Project"
     data-cy="table-project"
     @refresh="handleReload"
-    @row:add="handleOpenAdd"
-    @row:edit="handleOpenEdit"
-    @row:delete="handleOpenDelete"
+    @row:add="identifierSaveStore.selectIdentifier(undefined, 'save')"
+    @row:edit="identifierSaveStore.selectIdentifier($event, 'save')"
+    @row:delete="identifierSaveStore.selectIdentifier($event, 'delete')"
   >
     <template #cell-actions="{ row }">
       <icon-button
@@ -23,18 +23,6 @@
         tooltip="Leave project"
         data-cy="button-selector-leave"
         @click="handleLeave(row)"
-      />
-    </template>
-    <template #bottom>
-      <confirm-project-delete
-        :open="deleteOpen"
-        @close="deleteOpen = false"
-        @confirm="handleConfirmDelete"
-      />
-      <project-identifier-modal
-        :open="saveOpen"
-        @close="saveOpen = false"
-        @save="handleConfirmSave"
       />
     </template>
   </selector-table>
@@ -53,7 +41,11 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IdentifierSchema, ProjectRole } from "@/types";
-import { projectExpandedColumns, projectNameColumn } from "@/util";
+import {
+  actionsColumn,
+  projectExpandedColumns,
+  projectNameColumn,
+} from "@/util";
 import {
   getProjectApiStore,
   identifierSaveStore,
@@ -62,7 +54,6 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
-import { ConfirmProjectDelete, ProjectIdentifierModal } from "../../base";
 
 const props = defineProps<{
   /**
@@ -86,8 +77,6 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
-const saveOpen = ref(false);
-const deleteOpen = ref(false);
 
 const selectedItems = computed({
   get() {
@@ -101,7 +90,7 @@ const selectedItems = computed({
 
 const columns = computed(() =>
   props.minimal
-    ? [projectNameColumn]
+    ? [projectNameColumn, actionsColumn]
     : [projectNameColumn, ...projectExpandedColumns]
 );
 
@@ -114,56 +103,6 @@ function handleReload() {
   selected.value = undefined;
 
   getProjectApiStore.handleReload();
-}
-
-/**
- * Returns whether a project is deletable.
- * @param project - The project to check.
- * @return Whether it can be deleted.
- */
-function isDeletable(project: IdentifierSchema): boolean {
-  return sessionStore.isOwner(project);
-}
-
-/**
- * Opens the add project modal.
- */
-function handleOpenAdd() {
-  identifierSaveStore.baseIdentifier = undefined;
-  saveOpen.value = true;
-}
-
-/**
- * Opens the edit project modal.
- * @param project - The project to edit.
- */
-function handleOpenEdit(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  saveOpen.value = true;
-}
-
-/**
- * Opens the delete project modal.
- * @param project - The project to delete.
- */
-function handleOpenDelete(project: IdentifierSchema) {
-  identifierSaveStore.baseIdentifier = project;
-  deleteOpen.value = true;
-}
-
-/**
- * Closes the delete project modal.
- */
-function handleConfirmDelete() {
-  deleteOpen.value = false;
-  selectedItems.value = [];
-}
-
-/**
- * Closes the save project modal.
- */
-function handleConfirmSave() {
-  saveOpen.value = false;
 }
 
 /**

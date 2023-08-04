@@ -17,13 +17,15 @@
     @popup-show="handleReloadOptions"
   >
     <template #before-options>
-      <flex-box full-width justify="end" y="2">
+      <div class="q-py-sm bg-neutral sticky-top">
         <type-buttons
+          class="width-fit q-ml-auto"
           default-visible
           :hidden-types="hiddenTypes"
           @click="handleTypeChange"
         />
-      </flex-box>
+        <slot name="before-options" />
+      </div>
     </template>
     <template #option="{ opt, itemProps }">
       <artifact-body-display v-bind="itemProps" display-title :artifact="opt" />
@@ -58,15 +60,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { ArtifactInput, ArtifactTypeSchema } from "@/types";
-import { filterArtifacts } from "@/util";
+import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
 import {
   Typography,
   ArtifactBodyDisplay,
   AttributeChip,
-  FlexBox,
 } from "@/components/common/display";
 import { TypeButtons } from "@/components/common/button";
 
@@ -79,8 +80,11 @@ const artifacts = computed(() =>
     ? artifactStore.currentArtifacts
     : artifactStore.allArtifacts
 );
+const sortedArtifacts = computed(() =>
+  sortSelectedArtifactsToTop(artifacts.value, model.value)
+);
 
-const options = ref(artifacts.value);
+const options = ref(sortedArtifacts.value);
 const hiddenTypes = ref(props.defaultHiddenTypes || []);
 
 const selectedCount = computed(() => {
@@ -104,7 +108,7 @@ function filterOptions(
 ): void {
   update(() => {
     if (searchText === "") {
-      options.value = artifacts.value.filter(
+      options.value = sortedArtifacts.value.filter(
         (artifact) =>
           !props.hiddenArtifactIds?.includes(artifact.id) &&
           !hiddenTypes.value.includes(artifact.type)
@@ -112,7 +116,7 @@ function filterOptions(
     } else {
       const lowercaseSearchText = searchText.toLowerCase();
 
-      options.value = artifacts.value.filter(
+      options.value = sortedArtifacts.value.filter(
         (artifact) =>
           !props.hiddenArtifactIds?.includes(artifact.id) &&
           !hiddenTypes.value.includes(artifact.type) &&
@@ -159,4 +163,10 @@ function handleReloadOptions(): void {
   hiddenTypes.value = props.defaultHiddenTypes;
   filterOptions("", (fn) => fn());
 }
+
+// When the model changes, filter selected options to the top.
+watch(
+  () => model.value,
+  () => (options.value = sortSelectedArtifactsToTop(options.value, model.value))
+);
 </script>

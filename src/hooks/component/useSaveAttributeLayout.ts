@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
-import { createAttributeLayout } from "@/util";
+import { createAttributeLayout, DEFAULT_LAYOUT_ID } from "@/util";
 import { pinia } from "@/plugins";
 import attributesStore from "../project/useAttributes";
 
@@ -26,7 +26,7 @@ export const useSaveAttributeLayout = (id: string) =>
        * @return Whether the current layout is not the default one.
        */
       isCustom(): boolean {
-        return this.baseLayout?.id !== "default";
+        return this.baseLayout?.id !== DEFAULT_LAYOUT_ID;
       },
       /**
        * @return Whether an existing attribute layout is being updated.

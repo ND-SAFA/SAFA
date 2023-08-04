@@ -1,19 +1,20 @@
 <template>
-  <div>
+  <div class="overflow-hidden">
     <typography
       bold
+      ellipsis
       color="primary"
       class="q-mr-xs"
       :value="props.artifactType.name"
     />
     <typography secondary value="Traces To" />
     <div>
-      <chip
+      <attribute-chip
         v-for="{ name } in allowedTypes"
         :key="name"
-        outlined
+        :value="getTypeLabel(name)"
+        artifact-type
         :removable="allowEditing"
-        :label="getTypeLabel(name)"
         data-cy="chip-type-direction"
         @remove="handleDelete(name)"
       />
@@ -41,6 +42,7 @@ import {
   traceMatrixApiStore,
 } from "@/hooks";
 import { Typography, Chip } from "@/components/common/display";
+import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
 const props = defineProps<ArtifactLevelInputProps>();
 

@@ -37,3 +37,25 @@ export function flattenArtifact(artifact: ArtifactSchema): FlatArtifact {
     ...(artifact.attributes || {}),
   };
 }
+
+/**
+ * Sorts a list of artifacts so that selected ones appear first.
+ * @param artifacts - The list of artifacts to sort.
+ * @param selectedIds - The list of selected artifact IDs.
+ * @return The sorted list of artifacts.
+ */
+export function sortSelectedArtifactsToTop(
+  artifacts: ArtifactSchema[],
+  selectedIds: string[] | string | undefined | null
+): ArtifactSchema[] {
+  return [...artifacts].sort((a, b) => {
+    // Move selected options to the top.
+    if (selectedIds?.includes(a.id)) {
+      return -1;
+    } else if (selectedIds?.includes(b.id)) {
+      return 1;
+    }
+    // Keep the original order for non-selected options.
+    return artifacts.indexOf(a) - artifacts.indexOf(b);
+  });
+}

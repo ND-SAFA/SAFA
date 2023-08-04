@@ -1,9 +1,9 @@
 <template>
-  <flex-box v-if="doDisplay" b="2">
+  <flex-box v-if="display" b="2">
     <text-button
       text
       label="View Content"
-      icon="artifact"
+      icon="code"
       data-cy="button-artifact-body"
       @click="handleViewBody"
     />
@@ -46,7 +46,7 @@ import {
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => sessionStore.isEditor(projectStore.project));
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

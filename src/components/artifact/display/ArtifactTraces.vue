@@ -1,18 +1,9 @@
 <template>
   <div>
-    <panel-card>
-      <text-button
-        text
-        block
-        :label="`View Related Artifacts`"
-        icon="view-tree"
-        @click="handleViewNeighborhood"
-      />
-    </panel-card>
-
     <panel-card :title="parentTitle">
       <template #title-actions>
         <text-button
+          v-if="displayActions"
           text
           label="Link Parent"
           icon="add"
@@ -58,6 +49,7 @@
     <panel-card :title="childTitle">
       <template #title-actions>
         <text-button
+          v-if="displayActions"
           text
           label="Link Child"
           icon="add"
@@ -117,8 +109,9 @@ import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import {
   appStore,
   artifactStore,
-  documentStore,
+  projectStore,
   selectionStore,
+  sessionStore,
   subtreeStore,
   traceStore,
 } from "@/hooks";
@@ -131,6 +124,10 @@ import {
   List,
   ListItem,
 } from "@/components/common";
+
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 
@@ -190,15 +187,6 @@ function getTraceLinkClassName(artifactName: string): string {
       : "";
 
   return base + unreviewed;
-}
-
-/**
- * Opens a new view with this artifact and all artifacts it traces to.
- */
-function handleViewNeighborhood(): void {
-  if (!artifact.value) return;
-
-  documentStore.addDocumentOfNeighborhood(artifact.value);
 }
 
 /**

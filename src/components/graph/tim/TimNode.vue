@@ -1,5 +1,45 @@
 <template>
-  <cy-element3 :definition="definition" />
+  <cy-element
+    :definition="definition"
+    :style="style"
+    data-cy="tim-node"
+    :data-cy-name="props.artifactType"
+  >
+    <node-display
+      separator
+      :color="color"
+      variant="tim"
+      :title="props.artifactType"
+      :subtitle="countLabel"
+      :selected="selected"
+      @click="handleSelect"
+    />
+
+    <node-display
+      v-if="selected"
+      :color="color"
+      variant="sidebar"
+      :selected="selected"
+      @mousedown.stop
+      @mouseup.stop
+    >
+      <flex-box column>
+        <icon-button
+          tooltip="View artifacts"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfTypes([props.artifactType])"
+        />
+        <separator v-if="displayEditing" class="full-width q-my-xs" />
+        <icon-button
+          v-if="displayEditing"
+          tooltip="Generate parents"
+          icon="generate-artifacts"
+          color="primary"
+          @click="appStore.openDetailsPanel('generateArtifact')"
+        />
+      </flex-box>
+    </node-display>
+  </cy-element>
 </template>
 
 <script lang="ts">
@@ -14,8 +54,19 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
-import { timStore, useTheme } from "@/hooks";
-import { CyElement3 } from "../base";
+import { sanitizeNodeId } from "@/util";
+import {
+  timStore,
+  appStore,
+  documentStore,
+  projectStore,
+  selectionStore,
+  sessionStore,
+  useTheme,
+} from "@/hooks";
+import { CyElement } from "@/components/graph/base";
+import { NodeDisplay } from "@/components/graph/display";
+import { FlexBox, IconButton, Separator } from "@/components";
 
 const props = defineProps<{
   artifactType: string;
@@ -25,16 +76,42 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
+const displayEditing = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
+const selected = computed(
+  () => selectionStore.selectedArtifactLevelType === props.artifactType
+);
+
+const style = computed(() => (selected.value ? "z-index: 10;" : "z-index: 1;"));
+
+const color = computed(() => timStore.getTypeColor(props.artifactType));
+
+const countLabel = computed(() =>
+  props.count === 1 ? "1 Artifact" : `${props.count} Artifacts`
+);
+
 const definition = computed<TimNodeCytoElement>(() => ({
   data: {
     type: GraphElementType.node,
     graph: GraphMode.tim,
-    id: props.artifactType?.replace(/ /g, "") || "",
+    id: sanitizeNodeId(props.artifactType),
+
     artifactType: props.artifactType,
-    count: props.count,
-    typeColor: timStore.getTypeColor(props.artifactType),
-    icon: props.icon,
+
     dark: darkMode.value,
   },
 }));
+
+/**
+ * Selects this artifact level.
+ */
+function handleSelect(): void {
+  if (!selected.value) {
+    selectionStore.selectArtifactLevel(props.artifactType);
+  } else {
+    documentStore.addDocumentOfTypes([props.artifactType]);
+  }
+}
 </script>

@@ -1,6 +1,6 @@
 import { IconVariant, JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, timestampToDisplay } from "@/util/string-helper";
-import { getJobStatusColor } from "@/util/theme";
+import { getEnumColor } from "@/util/theme";
 
 /**
  * Returns helpful display information about a job.
@@ -16,21 +16,20 @@ export function jobStatus(job: JobSchema) {
       switch (job.status) {
         case JobStatus.IN_PROGRESS:
           return (
-            `${job.currentProgress}% ` +
-            `(${timestampToDisplay(job.lastUpdatedAt)})`
+            `${job.currentProgress}% | ` +
+            `${timestampToDisplay(job.lastUpdatedAt)}`
           );
         case JobStatus.COMPLETED:
-          return `Completed: ${timestampToDisplay(job.completedAt)}`;
+          return timestampToDisplay(job.completedAt);
         case JobStatus.CANCELLED:
-          return `Cancelled: ${timestampToDisplay(job.lastUpdatedAt)}`;
         case JobStatus.FAILED:
-          return `Failed: ${timestampToDisplay(job.lastUpdatedAt)}`;
+          return timestampToDisplay(job.lastUpdatedAt);
         default:
           return "";
       }
     },
     status: () => enumToDisplay(job.status || ""),
-    color: () => getJobStatusColor(job.status || ""),
+    color: () => getEnumColor(job.status || ""),
     icon: (): IconVariant => {
       switch (job.status) {
         case JobStatus.CANCELLED:

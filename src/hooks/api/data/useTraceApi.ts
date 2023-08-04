@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   ArtifactSchema,
   ArtifactCytoElementData,
@@ -30,6 +30,14 @@ export const useTraceApi = defineStore("traceApi", () => {
   const approveLoading = computed(() => approveTraceApi.loading);
   const unreviewLoading = computed(() => unreviewTraceApi.loading);
   const declineLoading = computed(() => declineTraceApi.loading);
+
+  const loadingTraceIds = ref<string[]>([]);
+  const loadTrace = (traceId: string) =>
+    (loadingTraceIds.value = [...loadingTraceIds.value, traceId]);
+  const unloadTrace = (traceId: string) =>
+    (loadingTraceIds.value = loadingTraceIds.value.filter(
+      (id) => id !== traceId
+    ));
 
   /**
    * Creates a new trace link.
@@ -99,12 +107,20 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await approveTraceApi.handleRequest(
       async () => {
+        loadTrace(traceLink.traceLinkId);
+
         const updatedLinks = await traceCommitApiStore.handleApprove(traceLink);
 
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.approveLink(traceLink);
       },
-      callbacks,
+      {
+        ...callbacks,
+        onComplete: () => {
+          unloadTrace(traceLink.traceLinkId);
+          callbacks.onComplete?.();
+        },
+      },
       {
         success: `Trace link approved: ${traceLink.sourceName} -> ${traceLink.targetName}`,
         error: `Unable to approve trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
@@ -124,13 +140,21 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await declineTraceApi.handleRequest(
       async () => {
+        loadTrace(traceLink.traceLinkId);
+
         const updatedLinks = await traceCommitApiStore.handleDecline(traceLink);
 
         traceStore.deleteTraceLinks(updatedLinks);
         approvalStore.declineLink(traceLink);
         subtreeStore.deleteTraceSubtree(traceLink);
       },
-      callbacks,
+      {
+        ...callbacks,
+        onComplete: () => {
+          unloadTrace(traceLink.traceLinkId);
+          callbacks.onComplete?.();
+        },
+      },
       {
         success: `Trace link declined: ${traceLink.sourceName} -> ${traceLink.targetName}`,
         error: `Unable to decline trace link: ${traceLink.sourceName} -> ${traceLink.targetName}`,
@@ -185,6 +209,8 @@ export const useTraceApi = defineStore("traceApi", () => {
   ): Promise<void> {
     await unreviewTraceApi.handleRequest(
       async () => {
+        loadTrace(traceLink.traceLinkId);
+
         const updatedLinks = await traceCommitApiStore.handleUnreview(
           traceLink
         );
@@ -192,7 +218,13 @@ export const useTraceApi = defineStore("traceApi", () => {
         traceStore.addOrUpdateTraceLinks(updatedLinks);
         approvalStore.resetLink(traceLink);
       },
-      callbacks,
+      {
+        ...callbacks,
+        onComplete: () => {
+          unloadTrace(traceLink.traceLinkId);
+          callbacks.onComplete?.();
+        },
+      },
       {
         useAppLoad: true,
         success: `Trace link unreviewed: ${traceLink.sourceName} -> ${traceLink.targetName}`,
@@ -223,6 +255,7 @@ export const useTraceApi = defineStore("traceApi", () => {
   }
 
   return {
+    loadingTraceIds,
     createLoading,
     approveLoading,
     declineLoading,

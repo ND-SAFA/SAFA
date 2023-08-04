@@ -1,9 +1,31 @@
 <template>
   <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
-    <panel-card :title="artifactLevelName">
-      <template #title-actions>
+    <flex-box v-if="displayActions" b="2">
+      <text-button
+        text
+        label="View Artifacts"
+        icon="view-tree"
+        @click="handleViewLevel"
+      />
+    </flex-box>
+
+    <panel-card>
+      <flex-box align="center" justify="between">
+        <div class="overflow-hidden">
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            :value="name"
+            data-cy="text-selected-name"
+          />
+          <q-tooltip>{{ name }}</q-tooltip>
+        </div>
         <icon :id="iconId" size="md" color="primary" />
-      </template>
+      </flex-box>
+
+      <separator b="2" />
+
       <typography variant="caption" value="Details" />
       <typography el="p" :value="countDisplay" />
     </panel-card>
@@ -15,24 +37,6 @@
     >
       <type-direction-input :artifact-level="artifactLevel" />
       <type-icon-input :artifact-level="artifactLevel" />
-    </panel-card>
-
-    <panel-card>
-      <text-button
-        text
-        block
-        :label="`View ${artifactLevelName} Artifacts`"
-        icon="view-tree"
-        @click="handleViewLevel"
-      />
-      <text-button
-        text
-        block
-        color="primary"
-        label="Generate Parents"
-        icon="generateArtifacts"
-        @click="handleGenerateParents"
-      />
     </panel-card>
   </details-panel>
 </template>
@@ -48,19 +52,32 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, documentStore, selectionStore, timStore } from "@/hooks";
+import {
+  timStore,
+  documentStore,
+  projectStore,
+  selectionStore,
+  sessionStore,
+} from "@/hooks";
 import {
   PanelCard,
   Typography,
   TypeDirectionInput,
   TypeIconInput,
-  TextButton,
   Icon,
   DetailsPanel,
+  FlexBox,
+  TextButton,
+  Separator,
 } from "@/components/common";
 
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
-const artifactLevelName = computed(() => artifactLevel.value?.name || "");
+
+const name = computed(() => artifactLevel.value?.name || "");
 
 const countDisplay = computed(() => {
   const count = artifactLevel.value?.count || 0;
@@ -68,23 +85,14 @@ const countDisplay = computed(() => {
   return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
 
-const iconId = computed(() => timStore.getTypeIcon(artifactLevelName.value));
+const iconId = computed(() => timStore.getTypeIcon(name.value));
 
 /**
- * Switches to tree view and highlights this type level.
+ * Switches to tree view and highlights this artifact level.
  */
 function handleViewLevel(): void {
   if (!artifactLevel.value) return;
 
   documentStore.addDocumentOfTypes([artifactLevel.value.name]);
-}
-
-/**
- * Opens the generate artifact panel.
- */
-function handleGenerateParents(): void {
-  if (!artifactLevel.value) return;
-
-  appStore.openDetailsPanel("generateArtifact");
 }
 </script>

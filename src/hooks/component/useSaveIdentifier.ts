@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { IdentifierSchema } from "@/types";
 import { createProjectIdentifier } from "@/util";
+import { appStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -38,6 +39,22 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
      */
     resetIdentifier(): void {
       this.editedIdentifier = createProjectIdentifier(this.baseIdentifier);
+    },
+    /**
+     * Selects an identifier and opens the edit or delete modal.
+     *
+     * @param identifier - The identifier to select.
+     * @param mode - The type of action to open a modal for.
+     */
+    selectIdentifier(
+      identifier: IdentifierSchema | undefined,
+      mode: "save" | "delete"
+    ): void {
+      this.baseIdentifier = identifier;
+      this.resetIdentifier();
+
+      appStore.isOpen[mode === "save" ? "projectSaver" : "projectDeleter"] =
+        true;
     },
   },
 });

@@ -12,7 +12,15 @@
         :hidden-artifact-ids="traceSaveStore.hiddenTargetIds"
         :default-hidden-types="traceSaveStore.defaultHiddenTargetTypes"
         data-cy="button-trace-save-target"
-      />
+      >
+        <template v-if="!!sourceArtifact" #before-options>
+          <typography variant="caption" value="Child Artifact" l="2" />
+          <separator class="q-mx-sm" />
+          <artifact-body-display display-title :artifact="sourceArtifact" />
+          <typography variant="caption" value="Parent Artifacts" l="2" />
+          <separator class="q-mx-sm" />
+        </template>
+      </artifact-input>
       <artifact-input
         v-model="traceSaveStore.sourceIds"
         multiple
@@ -21,7 +29,13 @@
         :hidden-artifact-ids="traceSaveStore.hiddenSourceIds"
         :default-hidden-types="traceSaveStore.defaultHiddenSourceTypes"
         data-cy="button-trace-save-source"
-      />
+      >
+        <template v-if="!!targetArtifact" #before-options>
+          <typography variant="caption" value="Parent Artifact" l="2" />
+          <artifact-body-display display-title :artifact="targetArtifact" />
+          <typography variant="caption" value="Child Artifacts" l="2" />
+        </template>
+      </artifact-input>
 
       <expansion-item
         label="Allowed Trace Directions"
@@ -70,7 +84,13 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { appStore, timStore, traceApiStore, traceSaveStore } from "@/hooks";
+import {
+  timStore,
+  appStore,
+  artifactStore,
+  traceApiStore,
+  traceSaveStore,
+} from "@/hooks";
 import {
   Typography,
   ArtifactInput,
@@ -80,11 +100,24 @@ import {
   PanelCard,
   TextButton,
   DetailsPanel,
+  ArtifactBodyDisplay,
+  Separator,
 } from "@/components/common";
 
 const loading = ref(false);
 
 const artifactTypes = computed(() => timStore.artifactTypes);
+
+const sourceArtifact = computed(() =>
+  traceSaveStore.sourceIds
+    ? artifactStore.getArtifactById(traceSaveStore.sourceIds[0])
+    : undefined
+);
+const targetArtifact = computed(() =>
+  traceSaveStore.targetIds
+    ? artifactStore.getArtifactById(traceSaveStore.targetIds[0])
+    : undefined
+);
 
 /**
  * Creates a trace link from the given artifacts.

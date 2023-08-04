@@ -12,7 +12,8 @@ export interface IgnoreTypeFilterAction {
  */
 export interface SubtreeFilterAction {
   type: "subtree";
-  artifactsInSubtree: string[];
+  nodeIds: string[];
+  centerIds?: string[];
 }
 
 /**

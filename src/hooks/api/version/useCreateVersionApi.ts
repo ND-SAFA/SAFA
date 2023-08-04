@@ -75,6 +75,7 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
         formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
 
         const job = await createFlatFileUploadJob(versionId, formData);
+
         await jobApiStore.handleCreate(job);
       },
       {
@@ -84,11 +85,7 @@ export const useCreateVersionApi = defineStore("createVersionApi", () => {
           await navigateTo(Routes.UPLOAD_STATUS);
         },
       },
-      {
-        useAppLoad: true,
-        success: "Successfully uploaded files.",
-        error: "Unable to upload files.",
-      }
+      { useAppLoad: true }
     );
   }
 

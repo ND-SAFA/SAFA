@@ -1,26 +1,26 @@
 <template>
-  <cytoscape-controller
+  <cytoscape
     id="cytoscape-artifact"
-    :cyto-core-graph="artifactTreeGraph"
+    :graph="artifactTreeGraph"
     :class="className"
     data-cy="view-artifact-tree"
+    @click="handleClick"
   >
-    <template v-if="isTreeMode" #elements>
+    <template v-if="isTreeMode">
       <artifact-node
         v-for="artifact in artifacts"
         :key="artifact.id"
         :artifact="artifact"
-        :hidden="isArtifactHidden(artifact.id)"
-        :faded="isArtifactFaded(artifact.id)"
+        :artifacts-in-view="artifactsInView"
       />
       <trace-link
         v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
         :trace="traceLink"
-        :faded="isTraceLinkFaded(traceLink)"
+        :artifacts-in-view="artifactsInView"
       />
     </template>
-    <template v-else #elements>
+    <template v-else>
       <tim-node
         v-for="type in artifactTypes"
         :key="type.id"
@@ -37,7 +37,14 @@
         :generated="matrix.generatedCount > 0"
       />
     </template>
-  </cytoscape-controller>
+
+    <template v-if="isTreeMode" #context-menu>
+      <artifact-menu />
+    </template>
+    <template v-else #context-menu>
+      <tim-menu />
+    </template>
+  </cytoscape>
 </template>
 
 <script lang="ts">
@@ -53,22 +60,22 @@ export default {
 <script setup lang="ts">
 import { watch, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { TraceLinkSchema } from "@/types";
+import { EventObject } from "cytoscape";
+import { DetailsOpenState } from "@/types";
 import {
   appStore,
   artifactStore,
   traceStore,
   deltaStore,
-  subtreeStore,
   selectionStore,
   layoutStore,
   timStore,
 } from "@/hooks";
 import { Routes } from "@/router";
-import { artifactTreeGraph } from "@/cytoscape";
-import CytoscapeController from "./CytoscapeController.vue";
-import { ArtifactNode, TraceLink } from "./tree";
-import { TimNode, TimLink } from "./tim";
+import { artifactTreeGraph, disableDrawMode } from "@/cytoscape";
+import { Cytoscape } from "./base";
+import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
+import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
 
@@ -76,12 +83,11 @@ const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
 
 const artifacts = computed(() => artifactStore.currentArtifacts);
-const nodesInView = computed(() => selectionStore.artifactsInView);
+const artifactsInView = computed(() => selectionStore.artifactsInView);
 
 const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces
 );
-const hiddenSubtreeIds = computed(() => subtreeStore.hiddenSubtreeNodes);
 
 const artifactTypes = computed(() => timStore.artifactTypes);
 const traceMatrices = computed(() => timStore.traceMatrices);
@@ -97,33 +103,33 @@ const className = computed(() => {
 });
 
 /**
- * Returns whether to fade an artifact.
- * @param id - The artifact to check.
- * @return Whether to fade.
+ * Handles a click event on the graph.
+ * When a click is registered on the background:
+ * - Draw mode is disabled.
+ * - Selections are cleared if a save panel is not open.
+ * @param event - The click event.
  */
-function isArtifactFaded(id: string): boolean {
-  return !nodesInView.value.includes(id);
-}
+function handleClick(event: EventObject): void {
+  if (event.target !== event.cy) return;
 
-/**
- * Returns whether to hide an artifact.
- * @param id - The artifact to check.
- * @return Whether to hide.
- */
-function isArtifactHidden(id: string): boolean {
-  return hiddenSubtreeIds.value.includes(id);
-}
+  if (appStore.isCreateLinkEnabled) {
+    disableDrawMode();
+  }
 
-/**
- * Returns whether to fade a trace link.
- * @param link - The trace link to check.
- * @return Whether to fade.
- */
-function isTraceLinkFaded(link: TraceLinkSchema): boolean {
-  return (
-    !nodesInView.value.includes(link.targetId) ||
-    !nodesInView.value.includes(link.sourceId)
-  );
+  if (
+    (
+      [
+        "document",
+        "saveArtifact",
+        "saveTrace",
+        "generateArtifact",
+        "generateTrace",
+      ] as DetailsOpenState[]
+    ).includes(appStore.isDetailsPanelOpen)
+  )
+    return;
+
+  selectionStore.clearSelections(true);
 }
 
 onMounted(() => {

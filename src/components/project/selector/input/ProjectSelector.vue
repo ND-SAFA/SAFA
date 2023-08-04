@@ -12,20 +12,42 @@
     color="primary"
     @popup-show="getProjectApiStore.handleReload()"
   >
+    <template #option="{ opt, itemProps }">
+      <list-item
+        v-bind="itemProps"
+        :title="opt.name"
+        :action-cols="2"
+        :data-cy-name="opt.name"
+      >
+        <template #actions>
+          <flex-box justify="end">
+            <icon-button
+              v-if="sessionStore.isEditor(opt)"
+              small
+              :tooltip="`Edit ${opt.name}`"
+              icon="edit"
+              data-cy="button-project-edit"
+              @click="identifierSaveStore.selectIdentifier(opt, 'save')"
+            />
+            <icon-button
+              v-if="sessionStore.isOwner(opt)"
+              small
+              :tooltip="`Delete ${opt.name}`"
+              icon="delete"
+              data-cy="button-project-delete"
+              @click="identifierSaveStore.selectIdentifier(opt, 'delete')"
+            />
+          </flex-box>
+        </template>
+      </list-item>
+    </template>
     <template #after-options>
       <text-button
         text
         block
         label="Add Project"
         icon="add"
-        @click="openCreateProject = true"
-      />
-    </template>
-    <template #append>
-      <project-identifier-modal
-        :open="openCreateProject"
-        @close="openCreateProject = false"
-        @save="handleProjectCreated"
+        @click="identifierSaveStore.selectIdentifier(undefined, 'save')"
       />
     </template>
   </q-select>
@@ -41,19 +63,13 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { getProjectApiStore, useTheme } from "@/hooks";
-import { TextButton } from "@/components/common";
-import { ProjectIdentifierModal } from "../../base";
-
-const openCreateProject = ref(false);
+import {
+  getProjectApiStore,
+  identifierSaveStore,
+  sessionStore,
+  useTheme,
+} from "@/hooks";
+import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
 
 const { darkMode } = useTheme();
-
-/**
- * Reloads projects when a new one is created.
- */
-async function handleProjectCreated(): Promise<void> {
-  await getProjectApiStore.handleReload();
-}
 </script>

@@ -2,7 +2,8 @@
   <panel-card>
     <groupable-table
       v-model:group-by="groupBy"
-      :expanded="expanded"
+      v-model:expanded="expanded"
+      expandable
       :columns="columns"
       :rows="rows"
       row-key="id"
@@ -13,6 +14,8 @@
       :custom-cells="customCells"
       data-cy="view-artifact-table"
       @row-click="handleView"
+      @group:open="handleOpenGroup"
+      @group:close="handleCloseGroup"
     >
       <template #header-right>
         <multiselect-input
@@ -58,22 +61,7 @@
       </template>
 
       <template #body-expanded="{ row }">
-        <typography
-          v-if="row.summary"
-          default-expanded
-          :collapse-length="0"
-          variant="expandable"
-          el="p"
-          :value="row.summary"
-        />
-        <typography
-          v-else
-          default-expanded
-          :collapse-length="0"
-          :variant="getVariant(row)"
-          el="p"
-          :value="row.body"
-        />
+        <artifact-content-display :artifact="row" />
       </template>
 
       <template #body-cell-type="{ row }">
@@ -108,7 +96,6 @@ import {
   ArtifactDeltaState,
   FlatArtifact,
   TableGroupRow,
-  TextType,
   TraceCountTypes,
 } from "@/types";
 import {
@@ -118,14 +105,15 @@ import {
   artifactDeltaColumn,
   actionsColumn,
   traceCountOptions,
-  isCodeArtifact,
 } from "@/util";
 import {
   appStore,
   artifactStore,
   attributesStore,
   deltaStore,
+  projectStore,
   selectionStore,
+  sessionStore,
   subtreeStore,
   timStore,
 } from "@/hooks";
@@ -134,8 +122,8 @@ import {
   GroupableTable,
   AttributeChip,
   MultiselectInput,
-  Typography,
   SelectInput,
+  ArtifactContentDisplay,
 } from "@/components/common";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
@@ -153,19 +141,21 @@ const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
+const displayActions = computed(() =>
+  sessionStore.isEditor(projectStore.project)
+);
+
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);
 const typeOptions = computed(() => timStore.typeNames);
 
-const expanded = computed(() =>
-  selectionStore.selectedArtifactId ? [selectionStore.selectedArtifactId] : []
-);
+const expanded = ref<string[]>([]);
 
 const columns = computed(() => [
   ...artifactColumns,
   ...(inDeltaView.value ? [artifactDeltaColumn] : []),
   ...artifactAttributesColumns(attributesStore.attributes),
-  actionsColumn,
+  ...(displayActions.value ? [actionsColumn] : []),
 ]);
 
 const rows = computed(() => artifactStore.flatArtifacts);
@@ -194,15 +184,6 @@ function filterRow(row: FlatArtifact): boolean {
 }
 
 /**
- * Returns the typography variant for a rendering the body of a row.
- * @param row - The artifact to display.
- * @return The typography variant to use.
- */
-function getVariant(row: FlatArtifact): TextType {
-  return isCodeArtifact(row.name || "") ? "code" : "expandable";
-}
-
-/**
  * Returns the delta type for a row.
  * @param row - The artifact to check.
  * @return The type of change delta loaded for this artifact.
@@ -219,5 +200,29 @@ function handleView(row: TableGroupRow | FlatArtifact) {
   if ("id" in row) {
     selectionStore.toggleSelectArtifact(String(row.id));
   }
+}
+
+/**
+ * Expands all panels in the group.
+ * @param groupBy - The grouped field.
+ * @param groupValue - The grouped value.
+ */
+function handleOpenGroup(groupBy: keyof FlatArtifact, groupValue: unknown) {
+  expanded.value = rows.value
+    .filter((row) => row[groupBy] === groupValue)
+    .map((row) => row.id);
+}
+
+/**
+ * Collapses all panels in the group.
+ * @param groupBy - The grouped field.
+ * @param groupValue - The grouped value.
+ */
+function handleCloseGroup(groupBy: keyof FlatArtifact, groupValue: unknown) {
+  expanded.value = rows.value
+    .filter(
+      (row) => expanded.value.includes(row.id) && row[groupBy] !== groupValue
+    )
+    .map((row) => row.id);
 }
 </script>

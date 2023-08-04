@@ -44,12 +44,4 @@ class InitializeDatasetStepAbstract(AbstractPipelineStep[HGenArgs, HGenState]):
         layer_artifact_df = original_artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
         if len(layer_artifact_df) == 0:
             raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
-        layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [layer_id],
-                                   LayerKeys.TARGET_TYPE: [layer_id]})
-        layer_trace_df = TraceDataFrame() if original_trace_df is None else \
-            TraceDataFrame(DataFrameUtil.filter_df_by_row(original_trace_df,
-                                                          lambda row: row[TraceKeys.SOURCE.value] in layer_artifact_df
-                                                                      and row[TraceKeys.TARGET.value] in layer_artifact_df))
-        trace_df = TraceDatasetCreator.generate_negative_links(artifact_df=layer_artifact_df, trace_df=layer_trace_df,
-                                                               layer_mapping_df=layer_df)
-        return PromptDataset(trace_dataset=TraceDataset(artifact_df=layer_artifact_df, trace_df=trace_df, layer_df=layer_df))
+        return PromptDataset(artifact_df=layer_artifact_df)

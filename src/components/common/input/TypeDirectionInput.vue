@@ -10,7 +10,7 @@
     <typography secondary value="Traces To" />
     <div>
       <attribute-chip
-        v-for="{ name } in allowedTypes"
+        v-for="name in allowedTypes"
         :key="name"
         :value="getTypeLabel(name)"
         artifact-type
@@ -51,9 +51,9 @@ const allowEditing = computed(() =>
 );
 
 const allowedTypes = computed(() =>
-  timStore.traceMatrices.filter(
-    ({ sourceType }) => sourceType === props.artifactType.name
-  )
+  timStore.traceMatrices
+    .filter(({ sourceType }) => sourceType === props.artifactType.name)
+    .map(({ targetType }) => targetType)
 );
 
 /**

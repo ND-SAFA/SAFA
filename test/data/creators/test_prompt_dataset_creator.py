@@ -42,12 +42,11 @@ class TestPromptDatasetCreator(BaseTest):
 
         self.verify_summarization(dataset_creator=dataset_creator, artifacts_entries=ArtifactTestProject.get_artifact_entries())
 
-    @skip("TODO")
     def test_project_reader_prompt(self):
         prompt_project_reader = PromptTestProject.get_project_reader()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=prompt_project_reader)
         artifact_df, trace_df, _ = PromptTestProject.SAFA_PROJECT.get_project_reader().read_project()
-        self.verify_dataset_creator(dataset_creator, trace_df=trace_df, use_targets_only=True)
+        self.verify_dataset_creator(dataset_creator, trace_df=trace_df, use_targets_only=True, include_prompt_builder=False)
 
     def test_trace_dataset_creator(self):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
@@ -83,8 +82,8 @@ class TestPromptDatasetCreator(BaseTest):
         self.assertEqual(trace_dataset.project_file_id, "id")
 
     def verify_dataset_creator(self, dataset_creator: PromptDatasetCreator, trace_df: TraceDataFrame, use_targets_only: bool = False,
-                               prompt_builder: PromptBuilder = None):
-        if prompt_builder is None:
+                               prompt_builder: PromptBuilder = None, include_prompt_builder: bool = True):
+        if prompt_builder is None and include_prompt_builder:
             prompt1 = QuestionPrompt("Tell me about this artifact:")
             prompt2 = MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)
             prompt_builder = PromptBuilder([prompt1, prompt2])

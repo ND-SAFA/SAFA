@@ -37,7 +37,6 @@ def get_res(prompt, **kwargs):
     return [{"completion": "".join(group_tags)}]
 
 
-@skip("Skipping hgen tests until can fix for update")
 class TestMultiLayerHGenJob(BaseJobTest):
     project = GenerationTestProject()
 

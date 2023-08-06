@@ -4,7 +4,6 @@ from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.jobs.data_jobs.download_repository_job import DownloadRepositoryJob
 from tgen.jobs.data_jobs.export_artifacts_job import ExportArtifactsJob
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
-from tgen.jobs.hgen_jobs.generate_artifacts_job import GenerateArtifactsJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.model_jobs.create_model_job import CreateModelJob
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
@@ -23,7 +22,6 @@ class SupportedJobType(SupportedEnum):
     MULTI_LAYER_HGEN = MultiLayerHGenJob
     EXPORT_ARTIFACTS = ExportArtifactsJob
     CREATE_DATASETS = CreateDatasetsJob
-    GENERATE_ARTIFACTS = GenerateArtifactsJob
     CREATE_MODEL = CreateModelJob
     DELETE_MODEL = DeleteModelJob
     LLM = LLMJob

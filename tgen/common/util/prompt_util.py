@@ -1,4 +1,3 @@
-from typing import Any
 
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, SPACE
 

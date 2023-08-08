@@ -67,7 +67,7 @@ class ArtifactPrompt(Prompt):
         :return: The formatted prompt
         """
         formatted_id = PromptUtil.create_xml(tag_name="id", tag_content=artifact_id)
-        formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body)
+        formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body) if include_id else artifact_body
         content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
         formatted_artifact = PromptUtil.create_xml(tag_name="artifact",
                                                    tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")

@@ -7,7 +7,7 @@ class ChangeType(Enum):
     MODIFIED = "modified"
     RENAMED = "renamed"
 
-    DEPENDENCIES = "dependencies"
+    DEPENDENCIES_IMPORTS = "dependencies"
     RENAMED_VARS = "renamed vars"
     NEW_FUNC = "new functionality"
     MODIFIED_FUNC = "modified functionality"

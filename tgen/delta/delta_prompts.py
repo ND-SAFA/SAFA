@@ -6,9 +6,9 @@ from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.select_question_prompt import SelectQuestionPrompt
 
-FORMAT_DIVIDER = NEW_LINE + "{}" + NEW_LINE
+FORMAT_DIVIDER = NEW_LINE + "{}" + NEW_LINE + NEW_LINE
 
-CHANGED_FILE_PROMPT = Prompt(f"{NEW_LINE}"
+CHANGED_FILE_PROMPT = Prompt(f"{FORMAT_DIVIDER}"
                              f"{PromptUtil.format_as_markdown('ORIGINAL CODE FILE:')}"
                              f"{FORMAT_DIVIDER}"
                              f"{PromptUtil.format_as_markdown('DIFF FOR CODE:')}"
@@ -16,11 +16,12 @@ CHANGED_FILE_PROMPT = Prompt(f"{NEW_LINE}"
 DIFF_SUMMARY_TASKS = {
     1: QuestionPrompt("First, identify if imports or dependencies were changed. "
                       "If so, provide a brief summary. Otherwise response with no.",
-                      PromptResponseManager(response_tag="dependencies")),
+                      PromptResponseManager(response_tag="dependencies-imports")),
     2: QuestionPrompt("Next, identify if any variables, methods or class names were renamed. "
                       "If so, provide a brief summary. Otherwise response with no.",
                       PromptResponseManager(response_tag="renamed-vars")),
     3: QuestionPrompt("Next, determine if the code was refactored such that the changes did not change the original functionality. "
+                      "This might include re-ordering or re-structuring the code."
                       "If so, provide a brief summary. Otherwise response with no.",
                       PromptResponseManager(response_tag="refactored")),
     4: QuestionPrompt("Then, identify if any new functionality has been added to the code. "
@@ -40,9 +41,11 @@ DIFF_SUMMARY_TASKS = {
                       PromptResponseManager(response_tag="impact", required_tag_ids=REQUIRE_ALL_TAGS)),
 }
 PROJECT_SUMMARY_PROMPT = Prompt(f"You are an expert on a software project and a change has recently been made to the project. "
-                                f"Below is a software specification for the project, the original version of the code file, "
+                                f"Below is a software specification for the project, context/documentation surrounding the code, "
+                                f"the original version of the code file, "
                                 f"and its diff."
-                                f"{NEW_LINE}" + "{summary}")
+                                f"{NEW_LINE}" + "{summary}"
+                                f"{NEW_LINE}" + "{context}")
 DIFF_SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=DIFF_SUMMARY_TASKS,
     instructions=f"{PromptUtil.format_as_markdown('TASKS:')}{NEW_LINE}"

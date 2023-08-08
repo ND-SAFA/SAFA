@@ -4,10 +4,11 @@ from typing import Dict, List
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import NEW_LINE, DASH
+from tgen.constants.deliminator_constants import NEW_LINE, DASH, EMPTY_STRING
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
@@ -17,6 +18,7 @@ from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
@@ -26,7 +28,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     LAYER_ID = "diff"
-    CATEGORIES = [ChangeType.RENAMED_VARS, ChangeType.DEPENDENCIES, ChangeType.NEW_FUNC, ChangeType.MODIFIED_FUNC,
+    CATEGORIES = [ChangeType.RENAMED_VARS, ChangeType.DEPENDENCIES_IMPORTS, ChangeType.NEW_FUNC, ChangeType.MODIFIED_FUNC,
                   ChangeType.BUG_FIXES, ChangeType.REFACTORED]
 
     def run(self, args: DeltaArgs, state: DeltaState) -> None:
@@ -57,6 +59,7 @@ class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         """
         original_artifacts = args.dataset.artifact_df
         content = [SupportedPrompts.DELTA_CHANGED_FILE_PROMPT.value.format_value(
+            self._get_parent_artifact_content(a_id, args.dataset),
             original_artifacts.get_artifact(a_id)[ArtifactKeys.CONTENT], modified_diffs[a_id]) for a_id in ids]
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ids,
                                          ArtifactKeys.CONTENT: content,
@@ -72,7 +75,7 @@ class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :return: A dictionary mapping the filename to the diff summaries/related
         """
         questionnaire: QuestionnairePrompt = SupportedPrompts.DELTA_DIFF_SUMMARY_QUESTIONNAIRE.value
-        assert len(output.predictions) == len(ids), "Missing predictions."
+        assert len(output) == len(ids), "Missing predictions."
         results = {}
         for pred, filename in zip(output, ids):
             results[filename] = {}
@@ -107,3 +110,20 @@ class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                                              completion_type=LLMCompletionType.GENERATION))
         output = trainer.perform_prediction().predictions
         return output
+
+    @staticmethod
+    def _get_parent_artifact_content(child_id: str, original_dataset: TraceDataset) -> str:
+        """
+        Gets the parent artifact content to include in the prompt as context
+        :param child_id: The id of the child
+        :param original_dataset: The original dataset with parent artifacts
+        :return: The content to include in the prompt
+        """
+        links = original_dataset.trace_df.filter_by_row(lambda row: row[TraceKeys.SOURCE.value] == child_id
+                                                                    and row[TraceKeys.LABEL.value] == 1)
+        parents = [original_dataset.artifact_df.get_artifact(link[TraceKeys.TARGET])[ArtifactKeys.CONTENT]
+                   for i, link in links.itertuples()]
+        content = NEW_LINE.join(parents)
+        if content:
+            return f"{PromptUtil.format_as_markdown('CONTEXT:')}{NEW_LINE}{content}"
+        return EMPTY_STRING

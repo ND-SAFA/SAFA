@@ -1,7 +1,4 @@
-from enum import Enum, auto
-from typing import Union
-
-from tgen.common.util.enum_util import EnumUtil
+from enum import Enum
 
 
 class ChangeType(Enum):
@@ -9,3 +6,10 @@ class ChangeType(Enum):
     DELETED = "deleted"
     MODIFIED = "modified"
     RENAMED = "renamed"
+
+    DEPENDENCIES = "dependencies"
+    RENAMED_VARS = "renamed vars"
+    NEW_FUNC = "new functionality"
+    MODIFIED_FUNC = "modified functionality"
+    BUG_FIXES = "bug fixes"
+    REFACTORED = "refactored"

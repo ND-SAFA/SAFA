@@ -33,6 +33,14 @@ class DeltaArgs(PipelineArgs):
     :param llm_manager: The LLM Manager to use for generations
     """
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
+    """
+    :param export_path: Path to save checkpoints to
+    """
+    export_dir: str = None
+    """
+    :param load_dir: Path to load checkpoints from
+    """
+    load_dir: str = None
 
     def __post_init__(self) -> None:
         """

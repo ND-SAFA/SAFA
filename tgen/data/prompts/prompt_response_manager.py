@@ -174,10 +174,9 @@ class PromptResponseManager:
                         is_list = isinstance(formatted_val, list)
                         vals2check = [formatted_val] if not is_list else formatted_val
                         if tag in self.expected_response_type:
-                            vals2check = [self.expected_response_type[tag](v) for v in vals2check]
+                            vals2check = self._convert_to_expected_type(vals2check, tag, is_list)
                         if tag in self.expected_responses:
-                            for v in vals2check:
-                                assert v in self.expected_responses[tag], f"Unexpected value for {tag}"
+                            vals2check = self._assert_expected_response(vals2check, tag, is_list)
                         formatted_val = vals2check if is_list else vals2check.pop()
                     except (TypeError, AssertionError, ValueError) as e:
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
@@ -185,15 +184,53 @@ class PromptResponseManager:
             formatted[tag] = formatted_values
         return formatted
 
-    def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str]) -> Any:
+    def _assert_expected_response(self, vals2check: List[Any], tag: str, is_list: bool) -> List[Any]:
+        """
+        Asserts that all values are expected
+        :param vals2check: The values to check
+        :param tag: The tag used to output values
+        :param is_list: True if the response is a list
+        :return: The checked values
+        """
+        checked_values = []
+        for v in vals2check:
+            val = v
+            if v not in self.expected_responses[tag]:
+                val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
+                                              no_exception=is_list, return_none_on_fail=is_list)
+            if val is not None:
+                checked_values.append(val)
+        return checked_values
+
+    def _convert_to_expected_type(self, vals2convert: List[Any], tag: str, is_list: bool) -> List[Any]:
+        """
+        Returns the list of values converted to the expected type
+        :param vals2convert: The list of values to convert
+        :param tag: The tag used to output values
+        :return: The list of converted values
+        """
+        converted = []
+        for v in vals2convert:
+            try:
+                val = self.expected_response_type[tag](v)
+            except (ValueError, TypeError) as e:
+                val = self._format_on_failure(tag, v, e, no_exception=is_list, return_none_on_fail=is_list)
+            if val is not None:
+                converted.append(val)
+        return converted
+
+    def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str], no_exception: bool = False,
+                           return_none_on_fail: bool = False) -> Any:
         """
         Parses the response if it fails in some way, may be overridden in child classes
         :param tag_id: The id of the tag that failed
         :param e: The exception causing the failure
+        :param no_exception: If True, no exception will be thrown
+        :param return_none_on_fail: If True, returns None instead of the origin value
         :return: Default value
         """
-        assert tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
+        assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
         logger.warning(f"Unexpected response for {tag_id}: {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)
-        return val
+        return val if not return_none_on_fail else None

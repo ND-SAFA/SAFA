@@ -61,8 +61,12 @@ class TestPromptResponseManager(BaseTest):
         self.assertEqual(formatted_response, {"tag1": [[1, 2]]})
 
         # Not an expected response but not default provided
-        formatted_response_bad = prm_single._format_response({"tag1": "4"})
-        self.assertEqual(formatted_response_bad, {"tag1": [['4']]})
+        formatted_response_bad = prm_single._format_response({"tag1": "4, 2"})
+        self.assertEqual(formatted_response_bad, {"tag1": [[2]]})
+
+        # Not an expected response type but not default provided
+        formatted_response_bad = prm_single._format_response({"tag1": "four, 2"})
+        self.assertEqual(formatted_response_bad, {"tag1": [[2]]})
 
     def test_format_response_instructions(self):
         prm_single = self.get_single_tag_prm()

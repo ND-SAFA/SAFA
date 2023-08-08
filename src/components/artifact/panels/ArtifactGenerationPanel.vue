@@ -84,6 +84,7 @@ const generateTypeOptions = [
   "Functional Requirement",
   "Feature Description",
   "Epic",
+  "GraphQL API Documentation",
 ];
 
 const mode = ref<"single" | "multiple">("single");
@@ -158,7 +159,10 @@ function handleGenerate(): void {
         };
 
   artifactGenerationApiStore.handleGenerateArtifacts(config, {
-    onSuccess: () => handleReset(),
+    onSuccess: () => {
+      handleReset();
+      appStore.closeSidePanels();
+    },
   });
 }
 watch(

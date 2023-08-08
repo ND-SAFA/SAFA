@@ -171,10 +171,14 @@ class PromptResponseManager:
                             formatted_val = str(formatted_val)
                         if self.formatter:
                             formatted_val = self.formatter(tag, formatted_val)
+                        is_list = isinstance(formatted_val, list)
+                        vals2check = [formatted_val] if not is_list else formatted_val
                         if tag in self.expected_response_type:
-                            formatted_val = self.expected_response_type[tag](formatted_val)
+                            vals2check = [self.expected_response_type[tag](v) for v in vals2check]
                         if tag in self.expected_responses:
-                            assert formatted_val in self.expected_responses[tag]
+                            for v in vals2check:
+                                assert v in self.expected_responses[tag], f"Unexpected value for {tag}"
+                        formatted_val = vals2check if is_list else vals2check.pop()
                     except (TypeError, AssertionError, ValueError) as e:
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
                     formatted_values.append(formatted_val)

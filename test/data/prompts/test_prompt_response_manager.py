@@ -35,8 +35,8 @@ class TestPromptResponseManager(BaseTest):
         self.assertEqual(parsed_response_missing, {"parent": {"c1": [2], "c2": [self.EXPECTED_FAIL_VAl]}})
 
         prm_single = self.get_single_tag_prm()
-        parsed_response_missing = prm_single.parse_response("<tag1>1</tag>")
-        self.assertEqual(parsed_response_missing, {"tag1": [1]})
+        parsed_response_missing = prm_single.parse_response("<tag1>1, 2</tag>")
+        self.assertEqual(parsed_response_missing, {"tag1": [[1, 2]]})
 
     def test_format_response(self):
         prm_multi = self.get_multi_tag_prm()
@@ -44,24 +44,25 @@ class TestPromptResponseManager(BaseTest):
         self.assertEqual(formatted_response, {"tag1": ["one"], "tag2": [2]})
 
         # Not expected response
-        formatted_response_bad = prm_multi._format_response({"tag1": "four", "tag2": "2 "})
-        self.assertEqual(formatted_response_bad, {"tag1": [self.EXPECTED_FAIL_VAl], "tag2": [2]})
+        formatted_response_bad = prm_multi._format_response({"tag1": "two", "tag2": "4 "})
+        self.assertEqual(formatted_response_bad, {"tag1": ["two"], "tag2": [self.EXPECTED_FAIL_VAl]})
 
         prm_parent_child = self.get_parent_child_tag_prm()
         formatted_response = prm_parent_child._format_response({"parent": {"c1": "2!", "c2": "hello!"}})
         self.assertEqual(formatted_response, {"parent": {"c1": [2], "c2": ["hello"]}})
 
         # Not correct type
+        prm_parent_child.required_tag_ids.remove("c1")
         formatted_response_bad = prm_parent_child._format_response({"parent": {"c1": "two!", "c2": "hello!"}})
         self.assertEqual(formatted_response_bad, {"parent": {"c1": [self.EXPECTED_FAIL_VAl], "c2": ["hello"]}})
 
         prm_single = self.get_single_tag_prm()
-        formatted_response = prm_single._format_response({"tag1": "1"})
-        self.assertEqual(formatted_response, {"tag1": [1]})
+        formatted_response = prm_single._format_response({"tag1": "1, 2"})
+        self.assertEqual(formatted_response, {"tag1": [[1, 2]]})
 
         # Not an expected response but not default provided
         formatted_response_bad = prm_single._format_response({"tag1": "4"})
-        self.assertEqual(formatted_response_bad, {"tag1": [4]})
+        self.assertEqual(formatted_response_bad, {"tag1": [['4']]})
 
     def test_format_response_instructions(self):
         prm_single = self.get_single_tag_prm()
@@ -89,7 +90,9 @@ class TestPromptResponseManager(BaseTest):
         return PromptResponseManager(response_tag="tag1",
                                      include_response_instructions=False,
                                      expected_response_type=int,
-                                     expected_responses=[1, 2, 3])
+                                     expected_responses=[1, 2, 3],
+                                     formatter=lambda tag, val: val.split(",")
+                                     )
 
     def get_parent_child_tag_prm(self) -> PromptResponseManager:
         response_format = self.RESPONSE_FORMAT.format("{parent}", "{c1}", "{c2}")

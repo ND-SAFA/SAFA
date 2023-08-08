@@ -84,9 +84,9 @@ class MultiArtifactPrompt(Prompt):
         :param include_ids: If True, includes artifact ids
         :return: The formatted prompt
         """
-        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.BASE, include_id=include_ids)
+        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.XML, include_id=include_ids)
         formatted_artifacts = [artifact_prompt.build(artifact=artifact) for artifact in artifacts]
-        raise NEW_LINE.join(formatted_artifacts)
+        return NEW_LINE.join(formatted_artifacts)
 
     def __repr__(self) -> str:
         """

@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.jobs.controllers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
 
@@ -24,6 +26,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +42,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 public class JobController extends BaseController {
+
+    private static final String TIM_FILE_NAME = "tim.json";
+    private static final String EMPTY_TIM_CONTENT = "{\"artifacts\": [], \"traces\": []}";
 
     private final JobService jobService;
     private final SafaUserService safaUserService;
@@ -91,12 +97,17 @@ public class JobController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(
         @PathVariable UUID versionId,
-        @RequestParam MultipartFile[] files,
+        @RequestParam Optional<MultipartFile[]> files,
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
 
-        UpdateProjectByFlatFileJobBuilder jobBuilder = new UpdateProjectByFlatFileJobBuilder(
-            serviceProvider, versionId, files, summarize);
+        UpdateProjectByFlatFileJobBuilder jobBuilder =
+            new UpdateProjectByFlatFileJobBuilder(
+                serviceProvider,
+                versionId,
+                files.orElseGet(this::defaultFileListSupplier),
+                summarize);
+
         return jobBuilder.perform();
     }
 
@@ -113,14 +124,21 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.PROJECT_BULK_UPLOAD)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectCreationJob(
-        @RequestParam MultipartFile[] files,
+        @RequestParam Optional<MultipartFile[]> files,
         @RequestParam String name,
         @RequestParam String description,
         @RequestParam(required = false, defaultValue = "false") boolean summarize)
         throws Exception {
 
-        CreateProjectByFlatFileJobBuilder jobBuilder = new CreateProjectByFlatFileJobBuilder(
-            serviceProvider, files, safaUserService.getCurrentUser(), name, description, summarize);
+        CreateProjectByFlatFileJobBuilder jobBuilder =
+            new CreateProjectByFlatFileJobBuilder(
+                serviceProvider,
+                files.orElseGet(this::defaultFileListSupplier),
+                safaUserService.getCurrentUser(),
+                name,
+                description,
+                summarize);
+
         return jobBuilder.perform();
     }
 
@@ -159,5 +177,17 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request, user);
         return jobBuilder.perform();
+    }
+
+    /**
+     * Supplies a default list of files for an upload in case an empty upload is given.
+     *
+     * @return The default files. Currently, just the most basic tim.json
+     */
+    private MultipartFile[] defaultFileListSupplier() {
+        return new MultipartFile[]{
+            new MockMultipartFile(TIM_FILE_NAME, TIM_FILE_NAME,
+                null, EMPTY_TIM_CONTENT.getBytes(StandardCharsets.UTF_8))
+        };
     }
 }

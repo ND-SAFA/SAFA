@@ -176,7 +176,7 @@ public class ArtifactVersionRepositoryImpl
     public void updateTimInfo(ProjectVersion projectVersion, ArtifactVersion versionEntity,
                               ArtifactVersion previousVersionEntity, SafaUser user) {
         ModificationType modificationType = versionEntity.getModificationType();
-        boolean added = modificationType == ModificationType.ADDED;
+        boolean added = modificationType == ModificationType.ADDED && previousVersionEntity == null;
         boolean removed = modificationType == ModificationType.REMOVED;
 
         if (added || removed) {

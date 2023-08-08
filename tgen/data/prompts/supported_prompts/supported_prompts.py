@@ -7,6 +7,7 @@ from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFIC
 from tgen.data.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GENERATION_PROMPT, INSTRUCTION_CREATION_PROMPT, \
     REFINE_PROMPT, REFINE_QUESTIONNAIRE
 from tgen.data.prompts.supported_prompts.summary_prompts import CODE_SUMMARY, NL_SUMMARY
+from tgen.delta.delta_prompts import CHANGED_FILE_PROMPT, DIFF_SUMMARY_QUESTIONNAIRE, PROJECT_SUMMARY_PROMPT
 
 
 class SupportedPrompts(SupportedEnum):
@@ -23,6 +24,11 @@ class SupportedPrompts(SupportedEnum):
     # ---------- SUMMARY ----------------
     CODE_SUMMARY = CODE_SUMMARY
     NL_SUMMARY = NL_SUMMARY
+
+    # ---------- DELTA ----------------
+    DELTA_CHANGED_FILE_PROMPT = CHANGED_FILE_PROMPT
+    DELTA_DIFF_SUMMARY_QUESTIONNAIRE = DIFF_SUMMARY_QUESTIONNAIRE
+    DELTA_PROJECT_SUMMARY_PROMPT = PROJECT_SUMMARY_PROMPT
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

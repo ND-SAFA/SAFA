@@ -19,6 +19,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                  instructions: str = DEFAULT_INSTRUCTIONS,
                  response_format: str = DEFAULT_RESPONSE_FORMAT,
                  response_tag: str = DEFAULT_RESPONSE_TAG,
+                 multiple_responses_allowed: bool = False,
                  default_factory: Callable = None):
         """
         Initializes the prompt with the categories that a model can select
@@ -35,7 +36,8 @@ class SelectQuestionPrompt(QuestionPrompt):
         response_manager = PromptResponseManager(response_tag=self.response_tag,
                                                  response_instructions_format=self.response_format,
                                                  expected_responses=category_names,
-                                                 expected_response_type=type(category_names[0]),
+                                                 expected_response_type=list if multiple_responses_allowed
+                                                 else type(category_names[0]),
                                                  default_factory=default_factory)
         super().__init__(f"{question}{self.instructions}",
                          response_manager=response_manager)

@@ -6,7 +6,7 @@ import pandas as pd
 from datasets import disable_caching
 
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.enum_util import get_enum_from_name
+from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -205,7 +205,7 @@ class TrainerDatasetManager(BaseObject):
         for dataset_role, dataset_creator in dataset_creators_map.items():
             if isinstance(dataset_creator, SplitDatasetCreator):
                 dataset_creator.name = dataset_creators_map[DatasetRole.TRAIN].get_name()
-                split_strategy_enum = get_enum_from_name(SupportedSplitStrategy, dataset_creator.split_strategy) \
+                split_strategy_enum = EnumUtil.get_enum_from_name(SupportedSplitStrategy, dataset_creator.split_strategy) \
                     if not isinstance(dataset_creator.split_strategy, SupportedSplitStrategy) else dataset_creator.split_strategy
                 strategies.append(split_strategy_enum)
                 dataset_role_to_split_percentage[dataset_role] = dataset_creator.val_percentage

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
 from typeguard import check_type
 from typing_extensions import get_args
 
-from tgen.common.util.enum_util import get_enum_from_name
+from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -155,7 +155,7 @@ class BaseObject(ABC):
         else:  # not a variable
             val = variable
         if ReflectionUtil.is_instance_or_subclass(expected_type, Enum) and isinstance(val, str):
-            val = get_enum_from_name(expected_type, val)
+            val = EnumUtil.get_enum_from_name(expected_type, val)
         return val
 
     @classmethod
@@ -231,7 +231,7 @@ class BaseObject(ABC):
         abstract_class = cls._get_base_class(abstract_class)
         assert hasattr(abstract_class, "_get_enum_class"), f"{abstract_class} does not implement `_get_enum_class`"
         enum_class = abstract_class._get_enum_class(child_class_name)
-        enum_value = get_enum_from_name(enum_class, child_class_name).value
+        enum_value = EnumUtil.get_enum_from_name(enum_class, child_class_name).value
         return enum_value
 
     @staticmethod

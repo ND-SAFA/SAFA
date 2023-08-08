@@ -15,10 +15,7 @@
       <project-searchbar v-if="graphVisible" />
       <q-space />
       <q-space />
-      <flex-box align="center">
-        <update-button />
-        <saving-icon />
-      </flex-box>
+      <update-button />
     </flex-box>
     <separator v-if="graphVisible" nav />
   </div>
@@ -41,7 +38,6 @@ import { Routes } from "@/router";
 import { FlexBox, Separator } from "@/components/common";
 import { VersionSelector, ProjectSelector } from "@/components/project";
 import { ProjectSearchbar } from "@/components/search";
-import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 
 const currentRoute = useRoute();

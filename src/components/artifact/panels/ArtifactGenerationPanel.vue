@@ -79,12 +79,15 @@ import {
   MultiselectInput,
 } from "@/components/common";
 
+const additionalOptions =
+  process.env.NODE_ENV === "production" ? [] : ["GraphQL API Documentation"];
+
 const generateTypeOptions = [
   "User Story",
   "Functional Requirement",
   "Feature Description",
   "Epic",
-  "GraphQL API Documentation",
+  ...additionalOptions,
 ];
 
 const mode = ref<"single" | "multiple">("single");

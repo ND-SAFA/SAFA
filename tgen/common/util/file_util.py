@@ -96,7 +96,7 @@ class FileUtil:
             return {k: FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
         if isinstance(value, str):
             if "~" in value:
-                return os.path.expanduser(value)
+                value = os.path.expanduser(value)
             if replacements:
                 for k, v in replacements.items():
                     value = value.replace(k, v)

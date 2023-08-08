@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import DEFAULT_MAX_N_CHILDREN, DEFAULT_PARENT_MIN_THRESHOLD, \
+from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
@@ -12,6 +12,11 @@ from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_S
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 CURRENT_PROJECT = os.environ["CURRENT_PROJECT"]
+save_output = os.environ.get("SAVE_OUTPUT", False)
+use_summary = os.environ.get("USE_SUMMARY", False)
+
+EXPORT_DIR = f"~/desktop/hgen/checkpoints/{CURRENT_PROJECT}" if save_output else None
+SUMMARY_PATH = f"~/desktop/hgen/summaries/project/{CURRENT_PROJECT}.txt" if use_summary else None
 
 
 @dataclass
@@ -27,7 +32,7 @@ class RankingArgs(PipelineArgs):
     """
     Path to export various checkpoints
     """
-    export_dir: str = f"~/desktop/hgen/checkpoints/{CURRENT_PROJECT}"
+    export_dir: str = EXPORT_DIR
     """
     Optional.List of children ids to compare to each parent.
     """
@@ -39,7 +44,7 @@ class RankingArgs(PipelineArgs):
     """
     The number of maximum children to give to claude
     """
-    max_children_per_query: int = DEFAULT_MAX_N_CHILDREN
+    max_children_per_query: int = None
     """
     The sorting algorithm to use before ranking with claude
     """
@@ -67,7 +72,7 @@ class RankingArgs(PipelineArgs):
     """
     The path to load a project summary from
     """
-    project_summary_path: str = f"~/desktop/hgen/summaries/project/{CURRENT_PROJECT}.txt"
+    project_summary_path: str = SUMMARY_PATH
     """
     The model used to rank
     """

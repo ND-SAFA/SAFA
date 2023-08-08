@@ -32,7 +32,7 @@ DEFAULT_SEARCH_INSTRUCTIONS = "# Instructions\n---\n" \
                               "\n    Base your score on how directly each artifact contributes to or enables the functionality " \
                               "described in your answer to (1)." \
                               "\nIMPORTANT: For question (2), work through each artifact sequentially starting with ID 0. " \
-                              "Include an entry for each artifact. " \
+                              "Include an entry for ALL IDs in the system " \
                               "Provide each artifact's entry on a single line in the format specified. " \
                               "Enclose your answer in <explanation></explanation>."
 DEFAULT_SEARCH_QUERY_TAG = "query"

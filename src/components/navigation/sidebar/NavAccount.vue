@@ -1,5 +1,11 @@
 <template>
   <div class="full-width nav-account">
+    <list-item to="" title="">
+      <template #icon>
+        <saving-icon />
+      </template>
+    </list-item>
+
     <list-item to="" title="Notifications">
       <template #icon>
         <notifications />
@@ -30,5 +36,6 @@ export default {
 <script setup lang="ts">
 import { Routes } from "@/router";
 import { ListItem, Separator } from "@/components/common";
+import SavingIcon from "./SavingIcon.vue";
 import Notifications from "./Notifications.vue";
 </script>

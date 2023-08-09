@@ -79,11 +79,15 @@ import {
   MultiselectInput,
 } from "@/components/common";
 
+const additionalOptions =
+  process.env.NODE_ENV === "production" ? [] : ["GraphQL API Documentation"];
+
 const generateTypeOptions = [
   "User Story",
   "Functional Requirement",
   "Feature Description",
   "Epic",
+  ...additionalOptions,
 ];
 
 const mode = ref<"single" | "multiple">("single");
@@ -158,7 +162,10 @@ function handleGenerate(): void {
         };
 
   artifactGenerationApiStore.handleGenerateArtifacts(config, {
-    onSuccess: () => handleReset(),
+    onSuccess: () => {
+      handleReset();
+      appStore.closeSidePanels();
+    },
   });
 }
 watch(

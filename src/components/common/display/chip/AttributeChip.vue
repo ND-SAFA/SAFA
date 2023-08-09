@@ -22,7 +22,7 @@
     <typography
       ellipsis
       :color="enumerated ? displayColor : 'text'"
-      :small="text.length >= 15"
+      :small="text.length >= 20"
       :l="iconVisible ? '1' : ''"
       :value="text"
     />

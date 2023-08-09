@@ -35,6 +35,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-alert-circle-outline";
     case "error":
       return "mdi-alert-circle-outline";
+    case "invite":
+      return "mdi-account-plus-outline";
     case "success":
       return "mdi-check-circle-outline";
     case "artifact":

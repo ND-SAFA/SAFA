@@ -20,6 +20,9 @@
       data-cy-name="input-project-name-modal"
       data-cy-description="input-project-description-modal"
     />
+    <expansion-item label="Members">
+      <project-member-table minimal />
+    </expansion-item>
     <template v-if="!showUpload" #actions>
       <text-button
         color="primary"
@@ -51,6 +54,8 @@ import {
   getProjectApiStore,
 } from "@/hooks";
 import { Modal, TextButton } from "@/components/common";
+import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
+import ProjectMemberTable from "@/components/settings/members/ProjectMemberTable.vue";
 import { ProjectFilesUploader, ProjectIdentifierInput } from "../base";
 
 const open = computed(() => appStore.isProjectCreatorOpen);

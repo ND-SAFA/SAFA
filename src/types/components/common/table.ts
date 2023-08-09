@@ -201,4 +201,8 @@ export interface SelectorTableProps
    * Whether these rows are deletable.
    */
   deletable?: boolean | ((row: TableRow) => boolean);
+  /**
+   * A hint to display beneath the searchbar.
+   */
+  searchHint?: string;
 }

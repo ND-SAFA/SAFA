@@ -1,7 +1,7 @@
 <template>
   <div :class="containerClassName">
     <q-card flat :class="className">
-      <flex-box align="center" justify="between">
+      <flex-box v-if="!props.minimal" align="center" justify="between">
         <flex-box align="center">
           <icon
             v-if="!!props.icon"
@@ -18,9 +18,9 @@
         </flex-box>
         <slot name="title-actions" />
       </flex-box>
-      <separator v-if="!!props.title" b="2" />
+      <separator v-if="!props.minimal && !!props.title" b="2" />
       <typography
-        v-if="!!props.subtitle"
+        v-if="!props.minimal && !!props.subtitle"
         el="p"
         b="4"
         :value="props.subtitle"
@@ -63,8 +63,13 @@ const props = withDefaults(defineProps<PanelCardProps>(), {
 
 const slots = useSlots();
 
+const color = computed(() => (props.minimal ? "transparent" : props.color));
+
+const padding = computed(() => (props.minimal ? "q-pa-xs" : "q-pa-md"));
+
 const className = computed(
-  () => `q-pa-md overflow-hidden bg-neutral bd-${props.color} ${props.class}`
+  () =>
+    `overflow-hidden bg-neutral ${padding.value} bd-${color.value} ${props.class}`
 );
 
 const containerClassName = computed(() => `q-mb-md ${props.containerClass}`);

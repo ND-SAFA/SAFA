@@ -15,6 +15,7 @@ export type IconVariant =
   | "update"
   | "success"
   | "error"
+  | "invite"
   | "artifact"
   | "trace"
   | "upload"

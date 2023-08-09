@@ -2,7 +2,12 @@
   <panel-card :title="project.name">
     <typography variant="caption" :value="versionLabel" />
     <br />
-    <typography ep="p" :value="description" />
+    <typography
+      ep="p"
+      variant="expandable"
+      :value="description"
+      default-expanded
+    />
     <div class="q-mt-md">
       <flex-box wrap b="2">
         <div class="q-mb-sm">
@@ -27,9 +32,7 @@
             color="primary"
             variant="trace"
           />
-          <div v-for="type in direction[1]" :key="type">
-            <attribute-chip artifact-type :value="type" />
-          </div>
+          <attribute-chip artifact-type :value="direction[1]" />
         </flex-box>
       </flex-box>
     </div>

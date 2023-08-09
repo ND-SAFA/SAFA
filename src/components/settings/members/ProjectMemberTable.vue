@@ -2,6 +2,7 @@
   <panel-card
     title="Project Members"
     subtitle="Edit and invite project members."
+    :minimal="props.minimal"
   >
     <selector-table
       :columns="membersColumns"
@@ -11,11 +12,21 @@
       :deletable="isAdmin"
       :editable="isAdmin"
       :loading="memberApiStore.loading"
-      @row:add="modalOpen = true"
+      @row:add="handleAdd"
       @row:edit="handleEdit"
       @row:delete="handleDelete"
       @refresh="handleRefresh"
     >
+      <template #search-append="{ search }">
+        <icon-button
+          v-if="!!search"
+          small
+          tooltip="Invite member"
+          icon="invite"
+          @click="handleAdd(search)"
+        />
+      </template>
+
       <template #cell-actions="{ row }">
         <icon-button
           v-if="membersColumns.length > 1 && row.email === userEmail"
@@ -29,8 +40,9 @@
     <project-member-modal
       :open="modalOpen"
       :member="editedMember"
-      @close="modalOpen = false"
-      @submit="modalOpen = false"
+      :email="addedMember"
+      @close="handleClose"
+      @submit="handleClose"
     />
   </panel-card>
 </template>
@@ -58,7 +70,15 @@ import {
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
+const props = defineProps<{
+  /**
+   * Whether the table should be displayed minimally.
+   */
+  minimal?: boolean;
+}>();
+
 const editedMember = ref<MembershipSchema>();
+const addedMember = ref<string | null>(null);
 const modalOpen = ref(false);
 
 const project = computed(() => projectStore.project);
@@ -80,6 +100,24 @@ async function handleRefresh(): Promise<void> {
   if (project.value.projectId === "") return;
 
   await memberApiStore.handleReload();
+}
+
+/**
+ * Clears all member modal state.
+ */
+function handleClose(): void {
+  addedMember.value = "";
+  editedMember.value = undefined;
+  modalOpen.value = false;
+}
+
+/**
+ * Opens the invite member modal.
+ * @param email - The member email to invite.
+ */
+function handleAdd(email: string | null): void {
+  addedMember.value = email;
+  modalOpen.value = true;
 }
 
 /**

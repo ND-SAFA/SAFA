@@ -9,11 +9,10 @@ import {
 } from "@/types";
 import {
   useApi,
-  artifactStore,
   projectStore,
-  traceStore,
   artifactSaveStore,
   artifactApiStore,
+  jobStore,
 } from "@/hooks";
 import { createGeneratedArtifacts, createPrompt, createSummary } from "@/api";
 import { pinia } from "@/plugins";
@@ -128,17 +127,17 @@ export const useArtifactGenerationApi = defineStore(
     ): Promise<void> {
       await artifactGenerationApi.handleRequest(
         async () => {
-          const commit = await createGeneratedArtifacts(
+          const job = await createGeneratedArtifacts(
             configuration,
             projectStore.versionId
           );
 
-          artifactStore.addOrUpdateArtifacts(commit.artifacts.added);
-          traceStore.addOrUpdateTraceLinks(commit.traces.added);
+          jobStore.updateJob(job);
         },
         callbacks,
         {
-          success: "Successfully generated artifacts.",
+          success:
+            "Artifacts are being generated. You'll receive an update when they have been created.",
           error: "Unable to generate artifacts.",
         }
       );

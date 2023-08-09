@@ -31,4 +31,8 @@ export interface PanelCardProps extends ColorProps, IconProps, ClassNameProps {
    * The panel's container's classes.
    */
   containerClass?: string;
+  /**
+   * Whether this card should be displayed minimally.
+   */
+  minimal?: boolean;
 }

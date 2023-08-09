@@ -1,10 +1,11 @@
 from typing import Dict, List, TypeVar
 from unittest import TestCase
 
-from tgen.server.serializers.experiment_serializer import ExperimentSerializer
+from variables import DefinitionVariable
+
+from tgen.experiments.experiment_serializer import ExperimentSerializer
 from tgen.variables.experimental_variable import ExperimentalVariable
 from tgen.variables.variable import Variable
-from variables import DefinitionVariable
 
 AppEntity = TypeVar('AppEntity')
 

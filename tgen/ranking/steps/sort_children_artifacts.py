@@ -18,7 +18,7 @@ class PrepareChildren(AbstractPipelineStep[RankingArgs, RankingState]):
             raise ValueError("Please provide sorter or parent2children, but not both.")
 
         if use_sorter:
-            sorting_function = registered_sorters[args.sorter]
+            sorting_function = registered_sorters[args.sorter.lower()]
             parent_map = sorting_function(args.parent_ids, args.children_ids, args.artifact_map)
             state.sorted_parent2children = parent_map
         elif use_pre_ranked:

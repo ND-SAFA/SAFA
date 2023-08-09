@@ -4,11 +4,11 @@ from typing import Dict, Iterable, List, Tuple, Union
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
-from scipy.stats import percentileofscore
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
@@ -229,18 +229,6 @@ class VSMTrainer(AbstractTrainer):
 
         for parent, preds in parent2preds.items():
             scores = [p["score"] for p in preds]
-            percentiles = VSMTrainer.get_percentiles(scores)
+            percentiles = ListUtil.get_percentiles(scores)
             for p, percentile in zip(preds, percentiles):
                 p["score"] = percentile
-
-    @staticmethod
-    def get_percentiles(scores: List[float]) -> List[float]:
-        """
-        Converts scores to percentiles.
-        :param scores: The scores to convert.
-        :return: List of percentiles.
-        """
-        scores_sorted = sorted(scores)
-        s = pd.Series(scores)
-        percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
-        return list(percentiles)

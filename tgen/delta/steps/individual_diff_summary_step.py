@@ -12,7 +12,6 @@ from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -26,20 +25,18 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
+class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     LAYER_ID = "diff"
     CATEGORIES = [ChangeType.RENAMED_VARS, ChangeType.DEPENDENCIES_IMPORTS, ChangeType.NEW_FUNC, ChangeType.MODIFIED_FUNC,
                   ChangeType.BUG_FIXES, ChangeType.REFACTORED]
 
-    def run(self, args: DeltaArgs, state: DeltaState) -> None:
+    def _run(self, args: DeltaArgs, state: DeltaState) -> None:
         """
         Gets summaries and categorizations for each modified file diff
         :param args: The arguments for the delta summarizer
         :param state: The current state of the delta summarizer
         :return: None
         """
-        if state.diff_summaries:
-            return
         logger.log_with_title("STEP 1 - Generating DIFF Summaries")
         modified_diffs = args.change_type_to_diffs[ChangeType.MODIFIED]
         ids = list(modified_diffs.keys())
@@ -47,7 +44,6 @@ class DiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         output = self._get_prediction_output(args, diff_dataset, state)
         results = self._parse_output(ids, output)
         state.diff_summaries = results
-        state.on_step_complete(self.__class__.__name__)
 
     def _create_dataset_from_diff(self, args: DeltaArgs, modified_diffs: Dict[str, str], ids: List[str]) -> PromptDataset:
         """

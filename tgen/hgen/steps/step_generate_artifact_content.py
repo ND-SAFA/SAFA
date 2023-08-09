@@ -24,7 +24,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the content for the new artifacts.
         :param args: HGEN configuration.

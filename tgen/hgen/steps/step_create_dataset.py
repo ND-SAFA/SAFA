@@ -23,7 +23,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates a dataset containing original artifacts, generated upper level artifacts, and trace links between them.
         :param state: The current state of hgen at this point in time

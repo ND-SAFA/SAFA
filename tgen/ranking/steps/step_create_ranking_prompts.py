@@ -9,7 +9,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
-    def run(self, args: RankingArgs, state: RankingState) -> None:
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         self.create_ranking_prompts(args, state)
 
     @staticmethod

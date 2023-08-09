@@ -6,7 +6,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
-    def run(self, args: RankingArgs, state: RankingState) -> None:
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
         Sets the pipeline to either NO SUMMARY, MANUAL SUMMARY, or GENERATED SUMMARY.
         If NO SUMMARY, summary is set to None

@@ -13,7 +13,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class InitializeDatasetStepAbstract(AbstractPipelineStep[HGenArgs, HGenState]):
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Gets the original source datasets used for the generation
         :param args: The arguments and current state of HGEN.

@@ -5,7 +5,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class PrepareChildren(AbstractPipelineStep[RankingArgs, RankingState]):
-    def run(self, args: RankingArgs, state: RankingState) -> None:
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
         Sorts the children for each parent according to specified sorting function.
         :param args: The ranking arguments to the pipeline.

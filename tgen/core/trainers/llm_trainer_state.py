@@ -17,15 +17,15 @@ class LLMTrainerState(State):
     """
     :param prompt_builder: Creates the prompts for trace link prediction.
     """
-    prompt_builder: PromptBuilder
+    prompt_builder: PromptBuilder = None
     """
     :param trainer_dataset_manager: The dataset manager for training and prediction
     """
-    trainer_dataset_manager: TrainerDatasetManager
+    trainer_dataset_manager: TrainerDatasetManager = None
     """
     :param llm_manager: The manager incharge of the lLM being used
     """
-    llm_manager: AbstractLLMManager
+    llm_manager: AbstractLLMManager = None
     """
     :param summarizer: The summarizer to use for shortening artifacts over the token limit.
     """

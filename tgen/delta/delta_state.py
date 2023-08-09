@@ -1,8 +1,8 @@
 import os
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from typing import List, Dict
+from typing import List, Dict, Set
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -25,6 +25,7 @@ class DeltaState(State):
         :param step_name: The name of the step completed
         :return: None
         """
+        super().on_step_complete(step_name)
         self.save(step_name)
 
     @staticmethod

@@ -12,7 +12,7 @@ from tgen.common.util.logging.logger_manager import logger
 
 
 class RefineArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
-    def run(self, hgen_args: HGenArgs, state: HGenState) -> None:
+    def _run(self, hgen_args: HGenArgs, state: HGenState) -> None:
         """
         Refines the artifact generation content.
         :param hgen_args: The arguments to HGEN and its current state.

@@ -2,6 +2,7 @@
   <panel-card
     title="Project Members"
     subtitle="Edit and invite project members."
+    :minimal="props.minimal"
   >
     <selector-table
       :columns="membersColumns"
@@ -68,6 +69,13 @@ import {
 } from "@/hooks";
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
+
+const props = defineProps<{
+  /**
+   * Whether the table should be displayed minimally.
+   */
+  minimal?: boolean;
+}>();
 
 const editedMember = ref<MembershipSchema>();
 const addedMember = ref<string | null>(null);

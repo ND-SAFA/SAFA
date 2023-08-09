@@ -4,7 +4,6 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
@@ -58,7 +57,7 @@ class ProjectSummaryJob(AbstractJob):
         if artifact_reader:
             summarizer = Summarizer()
             artifact_reader.set_summarizer(summarizer)
-            artifact_map = ProjectSummaryJob.create_artifact_map(artifact_reader)
+            artifact_map = artifact_reader.read_project().to_map()
         self.artifact_map = artifact_map
         self.n_tokens = n_tokens
         self.export_path = export_path
@@ -82,11 +81,3 @@ class ProjectSummaryJob(AbstractJob):
         if self.export_path:
             FileUtil.write(summary, self.export_path)
         return ProjectSummaryResponse(summary=summary)
-
-    @staticmethod
-    def create_artifact_map(reader: ArtifactProjectReader) -> Dict[str, str]:
-        artifact_map: Dict[str, str] = {}
-        artifact_df = reader.read_project()
-        for artifact_id, artifact_row in artifact_df.itertuples():
-            artifact_map[artifact_id] = artifact_row[ArtifactKeys.CONTENT]
-        return artifact_map

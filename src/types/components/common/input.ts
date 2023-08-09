@@ -159,6 +159,10 @@ export interface SearchbarProps extends LabelProps {
    * The search text to manage.
    */
   modelValue: string;
+  /**
+   * A hint to display below the input.
+   */
+  hint?: string;
 }
 
 /**

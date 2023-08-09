@@ -4,11 +4,16 @@
     dense
     outlined
     clearable
-    :label="label"
+    :label="props.label"
+    :hint="props.hint"
     class="full-width"
+    @keydown="handleKeydown"
   >
     <template #prepend>
       <icon variant="search" />
+    </template>
+    <template #append>
+      <slot name="append" :search="model as string" />
     </template>
   </q-input>
 </template>
@@ -30,9 +35,25 @@ import { Icon } from "@/components/common/display";
 
 const props = withDefaults(defineProps<SearchbarProps>(), { label: "Search" });
 
-defineEmits<{
+const emit = defineEmits<{
+  /**
+   * Called when the model is updated.
+   */
   (e: "update:modelValue"): void;
+  /**
+   * Called when the enter button is pressed.
+   */
+  (e: "enter"): void;
 }>();
 
 const model = useVModel(props, "modelValue");
+
+/**
+ * Emits an event when enter is clicked.
+ */
+function handleKeydown(e?: { key: string }) {
+  if (e?.key === "Enter") {
+    emit("enter");
+  }
+}
 </script>

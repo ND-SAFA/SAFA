@@ -54,6 +54,7 @@ import {
 const props = defineProps<{
   open: boolean;
   member?: MembershipSchema;
+  email?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -101,7 +102,7 @@ const isValid = computed(
  */
 function handleReset(): void {
   projectIds.value = [projectStore.projectId];
-  userEmail.value = props.member?.email || "";
+  userEmail.value = props.email || props.member?.email || "";
   userRole.value = props.member?.role;
 }
 

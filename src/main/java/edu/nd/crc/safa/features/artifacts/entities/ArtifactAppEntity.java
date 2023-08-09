@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.entities;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,51 +25,60 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * UUID uniquely identifying artifact.
      */
-    UUID id;
+    private UUID id;
+
     /**
      * The user-defined identifier for the artifact.
      */
     @NotNull
     @NotEmpty
-    String name;
+    private String name;
+
     /**
      * Summary of the artifact body used for short displays of what the
      * artifact contains.
      */
     @NotNull
-    String summary;
+    private String summary;
+
     /**
      * The string representation of an artifact's content. Could be string, code, or other
      * file type like JSON.
      */
     @NotNull
-    String body;
+    private String body;
+
     /**
      * The name of the ArtifactType this pertains to.
      */
     @NotNull
     @NotEmpty
-    String type;
+    private String type;
+
     /**
      * Mapping of columns ids to column values for this artifact.
      */
-    Map<String, JsonNode> attributes = new HashMap<>();
+    private Map<String, JsonNode> attributes = new HashMap<>();
+
     /**
      * The type of document this artifact is displayed in.
      */
-    DocumentType documentType = DocumentType.ARTIFACT_TREE;
+    private DocumentType documentType = DocumentType.ARTIFACT_TREE;
+
     /**
      * For safety case nodes, the type of safety case node.
      */
-    SafetyCaseType safetyCaseType;
+    private SafetyCaseType safetyCaseType;
+
     /**
      * For FTA logic nodes,  the logical operator of this node.
      */
-    FTAType logicType;
+    private FTAType logicType;
+
     /**
      * List of document Ids this artifact belongs to.
      */
-    List<UUID> documentIds = new ArrayList<>();
+    private List<UUID> documentIds = new ArrayList<>();
 
     public ArtifactAppEntity() {
         this.name = "";
@@ -127,5 +138,14 @@ public class ArtifactAppEntity implements IAppEntity {
         } else {
             return this.name;
         }
+    }
+
+    /**
+     * Returns whether this artifact represents a code file based on its file extension.
+     *
+     * @return True if the artifact is code, false otherwise.
+     */
+    public boolean isCode() {
+        return FileUtilities.isCodeFile(Path.of(this.name));
     }
 }

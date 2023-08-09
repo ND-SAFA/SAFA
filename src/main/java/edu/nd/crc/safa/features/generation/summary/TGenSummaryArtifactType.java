@@ -1,6 +1,10 @@
 package edu.nd.crc.safa.features.generation.summary;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,26 +33,10 @@ public enum TGenSummaryArtifactType {
      */
     CODE(".*");
 
-    private static final String[] codeExtensions = new String[]{
-        ".c",
-        ".h",
-        ".sh",
-        ".cpp",
-        ".hpp",
-        ".swift",
-        ".php",
-        ".vue",
-        ".rb",
-        ".js",
-        ".ts",
-        ".tsx",
-        ".html",
-        ".htm",
-        ".xml",
-        ".json",
-        ".sql"
-    };
-    String fileExtension;
+    private final String fileExtension;
+
+    private static final List<TGenSummaryArtifactType> KNOWN_TYPES = List.of(JAVA, PY);
+    private static final Set<TGenSummaryArtifactType> CODE_TYPES = Set.of(CODE, JAVA, PY);
 
     /**
      * Returns the artifact type associated with file extension in name. If none exists then NL is returned.
@@ -60,16 +48,13 @@ public enum TGenSummaryArtifactType {
         if (artifactName == null) {
             return NL;
         }
-        List<TGenSummaryArtifactType> artifactTypes = List.of(PY, JAVA);
-        for (TGenSummaryArtifactType artifactType : artifactTypes) {
+        for (TGenSummaryArtifactType artifactType : KNOWN_TYPES) {
             if (artifactName.endsWith(artifactType.fileExtension)) {
                 return artifactType;
             }
         }
-        for (String codeExtension : codeExtensions) {
-            if (artifactName.endsWith(codeExtension)) {
-                return CODE;
-            }
+        if (FileUtilities.isCodeFile(Path.of(artifactName))) {
+            return CODE;
         }
         return NL;
     }
@@ -82,6 +67,6 @@ public enum TGenSummaryArtifactType {
      */
     public static boolean isCode(String artifactName) {
         TGenSummaryArtifactType artifactType = TGenSummaryArtifactType.getArtifactType(artifactName);
-        return List.of(CODE, PY, JAVA).contains(artifactType);
+        return CODE_TYPES.contains(artifactType);
     }
 }

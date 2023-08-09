@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
@@ -145,6 +146,7 @@ public class ArtifactAppEntity implements IAppEntity {
      *
      * @return True if the artifact is code, false otherwise.
      */
+    @JsonProperty(value = "isCode", access = JsonProperty.Access.READ_ONLY)
     public boolean isCode() {
         return FileUtilities.isCodeFile(Path.of(this.name));
     }

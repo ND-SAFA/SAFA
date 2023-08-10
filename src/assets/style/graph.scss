@@ -56,22 +56,16 @@ $graph-border-radius: 8px;
     cursor: grabbing;
   }
 
-  & > .cy-node-title {
-    max-height: 47px;
+  .cy-node-title {
+    span {
+      max-height: 49px;
+      line-height: 24px !important;
+    }
   }
 
-  & > .cy-node-subtitle {
-    max-height: 71px;
-  }
-
-  & > .cy-node-title, & > .cy-node-subtitle {
-    border-radius: 0px !important;
-    overflow: hidden;
-    text-align: center;
-
-    & > span {
-      text-overflow: ellipsis;
-      line-height: 20px !important;
+  .cy-node-artifact-name {
+    h1 {
+      line-height: 27px !important;
     }
   }
 

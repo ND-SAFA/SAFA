@@ -18,6 +18,7 @@
         align="center"
         :artifact="props.artifact"
         is-header
+        class="cy-node-artifact-name"
       />
       <separator
         v-if="showDelta"

@@ -1,6 +1,6 @@
 from typing import Any
 
-from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, SPACE
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, SPACE, TAB
 
 
 class PromptUtil:
@@ -19,7 +19,7 @@ class PromptUtil:
         return f"<{tag_name}>{tag_content}</{tag_name}>"
 
     @staticmethod
-    def format_as_markdown(original_string: str, level: int = 1) -> str:
+    def format_as_markdown_header(original_string: str, level: int = 1) -> str:
         """
         Formats the string as markdown header
         :param original_string: The string to format
@@ -27,6 +27,18 @@ class PromptUtil:
         :return: The string formatted as markdown
         """
         return f"{'#' * level} {original_string}"
+
+    @staticmethod
+    def format_as_bullet_point(original_string: str, level: int = 1) -> str:
+        """
+        Formats the string as markdown header
+        :param original_string: The string to format
+        :param level: The level of the bullet point
+        :return: The string formatted as markdown
+        """
+        bullets = ['-', '+', '*']
+        level -= 1
+        return f"{TAB * level}{bullets[level % 3]} {original_string}"
 
     @staticmethod
     def strip_new_lines_and_extra_space(original_string) -> str:

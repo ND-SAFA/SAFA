@@ -19,6 +19,10 @@ class DeltaState(State):
 
     diff_summaries: Dict = None  # maps filename to the results of the diff summary
 
+    change_summary_output: Dict = None  # output from model, includes the grouping of changes and summaries
+
+    change_summary: str = None # Markdown version of the change summary
+
     def on_step_complete(self, step_name: str) -> None:
         """
         Performs all tasks required after step complete (i.e. saving)

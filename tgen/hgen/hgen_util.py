@@ -188,14 +188,14 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
         else task_prompt.response_manager
     generation_step_response_manager.formatter = lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(val)
 
-    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown("{artifact_type}S:"),
+    artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown_header("{artifact_type}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,
                                           include_ids=False, data_type=MultiArtifactPrompt.DataType.ARTIFACT)
     artifact_type = hgen_args.source_type if not artifact_type else artifact_type
     artifact_prompt.format_value(artifact_type=artifact_type.upper())
     prompts = [base_prompt, artifact_prompt]
 
-    task_preface = f"{NEW_LINE}{PromptUtil.format_as_markdown('TASKS:')}{NEW_LINE}"
+    task_preface = f"{NEW_LINE}{PromptUtil.format_as_markdown_header('TASKS:')}{NEW_LINE}"
     if summary_prompt:
         summary_prompt.value = task_preface + summary_prompt.value
         prompts.append(summary_prompt)

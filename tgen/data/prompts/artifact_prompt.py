@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Union
+from typing import Union, Dict, List
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
@@ -16,6 +16,8 @@ class ArtifactPrompt(Prompt):
     Please rank the following children based on the parent artifact: <artifact></artifact>
     """
 
+    DEFAULT_XML_TAGS = {"artifacts": ["id", "body"]}
+
     class BuildMethod(Enum):
         """
         The method to build the prompt (determines prompt format)
@@ -23,12 +25,15 @@ class ArtifactPrompt(Prompt):
         XML = auto()
         BASE = auto()
 
-    def __init__(self, prompt_start: str = EMPTY_STRING, build_method: BuildMethod = BuildMethod.BASE, include_id: bool = True):
+    def __init__(self, prompt_start: str = EMPTY_STRING, build_method: BuildMethod = BuildMethod.BASE,
+                 include_id: bool = True, xml_tags: Dict[str, List[str]] = None):
         """
         Constructor for making a prompt from an artifact
         :param build_method: The method to build the prompt (determines prompt format)
+        :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
         :param include_id: If True, includes the id of the artifact
         """
+        self.xml_tags = xml_tags if xml_tags else self.DEFAULT_XML_TAGS
         self.build_method = build_method
         self.build_methods = {
             self.BuildMethod.XML: self._build_as_xml,
@@ -50,11 +55,12 @@ class ArtifactPrompt(Prompt):
         build_method = self.build_methods[self.build_method]
         artifact_id = artifact.get(ArtifactKeys.ID.value, EMPTY_STRING)
         content = artifact[ArtifactKeys.CONTENT]
-        artifact = build_method(artifact_id=artifact_id, artifact_body=content, include_id=self.include_id)
+        artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
+                                include_id=self.include_id)
         return f"{prompt}{artifact}"
 
     @staticmethod
-    def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:
+    def _build_as_xml(artifact_id: Union[int, str], artifact_body: str, xml_tags: Dict, include_id: bool = True) -> str:
         """
         Formats the artifact as follows:
         <artifact>
@@ -66,15 +72,17 @@ class ArtifactPrompt(Prompt):
         :param include_id: If True, includes the id of the artifact
         :return: The formatted prompt
         """
-        formatted_id = PromptUtil.create_xml(tag_name="id", tag_content=artifact_id)
-        formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body)
+        outer_tag = list(xml_tags.keys())[0]
+        id_tag, body_tag = xml_tags[outer_tag]
+        formatted_id = PromptUtil.create_xml(tag_name=id_tag, tag_content=artifact_id)
+        formatted_content = PromptUtil.create_xml(tag_name=body_tag, tag_content=artifact_body)
         content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
-        formatted_artifact = PromptUtil.create_xml(tag_name="artifact",
+        formatted_artifact = PromptUtil.create_xml(tag_name=outer_tag,
                                                    tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
 
     @staticmethod
-    def _build_as_base(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True) -> str:
+    def _build_as_base(artifact_id: Union[int, str], artifact_body: str, include_id: bool = True, **kwargs) -> str:
         """
         Formats the artifact as follows: [ID]: [BODY] if include id else just [BODY]
         :param artifact_id: The id of the artifact

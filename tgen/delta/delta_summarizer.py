@@ -4,6 +4,7 @@ import uuid
 from tgen.common.util.file_util import FileUtil
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
+from tgen.delta.steps.complete_change_summary_step import CompleteChangeSummaryStep
 from tgen.delta.steps.individual_diff_summary_step import IndividualDiffSummaryStep
 from tgen.delta.steps.project_summary_step import ProjectSummaryStep
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
@@ -14,7 +15,8 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
     Responsible for generating summaries of PR changes
     """
     steps = [ProjectSummaryStep,
-             IndividualDiffSummaryStep]
+             IndividualDiffSummaryStep,
+             CompleteChangeSummaryStep]
 
     def __init__(self, args: DeltaArgs):
         """

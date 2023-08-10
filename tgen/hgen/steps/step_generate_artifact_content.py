@@ -84,9 +84,9 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         question_id = instructions_prompt.response_manager.response_tag
         questions = questionnaire_content[question_id][0]
         question_prompts = [QuestionPrompt(question) for i, question in enumerate(questions)]
-        artifact_description_tag = format_questionnaire.question_prompts[0].response_manager.response_tag
+        artifact_description_tag = format_questionnaire.get_response_tags_for_question(0)
         artifact_description = questionnaire_content[artifact_description_tag][0]
-        format_of_artifacts = questionnaire_content[format_questionnaire.question_prompts[-1].response_manager.response_tag][0]
+        format_of_artifacts = questionnaire_content[format_questionnaire.get_response_tags_for_question(-1)][0]
         response_manager = PromptResponseManager(response_tag="summary")
         questionnaire_prompt = QuestionnairePrompt(question_prompts=question_prompts,
                                                    enumeration_chars=["-"],

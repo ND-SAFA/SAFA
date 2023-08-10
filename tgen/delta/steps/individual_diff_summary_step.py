@@ -19,6 +19,8 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     LAYER_ID = "diff"
+    CHANGE_TYPE_TO_QUESTION_PROMPT = {ChangeType.ADDED: SupportedPrompts.DELTA_NEW_FILE,
+                                      ChangeType.DELETED: SupportedPrompts.DELTA_REMOVED_FILE}
 
     def _run(self, args: DeltaArgs, state: DeltaState) -> None:
         """
@@ -28,15 +30,28 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :return: None
         """
         logger.log_with_title("STEP 2 - Generating DIFF Summaries")
-        modified_diffs = args.change_type_to_diffs[ChangeType.MODIFIED]
-        ids = list(modified_diffs.keys())
-        artifacts_df = self._create_artifacts_df_from_diff(args, modified_diffs, ids)
-        output = get_prediction_output(args, artifacts_df, state, prompts=[SupportedPrompts.DIFF_SUMMARY_STARTER.value,
-                                                                           ArtifactPrompt(include_id=False),
-                                                                           SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value])
-        state.diff_summaries = self._parse_output(ids, output)
 
-    def _create_artifacts_df_from_diff(self, args: DeltaArgs, modified_diffs: Dict[str, str], ids: List[str]) -> ArtifactDataFrame:
+        state.diff_summaries = {}
+        for change_type in [ChangeType.MODIFIED, ChangeType.ADDED, ChangeType.DELETED]:
+            diffs = args.change_type_to_diffs[change_type]
+            if len(diffs) < 1:
+                continue
+            logger.info(f"Getting diff summaries for {change_type.value} files.")
+            ids = list(diffs.keys())
+            artifacts_df = self._create_artifacts_df_from_diff(args, diffs, ids, include_original=change_type == ChangeType.MODIFIED)
+            questionnaire: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value
+            if change_type in self.CHANGE_TYPE_TO_QUESTION_PROMPT:
+                questionnaire.question_prompts = [self.CHANGE_TYPE_TO_QUESTION_PROMPT[change_type].value] \
+                                                 + questionnaire.question_prompts[-2:]
+            output = get_prediction_output(args, artifacts_df, state, prompts=[SupportedPrompts.DIFF_SUMMARY_STARTER.value,
+                                                                               ArtifactPrompt(include_id=False),
+                                                                               questionnaire])
+
+            state.diff_summaries.update(self._parse_output(ids, output, questionnaire))
+            state.save(self.get_step_name())
+
+    def _create_artifacts_df_from_diff(self, args: DeltaArgs, modified_diffs: Dict[str, str], ids: List[str],
+                                       include_original: bool = True) -> ArtifactDataFrame:
         """
         Creates a dataset from the file diffs
         :param args: The arguments for the delta summarizer
@@ -44,24 +59,30 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param ids: The filename ids
         :return: The artifacts df created from the file diffs
         """
-        original_artifacts = args.dataset.artifact_df
-        content = [SupportedPrompts.DELTA_CHANGED_FILE.value.format_value(
-            self._get_parent_artifact_content(a_id, args.dataset),
-            original_artifacts.get_artifact(a_id)[ArtifactKeys.CONTENT], modified_diffs[a_id]) for a_id in ids]
+        contents = []
+        for a_id in ids:
+            content = []
+            parent = self._get_parent_artifact_content(a_id, args.dataset)
+            if parent:
+                content.extend(parent)
+            if include_original:
+                original = args.dataset.artifact_df.get_artifact(a_id)[ArtifactKeys.CONTENT]
+                content.extend([PromptUtil.format_as_markdown_header('ORIGINAL CODE FILE:'), original])
+            content.extend([PromptUtil.format_as_markdown_header('DIFF FOR CODE:'), modified_diffs[a_id]])
+            contents.append(f'{NEW_LINE}{NEW_LINE.join(content)}{NEW_LINE}')
         artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ids,
-                                         ArtifactKeys.CONTENT: content,
+                                         ArtifactKeys.CONTENT: contents,
                                          ArtifactKeys.LAYER_ID: [self.LAYER_ID for _ in ids]})
         return artifact_df
 
     @staticmethod
-    def _parse_output(ids, output) -> Dict[str, Dict[str, str]]:
+    def _parse_output(ids: List[str], output: List[Dict], questionnaire: QuestionnairePrompt) -> Dict[str, Dict[str, str]]:
         """
         Parses the output to create dictionary mapping the filename to the diff summaries/related
         :param ids: The list of filenames
         :param output: The output from the model
         :return: A dictionary mapping the filename to the diff summaries/related
         """
-        questionnaire: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value
         assert len(output) == len(ids), "Missing predictions."
         results = {}
         for pred, filename in zip(output, ids):
@@ -73,7 +94,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                 if not category_res.lower().startswith("no"):
                     results[filename][category.value] = category_res
             for i in range(1, 3):
-                tag = questionnaire.question_prompts[-i].response_manager.response_tag
+                tag = questionnaire.get_response_tags_for_question(-i)
                 results[filename][tag] = res[tag]
         return results
 

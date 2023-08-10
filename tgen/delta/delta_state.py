@@ -15,13 +15,20 @@ from tgen.state.state import State
 class DeltaState(State):
     export_dir: str = None  # The path to save the state to
 
+    # ------- STEP 1 ----------
     project_summary: str = None  # The summary of the project
 
+    # ------- STEP 2 ----------
     diff_summaries: Dict = None  # maps filename to the results of the diff summary
 
+    # ------- STEP 3 ----------
     change_summary_output: Dict = None  # output from model, includes the grouping of changes and summaries
+    overview_section: List[str] = None  # list of each part of the overview section
+    change_details_section: List[str] = None  # list of each part of the change details section
 
-    change_summary: str = None # Markdown version of the change summary
+    # ------- STEP 4 ----------
+    impact: str = None  # summary of the impact of the changes on the system
+    final_summary: str = None  # Markdown version of the final change summary
 
     def on_step_complete(self, step_name: str) -> None:
         """
@@ -45,7 +52,7 @@ class DeltaState(State):
         for step in steps:
             path = os.path.join(load_dir, DeltaState._get_filename(step.__name__))
             if os.path.exists(path):
-                attrs = FileUtil.read_yaml(path)
+                attrs = {attr: val for attr, val in FileUtil.read_yaml(path).items() if val is not None}
                 logger.info(f"Loaded previous state from {path}")
                 return DeltaState(**attrs)
         logger.warning(f"No previous state was found at {load_dir}. Creating new state.")

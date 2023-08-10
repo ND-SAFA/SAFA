@@ -4,7 +4,8 @@ import uuid
 from tgen.common.util.file_util import FileUtil
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
-from tgen.delta.steps.complete_change_summary_step import CompleteChangeSummaryStep
+from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryStep
+from tgen.delta.steps.impact_analysis_step import ImpactAnalysisStep
 from tgen.delta.steps.individual_diff_summary_step import IndividualDiffSummaryStep
 from tgen.delta.steps.project_summary_step import ProjectSummaryStep
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
@@ -16,7 +17,8 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
     """
     steps = [ProjectSummaryStep,
              IndividualDiffSummaryStep,
-             CompleteChangeSummaryStep]
+             OverviewChangeSummaryStep,
+             ImpactAnalysisStep]
 
     def __init__(self, args: DeltaArgs):
         """
@@ -34,10 +36,10 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
             return DeltaState.load_latest(self.args.load_dir, self.steps)
         return DeltaState()
 
-    def run(self) -> None:
+    def run(self) -> str:
         """
         Runs the delta summarizer to create a summary of the changes in a PR
-        :return: None
+        :return: The summary of the changes
         """
         if not self.state.export_dir:
             export_path = os.path.join(self.args.export_dir, str(uuid.uuid4())) if self.args.export_dir else None
@@ -45,3 +47,4 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
             self.state.export_dir = export_path
 
         super().run()
+        return self.state.final_summary

@@ -57,7 +57,7 @@ class RefineArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
                                                                     artifact_generations=generated_artifact_content,
                                                                     target_layer_id=hgen_args.target_type,
                                                                     generate_names=False)
-            generated_artifacts_tag: str = questionnaire.question_prompts[-1].response_manager.response_tag
+            generated_artifacts_tag: str = questionnaire.get_response_tags_for_question(-1)
             refined_artifact_content = get_predictions(prompt_builder,
                                                        PromptDataset(artifact_df=artifacts),
                                                        hgen_args=hgen_args,

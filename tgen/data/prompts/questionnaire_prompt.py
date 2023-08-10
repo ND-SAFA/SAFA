@@ -33,6 +33,17 @@ class QuestionnairePrompt(Prompt):
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
         super().__init__(instructions, response_manager=response_manager)
 
+    def get_response_tags_for_question(self, question_index: int) -> Union[str, List[str]]:
+        """
+        Gets the response tags for a given question number
+        :param question_index: The index of the question
+        :return: The response tag ids
+        """
+        tag_ids = self.question_prompts[question_index].response_manager.get_all_tag_ids()
+        if len(tag_ids) == 1:
+            return tag_ids[0]
+        return tag_ids
+
     @overrides(Prompt)
     def format_value(self, *args: object, **kwargs: object) -> None:
         """

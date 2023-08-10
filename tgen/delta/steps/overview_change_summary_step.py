@@ -15,11 +15,14 @@ from tgen.delta.delta_state import DeltaState
 from tgen.delta.delta_util import get_prediction_output
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
+from collections import OrderedDict
 
-class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
+
+class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     LAYER_ID = "diff"
     ARTIFACT_CONTENT = "{}" + NEW_LINE + "{}"
     UNKNOWN_CHANGE_TYPE_KEY = "other"
+    IMPACT_TAG_ID: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value.get_response_tags_for_question(-1)
 
     def _run(self, args: DeltaArgs, state: DeltaState) -> None:
         """
@@ -31,37 +34,35 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         logger.log_with_title("STEP 3 - Generating Complete Change Summary")
         artifacts_df = self._create_diff_artifacts_df(state)
         task_prompt: QuestionnairePrompt = SupportedPrompts.DELTA_CHANGE_SUMMARY_QUESTIONNAIRE.value
-        if not state.change_summary_output:
-            output = self._get_output(args, state, artifacts_df, task_prompt)
-            state.change_summary_output = output
+
+        output = self._get_output(args, state, artifacts_df, task_prompt)
+        state.change_summary_output = output
 
         low_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 1)
-        high_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 2)
-        summary = [PromptUtil.format_as_markdown_header("Overview"), low_level_summary,
-                   PromptUtil.format_as_markdown_header("User-level Summary"), high_level_summary,
-                   PromptUtil.format_as_markdown_header("Change Details")]
+        user_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 2)
+        state.overview_section = [PromptUtil.format_as_markdown_header("Overview"), low_level_summary,
+                                  PromptUtil.format_as_markdown_header("User-level Summary"), user_level_summary]
 
         change_types = self._create_change_type_mapping(state.change_summary_output, task_prompt)
-        self._add_change_details_to_summary(change_types, summary)
-
-        state.change_summary = NEW_LINE.join(summary)
+        state.change_details_section = self._create_change_details_section(change_types)
 
     @staticmethod
-    def _add_change_details_to_summary(change_types: Dict[str, Dict[str, List]], summary: List[str]) -> None:
+    def _create_change_details_section(change_types: Dict[str, Dict[str, List]]) -> List[str]:
         """
         Add the change details section to the summary
         :param change_types: The dictionary containing changes for each change type
-        :param summary: The list containing the summary thus far
-        :return: None
+        :return: The list of all parts of the change details summary
         """
+        change_details = [PromptUtil.format_as_markdown_header("Change Details")]
         for change_type, changes in change_types.items():
             if len(changes) < 1:
                 continue
-            summary.append(PromptUtil.format_as_markdown_header(change_type.title(), level=2))
+            change_details.append(PromptUtil.format_as_markdown_header(change_type.title(), level=2))
             for change, filenames in changes.items():
-                summary.append(PromptUtil.format_as_bullet_point(change))
+                change_details.append(PromptUtil.format_as_bullet_point(change))
                 for filename in filenames:
-                    summary.append(PromptUtil.format_as_bullet_point(filename, level=2))
+                    change_details.append(PromptUtil.format_as_bullet_point(filename, level=2))
+        return change_details
 
     def _create_change_type_mapping(self, change_summary_output: Dict, task_prompt: QuestionnairePrompt) -> Dict[str, Dict[str, List]]:
         """
@@ -70,16 +71,16 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param task_prompt: The prompt used to create the output
         :return: A dictionary mapping change type to the associated changes which are mapped to the affected filenames
         """
-        group_tag, filenames_tag, change_tag, type_tag = task_prompt.question_prompts[0].response_manager.get_all_tag_ids()
+        group_tag, filenames_tag, change_tag, type_tag = task_prompt.get_response_tags_for_question(0)
         groups = change_summary_output[group_tag]
-        change_types = {ct.value.lower(): {} for ct in ChangeType.get_granular_change_type_categories()}
-        change_types[self.UNKNOWN_CHANGE_TYPE_KEY] = {}
-        for filenames, change, change_type in zip(groups[filenames_tag], groups[change_tag], groups[type_tag]):
-            key = self._match_change_type(change_type, change_types)
-            change_types[key][change] = filenames
-        return change_types
+        change_type_mapping = OrderedDict({ct.value.lower(): {} for ct in ChangeType.get_granular_change_type_categories()})
+        change_type_mapping[self.UNKNOWN_CHANGE_TYPE_KEY] = {}
+        for filenames, change, types in zip(groups[filenames_tag], groups[change_tag], groups[type_tag]):
+            key = self._match_change_type(types, change_type_mapping)
+            change_type_mapping[key][change.strip(NEW_LINE)] = filenames
+        return change_type_mapping
 
-    def _create_diff_artifacts_df(self, state: DeltaState) -> ArtifactDataFrame:
+    def _create_diff_artifacts_df(self, state: DeltaState, include_impact: bool = False) -> ArtifactDataFrame:
         """
         Creates a dataframe of artifacts representing the diff summary for each changed file
         :param state: The current state of the delta summarizer
@@ -89,7 +90,7 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         for filenames, diff_info in state.diff_summaries.items():
             content = NEW_LINE + \
                       EMPTY_STRING.join([self.ARTIFACT_CONTENT.format(name.upper(), val) for name, val in diff_info.items()
-                                         if name != "impact"])
+                                         if (name != self.IMPACT_TAG_ID or include_impact)])
             DataFrameUtil.append(artifacts, EnumDict({ArtifactKeys.ID: filenames,
                                                       ArtifactKeys.CONTENT: content,
                                                       ArtifactKeys.LAYER_ID: self.LAYER_ID}))
@@ -112,7 +113,7 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                    MultiArtifactPrompt(
                        prompt_prefix=PromptUtil.format_as_markdown_header("CHANGES:"),
                        build_method=MultiArtifactPrompt.BuildMethod.XML,
-                       xml_tags={"change": ["filename", "description"]}),
+                       xml_tags={"file-change": ["filename", "description"]}),
                    task_prompt
                    ]
         output = get_prediction_output(args, artifacts_df, state, categories=categories,
@@ -120,20 +121,18 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         return output[0][task_prompt.id]
 
     @staticmethod
-    def _match_change_type(change_type, change_types) -> str:
+    def _match_change_type(types, change_type_mapping) -> str:
         """
         Attempts to match the change type produced by the model with known change types
-        :param change_type: The change type produced by the model
-        :param change_types: A dictionary with all change_types
+        :param types: The change type produced by the model
+        :param change_type_mapping: A dictionary with all change_types
         :return: The matched change type if successful otherwise "other"
         """
-        if change_type.lower() not in change_types:
-            as_list = [ct.lower().strip() for ct in change_type.split(COMMA) if ct]
-            if len(as_list) > 1:
-                return CompleteChangeSummaryStep._match_change_type(as_list[0], change_types)
-            return CompleteChangeSummaryStep.UNKNOWN_CHANGE_TYPE_KEY
+        change_type = types[0].lower()
+        if change_type not in change_type_mapping:
+            return OverviewChangeSummaryStep.UNKNOWN_CHANGE_TYPE_KEY
         else:
-            return change_type.lower()
+            return change_type
 
     @staticmethod
     def _get_summary_from_output(change_summary_output: Dict, task_prompt: QuestionnairePrompt, prompt_num: int) -> str:
@@ -144,5 +143,5 @@ class CompleteChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param prompt_num: The number of the prompt that produced the summary
         :return: The summary
         """
-        tag = task_prompt.question_prompts[prompt_num].response_manager.response_tag
+        tag = task_prompt.get_response_tags_for_question(prompt_num)
         return change_summary_output[tag][0]

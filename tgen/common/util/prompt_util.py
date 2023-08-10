@@ -36,7 +36,7 @@ class PromptUtil:
         :param level: The level of the bullet point
         :return: The string formatted as markdown
         """
-        bullets = ['-', '+', '*']
+        bullets = ['*', '-', '+']
         level -= 1
         return f"{TAB * level}{bullets[level % 3]} {original_string}"
 

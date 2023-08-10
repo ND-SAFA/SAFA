@@ -110,7 +110,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         for res in global_responses:
             if res and res.get("exception", EMPTY_STRING):
                 raise Exception(res["exception"])
-        return [res for res in global_responses if res is not None]
+        responses = [res for res in global_responses if res is not None]
+        return responses
 
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
         SupportedLLMResponses]:

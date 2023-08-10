@@ -75,7 +75,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             choices[index] = res.choices
 
         ThreadUtil.multi_thread_process("Making completion requests",
-                                        enumerate(prompts),
+                                        list(enumerate(prompts)),
                                         perform_work,
                                         n_threads=1,
                                         max_attempts=3)

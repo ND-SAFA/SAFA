@@ -123,18 +123,6 @@ export function versionToString(currentVersion?: VersionSchema): string {
 }
 
 /**
- * Determines if the given artifact name is a code artifact.
- * @param name - The artifact name to check.
- * @return True if the artifact is a code artifact.
- */
-export function isCodeArtifact(name: string): boolean {
-  const codeFileRegex =
-    /\.(js|jsx|ts|tsx|vue|java|py|cpp|c|h|CMakeLists\.txt|php|html|css|sass|scss|json|yaml|yml|go|glsl)$/i;
-
-  return codeFileRegex.test(name);
-}
-
-/**
  * Sanitizes the id of a node so it is valid in the DOM.
  * @param id - The artifact id.
  * @return The sanitized artifact id.

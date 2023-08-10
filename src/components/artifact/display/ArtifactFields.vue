@@ -47,7 +47,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { isCodeArtifact } from "@/util";
 import { selectionStore } from "@/hooks";
 import {
   Typography,
@@ -63,11 +62,9 @@ const artifact = computed(() => selectionStore.selectedArtifact);
 const name = computed(() => artifact.value?.name || "");
 const type = computed(() => artifact.value?.type || "");
 const body = computed(() => artifact.value?.body.trim() || "");
-const variant = computed(() =>
-  isCodeArtifact(artifact.value?.name || "") ? "code" : "expandable"
-);
+const isCode = computed(() => !!artifact.value?.isCode);
 
-const isCode = computed(() => isCodeArtifact(name.value));
+const variant = computed(() => (isCode.value ? "code" : "expandable"));
 
 const codePath = computed(() =>
   isCode.value ? name.value.split("/").slice(0, -1).join("/") : ""

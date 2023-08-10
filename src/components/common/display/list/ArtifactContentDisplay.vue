@@ -35,7 +35,6 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactSchema } from "@/types";
-import { isCodeArtifact } from "@/util";
 import { ArtifactBodyDisplay, FlexBox, Typography } from "@/components";
 
 const props = defineProps<{
@@ -46,6 +45,5 @@ const props = defineProps<{
 }>();
 
 const showSummary = computed(() => !!props.artifact.summary);
-
-const isCode = computed(() => isCodeArtifact(props.artifact.name));
+const isCode = computed(() => props.artifact.isCode);
 </script>

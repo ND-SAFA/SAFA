@@ -48,7 +48,6 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
-import { isCodeArtifact } from "@/util";
 import { timStore } from "@/hooks";
 import { FlexBox, Typography } from "../content";
 import { AttributeChip } from "../chip";
@@ -64,8 +63,9 @@ const emit = defineEmits<{
 }>();
 
 const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
+const showSummary = computed(() => !!props.artifact?.summary);
+const isCode = computed(() => props.artifact.isCode);
 
-const isCode = computed(() => isCodeArtifact(props.artifact.name));
 const codePath = computed(() =>
   isCode.value
     ? props.artifact.name.split("/").slice(0, -1).join("/")
@@ -78,9 +78,5 @@ const displayName = computed(
     props.artifact.name
 );
 
-const bodyVariant = computed(() =>
-  isCodeArtifact(props.artifact?.name || "") ? "code" : "expandable"
-);
-
-const showSummary = computed(() => !!props.artifact?.summary);
+const bodyVariant = computed(() => (isCode.value ? "code" : "expandable"));
 </script>

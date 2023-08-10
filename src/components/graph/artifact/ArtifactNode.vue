@@ -124,7 +124,7 @@ import {
   GraphElementType,
   GraphMode,
 } from "@/types";
-import { getEnumColor, isCodeArtifact } from "@/util";
+import { getEnumColor } from "@/util";
 import {
   useTheme,
   deltaStore,
@@ -175,8 +175,7 @@ const style = computed(
 
 const displayName = computed(
   () =>
-    (isCodeArtifact(props.artifact.name) &&
-      props.artifact.name.split("/").pop()) ||
+    (props.artifact.isCode && props.artifact.name.split("/").pop()) ||
     props.artifact.name
 );
 

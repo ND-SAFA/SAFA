@@ -18,7 +18,7 @@ class RankingUtil:
     """
 
     @staticmethod
-    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]]) -> List[TracePredictionEntry]:
+    def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[TracePredictionEntry]:
         """
         Converts ranking to prediction entries.
         :param parent2rankings: Mapping of parent name to ranked children.
@@ -26,15 +26,21 @@ class RankingUtil:
         """
         predicted_entries = []
         for parent_id, ranked_children in parent2rankings.items():
-            explanations = parent2explanations[parent_id]
-            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, explanations=explanations)
+            if isinstance(ranked_children, tuple):
+                ranked_children, children_scores = ranked_children
+            else:
+                children_scores = RankingUtil.assign_scores_to_targets(len(ranked_children))
+
+            explanations = parent2explanations[parent_id] if parent2explanations else None
+            target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, scores=children_scores,
+                                                                              explanations=explanations)
             predicted_entries.extend(target_predicted_entries)
         return predicted_entries
 
     @staticmethod
     def create_ranking_predictions(parent_id: str, ranked_children_ids: List[str],
-                                   original_entries: List[TracePredictionEntry] = None, explanations: List[str] = None,
-                                   min_score: float = DEFAULT_MIN_RANKING_SCORE) -> List[TracePredictionEntry]:
+                                   scores: List[float] = None, original_entries: List[TracePredictionEntry] = None,
+                                   explanations: List[str] = None) -> List[TracePredictionEntry]:
         """
         Creates ranking predictions by assigning scores to ranking in linear fashion.
         :param parent_id: The parent artifact id.
@@ -44,7 +50,6 @@ class RankingUtil:
         :return:
         """
         children2label = {entry["source"]: entry["label"] for entry in original_entries} if original_entries else {}
-        scores = RankingUtil.assign_scores_to_targets(len(ranked_children_ids), min_score=min_score)
         predicted_entries = []
         for i in range(len(ranked_children_ids)):
             child_id = ranked_children_ids[i]
@@ -62,7 +67,7 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def assign_scores_to_targets(n_items: int, min_score=0.5) -> List[float]:
+    def assign_scores_to_targets(n_items: int, min_score=DEFAULT_MIN_RANKING_SCORE) -> List[float]:
         """
         Assigns scores to ranked targets from 1 to min score incrementing linearly.
         :param n_items: The number of items to assign scores for.
@@ -127,10 +132,19 @@ class RankingUtil:
             if top_n is not None:
                 selected_entries = sorted_entries[:top_n]
             else:
-                selected_entries = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= parent_threshold]
-                top_parent = sorted_entries[0]
-                if len(selected_entries) == 0:
-                    selected_entries.append(top_parent)
+                selected_entries = []
+                t1_preds, t2_preds, t3_preds = [], [], []
+
+                t1_preds = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.8]
+                t2_preds = [s for s in sorted_entries if 0.7 <= s[StructuredKeys.SCORE] < 0.8]
+                t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
+                if len(t1_preds) > 0:
+                    selected_entries = t1_preds
+                elif len(t2_preds):
+                    selected_entries = t2_preds
+                else:
+                    selected_entries = t3_preds
+
             predictions.extend(selected_entries)
 
         if top_n:

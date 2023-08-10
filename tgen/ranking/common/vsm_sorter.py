@@ -1,5 +1,10 @@
 from typing import Callable, Dict, List
 
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+from tqdm import tqdm
+
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -13,8 +18,10 @@ from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 GenericSorter = Callable[
     [List[str], List[str], Dict], Dict[str, str]]  # source names, target names, artifact map -> sorted target names
 
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-roberta-large-v1"
 
-def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str]) -> Dict[str, str]:
+
+def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str]) -> Dict[str, List[str]]:
     """
     Ranks children artifacts from most to least similar to the parent.
     :param parent_ids: The parent ids.
@@ -51,6 +58,34 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
     return sorted_targets
 
 
+def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str],
+                     model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False) -> Dict[str, str]:
+    model = SentenceTransformer(model_name)
+    cache = {}
+
+    def encode(artifact_id: str):
+        if artifact_id not in cache:
+            a_body = artifact_map[artifact_id]
+            a_embedding = model.encode([a_body])[0]
+            cache[artifact_id] = a_embedding
+        return cache[artifact_id]
+
+    children_embeddings = [encode(a_id) for a_id in tqdm(child_ids, "Creating children embeddings")]
+
+    parent2rankings = {}
+    for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):
+        parent_embedding = encode(parent_id)
+        similarity_scores = cosine_similarity([parent_embedding], children_embeddings)[0]
+        scores = ListUtil.get_percentiles(similarity_scores)
+        sorted_artifact_ids = [a for s, a in sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])]
+        if return_scores:
+            parent2rankings[parent_id] = (sorted_artifact_ids, scores)
+        else:
+            parent2rankings[parent_id] = sorted_artifact_ids
+    return parent2rankings
+
+
 registered_sorters: Dict[str, GenericSorter] = {
-    "vsm": vsm_sorter
+    "vsm": vsm_sorter,
+    "embedding": embedding_sorter
 }

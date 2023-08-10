@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List, Sized, Tuple
+from typing import Callable, List, Sized, Tuple, Type
 from unittest import TestCase
 
 import mock
@@ -136,3 +136,15 @@ class BaseTest(TestCase):
         layer_ids = [1 for i in range(n_artifacts)]
         return ArtifactDataFrame(
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
+
+    def assert_error(self, callable: Callable, exception_type: Type[Exception], sub_msg: str):
+        """
+        Expects that callable throws error containing sub-message.
+        :param callable: The callable to throw the error.
+        :param exception_type: The exception type.
+        :param sub_msg: The message to expect to find the exception.
+        :return: None
+        """
+        with self.assertRaises(exception_type) as e:
+            callable()
+        self.assertIn(sub_msg, e.exception.args[0])

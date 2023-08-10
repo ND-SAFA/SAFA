@@ -17,7 +17,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.testprojects.mocking.test_response_manager import TestResponseManager
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestSummarizer(BaseTest):
@@ -29,7 +29,7 @@ class TestSummarizer(BaseTest):
     MAX_COMPLETION_TOKENS = 500
 
     @mock_openai
-    def test_summarize_chunks(self, response_manager: TestResponseManager):
+    def test_summarize_chunks(self, response_manager: TestAIManager):
         """
         Tests ability to summarize multiple chunks and combine them.
         - Verifies that each chunk is summarized.
@@ -44,7 +44,7 @@ class TestSummarizer(BaseTest):
         self.assertEqual(summary, expected_summary)
 
     @mock_openai
-    def test_summarize(self, response_manager: TestResponseManager):
+    def test_summarize(self, response_manager: TestAIManager):
         """
         Tests ability to summarize single artifacts.
         - Verifies that code is chunked according to model token limit via data manager.
@@ -58,14 +58,14 @@ class TestSummarizer(BaseTest):
         self.assertEqual(content_summary, CODE_SUMMARY)
 
     @mock_openai(test_expected_responses=False)
-    def test_code_or_exceeds_limit_true(self, response_manager: TestResponseManager):
+    def test_code_or_exceeds_limit_true(self, response_manager: TestAIManager):
         short_text = "This is a short text under the token limit"
         summarizer = self.get_summarizer(code_or_exceeds_limit_only=True, max_completion_tokens=500)
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
 
     @mock_openai
-    def test_code_summarization(self, response_manager: TestResponseManager):
+    def test_code_summarization(self, response_manager: TestAIManager):
         max_completion_tokens = 500
 
         # Calculated expected chunks + summary
@@ -86,7 +86,7 @@ class TestSummarizer(BaseTest):
             self.assertEqual(line_a, line_b, msg=f"Line: {i}")
 
     @mock_openai
-    def test_summarize_bulk(self, response_manager: TestResponseManager):
+    def test_summarize_bulk(self, response_manager: TestAIManager):
         """
         Tests ability to summarize in bulk while still using chunkers.
         - Verifies that content under limit is not summarized
@@ -114,7 +114,7 @@ class TestSummarizer(BaseTest):
         self.assertEqual(PL_SUMMARY, summaries[1])
 
     @mock_openai
-    def test_summarize_bulk_code_or_exceeds_limit_only(self, response_manager: TestResponseManager):
+    def test_summarize_bulk_code_or_exceeds_limit_only(self, response_manager: TestAIManager):
         """
         Tests bulk summaries with code or exceeds limit only.
         - Verifies that only content over limit is summarized.

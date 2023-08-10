@@ -1,3 +1,6 @@
+import os.path
+
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 from tgen.ranking.ranking_args import RankingArgs
@@ -16,7 +19,9 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the pipeline.
         :return: None
         """
-        if args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
+        if args.project_summary_path is not None:
+            summary = FileUtil.read_file(os.path.expanduser(args.project_summary_path))
+        elif args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
             logger.info("Project summary included in original request.")
             summary = args.project_summary
         elif not args.generate_summary:  # NO SUMMARY

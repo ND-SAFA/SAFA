@@ -7,8 +7,10 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
     DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG
+from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 CURRENT_PROJECT = os.environ["CURRENT_PROJECT"]
@@ -16,27 +18,30 @@ save_output = os.environ.get("SAVE_OUTPUT", False)
 use_summary = os.environ.get("USE_SUMMARY", False)
 
 EXPORT_DIR = f"~/desktop/hgen/checkpoints/{CURRENT_PROJECT}" if save_output else None
-SUMMARY_PATH = f"~/desktop/hgen/summaries/project/{CURRENT_PROJECT}.txt" if use_summary else None
 
 
 @dataclass
 class RankingArgs(PipelineArgs):
     """
-    Maps artifact ids to content.
+    The data-frame containing all the project aritfacts.
     """
-    artifact_map: Dict
+    artifact_df: ArtifactDataFrame
     """
     List of parent artifact ids.
     """
     parent_ids: List[str]
     """
-    Path to export various checkpoints
-    """
-    export_dir: str = EXPORT_DIR
-    """
     Optional.List of children ids to compare to each parent.
     """
-    children_ids: Optional[List[str]] = None
+    children_ids: Optional[List[str]]
+    """
+    Path to export various checkpoints
+    """
+    export_dir: str = None
+    """
+    Maps artifact ids to content.
+    """
+    artifact_map: Dict = None
     """
     Maps parent ids to their children ids.
     """
@@ -72,11 +77,15 @@ class RankingArgs(PipelineArgs):
     """
     The path to load a project summary from
     """
-    project_summary_path: str = SUMMARY_PATH
+    project_summary_path: str = None
     """
     The model used to rank
     """
-    model: str = DEFAULT_RANKING_MODEL
+    ranking_llm_model: str = DEFAULT_RANKING_MODEL
+    """
+    The model whose embeddings are used to rank children.
+    """
+    embedding_model: str = DEFAULT_EMBEDDING_MODEL
     """
     The threshold to establish primary parents from.
     """
@@ -128,3 +137,10 @@ class RankingArgs(PipelineArgs):
         path = os.path.join(self.export_dir, file_name)
         path = os.path.expanduser(path)
         return path
+
+    def __post_init__(self) -> None:
+        """
+        Creates the necessary data structures for operation.
+        :return: None
+        """
+        self.artifact_map = self.artifact_df.to_map()

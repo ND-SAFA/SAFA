@@ -84,3 +84,20 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                               content=artifact_row[StructuredKeys.Artifact.CONTENT])
                      for artifact_id, artifact_row in self.itertuples()]
         return artifacts
+
+    def get_body(self, artifact_id: str) -> str:
+        """
+        Retrieves the body of the artifact with given ID.
+        :param artifact_id: The ID of the artifact.
+        :return: The content of the artifact.
+        """
+        return self.loc[artifact_id][ArtifactKeys.CONTENT.value]
+
+    def set_body(self, artifact_id: str, new_body: str) -> None:
+        """
+        Sets the body of the artifact with given ID.
+        :param artifact_id: The id of the artifact.
+        :param new_body: The body to update the artifact with.
+        :return: None 
+        """
+        self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body

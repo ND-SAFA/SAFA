@@ -4,7 +4,7 @@ from typing import Dict, List
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
-from tgen.ranking.steps.sort_children_artifacts import PrepareChildren
+from tgen.ranking.steps.sort_children_step import SortChildren
 from tgen.ranking.steps.step_complete_prompts import CompleteRankingPrompts
 from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
@@ -15,7 +15,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     steps = [
         CreateProjectSummary,
-        PrepareChildren,
+        SortChildren,
         CreateRankingPrompts,
         CompleteRankingPrompts,
         ProcessRankingResponses]

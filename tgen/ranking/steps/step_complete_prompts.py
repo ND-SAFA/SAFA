@@ -37,8 +37,8 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: None
         """
         kwargs = {}
-        if args.model:
-            kwargs["model"] = args.model
+        if args.ranking_llm_model:
+            kwargs["model"] = args.ranking_llm_model
         batch_response = complete_prompts(state.ranking_prompts,
                                           temperature=0,
                                           max_tokens=args.n_completion_tokens,

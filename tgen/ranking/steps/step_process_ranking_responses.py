@@ -24,30 +24,32 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
     def process_ranking_prompts(args: RankingArgs, state: RankingState) -> None:
         """
         Sets processed prompts in store.
-        :param state: The ranking store.
+        :param args: The arguments of the ranking pipeline.
+        :param state: The state of the ranking pipeline.
         :return: None
         """
-        ranked_children, children_explanations = ProcessRankingResponses.process_ranked_artifacts(args, state)
+        ranked_children, children_explanations = ProcessRankingResponses.process_ranked_artifacts(args.parent_ids,
+                                                                                                  state.ranking_responses.batch_responses,
+                                                                                                  state.sorted_parent2children)
         state.ranked_children = ranked_children
         state.ranked_children_explanations = children_explanations
 
     @staticmethod
-    def process_ranked_artifacts(args: RankingArgs, state: RankingState) -> List[List[str]]:
+    def process_ranked_artifacts(parent_ids: List[str], batch_responses: List[str], sorted_parent2children: Dict[str, List[str]]) -> \
+            List[List[str]]:
         """
         Reads the ranking responses and performs post-processing.
-        :param args: The ranking pipeline configuration.
+        :param parent_ids: The artifact IDs of the parents.
         :param state: The ranking pipeline state.
         :param add_missing: Whether to add missing artifact ids.
         :return: Ranked children for each source.
         """
-        batch_response = state.ranking_responses
-
-        ranked_children_list = [[] for _ in range(len(args.parent_ids))]
-        ranked_children_explanations = [None] * len(args.parent_ids)
-        parent2index: Dict[str, int] = {p: i for i, p in enumerate(args.parent_ids)}
-        for parent_name, prompt_response in zip(args.parent_ids, batch_response.batch_responses):
+        ranked_children_list = [[] for _ in range(len(parent_ids))]
+        ranked_children_explanations = [None] * len(parent_ids)
+        parent2index: Dict[str, int] = {p: i for i, p in enumerate(parent_ids)}
+        for parent_name, prompt_response in zip(parent_ids, batch_responses):
             parent_index = parent2index[parent_name]
-            related_children = state.sorted_parent2children[parent_name]
+            related_children = sorted_parent2children[parent_name]
 
             # Step - Parse and clean
             ID_INDEX = 0
@@ -68,7 +70,8 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                     artifact_explanation = e[EXPLANATION_INDEX]
                     artifact_score = float(e[SCORE_INDEX])
                     parsed_entries.append((artifact_index, artifact_summary, artifact_explanation, artifact_score))
-                except:
+                except Exception as e:
+                    logger.exception(e)
                     logger.info(f"Unable to parse: {e}")
 
             # Step - Translate

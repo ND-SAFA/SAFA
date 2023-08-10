@@ -76,8 +76,12 @@ class ProjectSummaryJob(AbstractJob):
             prompt_builder.with_artifact(target_artifact_name, self.artifact_map[target_artifact_name])
         prompt = prompt_builder.get()
         generation_response = complete_prompts([prompt], max_tokens=self.n_tokens, temperature=0)
-        response = generation_response.batch_responses[0]
-        summary = LLMResponseUtil.parse(response, "summary")[0].strip()
+        summary_response = generation_response.batch_responses[0]
+        summary_tag_query = LLMResponseUtil.parse(summary_response, "summary")
+        if len(summary_tag_query) == 0:
+            summary = summary_response
+        else:
+            summary = summary_tag_query[0].strip()
         if self.export_path:
             FileUtil.write(summary, self.export_path)
         return ProjectSummaryResponse(summary=summary)

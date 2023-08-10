@@ -35,6 +35,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         if self.args.export_dir is not None:
             os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
-        parent2rankings = embedding_sorter(self.args.parent_ids, self.args.children_ids, self.args.artifact_map, return_scores=False)
+        parent2rankings = embedding_sorter(self.args.parent_ids, self.args.children_ids, self.args.artifact_map,
+                                           return_scores=False, model_name=self.args.embedding_model)
         prediction_entries = RankingUtil.ranking_to_predictions(parent2rankings)
         return prediction_entries

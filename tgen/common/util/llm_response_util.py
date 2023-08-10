@@ -27,6 +27,8 @@ class LLMResponseUtil:
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
                 query = soup.find(tag_name)
+                if query is None:  # if no tag is found, return respon
+                    return []
                 content = query.decode_contents()
                 content = [content]
         except (AssertionError, IndexError):

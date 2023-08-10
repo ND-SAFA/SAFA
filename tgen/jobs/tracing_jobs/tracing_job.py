@@ -1,6 +1,5 @@
 from typing import Dict, List, Union
 
-from tgen.common.util.data_structure_util import DataStructureUtil
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -53,7 +52,7 @@ class TracingJob(AbstractJob):
         """
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
         dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
-        artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
+        artifact_map = dataset.artifact_df.to_map()
 
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.TGEN_CLASSIFICATION.value])
         base_tracing_job = LLMJob(trainer_dataset_manager,

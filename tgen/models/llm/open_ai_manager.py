@@ -1,10 +1,11 @@
 from collections import namedtuple
+from typing import Tuple
 
 import openai
 from openai.openai_object import OpenAIObject
 
 from tgen.common.util.logging.logger_manager import logger
-from tgen.common.util.logging.tgen_tqdm import tgen_tqdm
+from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.data.prompts.prompt_args import PromptArgs
@@ -66,10 +67,19 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         prompts = prompt if isinstance(prompt, list) else [prompt]
         choices = []
         logger.info(f"Starting OpenAI batch: {params['model']}")
-        for p in tgen_tqdm(prompts, desc="Making completion requests"):
+
+        def perform_work(payload: Tuple[int, str]):
+            index, p = payload
             params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
             res = openai.ChatCompletion.create(**params)
-            choices.extend(res.choices)
+            choices[index] = res.choices
+
+        ThreadUtil.multi_thread_process("Making completion requests",
+                                        enumerate(prompts),
+                                        perform_work,
+                                        n_threads=1,
+                                        max_attempts=3)
+
         return Res(choices=choices)
 
     @staticmethod

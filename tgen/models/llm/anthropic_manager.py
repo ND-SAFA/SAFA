@@ -13,6 +13,9 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 
+MAX_ATTEMPTS = 3
+SLEEP_TIME = 5
+
 
 class AnthropicResponse(TypedDict):
     """
@@ -87,27 +90,27 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         prompts = params[AnthropicParams.PROMPT]
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
 
-        response = []
+        global_responses = []
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        response = [None] * len(prompts)
+        global_responses = [None] * len(prompts)
 
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            try:
-                prompt_response = AnthropicManager.Client.completion(**prompt_params)
-            except Exception as e:
-                prompt_response = response_with_defaults(exception=str(e))
-            response[index] = prompt_response
+            local_response = AnthropicManager.Client.completion(**prompt_params)
+            global_responses[index] = local_response
 
-        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
+        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
+                                        thread_work,
+                                        n_threads=ANTHROPIC_MAX_THREADS,
+                                        max_attempts=MAX_ATTEMPTS)
 
-        for res in response:
+        for res in global_responses:
             if res and res.get("exception", EMPTY_STRING):
                 raise Exception(res["exception"])
-        return [res for res in response if res is not None]
+        return [res for res in global_responses if res is not None]
 
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
         SupportedLLMResponses]:

@@ -26,7 +26,8 @@ class AbstractCodeChunker(AbstractChunker, ABC):
             logger.warning(f"Unable to parse file {msg_end}")
             return NaturalLanguageChunker(model_name=self.model_name, max_prompt_tokens=self.max_prompt_tokens).chunk(content)
         chunks = self.__chunk_helper(head_node, lines)
-        return [self._get_node_content(chunk, lines) for chunk in chunks]
+        chunk_contents = [self._get_node_content(chunk, lines) for chunk in chunks]
+        return chunk_contents
 
     def __chunk_helper(self, p_node: ChunkedNode, lines: List[str]) -> List[ChunkedNode]:
         """

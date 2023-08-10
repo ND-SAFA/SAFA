@@ -35,7 +35,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactSchema } from "@/types";
-import { ArtifactBodyDisplay, FlexBox, Typography } from "@/components";
+import { FlexBox, Typography } from "@/components/common";
+import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
 const props = defineProps<{
   /**

@@ -49,9 +49,9 @@ export default {
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
 import { timStore } from "@/hooks";
-import { FlexBox, Typography } from "../content";
-import { AttributeChip } from "../chip";
-import ListItem from "./ListItem.vue";
+import { FlexBox, Typography } from "../../common/display/content";
+import { AttributeChip } from "../../common/display/chip";
+import ListItem from "../../common/display/list/ListItem.vue";
 
 const props = defineProps<ArtifactListItemProps>();
 

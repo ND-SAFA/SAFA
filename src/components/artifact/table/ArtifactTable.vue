@@ -123,8 +123,8 @@ import {
   AttributeChip,
   MultiselectInput,
   SelectInput,
-  ArtifactContentDisplay,
 } from "@/components/common";
+import { ArtifactContentDisplay } from "@/components/artifact/display";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 const customCells: (keyof FlatArtifact | string)[] = [

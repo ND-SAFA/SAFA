@@ -100,9 +100,9 @@ import {
   PanelCard,
   TextButton,
   DetailsPanel,
-  ArtifactBodyDisplay,
   Separator,
 } from "@/components/common";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const loading = ref(false);
 

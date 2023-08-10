@@ -119,11 +119,11 @@ import {
   Typography,
   IconButton,
   PanelCard,
-  ArtifactBodyDisplay,
   TextButton,
   List,
   ListItem,
 } from "@/components/common";
+import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
 const displayActions = computed(() =>
   sessionStore.isEditor(projectStore.project)

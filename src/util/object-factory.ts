@@ -134,6 +134,7 @@ export function createArtifact(
     summary: artifact?.summary || "",
     body: artifact?.body || "",
     type: artifact?.type || "",
+    isCode: artifact?.isCode || false,
     documentType: artifact?.documentType || DocumentType.ARTIFACT_TREE,
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,

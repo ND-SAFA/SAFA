@@ -59,6 +59,10 @@ export interface ArtifactSchema {
    */
   type: string;
   /**
+   * Whether the artifact is a code artifact.
+   */
+  isCode: boolean;
+  /**
    * The ids of documents that display this artifact.
    */
   documentIds: string[];

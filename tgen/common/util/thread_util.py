@@ -45,6 +45,8 @@ class ThreadUtil:
                     except Exception as e:
                         logger.exception(e)
                     attempts += 1
+                if attempts >= max_attempts and not successful:
+                    raise ValueError(f"A thread executed {attempts} out of {max_attempts}.")
                 progress_bar.update()
 
         threads = []

@@ -112,14 +112,13 @@ public class GenerationApi implements ITraceGenerationController {
 
     /**
      * Performs a completion request to TGen.
-     * TODO: Add logger.
      *
      * @param request The request containing prompt.
      * @return The completion string.
      */
     public TGenPromptResponse generatePrompt(TGenPromptRequest request) {
         String generatePromptEndpoint = getEndpoint("complete");
-        return this.performJob(generatePromptEndpoint, request, TGenPromptResponse.class, null);
+        return this.safaRequestBuilder.sendPost(generatePromptEndpoint, request, TGenPromptResponse.class);
     }
 
     /**

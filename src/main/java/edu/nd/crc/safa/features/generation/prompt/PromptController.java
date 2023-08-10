@@ -9,7 +9,6 @@ import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.generation.GenerationApi;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,13 +25,12 @@ public class PromptController extends BaseController {
     /**
      * Completes the prompt for given model
      *
-     * @param request            The request payload defining prompt and model.
-     * @param safaRequestBuilder The request builder used for sending prompt requtest to TGEN.
+     * @param request The request payload defining prompt and model.
      * @return The completion.
      */
     @PostMapping(AppRoutes.Prompts.COMPLETE)
-    public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request,
-                                             @Autowired SafaRequestBuilder safaRequestBuilder) {
+    public TGenPromptResponse completePrompt(@RequestBody @Valid TGenPromptRequest request) {
+        SafaRequestBuilder safaRequestBuilder = this.serviceProvider.getSafaRequestBuilder();
         GenerationApi controller = new GenerationApi(safaRequestBuilder);
         return controller.generatePrompt(request);
     }

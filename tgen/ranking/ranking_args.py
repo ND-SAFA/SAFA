@@ -13,12 +13,6 @@ from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_S
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
-CURRENT_PROJECT = os.environ["CURRENT_PROJECT"]
-save_output = os.environ.get("SAVE_OUTPUT", False)
-use_summary = os.environ.get("USE_SUMMARY", False)
-
-EXPORT_DIR = f"~/desktop/hgen/checkpoints/{CURRENT_PROJECT}" if save_output else None
-
 
 @dataclass
 class RankingArgs(PipelineArgs):

@@ -64,12 +64,9 @@ import { computed, ref, watch } from "vue";
 import { ArtifactInput, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts, sortSelectedArtifactsToTop } from "@/util";
 import { artifactStore, useVModel } from "@/hooks";
-import {
-  Typography,
-  ArtifactBodyDisplay,
-  AttributeChip,
-} from "@/components/common/display";
+import { Typography, AttributeChip } from "@/components/common/display";
 import { TypeButtons } from "@/components/common/button";
+import ArtifactBodyDisplay from "@/components/artifact/display/ArtifactBodyDisplay.vue";
 
 const props = defineProps<ArtifactInput>();
 

@@ -206,7 +206,9 @@ export const useTIM = defineStore("tim", {
     getTypeIcon(name: string): string {
       const artifactType = this.getType(name);
 
-      return artifactType?.icon || defaultTypeIcon;
+      return artifactType?.icon.includes("help")
+        ? defaultTypeIcon
+        : artifactType?.icon || defaultTypeIcon;
     },
     /**
      * TODO: update to use node id sanitization function.

@@ -64,6 +64,10 @@
         <artifact-content-display :artifact="row" />
       </template>
 
+      <template #body-cell-name="{ row }">
+        <artifact-name-display :artifact="row" display-tooltip />
+      </template>
+
       <template #body-cell-type="{ row }">
         <attribute-chip :value="row.type" artifact-type />
       </template>
@@ -123,11 +127,15 @@ import {
   AttributeChip,
   MultiselectInput,
   SelectInput,
-  ArtifactContentDisplay,
 } from "@/components/common";
+import {
+  ArtifactContentDisplay,
+  ArtifactNameDisplay,
+} from "@/components/artifact/display";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 const customCells: (keyof FlatArtifact | string)[] = [
+  "name",
   "type",
   "deltaType",
   "actions",

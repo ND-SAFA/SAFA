@@ -56,22 +56,16 @@ $graph-border-radius: 8px;
     cursor: grabbing;
   }
 
-  & > .cy-node-title {
-    max-height: 47px;
+  .cy-node-title {
+    span {
+      max-height: 49px;
+      line-height: 24px !important;
+    }
   }
 
-  & > .cy-node-subtitle {
-    max-height: 71px;
-  }
-
-  & > .cy-node-title, & > .cy-node-subtitle {
-    border-radius: 0px !important;
-    overflow: hidden;
-    text-align: center;
-
-    & > span {
-      text-overflow: ellipsis;
-      line-height: 20px !important;
+  .cy-node-artifact-name {
+    h1 {
+      line-height: 27px !important;
     }
   }
 
@@ -109,22 +103,6 @@ $graph-border-radius: 8px;
       top: 0;
       left: 28%;
     }
-
-    & > .cy-node-delta-chip {
-      position: absolute;
-      bottom: 2px;
-      left: 2px;
-      width: 98%;
-      height: 10px;
-      border-radius: 5px;
-
-      & > .cy-node-delta-child-chip {
-        height: 10px;
-        border-radius: 5px;
-        width: 32.5%;
-        margin-right: 2px;
-      }
-    }
   }
 
   &.cy-node-menu {
@@ -132,6 +110,22 @@ $graph-border-radius: 8px;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  .cy-node-delta-chip {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 98%;
+    height: 10px;
+    border-radius: 5px;
+
+    & > .cy-node-delta-child-chip {
+      height: 10px;
+      border-radius: 5px;
+      width: 32.5%;
+      margin-right: 2px;
+    }
   }
 }
 

@@ -8,9 +8,23 @@
     @mouseup="mouseUpTime = new Date().getTime()"
     @click="handleClick"
   >
-    <div v-if="props.title" class="cy-node-title" data-cy="tree-node-type">
-      <typography variant="subtitle" :value="props.title" bold />
-    </div>
+    <flex-box
+      v-if="props.title"
+      class="cy-node-title"
+      justify="center"
+      align="center"
+      data-cy="tree-node-type"
+    >
+      <icon :id="iconId" size="sm" />
+      <typography
+        variant="subtitle"
+        :value="props.title"
+        bold
+        l="1"
+        align="center"
+        ellipsis
+      />
+    </flex-box>
 
     <separator
       v-if="props.separator"
@@ -44,7 +58,8 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ThemeColor } from "@/types";
-import { Separator, Typography } from "@/components/common";
+import { timStore } from "@/hooks";
+import { Separator, Typography, Icon, FlexBox } from "@/components/common";
 
 const props = defineProps<{
   /**
@@ -110,6 +125,10 @@ const cardStyle = computed(() =>
 );
 const separatorStyle = computed(() =>
   props.color.includes("#") ? `background-color: ${props.color};` : undefined
+);
+
+const iconId = computed(() =>
+  props.title ? timStore.getTypeIcon(props.title) : undefined
 );
 
 /**

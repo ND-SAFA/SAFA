@@ -16,7 +16,7 @@
               data-cy="artifact-table-group-value"
             />
             <attribute-chip
-              v-if="groupDisplayArtifact"
+              v-if="groupDisplayArtifact && groupHeaderType"
               :value="groupHeaderType"
               artifact-type
             />
@@ -52,7 +52,7 @@
     v-else
     :props="props.quasarProps"
     class="cursor-pointer"
-    @click="handleClickRow"
+    @click="emit('click')"
   >
     <q-td
       v-for="(column, idx) in props.columns"
@@ -60,21 +60,23 @@
       :align="idx === 0 ? 'start' : 'end'"
       :class="column.classes"
     >
-      <span @click.stop>
-        <icon-button
-          v-if="idx === 0 && props.expandable"
-          tooltip="Toggle expand"
-          :icon="props.expand ? 'up' : 'down'"
-          class="q-mr-sm"
-          @click="rowExpanded = !rowExpanded"
+      <flex-box align="center">
+        <div @click.stop>
+          <icon-button
+            v-if="idx === 0 && props.expandable"
+            tooltip="Toggle expand"
+            :icon="props.expand ? 'up' : 'down'"
+            class="q-mr-sm"
+            @click="rowExpanded = !rowExpanded"
+          />
+        </div>
+        <slot
+          v-if="!!slots[`body-cell-${column.name}`]"
+          :name="`body-cell-${column.name}`"
+          :row="props.row"
         />
-      </span>
-      <slot
-        v-if="!!slots[`body-cell-${column.name}`]"
-        :name="`body-cell-${column.name}`"
-        :row="props.row"
-      />
-      <typography v-else :value="String(column.field(props.row))" />
+        <typography v-else :value="String(column.field(props.row))" />
+      </flex-box>
     </q-td>
   </q-tr>
   <q-tr v-if="!groupBy" v-show="props.expand" :props="props.quasarProps">
@@ -140,15 +142,4 @@ const groupHeaderDescription = computed(() =>
     ? artifactStore.getArtifactByName(groupValue.value)?.body
     : undefined
 );
-
-/**
- * Expands the row if expandable, and emits a clicked event.
- */
-function handleClickRow(): void {
-  emit("click");
-
-  if (!props.expandable) return;
-
-  rowExpanded.value = !rowExpanded.value;
-}
 </script>

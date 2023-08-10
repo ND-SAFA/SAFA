@@ -1,24 +1,12 @@
 <template>
   <panel-card>
-    <flex-box align="center" justify="between">
-      <flex-box column>
-        <typography
-          v-if="isCode"
-          variant="caption"
-          :value="codePath"
-          el="h1"
-          ellipsis
-          data-cy="text-selected-name"
-        />
-        <typography variant="subtitle" :value="displayName" ellipsis />
-        <q-tooltip>{{ displayName }}</q-tooltip>
-      </flex-box>
-      <attribute-chip
-        artifact-type
-        :value="type"
-        data-cy="text-selected-type"
-      />
-    </flex-box>
+    <artifact-name-display
+      v-if="artifact"
+      :artifact="artifact"
+      display-type
+      display-tooltip
+      is-header
+    />
 
     <separator b="2" t="1" />
 
@@ -50,27 +38,15 @@ import { computed } from "vue";
 import { selectionStore } from "@/hooks";
 import {
   Typography,
-  FlexBox,
-  AttributeChip,
   PanelCard,
   AttributeListDisplay,
   Separator,
 } from "@/components/common";
+import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
 import ArtifactSummary from "./ArtifactSummary.vue";
 
 const artifact = computed(() => selectionStore.selectedArtifact);
-const name = computed(() => artifact.value?.name || "");
-const type = computed(() => artifact.value?.type || "");
 const body = computed(() => artifact.value?.body.trim() || "");
 const isCode = computed(() => !!artifact.value?.isCode);
-
 const variant = computed(() => (isCode.value ? "code" : "expandable"));
-
-const codePath = computed(() =>
-  isCode.value ? name.value.split("/").slice(0, -1).join("/") : ""
-);
-
-const displayName = computed(
-  () => (isCode.value && name.value.split("/").pop()) || name.value
-);
 </script>

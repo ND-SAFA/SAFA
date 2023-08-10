@@ -6,18 +6,11 @@
     :class="props.fullWidth ? 'full-width' : 'artifact-display'"
     @click="emit('click')"
   >
-    <flex-box v-if="props.displayTitle" align="center" justify="between">
-      <flex-box column>
-        <typography
-          v-if="isCode"
-          variant="caption"
-          :value="codePath"
-          ellipsis
-        />
-        <typography :value="displayName" ellipsis />
-      </flex-box>
-      <attribute-chip artifact-type :value="artifactType" />
-    </flex-box>
+    <artifact-name-display
+      v-if="props.displayTitle"
+      :artifact="props.artifact"
+      display-type
+    />
     <template #subtitle>
       <typography
         v-if="showSummary"
@@ -48,10 +41,8 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
-import { timStore } from "@/hooks";
-import { FlexBox, Typography } from "../../common/display/content";
-import { AttributeChip } from "../../common/display/chip";
-import ListItem from "../../common/display/list/ListItem.vue";
+import { Typography, ListItem } from "@/components/common";
+import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
 
 const props = defineProps<ArtifactListItemProps>();
 
@@ -62,21 +53,7 @@ const emit = defineEmits<{
   (e: "click"): void;
 }>();
 
-const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 const showSummary = computed(() => !!props.artifact?.summary);
 const isCode = computed(() => props.artifact.isCode);
-
-const codePath = computed(() =>
-  isCode.value
-    ? props.artifact.name.split("/").slice(0, -1).join("/")
-    : undefined
-);
-
-const displayName = computed(
-  () =>
-    (isCode.value && props.artifact.name.split("/").pop()) ||
-    props.artifact.name
-);
-
 const bodyVariant = computed(() => (isCode.value ? "code" : "expandable"));
 </script>

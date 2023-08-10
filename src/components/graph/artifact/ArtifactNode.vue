@@ -11,10 +11,14 @@
       :color="color"
       variant="artifact"
       :title="props.artifact.type"
-      :subtitle="displayName"
       :selected="selected"
       @click="handleSelect"
     >
+      <artifact-name-display
+        align="center"
+        :artifact="props.artifact"
+        is-header
+      />
       <separator
         v-if="showDelta"
         :color="deltaColor"
@@ -145,6 +149,7 @@ import {
   Separator,
   IconButton,
 } from "@/components/common";
+import ArtifactNameDisplay from "@/components/artifact/display/ArtifactNameDisplay.vue";
 import { CyElement } from "../base";
 
 const props = defineProps<{
@@ -171,12 +176,6 @@ const style = computed(
   () =>
     `opacity: ${opacity.value};` +
     (selected.value ? "z-index: 10;" : "z-index: 1;")
-);
-
-const displayName = computed(
-  () =>
-    (props.artifact.isCode && props.artifact.name.split("/").pop()) ||
-    props.artifact.name
 );
 
 const hasSubtree = computed(

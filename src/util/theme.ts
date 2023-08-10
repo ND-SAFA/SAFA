@@ -155,7 +155,7 @@ export function convertTypeToColor(
       gradient3: Colors.gradient3,
       gradient4: Colors.gradient4,
       gradient5: Colors.gradient5,
-    }[colorName] || Colors.blue
+    }[colorName] || ThemeColors.primary
   );
 }
 

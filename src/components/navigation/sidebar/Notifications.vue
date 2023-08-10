@@ -1,12 +1,13 @@
 <template>
   <div>
-    <q-circular-progress
-      v-if="displayInProgressJobs"
-      :color="color"
-      indeterminate
-      size="md"
-      class="nav-job-icon"
-    />
+    <div class="nav-job-icon">
+      <q-circular-progress
+        v-if="displayInProgressJobs"
+        :color="color"
+        indeterminate
+        size="md"
+      />
+    </div>
     <q-btn round flat @click="handleClearNewMessages">
       <icon variant="notification" />
       <q-tooltip :delay="200">View notifications</q-tooltip>

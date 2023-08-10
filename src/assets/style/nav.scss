@@ -119,12 +119,18 @@
 
 .nav-saving-icon {
   position: relative;
-  top: 30px;
+  width: 0;
+  height: 0;
+  right: 4px;
+  bottom: 2px;
 }
 
 .nav-job-icon {
   position: relative;
-  top: 37px;
+  top: 5px;
+  left: 5px;
+  width: 0;
+  height: 0;
 }
 
 .nav-mode-select {

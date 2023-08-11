@@ -5,7 +5,13 @@
         text
         label="View Artifacts"
         icon="view-tree"
-        @click="handleViewLevel"
+        @click="documentStore.addDocumentOfTypes([name])"
+      />
+      <text-button
+        text
+        label="Edit Type"
+        icon="edit"
+        @click="appStore.openDetailsPanel('saveArtifactLevel')"
       />
     </flex-box>
 
@@ -106,6 +112,7 @@ import {
   projectStore,
   selectionStore,
   sessionStore,
+  appStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -149,13 +156,4 @@ const countDisplay = computed(() => {
 });
 
 const iconId = computed(() => timStore.getTypeIcon(name.value));
-
-/**
- * Switches to tree view and highlights this artifact level.
- */
-function handleViewLevel(): void {
-  if (!artifactLevel.value) return;
-
-  documentStore.addDocumentOfTypes([artifactLevel.value.name]);
-}
 </script>

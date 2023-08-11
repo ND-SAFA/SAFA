@@ -10,7 +10,7 @@ import {
 } from "@/types";
 import {
   convertTypeToColor,
-  defaultTypeIcon,
+  DefaultTypeIcon,
   isLinkAllowedByType,
   removeMatches,
   sanitizeNodeId,
@@ -84,7 +84,7 @@ export const useTIM = defineStore("tim", {
           {
             typeId: "",
             name: type,
-            icon: defaultTypeIcon,
+            icon: DefaultTypeIcon,
             color: "base",
             count: 1,
           },
@@ -208,8 +208,8 @@ export const useTIM = defineStore("tim", {
       const artifactType = this.getType(name);
 
       return artifactType?.icon.includes("help")
-        ? defaultTypeIcon
-        : artifactType?.icon || defaultTypeIcon;
+        ? DefaultTypeIcon
+        : artifactType?.icon || DefaultTypeIcon;
     },
     /**
      * Gets the trace matrix with the given source and target types.

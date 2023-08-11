@@ -1,13 +1,6 @@
 <template>
   <div class="overflow-hidden">
-    <typography
-      bold
-      ellipsis
-      color="primary"
-      class="q-mr-xs"
-      :value="props.artifactType.name"
-    />
-    <typography secondary value="Traces To" />
+    <typography variant="caption" color="primary" value="Parent Types" />
     <div>
       <attribute-chip
         v-for="name in allowedTypes"

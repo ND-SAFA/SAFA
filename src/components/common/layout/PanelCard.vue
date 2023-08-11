@@ -2,7 +2,7 @@
   <div :class="containerClassName">
     <q-card flat :class="className">
       <flex-box v-if="!props.minimal" align="center" justify="between">
-        <flex-box align="center">
+        <flex-box align="center" full-width>
           <icon
             v-if="!!props.icon"
             :variant="props.icon"
@@ -14,6 +14,7 @@
             variant="subtitle"
             el="h2"
             :value="props.title"
+            ellipsis
           />
         </flex-box>
         <slot name="title-actions" />

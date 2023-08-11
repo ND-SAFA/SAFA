@@ -1,49 +1,58 @@
 <template>
   <div class="overflow-hidden">
-    <typography variant="caption" color="primary" value="Icon" />
+    <typography variant="caption" color="primary" value="Color" />
     <br />
     <q-btn-toggle
-      v-model="icon"
+      v-model="color"
       flat
       style="flex-wrap: wrap"
-      :options="iconOptions"
+      :options="colorOptions"
       :disable="!allowEditing"
       :toggle-color="currentColor"
-      data-cy="button-type-options-icon"
+      data-cy="button-type-options-color"
     />
   </div>
 </template>
 
 <script lang="ts">
 /**
- * Renders an input for changing the icon for an artifact type.
+ * Renders an input for changing the color for an artifact type.
  */
 export default {
-  name: "TypeIconInput",
+  name: "TypeColorInput",
 };
 </script>
 
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
-import { TypeIcons } from "@/util";
-import { artifactTypeApiStore, projectStore, sessionStore } from "@/hooks";
+import { ThemeGradient } from "@/util";
+import {
+  artifactTypeApiStore,
+  projectStore,
+  sessionStore,
+  timStore,
+} from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
 
 const currentColor = computed(() => props.artifactType.color);
+const currentIcon = computed(() =>
+  timStore.getTypeIcon(props.artifactType.name)
+);
 
-const iconOptions = computed(() =>
-  TypeIcons.map((icon) => {
-    const selected = props.artifactType.icon === icon;
+const colorOptions = computed(() =>
+  Object.entries(ThemeGradient).map(([id, color]) => {
+    const selected = currentColor.value === id;
 
     return {
-      icon,
+      icon: currentIcon.value,
       label: "",
-      value: icon,
+      value: id,
       text: !selected,
       outlined: selected,
+      style: `color: ${color}`,
       class: selected ? "nav-mode-selected" : "",
     };
   })
@@ -53,12 +62,12 @@ const allowEditing = computed(() =>
   sessionStore.isEditor(projectStore.project)
 );
 
-const icon = computed({
+const color = computed({
   get(): string {
-    return props.artifactType.icon;
+    return props.artifactType.color;
   },
-  set(iconId: string) {
-    props.artifactType.icon = iconId;
+  set(color: string) {
+    props.artifactType.color = color;
 
     artifactTypeApiStore.handleSave(props.artifactType);
   },

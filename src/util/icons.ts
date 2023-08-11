@@ -1,13 +1,21 @@
 import { IconVariant } from "@/types";
 
-export const defaultTypeIcon = "mdi-alpha-a-box-outline";
+export const DefaultTypeIcon = "mdi-alpha-a-box-outline";
 
-export const allTypeIcons = [
+export const TypeIcons = [
   "mdi-clipboard-text",
   "mdi-math-compass",
   "mdi-hazard-lights",
   "mdi-pine-tree-fire",
-  "mdi-alpha-a-box-outline",
+  "mdi-alpha-a-box",
+
+  "mdi-text-box-multiple",
+  "mdi-file-code",
+  "mdi-file-image",
+  "mdi-folder",
+  "mdi-file-table",
+  "mdi-database",
+  "mdi-application-cog",
 ];
 
 /**

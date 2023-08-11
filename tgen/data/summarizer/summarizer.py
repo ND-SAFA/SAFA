@@ -114,7 +114,6 @@ class Summarizer(BaseObject):
         indices2resummarize = set()
         summary_prompts = []
         for i, body, chunker_type, id_ in zip(range(len(bodies)), bodies, chunker_types, ids):
-            logger.info(f"Code or above limit: {self.code_or_above_limit_only}")
             chunk_prompts = self._create_chunk_prompts(body, chunker_type, id_,
                                                        code_or_above_limit_only=self.code_or_above_limit_only)
             if len(chunk_prompts) == 0:  # no prompt because does not need summarized
@@ -181,8 +180,8 @@ class Summarizer(BaseObject):
         :param chunk_prompts: The prompts used to summarize each chunk
         :return: The combined summaries of all chunks
         """
-        if len(chunk_prompts) < 1:
-            return chunk_prompts
+        if len(chunk_prompts) == 0:
+            return []
         if not isinstance(chunk_prompts[0], List):
             chunk_prompts = [chunk_prompts]
         n_chunks_per_summary = [len(chunks) for chunks in chunk_prompts]

@@ -36,7 +36,8 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         completion_params = self.llm_args.to_params(TrainerTask.PREDICT, completion_type)
         completion_params.update(params)
         llm_response = self.make_completion_request_impl(**completion_params)
-        return self.translate_to_response(completion_type, llm_response, **params)
+        translated_response = self.translate_to_response(completion_type, llm_response, **params)
+        return translated_response
 
     @abstractmethod
     def make_completion_request_impl(self, **params) -> AIObject:

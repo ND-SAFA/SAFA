@@ -1,5 +1,4 @@
 from collections import namedtuple
-from typing import Tuple
 
 import openai
 from openai.openai_object import OpenAIObject
@@ -7,6 +6,7 @@ from openai.openai_object import OpenAIObject
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
+from tgen.constants.open_ai_constants import OPENAI_MAX_ATTEMPTS, OPENAI_MAX_THREADS
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
@@ -23,7 +23,6 @@ Res = namedtuple('Res', ['choices'])
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
-    MAX_COMPLETION_PROMPTS: int = 20
     prompt_args = PromptArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="")
 
     def __init__(self, llm_args: OpenAIArgs = None):
@@ -65,20 +64,19 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         params.pop(OpenAIParams.LOG_PROBS)
         prompt = params.pop(OpenAIParams.PROMPT)
         prompts = prompt if isinstance(prompt, list) else [prompt]
-        choices = []
         logger.info(f"Starting OpenAI batch: {params['model']}")
 
-        def perform_work(payload: Tuple[int, str]):
-            index, p = payload
+        def perform_work(p: str):
             params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
             res = openai.ChatCompletion.create(**params)
-            choices[index] = res.choices
+            return res.choices[0]
 
-        ThreadUtil.multi_thread_process("Making completion requests",
-                                        list(enumerate(prompts)),
-                                        perform_work,
-                                        n_threads=1,
-                                        max_attempts=3)
+        choices = ThreadUtil.multi_thread_process("Making completion requests",
+                                                  prompts,
+                                                  perform_work,
+                                                  n_threads=OPENAI_MAX_THREADS,
+                                                  max_attempts=OPENAI_MAX_ATTEMPTS,
+                                                  collect_as_list=True)
 
         return Res(choices=choices)
 

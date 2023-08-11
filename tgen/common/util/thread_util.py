@@ -13,7 +13,8 @@ class ThreadUtil:
     """
 
     @staticmethod
-    def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1) -> None:
+    def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
+                             collect_as_list: bool = False) -> None:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -22,6 +23,10 @@ class ThreadUtil:
         :param n_threads: The number of threads to use to perform work.
         :return: None
         """
+        if collect_as_list:
+            iterable = list(enumerate(iterable))
+
+        result_list = [None] * len(iterable)
 
         item_queue = Queue()
         for i in iterable:
@@ -36,12 +41,16 @@ class ThreadUtil:
             """
             while not item_queue.empty():
                 item = item_queue.get()
+                if collect_as_list:
+                    index, item = item
                 attempts = 0
                 successful = False
                 while not successful and attempts < max_attempts:
                     try:
-                        thread_work(item)
+                        thread_result = thread_work(item)
                         successful = True
+                        if collect_as_list:
+                            result_list[index] = thread_result
                     except Exception as e:
                         logger.exception(e)
                     attempts += 1
@@ -56,3 +65,5 @@ class ThreadUtil:
             t1.start()
         for t in threads:
             t.join()
+        if collect_as_list:
+            return result_list

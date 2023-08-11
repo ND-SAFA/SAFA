@@ -40,16 +40,21 @@ class LLMResponseUtil:
         return content
 
     @staticmethod
-    def _parse_children(tag: Tag) -> Dict[str, str]:
+    def _parse_children(tag: Tag) -> str:
         """
         Parses all children tags in the given tag
         :param tag: The parent tag
         :return: The children of the tag
         """
         children = {}
+        if isinstance(tag, str):
+            return tag
         for child in tag.children:
-            if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
-                children[child.name] = child.contents[0]
+            if isinstance(child, Tag):
+                thingies = "".join([LLMResponseUtil._parse_children(c) for c in child.contents])
+                return f"<{child.name}>{thingies}</{child.name}>"
+            if isinstance(child, str):
+                return child
         return children
 
     @staticmethod

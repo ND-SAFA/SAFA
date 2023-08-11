@@ -70,11 +70,12 @@ class Summarizer(BaseObject):
         :param ids: The ids associated with each content
         :return: The summarization
         """
+        logger.info(f"Received {len(bodies)} artifacts to summarize.")
         selective_summary_payload = self.construct_select_summary_payload(bodies,
                                                                           chunker_types=chunker_types,
                                                                           ids=ids)
         indices2summarize, indices2resummarize, summary_prompts = selective_summary_payload
-        logger.info(f"\nSummarizing {len(indices2summarize)} artifacts")
+        logger.info(f"\nSelected {len(indices2summarize)} artifacts to summarize.")
         summarized_content = self._chunk_and_summarize_selective(contents=bodies,
                                                                  indices2summarize=indices2summarize,
                                                                  prompts_for_summaries=summary_prompts)
@@ -105,6 +106,7 @@ class Summarizer(BaseObject):
             chunker_types = [SupportedChunker.NL for _ in range(len(bodies))]
         if not isinstance(ids, List):
             ids = [ids for i in range(len(bodies))]
+
         assert len(chunker_types) == len(bodies) and len(ids) == len(bodies), "If supplying a chunker type and id, " \
                                                                               "must provide one for all content"
 
@@ -112,9 +114,10 @@ class Summarizer(BaseObject):
         indices2resummarize = set()
         summary_prompts = []
         for i, body, chunker_type, id_ in zip(range(len(bodies)), bodies, chunker_types, ids):
+            logger.info(f"Code or above limit: {self.code_or_above_limit_only}")
             chunk_prompts = self._create_chunk_prompts(body, chunker_type, id_,
                                                        code_or_above_limit_only=self.code_or_above_limit_only)
-            if len(chunk_prompts) < 1:  # no prompt because does not need summarized
+            if len(chunk_prompts) == 0:  # no prompt because does not need summarized
                 continue
             # Summarize the summarized chunks to have one congruent summary at the end
             if len(chunk_prompts) > 1:

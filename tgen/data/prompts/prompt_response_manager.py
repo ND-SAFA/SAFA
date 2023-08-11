@@ -124,7 +124,7 @@ class PromptResponseManager:
             tags = [self.response_tag] if not isinstance(self.response_tag, list) else self.response_tag
             for tag in tags:
                 tag_id = self._tag2id[tag]
-                output[tag_id] = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids)
+                output[tag_id] = LLMResponseUtil.parse(response, tag, is_nested=True, raise_exception=tag in self.required_tag_ids)
         formatted_output = self._format_response(output)
         return formatted_output
 

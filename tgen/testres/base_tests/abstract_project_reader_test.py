@@ -46,7 +46,7 @@ class AbstractProjectReaderTest(BaseTest):
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
-        TestAssertions.verify_entities_in_df(self, test_project.get_trace_layers(), layer_mapping_df)
+        TestAssertions.verify_trace_layers(self, test_project.get_trace_layers(), layer_mapping_df)
 
     @staticmethod
     def generate_artifact_entries(artifact_ids: List[int], prefix: str = "None") -> List[Dict]:

@@ -8,7 +8,6 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 
 
@@ -30,10 +29,10 @@ class AbstractProjectReaderTest(BaseTest):
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, layer_entries, layer_mapping_df)
 
-    @mock_openai
-    def verify_summarization(self, test_project):
+    def verify_summarization(self, test_project: AbstractTestProject):
         """
         Verifies that entries are properly summarized by reader
+        :param ai_manager: The manager responsible for specifying LLM responses. Uses dependency injection.
         :param test_project: Project containing entities to compare data frames to.
         :return: None
         """
@@ -60,3 +59,13 @@ class AbstractProjectReaderTest(BaseTest):
             "id": f"{prefix}{i}",
             "content": f"{prefix}_token{i}"
         } for i in artifact_ids]
+
+    @staticmethod
+    def create_summarization_response(p: str):
+        """
+        Generically creates a summarize response from the body of the artifact.
+        :param p: The summarization prompt.
+        :return: The summarization response for prompt.
+        """
+        artifact_body = p.splitlines()[-2]
+        return f"<summary>Summary of {artifact_body}</summary>"

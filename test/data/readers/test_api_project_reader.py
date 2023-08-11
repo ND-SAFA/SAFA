@@ -1,5 +1,7 @@
 from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
 from tgen.testres.testprojects.api_test_project import ApiTestProject
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestClassicProjectReader(AbstractProjectReaderTest):
@@ -14,8 +16,10 @@ class TestClassicProjectReader(AbstractProjectReaderTest):
         """
         self.verify_project_data_frames(self.test_project)
 
-    def test_summarization(self):
+    @mock_openai
+    def test_summarization(self, ai_manager: TestAIManager):
         """
         Tests that project artifacts can be summarized
         """
+        ai_manager.set_responses([self.create_summarization_response] * 12)
         self.verify_summarization(test_project=self.test_project)

@@ -117,6 +117,8 @@ const width = computed(() => {
   } else if (
     openState.value === "displayTrace" ||
     openState.value === "displayArtifact" ||
+    openState.value === "displayArtifactLevel" ||
+    openState.value === "displayTraceMatrix" ||
     openState.value === "saveArtifact"
   ) {
     return 600;

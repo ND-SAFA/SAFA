@@ -47,9 +47,22 @@
           :title="parent.name"
           :icon-id="timStore.getTypeIcon(parent.name)"
           :color="parent.color"
+          :action-cols="1"
           data-cy="list-selected-parent-item"
           @click="selectionStore.selectArtifactLevel(parent.name)"
-        />
+        >
+          <template #actions>
+            <icon-button
+              outline
+              :flat="false"
+              icon="trace"
+              tooltip="View Trace Matrix"
+              data-cy="button-selected-parent-link"
+              class="trace-chip text-nodeDefault"
+              @click="selectionStore.selectTraceMatrix(name, parent.name)"
+            />
+          </template>
+        </list-item>
       </list>
       <typography
         v-else
@@ -72,9 +85,22 @@
           :title="child.name"
           :icon-id="timStore.getTypeIcon(child.name)"
           :color="child.color"
+          :action-cols="1"
           data-cy="list-selected-child-item"
           @click="selectionStore.selectArtifactLevel(child.name)"
-        />
+        >
+          <template #actions>
+            <icon-button
+              outline
+              :flat="false"
+              icon="trace"
+              tooltip="View Trace Matrix"
+              data-cy="button-selected-child-link"
+              class="trace-chip text-nodeDefault"
+              @click="selectionStore.selectTraceMatrix(child.name, name)"
+            />
+          </template>
+        </list-item>
       </list>
       <typography
         v-else
@@ -115,6 +141,7 @@ import {
   Separator,
   List,
   ListItem,
+  IconButton,
 } from "@/components/common";
 
 const displayActions = computed(() =>

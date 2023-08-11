@@ -35,7 +35,7 @@
           <icon
             class="q-my-xs"
             size="sm"
-            color="secondary"
+            :color="generatedCount > 0 ? 'nodeGenerated' : 'nodeDefault'"
             variant="trace"
             :rotate="-90"
           />

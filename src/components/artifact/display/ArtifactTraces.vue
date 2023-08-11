@@ -162,7 +162,7 @@ const childTitle = computed(() =>
 );
 
 /**
- * Determines the className of the link to a parent artifact.
+ * Determines the className of the link to another artifact.
  * @param artifactName - The artifact to select the link to.
  * @returns The className for the link.
  */

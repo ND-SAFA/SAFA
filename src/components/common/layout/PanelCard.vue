@@ -2,7 +2,7 @@
   <div :class="containerClassName">
     <q-card flat :class="className">
       <flex-box v-if="!props.minimal" align="center" justify="between">
-        <flex-box align="center" full-width>
+        <flex-box align="center">
           <icon
             v-if="!!props.icon"
             :variant="props.icon"

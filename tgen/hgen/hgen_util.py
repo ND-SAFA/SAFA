@@ -186,7 +186,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     generation_step_response_manager = task_prompt.question_prompts[-1].response_manager if isinstance(task_prompt,
                                                                                                        QuestionnairePrompt) \
         else task_prompt.response_manager
-    generation_step_response_manager.formatter = lambda tag, val: PromptUtil.strip_new_lines_and_extra_space(val)
+    generation_step_response_manager.formatter = lambda tag, val: val.strip().strip(NEW_LINE)
 
     artifact_prompt = MultiArtifactPrompt(prompt_prefix=PromptUtil.format_as_markdown("{artifact_type}S:"),
                                           build_method=MultiArtifactPrompt.BuildMethod.NUMBERED,

@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Set, Type, Union
+from typing import Any, Callable, Dict, List, Set, Type, Union, Tuple
 
 import bs4
 
@@ -139,10 +139,10 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags} for val in values]
+                values = {self._tag2id[c_tag]: val.get(c_tag, None) for val in values for c_tag in child_tags}
                 output[self._tag2id[parent]] = values
         else:
-            tags = [self.response_tag] if not isinstance(self.response_tag, list) else self.response_tag
+            tags, _ = self._convert2list(self.response_tag)
             for tag in tags:
                 tag_id = self._tag2id[tag]
                 parsed = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids)
@@ -156,9 +156,9 @@ class PromptResponseManager:
         :param output: Maps tag id to the parsed output from the model
         :return: A mapping of tag id to the formatted output value
         """
-        formatted = {}
+        formatted_tags = {}
         for tag, values in output.items():
-            values = [values] if not isinstance(values, list) else values
+            values, _ = self._convert2list(values)
             formatted_values = []
             for val in values:
                 formatted_val = val
@@ -166,23 +166,39 @@ class PromptResponseManager:
                     formatted_values = self._format_response(val)
                 else:
                     try:
-                        assert val is not None, f"Missing {tag}"
-                        if isinstance(formatted_val, bs4.NavigableString):
-                            formatted_val = str(formatted_val)
-                        if self.formatter:
-                            formatted_val = self.formatter(tag, formatted_val)
-                        is_list = isinstance(formatted_val, list)
-                        vals2check = [formatted_val] if not is_list else formatted_val
-                        if tag in self.expected_response_type:
-                            vals2check = self._convert_to_expected_type(vals2check, tag, is_list)
-                        if tag in self.expected_responses:
-                            vals2check = self._assert_expected_response(vals2check, tag, is_list)
-                        formatted_val = vals2check if is_list else vals2check.pop()
+                        formatted_val = self._format_value(tag, formatted_val)
                     except (TypeError, AssertionError, ValueError) as e:
                         formatted_val = self._format_on_failure(tag, formatted_val, e)
-                    formatted_values.append(formatted_val)
-            formatted[tag] = formatted_values
-        return formatted
+                    if formatted_val is not None:
+                        formatted_values.append(formatted_val)
+            formatted_tags[tag] = formatted_values
+        return formatted_tags
+
+    def _format_value(self, tag: str, orig_val: Any) -> Any:
+        """
+        Formats a value for a tag
+        :param tag: The tag to format the value for
+        :param orig_val: The original value
+        :return: The formatted value
+        """
+        assert orig_val is not None, f"Missing {tag}"
+        vals2format, orig_vals_is_list = self._convert2list(orig_val)
+        formatted = []
+        for val in vals2format:
+            if isinstance(val, bs4.NavigableString):
+                val = str(val)
+            if self.formatter:
+                val = self.formatter(tag, val)
+            inner_vals, inner_vals_is_list = self._convert2list(val)
+            if tag in self.expected_response_type:
+                inner_vals = self._convert_to_expected_type(inner_vals, tag, inner_vals_is_list)
+            if tag in self.expected_responses:
+                inner_vals = self._assert_expected_response(inner_vals, tag, inner_vals_is_list)
+            val = inner_vals if inner_vals_is_list else inner_vals.pop()
+            if val is not None:
+                formatted.append(val)
+        formatted_val = formatted if orig_vals_is_list else formatted.pop()
+        return formatted_val
 
     def _assert_expected_response(self, vals2check: List[Any], tag: str, is_list: bool) -> List[Any]:
         """
@@ -234,3 +250,13 @@ class PromptResponseManager:
         if self.default_factory:
             return self.default_factory(tag_id, val)
         return val if not return_none_on_fail else None
+
+    @staticmethod
+    def _convert2list(orig_val: Any) -> Tuple[List, bool]:
+        """
+        Converts val to list if not already
+        :param orig_val: The original value
+        :return: The values as a list and whether it was already a list
+        """
+        is_list = isinstance(orig_val, list)
+        return [orig_val] if not is_list else orig_val, is_list

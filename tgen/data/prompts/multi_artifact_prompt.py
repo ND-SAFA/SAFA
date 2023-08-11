@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import List
+from typing import List, Dict
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
@@ -25,20 +25,24 @@ class MultiArtifactPrompt(Prompt):
         ARTIFACT = auto()
 
     def __init__(self, prompt_prefix: str = EMPTY_STRING,
-                 build_method: BuildMethod = BuildMethod.NUMBERED, include_ids: bool = True,
+                 build_method: BuildMethod = BuildMethod.NUMBERED,
+                 include_ids: bool = True,
+                 xml_tags: Dict = None,
                  data_type: DataType = DataType.ARTIFACT):
         """
         Constructor for making a prompt containing many artifacts.
         :param prompt_prefix: The prefix to attach to prompt.
         :param build_method: The method to build the prompt (determines prompt format).
         :param include_ids: If True, includes artifact ids
-        :param data_type:
+        :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
+        :param data_type: Whether the data is coming from artifacts or traces
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
                               self.BuildMethod.NUMBERED: self._build_as_numbered}
         self.include_ids = include_ids
         self.data_type = data_type
+        self.xml_tags = xml_tags
         super().__init__(value=prompt_prefix)
 
     @overrides(Prompt)
@@ -51,13 +55,13 @@ class MultiArtifactPrompt(Prompt):
         """
         prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
         if self.build_method in self.build_methods:
-            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids)
+            artifacts = self.build_methods[self.build_method](artifacts, include_ids=self.include_ids, xml_tags=self.xml_tags)
             return f"{prompt}{artifacts}"
         else:
             raise NameError(f"Unknown Build Method: {self.build_method}")
 
     @staticmethod
-    def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False) -> str:
+    def _build_as_numbered(artifacts: List[EnumDict], include_ids: bool = False, **kwargs) -> str:
         """
         Formats the artifacts as follows:
         1. ID: BODY
@@ -73,7 +77,7 @@ class MultiArtifactPrompt(Prompt):
         return NEW_LINE.join(formatted_artifacts)
 
     @staticmethod
-    def _build_as_xml(artifacts: List[ArtifactPrompt], include_ids: bool = True):
+    def _build_as_xml(artifacts: List[ArtifactPrompt], xml_tags: Dict, include_ids: bool = True):
         """
         Formats the artifacts as follows:
         <artifact>
@@ -84,7 +88,8 @@ class MultiArtifactPrompt(Prompt):
         :param include_ids: If True, includes artifact ids
         :return: The formatted prompt
         """
-        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.XML, include_id=include_ids)
+        artifact_prompt = ArtifactPrompt(build_method=ArtifactPrompt.BuildMethod.XML, xml_tags=xml_tags,
+                                         include_id=include_ids)
         formatted_artifacts = [artifact_prompt.build(artifact=artifact) for artifact in artifacts]
         return NEW_LINE.join(formatted_artifacts)
 

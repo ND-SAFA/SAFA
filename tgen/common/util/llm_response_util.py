@@ -22,14 +22,12 @@ class LLMResponseUtil:
 
         try:
             assert tag_name in res, f"Missing expected tag {tag_name}"
+            tags = soup.findAll(tag_name)
             if is_nested:
-                tags = soup.findAll(tag_name)
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
-                query = soup.find(tag_name)
-                content = query.decode_contents()
-                content = [content]
-        except (AssertionError, IndexError):
+                content = [tag.contents[0] for tag in tags]
+        except Exception:
             error = f"Unable to parse {tag_name}"
             logger.exception(error)
             if raise_exception:
@@ -47,7 +45,9 @@ class LLMResponseUtil:
         children = {}
         for child in tag.children:
             if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
-                children[child.name] = child.contents[0]
+                if child.name not in children:
+                    children[child.name] = []
+                children[child.name].append(child.contents[0])
         return children
 
     @staticmethod

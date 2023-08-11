@@ -9,11 +9,20 @@
       />
     </flex-box>
 
-    <panel-card
-      v-if="artifactLevel"
-      :title="artifactLevel.name"
-      data-cy="panel-artifact-type-options"
-    >
+    <panel-card v-if="artifactLevel" data-cy="panel-artifact-type-options">
+      <flex-box align="center" justify="between">
+        <typography
+          ellipsis
+          variant="subtitle"
+          el="h1"
+          :value="name"
+          data-cy="text-selected-name"
+        />
+        <q-tooltip>{{ name }}</q-tooltip>
+        <icon :id="iconId" size="md" :color="iconColor" />
+      </flex-box>
+
+      <separator b="2" />
       <type-direction-input :artifact-type="artifactLevel" />
       <type-icon-input :artifact-type="artifactLevel" />
       <type-color-input :artifact-type="artifactLevel" />
@@ -32,7 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, selectionStore, timStore } from "@/hooks";
 import {
   PanelCard,
   TypeDirectionInput,
@@ -40,8 +49,14 @@ import {
   DetailsPanel,
   FlexBox,
   TextButton,
+  Icon,
+  Separator,
+  Typography,
 } from "@/components/common";
 import TypeColorInput from "@/components/common/input/TypeColorInput.vue";
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const name = computed(() => artifactLevel.value?.name || "");
+const iconId = computed(() => timStore.getTypeIcon(name.value));
+const iconColor = computed(() => timStore.getTypeColor(name.value));
 </script>

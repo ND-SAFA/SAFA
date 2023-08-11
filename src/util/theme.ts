@@ -110,6 +110,8 @@ export const lightPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
 /**
@@ -139,6 +141,8 @@ export const darkPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
 /**

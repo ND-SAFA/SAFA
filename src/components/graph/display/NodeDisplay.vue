@@ -15,7 +15,7 @@
       align="center"
       data-cy="tree-node-type"
     >
-      <icon :id="iconId" size="sm" />
+      <icon :id="iconId" :color="iconColor" size="sm" />
       <typography
         variant="subtitle"
         :value="props.title"
@@ -129,6 +129,10 @@ const separatorStyle = computed(() =>
 
 const iconId = computed(() =>
   props.title ? timStore.getTypeIcon(props.title) : undefined
+);
+
+const iconColor = computed(() =>
+  props.title ? timStore.getTypeColor(props.title) : undefined
 );
 
 /**

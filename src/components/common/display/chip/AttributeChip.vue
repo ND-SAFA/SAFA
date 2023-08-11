@@ -144,10 +144,17 @@ const bgClassName = computed(() =>
   darkMode.value ? "bg-background " : "bg-neutral "
 );
 
+const bdClassName = computed(() => {
+  if (enumerated.value) {
+    return "";
+  } else if (props.artifactType) {
+    return `bd-${typeColor.value} `;
+  } else {
+    return "bd-primary ";
+  }
+});
+
 const chipClassName = computed(
-  () =>
-    "q-mr-sm attribute-chip " +
-    bgClassName.value +
-    (enumerated.value ? "" : "bd-primary")
+  () => "q-mr-sm attribute-chip " + bgClassName.value + bdClassName.value
 );
 </script>

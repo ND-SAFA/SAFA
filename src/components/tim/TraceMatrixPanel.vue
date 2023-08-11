@@ -12,15 +12,7 @@
     <panel-card>
       <flex-box align="center" justify="between" class="overflow-hidden">
         <div class="overflow-hidden" data-cy="text-selected-name">
-          <typography variant="caption" value="From" />
-          <typography
-            ellipsis
-            variant="subtitle"
-            el="h1"
-            class="q-my-none"
-            :value="sourceType"
-          />
-          <typography variant="caption" value="To" />
+          <typography variant="caption" value="Parent Type" />
           <typography
             ellipsis
             variant="subtitle"
@@ -28,15 +20,27 @@
             class="q-my-none"
             :value="targetType"
           />
+          <typography variant="caption" value="Child Type" />
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            class="q-my-none"
+            :value="sourceType"
+          />
           <q-tooltip>{{ name }}</q-tooltip>
         </div>
-        <icon
-          class="q-mx-xs"
-          size="sm"
-          color="primary"
-          variant="trace"
-          :rotate="-90"
-        />
+        <flex-box column>
+          <icon :id="targetIcon" size="sm" :color="targetColor" />
+          <icon
+            class="q-my-xs"
+            size="sm"
+            color="secondary"
+            variant="trace"
+            :rotate="-90"
+          />
+          <icon :id="sourceIcon" size="sm" :color="sourceColor" />
+        </flex-box>
       </flex-box>
 
       <separator b="2" t="1" />
@@ -67,6 +71,7 @@ import {
   projectStore,
   selectionStore,
   sessionStore,
+  timStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -85,9 +90,14 @@ const displayActions = computed(() =>
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 
 const sourceType = computed(() => traceMatrix.value?.sourceType || "");
-const targetType = computed(() => traceMatrix.value?.targetType || "");
+const sourceIcon = computed(() => timStore.getTypeIcon(sourceType.value));
+const sourceColor = computed(() => timStore.getTypeColor(sourceType.value));
 
-const name = computed(() => `${sourceType.value} to ${targetType.value}`);
+const targetType = computed(() => traceMatrix.value?.targetType || "");
+const targetIcon = computed(() => timStore.getTypeIcon(targetType.value));
+const targetColor = computed(() => timStore.getTypeColor(targetType.value));
+
+const name = computed(() => `"${sourceType.value}" to "${targetType.value}"`);
 
 const totalCount = computed(() => {
   const count = traceMatrix.value?.count || 0;

@@ -17,17 +17,15 @@
 
     <panel-card>
       <flex-box align="center" justify="between">
-        <div class="overflow-hidden">
-          <typography
-            ellipsis
-            variant="subtitle"
-            el="h1"
-            :value="name"
-            data-cy="text-selected-name"
-          />
-          <q-tooltip>{{ name }}</q-tooltip>
-        </div>
-        <icon :id="iconId" size="md" color="primary" />
+        <typography
+          ellipsis
+          variant="subtitle"
+          el="h1"
+          :value="name"
+          data-cy="text-selected-name"
+        />
+        <q-tooltip>{{ name }}</q-tooltip>
+        <icon :id="iconId" size="md" :color="iconColor" />
       </flex-box>
 
       <separator b="2" />
@@ -48,6 +46,7 @@
           clickable
           :title="parent.name"
           :icon-id="timStore.getTypeIcon(parent.name)"
+          :color="parent.color"
           data-cy="list-selected-parent-item"
           @click="selectionStore.selectArtifactLevel(parent.name)"
         />
@@ -72,6 +71,7 @@
           clickable
           :title="child.name"
           :icon-id="timStore.getTypeIcon(child.name)"
+          :color="child.color"
           data-cy="list-selected-child-item"
           @click="selectionStore.selectArtifactLevel(child.name)"
         />
@@ -82,15 +82,6 @@
         variant="caption"
         value="There are no child types."
       />
-    </panel-card>
-
-    <panel-card
-      v-if="artifactLevel"
-      title="Type Options"
-      data-cy="panel-artifact-type-options"
-    >
-      <type-direction-input :artifact-type="artifactLevel" />
-      <type-icon-input :artifact-type="artifactLevel" />
     </panel-card>
   </details-panel>
 </template>
@@ -117,8 +108,6 @@ import {
 import {
   PanelCard,
   Typography,
-  TypeDirectionInput,
-  TypeIconInput,
   Icon,
   DetailsPanel,
   FlexBox,
@@ -134,6 +123,8 @@ const displayActions = computed(() =>
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");
+const iconId = computed(() => timStore.getTypeIcon(name.value));
+const iconColor = computed(() => timStore.getTypeColor(name.value));
 
 const parentTypes = computed(() => timStore.getParentMatrices(name.value));
 const parentCount = computed(() => parentTypes.value?.length || 0);
@@ -154,6 +145,4 @@ const countDisplay = computed(() => {
 
   return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
-
-const iconId = computed(() => timStore.getTypeIcon(name.value));
 </script>

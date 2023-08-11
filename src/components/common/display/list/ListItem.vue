@@ -3,7 +3,6 @@
     :clickable="itemClickable"
     :v-ripple="!!props.to"
     :to="props.to"
-    :color="color"
     :data-cy="dataCy"
     @click="emit('click')"
   >
@@ -18,11 +17,12 @@
         v-if="!!props.icon || !!props.iconId"
         :id="props.iconId"
         :variant="props.icon"
+        :color="props.color"
       />
       <slot name="icon" />
     </q-item-section>
     <q-item-section>
-      <q-item-label>
+      <q-item-label class="text-ellipsis">
         <typography v-if="!!props.title" :value="props.title" ellipsis />
         <slot />
         <separator v-if="!!props.divider" t="1" />

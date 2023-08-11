@@ -50,6 +50,10 @@ export interface IconButtonProps
    */
   tooltipDelay?: number;
   /**
+   * The icon id to render on this button.
+   */
+  iconId?: string;
+  /**
    * Whether to render this button as a fab.
    */
   fab?: boolean;

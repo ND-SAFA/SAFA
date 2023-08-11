@@ -4,7 +4,7 @@ from typing import Union
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.prompts.prompt import Prompt
 
@@ -68,9 +68,9 @@ class ArtifactPrompt(Prompt):
         """
         formatted_id = PromptUtil.create_xml(tag_name="id", tag_content=artifact_id)
         formatted_content = PromptUtil.create_xml(tag_name="body", tag_content=artifact_body)
-        content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
+        content_for_prompt = f"{NEW_LINE}{TAB}".join([formatted_id, formatted_content]) if include_id else formatted_content
         formatted_artifact = PromptUtil.create_xml(tag_name="artifact",
-                                                   tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
+                                                   tag_content=f"{NEW_LINE}{TAB}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
 
     @staticmethod

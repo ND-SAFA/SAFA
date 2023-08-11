@@ -21,13 +21,12 @@ def mock_ai(library: str, response_formatter: Callable, func=None, format: str =
         @mock.patch(library_mock_method_name)
         def test_function_wrapper(self, mock_completion):
             response_manager = TestAIManager(library, response_formatter, format=format,
-                                             *test_func_args, *outer_args,
-                                             **test_func_kwargs, **outer_kwargs)
+                                             *outer_args, **outer_kwargs)
             mock_completion.side_effect = response_manager
             if does_accept(test_func, response_manager):
-                test_func(self, response_manager)
+                test_func(self, response_manager, *test_func_args, **test_func_kwargs)
             else:
-                test_func(self)
+                test_func(self, *test_func_args, **test_func_kwargs)
             if test_expected_responses:
                 n_used = response_manager.start_index
                 n_expected = len(response_manager.responses)

@@ -151,8 +151,8 @@ class TestTraceDataset(BaseTraceTest):
                                                        list(self.positive_links.index))
         self.assertEqual(len(data_entries), self.N_POSITIVE)
         for link_id, link in self.positive_links.itertuples():
-            source_body = TestDataManager._get_artifact_body(link[TraceKeys.SOURCE])
-            target_body = TestDataManager._get_artifact_body(link[TraceKeys.TARGET])
+            source_body = TestDataManager.get_artifact_body(link[TraceKeys.SOURCE])
+            target_body = TestDataManager.get_artifact_body(link[TraceKeys.TARGET])
             self.assertIn((source_body, target_body), data_entries)
 
     def test_create_links_from_augmentation(self):

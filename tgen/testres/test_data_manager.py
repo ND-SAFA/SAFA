@@ -110,7 +110,7 @@ class TestDataManager:
         return artifacts
 
     @staticmethod
-    def _get_artifact_body(artifact_id: str):
+    def get_artifact_body(artifact_id: str):
         """
         :param artifact_id: The id of the artifact whose body is returned.
         :return: Returns the body of the artifact with given id.

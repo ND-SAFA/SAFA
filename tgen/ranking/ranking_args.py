@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
@@ -9,7 +9,7 @@ from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
-    DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG
+    DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG, RANKING_INSTRUCTIONS
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
@@ -101,7 +101,11 @@ class RankingArgs(PipelineArgs):
     """
     The detailed task instructions. The bottom portion. 
     """
-    ranking_instructions: str = DEFAULT_SEARCH_INSTRUCTIONS
+    ranking_instructions: str = RANKING_INSTRUCTIONS
+    """
+    The list of questions to answer for the ranking task.
+    """
+    ranking_questions: List[Tuple] = None
     """
     The tag used to encapsulate the parent or query string.
     """
@@ -144,3 +148,5 @@ class RankingArgs(PipelineArgs):
         :return: None
         """
         self.artifact_map = self.artifact_df.to_map()
+        if self.ranking_questions is None:
+            self.ranking_questions = DEFAULT_SEARCH_INSTRUCTIONS

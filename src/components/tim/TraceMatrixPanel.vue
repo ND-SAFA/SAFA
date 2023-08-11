@@ -45,12 +45,26 @@
 
       <separator b="2" t="1" />
 
-      <typography variant="caption" value="Total Trace Links" />
-      <typography el="p" :value="totalCount" />
-      <typography variant="caption" value="Generated Trace Links" />
-      <typography el="p" :value="generatedCount" />
-      <typography variant="caption" value="Approved Trace Links" />
-      <typography el="p" :value="approvedCount" />
+      <flex-box>
+        <flex-item parts="6">
+          <typography variant="caption" value="Total Trace Links" />
+          <typography el="p" :value="totalCount" />
+          <typography variant="caption" value="Generated Trace Links" />
+          <typography el="p" :value="generatedCount" />
+          <typography variant="caption" value="Approved Trace Links" />
+          <typography el="p" :value="approvedCount" />
+        </flex-item>
+        <flex-item parts="6">
+          <typography variant="caption" value="Trace Coverage" />
+          <flex-box align="center">
+            <attribute-chip
+              :value="traceCoverage.percentage"
+              confidence-score
+            />
+            <typography el="span" :value="traceCoverage.text" l="1" />
+          </flex-box>
+        </flex-item>
+      </flex-box>
     </panel-card>
   </details-panel>
 </template>
@@ -67,10 +81,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  artifactStore,
   documentStore,
   projectStore,
   selectionStore,
   sessionStore,
+  subtreeStore,
   timStore,
 } from "@/hooks";
 import {
@@ -82,6 +98,8 @@ import {
   FlexBox,
   Separator,
 } from "@/components/common";
+import FlexItem from "@/components/common/display/content/FlexItem.vue";
+import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
 const displayActions = computed(() =>
   sessionStore.isEditor(projectStore.project)
@@ -115,6 +133,30 @@ const approvedCount = computed(() => {
   const count = traceMatrix.value?.approvedCount || 0;
 
   return count === 1 ? "1 Link" : `${count} Links`;
+});
+
+/**
+ * Calculate the percentage of child artifacts of this type
+ * that trace to at least one parent artifact of this type.
+ */
+const traceCoverage = computed(() => {
+  const sourceArtifacts = artifactStore.allArtifacts.filter(
+    (artifact) => artifact.type === sourceType.value
+  );
+  const sourceCount = sourceArtifacts.length;
+  const traceCount = sourceArtifacts
+    .map(({ id }) => subtreeStore.getParents(id))
+    .filter((parents) =>
+      parents.some(
+        (id) => artifactStore.getArtifactById(id)?.type === targetType.value
+      )
+    ).length;
+  const coverage = traceCount / sourceCount;
+
+  return {
+    text: `(${traceCount}/${sourceCount})`,
+    percentage: coverage,
+  };
 });
 
 /**

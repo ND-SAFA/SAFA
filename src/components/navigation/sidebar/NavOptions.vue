@@ -4,7 +4,6 @@
       <separator v-if="item.divider" />
       <list-item
         :to="item.path"
-        color="primary"
         :data-cy="'button-nav-' + item.label"
         :icon="item.icon"
         :title="item.label"

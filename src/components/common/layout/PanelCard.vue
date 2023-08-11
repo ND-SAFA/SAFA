@@ -14,6 +14,7 @@
             variant="subtitle"
             el="h2"
             :value="props.title"
+            ellipsis
           />
         </flex-box>
         <slot name="title-actions" />

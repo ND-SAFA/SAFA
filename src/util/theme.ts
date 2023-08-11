@@ -38,6 +38,17 @@ export enum Colors {
 }
 
 /**
+ * The gradient colors used in the theme.
+ */
+export const ThemeGradient = {
+  nodeGradient1: Colors.gradient1,
+  nodeGradient2: Colors.gradient2,
+  nodeGradient3: Colors.gradient3,
+  nodeGradient4: Colors.gradient4,
+  nodeGradient5: Colors.gradient5,
+};
+
+/**
  * Defines all colors in the theme.
  */
 export const ThemeColors = {
@@ -69,11 +80,7 @@ export const ThemeColors = {
   nodeDefault: Colors.brownDark,
   nodeGenerated: Colors.brown,
 
-  nodeGradient1: Colors.gradient1,
-  nodeGradient2: Colors.gradient2,
-  nodeGradient3: Colors.gradient3,
-  nodeGradient4: Colors.gradient4,
-  nodeGradient5: Colors.gradient5,
+  ...ThemeGradient,
 };
 
 /**
@@ -103,6 +110,8 @@ export const lightPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
 /**
@@ -132,6 +141,8 @@ export const darkPalette: Record<string, string> = {
 
   nodeDefault: ThemeColors.nodeDefault,
   nodeGenerated: ThemeColors.nodeGenerated,
+
+  ...ThemeGradient,
 };
 
 /**
@@ -140,22 +151,10 @@ export const darkPalette: Record<string, string> = {
  * @return The color.
  */
 export function convertTypeToColor(
-  colorName:
-    | "gradient1"
-    | "gradient2"
-    | "gradient3"
-    | "gradient4"
-    | "gradient5"
-    | string
+  colorName: keyof typeof ThemeGradient | string
 ): string {
   return (
-    {
-      gradient1: Colors.gradient1,
-      gradient2: Colors.gradient2,
-      gradient3: Colors.gradient3,
-      gradient4: Colors.gradient4,
-      gradient5: Colors.gradient5,
-    }[colorName] || ThemeColors.primary
+    (ThemeGradient as Record<string, string>)[colorName] || ThemeColors.primary
   );
 }
 

@@ -47,6 +47,7 @@ export type DetailsOpenState =
   | "saveTrace"
   | "generateTrace"
   | "displayArtifactLevel"
+  | "saveArtifactLevel"
   | "displayTraceMatrix";
 
 /**

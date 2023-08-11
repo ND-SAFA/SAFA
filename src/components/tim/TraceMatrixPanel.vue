@@ -12,15 +12,7 @@
     <panel-card>
       <flex-box align="center" justify="between" class="overflow-hidden">
         <div class="overflow-hidden" data-cy="text-selected-name">
-          <typography variant="caption" value="From" />
-          <typography
-            ellipsis
-            variant="subtitle"
-            el="h1"
-            class="q-my-none"
-            :value="sourceType"
-          />
-          <typography variant="caption" value="To" />
+          <typography variant="caption" value="Parent Type" />
           <typography
             ellipsis
             variant="subtitle"
@@ -28,25 +20,51 @@
             class="q-my-none"
             :value="targetType"
           />
+          <typography variant="caption" value="Child Type" />
+          <typography
+            ellipsis
+            variant="subtitle"
+            el="h1"
+            class="q-my-none"
+            :value="sourceType"
+          />
           <q-tooltip>{{ name }}</q-tooltip>
         </div>
-        <icon
-          class="q-mx-xs"
-          size="sm"
-          color="primary"
-          variant="trace"
-          :rotate="-90"
-        />
+        <flex-box column>
+          <icon :id="targetIcon" size="sm" :color="targetColor" />
+          <icon
+            class="q-my-xs"
+            size="sm"
+            :color="generatedCount > 0 ? 'nodeGenerated' : 'nodeDefault'"
+            variant="trace"
+            :rotate="-90"
+          />
+          <icon :id="sourceIcon" size="sm" :color="sourceColor" />
+        </flex-box>
       </flex-box>
 
       <separator b="2" t="1" />
 
-      <typography variant="caption" value="Total Trace Links" />
-      <typography el="p" :value="totalCount" />
-      <typography variant="caption" value="Generated Trace Links" />
-      <typography el="p" :value="generatedCount" />
-      <typography variant="caption" value="Approved Trace Links" />
-      <typography el="p" :value="approvedCount" />
+      <flex-box>
+        <flex-item parts="6">
+          <typography variant="caption" value="Total Trace Links" />
+          <typography el="p" :value="totalCount" />
+          <typography variant="caption" value="Generated Trace Links" />
+          <typography el="p" :value="generatedCount" />
+          <typography variant="caption" value="Approved Trace Links" />
+          <typography el="p" :value="approvedCount" />
+        </flex-item>
+        <flex-item parts="6">
+          <typography variant="caption" value="Trace Coverage" />
+          <flex-box align="center">
+            <attribute-chip
+              :value="traceCoverage.percentage"
+              confidence-score
+            />
+            <typography el="span" :value="traceCoverage.text" l="1" />
+          </flex-box>
+        </flex-item>
+      </flex-box>
     </panel-card>
   </details-panel>
 </template>
@@ -63,10 +81,13 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  artifactStore,
   documentStore,
   projectStore,
   selectionStore,
   sessionStore,
+  subtreeStore,
+  timStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -77,6 +98,8 @@ import {
   FlexBox,
   Separator,
 } from "@/components/common";
+import FlexItem from "@/components/common/display/content/FlexItem.vue";
+import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
 const displayActions = computed(() =>
   sessionStore.isEditor(projectStore.project)
@@ -85,9 +108,14 @@ const displayActions = computed(() =>
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 
 const sourceType = computed(() => traceMatrix.value?.sourceType || "");
-const targetType = computed(() => traceMatrix.value?.targetType || "");
+const sourceIcon = computed(() => timStore.getTypeIcon(sourceType.value));
+const sourceColor = computed(() => timStore.getTypeColor(sourceType.value));
 
-const name = computed(() => `${sourceType.value} to ${targetType.value}`);
+const targetType = computed(() => traceMatrix.value?.targetType || "");
+const targetIcon = computed(() => timStore.getTypeIcon(targetType.value));
+const targetColor = computed(() => timStore.getTypeColor(targetType.value));
+
+const name = computed(() => `"${sourceType.value}" to "${targetType.value}"`);
 
 const totalCount = computed(() => {
   const count = traceMatrix.value?.count || 0;
@@ -105,6 +133,30 @@ const approvedCount = computed(() => {
   const count = traceMatrix.value?.approvedCount || 0;
 
   return count === 1 ? "1 Link" : `${count} Links`;
+});
+
+/**
+ * Calculate the percentage of child artifacts of this type
+ * that trace to at least one parent artifact of this type.
+ */
+const traceCoverage = computed(() => {
+  const sourceArtifacts = artifactStore.allArtifacts.filter(
+    (artifact) => artifact.type === sourceType.value
+  );
+  const sourceCount = sourceArtifacts.length;
+  const traceCount = sourceArtifacts
+    .map(({ id }) => subtreeStore.getParents(id))
+    .filter((parents) =>
+      parents.some(
+        (id) => artifactStore.getArtifactById(id)?.type === targetType.value
+      )
+    ).length;
+  const coverage = traceCount / sourceCount;
+
+  return {
+    text: `(${traceCount}/${sourceCount})`,
+    percentage: coverage,
+  };
 });
 
 /**

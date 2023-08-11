@@ -3,25 +3,37 @@
     :clickable="itemClickable"
     :v-ripple="!!props.to"
     :to="props.to"
-    :color="color"
     :data-cy="dataCy"
     @click="emit('click')"
   >
     <q-tooltip v-if="!!props.tooltip">
       {{ itemTooltip }}
     </q-tooltip>
-    <q-item-section v-if="!!props.icon || !!slots.icon" avatar>
-      <icon v-if="!!props.icon" :variant="props.icon" />
+    <q-item-section
+      v-if="!!props.icon || !!props.iconId || !!slots.icon"
+      avatar
+    >
+      <icon
+        v-if="!!props.icon || !!props.iconId"
+        :id="props.iconId"
+        :variant="props.icon"
+        :color="props.color"
+      />
       <slot name="icon" />
     </q-item-section>
     <q-item-section>
-      <q-item-label>
-        <typography v-if="!!props.title" :value="props.title" />
+      <q-item-label class="text-ellipsis">
+        <typography v-if="!!props.title" :value="props.title" ellipsis />
         <slot />
         <separator v-if="!!props.divider" t="1" />
       </q-item-label>
       <q-item-label v-if="!!props.subtitle || !!slots.subtitle" caption>
-        <typography v-if="!!props.subtitle" secondary :value="props.subtitle" />
+        <typography
+          v-if="!!props.subtitle"
+          secondary
+          :value="props.subtitle"
+          ellipsis
+        />
         <slot name="subtitle" />
       </q-item-label>
     </q-item-section>

@@ -10,9 +10,10 @@ import {
 } from "@/types";
 import {
   convertTypeToColor,
-  defaultTypeIcon,
+  DefaultTypeIcon,
   isLinkAllowedByType,
   removeMatches,
+  sanitizeNodeId,
 } from "@/util";
 import { pinia } from "@/plugins";
 import projectStore from "@/hooks/project/useProject";
@@ -83,7 +84,7 @@ export const useTIM = defineStore("tim", {
           {
             typeId: "",
             name: type,
-            icon: defaultTypeIcon,
+            icon: DefaultTypeIcon,
             color: "base",
             count: 1,
           },
@@ -207,11 +208,10 @@ export const useTIM = defineStore("tim", {
       const artifactType = this.getType(name);
 
       return artifactType?.icon.includes("help")
-        ? defaultTypeIcon
-        : artifactType?.icon || defaultTypeIcon;
+        ? DefaultTypeIcon
+        : artifactType?.icon || DefaultTypeIcon;
     },
     /**
-     * TODO: update to use node id sanitization function.
      * Gets the trace matrix with the given source and target types.
      *
      * @param sourceName - The source artifact type name.
@@ -224,9 +224,33 @@ export const useTIM = defineStore("tim", {
     ): TraceMatrixSchema | undefined {
       return this.traceMatrices.find(
         ({ sourceType, targetType }) =>
-          sourceType.replace(/ /g, "") === sourceName &&
-          targetType.replace(/ /g, "") === targetName
+          sanitizeNodeId(sourceType) === sourceName &&
+          sanitizeNodeId(targetType) === targetName
       );
+    },
+    /**
+     * Gets all trace matrices that are a parent of the given one.
+     *
+     * @param sourceName - The source artifact type name.
+     * @returns All  artifact types that are a parent to this type.
+     */
+    getParentMatrices(sourceName: string): ArtifactTypeSchema[] {
+      return this.traceMatrices
+        .filter(({ sourceType }) => sourceType === sourceName)
+        .map(({ targetType }) => this.getType(targetType))
+        .filter((type) => type !== undefined) as ArtifactTypeSchema[];
+    },
+    /**
+     * Gets all trace matrices that are a child of the given one.
+     *
+     * @param targetName - The target artifact type name.
+     * @returns All artifact types that are a child to this type.
+     */
+    getChildMatrices(targetName: string): ArtifactTypeSchema[] {
+      return this.traceMatrices
+        .filter(({ targetType }) => targetType === targetName)
+        .map(({ sourceType }) => this.getType(sourceType))
+        .filter((type) => type !== undefined) as ArtifactTypeSchema[];
     },
     /**
      * Determines if the trace link is allowed based on the type of the nodes.

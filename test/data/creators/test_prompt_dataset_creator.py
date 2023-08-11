@@ -19,6 +19,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -34,7 +35,9 @@ class TestPromptDatasetCreator(BaseTest):
         prompts_df = prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
-    def test_project_reader_artifact_with_summarizer(self):
+    @mock_openai
+    def test_project_reader_artifact_with_summarizer(self, ai_manager: TestAIManager):
+        ai_manager.mock_summarization()
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
@@ -58,7 +61,10 @@ class TestPromptDatasetCreator(BaseTest):
         prompt_builder = PromptBuilder(prompts=[prompt, prompt2])
         self.verify_dataset_creator(dataset_creator, prompt_builder=prompt_builder, trace_df=trace_df)
 
-    def test_trace_dataset_creator_with_summarizer(self):
+    @mock_openai
+    def test_trace_dataset_creator_with_summarizer(self, ai_manager: TestAIManager):
+        ai_manager.mock_summarization()
+
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
@@ -95,7 +101,6 @@ class TestPromptDatasetCreator(BaseTest):
         else:
             PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
-    @mock_openai
     def verify_summarization(self, dataset_creator, artifacts_entries):
         """
         Verifies that entries are properly summarized by reader

@@ -11,6 +11,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestPreTrainingTraceReader(BaseTest):
@@ -28,10 +29,11 @@ class TestPreTrainingTraceReader(BaseTest):
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
     @mock_openai
-    def test_summarization(self):
+    def test_summarization(self, ai_manager: TestAIManager):
         """
         Tests that pre-train data can be summarized
         """
+        ai_manager.mock_summarization()
         reader: PreTrainTraceReader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
@@ -63,4 +65,6 @@ class TestPreTrainingTraceReader(BaseTest):
         self.assertEqual(len(expected_artifacts), len(artifacts_df.index))
         self.assertEqual(len(traces_df[traces_df[TraceKeys.LABEL] == 1]), len(traces_df[traces_df[TraceKeys.LABEL] == 0]))
         for i, row in artifacts_df.itertuples():
-            self.assertEqual(lines[i].strip(), row[ArtifactKeys.CONTENT].strip(), msg="Item {} failed.".format(i))
+            expected = lines[i].strip()
+            result = row[ArtifactKeys.CONTENT].strip()
+            self.assertEqual(expected, result)

@@ -22,5 +22,5 @@ class TestRepositoryProjectReader(AbstractProjectReaderTest):
         """
         Tests that project artifacts can be summarized
         """
-        ai_manager.set_responses([self.create_summarization_response] * 6)
+        ai_manager.mock_summarization()
         self.verify_summarization(test_project=self.test_project)

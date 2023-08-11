@@ -41,7 +41,8 @@ class FileUtil:
         """
         try:
             with open(file_path) as file:
-                return file.read()
+                file_content = file.read()
+                return file_content
         except Exception as e:
             print(f"Failed reading file: {file_path}")
             raise e

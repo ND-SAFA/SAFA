@@ -21,6 +21,7 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 Res = namedtuple("Res", ["id"])
@@ -74,7 +75,8 @@ class TestOpenAiTrainer(BaseTest):
 
     @mock_openai
     @mock.patch.object(LLMResponseUtil, "extract_labels")
-    def test_perform_prediction_classification(self, llm_response_mock: mock.MagicMock):
+    def test_perform_prediction_classification(self, ai_manager: TestAIManager, llm_response_mock: mock.MagicMock):
+        ai_manager.mock_responses()
         llm_response_mock.return_value = self.FAKE_CLASSIFICATION_OUTPUT
 
         dataset_creators = self.get_all_dataset_creators()

@@ -1,3 +1,4 @@
+import html
 import re
 from typing import Dict, List, Union
 
@@ -18,7 +19,7 @@ class LLMResponseUtil:
         :param raise_exception: if True, raises an exception if parsing fails
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
-        soup = BeautifulSoup(res, 'html.parser')
+        soup = BeautifulSoup(res, features="lxml")
 
         try:
             assert tag_name in res, f"Missing expected tag {tag_name}"
@@ -37,7 +38,7 @@ class LLMResponseUtil:
             if raise_exception:
                 raise Exception(error)
             content = []
-        return content
+        return [html.unescape(c) for c in content]
 
     @staticmethod
     def _parse_children(tag: Tag) -> str:

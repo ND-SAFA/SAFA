@@ -3,11 +3,11 @@ import random
 import uuid
 from typing import List
 
+from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from tgen.common.util.file_util import FileUtil
 
 
 class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
@@ -29,7 +29,8 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         artifacts_df = self._get_artifacts_df(self.data_file)
         if self.summarizer is not None:
-            artifacts_df = self.summarizer.summarize_dataframe(artifacts_df, ArtifactKeys.CONTENT.value, ArtifactKeys.LAYER_ID.value)
+            artifacts_df = self.summarizer.summarize_dataframe(artifacts_df,
+                                                               col2summarize=ArtifactKeys.CONTENT.value)
         trace_df = self._get_trace_df(list(artifacts_df.index))
         layer_df = self._get_layer_dataframe()
         return artifacts_df, trace_df, layer_df
@@ -55,7 +56,6 @@ class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):
         return ArtifactDataFrame({ArtifactKeys.ID: all_ids,
                                   ArtifactKeys.CONTENT: content,
                                   ArtifactKeys.LAYER_ID: [PreTrainTraceReader.LAYER_ID for i in range(len(content))]})
-
 
     @staticmethod
     def _get_trace_df(artifact_ids: List[int]) -> TraceDataFrame:

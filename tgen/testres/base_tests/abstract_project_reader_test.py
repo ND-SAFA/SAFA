@@ -59,13 +59,3 @@ class AbstractProjectReaderTest(BaseTest):
             "id": f"{prefix}{i}",
             "content": f"{prefix}_token{i}"
         } for i in artifact_ids]
-
-    @staticmethod
-    def create_summarization_response(p: str):
-        """
-        Generically creates a summarize response from the body of the artifact.
-        :param p: The summarization prompt.
-        :return: The summarization response for prompt.
-        """
-        artifact_body = p.splitlines()[-2]
-        return f"<summary>Summary of {artifact_body}</summary>"

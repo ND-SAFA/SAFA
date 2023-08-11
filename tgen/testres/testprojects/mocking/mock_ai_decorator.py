@@ -6,9 +6,8 @@ from tgen.testres.testprojects.mocking.test_open_ai_responses import does_accept
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
-def mock_ai(library: str, response_formatter: Callable, func=None, format: str = None, test_expected_responses: bool = True,
-            *outer_args,
-            **outer_kwargs):
+def mock_ai(library: str, response_formatter: Callable, func=None, format: str = None,
+            test_expected_responses: bool = True, *outer_args, **outer_kwargs):
     """
     Automatically mocks open ai
     :param format: The format to encapsulate responses in.
@@ -29,7 +28,7 @@ def mock_ai(library: str, response_formatter: Callable, func=None, format: str =
                 test_func(self, *test_func_args, **test_func_kwargs)
             if test_expected_responses:
                 n_used = response_manager.start_index
-                n_expected = len(response_manager.responses)
+                n_expected = len(response_manager._responses)
                 assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
 
         function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__

@@ -22,7 +22,7 @@ class TestCreateProjectSummary(BaseTest):
         """
         Tests the generation of a project summary.
         """
-        ai_manager.responses = [self.PROJECT_SUMMARY]
+        ai_manager.set_responses([self.PROJECT_SUMMARY])
         args, state = RankingPipelineTest.create_ranking_structures()
         step = CreateProjectSummary()
         self.assert_result(args, state, step)

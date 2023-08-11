@@ -19,14 +19,14 @@ class TestLLMRankingPipeline(BaseTest):
     """
 
     @mock_anthropic
-    def test_prediction_construction(self, test_response_manager: TestAIManager):
+    def test_prediction_construction(self, ai_manager: TestAIManager):
         """
         Tests that pipeline correctly constructs the ranked predictions.
         """
-        test_response_manager.responses = [
+        ai_manager.set_responses([
             "<summary>project_summary</summary>",
             TEST_RESPONSE
-        ]
+        ])
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
         prediction_entries = pipeline.run()

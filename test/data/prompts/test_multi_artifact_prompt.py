@@ -3,7 +3,6 @@ from typing import List
 from tgen.common.util.enum_util import EnumDict
 from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 

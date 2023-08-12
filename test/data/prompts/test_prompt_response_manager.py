@@ -29,8 +29,13 @@ class TestPromptResponseManager(BaseTest):
         except Exception:
             pass
 
-        # missing non-critical
+        prm_parent_child = self.get_parent_child_tag_prm()
         prm_parent_child.required_tag_ids.remove("c2")
+        parsed_response = prm_parent_child.parse_response("<tag1><tag2>2!</tag2><tag3>hello!</tag3>"
+                                                          "</tag1><tag1>world<tag2>2!</tag2></tag1>")
+        parsed_response
+
+        # missing non-critical
         parsed_response_missing = prm_parent_child.parse_response("<tag1><tag2>2!</tag2></tag1>")
         self.assertEqual(parsed_response_missing, {"parent": {"c1": [2], "c2": [self.EXPECTED_FAIL_VAl]}})
 

@@ -2,6 +2,7 @@ import re
 from typing import Dict, List, Union
 
 from bs4 import BeautifulSoup, Tag
+from bs4.element import NavigableString
 
 from tgen.common.util.logging.logger_manager import logger
 
@@ -36,7 +37,7 @@ class LLMResponseUtil:
         return content
 
     @staticmethod
-    def _parse_children(tag: Tag) -> Dict[str, str]:
+    def _parse_children(tag: Tag) -> Dict[str, List]:
         """
         Parses all children tags in the given tag
         :param tag: The parent tag
@@ -45,9 +46,16 @@ class LLMResponseUtil:
         children = {}
         for child in tag.children:
             if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
-                if child.name not in children:
-                    children[child.name] = []
-                children[child.name].append(child.contents[0])
+                tag_name = child.name
+                content = child.contents[0]
+            elif isinstance(child, NavigableString):
+                tag_name = tag.name
+                content = child
+            else:
+                continue
+            if tag_name not in children:
+                children[tag_name] = []
+            children[tag_name].append(content)
         return children
 
     @staticmethod

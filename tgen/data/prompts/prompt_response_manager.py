@@ -139,7 +139,7 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                values = {self._tag2id[c_tag]: val.get(c_tag, None) for val in values for c_tag in child_tags}
+                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags} for val in values]
                 output[self._tag2id[parent]] = values
         else:
             tags, _ = self._convert2list(self.response_tag)
@@ -163,7 +163,11 @@ class PromptResponseManager:
             for val in values:
                 formatted_val = val
                 if isinstance(val, dict):
-                    formatted_values = self._format_response(val)
+                    formatted_val = self._format_response(val)
+                    if len(values) > 1:
+                        formatted_values.append(formatted_val)
+                    else:
+                        formatted_values = formatted_val
                 else:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)

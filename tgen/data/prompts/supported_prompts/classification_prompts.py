@@ -2,7 +2,6 @@ from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.data.prompts.select_question_prompt import SelectQuestionPrompt
-from tgen.common.util.list_util import ListUtil
 
 SOURCE_COMPONENT_LABEL = "subsystem_one"
 TARGET_COMPONENT_LABEL = "subsystem_two"
@@ -26,10 +25,15 @@ CLASSIFICATION_CATEGORIES = {
     "INDIRECT UNRELATED": D_CATEGORY,
     "INDEPENDENT": E_CATEGORY
 }
+CLASSIFICATION_SCORES = {
+    "DIRECT": [0.75, 1],
+    "INDIRECT SIGNIFICANT": [0.75, 0.5],
+    "INDIRECT RELATED": [0.25, 0.5],
+    "INDIRECT UNRELATED": [0, 0.25],
+    "INDEPENDENT": [0, 0]
+}
 REVERSE_CATEGORIES = ["E"]
 CATEGORIES = list(CLASSIFICATION_CATEGORIES.keys())
-CATEGORY_SCORES = ListUtil.create_step_list(len(CLASSIFICATION_CATEGORIES))
-CLASSIFICATION_SCORES = {c: s for c, s in zip(CATEGORIES, CATEGORY_SCORES)}
 
 CLASSIFICATION_STEPS = {
     1: QuestionPrompt("In 10 words, describe the function of the sub-system containing (1).",

@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Tuple, Union
 from unittest import mock
 
 from tgen.common.util.attr_dict import AttrDict
@@ -62,8 +62,28 @@ def mock_openai(func=None, *args, **kwargs):
     :return: Wrapped test function.
     """
 
-    def openai_response_formatter(responses: List[str]):
-        res = AttrDict({"choices": [AttrDict({"message": {"content": r}}) for r in responses], "id": "id"})
-        return res
+    def openai_response_formatter(responses: List[Union[str, Tuple]]):
+        assert len(responses) == 1, f"Expected responses to contain single output but got: {len(responses)}"
+        r = responses[0]
+        if isinstance(r, tuple):
+            content, logprobs = r
+            logprobs = AttrDict({"top_logprobs": [logprobs]})
+        else:
+            content = r
+            logprobs = None
+
+        entry = AttrDict({
+            "choices": [
+                AttrDict({
+                    "message": {
+                        "content": content
+                    },
+                    "logprobs": logprobs
+                })
+            ],
+
+            "id": "id"
+        })
+        return entry
 
     return mock_ai(library="openai", response_formatter=openai_response_formatter, func=func, *args, **kwargs)

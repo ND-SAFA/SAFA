@@ -78,7 +78,6 @@ class TestAIManager:
 
         if response_handler not in self.handlers:
             self.handlers.append(response_handler)
-        print("hi")
 
     @staticmethod
     def create_summarization_response(p: str):

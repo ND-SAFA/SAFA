@@ -9,6 +9,7 @@ from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestArtifactProjectReader(BaseTest):
@@ -23,10 +24,12 @@ class TestArtifactProjectReader(BaseTest):
         """
         self.verify_project_data_frames(self.test_project)
 
-    def test_summarization(self):
+    @mock_openai
+    def test_summarization(self, ai_manager: TestAIManager):
         """
         Tests that project artifacts can be summarized
         """
+        ai_manager.mock_summarization()
         self.verify_summarization(test_project=self.test_project)
 
     def verify_project_data_frames(self, test_project: AbstractTestProject) -> None:
@@ -39,7 +42,6 @@ class TestArtifactProjectReader(BaseTest):
         artifact_df = project_reader.read_project()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
 
-    @mock_openai
     def verify_summarization(self, test_project):
         project_reader: AbstractProjectReader = test_project.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())

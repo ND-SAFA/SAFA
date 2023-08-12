@@ -19,7 +19,7 @@ class TestAIManager:
         self.tags = tags
         self.response_formatter = response_formatter
         self.format = format
-        self.n_given = 0
+        self.n_used = 0
         self.start_index = 0
         self.end_index = len(responses)
         self.handlers = []
@@ -35,7 +35,7 @@ class TestAIManager:
         responses = self.response_formatter(responses)
         if self.format:
             responses = [self.format.format(r) for r in responses]
-        self.n_given += n_manual_prompts
+        self.n_used += n_manual_prompts
         return responses
 
     def run_prompt_handlers(self, prompts):
@@ -53,9 +53,10 @@ class TestAIManager:
         return handled_responses, unhandled_prompts
 
     def set_responses(self, responses: List[Union[str, Callable[[str], str]]]):
+        n_responses = len(responses)
         self._responses = responses
         self.start_index = 0
-        self.end_index = len(responses)
+        self.end_index = n_responses
 
     def mock_summarization(self) -> None:
         """
@@ -95,13 +96,13 @@ class TestAIManager:
         return summary
 
     def get_next_response(self, n_requested: int = 1) -> List[str]:
-        end_index = self.n_given + n_requested
+        total_requested = self.n_used + n_requested
         n_responses = len(self._responses)
-        if end_index > n_responses:
-            raise ValueError(f"Ran out of mock responses. Contains only {n_responses} responses.")
+        if total_requested > n_responses:
+            raise ValueError(f"Requested {total_requested} out of {n_responses} responses.")
 
-        responses = self._responses[self.start_index: end_index]
-        self.start_index = end_index
+        responses = self._responses[self.start_index: total_requested]
+        self.start_index = total_requested
         return responses
 
     def get_prompts(self, kwargs: Dict):

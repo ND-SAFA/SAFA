@@ -11,9 +11,10 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestClusterDatasetCreator(BaseTest):
@@ -23,15 +24,16 @@ class TestClusterDatasetCreator(BaseTest):
                                                         5: ['t3']},
                       SupportedClusteringMethod.LLM: {3: ['s4', 't4', 't5', 's6'],
                                                       4: ['s5', 't6']}}
+    artifact_descriptions = "\n".join([f"{i + 1}. {i}" for i in range(12)])
+    artifact_descriptions = f"<feature>{artifact_descriptions}</feature>"
+    cluster_response = '<group>\n<feature>1</feature>\n<artifacts>8</artifacts>' \
+                       '<group>\n<feature>3</feature>\n<artifacts>6,9,10</artifacts>\n</group>' \
+                       '</group>' \
+                       '\n<group><feature>4</feature>\n<artifacts>7,11</artifacts> \n</group>'
 
-    res = GenerationResponse(batch_responses=['<group>\n<feature>1</feature>\n'
-                                              '<artifacts>8</artifacts> \n<group>\n<feature>3</feature>\n'
-                                              '<artifacts>6,9,10</artifacts>\n</group>\n\n</group>\n\n<group>\n'
-                                              '<feature>4</feature>\n<artifacts>7,11</artifacts> \n</group>'])
-
-    @mock.patch.object(AbstractLLMManager, "make_completion_request")
-    def test_get_clusters(self, completion_request_mock: mock.MagicMock):
-        completion_request_mock.return_value = self.res
+    @mock_anthropic
+    def test_get_clusters(self, ai_manager: TestAIManager):
+        ai_manager.set_responses([self.artifact_descriptions, self.cluster_response])
         clusterer = self.get_artifact_clusterer()
         clusters = clusterer.get_clusters()
         self.assertIn(SupportedClusteringMethod.GRAPH, clusters)

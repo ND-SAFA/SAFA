@@ -4,6 +4,8 @@ from typing import Callable, List
 
 from tqdm import tqdm
 
+from tgen.common.util.logging.logger_manager import logger
+
 
 class ThreadUtil:
     """
@@ -11,7 +13,8 @@ class ThreadUtil:
     """
 
     @staticmethod
-    def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int) -> None:
+    def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
+                             collect_as_list: bool = False) -> None:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -20,10 +23,14 @@ class ThreadUtil:
         :param n_threads: The number of threads to use to perform work.
         :return: None
         """
+        if collect_as_list:
+            iterable = list(enumerate(iterable))
+
+        result_list = [None] * len(iterable)
 
         item_queue = Queue()
-        for item in iterable:
-            item_queue.put(item)
+        for i in iterable:
+            item_queue.put(i)
 
         progress_bar = tqdm(total=len(iterable), desc=title)
 
@@ -34,7 +41,21 @@ class ThreadUtil:
             """
             while not item_queue.empty():
                 item = item_queue.get()
-                thread_work(item)
+                if collect_as_list:
+                    index, item = item
+                attempts = 0
+                successful = False
+                while not successful and attempts < max_attempts:
+                    try:
+                        thread_result = thread_work(item)
+                        successful = True
+                        if collect_as_list:
+                            result_list[index] = thread_result
+                    except Exception as e:
+                        logger.exception(e)
+                    attempts += 1
+                if attempts >= max_attempts and not successful:
+                    raise ValueError(f"A thread executed {attempts} out of {max_attempts}.")
                 progress_bar.update()
 
         threads = []
@@ -44,3 +65,5 @@ class ThreadUtil:
             t1.start()
         for t in threads:
             t.join()
+        if collect_as_list:
+            return result_list

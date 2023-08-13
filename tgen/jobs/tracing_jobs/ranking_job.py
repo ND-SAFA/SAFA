@@ -1,7 +1,5 @@
-import re
 from typing import Dict, List, Optional, Tuple, Union
 
-from tgen.common.util.data_structure_util import DataStructureUtil
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -10,7 +8,10 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
+from tgen.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+
+DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."
+DATA_TOO_MANY_INPUTS = "Expected only one of dataset_creator or artifact_df + layer_ids to be defined."
 
 
 class RankingJob(AbstractJob):
@@ -19,6 +20,7 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
+                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM,
                  select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
@@ -29,9 +31,11 @@ class RankingJob(AbstractJob):
         :param layer_ids
         """
         super().__init__()
-        assert dataset_creator is None or artifact_df is None, "Cannot define both dataset creator and artifact df."
+        assert dataset_creator is not None or (artifact_df is not None and layer_ids is not None), DATA_TOO_LITTLE_INPUTS
+        assert dataset_creator is None or artifact_df is None, DATA_TOO_MANY_INPUTS
         self.dataset_creator = dataset_creator
         self.select_top_predictions = select_top_predictions
+        self.ranking_pipeline = ranking_pipeline
         self.artifact_df = artifact_df
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
@@ -45,42 +49,16 @@ class RankingJob(AbstractJob):
         :return:
         """
         tracing_types, artifact_df, dataset = self.construct_tracing_request()
-        artifact_map = DataStructureUtil.create_artifact_map(artifact_df)
-        artifact_map = self.process_newlines(artifact_map)
 
         # Predict
         global_predictions = []
         for tracing_type in tracing_types:
-            predicted_entries = self.trace_layer(artifact_df, artifact_map, tracing_type)
+            predicted_entries = self.trace_layer(artifact_df, tracing_type)
             global_predictions.extend(predicted_entries)
 
         self.optional_eval(dataset, global_predictions)
 
         return TracePredictionOutput(prediction_entries=global_predictions)
-
-    def trace_layer(self, artifact_df: ArtifactDataFrame, artifact_map: Dict[str, str], types_to_trace: Tuple[str, str]):
-        """
-        Traces the between the child-parent artifact types.
-        :param artifact_df: The artifact dataframe containing artifacts ids.
-        :param artifact_map: Map of artifact id to content.
-        :param types_to_trace: The child-parent layers being traced.
-        :return:
-        """
-        parent_type, child_type = types_to_trace
-        parent_ids = list(artifact_df.get_type(parent_type).index)
-        children_ids = list(artifact_df.get_type(child_type).index)
-        pipeline_args = RankingArgs(artifact_map=artifact_map,
-                                    parent_ids=parent_ids,
-                                    children_ids=children_ids,
-                                    **self.ranking_kwargs)
-        pipeline = ArtifactRankingPipeline(pipeline_args)
-        parent2rankings, parent2explanations = pipeline.run()
-        predicted_entries = RankingUtil.ranking_to_predictions(parent2rankings, parent2explanations)
-        if self.select_top_predictions:
-            predicted_entries = RankingUtil.select_predictions(predicted_entries,
-                                                               parent_threshold=pipeline_args.parent_primary_threshold,
-                                                               min_threshold=pipeline_args.parent_min_threshold)
-        return predicted_entries
 
     def construct_tracing_request(self) -> Tuple[List[Tuple[str, str]], ArtifactDataFrame, Optional[TraceDataset]]:
         """
@@ -98,16 +76,32 @@ class RankingJob(AbstractJob):
             tracing_types = [self.layer_ids]
         return tracing_types, artifact_df, dataset
 
+    def trace_layer(self, artifact_df: ArtifactDataFrame, types_to_trace: Tuple[str, str]):
+        """
+        Traces the between the child-parent artifact types.
+        :param artifact_df: The artifact dataframe containing artifacts ids.
+        :param artifact_map: Map of artifact id to content.
+        :param types_to_trace: The child-parent layers being traced.
+        :return:
+        """
+        parent_type, child_type = types_to_trace
+        parent_ids = list(artifact_df.get_type(parent_type).index)
+        children_ids = list(artifact_df.get_type(child_type).index)
+
+        pipeline_args = RankingArgs(artifact_df=artifact_df,
+                                    parent_ids=parent_ids,
+                                    children_ids=children_ids,
+                                    **self.ranking_kwargs)
+        pipeline = self.ranking_pipeline.value(pipeline_args)
+        predicted_entries = pipeline.run()
+        if self.select_top_predictions:
+            predicted_entries = RankingUtil.select_predictions(predicted_entries,
+                                                               parent_threshold=pipeline_args.parent_primary_threshold,
+                                                               min_threshold=pipeline_args.parent_min_threshold)
+        return predicted_entries
+
     @staticmethod
     def optional_eval(dataset, predictions):
         if dataset is None:
             return
         RankingUtil.calculate_ranking_metrics(dataset, predictions)
-
-    @staticmethod
-    def process_newlines(dictionary):
-        processed_dict = {}
-        for key, value in dictionary.items():
-            processed_value = re.sub(r'\n{2,}', '\n', value)
-            processed_dict[key] = processed_value
-        return processed_dict

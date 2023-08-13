@@ -76,9 +76,9 @@ class ArtifactPrompt(Prompt):
         id_tag, body_tag = xml_tags[outer_tag]
         formatted_id = PromptUtil.create_xml(tag_name=id_tag, tag_content=artifact_id)
         formatted_content = PromptUtil.create_xml(tag_name=body_tag, tag_content=artifact_body) if include_id else artifact_body
-        content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
+        content_for_prompt = f"{NEW_LINE}{TAB}".join([formatted_id, formatted_content]) if include_id else formatted_content
         formatted_artifact = PromptUtil.create_xml(tag_name=outer_tag,
-                                                   tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
+                                                   tag_content=f"{NEW_LINE}{TAB}{content_for_prompt}{NEW_LINE}")
         return formatted_artifact
 
     @staticmethod

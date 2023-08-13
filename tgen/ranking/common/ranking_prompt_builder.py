@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 from tgen.constants.deliminator_constants import NEW_LINE, TAB
 from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
 
-DEFAULT_BODY_TITLE = "# Software Artifacts"
+DEFAULT_BODY_TITLE = "# Software Artifacts\n---\n"
 
 
 def builder_method(func):
@@ -68,7 +68,7 @@ class RankingPromptBuilder:
         """
         :return: Builds and returns prompt.
         """
-        query_formatted = f"<{self.query_tag}>\n{self.query}\n</{self.query_tag}>" if self.query else self.query
+        query_formatted = f"\n\n<{self.query_tag}>\n{self.query}\n</{self.query_tag}>" if self.query else self.query
         body = self.join_prompts([self.body_title, self.body], "\n\n")
         items = [self.goal + query_formatted, self.context, body, self.instructions]
         prompt = self.join_prompts(items, self.section_delimiter)

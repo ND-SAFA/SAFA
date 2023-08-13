@@ -1,6 +1,8 @@
 from typing import List, Tuple
 
 import numpy as np
+import pandas as pd
+from scipy.stats import percentileofscore
 
 
 class ListUtil:
@@ -88,3 +90,15 @@ class ListUtil:
         if ascending:
             descending_list = sorted(descending_list)
         return descending_list
+
+    @staticmethod
+    def get_percentiles(scores: List[float]) -> List[float]:
+        """
+        Converts scores to percentiles.
+        :param scores: The scores to convert.
+        :return: List of percentiles.
+        """
+        scores_sorted = sorted(scores)
+        s = pd.Series(scores)
+        percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
+        return list(percentiles)

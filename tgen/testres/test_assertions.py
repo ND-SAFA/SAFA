@@ -9,8 +9,10 @@ from tgen.common.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
+from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
 
 
@@ -135,3 +137,15 @@ class TestAssertions:
         """
         for k, v in properties.items():
             test_case.assertAlmostEqual(v, row[k], delta=delta)
+
+    @staticmethod
+    def verify_trace_layers(test_case: TestCase, trace_layers: List[TraceLayer], layer_df: LayerDataFrame) -> None:
+        """
+        Verifies that trace layers are present in layer data frame.
+        :param test_case: The test case to make assertions for.
+        :param trace_layers: The expected trace layers in the data frame.
+        :param layer_df: The data frame mapping taced layers.
+        :return: None
+        """
+        layer_dicts = [{"source_type": l.child, "target_type": l.parent} for l in trace_layers]
+        TestAssertions.verify_entities_in_df(test_case, layer_dicts, layer_df)

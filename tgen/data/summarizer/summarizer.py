@@ -12,7 +12,9 @@ from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_D
 from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.supported_prompts.summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
@@ -31,6 +33,7 @@ class Summarizer(BaseObject):
                  max_completion_tokens: int = MAX_TOKENS_DEFAULT, code_or_exceeds_limit_only: bool = False,
                  nl_base_prompt: SupportedPrompts = SupportedPrompts.NL_SUMMARY,
                  code_base_prompt: SupportedPrompts = SupportedPrompts.CODE_SUMMARY):
+                 project_summary: str = None):
         """
         Initializes a summarizer for a specific model
         :param model_name: name of the model that should be used to evaluate token_limit
@@ -49,8 +52,12 @@ class Summarizer(BaseObject):
         self.args_for_summarizer_model = self.llm_manager.llm_args
         self.code_or_above_limit_only = code_or_exceeds_limit_only
         self.prompt_args = self.llm_manager.prompt_args
-        self.code_prompt_builder = PromptBuilder(
-            prompts=code_base_prompt.value)
+        self.project_summary = project_summary
+        code_prompts = code_base_prompt.value
+        if project_summary:
+            code_prompts.insert(0, CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX)
+            code_prompts.insert(1, Prompt(project_summary))
+        self.code_prompt_builder = PromptBuilder(prompts=code_prompts)
         self.nl_prompt_builder = PromptBuilder(
             prompts=nl_base_prompt.value)
 
@@ -62,11 +69,12 @@ class Summarizer(BaseObject):
         :param ids: The ids associated with each content
         :return: The summarization
         """
+        logger.info(f"Received {len(bodies)} artifacts to summarize.")
         selective_summary_payload = self.construct_select_summary_payload(bodies,
                                                                           chunker_types=chunker_types,
                                                                           ids=ids)
         indices2summarize, indices2resummarize, summary_prompts = selective_summary_payload
-        logger.info(f"\nSummarizing {len(indices2summarize)} artifacts")
+        logger.info(f"\nSelected {len(indices2summarize)} artifacts to summarize.")
         summarized_content = self._chunk_and_summarize_selective(contents=bodies,
                                                                  indices2summarize=indices2summarize,
                                                                  prompts_for_summaries=summary_prompts)
@@ -91,11 +99,13 @@ class Summarizer(BaseObject):
             prompts_for_resummarization.append(resummarization_prompt)
         return prompts_for_resummarization
 
-    def construct_select_summary_payload(self, bodies: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None):
+    def construct_select_summary_payload(self, bodies: List[str], chunker_types: List[SupportedChunker] = None, ids: List[str] = None,
+                                         context: str = ""):
         if chunker_types is None:
             chunker_types = [SupportedChunker.NL for _ in range(len(bodies))]
         if not isinstance(ids, List):
             ids = [ids for i in range(len(bodies))]
+
         assert len(chunker_types) == len(bodies) and len(ids) == len(bodies), "If supplying a chunker type and id, " \
                                                                               "must provide one for all content"
 
@@ -105,7 +115,7 @@ class Summarizer(BaseObject):
         for i, body, chunker_type, id_ in zip(range(len(bodies)), bodies, chunker_types, ids):
             chunk_prompts = self._create_chunk_prompts(body, chunker_type, id_,
                                                        code_or_above_limit_only=self.code_or_above_limit_only)
-            if len(chunk_prompts) < 1:  # no prompt because does not need summarized
+            if len(chunk_prompts) == 0:  # no prompt because does not need summarized
                 continue
             # Summarize the summarized chunks to have one congruent summary at the end
             if len(chunk_prompts) > 1:
@@ -169,8 +179,8 @@ class Summarizer(BaseObject):
         :param chunk_prompts: The prompts used to summarize each chunk
         :return: The combined summaries of all chunks
         """
-        if len(chunk_prompts) < 1:
-            return chunk_prompts
+        if len(chunk_prompts) == 0:
+            return []
         if not isinstance(chunk_prompts[0], List):
             chunk_prompts = [chunk_prompts]
         n_chunks_per_summary = [len(chunks) for chunks in chunk_prompts]

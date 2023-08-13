@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.state.state import State
 
@@ -24,3 +25,6 @@ class RankingState(State):
 
     # IO
     export_path: str = None
+
+    # Prompt building and parsing
+    prompt_builder: PromptBuilder = None

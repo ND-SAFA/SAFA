@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, IO, List, Tuple, Union
 
 import yaml
 
-from tgen.constants.deliminator_constants import F_SLASH
 from tgen.common.util.json_util import JsonUtil
+from tgen.constants.deliminator_constants import F_SLASH
 
 
 class FileUtil:
@@ -41,7 +41,8 @@ class FileUtil:
         """
         try:
             with open(file_path) as file:
-                return file.read()
+                file_content = file.read()
+                return file_content
         except Exception as e:
             print(f"Failed reading file: {file_path}")
             raise e
@@ -96,7 +97,7 @@ class FileUtil:
             return {k: FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
         if isinstance(value, str):
             if "~" in value:
-                return os.path.expanduser(value)
+                value = os.path.expanduser(value)
             if replacements:
                 for k, v in replacements.items():
                     value = value.replace(k, v)
@@ -292,5 +293,6 @@ class FileUtil:
         :param content: The content of the file to create.
         :param output_file_path: The path to save the file to.
         """
+        output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
             yaml.dump(content, file)

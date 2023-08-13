@@ -5,10 +5,10 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 class TestArtifactProjectReader(BaseTest):
@@ -21,31 +21,21 @@ class TestArtifactProjectReader(BaseTest):
         """
         Tests that the artifact project can be read and translated to artifact data frame.
         """
-        self.verify_project_data_frames(self.test_project)
+        project_reader = self.test_project.get_project_reader()
+        artifact_df = project_reader.read_project()
+        TestAssertions.verify_entities_in_df(self, self.test_project.get_artifact_entries(), artifact_df)
 
-    def test_summarization(self):
+    @mock_openai
+    def test_summarization(self, ai_manager: TestAIManager):
         """
         Tests that project artifacts can be summarized
         """
-        self.verify_summarization(test_project=self.test_project)
-
-    def verify_project_data_frames(self, test_project: AbstractTestProject) -> None:
-        """
-        Verifies that entries are found in data frames created by project reader.
-        :param test_project: Project containing entities to compare data frames to.
-        :return: None
-        """
-        project_reader = test_project.get_project_reader()
-        artifact_df = project_reader.read_project()
-        TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
-
-    @mock_openai
-    def verify_summarization(self, test_project):
-        project_reader: AbstractProjectReader = test_project.get_project_reader()
+        ai_manager.mock_summarization()
+        project_reader: AbstractProjectReader = self.test_project.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
         project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
         artifact_df = project_reader.read_project()
-        summary_artifacts = test_project.get_artifact_entries()
+        summary_artifacts = self.test_project.get_artifact_entries()
         for row in summary_artifacts:
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)

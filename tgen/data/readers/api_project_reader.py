@@ -9,7 +9,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from tgen.server.api.api_definition import ApiDefinition
+from tgen.data.readers.definitions.api_definition import ApiDefinition
 
 
 class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):

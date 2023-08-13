@@ -1,10 +1,11 @@
+from typing import Dict, List
 from unittest import skip
 
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -19,6 +20,7 @@ from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
 from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -34,13 +36,15 @@ class TestPromptDatasetCreator(BaseTest):
         prompts_df = prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
-    def test_project_reader_artifact_with_summarizer(self):
+    @mock_openai
+    def test_project_reader_artifact_with_summarizer(self, ai_manager: TestAIManager):
+        ai_manager.mock_summarization()
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
                                                           summarizer=Summarizer(llm_manager, code_or_exceeds_limit_only=False))
 
-        self.verify_summarization(dataset_creator=dataset_creator, artifacts_entries=ArtifactTestProject.get_artifact_entries())
+        self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
     def test_project_reader_prompt(self):
         prompt_project_reader = PromptTestProject.get_project_reader()
@@ -57,24 +61,23 @@ class TestPromptDatasetCreator(BaseTest):
         prompt_builder = PromptBuilder(prompts=[prompt, prompt2])
         self.verify_dataset_creator(dataset_creator, prompt_builder=prompt_builder, trace_df=trace_df)
 
-    def test_trace_dataset_creator_with_summarizer(self):
+    @mock_openai
+    def test_trace_dataset_creator_with_summarizer(self, ai_manager: TestAIManager):
+        ai_manager.mock_summarization()
+
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         llm_manager = self.create_llm_manager()
-        dataset_creator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
-                                                          summarizer=Summarizer(llm_manager, code_or_exceeds_limit_only=False))
-        all_artifacts = {artifact[ArtifactKeys.ID.value]: artifact[ArtifactKeys.CONTENT.value]
-                         for artifact in PromptTestProject.get_safa_artifacts()}
-        artifact_entries = []
-        ids = set()
-        for trace in PromptTestProject.SAFA_PROJECT.get_trace_entries():
-            source_name = trace[TraceKeys.SOURCE.value]
-            if source_name not in ids:
-                artifact_entries.append({ArtifactKeys.CONTENT.value: all_artifacts[source_name]})
-                ids.add(trace[TraceKeys.SOURCE.value])
-            if trace[TraceKeys.TARGET.value] not in ids:
-                artifact_entries.append({ArtifactKeys.CONTENT.value: all_artifacts[trace[TraceKeys.TARGET.value]]})
-                ids.add(trace[TraceKeys.TARGET.value])
-        self.verify_summarization(dataset_creator=dataset_creator, artifacts_entries=artifact_entries)
+        dataset_creator: PromptDatasetCreator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
+                                                                                summarizer=Summarizer(llm_manager,
+                                                                                                      code_or_exceeds_limit_only=False))
+        artifact_entries = self.get_expected_bodies()
+        self.verify_summarization(dataset_creator=dataset_creator, expected_entries=artifact_entries)
+
+    @staticmethod
+    def get_expected_bodies():
+        artifact_entries = [{ArtifactKeys.CONTENT.value: a[ArtifactKeys.CONTENT.value]} for a in
+                            PromptTestProject.get_safa_artifacts()]
+        return artifact_entries
 
     def test_project_file_id(self):
         dataset_creator = self.get_prompt_dataset_creator(project_file_id="id")
@@ -94,18 +97,17 @@ class TestPromptDatasetCreator(BaseTest):
         else:
             PromptTestProject.verify_prompts_safa_project_traces_for_generation(self, prompts_df, trace_df)
 
-    @mock_openai
-    def verify_summarization(self, dataset_creator, artifacts_entries):
+    def verify_summarization(self, dataset_creator: PromptDatasetCreator, expected_entries: List[Dict]):
         """
         Verifies that entries are properly summarized by reader
         :return: None
         """
         prompt_dataset: PromptDataset = dataset_creator.create()
-        for row in artifacts_entries:
+        for row in expected_entries:
             row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
             else prompt_dataset.trace_dataset.artifact_df
-        TestAssertions.verify_entities_in_df(self, artifacts_entries, artifacts_df)
+        TestAssertions.verify_entities_in_df(self, expected_entries, artifacts_df)
 
     @staticmethod
     def get_prompt_dataset_creator(**params):

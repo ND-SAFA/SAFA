@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 
 load_dotenv()
-
+OPENAI_MAX_THREADS = 1
+OPENAI_MAX_ATTEMPTS = 3
 TEMPERATURE_DEFAULT = 0.0
 MAX_TOKENS_DEFAULT = 2000
 MAX_TOKENS_BUFFER = 400

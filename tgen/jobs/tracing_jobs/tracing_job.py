@@ -1,6 +1,5 @@
 from typing import Dict, List, Union
 
-from tgen.common.util.data_structure_util import DataStructureUtil
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -18,8 +17,8 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
+from tgen.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.ranking.ranking_args import RankingArgs
-from tgen.ranking.ranking_pipeline import ArtifactRankingPipeline
 
 
 class TracingJob(AbstractJob):
@@ -53,7 +52,7 @@ class TracingJob(AbstractJob):
         """
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
         dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
-        artifact_map = DataStructureUtil.create_artifact_map(dataset.artifact_df)
+        artifact_map = dataset.artifact_df.to_map()
 
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.TGEN_CLASSIFICATION.value])
         base_tracing_job = LLMJob(trainer_dataset_manager,
@@ -73,7 +72,7 @@ class TracingJob(AbstractJob):
         pipeline_args = RankingArgs(parent_ids=parent_ids,
                                     parent2children=parent2children,
                                     artifact_map=artifact_map)
-        pipeline = ArtifactRankingPipeline(pipeline_args)
+        pipeline = LLMRankingPipeline(pipeline_args)
         parent2rankings = pipeline.run()
         predicted_entries = []
 

@@ -170,7 +170,8 @@ def create_artifact_df_from_generated_artifacts(hgen_args: HGenArgs, artifact_ge
 def get_prompt_builder_for_generation(hgen_args: HGenArgs,
                                       task_prompt: Union[QuestionnairePrompt, Prompt],
                                       base_prompt: Union[SupportedPrompts, str] = SupportedPrompts.HGEN_GENERATION,
-                                      summary_prompt: Prompt = None, artifact_type: str = None) -> PromptBuilder:
+                                      summary_prompt: Prompt = None, artifact_type: str = None,
+                                      combine_summary_and_task_prompts: bool = False) -> PromptBuilder:
     """
     Gets the prompt builder used for the generations
     :param hgen_args: The arguments for the hierarchy generator
@@ -178,6 +179,7 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
     :param base_prompt: The main prompt that starts the prompt
     :param summary_prompt: Instructions for the model to create a summary of the system first
     :param artifact_type: The type of artifact being presented in the prompt
+    :param combine_summary_and_task_prompts: If True combines the summary and task prompts into a single Questionnaire prompt
     :return: The prompt builder used for the generations
     """
     if isinstance(base_prompt, SupportedPrompts):
@@ -197,8 +199,12 @@ def get_prompt_builder_for_generation(hgen_args: HGenArgs,
 
     task_preface = f"{NEW_LINE}{PromptUtil.format_as_markdown('TASKS:')}{NEW_LINE}"
     if summary_prompt:
-        summary_prompt.value = task_preface + summary_prompt.value
-        prompts.append(summary_prompt)
+        if combine_summary_and_task_prompts:
+            task_prompt = QuestionnairePrompt(question_prompts=[summary_prompt, task_prompt],
+                                              use_multi_step_task_instructions=True)
+        else:
+            summary_prompt.value = task_preface + summary_prompt.value
+            prompts.append(summary_prompt)
     else:
         task_prompt.value = task_preface + task_prompt.value
 

@@ -71,7 +71,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
                             args.ranking_questions]
         prompt_builder.add_prompt(QuestionnairePrompt(question_prompts=question_prompts, instructions=args.ranking_instructions))
 
-        artifacts = [EnumDict({ArtifactKeys.ID: a_id, ArtifactKeys.CONTENT: content}) for a_id, content in artifact_map.items()]
+        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[a_id]}) for i, a_id in enumerate(target_names)]
         prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,
                                            artifacts=artifacts)
         prompt = prompt_dict[PromptKeys.PROMPT]

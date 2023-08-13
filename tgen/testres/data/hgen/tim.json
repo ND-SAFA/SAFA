@@ -1,0 +1,19 @@
+{
+    "artifacts": [
+        {
+            "type": "Epic Title",
+            "fileName": "Epic Title.csv"
+        },
+        {
+            "type": "C++ Code",
+            "fileName": "C++ Code.csv"
+        }
+    ],
+    "traces": [
+        {
+            "fileName": "C++ Code2Epic Title.json",
+            "sourceType": "C++ Code",
+            "targetType": "Epic Title"
+        }
+    ]
+}

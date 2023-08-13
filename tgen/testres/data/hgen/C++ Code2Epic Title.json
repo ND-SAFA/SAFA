@@ -1,0 +1,158 @@
+{
+    "traces": [
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75
+        },
+        {
+            "sourceName": "/Graphics/Components/Button.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8888888888888888
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/Graphics/Components/HBox.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9166666666666666
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8333333333333334
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8611111111111112
+        },
+        {
+            "sourceName": "/Graphics/Components/VBox.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9444444444444444
+        },
+        {
+            "sourceName": "/Graphics/Menu/ColorSelectorMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8055555555555556
+        },
+        {
+            "sourceName": "/Graphics/Menu/EscapeMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9722222222222222
+        },
+        {
+            "sourceName": "/Graphics/Menu/SettingsMenu.cpp",
+            "targetName": "Modular Interface Development ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7777777777777778
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "First Person Player Movement ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.75
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Texture Loading Utilities ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Detect Block Collisions ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875
+        },
+        {
+            "sourceName": "/Utils/ICollidable.cpp",
+            "targetName": "Detect Block Collisions ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Generate Voxel Cubic Chunk World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.875
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Generate Voxel Cubic Chunk World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Render 3D Block World ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Improve Rendering Large Procedural Worlds ET",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0
+        }
+    ]
+}

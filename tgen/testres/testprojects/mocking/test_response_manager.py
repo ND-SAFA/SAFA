@@ -1,27 +1,16 @@
 from typing import Callable, Dict, List, Union
 
-from tgen.testres.testprojects.mocking.test_open_ai_responses import DEFAULT_SUMMARY_TAG
-
 
 class TestAIManager:
     def __init__(self,
                  library: str,
-                 response_formatter: Callable,
-                 responses: Union[str, List[str]] = None,
-                 tags: List[str] = None,
-                 format: str = None):
-        if responses is None:
-            responses = []
-        if tags is None:
-            tags = [DEFAULT_SUMMARY_TAG]
+                 response_formatter: Callable):
         self.library = library
-        self._responses = responses
-        self.tags = tags
+        self._responses = []
         self.response_formatter = response_formatter
-        self.format = format
         self.n_used = 0
         self.start_index = 0
-        self.end_index = len(responses)
+        self.end_index = 0
         self.handlers = []
 
     def __call__(self, *args, **kwargs) -> List[str]:
@@ -33,8 +22,6 @@ class TestAIManager:
         manual_responses = [r(manual_prompts[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
-        if self.format:
-            responses = [self.format.format(r) for r in responses]
         self.n_used += n_manual_prompts
         return responses
 

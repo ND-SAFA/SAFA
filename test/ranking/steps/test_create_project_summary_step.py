@@ -7,7 +7,7 @@ from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic
+from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 

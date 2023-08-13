@@ -1,6 +1,6 @@
 from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
 from tgen.testres.testprojects.csv_test_project import CsvTestProject
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.mock_openai import mock_openai
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 

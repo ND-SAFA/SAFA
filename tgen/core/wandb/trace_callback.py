@@ -4,7 +4,6 @@ from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.wandb.Wandb import Wandb
 
 
 class TraceCallback(WandbCallback):
@@ -23,19 +22,11 @@ class TraceCallback(WandbCallback):
         """
         project = os.getenv("WANDB_PROJECT", "huggingface")
         run = args.run_name
-        experimental_vars = Wandb.get_clean_vars(args.experimental_vars)
-        if isinstance(experimental_vars, str):
-            experimental_vars = {"name": experimental_vars}
-        group = Wandb.get_group(experimental_vars)
         if self._wandb.run is None:
             self._wandb.init(
                 project=project,
-                name=run,
-                group=group
+                name=run
             )
-            # add config parameters (run may have been created manually)
-            self._wandb.config.update(experimental_vars, allow_val_change=True)
-
             # define default x-axis (for latest wandb versions)
             if getattr(self._wandb, "define_metric", None):
                 self._wandb.define_metric("train/global_step")

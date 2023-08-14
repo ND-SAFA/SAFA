@@ -15,7 +15,7 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits, TokenLimitCalculator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.mock_openai import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
@@ -57,15 +57,16 @@ class TestSummarizer(BaseTest):
         content_summary = summarizer.summarize_single(content=self.CODE_CONTENT)
         self.assertEqual(content_summary, CODE_SUMMARY)
 
-    @mock_openai(test_expected_responses=False)
-    def test_code_or_exceeds_limit_true(self, response_manager: TestAIManager):
+    @mock_openai
+    def test_code_or_exceeds_limit_true(self, ai_manager: TestAIManager):
+        ai_manager.mock_summarization()
         short_text = "This is a short text under the token limit"
         summarizer = self.get_summarizer(code_or_exceeds_limit_only=True, max_completion_tokens=500)
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
 
     @mock_openai
-    def test_code_summarization(self, response_manager: TestAIManager):
+    def test_code_summarization(self, ai_manager: TestAIManager):
         max_completion_tokens = 500
 
         # Calculated expected chunks + summary
@@ -75,7 +76,7 @@ class TestSummarizer(BaseTest):
         expected_summarized_chunks = [SUMMARY_FORMAT.format(chunk) for chunk in expected_chunks]
         expected_summary = "".join(expected_summarized_chunks)
 
-        response_manager.set_responses(expected_summarized_chunks + [expected_summary])
+        ai_manager.set_responses(expected_summarized_chunks + [expected_summary])
         summarizer = self.get_summarizer(max_completion_tokens=max_completion_tokens)
         content_summary = summarizer.summarize_single(self.CODE_CONTENT, chunker_type=SupportedChunker.PY)
 

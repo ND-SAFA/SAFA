@@ -9,7 +9,7 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.mock_openai import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 

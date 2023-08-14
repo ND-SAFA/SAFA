@@ -45,7 +45,8 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, list) or isinstance(obj, tuple):
             return [self.default(v) for v in obj]
         if isinstance(obj, dict):
-            return {self.default(k): self.default(v) for k, v in obj.items()}
+            value = {self.default(k): self.default(v) for k, v in obj.items()}
+            return value
         if hasattr(obj, "__dict__") and not isinstance(obj, str):
             instance_fields: Dict = ReflectionUtil.get_fields(obj)
             return {self.default(k): self.default(v) for k, v in instance_fields.items()}

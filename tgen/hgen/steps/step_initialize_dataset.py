@@ -1,5 +1,6 @@
 from typing import Any
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint
@@ -32,7 +33,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param layer_id: ID of the layer to construct a dataset for
         :return: The trace dataset
         """
-        layer_artifact_df = original_artifact_df.filter_by_row(lambda row: row[ArtifactKeys.LAYER_ID.value] == layer_id)
+        layer_artifact_df = original_artifact_df.get_type(layer_id)
         if len(layer_artifact_df) == 0:
             raise NameError(f"source_layer_id: {layer_id} does not match any artifacts in the dataset")
         return PromptDataset(artifact_df=layer_artifact_df)

@@ -1,5 +1,4 @@
 from typing import Dict, List
-from unittest import skip
 
 from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
@@ -18,7 +17,7 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.mock_openai import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject

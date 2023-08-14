@@ -155,8 +155,6 @@ class ExperimentStep(BaseObject):
                 job.result.experimental_vars = {}
             if experimental_vars:
                 job.result.experimental_vars.update(experimental_vars[i])
-                if isinstance(job, AbstractTrainerJob) and job.trainer_args is not None:
-                    job.trainer_args.experimental_vars = experimental_vars[i]
         return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:

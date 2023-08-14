@@ -54,7 +54,9 @@ class ArtifactPrompt(Prompt):
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]
         artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
-        content = artifact[StructuredKeys.Artifact.CONTENT]
+        content = artifact.get(StructuredKeys.Artifact.SUMMARY, None)
+        if not content:
+            content = artifact[StructuredKeys.Artifact.CONTENT]
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
                                 include_id=self.include_id)
         return f"{prompt}{artifact}"

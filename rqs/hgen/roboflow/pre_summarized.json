@@ -7,7 +7,7 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/roboflow",
-              "load_dir": "[OUTPUT_PATH]/hgen/roboflow/combined",
+              "load_dir": "[OUTPUT_PATH]/hgen/roboflow/28bff4c2-3bbe-4e7e-b115-3d7ae84b5c93",
               "source_layer_id": "code",
               "target_type": "User Story",
               "dataset_creator_for_sources": {

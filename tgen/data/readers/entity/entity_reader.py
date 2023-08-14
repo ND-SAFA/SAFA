@@ -33,7 +33,7 @@ class EntityReader(Generic[EntityType]):
         self.conversions: Dict[str, Dict] = conversions
         self.entity_type = None
 
-    def read_entities(self, summarizer: Summarizer = None, col2summarize: str = EMPTY_STRING) -> pd.DataFrame:
+    def read_entities(self, summarizer: Summarizer = None, col2summarize: str = EMPTY_STRING, summarycol: str = None) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
         :return: DataFrame containing processed entities.
@@ -43,7 +43,8 @@ class EntityReader(Generic[EntityType]):
         column_conversion = self.get_column_conversion()
         processed_df = DataFrameUtil.rename_columns(source_entities_df, column_conversion)
         if summarizer and not parser.performs_summarization() and col2summarize in processed_df:
-            summarizer.summarize_dataframe(processed_df, col2summarize)
+            summarycol = col2summarize if not summarycol else summarycol
+            processed_df[summarycol] = summarizer.summarize_dataframe(processed_df, col2summarize)
         logger.info(f"{self.path}:{len(source_entities_df)}")
         return processed_df
 

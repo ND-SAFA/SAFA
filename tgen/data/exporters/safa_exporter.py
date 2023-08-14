@@ -1,10 +1,9 @@
 import os
-from typing import Dict, List
+from typing import Dict
 
 import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -55,24 +54,17 @@ class SafaExporter(AbstractDatasetExporter):
         Creates dataframe for each artifact grouped by type.
         :return: None
         """
-        artifact_types = set()
-        for _, row in self.get_dataset().layer_df.itertuples():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            artifact_types.update({source_type, target_type})
+        artifact_df = self.get_dataset().artifact_df
+        artifact_types = set(artifact_df[ArtifactKeys.LAYER_ID.value].unique())
 
         artifact_type_to_artifacts = {}
         for artifact_type in artifact_types:
-            entries: List[Dict] = []
-            artifact_type_to_artifacts[artifact_type] = self.get_artifacts_of_type(artifact_type)
-            for id_, artifact in artifact_type_to_artifacts[artifact_type].iterrows():
-                entries.append(EnumDict({
-                    StructuredKeys.Artifact.ID: id_,
-                    StructuredKeys.Artifact.CONTENT: artifact[ArtifactKeys.CONTENT.value],
-                }))
-            file_name = artifact_type + ".csv"
-            local_export_path = os.path.join(self.export_path, file_name)
-            pd.DataFrame(entries).to_csv(local_export_path, index=False)
+            artifact_type_df = artifact_df.get_type(artifact_type)
+            artifact_type_to_artifacts[artifact_type] = artifact_type_df
+            # Export artifacts of type
+            file_name = f"{artifact_type}.csv"
+            artifact_type_export_path = os.path.join(self.export_path, file_name)
+            artifact_type_df.to_csv(artifact_type_export_path)
             self.artifact_definitions.append({
                 SafaKeys.TYPE: artifact_type,
                 SafaKeys.FILE: file_name

@@ -34,5 +34,7 @@ class SummarizeArtifactsJob(AbstractJob):
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
-        summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.TYPE_KEY)
-        return summarized_df.to_dict(orient='index')
+        self.artifact_df[ArtifactKeys.SUMMARY.value] = self.summarizer.summarize_dataframe(self.artifact_df,
+                                                                                           ArtifactKeys.CONTENT.value,
+                                                                                           self.TYPE_KEY)
+        return self.artifact_df.to_dict(orient='index')

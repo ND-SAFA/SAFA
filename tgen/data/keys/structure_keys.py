@@ -36,6 +36,7 @@ class StructuredKeys:
         ID = "id"
         CONTENT = "content"
         LAYER_ID = "layer_id"
+        SUMMARY = "summary"
 
     class LayerMapping(Enum):
         SOURCE_TYPE = "source_type"

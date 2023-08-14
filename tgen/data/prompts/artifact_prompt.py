@@ -5,7 +5,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.prompts.prompt import Prompt
 
 
@@ -53,8 +53,10 @@ class ArtifactPrompt(Prompt):
         if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]
-        artifact_id = artifact.get(ArtifactKeys.ID.value, EMPTY_STRING)
-        content = artifact[ArtifactKeys.CONTENT]
+        artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
+        content = artifact.get(StructuredKeys.Artifact.SUMMARY, None)
+        if not content:
+            content = artifact[StructuredKeys.Artifact.CONTENT]
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
                                 include_id=self.include_id)
         return f"{prompt}{artifact}"

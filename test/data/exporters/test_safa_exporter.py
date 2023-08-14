@@ -1,9 +1,13 @@
 import os
 from typing import List
 
+import pandas as pd
+
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
@@ -76,3 +80,36 @@ class TestSafaExporter(BaseTest):
         self.assertEqual(trace["explanation"], explanation)
         self.assertEqual(trace["approvalStatus"], "UNREVIEWED")
         self.assertEqual(trace["traceType"], "GENERATED")
+
+    def test_summaries(self):
+        """
+        Tests that summaries are included in the safa export.
+        """
+        artifact_id = "RE1"
+        artifact_content = "This is a body"
+        artifact_type = "source"
+        artifact_summary = "This is a summary"
+        artifact_type_file_name = f"{artifact_type}.csv"
+
+        artifact_export_path = os.path.join(TEST_OUTPUT_DIR, "source.csv")
+        entries = [{"id": artifact_id, "content": artifact_content, "layer_id": artifact_type, "summary": artifact_summary}]
+        artifact_df = ArtifactDataFrame(entries)
+        artifact_df.to_csv(artifact_export_path)
+        tim_json = {"artifacts": [{
+            "fileName": artifact_type_file_name,
+            "type": artifact_type
+        }], "traces": []}
+        FileUtil.write(tim_json, os.path.join(TEST_OUTPUT_DIR, "tim.json"))
+
+        export_dir = os.path.join(TEST_OUTPUT_DIR, "export")
+        project_reader = StructuredProjectReader(project_path=TEST_OUTPUT_DIR)
+        trace_dataset_creator = TraceDatasetCreator(project_reader=project_reader)
+        safa_exporter = SafaExporter(export_dir, trace_dataset_creator)
+        safa_exporter.export()
+
+        artifact_exported_df = pd.read_csv(os.path.join(export_dir, artifact_type_file_name))
+        self.assertEqual(1, len(artifact_exported_df))
+        artifact = artifact_exported_df.iloc[0]
+        self.assertEqual(artifact_id, artifact[ArtifactKeys.ID.value])
+        self.assertEqual(artifact_content, artifact[ArtifactKeys.CONTENT.value])
+        self.assertEqual(artifact_summary, artifact[ArtifactKeys.SUMMARY.value])

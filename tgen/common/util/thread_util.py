@@ -1,10 +1,13 @@
 import threading
+import time
 from queue import Queue
 from typing import Callable, List
 
 from tqdm import tqdm
 
 from tgen.common.util.logging.logger_manager import logger
+
+THREAD_SLEEP = 5
 
 
 class ThreadUtil:
@@ -46,6 +49,8 @@ class ThreadUtil:
                 attempts = 0
                 successful = False
                 while not successful and attempts < max_attempts:
+                    if attempts > 0:
+                        logger.info(f"Re-trying request...")
                     try:
                         thread_result = thread_work(item)
                         successful = True
@@ -53,6 +58,9 @@ class ThreadUtil:
                             result_list[index] = thread_result
                     except Exception as e:
                         logger.exception(e)
+                        logger.info(f"Request failed, retrying in {THREAD_SLEEP} seconds.")
+                        time.sleep(THREAD_SLEEP)
+
                     attempts += 1
                 if attempts >= max_attempts and not successful:
                     raise ValueError(f"A thread executed {attempts} out of {max_attempts}.")

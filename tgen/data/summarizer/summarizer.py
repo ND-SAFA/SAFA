@@ -10,8 +10,8 @@ from tgen.constants.deliminator_constants import EMPTY_STRING, SPACE
 from tgen.constants.model_constants import get_efficient_default_llm_manager
 from tgen.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.data.chunkers.supported_chunker import SupportedChunker
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.supported_prompts.summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
@@ -149,6 +149,7 @@ class Summarizer(BaseObject):
         Summarizes the information in a dataframe in a given column
         :param df: The dataframe to summarize
         :param col2summarize: The name of the column in the dataframe to summarize
+        :param col2use4chunker:
         :param index_to_chunker_to_use: Dictionary mapping index to the chunker to use for that row
         :return: The dataframe with the contents in the given column summarized
         """
@@ -220,7 +221,7 @@ class Summarizer(BaseObject):
             return []  # skip summarizing content below token limit unless code
         prompt_builder = self.nl_prompt_builder if chunker_type == SupportedChunker.NL else self.code_prompt_builder
         return [prompt_builder.build(model_format_args=self.llm_manager.prompt_args,
-                                     artifact={ArtifactKeys.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
+                                     artifact={StructuredKeys.Artifact.CONTENT: chunk})[PromptKeys.PROMPT.value] for chunk in chunks]
 
     def _chunk_and_summarize_selective(self,
                                        contents: List[str],

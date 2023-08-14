@@ -69,10 +69,6 @@ class RankingArgs(PipelineArgs):
     """
     project_summary: str = None
     """
-    The path to load a project summary from
-    """
-    project_summary_path: str = None
-    """
     The model used to rank
     """
     ranking_llm_model: str = DEFAULT_RANKING_MODEL

@@ -1,5 +1,6 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
+import numpy as np
 import pandas as pd
 
 
@@ -99,3 +100,17 @@ class DataFrameUtil:
                 df_dict[col] = []
             df_dict[col].append(value)
         return df_dict
+
+    @staticmethod
+    def get_float_value(row: pd.Series, col_name: str) -> Optional[Any]:
+        """
+        Returns the column value if exists, otherwise None is returned.
+        :param row: The row in the dataframe.
+        :param col_name: The name of the column.
+        :return:
+        """
+        potential_value = row.get(col_name, None)
+        if potential_value is not None and not np.isnan(potential_value):
+            return potential_value
+        else:
+            return None

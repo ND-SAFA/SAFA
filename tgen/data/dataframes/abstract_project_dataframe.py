@@ -126,7 +126,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         for col in expected_columns:
             if col == self.index_name() and columns[i] != col:
                 continue
-            assert col == columns[i], f"Columns expected to be in the following order: {expected_columns}"
+            assert col == columns[
+                i], f"Columns expected to be in the following order: {expected_columns} but received {columns[i]} instead of {col}"
             i += 1
 
     @classmethod

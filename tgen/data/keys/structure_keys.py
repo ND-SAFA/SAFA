@@ -22,13 +22,18 @@ class StructuredKeys:
         TARGET = "target"
         LABEL = "label"
         SCORE = "score"
+        EXPLANATION = "explanation"
 
-        @staticmethod
-        def get_cols() -> List["Trace"]:
+        @classmethod
+        def get_cols(cls, excluded: List["Trace"] = None) -> List["Trace"]:
             """
+            :param: excluded: The columns excluded in the returned list.
             :return: Returns the list of columns in trace dataframe.
             """
-            return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL, StructuredKeys.Trace.SCORE]
+            if excluded is None:
+                excluded = [cls.LINK_ID]
+            trace_columns = [trace_col for trace_col in StructuredKeys.Trace if trace_col not in excluded]
+            return trace_columns
 
     class Artifact(Enum):
         ID = "id"

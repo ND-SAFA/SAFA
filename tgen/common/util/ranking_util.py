@@ -62,7 +62,7 @@ class RankingUtil:
                 "label": label
             }
             if explanations:
-                entry["explanation"] = explanations[i]
+                entry[TraceKeys.EXPLANATION.value] = explanations[i]
             predicted_entries.append(entry)
         return predicted_entries
 

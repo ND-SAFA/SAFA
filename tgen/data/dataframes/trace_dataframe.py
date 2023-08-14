@@ -11,7 +11,10 @@ class TraceDataFrame(AbstractProjectDataFrame):
     """
     Contains the trace links found in a project
     """
-    OPTIONAL_COLUMNS = [StructuredKeys.Trace.SCORE.value]
+    OPTIONAL_COLUMNS = [StructuredKeys.Trace.LABEL.value,
+                        StructuredKeys.Trace.SCORE.value,
+                        StructuredKeys.Trace.EXPLANATION.value,
+                        StructuredKeys.Trace.LINK_ID.value]
 
     def __init__(self, *args, **kwargs):
         """

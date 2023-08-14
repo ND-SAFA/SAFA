@@ -267,8 +267,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         artifact_ids = list(set(artifact_ids))
         n_artifacts = len(artifact_ids)
         if n_artifacts > n_allowed:
-            artifact_id_str = NEW_LINE.join(
-                [COMMA.join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)])
+            missing_artifact_ids = [COMMA.join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)]
+            headers = ["# Missing Artifacts"]
+            artifact_id_str = NEW_LINE.join(headers + missing_artifact_ids)
             raise ValueError(f"{error_msg}. Expected {n_allowed} but found {n_artifacts}.\n {artifact_id_str}")
         else:
             if default_msg:

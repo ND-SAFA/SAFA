@@ -109,6 +109,7 @@ class SafaExporter(AbstractDatasetExporter):
                     trace_entry["traceType"] = "GENERATED"
                     trace_entry["approvalStatus"] = "UNREVIEWED"
                     trace_entry["score"] = trace_row[TraceKeys.SCORE.value]
+                    trace_entry["explanation"] = trace_row[TraceKeys.EXPLANATION.value]
 
                 else:
                     trace_entry["traceType"] = "MANUAL"

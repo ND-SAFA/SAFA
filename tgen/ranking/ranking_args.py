@@ -31,7 +31,7 @@ class RankingArgs(PipelineArgs):
     """
     Path to export various checkpoints
     """
-    export_dir: str = None
+    export_dir: str = "~/desktop/safa/output/hgen/roboflow/explanations"
     """
     Maps artifact ids to content.
     """
@@ -68,10 +68,6 @@ class RankingArgs(PipelineArgs):
     A pre-existing project summary to use.
     """
     project_summary: str = None
-    """
-    The path to load a project summary from
-    """
-    project_summary_path: str = None
     """
     The model used to rank
     """

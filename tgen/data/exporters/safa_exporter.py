@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -104,16 +103,18 @@ class SafaExporter(AbstractDatasetExporter):
                     "sourceName": trace_row[TraceKeys.SOURCE.value],
                     "targetName": trace_row[TraceKeys.TARGET.value]
                 }
-
-                if TraceKeys.SCORE.value in trace_row:
+                score = DataFrameUtil.get_float_value(trace_row, TraceKeys.SCORE.value)
+                label = DataFrameUtil.get_float_value(trace_row, TraceKeys.LABEL.value)
+                if score:
                     trace_entry["traceType"] = "GENERATED"
                     trace_entry["approvalStatus"] = "UNREVIEWED"
-                    trace_entry["score"] = trace_row[TraceKeys.SCORE.value]
-                    trace_entry["explanation"] = trace_row[TraceKeys.EXPLANATION.value]
-
-                else:
+                    trace_entry["score"] = score
+                    trace_entry["explanation"] = trace_row.get(TraceKeys.EXPLANATION.value, None)
+                elif label and label == 1:
                     trace_entry["traceType"] = "MANUAL"
                     trace_entry["score"] = 1
+                else:  # negative link
+                    continue
                 traces_json.append(trace_entry)
             FileUtil.write({"traces": traces_json}, export_file_path)
 

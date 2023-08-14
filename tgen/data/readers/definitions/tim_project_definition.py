@@ -29,11 +29,15 @@ class TimProjectDefinition(AbstractProjectDefinition):
         CSV: {
             StructuredKeys.ARTIFACTS: {
                 "id": StructuredKeys.Artifact.ID.value,
-                "content": StructuredKeys.Artifact.CONTENT.value
+                "content": StructuredKeys.Artifact.CONTENT.value,
+                "summary": StructuredKeys.Artifact.SUMMARY.value
             },
             StructuredKeys.TRACES: {
                 "source": StructuredKeys.Trace.SOURCE.value,
                 "target": StructuredKeys.Trace.TARGET.value,
+                "label": StructuredKeys.Trace.LABEL.value,
+                "score": StructuredKeys.Trace.SOURCE.value,
+                "explanation": StructuredKeys.Trace.EXPLANATION.value
             }
         }
     }

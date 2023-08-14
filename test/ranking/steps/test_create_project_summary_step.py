@@ -39,7 +39,7 @@ class TestCreateProjectSummary(BaseTest):
         project_summary_path = os.path.join(TEST_OUTPUT_DIR, "project_summary.txt")
         FileUtil.write(self.PROJECT_SUMMARY, project_summary_path)
 
-        args, state = RankingPipelineTest.create_ranking_structures(project_summary_path=project_summary_path)
+        args, state = RankingPipelineTest.create_ranking_structures(export_dir=TEST_OUTPUT_DIR)
         step = CreateProjectSummary()
         self.assert_result(args, state, step)
 

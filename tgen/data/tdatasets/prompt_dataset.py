@@ -224,23 +224,6 @@ class PromptDataset(iDataset):
         # TODO: in the future may need to shorten if entry exceeds token limit but generally doesn't exceed limit for current models
         return entry
 
-    def _get_artifact_summarization(self, artifact: EnumDict, summarizer: Summarizer, force_create_new: bool = False) -> str:
-        """
-        Gets a summarization of the artifact from cache if it exists, otherwise creates a summarization
-        :param artifact: The artifact to summarize
-        :param summarizer: The summarizer to use
-        :return: The summarized content
-        """
-        artifact_id = artifact[ArtifactKeys.ID]
-        if artifact_id not in self.__summarized_artifacts:
-            summary = summarizer.summarize_single(content=artifact[ArtifactKeys.CONTENT], id_=artifact_id)
-            self.__summarized_artifacts[artifact_id] = summary
-            return summary
-        if force_create_new:
-            summary = summarizer.summarize_single(content=self.__summarized_artifacts[artifact_id], id_=artifact_id)
-            return summary
-        return self.__summarized_artifacts[artifact_id]
-
     def _has_trace_data(self) -> bool:
         """
         Returns True when project data in the form of an artifacts_df or trace_dataset has been provided, else False

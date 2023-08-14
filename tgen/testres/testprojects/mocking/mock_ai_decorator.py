@@ -1,34 +1,37 @@
-from typing import Callable, List, Tuple, Union
-from unittest import mock
+from typing import Callable, List, Union
+from unittest.mock import patch
 
-from tgen.common.util.attr_dict import AttrDict
-from tgen.testres.testprojects.mocking.test_open_ai_responses import does_accept, method_mock_map
+from tgen.testres.testprojects.mocking.test_open_ai_responses import library_formatter_map, library_mock_map
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
-def mock_ai(library: str, response_formatter: Callable, func=None, format: str = None,
-            test_expected_responses: bool = True, *outer_args, **outer_kwargs):
+def mock_ai(libraries: Union[str, List[str]],
+            ai_managers: List[TestAIManager],
+            func=None):
     """
-    Automatically mocks open ai
-    :param format: The format to encapsulate responses in.
-    :return: The decorated function with open ai mocked.
+    Mocks the given library with the ai_manager.
+    :param libraries: The library to mock (e.g. anthropic, openai).
+    :param ai_managers: The AI manager to intercept call with.
+    :param func: The function being decorated.
+    :return:
     """
-    library_mock_method_name = method_mock_map[library]
+    if isinstance(libraries, str):
+        libraries = [libraries]
+    if isinstance(ai_managers, TestAIManager):
+        ai_managers = [ai_managers]
+
+    library_method_names = [library_mock_map[l] for l in libraries]
+    library_ai_managers = [TestAIManager(l, library_formatter_map[l]) for l in libraries]
 
     def decorator(test_func: Callable = None, *test_func_args, **test_func_kwargs):
 
-        @mock.patch(library_mock_method_name)
-        def test_function_wrapper(self, mock_completion):
-            response_manager = TestAIManager(library, response_formatter, format=format,
-                                             *outer_args, **outer_kwargs)
-            mock_completion.side_effect = response_manager
-            if does_accept(test_func, response_manager):
-                test_func(self, response_manager, *test_func_args, **test_func_kwargs)
-            else:
-                test_func(self, *test_func_args, **test_func_kwargs)
-            if test_expected_responses:
-                n_used = response_manager.start_index
-                n_expected = len(response_manager._responses)
+        def test_function_wrapper(mock_completion, *wrapper_args, **wrapper_kwargs):
+            mock_completion.side_effect = ai_managers
+            self, *wrapper_args = wrapper_args
+            test_func(self, *library_ai_managers, *test_func_args, *wrapper_args, **test_func_kwargs, **wrapper_kwargs)
+            for ai_manager in ai_managers:
+                n_used = ai_manager.start_index
+                n_expected = len(ai_manager._responses)
                 assert n_used == n_expected, f"Response manager had {n_expected - n_used} / {n_expected} unused responses."
 
         function_name = test_func.__name__ if hasattr(test_func, "__name__") else func.__name__
@@ -36,54 +39,22 @@ def mock_ai(library: str, response_formatter: Callable, func=None, format: str =
         if callable(func):  # allows you to use @mock_anthropic or @mock_anthropic()
             parent_object = test_func
             test_func = func
-            return test_function_wrapper(parent_object)
+            return run_with_patches(library_method_names, test_function_wrapper, parent_object)
         else:
-            return test_function_wrapper
+            def inner_thing():
+                run_with_patches(library_method_names, test_function_wrapper, parent_object)
+
+            return inner_thing
 
     return decorator
 
 
-def mock_anthropic(func=None, *args, **kwargs):
-    def anthropic_response_formatter(responses: List[str]):
-        assert isinstance(responses, list), "Expected list as response from anthropic mock."
-        assert len(responses) == 1, "Expected single response in anthropic responses."
-        res = AttrDict({"completion": responses[0]})
-        return res
-
-    return mock_ai(library="anthropic", response_formatter=anthropic_response_formatter, func=func, *args, **kwargs)
-
-
-def mock_openai(func=None, *args, **kwargs):
-    """
-    Mocks openai response and allows test function to receive a TestResponseManager.
-    :param func: Internal. The test function being wrapped.
-    :param args: Positional arguments to mock ai decorator.
-    :param kwargs: Keyword arguments to mock ai decorator.
-    :return: Wrapped test function.
-    """
-
-    def openai_response_formatter(responses: List[Union[str, Tuple]]):
-        assert len(responses) == 1, f"Expected responses to contain single output but got: {len(responses)}"
-        r = responses[0]
-        if isinstance(r, tuple):
-            content, logprobs = r
-            logprobs = AttrDict({"top_logprobs": [logprobs]})
-        else:
-            content = r
-            logprobs = None
-
-        entry = AttrDict({
-            "choices": [
-                AttrDict({
-                    "message": {
-                        "content": content
-                    },
-                    "logprobs": logprobs
-                })
-            ],
-
-            "id": "id"
-        })
-        return entry
-
-    return mock_ai(library="openai", response_formatter=openai_response_formatter, func=func, *args, **kwargs)
+def run_with_patches(patches, runnable: Callable, *args, **kwargs):
+    assert len(patches) > 0, f"No methods to patch."
+    if len(patches) == 1:
+        patch_name = patches[0]
+        with patch(patch_name) as other_func:
+            runnable(other_func, *args, **kwargs)
+    else:
+        with patch(patches) as other_func:
+            run_with_patches(patches[1:], runnable, other_func, **kwargs)

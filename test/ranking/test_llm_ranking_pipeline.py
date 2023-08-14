@@ -2,7 +2,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_anthropic
+from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 PARENT_ID = "parent_1"

@@ -2,23 +2,21 @@ import math
 import random
 import re
 import uuid
-from unittest import mock, skip
 
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerKeys
-from tgen.data.summarizer.summarizer import Summarizer
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
-from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
+from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
+from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
 def get_res(prompt, **kwargs):
@@ -40,12 +38,19 @@ def get_res(prompt, **kwargs):
 class TestMultiLayerHGenJob(BaseJobTest):
     project = GenerationTestProject()
 
-    @mock_openai
-    @mock.patch.object(AnthropicManager, "make_completion_request_impl", side_effect=get_res)
-    def test_run_success(self, fake_open_ai_completion_mock: mock.MagicMock, fake_anthropic_completion_mock: mock.MagicMock):
+    @mock_anthropic
+    def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager):
         """
         Tests that job is completed succesfully.
         """
+        anthropic_ai_manager.mock_summarization()
+        anthropic_ai_manager.set_responses([
+            "hi"
+        ])
+        openai_ai_manager.set_responses([
+            "hi"
+        ])
+
         self._test_run_success()
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult):
@@ -70,7 +75,9 @@ class TestMultiLayerHGenJob(BaseJobTest):
         self.assertEqual(n_expected_links, len(dataset.trace_df))
 
     def _get_job(self):
-        starting_hgen_job = BaseHGenJob(HGenArgs(dataset_for_sources=PromptDataset(self.project.ARTIFACTS),
+        project_reader = TestDataManager.get_project_reader()
+        project_creator = TraceDatasetCreator(project_reader=project_reader)
+        starting_hgen_job = BaseHGenJob(HGenArgs(dataset_creator_for_sources=project_creator,
                                                  target_type="user_story",
-                                                 source_layer_id="source_layer"))
+                                                 source_layer_id="source_1"))
         return MultiLayerHGenJob(starting_hgen_job, ["epic", "requirement"])

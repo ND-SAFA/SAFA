@@ -1,0 +1,20 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "RANKING",
+          "ranking_pipeline": "LLM",
+          "export_dir": "~/desktop/roboflow/checkpoints",
+          "dataset_creator": {
+            "object_type": "TRACE",
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "~/desktop/roboflow"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

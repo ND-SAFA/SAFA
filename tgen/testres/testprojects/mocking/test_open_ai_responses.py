@@ -104,7 +104,7 @@ DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.resp
 
 library_mock_map = {
     "openai": "openai.ChatCompletion.create",
-    "anthropic": "tgen.models.llm.anthropic_manager.AnthropicManager.Client.completion"
+    "anthropic": "tgen.testres.testprojects.mocking.mock_anthropic.MockAnthropicClient"
 }
 
 library_formatter_map = {

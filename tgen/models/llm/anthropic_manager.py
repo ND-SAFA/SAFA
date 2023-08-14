@@ -12,6 +12,7 @@ from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.testres.testprojects.mocking.mock_anthropic import MockAnthropicClient
 
 MAX_ATTEMPTS = 3
 SLEEP_TIME = 5
@@ -163,3 +164,5 @@ if not IS_TEST:
     assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
     if AnthropicManager.Client is None:
         AnthropicManager.Client = anthropic.Client(ANTHROPIC_KEY)
+else:
+    AnthropicManager.Client = MockAnthropicClient()

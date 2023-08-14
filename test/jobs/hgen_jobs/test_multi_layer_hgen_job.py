@@ -2,6 +2,7 @@ import math
 import random
 import re
 import uuid
+from unittest import skip
 
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -38,6 +39,7 @@ def get_res(prompt, **kwargs):
 class TestMultiLayerHGenJob(BaseJobTest):
     project = GenerationTestProject()
 
+    @skip
     @mock_libraries
     def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager):
         """

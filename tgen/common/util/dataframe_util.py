@@ -22,13 +22,11 @@ class DataFrameUtil:
         if column_translation is None or len(column_translation) == 0:
             column_translation = {col: col for col in df.columns}
 
+        column_translation = {k: v for k, v in column_translation.items() if k in df.columns}
         df = df[column_translation.keys()]
         df = df.rename(column_translation, axis=1)
         df = df[list(column_translation.values())]
 
-        df = df.dropna()
-        for df_col in df.select_dtypes(include=[float]).columns:
-            df[df_col] = df[df_col].astype(int)
         return df
 
     @staticmethod

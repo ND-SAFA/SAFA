@@ -29,7 +29,7 @@ class StructuredKeys:
             """
             :return: Returns the list of columns in trace dataframe.
             """
-            trace_columns = [trace_col for trace_col in StructuredKeys.Trace]
+            trace_columns = [trace_col for trace_col in StructuredKeys.Trace if trace_col != StructuredKeys.Trace.LINK_ID]
             return trace_columns
 
     class Artifact(Enum):

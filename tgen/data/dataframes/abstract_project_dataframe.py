@@ -84,7 +84,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
             else:
                 if self.index_name() in row_as_dict:
                     row_as_dict.pop(self.index_name())
-                self.loc[index] = [row_as_dict.get(col, None) for col in self.column_names() if col != self.index_name()]
+                self.loc[index] = [row_as_dict.get(col, None) for col in self.column_names() if col != self.index_name()
+                                   and col in self.columns]
         return self.get_row(index)
 
     def get_row(self, index: Any) -> EnumDict:
@@ -95,7 +96,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         try:
             row_df = self.loc[[index]]
-            row_as_dict = EnumDict({col: row_df[col].values[0] for col in self.column_names() if col != self.index_name()})
+            row_as_dict = EnumDict({col: row_df[col].values[0] for col in self.column_names() if col != self.index_name()
+                                    and col in self.columns})
             if self.index_name():
                 row_as_dict[self.index_name()] = index
         except KeyError as e:  # index not in dataframe

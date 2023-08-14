@@ -1,7 +1,7 @@
 from typing import Callable, List, Union
 from unittest.mock import patch
 
-from tgen.testres.testprojects.mocking.test_open_ai_responses import library_formatter_map, library_mock_map
+from tgen.testres.testprojects.mocking.mocking_config import library_mock_map, library_formatter_map
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 

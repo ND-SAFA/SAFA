@@ -7,7 +7,6 @@ from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.testres.testprojects.mocking.library_formatters import anthropic_response_formatter, openai_response_formatter
 
 FINE_TUNE_REQUEST = AttrDict({
     "training_file": "training_id",
@@ -101,16 +100,6 @@ COMPLETION_RESPONSE_DICT = AttrDict({
 
 SUMMARY_FORMAT = "Summary of {}"
 DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag
-
-library_mock_map = {
-    "openai": "openai.ChatCompletion.create",
-    "anthropic": "tgen.testres.testprojects.mocking.mock_anthropic.MockAnthropicClient"
-}
-
-library_formatter_map = {
-    "openai": openai_response_formatter,
-    "anthropic": anthropic_response_formatter
-}
 
 DEFAULT_RESPONSE = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0]["message"]["content"])
 

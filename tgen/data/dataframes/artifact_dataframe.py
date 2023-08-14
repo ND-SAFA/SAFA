@@ -2,8 +2,11 @@ from typing import Any, Dict, List, Type
 
 from tgen.common.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.override import overrides
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.summarizer.summarizer import Summarizer
 
 ArtifactKeys = StructuredKeys.Artifact
 
@@ -12,6 +15,18 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
     """
     Contains the artifacts found in a project
     """
+
+    OPTIONAL_COLUMNS = [StructuredKeys.Artifact.SUMMARY.value]
+
+    @overrides(AbstractProjectDataFrame)
+    def process_data(self) -> None:
+        """
+        Sets the index of the dataframe and performs any other processing steps
+        :return: None
+        """
+        super().process_data()
+        if not self.empty and StructuredKeys.Artifact.SUMMARY.value not in self.columns:
+            self[StructuredKeys.Artifact.SUMMARY.value] = [EMPTY_STRING for _ in self.index]
 
     @classmethod
     def index_name(cls) -> str:
@@ -29,16 +44,20 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return ArtifactKeys
 
-    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1) -> EnumDict:
+    def add_artifact(self, artifact_id: Any, content: str, layer_id: Any = 1, summary: bool = EMPTY_STRING) -> EnumDict:
         """
         Adds artifact to dataframe
         :param artifact_id: The id of the Artifact
         :param content: The body of the artifact
         :param layer_id: The id of the layer that the artifact is part of
+        :param summary: The summary of the artifact body
         :return: The newly added artifact
         """
-        return self.add_new_row({ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content,
-                                 ArtifactKeys.LAYER_ID: layer_id})
+        row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content,
+                       ArtifactKeys.LAYER_ID: layer_id}
+        if summary:
+            row_as_dict[ArtifactKeys.SUMMARY] = summary
+        return self.add_new_row(row_as_dict)
 
     def get_artifact(self, artifact_id: Any) -> EnumDict:
         """
@@ -101,3 +120,13 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: None 
         """
         self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body
+
+    def summarize_content(self, summarizer: Summarizer) -> List[str]:
+        """
+        Summarizes the content in the artifact df
+        :param summarizer: The summarizer to use
+        :return: The summaries
+        """
+        summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
+        self[ArtifactKeys.SUMMARY.value] = summaries
+        return summaries

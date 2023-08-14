@@ -43,8 +43,7 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         trace_df = self.create_trace_df()
 
         if self.summarizer is not None:
-            artifact_df = self.summarizer.summarize_dataframe(artifact_df, col2summarize=StructuredKeys.Artifact.CONTENT.value,
-                                                              col2use4chunker=StructuredKeys.Artifact.LAYER_ID.value)
+            artifact_df.summarize_content(self.summarizer)
 
         return artifact_df, trace_df, layer_mapping_df
 

@@ -33,14 +33,14 @@ class TestSummarizeJob(BaseJobTest):
         for artifact_id, artifact in job_result.body.items():
             artifact = EnumDict(artifact)
             expected_artifact = self.project.get_artifact(artifact_id)
-            self.assertIn("Summary of", artifact[ArtifactKeys.CONTENT])
+            self.assertIn("Summary of", artifact[ArtifactKeys.SUMMARY])
             if expected_artifact[SummarizeArtifactsJob.TYPE_KEY] == "py":
-                self.assertIn("python", artifact[ArtifactKeys.CONTENT])
+                self.assertIn("python", artifact[ArtifactKeys.SUMMARY])
             elif expected_artifact[SummarizeArtifactsJob.TYPE_KEY] == "java":
-                self.assertIn("java", artifact[ArtifactKeys.CONTENT])
+                self.assertIn("java", artifact[ArtifactKeys.SUMMARY])
             else:
-                self.assertNotIn("python", artifact[ArtifactKeys.CONTENT])
-                self.assertNotIn("java", artifact[ArtifactKeys.CONTENT])
+                self.assertNotIn("python", artifact[ArtifactKeys.SUMMARY])
+                self.assertNotIn("java", artifact[ArtifactKeys.SUMMARY])
 
     def _get_job(self) -> AbstractJob:
         return SummarizeArtifactsJob(self.project.ARTIFACTS, summarizer=Summarizer(AnthropicManager()))

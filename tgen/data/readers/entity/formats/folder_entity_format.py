@@ -65,24 +65,25 @@ class FolderEntityFormat(AbstractEntityFormat):
         :param summarizer: If provided, will summarize the artifact content
         :return: DataFrame containing artifact properties id and body.
         """
-        summarize_desc = "and summarizing" if summarizer is not None else EMPTY_STRING
         artifact_names = []
-        chunker_types = []
         contents = []
         for file_path in file_paths:
             artifact_name = os.path.basename(file_path) if use_file_name else os.path.sep + os.path.relpath(file_path, base_path)
             if not with_extension:
                 artifact_name = os.path.splitext(artifact_name)[0]
             artifact_names.append(artifact_name)
-            chunker_types.append(SupportedChunker.determine_from_path(file_path))
             contents.append(FileUtil.read_file(file_path))
-        if summarizer is not None:
-            contents = summarizer.summarize_bulk(bodies=contents, chunker_types=chunker_types, ids=artifact_names)
+
         artifact_names, contents = FolderEntityFormat._remove_empty_contents(artifact_names, contents)
+        chunker_type = [SupportedChunker.get_chunker_from_ext(name) for name in artifact_names]
+        summaries = summarizer.summarize_bulk(bodies=contents, chunker_types=chunker_type, ids=artifact_names) \
+            if summarizer is not None else None
         entries = EnumDict({
             ArtifactKeys.ID: artifact_names,
             ArtifactKeys.CONTENT: contents
         })
+        if summaries:
+            entries[ArtifactKeys.SUMMARY] = summaries
         return pd.DataFrame(entries).sort_values([ArtifactKeys.ID.value], ignore_index=True)
 
     @staticmethod

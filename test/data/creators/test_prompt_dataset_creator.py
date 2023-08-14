@@ -103,7 +103,7 @@ class TestPromptDatasetCreator(BaseTest):
         """
         prompt_dataset: PromptDataset = dataset_creator.create()
         for row in expected_entries:
-            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+            row[ArtifactKeys.SUMMARY.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         artifacts_df = prompt_dataset.artifact_df if prompt_dataset.artifact_df is not None \
             else prompt_dataset.trace_dataset.artifact_df
         TestAssertions.verify_entities_in_df(self, expected_entries, artifacts_df)

@@ -19,8 +19,10 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the pipeline.
         :return: None
         """
-        if args.project_summary_path is not None:
-            summary = FileUtil.read_file(os.path.expanduser(args.project_summary_path))
+        project_summary_export_path = args.get_path("project_summary.txt")
+
+        if project_summary_export_path is not None:
+            summary = FileUtil.read_file(os.path.expanduser(project_summary_export_path))
         elif args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
             logger.info("Project summary included in original request.")
             summary = args.project_summary
@@ -31,4 +33,6 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
             summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens)
             response: ProjectSummaryResponse = summary_job.run().body
             summary = response["summary"]
+            if project_summary_export_path:
+                FileUtil.write(state.project_summary, project_summary_export_path)
         state.project_summary = summary

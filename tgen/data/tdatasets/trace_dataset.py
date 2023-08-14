@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 import torch
 from datasets import Dataset
@@ -423,7 +424,8 @@ class TraceDataset(iDataset):
         pos_link_ids = []
         neg_link_ids = []
         for index, row in trace_df.itertuples():
-            if round(row[TraceKeys.LABEL]) == 1:
+            label = row[TraceKeys.LABEL]
+            if not np.isnan(label) and round(label) == 1:
                 pos_link_ids.append(index)
             else:
                 neg_link_ids.append(index)

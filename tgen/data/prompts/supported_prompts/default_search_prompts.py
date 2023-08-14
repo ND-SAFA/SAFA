@@ -19,11 +19,13 @@ QUESTION1 = ("Write a paragraph about the search query describing:" \
 
 QUESTION2 = (
     "Provide the following information for each artifact as formatted below:" \
-    "\n    Format: ID | INTERSECTION | EXPLANATION | SCORE" \
+    "\n    Format: ID | EXPLANATION | SCORE" \
     "\n    - For `ID` provide the ID of artifact currently being processed." \
-    "\n    - For `INTERSECTION` identify the parts of the artifact's functionality relevant to your response to (1)." \
-    "\n    - For `EXPLANATION` explain how the functionality identified in `INTERSECTION` contributes to the fulfillment of the query's functionality. "
-    "Be very specific about how this functionality helps fulfill the query's functionality." \
+    "\n    - For `EXPLANATION` provide three sentences explaining how the artifact contributes to the fulfillment of the query's functionality. " \
+    "If the artifact is not related, provide `These artifacts are not related`."
+    "\n        * In the first sentence describe what part of the artifact is relevant to the query functionality. " \
+    "\n        * In the second sentence describe how the artifact functionality helps fulfill the query's functionality. " \
+    "\n        * In the second sentence describe why this artifact is important to the query's functionality. " \
     "\n    - For `SCORE` provide a number from 1-10 representing how directly applicable the artifact functionality's " \
     "is to the functionality described in your response to (1). " \
     "Specifically, the score should be a number from 1-10. " \
@@ -31,7 +33,7 @@ QUESTION2 = (
     "\n        * 10 = Artifact performs the query's core functionality" \
     "\n        * 8 = Artifact performs a direct and essential function to the query's functionality" \
     "\n        * 4 = Artifact performs an indirect functionality related to query's functionality" \
-    "\n        * 1 = Related to distant or unrelated functionality of search query." \
+    "\n        * 1 = Related to distant or unrelated functionality of search query. Use this score if artifacts are unrelated." \
     "\n    Base your score on how directly each artifact contributes to or enables the functionality " \
     "described in your answer to (1)." \
     "\nIMPORTANT: For question (2), work through each artifact sequentially starting with ID 0. " \

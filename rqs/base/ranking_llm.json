@@ -5,11 +5,13 @@
         {
           "object_type": "RANKING",
           "ranking_pipeline": "LLM",
+          "sorter": "embedding",
+          "export_dir": "~/desktop/safa/datasets/my_mip/task1/task1_answer/checkpoints",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "~/desktop/safa/datasets/test"
+              "project_path": "~/desktop/safa/datasets/my_mip/task1/task1_answer"
             }
           }
         }

@@ -53,9 +53,8 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
 
             # Step - Parse and clean
             ID_INDEX = 0
-            SUMMARY_INDEX = 1
-            EXPLANATION_INDEX = 2
-            SCORE_INDEX = 3
+            EXPLANATION_INDEX = 1
+            SCORE_INDEX = 2
 
             explanation = LLMResponseUtil.parse(prompt_response, "explanation")[0]
             entries = explanation.split("\n")
@@ -66,10 +65,10 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
             for e in entry_pieces:
                 try:
                     artifact_index = int(e[ID_INDEX])
-                    artifact_summary = e[SUMMARY_INDEX]
                     artifact_explanation = e[EXPLANATION_INDEX]
                     artifact_score = float(e[SCORE_INDEX])
-                    parsed_entries.append((artifact_index, artifact_summary, artifact_explanation, artifact_score))
+                    if artifact_score > 1:
+                        parsed_entries.append((artifact_index, artifact_explanation, artifact_score))
                 except Exception as e:
                     logger.exception(e)
                     logger.info(f"Unable to parse: {e}")

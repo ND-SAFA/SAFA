@@ -6,7 +6,7 @@ class MockAnthropicClient:
     Shell for the anthropic client.
     """
 
-    def completion(self):
+    def completion(self, *args, **kwargs):
         raise NotImplementedError("This object was access before mocking.")
 
 

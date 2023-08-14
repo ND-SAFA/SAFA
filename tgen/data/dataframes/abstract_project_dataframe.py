@@ -36,7 +36,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         self.process_data()
 
     @classmethod
-    def column_names(cls) -> List[str]:
+    def required_column_names(cls) -> List[str]:
         """
         Returns the names of the columns in the dataframe
         :return: A set containing the names of the columns in the dataframe
@@ -44,6 +44,13 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if cls.__COLS is None:
             cls.__COLS = [e.value for e in cls.data_keys() if e not in cls.OPTIONAL_COLUMNS]
         return cls.__COLS
+
+    def get_all_column_names(self) -> List[str]:
+        """
+        Gets the name of all columns
+        :return: The name of all columns
+        """
+        return [e.value for e in self.data_keys() if e.value != self.index_name()]
 
     @classmethod
     @abstractmethod
@@ -86,8 +93,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
             else:
                 if self.index_name() in row_as_dict:
                     row_as_dict.pop(self.index_name())
-                self.loc[index] = [row_as_dict.get(col, None) for col in self.column_names() if col != self.index_name()
-                                   and col in self.columns]
+                self.loc[index] = [row_as_dict.get(col, None) for col in self.get_all_column_names() if col in self.columns]
         return self.get_row(index)
 
     def get_row(self, index: Any) -> EnumDict:
@@ -98,8 +104,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         try:
             row_df = self.loc[[index]]
-            row_as_dict = EnumDict({col: row_df[col].values[0] for col in self.column_names() if col != self.index_name()
-                                    and col in self.columns})
+            row_as_dict = EnumDict({col: row_df[col].values[0] for col in self.get_all_column_names() if col in self.columns})
             if self.index_name():
                 row_as_dict[self.index_name()] = index
         except KeyError as e:  # index not in dataframe
@@ -115,7 +120,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
             return
         columns = self.columns if columns is None else columns
         columns = [col.value if isinstance(col, Enum) else col.lower() for col in columns]
-        expected_columns = deepcopy(self.column_names())
+        expected_columns = deepcopy(self.required_column_names())
         expected_columns = [c for c in expected_columns if c not in self.OPTIONAL_COLUMNS]
         if self.index_name() and self.index_name() not in columns:
             expected_columns.remove(self.index_name())

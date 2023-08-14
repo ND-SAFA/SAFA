@@ -68,6 +68,15 @@ class EnumDict(OrderedDict):
         dict_ = [(to_string(key), val) for key, val in dict_.items()] if dict_ is not None else []
         super().__init__(dict_)
 
+    def get(self, key: Union[str, Enum], default: Any = None) -> Any:
+        """
+        Get an item if it exists or return default
+        :param key: The key to get
+        :param default: default value to return
+        :return: The value if it exists else default
+        """
+        return super().get(to_string(key), default)
+
     def __contains__(self, item: Union[str, Enum]) -> bool:
         """
         Returns True if item in dictionary else False

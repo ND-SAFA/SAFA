@@ -10,7 +10,7 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
-from tgen.constants.environment_constants import DELETE_TEST_OUTPUT
+from tgen.constants import environment_constants
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -42,6 +42,7 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(BaseTest, cls).setUpClass()
+        environment_constants.IS_TEST = True
         if BaseTest.configure_logging:
             config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
             LoggerManager.configure_logger(config)
@@ -58,7 +59,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def remove_output_dir():
-        if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
+        if environment_constants.DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             if os.path.isdir(TEST_OUTPUT_DIR):
                 shutil.rmtree(TEST_OUTPUT_DIR)
             else:

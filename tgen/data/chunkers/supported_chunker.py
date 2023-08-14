@@ -40,6 +40,8 @@ class SupportedChunker(SupportedEnum):
         :param ext: The ext of the file being chunked
         :return: The chunker to use
         """
+        if not isinstance(ext, str):
+            ext = str(ext)
         tmp = os.path.splitext(ext)
         if tmp[-1]:
             ext = tmp[-1].replace(os.extsep, EMPTY_STRING)

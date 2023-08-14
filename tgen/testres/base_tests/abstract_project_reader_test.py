@@ -42,7 +42,7 @@ class AbstractProjectReaderTest(BaseTest):
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:
-            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+            row[ArtifactKeys.SUMMARY.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_trace_layers(self, test_project.get_trace_layers(), layer_mapping_df)

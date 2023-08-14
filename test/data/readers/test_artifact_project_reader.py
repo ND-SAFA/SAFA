@@ -37,5 +37,5 @@ class TestArtifactProjectReader(BaseTest):
         artifact_df = project_reader.read_project()
         summary_artifacts = self.test_project.get_artifact_entries()
         for row in summary_artifacts:
-            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+            row[ArtifactKeys.SUMMARY.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)

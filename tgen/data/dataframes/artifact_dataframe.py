@@ -120,3 +120,13 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: None 
         """
         self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body
+
+    def summarize_content(self, summarizer: Summarizer) -> List[str]:
+        """
+        Summarizes the content in the artifact df
+        :param summarizer: The summarizer to use
+        :return: The summaries
+        """
+        summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
+        self[ArtifactKeys.SUMMARY.value] = summaries
+        return summaries

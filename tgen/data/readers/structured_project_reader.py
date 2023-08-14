@@ -88,7 +88,8 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
                                            artifact_definition,
                                            conversions=self.get_project_conversions())
             artifact_type_df = artifact_reader.read_entities(summarizer=self.summarizer,
-                                                             col2summarize=StructuredKeys.Artifact.CONTENT.value)
+                                                             col2summarize=StructuredKeys.Artifact.CONTENT.value,
+                                                             summarycol=StructuredKeys.Artifact.SUMMARY.value)
             artifact_type_df[StructuredKeys.Artifact.LAYER_ID.value] = artifact_type
             artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
         return ArtifactDataFrame(artifacts_df)

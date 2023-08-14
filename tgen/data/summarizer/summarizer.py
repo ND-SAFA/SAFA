@@ -144,24 +144,25 @@ class Summarizer(BaseObject):
         return content_resummarized[0]
 
     def summarize_dataframe(self, df: pd.DataFrame, col2summarize: str, col2use4chunker: str = None,
-                            index_to_chunker_to_use: Dict[str, SupportedChunker] = None) -> pd.DataFrame:
+                            index_to_chunker_to_use: Dict[str, SupportedChunker] = None) -> List[str]:
         """
         Summarizes the information in a dataframe in a given column
         :param df: The dataframe to summarize
         :param col2summarize: The name of the column in the dataframe to summarize
         :param col2use4chunker:
         :param index_to_chunker_to_use: Dictionary mapping index to the chunker to use for that row
-        :return: The dataframe with the contents in the given column summarized
+        :return: The summaries for the column
         """
         ids = list(df.index)
         chunker_types = None
         if index_to_chunker_to_use:
             chunker_types = [index_to_chunker_to_use[index] for index in ids]
         elif col2use4chunker:
-            chunker_types = [SupportedChunker.get_chunker_from_ext(row[col2use4chunker]) for _, row in df.iterrows()]
+            use_id = col2use4chunker == df.index.name
+            chunker_types = [SupportedChunker.get_chunker_from_ext(id_ if use_id else row[col2use4chunker])
+                             for id_, row in df.iterrows()]
         summaries = self.summarize_bulk(list(df[col2summarize]), chunker_types, ids)
-        df[col2summarize] = summaries
-        return df
+        return summaries
 
     def exceeds_token_limit(self, content: str) -> bool:
         """

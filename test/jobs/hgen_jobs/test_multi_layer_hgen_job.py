@@ -15,7 +15,7 @@ from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
-from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.testprojects.mocking.mock_libraries import mock_libraries
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
 
@@ -38,7 +38,7 @@ def get_res(prompt, **kwargs):
 class TestMultiLayerHGenJob(BaseJobTest):
     project = GenerationTestProject()
 
-    @mock_anthropic
+    @mock_libraries
     def test_run_success(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager):
         """
         Tests that job is completed succesfully.

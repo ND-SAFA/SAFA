@@ -1,7 +1,5 @@
-from typing import List
+from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_ai
 
 
-def mock_libraries(libraries: List[str]):
-    ai_managers = []
-    for library in libraries:
-        pass
+def mock_libraries(func=None, *args, **kwargs):
+    return mock_ai(libraries=["anthropic", "openai"], func=func, *args, **kwargs)

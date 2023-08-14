@@ -13,8 +13,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
     """
     OPTIONAL_COLUMNS = [StructuredKeys.Trace.LABEL.value,
                         StructuredKeys.Trace.SCORE.value,
-                        StructuredKeys.Trace.EXPLANATION.value,
-                        StructuredKeys.Trace.LINK_ID.value]
+                        StructuredKeys.Trace.EXPLANATION.value]
 
     def __init__(self, *args, **kwargs):
         """

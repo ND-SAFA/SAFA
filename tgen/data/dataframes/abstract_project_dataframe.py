@@ -121,7 +121,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         unexpected_columns = set(columns).difference(expected_columns)
         unexpected_columns = [c for c in unexpected_columns if c not in self.OPTIONAL_COLUMNS]
 
-        assert len(unexpected_columns) == 0, f"Unexpected columns in the trace df: {unexpected_columns}"
+        assert len(unexpected_columns) == 0, f"Unexpected columns in the data frame: {unexpected_columns}"
         i = 0
         for col in expected_columns:
             if col == self.index_name() and columns[i] != col:

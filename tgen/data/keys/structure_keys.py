@@ -25,14 +25,11 @@ class StructuredKeys:
         EXPLANATION = "explanation"
 
         @classmethod
-        def get_cols(cls, excluded: List["Trace"] = None) -> List["Trace"]:
+        def get_cols(cls) -> List["Trace"]:
             """
-            :param: excluded: The columns excluded in the returned list.
             :return: Returns the list of columns in trace dataframe.
             """
-            if excluded is None:
-                excluded = [cls.LINK_ID]
-            trace_columns = [trace_col for trace_col in StructuredKeys.Trace if trace_col not in excluded]
+            trace_columns = [trace_col for trace_col in StructuredKeys.Trace]
             return trace_columns
 
     class Artifact(Enum):

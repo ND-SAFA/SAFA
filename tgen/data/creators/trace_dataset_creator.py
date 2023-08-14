@@ -207,7 +207,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)
-        return TraceDataFrame.from_dict(all_links, orient="index")
+        trace_df = TraceDataFrame.from_dict(all_links, orient="index")
+        return trace_df
 
     @staticmethod
     def _filter_unreferenced_traces(artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame, max_missing_sources: int,

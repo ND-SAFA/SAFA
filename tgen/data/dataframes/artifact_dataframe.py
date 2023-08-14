@@ -90,7 +90,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         artifact_map = {}
         for name, row in self.iterrows():
-            content = row[ArtifactKeys.CONTENT.value]
+            content = row.get(ArtifactKeys.SUMMARY.value, None)
+            if content is None or len(content) == 0:
+                content = row[ArtifactKeys.CONTENT.value]
             artifact_map[name] = content
         return artifact_map
 

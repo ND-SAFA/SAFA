@@ -19,18 +19,18 @@ QUESTION1 = ("Write a paragraph about the search query describing:" \
 
 QUESTION2 = (
     "Provide the following information for each artifact as formatted below:" \
-    "\n    Format: ID | SUMMARY | EXPLANATION | SCORE" \
+    "\n    Format: ID | INTERSECTION | EXPLANATION | SCORE" \
     "\n    - For `ID` provide the ID of artifact currently being processed." \
-    "\n    - For `SUMMARY` summarize the relevant parts of the artifact's functionality in the context of your response to (1)." \
-    "\n    - For `EXPLANATION` detail what part of the artifact's functionality contributes to the " \
-    "fulfillment of the query's functionality and what how it does it." \
-    "\n    - For `SCORE` provide a number from 1-10 representing how relevant the artifact functionality's " \
+    "\n    - For `INTERSECTION` identify the parts of the artifact's functionality relevant to your response to (1)." \
+    "\n    - For `EXPLANATION` explain how the functionality identified in `INTERSECTION` contributes to the fulfillment of the query's functionality. "
+    "Be very specific about how this functionality helps fulfill the query's functionality." \
+    "\n    - For `SCORE` provide a number from 1-10 representing how directly applicable the artifact functionality's " \
     "is to the functionality described in your response to (1). " \
     "Specifically, the score should be a number from 1-10. " \
     "Use the following guidelines to extrapolate the correct score:" \
     "\n        * 10 = Artifact performs the query's core functionality" \
-    "\n        * 8 = Artifact performs an essential function to the query's functionality" \
-    "\n        * 4 = Artifact performs functionality indirectly related to query's functionality" \
+    "\n        * 8 = Artifact performs a direct and essential function to the query's functionality" \
+    "\n        * 4 = Artifact performs an indirect functionality related to query's functionality" \
     "\n        * 1 = Related to distant or unrelated functionality of search query." \
     "\n    Base your score on how directly each artifact contributes to or enables the functionality " \
     "described in your answer to (1)." \

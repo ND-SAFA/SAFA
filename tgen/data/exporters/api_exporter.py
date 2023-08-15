@@ -9,9 +9,9 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.ranking.common.trace_layer import TraceLayer
-from tgen.server.api.api_definition import ApiDefinition
 
 
 class ApiExporter(AbstractDatasetExporter):

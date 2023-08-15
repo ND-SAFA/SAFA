@@ -207,7 +207,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)
-        return TraceDataFrame.from_dict(all_links, orient="index")
+        trace_df = TraceDataFrame.from_dict(all_links, orient="index")
+        return trace_df
 
     @staticmethod
     def _filter_unreferenced_traces(artifact_df: ArtifactDataFrame, trace_df: TraceDataFrame, max_missing_sources: int,
@@ -267,8 +268,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         artifact_ids = list(set(artifact_ids))
         n_artifacts = len(artifact_ids)
         if n_artifacts > n_allowed:
-            artifact_id_str = NEW_LINE.join(
-                [COMMA.join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)])
+            missing_artifact_ids = [COMMA.join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)]
+            headers = ["# Missing Artifacts"]
+            artifact_id_str = NEW_LINE.join(headers + missing_artifact_ids)
             raise ValueError(f"{error_msg}. Expected {n_allowed} but found {n_artifacts}.\n {artifact_id_str}")
         else:
             if default_msg:

@@ -4,8 +4,8 @@ from typing import Union, Dict, List
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
+from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.prompts.prompt import Prompt
 
 
@@ -15,8 +15,7 @@ class ArtifactPrompt(Prompt):
     --- Examples ---
     Please rank the following children based on the parent artifact: <artifact></artifact>
     """
-
-    DEFAULT_XML_TAGS = {"artifacts": ["id", "body"]}
+    DEFAULT_XML_TAGS = {"artifact": ["id", "body"]}
 
     class BuildMethod(Enum):
         """
@@ -53,8 +52,15 @@ class ArtifactPrompt(Prompt):
         if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]
+<<<<<<< HEAD
         artifact_id = artifact.get(ArtifactKeys.ID.value, EMPTY_STRING)
         content = artifact[ArtifactKeys.CONTENT]
+=======
+        artifact_id = artifact.get(StructuredKeys.Artifact.ID.value, EMPTY_STRING)
+        content = artifact.get(StructuredKeys.Artifact.SUMMARY, None)
+        if not content:
+            content = artifact[StructuredKeys.Artifact.CONTENT]
+>>>>>>> FEATURE/hgen-cleanup
         artifact = build_method(artifact_id=artifact_id, artifact_body=content, xml_tags=self.xml_tags,
                                 include_id=self.include_id)
         return f"{prompt}{artifact}"
@@ -75,10 +81,17 @@ class ArtifactPrompt(Prompt):
         outer_tag = list(xml_tags.keys())[0]
         id_tag, body_tag = xml_tags[outer_tag]
         formatted_id = PromptUtil.create_xml(tag_name=id_tag, tag_content=artifact_id)
+<<<<<<< HEAD
         formatted_content = PromptUtil.create_xml(tag_name=body_tag, tag_content=artifact_body)
         content_for_prompt = NEW_LINE.join([formatted_id, formatted_content]) if include_id else formatted_content
         formatted_artifact = PromptUtil.create_xml(tag_name=outer_tag,
                                                    tag_content=f"{NEW_LINE}{content_for_prompt}{NEW_LINE}")
+=======
+        formatted_content = PromptUtil.create_xml(tag_name=body_tag, tag_content=artifact_body) if include_id else artifact_body
+        content_for_prompt = f"{NEW_LINE}{TAB}".join([formatted_id, formatted_content]) if include_id else formatted_content
+        formatted_artifact = PromptUtil.create_xml(tag_name=outer_tag,
+                                                   tag_content=f"{NEW_LINE}{TAB}{content_for_prompt}{NEW_LINE}")
+>>>>>>> FEATURE/hgen-cleanup
         return formatted_artifact
 
     @staticmethod

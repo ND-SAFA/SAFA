@@ -4,14 +4,19 @@ import anthropic
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
+from tgen.constants import environment_constants
 from tgen.constants.anthropic_constants import ANTHROPIC_MAX_THREADS
 from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.constants.environment_constants import ANTHROPIC_KEY, IS_TEST
+from tgen.constants.environment_constants import ANTHROPIC_KEY
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.testres.testprojects.mocking.mock_anthropic import MockAnthropicClient
+
+MAX_ATTEMPTS = 3
+SLEEP_TIME = 5
 
 
 class AnthropicResponse(TypedDict):
@@ -59,6 +64,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
         logger.info(f"Created Anthropic manager with Model: {self.llm_args.model}")
+        AnthropicManager.Client = get_client()
 
     def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
         """
@@ -87,27 +93,28 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         prompts = params[AnthropicParams.PROMPT]
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
 
-        response = []
+        global_responses = []
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        response = [None] * len(prompts)
+        global_responses = [None] * len(prompts)
 
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            try:
-                prompt_response = AnthropicManager.Client.completion(**prompt_params)
-            except Exception as e:
-                prompt_response = response_with_defaults(exception=str(e))
-            response[index] = prompt_response
+            local_response = AnthropicManager.Client.completion(**prompt_params)
+            global_responses[index] = local_response
 
-        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)), thread_work, ANTHROPIC_MAX_THREADS)
+        ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
+                                        thread_work,
+                                        n_threads=ANTHROPIC_MAX_THREADS,
+                                        max_attempts=MAX_ATTEMPTS)
 
-        for res in response:
+        for res in global_responses:
             if res and res.get("exception", EMPTY_STRING):
                 raise Exception(res["exception"])
-        return [res for res in response if res is not None]
+        responses = [res for res in global_responses if res is not None]
+        return responses
 
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
         SupportedLLMResponses]:
@@ -155,7 +162,12 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return log_probs
 
 
-if not IS_TEST:
-    assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-    if AnthropicManager.Client is None:
-        AnthropicManager.Client = anthropic.Client(ANTHROPIC_KEY)
+def get_client():
+    if not environment_constants.IS_TEST:
+        assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
+        if AnthropicManager.Client is None:
+            return anthropic.Client(ANTHROPIC_KEY)
+        else:
+            return AnthropicManager.Client
+    else:
+        return MockAnthropicClient()

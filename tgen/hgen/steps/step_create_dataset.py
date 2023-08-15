@@ -21,7 +21,7 @@ from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
+class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
@@ -47,14 +47,14 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
                 original_trace_df = original_trace_dataset.trace_df
                 original_layer_df = original_trace_dataset.layer_df
 
-            target_layer_id = CreateHGenDataset._get_target_layer_id(args, original_dataset_complete)
+            target_layer_id = CreateHGenDatasetStep._get_target_layer_id(args, original_dataset_complete)
 
             new_artifact_df = create_artifact_df_from_generated_artifacts(args, artifact_generations, target_layer_id)
             save_dataset_checkpoint(PromptDataset(artifact_df=new_artifact_df), export_path, filename="generated_artifacts_only")
 
-            new_layer_df = CreateHGenDataset._create_layer_df_with_generated_artifacts(args, target_layer_id)
+            new_layer_df = CreateHGenDatasetStep._create_layer_df_with_generated_artifacts(args, target_layer_id)
             combined_artifact_df = ArtifactDataFrame.concat(original_artifact_df, new_artifact_df)
-            new_trace_df = CreateHGenDataset._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df)
+            new_trace_df = CreateHGenDatasetStep._create_trace_df_with_generated_artifacts(args, state, combined_artifact_df)
             save_dataset_checkpoint(TraceDataset(artifact_df=new_artifact_df, trace_df=new_trace_df, layer_df=new_layer_df),
                                     export_path, filename="generated_dataset_checkpoint")
 

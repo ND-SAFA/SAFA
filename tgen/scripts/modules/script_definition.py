@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Tuple
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.constants.path_constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from tgen.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 
-ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM]
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
 
 
 class ScriptDefinition:

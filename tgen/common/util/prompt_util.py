@@ -19,6 +19,15 @@ class PromptUtil:
         return f"<{tag_name}>{tag_content}</{tag_name}>"
 
     @staticmethod
+    def format_as_markdown_italics(original_string: str) -> str:
+        """
+        Formats the string as markdown italics
+        :param original_string: The string to format
+        :return: The string formatted as markdown
+        """
+        return f"*{original_string}*"
+
+    @staticmethod
     def format_as_markdown_header(original_string: str, level: int = 1) -> str:
         """
         Formats the string as markdown header

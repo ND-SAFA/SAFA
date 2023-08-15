@@ -30,12 +30,9 @@ class FakeProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads in the project dataframes
         :return: The Project dataframes
         """
+        if self.summarizer:
+            self.artifact_df.summarize_content(self.summarizer)
         dataframes = [self.artifact_df, self.trace_df, self.layer_df]
-        for i, df in enumerate(dataframes):
-            if self.summarizer:
-                df = self.summarizer.summarize_dataframe(df, col2summarize=ArtifactKeys.CONTENT.value,
-                                                         col2use4chunker=ArtifactKeys.LAYER_ID.value)
-                dataframes[i] = df
         return tuple(dataframes)
 
     def get_project_name(self) -> str:

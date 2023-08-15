@@ -29,7 +29,6 @@ class TestExperimentStep(BaseExperimentTest):
     EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
-    @skip
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(HuggingFaceJob, "_run")
     def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
@@ -42,12 +41,11 @@ class TestExperimentStep(BaseExperimentTest):
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
         output = self._load_step_output()
-        job_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
         n_jobs = len(output["jobs"])
-        self.assertEqual(n_jobs, len(job_dirs))
+        self.assertEqual(n_jobs, len(output["jobs"]))
         self.assert_experimental_vars(experiment_step)
         self.assertEqual(output["status"], Status.SUCCESS.value)
-        best_job = self.get_job_by_id(experiment_step, output["best_job"])
+        best_job = self.get_job_by_id(experiment_step, output["best_job"]["id"])
         self.assertTrue(best_job is not None)
         self.assertEqual(max(self.accuracies), best_job.result.body.metrics["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)

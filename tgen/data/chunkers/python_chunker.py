@@ -1,8 +1,9 @@
 import ast
-import math
 import re
 from copy import deepcopy
 from typing import List, Type, Union
+
+import math
 
 from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import TAB
@@ -28,6 +29,18 @@ class PythonChunker(AbstractCodeChunker):
         :return: The head node
         """
         nodes = ast.parse(content)
+        if len(nodes.body) == 0:
+            line_start = 0
+            line_end = len(content.splitlines())
+            return ChunkedNode(lineno=line_start,
+                               end_lineno=line_end,
+                               type="",
+                               body=[ChunkedNode(
+                                   lineno=line_start,
+                                   end_lineno=line_end,
+                                   type="",
+                                   body=[]
+                               )])
         return ChunkedNode.from_python_ast(nodes)
 
     @staticmethod

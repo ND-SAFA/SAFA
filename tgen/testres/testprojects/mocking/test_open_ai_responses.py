@@ -101,11 +101,6 @@ COMPLETION_RESPONSE_DICT = AttrDict({
 SUMMARY_FORMAT = "Summary of {}"
 DEFAULT_SUMMARY_TAG = SupportedPrompts.NL_SUMMARY.value[0].response_manager.response_tag
 
-library_map = {
-    "openai": "openai.ChatCompletion.create",
-    "anthropic": "AnthropicManager.Client.completion"
-}
-
 DEFAULT_RESPONSE = deepcopy(COMPLETION_RESPONSE_DICT["choices"][0]["message"]["content"])
 
 

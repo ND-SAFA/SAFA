@@ -22,8 +22,8 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
         """
         slice_pos_link_ids = []
         slice_neg_link_ids = []
-        traces = {col: [] for col in TraceDataFrame.column_names()}
-        artifacts = {col: [] for col in ArtifactDataFrame.column_names()}
+        traces = {col: [] for col in TraceDataFrame.required_column_names()}
+        artifacts = {col: [] for col in ArtifactDataFrame.required_column_names()}
         artifact_ids = set()
         for link_id in slice_link_ids:
             trace_link = trace_dataset.trace_df.get_link(link_id)
@@ -33,12 +33,12 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
                 slice_pos_link_ids.append(trace_link[TraceKeys.LINK_ID])
             else:
                 slice_neg_link_ids.append(trace_link[TraceKeys.LINK_ID])
-            for col in TraceDataFrame.column_names():
+            for col in TraceDataFrame.required_column_names():
                 traces[col].append(trace_link[col])
             for artifact in [source, target]:
                 if artifact[ArtifactKeys.ID] not in artifact_ids:
                     artifact_ids.add(artifact[ArtifactKeys.ID])
-                    for col in ArtifactDataFrame.column_names():
+                    for col in ArtifactDataFrame.required_column_names():
                         artifacts[col].append(artifact[col])
         return TraceDataset(artifact_df=ArtifactDataFrame(artifacts), trace_df=TraceDataFrame(traces),
                             layer_df=trace_dataset.layer_df, pos_link_ids=slice_pos_link_ids,

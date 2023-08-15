@@ -15,7 +15,7 @@ class SummarizeArtifactsJob(AbstractJob):
     """
     TYPE_KEY = "type"
 
-    def __init__(self, artifacts: List[Dict], summarizer: Summarizer = None, job_args: JobArgs = None):
+    def __init__(self, artifacts: List[Dict], summarizer: Summarizer = None, job_args: JobArgs = None, **kwargs):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
@@ -24,7 +24,7 @@ class SummarizeArtifactsJob(AbstractJob):
         artifacts = [EnumDict(a) for a in artifacts]
         super().__init__(job_args)
         if summarizer is None:
-            summarizer = Summarizer(code_or_exceeds_limit_only=False)
+            summarizer = Summarizer(**kwargs)
         self.artifacts = artifacts
         self.artifact_df = pd.DataFrame(self.artifacts).set_index(ArtifactKeys.ID.value)
         self.summarizer = summarizer
@@ -34,5 +34,7 @@ class SummarizeArtifactsJob(AbstractJob):
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
-        summarized_df = self.summarizer.summarize_dataframe(self.artifact_df, ArtifactKeys.CONTENT.value, self.TYPE_KEY)
-        return summarized_df.to_dict(orient='index')
+        self.artifact_df[ArtifactKeys.SUMMARY.value] = self.summarizer.summarize_dataframe(self.artifact_df,
+                                                                                           ArtifactKeys.CONTENT.value,
+                                                                                           self.TYPE_KEY)
+        return self.artifact_df.to_dict(orient='index')

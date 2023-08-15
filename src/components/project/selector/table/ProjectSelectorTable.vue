@@ -18,7 +18,16 @@
   >
     <template #cell-actions="{ row }">
       <icon-button
+        v-if="sessionStore.isEditor(row)"
+        :small="props.minimal"
+        :tooltip="`Invite to ${row.name}`"
+        icon="invite"
+        data-cy="button-project-invite"
+        @click="projectInviteId = row.projectId"
+      />
+      <icon-button
         v-if="row.members.length > 1"
+        :small="props.minimal"
         icon="leave"
         tooltip="Leave project"
         data-cy="button-selector-leave"
@@ -26,6 +35,13 @@
       />
     </template>
   </selector-table>
+
+  <project-member-modal
+    :open="!!projectInviteId"
+    :project-id="projectInviteId"
+    @close="projectInviteId = undefined"
+    @submit="projectInviteId = undefined"
+  />
 </template>
 
 <script lang="ts">
@@ -54,6 +70,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
+import { ProjectMemberModal } from "@/components/settings";
 
 const props = defineProps<{
   /**
@@ -77,6 +94,7 @@ const emit = defineEmits<{
 const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
+const projectInviteId = ref<string>();
 
 const selectedItems = computed({
   get() {
@@ -101,6 +119,7 @@ const rows = computed(() => getProjectApiStore.allProjects);
  */
 function handleReload() {
   selected.value = undefined;
+  projectInviteId.value = undefined;
 
   getProjectApiStore.handleReload();
 }

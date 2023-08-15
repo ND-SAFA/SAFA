@@ -47,6 +47,7 @@
           <slot name="cell-actions" :row="row" />
           <icon-button
             v-if="isEditEnabled(row)"
+            :small="props.minimal"
             icon="edit"
             :tooltip="editLabel"
             data-cy="button-selector-edit"
@@ -54,6 +55,7 @@
           />
           <icon-button
             v-if="isDeleteEnabled(row)"
+            :small="props.minimal"
             icon="delete"
             :tooltip="deleteLabel"
             data-cy="button-selector-delete"

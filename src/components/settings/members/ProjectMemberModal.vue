@@ -53,7 +53,7 @@ import {
 
 const props = defineProps<{
   open: boolean;
-  projectId: string;
+  projectId?: string;
   member?: MembershipSchema;
   email?: string | null;
 }>();
@@ -102,7 +102,7 @@ const isValid = computed(
  * Resets all modal data.
  */
 function handleReset(): void {
-  projectIds.value = [props.projectId];
+  projectIds.value = props.projectId ? [props.projectId] : [];
   userEmail.value = props.email || props.member?.email || "";
   userRole.value = props.member?.role;
 }

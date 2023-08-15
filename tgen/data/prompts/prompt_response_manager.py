@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Set, Type, Union
+from typing import Any, Callable, Dict, List, Set, Type, Union, Tuple
 
 import bs4
 
@@ -139,10 +139,10 @@ class PromptResponseManager:
         if isinstance(self.response_tag, dict):
             for parent, child_tags in self.response_tag.items():
                 values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids)
-                values = {self._tag2id[c_tag]: [val.get(c_tag, None) for val in values] for c_tag in child_tags}
+                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in child_tags} for val in values]
                 output[self._tag2id[parent]] = values
         else:
-            tags = [self.response_tag] if not isinstance(self.response_tag, list) else self.response_tag
+            tags, _ = self._convert2list(self.response_tag)
             for tag in tags:
                 tag_id = self._tag2id[tag]
                 parsed = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids)
@@ -156,13 +156,18 @@ class PromptResponseManager:
         :param output: Maps tag id to the parsed output from the model
         :return: A mapping of tag id to the formatted output value
         """
-        formatted = {}
+        formatted_tags = {}
         for tag, values in output.items():
+<<<<<<< HEAD
             values = [values] if not isinstance(values, list) else values
+=======
+            values, _ = self._convert2list(values)
+>>>>>>> FEATURE/hgen-cleanup
             formatted_values = []
             for val in values:
                 formatted_val = val
                 if isinstance(val, dict):
+<<<<<<< HEAD
                     formatted_values = self._format_response(val)
                 else:
                     try:
@@ -184,14 +189,110 @@ class PromptResponseManager:
         return formatted
 
     def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str]) -> Any:
+=======
+                    formatted_val = self._format_response(val)
+                    if len(values) > 1:
+                        formatted_values.append(formatted_val)
+                    else:
+                        formatted_values = formatted_val
+                else:
+                    try:
+                        formatted_val = self._format_value(tag, formatted_val)
+                    except (TypeError, AssertionError, ValueError) as e:
+                        formatted_val = self._format_on_failure(tag, formatted_val, e)
+                    if formatted_val is not None:
+                        formatted_values.append(formatted_val)
+            formatted_tags[tag] = formatted_values
+        return formatted_tags
+
+    def _format_value(self, tag: str, orig_val: Any) -> Any:
+        """
+        Formats a value for a tag
+        :param tag: The tag to format the value for
+        :param orig_val: The original value
+        :return: The formatted value
+        """
+        assert orig_val is not None, f"Missing {tag}"
+        vals2format, orig_vals_is_list = self._convert2list(orig_val)
+        formatted = []
+        for val in vals2format:
+            if isinstance(val, bs4.NavigableString):
+                val = str(val)
+            if self.formatter:
+                val = self.formatter(tag, val)
+            inner_vals, inner_vals_is_list = self._convert2list(val)
+            if tag in self.expected_response_type:
+                inner_vals = self._convert_to_expected_type(inner_vals, tag, inner_vals_is_list)
+            if tag in self.expected_responses:
+                inner_vals = self._assert_expected_response(inner_vals, tag, inner_vals_is_list)
+            val = inner_vals if inner_vals_is_list else inner_vals.pop()
+            if val is not None:
+                formatted.append(val)
+        formatted_val = formatted if orig_vals_is_list else formatted.pop()
+        return formatted_val
+
+    def _assert_expected_response(self, vals2check: List[Any], tag: str, is_list: bool) -> List[Any]:
+        """
+        Asserts that all values are expected
+        :param vals2check: The values to check
+        :param tag: The tag used to output values
+        :param is_list: True if the response is a list
+        :return: The checked values
+        """
+        checked_values = []
+        for v in vals2check:
+            val = v
+            if v not in self.expected_responses[tag]:
+                val = self._format_on_failure(tag, v, AssertionError(f"Unexpected value for {tag}"),
+                                              no_exception=is_list, return_none_on_fail=is_list)
+            if val is not None:
+                checked_values.append(val)
+        return checked_values
+
+    def _convert_to_expected_type(self, vals2convert: List[Any], tag: str, is_list: bool) -> List[Any]:
+        """
+        Returns the list of values converted to the expected type
+        :param vals2convert: The list of values to convert
+        :param tag: The tag used to output values
+        :return: The list of converted values
+        """
+        converted = []
+        for v in vals2convert:
+            try:
+                val = self.expected_response_type[tag](v)
+            except (ValueError, TypeError) as e:
+                val = self._format_on_failure(tag, v, e, no_exception=is_list, return_none_on_fail=is_list)
+            if val is not None:
+                converted.append(val)
+        return converted
+
+    def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str], no_exception: bool = False,
+                           return_none_on_fail: bool = False) -> Any:
+>>>>>>> FEATURE/hgen-cleanup
         """
         Parses the response if it fails in some way, may be overridden in child classes
         :param tag_id: The id of the tag that failed
         :param e: The exception causing the failure
+        :param no_exception: If True, no exception will be thrown
+        :param return_none_on_fail: If True, returns None instead of the origin value
         :return: Default value
         """
+<<<<<<< HEAD
         assert tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
+=======
+        assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
+>>>>>>> FEATURE/hgen-cleanup
         logger.warning(f"Unexpected response for {tag_id}: {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)
-        return val
+        return val if not return_none_on_fail else None
+
+    @staticmethod
+    def _convert2list(orig_val: Any) -> Tuple[List, bool]:
+        """
+        Converts val to list if not already
+        :param orig_val: The original value
+        :return: The values as a list and whether it was already a list
+        """
+        is_list = isinstance(orig_val, list)
+        return [orig_val] if not is_list else orig_val, is_list

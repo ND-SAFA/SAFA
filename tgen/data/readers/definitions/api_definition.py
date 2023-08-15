@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import List
 
 from tgen.common.util.base_object import BaseObject
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
@@ -11,7 +11,7 @@ class ApiDefinition(BaseObject):
     """
     Defines the dataset received through the API.
     """
-    artifact_layers: Dict[str, Dict[str, str]]
+    artifact_layers: dict  # Dict[str, Dict[str, str]]
     layers: List[TraceLayer]
     true_links: List[TracePredictionEntry] = None
     summary: str = None

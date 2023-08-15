@@ -41,16 +41,21 @@ class HGenState(State):
     original_dataset: Union[PromptDataset, TraceDataset] = None
 
     """
-    Step 2 - Artifact generation
+    Step 2 - Input generation
+    """
+    description_of_artifact: str = None  # describes what the target type is
+    format_of_artifacts: str = None  # The format to use for the generated artifacts
+    questions: List[str] = None  # The questions to use to probe the model for a good summary
+
+    """
+    Step 3 - Artifact generation
     """
     generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
     summary: str = None  # The summary of all the source artifacts.
     generation_questionnaire: QuestionnairePrompt = None
-    description_of_artifact: str = None  # describes what the target type is
-    format_of_artifacts: str = None  # The format to use for the generated artifacts
 
     """
-    Step 3 - Refine 1
+    Optional Step - Refine 1
     """
     refinement_number: int = 1  # The current refinement step
     refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value

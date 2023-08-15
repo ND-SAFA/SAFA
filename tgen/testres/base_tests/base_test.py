@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List, Sized, Tuple
+from typing import Callable, List, Sized, Tuple, Type
 from unittest import TestCase
 
 import mock
@@ -10,7 +10,7 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
-from tgen.constants.environment_constants import DELETE_TEST_OUTPUT
+from tgen.constants import environment_constants
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
@@ -42,6 +42,7 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super(BaseTest, cls).setUpClass()
+        environment_constants.IS_TEST = True
         if BaseTest.configure_logging:
             config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
             LoggerManager.configure_logger(config)
@@ -58,7 +59,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def remove_output_dir():
-        if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
+        if environment_constants.DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             if os.path.isdir(TEST_OUTPUT_DIR):
                 shutil.rmtree(TEST_OUTPUT_DIR)
             else:
@@ -136,3 +137,15 @@ class BaseTest(TestCase):
         layer_ids = [1 for i in range(n_artifacts)]
         return ArtifactDataFrame(
             {ArtifactKeys.ID.value: ids, ArtifactKeys.CONTENT.value: bodies, ArtifactKeys.LAYER_ID.value: layer_ids})
+
+    def assert_error(self, callable: Callable, exception_type: Type[Exception], sub_msg: str):
+        """
+        Expects that callable throws error containing sub-message.
+        :param callable: The callable to throw the error.
+        :param exception_type: The exception type.
+        :param sub_msg: The message to expect to find the exception.
+        :return: None
+        """
+        with self.assertRaises(exception_type) as e:
+            callable()
+        self.assertIn(sub_msg, e.exception.args[0])

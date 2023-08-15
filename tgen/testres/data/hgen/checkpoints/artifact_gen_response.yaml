@@ -1,0 +1,74 @@
+- 0ff1e264-520d-543a-87dd-181a491e667e: {}
+  14dc6a81-0491-5683-baaf-7582a61c5798:
+    user-story:
+    - As a developer, I want to easily enable debugging visualizations like FPS counter,
+      hitboxes, etc. so that I can test and optimize my game.
+    - As a player, I want to be able to open menus and configure settings like light
+      positions so that I can customize my gameplay experience.
+    - As a player, I want to be able to place and remove blocks in the 3D world so
+      that I can build structures and modify the environment.
+    - As a player, I want to be able to copy the color of blocks so that I can match
+      adjacent blocks when building.
+    - As a player, I want the game to render smoothly even with large 3D worlds so
+      that I have an enjoyable gaming experience.
+    - As a developer, I want the 3D world to be divided into chunks that can rebuild
+      their geometry independently so that I can optimize rendering performance.
+    - As a developer, I want reusable UI components that I can easily layout and configure
+      so that I can quickly build game menus and HUDs.
+    - As a developer, I want to load images and fonts from files so that I can use
+      custom textures and text in my game.
+    - As a developer, I want robust error handling that provides stack traces so I
+      can debug crashes and exceptions.
+  7e645493-0898-5501-8155-e8578b4f5224:
+    summary:
+    - "\nHere is a summary of the key technical details and design aspects of the\
+      \ system based on the provided code:\n\nMain classes/functions:\n- DebugOptions:\
+      \ Stores default values for debug visualization options like showing FPS counter\
+      \ or entity hitboxes. Used to toggle debug features.\n- FPSCounter: Displays\
+      \ current FPS, updates at set interval. Rendered if debug options enabled. \n\
+      - Exception: Represents exceptions thrown in system. Stores reason and stack\
+      \ trace.\n- printStackTrace(): Prints human-readable stack trace by demangling\
+      \ function names.\n- Component: Base UI component class. Has position, size,\
+      \ layout, event handling.\n- HBox, VBox: Layout components that position child\
+      \ components horizontally or vertically.\n- Rectangle, Text: Visual components\
+      \ that can be rendered on screen.\n- Menu: Renders background and contains child\
+      \ UI components.\n- SettingsMenu: Allows configuring light position with sliders.\n\
+      - WorldScreen: Renders 3D world, handles input events, block placing/copying.\n\
+      - Player: Represents player entity, handles movement and rendering.\n- AABBRenderer:\
+      \ Renders axis-aligned bounding boxes.\n- BlockSelectionRenderer: Renders box\
+      \ around selected block.\n- Image: Loads image from file using STB library.\n\
+      - RenderEngine: Sets up OpenGL rendering context, handles window events.\n-\
+      \ Renderable: Represents renderable 3D object, stores vertex data.  \n- Shader:\
+      \ Loads and compiles OpenGL shaders.\n- ShaderProgram: Manages compiled shader\
+      \ programs.\n- Font: Renders text using loaded font.\n- ICollidable: Interface\
+      \ for objects that can collide.\n- Block: Represents a 3D cube with position,\
+      \ color, type.\n- BlockFace: Stores data about one face of a block.\n- Chunk:\
+      \ Manages a chunk of blocks in world. Rebuilds vertices when blocks change.\n\
+      - World: Manages all chunks in 3D voxel world. Handles collisions.\n- Game:\
+      \ Top-level game class, handles initialization and running loop.\n\nInputs/Outputs:\n\
+      - FPSCounter: Takes window size to set text position.\n- Component: Takes input\
+      \ events, renders to window.\n- Menu: Takes window size for layout.\n- WorldScreen:\
+      \ Takes window, input events, game state. Renders world and UI.\n- Player: Takes\
+      \ movement input, outputs position/rotation.\n- RenderEngine: Takes window handle.\
+      \ Renders 3D world.\n- Shader: Takes shader source files. Outputs compiled program.\n\
+      - Image: Takes image file path. Outputs pixel data.\n- BlockSelectionRenderer:\
+      \ Takes selected block position. Renders selection box.\n- Chunk: Takes block\
+      \ modifications. Rebuilds chunk mesh.\n- World: Takes block updates. Updates\
+      \ chunks.\n\nUI:\n- FPSCounter shows FPS as text overlay.\n- Components like\
+      \ Menu, Rectangle, Text for UI layout.\n- SettingsMenu allows configuring light\
+      \ settings.\n- WorldScreen shows FPS, menus, block selection.\n\nData Access:\
+      \ \n- Image loads image files using STB library.\n- Shader loads shader source\
+      \ files.\n- Font likely loads font data from file.\n\nConfiguration:\n- DebugOptions\
+      \ configures debug visualization features.\n\nLogging/Error Handling:\n- Exception\
+      \ class handles errors, stores stack trace.\n- printStackTrace() nicely prints\
+      \ exceptions.\n\nArchitecture:\n- Seems to follow MVC pattern.\n- WorldScreen\
+      \ is controller, handles input.\n- Player, Blocks, Chunks, World are model,\
+      \ store state.\n- RenderEngine, Components are view, handle rendering.\n\nExternal\
+      \ Services/Libraries:\n- Uses STB library for image loading.\n- OpenGL and GLFW\
+      \ for graphics and windowing.\n\nAlgorithms/Logic:\n- Movement controlled by\
+      \ velocity, collision detection.\n- Chunks dynamically rebuild mesh when blocks\
+      \ change.\n- Raycasting used to select blocks.\n\nUser Needs Addressed:\n- Debugging\
+      \ visualization like FPS counter and hitboxes.\n- Intuitive UI for configuring\
+      \ settings and menus.\n- 3D world interaction - placing, copying, moving blocks.\n\
+      - Rendering optimization via chunks.\n"
+  883e0a9c-e3b3-5f9c-8073-2913cbbb99ec: {}

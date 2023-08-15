@@ -50,7 +50,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                          response_manager=response_manager)
 
     @overrides(QuestionPrompt)
-    def _build(self) -> str:
+    def _build(self, **kwargs) -> str:
         """
         Formats the prompt as follows:
         Select one of the following categories:

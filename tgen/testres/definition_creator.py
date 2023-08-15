@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from tgen.server.serializers.experiment_serializer import ExperimentSerializer
+from tgen.experiments.experiment_serializer import ExperimentSerializer
 from tgen.variables.definition_variable import DefinitionVariable
 
 

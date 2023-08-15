@@ -1,11 +1,9 @@
 import os
-from typing import Dict, List
+from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -56,24 +54,17 @@ class SafaExporter(AbstractDatasetExporter):
         Creates dataframe for each artifact grouped by type.
         :return: None
         """
-        artifact_types = set()
-        for _, row in self.get_dataset().layer_df.itertuples():
-            source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
-            target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
-            artifact_types.update({source_type, target_type})
+        artifact_df = self.get_dataset().artifact_df
+        artifact_types = set(artifact_df[ArtifactKeys.LAYER_ID.value].unique())
 
         artifact_type_to_artifacts = {}
         for artifact_type in artifact_types:
-            entries: List[Dict] = []
-            artifact_type_to_artifacts[artifact_type] = self.get_artifacts_of_type(artifact_type)
-            for id_, artifact in artifact_type_to_artifacts[artifact_type].iterrows():
-                entries.append(EnumDict({
-                    StructuredKeys.Artifact.ID: id_,
-                    StructuredKeys.Artifact.CONTENT: artifact[ArtifactKeys.CONTENT.value],
-                }))
-            file_name = artifact_type + ".csv"
-            local_export_path = os.path.join(self.export_path, file_name)
-            pd.DataFrame(entries).to_csv(local_export_path, index=False)
+            artifact_type_df = artifact_df.get_type(artifact_type)
+            artifact_type_to_artifacts[artifact_type] = artifact_type_df
+            # Export artifacts of type
+            file_name = f"{artifact_type}.csv"
+            artifact_type_export_path = os.path.join(self.export_path, file_name)
+            artifact_type_df.to_csv(artifact_type_export_path)
             self.artifact_definitions.append({
                 SafaKeys.TYPE: artifact_type,
                 SafaKeys.FILE: file_name
@@ -104,15 +95,18 @@ class SafaExporter(AbstractDatasetExporter):
                     "sourceName": trace_row[TraceKeys.SOURCE.value],
                     "targetName": trace_row[TraceKeys.TARGET.value]
                 }
-
-                if TraceKeys.SCORE.value in trace_row:
+                score = DataFrameUtil.get_float_value(trace_row, TraceKeys.SCORE.value)
+                label = DataFrameUtil.get_float_value(trace_row, TraceKeys.LABEL.value)
+                if score:
                     trace_entry["traceType"] = "GENERATED"
                     trace_entry["approvalStatus"] = "UNREVIEWED"
-                    trace_entry["score"] = trace_row[TraceKeys.SCORE.value]
-
-                else:
+                    trace_entry["score"] = score
+                    trace_entry["explanation"] = trace_row.get(TraceKeys.EXPLANATION.value, None)
+                elif label and label == 1:
                     trace_entry["traceType"] = "MANUAL"
                     trace_entry["score"] = 1
+                else:  # negative link
+                    continue
                 traces_json.append(trace_entry)
             FileUtil.write({"traces": traces_json}, export_file_path)
 
@@ -123,35 +117,14 @@ class SafaExporter(AbstractDatasetExporter):
         :param target_type: The name of the target type.
         :return: DataFrame with positive links.
         """
+        trace_df = self.get_dataset().trace_df
+
         source_artifacts = self.artifact_type_to_artifacts[source_type]
         target_artifacts = self.artifact_type_to_artifacts[target_type]
-        trace_df = self.get_dataset().trace_df
-        entries = []
-        for source_id in source_artifacts.index:
-            for target_id in target_artifacts.index:
-                if source_id == target_id:
-                    continue
-                trace_link_id = TraceDataFrame.generate_link_id(source_id, target_id)
-                trace_link: EnumDict = trace_df.get_link(trace_link_id)
-                assert trace_link is not None, f"Expected trace (source: {source_id}, target: {target_id}) to exist but it does not"
-                score = trace_link[StructuredKeys.Trace.SCORE.value] if TraceKeys.SCORE in trace_link else np.NAN
-                is_tp = trace_link[TraceKeys.LABEL] == 1
-                is_generated = not np.isnan(score)
-                should_keep = is_tp or is_generated
-                if should_keep:
-                    trace_dict = EnumDict({
-                        StructuredKeys.Trace.TARGET: target_id,
-                        StructuredKeys.Trace.SOURCE: source_id
-                    })
-                    if is_tp:
-                        trace_dict[StructuredKeys.Trace.LABEL] = trace_link[TraceKeys.LABEL]
-                    if is_generated:
-                        if StructuredKeys.Trace.LABEL in trace_dict:
-                            trace_dict.pop(StructuredKeys.Trace.LABEL.value)
-                        trace_dict[StructuredKeys.Trace.SCORE] = trace_link[TraceKeys.SCORE]
-
-                    entries.append(trace_dict)
-        return pd.DataFrame(entries)
+        trace_ids = [TraceDataFrame.generate_link_id(source_id, target_id)
+                     for source_id in source_artifacts.index for target_id in target_artifacts.index]
+        filtered_trace_df = trace_df.filter_by_index(trace_ids)
+        return filtered_trace_df
 
     def create_tim(self) -> None:
         """

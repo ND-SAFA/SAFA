@@ -1,0 +1,20 @@
+import uuid
+
+from tgen.common.util.str_util import StrUtil
+from tgen.testres.base_tests.base_test import BaseTest
+
+
+class TestStrUtil(BaseTest):
+
+    def test_format_selective(self):
+        str2format = "I need to format these: {one} {two} but not this: {three}"
+        formatted = StrUtil.format_selective(str2format, one="A", two="B")
+        self.assertEqual(formatted, "I need to format these: A B but not this: {three}")
+
+        str2format = "I need to format these: {} {} but not this: {}"
+        formatted = StrUtil.format_selective(str2format, "A", "B")
+        self.assertEqual(formatted, "I need to format these: A B but not this: {}")
+
+    def test_is_uuid(self):
+        self.assertTrue(StrUtil.is_uuid(str(uuid.uuid4())))
+        self.assertFalse(StrUtil.is_uuid("hello world"))

@@ -3,6 +3,8 @@ from typing import Any, List, Union
 
 from openai.api_resources.fine_tune import FineTune
 
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.logging.logger_manager import logger
 from tgen.core.args.open_ai_args import OpenAIParams
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
@@ -21,8 +23,6 @@ from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.state_manager import StateManager
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
 
 
 class LLMTrainer(AbstractTrainer):
@@ -180,11 +180,11 @@ class LLMTrainer(AbstractTrainer):
         lower_bound, upper_bound = CLASSIFICATION_SCORES[classification]
         score_range = upper_bound - lower_bound
         try:
-            score = float(entry["confidence"])
+            confidence = float(entry["confidence"])
             if classification in REVERSE_CATEGORIES:
-                score = upper_bound - (score * score_range)
+                score = upper_bound - (confidence * score_range)
             else:
-                score = (score * score_range) + lower_bound
+                score = (confidence * score_range) + lower_bound
         except:
             score = lower_bound
             logger.info("Processing link with missing score.")

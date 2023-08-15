@@ -8,7 +8,6 @@ from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.testprojects.mocking.mock_ai_decorator import mock_openai
 from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
 
 
@@ -30,10 +29,10 @@ class AbstractProjectReaderTest(BaseTest):
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, layer_entries, layer_mapping_df)
 
-    @mock_openai
-    def verify_summarization(self, test_project):
+    def verify_summarization(self, test_project: AbstractTestProject):
         """
         Verifies that entries are properly summarized by reader
+        :param ai_manager: The manager responsible for specifying LLM responses. Uses dependency injection.
         :param test_project: Project containing entities to compare data frames to.
         :return: None
         """
@@ -43,10 +42,10 @@ class AbstractProjectReaderTest(BaseTest):
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:
-            row[ArtifactKeys.CONTENT.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
+            row[ArtifactKeys.SUMMARY.value] = SUMMARY_FORMAT.format(row[ArtifactKeys.CONTENT.value])
         TestAssertions.verify_entities_in_df(self, summary_artifacts, artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
-        TestAssertions.verify_entities_in_df(self, test_project.get_trace_layers(), layer_mapping_df)
+        TestAssertions.verify_trace_layers(self, test_project.get_trace_layers(), layer_mapping_df)
 
     @staticmethod
     def generate_artifact_entries(artifact_ids: List[int], prefix: str = "None") -> List[Dict]:

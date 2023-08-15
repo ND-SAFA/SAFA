@@ -8,8 +8,9 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs, HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint, SAVE_DATASET_DIRNAME
-from tgen.hgen.steps.step_create_dataset import CreateHGenDataset
-from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContent
+from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
+from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
+from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 
@@ -19,8 +20,9 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
     Responsible for generating higher-level artifacts from low-level artifacts
     """
     steps = [InitializeDatasetStep,
-             GenerateArtifactContent,
-             CreateHGenDataset]
+             GenerateInputsStep,
+             GenerateArtifactContentStep,
+             CreateHGenDatasetStep]
 
     def __init__(self, args: HGenArgs):
         """

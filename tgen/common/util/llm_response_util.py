@@ -1,7 +1,9 @@
+import html
 import re
 from typing import Dict, List, Union
 
 from bs4 import BeautifulSoup, Tag
+from bs4.element import NavigableString
 
 from tgen.common.util.logging.logger_manager import logger
 
@@ -18,36 +20,45 @@ class LLMResponseUtil:
         :param raise_exception: if True, raises an exception if parsing fails
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
-        soup = BeautifulSoup(res, 'html.parser')
+        soup = BeautifulSoup(res, features="lxml")
 
         try:
             assert tag_name in res, f"Missing expected tag {tag_name}"
+            tags = soup.findAll(tag_name)
             if is_nested:
-                tags = soup.findAll(tag_name)
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
-                query = soup.find(tag_name)
-                content = query.decode_contents()
-                content = [content]
-        except (AssertionError, IndexError):
+                content = [tag.contents[0] for tag in tags]
+        except Exception:
             error = f"Unable to parse {tag_name}"
             logger.exception(error)
             if raise_exception:
                 raise Exception(error)
             content = []
-        return content
+        return [html.unescape(c) for c in content]
 
     @staticmethod
-    def _parse_children(tag: Tag) -> Dict[str, str]:
+    def _parse_children(tag: Tag) -> Dict[str, List]:
         """
         Parses all children tags in the given tag
         :param tag: The parent tag
         :return: The children of the tag
         """
         children = {}
+        if isinstance(tag, str):
+            return tag
         for child in tag.children:
             if isinstance(child, Tag) and child.contents is not None and len(child.contents) > 0:
-                children[child.name] = child.contents[0]
+                tag_name = child.name
+                content = child.contents[0]
+            elif isinstance(child, NavigableString):
+                tag_name = tag.name
+                content = child
+            else:
+                continue
+            if tag_name not in children:
+                children[tag_name] = []
+            children[tag_name].append(content)
         return children
 
     @staticmethod

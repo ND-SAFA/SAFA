@@ -15,6 +15,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 from tgen.common.util.random_util import RandomUtil
+from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.common.util.status import Status
 from tgen.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.jobs.components.args.job_args import JobArgs
@@ -133,6 +134,7 @@ class AbstractJob(threading.Thread, BaseObject):
         params = {name: deepcopy(getattr(self, name, None)) for name in param_names if name != "self"}
         cpyobj = type(self)(**params)  # shallow copy of whole object
         cpyobj.result = deepcopy(self.result)
+        ReflectionUtil.copy_attributes(self, cpyobj, ParamScope.PRIVATE)
         return cpyobj
 
     def __str__(self) -> str:

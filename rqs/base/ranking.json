@@ -4,11 +4,15 @@
       "jobs": [
         {
           "object_type": "RANKING",
+          "ranking_pipeline": "EMBEDDING",
+          "should_summarize": true,
+          "project_summary": "~/desktop/safa/hgen/summaries/project/[CURRENT_PROJECT]",
+          "export_dir": "~/desktop/safa/hgen/checkpoints/",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "~/desktop/joc-vsm-testing"
+              "project_path": "~/desktop/safa/hgen/datasets-final/generated with code/answer/pl-no-summary/[CURRENT_PROJECT]"
             }
           }
         }

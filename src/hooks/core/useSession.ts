@@ -10,7 +10,13 @@ import { pinia } from "@/plugins";
 export const useSession = defineStore("session", {
   state() {
     return {
+      /**
+       * The current session.
+       */
       session: createSession(),
+      /**
+       * The current user.
+       */
       user: createUser(),
     };
   },

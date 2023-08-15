@@ -6,11 +6,13 @@ import {
   PasswordChangeSchema,
   UserPasswordSchema,
 } from "@/types";
+import { DEMO_ACCOUNT } from "@/util";
 import {
   getProjectApiStore,
   setProjectApiStore,
   sessionStore,
   logStore,
+  appStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -137,6 +139,19 @@ export const useSessionApi = defineStore("sessionApi", () => {
   }
 
   /**
+   * Logs in to the demo account and opens the demo project.
+   */
+  async function handleDemoLogin(): Promise<void> {
+    appStore.isDemo = true;
+
+    await handleLogin(DEMO_ACCOUNT).then(() =>
+      navigateTo(Routes.ARTIFACT, {
+        [QueryParams.VERSION]: "cf354d4b-21d7-4f8e-8951-e447ddf77997",
+      })
+    );
+  }
+
+  /**
    * Logs a user out to the login screen.
    *
    * @param sendLogoutRequest - Whether to send the API request to log out.
@@ -162,6 +177,10 @@ export const useSessionApi = defineStore("sessionApi", () => {
    */
   async function handleAuthentication(): Promise<void> {
     sessionStore.user = await getCurrentUser();
+
+    if (sessionStore.user.email === DEMO_ACCOUNT.email) {
+      appStore.isDemo = true;
+    }
 
     await getProjectApiStore.handleReload({});
   }
@@ -218,6 +237,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
     handlePasswordReset,
     handlePasswordUpdate,
     handleLogin,
+    handleDemoLogin,
     handleLogout,
     handleAuthentication,
     handleChangePassword,

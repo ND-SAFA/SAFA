@@ -1,6 +1,6 @@
 <template>
   <div :data-cy="isLoggedIn ? 'is-logged-in' : ''">
-    <app-nav-drawer v-if="isLoggedIn" />
+    <app-nav-drawer v-if="isLoggedIn && !isDemo" />
     <app-nav-bar v-if="isLoggedIn" />
     <details-drawer v-if="isLoggedIn" />
     <snackbar />
@@ -21,7 +21,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { logStore, sessionStore } from "@/hooks";
+import { appStore, logStore, sessionStore } from "@/hooks";
 import { AppConfirmModal } from "@/components/common";
 import { SaveProjectModal, DeleteProjectModal } from "@/components/project";
 import { AppNavDrawer } from "./sidebar";
@@ -29,6 +29,7 @@ import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";
 import Snackbar from "./Snackbar.vue";
 
+const isDemo = computed(() => appStore.isDemo);
 const isLoggedIn = computed(() => sessionStore.doesSessionExist);
 const confirmationMessage = computed(() => logStore.confirmation);
 </script>

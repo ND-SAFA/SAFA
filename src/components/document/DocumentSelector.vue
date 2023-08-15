@@ -115,7 +115,11 @@ const disabled = computed(() => deltaStore.inDeltaView);
  * @return Whether saving is allowed.
  */
 function canSave(doc = document.value): boolean {
-  return doc.name !== DEFAULT_VIEW_NAME && !doc.documentId;
+  return (
+    doc.name !== DEFAULT_VIEW_NAME &&
+    !doc.documentId &&
+    sessionStore.isEditor(projectStore.project)
+  );
 }
 
 /**

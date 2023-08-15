@@ -35,12 +35,13 @@ class AbstractPipelineStep(ABC, Generic[ArgType, StateType]):
         if state.step_is_complete(self.get_step_name()):
             return
 
-    def get_step_name(self) -> str:
+    @classmethod
+    def get_step_name(cls) -> str:
         """
         Returns the name of the step class
         :return: The name of the step class
         """
-        return self.__class__.__name__
+        return cls.__name__
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
@@ -60,12 +61,22 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         :return: None
         """
         for step in self.steps:
+            logger.info(f"Starting step: {step.get_step_name()}")
             step.run(self.args, self.state)
-            logger.info(f"Finished step: {step.__class__.__name__}")
+            logger.info(f"Finished step: {step.get_step_name()}")
 
-    @abstractmethod
-    def init_state(self) -> StateType:
+    def init_state(self):
         """
         Creates a new state corresponding to sub-class.
         :return: The new state.
+        """
+        if self.args.load_dir:
+            return self.state_class().load_latest(self.args.load_dir, [step.get_step_name() for step in self.steps])
+        return self.state_class()()
+
+    @abstractmethod
+    def state_class(self) -> Type[State]:
+        """
+        Gets the class used for the pipeline state.
+        :return: the state class
         """

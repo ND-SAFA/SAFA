@@ -3,6 +3,7 @@ from enum import Enum, auto
 from typing import Dict, List, Union
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import required_field, DataclassUtil
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.constants.model_constants import get_best_default_llm_manager, get_efficient_default_llm_manager
 from tgen.core.args.open_ai_args import OpenAIArgs
@@ -67,11 +68,11 @@ class HGenArgs(PipelineArgs, BaseObject):
     """
     The layer of the source artifacts for which higher-level artifacts will be generated
     """
-    source_layer_id: str
+    source_layer_id: str = required_field(field_name="source_layer_id")
     """
     The type of higher-level artifact that will be generated
     """
-    target_type: str
+    target_type: str = required_field(field_name="target_type")
     """
     The type of source artifacts for which higher-level artifacts will be generated
     """
@@ -96,14 +97,6 @@ class HGenArgs(PipelineArgs, BaseObject):
     Dataset creator used to make dataset containing source artifacts + links if tgen_trainer is not provide
     """
     dataset_for_sources: PromptDataset = None
-    """
-    The path to save checkpoints to if desired
-    """
-    export_dir: str = None
-    """
-    The path to load previous checkpoints from
-    """
-    load_dir: str = EMPTY_STRING
     """
     Max tokens to use for predictions.
     """

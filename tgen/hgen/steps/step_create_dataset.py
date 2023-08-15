@@ -64,9 +64,6 @@ class CreateHGenDataset(AbstractPipelineStep[HGenArgs, HGenState]):
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
             dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
-
-        save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
-        save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         state.dataset = dataset
 
     @staticmethod

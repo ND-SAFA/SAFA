@@ -12,7 +12,7 @@ from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class InitializeDatasetStepAbstract(AbstractPipelineStep[HGenArgs, HGenState]):
+class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
     def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Gets the original source datasets used for the generation

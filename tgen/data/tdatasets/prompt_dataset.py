@@ -9,8 +9,10 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
+from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.prompts.prompt_args import PromptArgs
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
@@ -248,12 +250,29 @@ class PromptDataset(iDataset):
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
 
+    def as_creator(self, project_path: str):
+        """
+        Converts the dataset into a creator that can remake it
+        :param project_path: The path to save the dataset at for reloading
+        :return: The dataset creator
+        """
+        from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+        if self.trace_dataset is not None:
+            return PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path))
+        elif self.artifact_df is not None:
+            from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
+            TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path)
+            return PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
+        elif self.prompt_df is not None:
+            raise NotImplementedError("Cannot get creator for prompt dataset with only prompt df")
+
     def __getattr__(self, item: str) -> Any:
         """
         Overriding to allow direct access to trace dataset elements
         :param item: The attribute name to get
         :return: The attribute from trace dataset if it exists else attribute error is raised
         """
-        if hasattr(self.trace_dataset, item):
+        try:
             return getattr(self.trace_dataset, item)
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        except Exception:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")

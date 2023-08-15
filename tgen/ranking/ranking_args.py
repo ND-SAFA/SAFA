@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.tgen_constants import DEFAULT_LINKS_TAG, DEFAULT_MAX_N_CHILDREN, DEFAULT_PARENT_MIN_THRESHOLD, \
@@ -16,11 +17,11 @@ class RankingArgs(PipelineArgs):
     """
     Maps artifact ids to content.
     """
-    artifact_map: Dict
+    artifact_map: Dict = required_field(field_name="artifact_map")
     """
     List of parent artifact ids.
     """
-    parent_ids: List[str]
+    parent_ids: List[str] = required_field(field_name="parent_ids")
     """
     Path to export various checkpoints
     """

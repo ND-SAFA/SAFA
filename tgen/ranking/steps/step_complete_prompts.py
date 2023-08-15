@@ -17,7 +17,7 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the current run.
         :return: None
         """
-        TRACE_FILE_NAME = "tracing_response.yaml"
+        TRACE_FILE_NAME = f"tracing_response_{args.run_name}.yaml"
         TRACE_FILE_PATH = args.get_path(TRACE_FILE_NAME)
 
         if TRACE_FILE_PATH is not None and os.path.exists(TRACE_FILE_PATH):
@@ -25,7 +25,7 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
             generation_response = GenerationResponse(**text)
         else:
             generation_response = self.complete_ranking_prompts(args, state)
-            args.save(generation_response, "tracing_response.yaml")
+            args.save(generation_response, TRACE_FILE_NAME)
         state.ranking_responses = generation_response
 
     @staticmethod

@@ -65,7 +65,8 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
             prompt_builder.add_prompt(Prompt(context_formatted))
 
         include_ids = not StrUtil.is_uuid(target_names[0])
-        prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.XML, include_ids=include_ids))
+        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=args.artifact_header,
+                                                      build_method=MultiArtifactPrompt.BuildMethod.XML, include_ids=include_ids))
 
         question_prompts = [QuestionPrompt(question=q, response_manager=PromptResponseManager(response_tag=tag)) for q, tag in
                             args.ranking_questions]

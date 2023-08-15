@@ -124,34 +124,52 @@ class RankingUtil:
         :param top_n: Whether to convert scores to classification labels.
         :return: List of selected predictions.
         """
-        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
-        predictions = []
+        trace_prediction_dict = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in trace_predictions}
+        parent2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.TARGET.value)
+        stage1_predictions = {}
 
-        for child, trace_predictions in children2entry.items():
-            sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-            if top_n is not None:
-                selected_entries = sorted_entries[:top_n]
-            else:
-                t1_preds, t2_preds, t3_preds = [], [], []
-                t0_preds = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.95]
-                t1_preds = [s for s in sorted_entries if 0.85 <= s[StructuredKeys.SCORE] < 0.95]
-                t2_preds = [s for s in sorted_entries if 0.75 <= s[StructuredKeys.SCORE] < 0.85]
-                t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
-                if len(t0_preds) > 0:
-                    selected_entries = t0_preds
-                elif len(t1_preds) > 0:
-                    selected_entries = t1_preds
-                elif len(t2_preds):
-                    selected_entries = t2_preds
-                else:
-                    selected_entries = t3_preds
+        for parent, parent_entries in parent2entry.items():
+            sorted_entries = sorted(parent_entries, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
+            stage1_selected_entries = [e for e in sorted_entries if e["score"] >= 0.8]
+            stage1_selected_entries = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in stage1_selected_entries}
+            stage1_predictions.update(stage1_selected_entries)
 
-            predictions.extend(selected_entries)
+        stage2_predictions = {}
+        child2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
+        for child, child_entries in child2entry.items():
+            sorted_entries = sorted(child_entries, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
+            stage2_selected_entries = sorted_entries[:1]
+            stage2_selected_entries = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in stage2_selected_entries}
+            stage2_predictions.update(stage2_selected_entries)
 
-        if top_n:
-            for p in predictions:
-                p["score"] = 1
-        return predictions
+        def calc_metrics(preds: Dict, name: str):
+            tp_items = [e for e in preds.values() if e["label"] == 1]
+            fp_items = [e for e in preds.values() if e["label"] == 0]
+            fn_items = [e for t_id, e in trace_prediction_dict.items() if e["label"] == 1 and t_id not in preds]
+            tp = len(tp_items)
+            fp = len(fp_items)
+            fn = len(fn_items)
+            print("-" * 15, name, "-" * 15)
+            print("TP, FP, FN:", tp, fp, fn)
+            print("Precision:", tp / (tp + fp))
+            print("Recall:", tp / (tp + fn))
+
+        calc_metrics(trace_prediction_dict, "Global")
+        calc_metrics(stage1_predictions, "Stage 1")
+        calc_metrics(stage2_predictions, "Stage 2")
+        # Test
+        stage1_keys = set(stage1_predictions.keys())
+        stage2_keys = set(stage2_predictions.keys())
+        intersection_keys = stage1_keys.intersection(stage2_keys)
+        intersection_entries = {t_id: e for t_id, e in trace_prediction_dict.items() if t_id in intersection_keys}
+        calc_metrics(intersection_entries, "Intersection")
+
+        # Select final predictions
+        final_predictions = {}
+        final_predictions.update(stage1_predictions)
+        final_predictions.update(stage2_predictions)
+        final_predictions = list(final_predictions.values())
+        return final_predictions
 
     @staticmethod
     def group_trace_predictions(predictions: List[TracePredictionEntry], key_id: str):

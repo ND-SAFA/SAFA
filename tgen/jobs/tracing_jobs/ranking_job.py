@@ -5,10 +5,13 @@ from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.ranking.ranking_args import RankingArgs
+from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+from tgen.state.pipeline.abstract_pipeline import AbstractPipeline
 
 DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."
 DATA_TOO_MANY_INPUTS = "Expected only one of dataset_creator or artifact_df + layer_ids to be defined."
@@ -21,7 +24,7 @@ class RankingJob(AbstractJob):
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
                  ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM,
-                 select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, **kwargs):
+                 select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, project_summary: str = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -39,6 +42,8 @@ class RankingJob(AbstractJob):
         self.artifact_df = artifact_df
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
+        self.project_summary = project_summary
+        self.dataset: TraceDataset = None
         if self.artifact_df is not None:
             assert self.layer_ids is not None, "Please define the layers to trace."
 
@@ -49,7 +54,7 @@ class RankingJob(AbstractJob):
         :return:
         """
         tracing_types, artifact_df, dataset = self.construct_tracing_request()
-
+        self.dataset = dataset
         # Predict
         global_predictions = []
         for tracing_type in tracing_types:
@@ -88,12 +93,21 @@ class RankingJob(AbstractJob):
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
 
-        pipeline_args = RankingArgs(artifact_df=artifact_df,
+        pipeline_args = RankingArgs(run_name=f"{child_type}2{parent_type}",
+                                    artifact_df=artifact_df,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
+                                    project_summary=self.project_summary,
                                     **self.ranking_kwargs)
-        pipeline = self.ranking_pipeline.value(pipeline_args)
+        pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         predicted_entries = pipeline.run()
+        self.project_summary = pipeline.state.project_summary
+        for entry in predicted_entries:
+            trace_id = TraceDataFrame.generate_link_id(entry["source"], entry["target"])
+            trace_entry = self.dataset.trace_df.loc[trace_id]
+            label = trace_entry[TraceKeys.LABEL.value]
+            entry["label"] = label
+
         if self.select_top_predictions:
             predicted_entries = RankingUtil.select_predictions(predicted_entries,
                                                                parent_threshold=pipeline_args.parent_primary_threshold,

@@ -95,8 +95,8 @@ class SafaExporter(AbstractDatasetExporter):
                     "sourceName": trace_row[TraceKeys.SOURCE.value],
                     "targetName": trace_row[TraceKeys.TARGET.value]
                 }
-                score = DataFrameUtil.get_float_value(trace_row, TraceKeys.SCORE.value)
-                label = DataFrameUtil.get_float_value(trace_row, TraceKeys.LABEL.value)
+                score = DataFrameUtil.get_optional_value(trace_row, TraceKeys.SCORE.value)
+                label = DataFrameUtil.get_optional_value(trace_row, TraceKeys.LABEL.value)
                 if score:
                     trace_entry["traceType"] = "GENERATED"
                     trace_entry["approvalStatus"] = "UNREVIEWED"

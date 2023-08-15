@@ -8,14 +8,20 @@ from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
-    DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG, RANKING_INSTRUCTIONS
+from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
+    DEFAULT_RANKING_QUERY_TAG, DEFAULT_RANKING_QUESTIONS
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
+
+DEFAULT_ARTIFACT_HEADER = "\n# Software Artifacts\n"
 
 
 @dataclass
 class RankingArgs(PipelineArgs):
+    """
+    The unique identifier of this run.
+    """
+    run_name: str
     """
     The data-frame containing all the project aritfacts.
     """
@@ -87,11 +93,11 @@ class RankingArgs(PipelineArgs):
     """
     The goal of the ranking prompt. The top portion.
     """
-    ranking_goal: str = DEFAULT_SEARCH_GOAL
+    ranking_goal: str = DEFAULT_RANKING_GOAL
     """
     The detailed task instructions. The bottom portion. 
     """
-    ranking_instructions: str = RANKING_INSTRUCTIONS
+    ranking_instructions: str = DEFAULT_RANKING_INSTRUCTIONS
     """
     The list of questions to answer for the ranking task.
     """
@@ -99,11 +105,11 @@ class RankingArgs(PipelineArgs):
     """
     The tag used to encapsulate the parent or query string.
     """
-    query_tag: str = DEFAULT_SEARCH_QUERY_TAG
+    query_tag: str = DEFAULT_RANKING_QUERY_TAG
     """
-    The tag used to contain the final ranked artifact ids.
+    The header to put above all the software artifacts.
     """
-    links_tag: str = DEFAULT_SEARCH_LINK_TAG
+    artifact_header: str = DEFAULT_ARTIFACT_HEADER
 
     def save(self, obj: Any, file_name: str) -> str:
         """
@@ -119,6 +125,16 @@ class RankingArgs(PipelineArgs):
             FileUtil.write_yaml(obj, export_path)
             logger.info(f"Saved object to: {export_path}")
             return export_path
+
+    def load(self, file_name: str) -> Any:
+        """
+        Reads the object with given file name in export directory.
+        :param file_name: The file name to load.
+        :return: The loaded object.
+        """
+        file_path = self.get_path(file_name)
+        obj = FileUtil.read_yaml(file_path)
+        return obj
 
     def get_path(self, file_name: str):
         """
@@ -139,4 +155,4 @@ class RankingArgs(PipelineArgs):
         """
         self.artifact_map = self.artifact_df.to_map()
         if self.ranking_questions is None:
-            self.ranking_questions = DEFAULT_SEARCH_INSTRUCTIONS
+            self.ranking_questions = DEFAULT_RANKING_QUESTIONS

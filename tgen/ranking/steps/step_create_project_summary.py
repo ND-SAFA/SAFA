@@ -1,6 +1,5 @@
 import os.path
 
-from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 from tgen.ranking.ranking_args import RankingArgs
@@ -19,10 +18,11 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the pipeline.
         :return: None
         """
-        project_summary_export_path = args.get_path("project_summary.txt")
+        PROJECT_SUMMARY_FILE_NAME = f"project_summary.yaml"
+        PROJECT_SUMMARY_PATH = args.get_path(PROJECT_SUMMARY_FILE_NAME)
 
-        if project_summary_export_path is not None and os.path.exists(project_summary_export_path):
-            summary = FileUtil.read_file(os.path.expanduser(project_summary_export_path))
+        if PROJECT_SUMMARY_PATH is not None and os.path.exists(PROJECT_SUMMARY_PATH):
+            summary = args.load(PROJECT_SUMMARY_FILE_NAME)
         elif args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
             logger.info("Project summary included in original request.")
             summary = args.project_summary
@@ -33,6 +33,5 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
             summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens)
             response: ProjectSummaryResponse = summary_job.run().body
             summary = response["summary"]
-            if project_summary_export_path:
-                FileUtil.write(summary, project_summary_export_path)
+            args.save(summary, PROJECT_SUMMARY_FILE_NAME)
         state.project_summary = summary

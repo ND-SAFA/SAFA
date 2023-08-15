@@ -16,7 +16,7 @@ class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param state: The state of HGEN.
         :return: The original dataset and a dataset with only the source layer
         """
-        export_path = state.export_path
+        export_path = state.export_dir
         original_dataset_complete = args.dataset_creator_for_sources.create() if args.dataset_for_sources is None \
             else args.dataset_for_sources
         save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")

@@ -31,7 +31,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME)
-        export_path = state.export_path
+        export_path = state.export_dir
 
         if os.path.exists(proj_path):
             dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()

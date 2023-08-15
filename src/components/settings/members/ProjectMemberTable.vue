@@ -39,6 +39,7 @@
     </selector-table>
     <project-member-modal
       :open="modalOpen"
+      :project-id="projectStore.projectId"
       :member="editedMember"
       :email="addedMember"
       @close="handleClose"

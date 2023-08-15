@@ -10,7 +10,7 @@
     option-label="name"
     class="nav-input"
     color="primary"
-    @popup-show="getProjectApiStore.handleReload()"
+    @popup-show="handleReload"
   >
     <template #option="{ opt, itemProps }">
       <list-item
@@ -21,6 +21,14 @@
       >
         <template #actions>
           <flex-box justify="end">
+            <icon-button
+              v-if="sessionStore.isEditor(opt)"
+              small
+              :tooltip="`Invite to ${opt.name}`"
+              icon="invite"
+              data-cy="button-project-invite"
+              @click="projectInviteId = opt.projectId"
+            />
             <icon-button
               v-if="sessionStore.isEditor(opt)"
               small
@@ -50,6 +58,12 @@
         icon="add"
         @click="identifierSaveStore.selectIdentifier(undefined, 'save')"
       />
+      <project-member-modal
+        :open="!!projectInviteId"
+        :project-id="projectInviteId"
+        @close="projectInviteId = undefined"
+        @submit="projectInviteId = undefined"
+      />
     </template>
   </q-select>
 </template>
@@ -64,6 +78,7 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import {
   appStore,
   getProjectApiStore,
@@ -72,6 +87,18 @@ import {
   useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";
+import { ProjectMemberModal } from "@/components/settings";
 
 const { darkMode } = useTheme();
+
+const projectInviteId = ref<string>();
+
+/**
+ * Reloads the project list and resets any selected project.
+ */
+function handleReload() {
+  projectInviteId.value = undefined;
+
+  getProjectApiStore.handleReload();
+}
 </script>

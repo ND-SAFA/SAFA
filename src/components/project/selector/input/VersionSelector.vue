@@ -38,6 +38,7 @@
     </template>
     <template #after-options>
       <text-button
+        v-if="!appStore.isDemo"
         text
         label="Add Version"
         icon="add"
@@ -69,6 +70,7 @@ import { computed, ref } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import {
+  appStore,
   getVersionApiStore,
   projectApiStore,
   projectStore,

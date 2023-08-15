@@ -43,6 +43,7 @@
     </template>
     <template #after-options>
       <text-button
+        v-if="!appStore.isDemo"
         text
         block
         label="Add Project"
@@ -64,6 +65,7 @@ export default {
 
 <script setup lang="ts">
 import {
+  appStore,
   getProjectApiStore,
   identifierSaveStore,
   sessionStore,

@@ -78,7 +78,7 @@ class EnumDict(OrderedDict):
         :param default: default value to return
         :return: The value if it exists else default
         """
-        return super().get(to_string(key), default)
+        return super().get(EnumUtil.to_string(key), default)
 
     def __contains__(self, item: Union[str, Enum]) -> bool:
         """

@@ -19,7 +19,7 @@ import bs4
 
 class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the input for the generation prompt.
         :param args: HGEN configuration.

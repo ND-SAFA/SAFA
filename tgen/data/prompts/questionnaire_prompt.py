@@ -101,7 +101,7 @@ class QuestionnairePrompt(Prompt):
         enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions-1])
         base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
                             f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions-1]}"
-        instructions = [PromptUtil.format_as_markdown('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
+        instructions = [PromptUtil.format_as_markdown_header('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
         return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def __repr__(self) -> str:

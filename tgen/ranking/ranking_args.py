@@ -14,13 +14,27 @@ from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_S
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
+import os
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
+
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.logging.logger_manager import logger
+from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
+    DEFAULT_PARENT_THRESHOLD, \
+    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.prompts.supported_prompts.default_search_prompts import DEFAULT_SEARCH_GOAL, DEFAULT_SEARCH_INSTRUCTIONS, \
+    DEFAULT_SEARCH_LINK_TAG, DEFAULT_SEARCH_QUERY_TAG, RANKING_INSTRUCTIONS
+from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
+from tgen.state.pipeline.pipeline_args import PipelineArgs
 
 @dataclass
 class RankingArgs(PipelineArgs):
     """
     The data-frame containing all the project aritfacts.
     """
-    artifact_map: Dict = required_field(field_name="artifact_map")
+    artifact_df: ArtifactDataFrame = required_field(field_name="artifact_df")
     """
     List of parent artifact ids.
     """
@@ -33,6 +47,10 @@ class RankingArgs(PipelineArgs):
     Path to export various checkpoints
     """
     export_dir: str = None
+    """
+    Maps artifact ids to content.
+    """
+    artifact_map: Dict = None
     """
     Maps parent ids to their children ids.
     """

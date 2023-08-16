@@ -1,5 +1,5 @@
 DEFAULT_PARENT_THRESHOLD = 0.80  # The minimum percentile to consider a candidate as true
-DEFAULT_PARENT_MIN_THRESHOLD = 0.5  # The minimum percentile allowed for a top parent prediction.
+DEFAULT_PARENT_MIN_THRESHOLD = 0.4  # The minimum percentile allowed for a top parent prediction.
 DEFAULT_MIN_RANKING_SCORE = 0.5
 DEFAULT_MAX_N_CHILDREN = 50
 DEFAULT_SORTING_ALGORITHM = "embedding"

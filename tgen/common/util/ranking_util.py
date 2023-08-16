@@ -128,59 +128,6 @@ class RankingUtil:
         :return: List of selected predictions.
         """
         final_predictions = [e for e in trace_predictions if e["score"] >= 0.6]
-        # trace_prediction_dict = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in trace_predictions}
-        # parent2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.TARGET.value)
-        # stage1_predictions = {}
-        #
-        # for parent, parent_entries in parent2entry.items():
-        #     sorted_entries = sorted(parent_entries, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-        #     stage1_selected_entries = [e for e in sorted_entries if e["score"] >= 0.8]
-        #     stage1_selected_entries = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in
-        #                                stage1_selected_entries}
-        #     stage1_predictions.update(stage1_selected_entries)
-        #
-        # stage2_predictions = {}
-        # child2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
-        # for child, child_entries in child2entry.items():
-        #     sorted_entries = sorted(child_entries, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-        #     stage2_selected_entries = sorted_entries[:1]
-        #     stage2_selected_entries = {TraceDataFrame.generate_link_id(e["source"], e["target"]): e for e in
-        #                                stage2_selected_entries}
-        #     stage2_predictions.update(stage2_selected_entries)
-        #
-        # def calc_metrics(preds: Dict, name: str):
-        #     tp_items = [e for e in preds.values() if e["label"] == 1]
-        #     fp_items = [e for e in preds.values() if e["label"] == 0]
-        #     fn_items = [e for t_id, e in trace_prediction_dict.items() if e["label"] == 1 and t_id not in preds]
-        #     tp = len(tp_items)
-        #     fp = len(fp_items)
-        #     fn = len(fn_items)
-        #     print("-" * 15, name, "-" * 15)
-        #     print("TP, FP, FN:", tp, fp, fn)
-        #     print("Precision:", tp / (tp + fp))
-        #     print("Recall:", tp / (tp + fn))
-        #
-        # calc_metrics(trace_prediction_dict, "Global")
-        # calc_metrics(stage1_predictions, "Stage 1")
-        # calc_metrics(stage2_predictions, "Stage 2")
-        # # Test
-        # stage1_keys = set(stage1_predictions.keys())
-        # stage2_keys = set(stage2_predictions.keys())
-        # intersection_keys = stage1_keys.intersection(stage2_keys)
-        # intersection_entries = {t_id: e for t_id, e in trace_prediction_dict.items() if t_id in intersection_keys}
-        # calc_metrics(intersection_entries, "Intersection")
-        #
-        # stage1_keys = set(stage1_predictions.keys())
-        # stage2_keys = set(stage2_predictions.keys())
-        # union_keys = stage1_keys.union(stage2_keys)
-        # union_entries = {t_id: e for t_id, e in trace_prediction_dict.items() if t_id in union_keys}
-        # calc_metrics(union_entries, "Union")
-        #
-        # # Select final predictions
-        # final_predictions = {}
-        # final_predictions.update(stage1_predictions)
-        # final_predictions.update(stage2_predictions)
-        # final_predictions = list(final_predictions.values())
         return final_predictions
 
     @staticmethod

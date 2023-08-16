@@ -31,7 +31,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME)
-        export_path = state.export_path
+        export_path = state.export_dir
 
         if os.path.exists(proj_path):
             dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
@@ -64,9 +64,6 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
             dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
-
-        save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
-        save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         state.dataset = dataset
 
     @staticmethod
@@ -79,6 +76,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         layer_id = hgen_args.target_type
         if hgen_args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
             layer_id = f"{layer_id}_{uuid.uuid4()}"
+            hgen_args.target_type = layer_id
         return layer_id
 
     @staticmethod
@@ -101,7 +99,9 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
-        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary)
+        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
+                                 export_dir=os.path.join(hgen_state.export_dir, "ranking"),
+                                 load_dir=os.path.join(hgen_args.load_dir, "ranking"))
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")

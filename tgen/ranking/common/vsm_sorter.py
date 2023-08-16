@@ -10,9 +10,12 @@ from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.fake_project_reader import FakeProjectReader
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 
 GenericSorter = Callable[
@@ -38,9 +41,10 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
                                      ArtifactKeys.LAYER_ID: [parent_tag_name for source in parent_ids] +
                                                             [child_tag_name for target in child_ids]})
     layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [child_tag_name], LayerKeys.TARGET_TYPE: [parent_tag_name]})
-    dataset_creator = TraceDatasetCreator(FakeProjectReader(artifact_df=artifact_df, layer_df=layer_df))
 
-    trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=dataset_creator)
+    trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: TraceDataset(artifact_df=artifact_df,
+                                                                                                         trace_df=TraceDataFrame(),
+                                                                                                         layer_df=layer_df)})
     vsm_job = VSMJob(trainer_dataset_manager=trainer_dataset_manager, select_predictions=False)
     job_result = vsm_job.run()
     assert job_result.status == Status.SUCCESS, f"Sorting using VSM failed. {job_result.body}"

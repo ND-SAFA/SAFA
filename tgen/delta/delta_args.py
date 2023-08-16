@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Union, Dict
 
+from tgen.common.util.dataclass_util import RequiredField, required_field
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
@@ -20,7 +21,8 @@ class DeltaArgs(PipelineArgs):
     """
     :param diffs: A dictionary mapping type of change (e.g. Added, Deleted, etc.) to a dictionary of filename to diff
     """
-    change_type_to_diffs: Union[str, Union[Dict[str, Dict], EnumDict[ChangeType, Dict]]]
+    change_type_to_diffs: Union[str, Union[Dict[str, Dict], EnumDict[ChangeType, Dict]]] = required_field(
+        field_name="change_type_to_diffs")
     """
     :param dataset: The dataset containing all files in the diffs and their relationships
     """

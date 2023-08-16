@@ -15,7 +15,7 @@ from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.hgen.hgen_args import HGenState
 from tgen.hgen.hgen_util import get_initials
-from tgen.hgen.steps.step_create_dataset import CreateHGenDatasetStep
+from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep

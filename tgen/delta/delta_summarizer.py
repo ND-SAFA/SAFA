@@ -1,6 +1,8 @@
 import os
 import uuid
 
+from typing import Type
+
 from tgen.common.util.file_util import FileUtil
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
@@ -27,14 +29,12 @@ class DeltaSummarizer(AbstractPipeline[DeltaArgs, DeltaState]):
         """
         super().__init__(args, DeltaSummarizer.steps)
 
-    def init_state(self) -> DeltaState:
+    def state_class(self) -> Type:
         """
-        Initialized pipeline state.
-        :return: the initialized state
+        Gets the class used for the pipeline state.
+        :return: the state class
         """
-        if self.args.load_dir:
-            return DeltaState.load_latest(self.args.load_dir, self.steps)
-        return DeltaState()
+        return DeltaState
 
     def run(self) -> str:
         """

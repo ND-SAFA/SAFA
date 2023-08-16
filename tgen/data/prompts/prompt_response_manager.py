@@ -158,38 +158,11 @@ class PromptResponseManager:
         """
         formatted_tags = {}
         for tag, values in output.items():
-<<<<<<< HEAD
-            values = [values] if not isinstance(values, list) else values
-=======
             values, _ = self._convert2list(values)
->>>>>>> FEATURE/hgen-cleanup
             formatted_values = []
             for val in values:
                 formatted_val = val
                 if isinstance(val, dict):
-<<<<<<< HEAD
-                    formatted_values = self._format_response(val)
-                else:
-                    try:
-                        assert val is not None, f"Missing {tag}"
-                        if isinstance(formatted_val, bs4.NavigableString):
-                            formatted_val = str(formatted_val)
-                        if self.formatter:
-                            formatted_val = self.formatter(tag, formatted_val)
-                        if tag in self.expected_response_type:
-                            formatted_val = self.expected_response_type[tag](formatted_val)
-                        if tag in self.expected_responses:
-                            vals2check = [formatted_val] if not isinstance(formatted_val, list) else formatted_val
-                            for val2check in vals2check:
-                                assert val2check in self.expected_responses[tag]
-                    except (TypeError, AssertionError, ValueError) as e:
-                        formatted_val = self._format_on_failure(tag, formatted_val, e)
-                    formatted_values.append(formatted_val)
-            formatted[tag] = formatted_values
-        return formatted
-
-    def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str]) -> Any:
-=======
                     formatted_val = self._format_response(val)
                     if len(values) > 1:
                         formatted_values.append(formatted_val)
@@ -268,7 +241,6 @@ class PromptResponseManager:
 
     def _format_on_failure(self, tag_id: str, val: Any, e: Union[Exception, str], no_exception: bool = False,
                            return_none_on_fail: bool = False) -> Any:
->>>>>>> FEATURE/hgen-cleanup
         """
         Parses the response if it fails in some way, may be overridden in child classes
         :param tag_id: The id of the tag that failed
@@ -277,11 +249,7 @@ class PromptResponseManager:
         :param return_none_on_fail: If True, returns None instead of the origin value
         :return: Default value
         """
-<<<<<<< HEAD
-        assert tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
-=======
         assert no_exception or tag_id not in self.required_tag_ids, f"Missing expected tag {tag_id}"
->>>>>>> FEATURE/hgen-cleanup
         logger.warning(f"Unexpected response for {tag_id}: {e}.")
         if self.default_factory:
             return self.default_factory(tag_id, val)

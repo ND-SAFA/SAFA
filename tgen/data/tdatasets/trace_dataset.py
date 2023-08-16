@@ -383,6 +383,18 @@ class TraceDataset(iDataset):
             tracing_types.append((parent_type, child_type))
         return tracing_types
 
+    def as_creator(self, project_path: str):
+        """
+        Converts the dataset into a creator that can remake it
+        :param project_path: The path to save the dataset at for reloading
+        :return: The dataset creator
+        """
+        from tgen.data.exporters.safa_exporter import SafaExporter
+        from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+        from tgen.data.readers.structured_project_reader import StructuredProjectReader
+        SafaExporter(project_path, dataset=self).export()
+        return TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=project_path))
+
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """

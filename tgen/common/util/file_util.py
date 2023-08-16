@@ -2,13 +2,14 @@ import os
 import shutil
 from copy import deepcopy
 from os.path import splitext
-from typing import Any, Callable, Dict, IO, List, Tuple, Union
+from typing import Any, Callable, Dict, IO, List, Tuple, Union, Type
 
 import yaml
+from yaml.loader import Loader, SafeLoader
 
 from tgen.common.util.json_util import JsonUtil
+import pickle
 from tgen.constants.deliminator_constants import F_SLASH
-
 
 class FileUtil:
 
@@ -277,14 +278,16 @@ class FileUtil:
             os.remove(file_path)
 
     @staticmethod
-    def read_yaml(file_path: str) -> Dict:
+    def read_yaml(file_path: str, loader: Type[Loader] = None) -> Dict:
         """
         Reads a yaml file at given path if exists.
         :param file_path: Path of the file to read.
+        :param loader: The loader to use for loading the yaml file
         :return: The content of the file.
         """
+        loader = SafeLoader if loader is None else loader
         with open(file_path, 'r') as file:
-            return yaml.safe_load(file)
+            return yaml.load(file, Loader=loader)
 
     @staticmethod
     def write_yaml(content: Any, output_file_path: str):
@@ -295,4 +298,24 @@ class FileUtil:
         """
         output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
-            yaml.dump(content, file)
+            yaml.dump(content, file, )
+
+    @staticmethod
+    def read_pickle(file_path: str) -> Any:
+        """
+        Reads a pickled obj
+        :param file_path: Path of the file to read.
+        :return: The content of the file.
+        """
+        with open(file_path, 'rb') as file:
+            return pickle.load(file)
+
+    @staticmethod
+    def write_pickle(content: Any, output_file_path: str) -> None:
+        """
+        Saves yaml to given file
+        :param content: The content of the file to create.
+        :param output_file_path: The path to save the file to.
+        """
+        with open(output_file_path, 'wb') as file:
+            pickle.dump(content, file)

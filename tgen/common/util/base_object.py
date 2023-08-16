@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type, TypedDict, Union, get_args
 
-from typeguard import check_type
+
 from typing_extensions import get_args
 
 from tgen.common.util.enum_util import EnumUtil
@@ -274,60 +274,9 @@ class BaseObject(ABC):
         :param param_name: the name of the parameter being tested
         :return: None (raises an exception if not the expected type)
         """
-        if not cls._is_type(val, expected_type, param_name):
+        if not ReflectionUtil.is_type(val, expected_type, param_name):
             raise TypeError(
                 "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))
-
-    @classmethod
-    def _is_type(cls, val: Any, expected_type: Union[Type], param_name: str, print_on_error: bool = True) -> bool:
-        """
-        Checks if the value is of the expected type for the variable with the given name
-        :param val: the value
-        :param expected_type: expected type or typing generic
-        :param param_name: the name of the parameter being tested
-        :return: True if the type of val matches expected_type, False otherwise
-        """
-        try:
-            if isinstance(val, UndeterminedVariable):
-                return True
-
-            if ReflectionUtil.is_typed_dict(expected_type):
-                assert isinstance(val, dict)
-                for field_name, expected_field_type in expected_type.__annotations__.items():
-                    check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
-                return True
-
-            if ReflectionUtil.is_typed_class(expected_type):
-                expected_type_name = expected_type._name
-                if expected_type_name == "Any":
-                    return True
-
-                parent_class, *child_classes = ReflectionUtil.get_typed_class(expected_type)
-                if parent_class == "dict":
-                    expected_type = child_classes[0]
-                elif parent_class == "list":
-                    child_type = child_classes[0]
-                    invalid_runs = [v for v in val if not cls._is_type(v, child_type, param_name, print_on_error=False)]
-                    if len(invalid_runs) > 0:
-                        raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
-                    return True
-                elif parent_class == "union":
-                    queries = [c for c in child_classes if cls._is_type(val, c, param_name, print_on_error=False)]
-                    if len(queries) == 0:
-                        raise TypeError(f"{val} was not of type: {child_classes}")
-                    return True
-                elif parent_class == "callable":
-                    check_type(param_name, val, expected_type)
-                    return True
-                else:
-                    expected_type = parent_class
-
-            check_type(param_name, val, expected_type)
-        except TypeError as e:
-            if print_on_error:
-                traceback.print_exc()
-            return False
-        return True
 
 
 class AT(TypedDict):

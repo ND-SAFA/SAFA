@@ -127,12 +127,12 @@ class VSMTrainer(AbstractTrainer):
             similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(parent_tf_matrix, child_tf_matrix)
 
             for i, (child_id, parent_id) in enumerate(child_parent_pairs):
-                link_id = TraceDataFrame.generate_link_id(source_id=child_id, target_id=parent_id)
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
 
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
-                label = eval_dataset.trace_df.get_link(link_id)[TraceKeys.LABEL]
+                link = eval_dataset.trace_df.get_link(link_id)
+                label = link[TraceKeys.LABEL] if link else 0
                 prediction_entry = TracePredictionEntry(source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
@@ -171,9 +171,9 @@ class VSMTrainer(AbstractTrainer):
         artifact_ids = []
         artifact_bodies = []
         for dataset_role in DatasetRole:
-            dataset = trainer_dataset_manager[dataset_role]
-            if dataset is None:
+            if dataset_role not in trainer_dataset_manager:
                 continue
+            dataset = trainer_dataset_manager[dataset_role]
             for artifact_id, artifact_row in dataset.artifact_df.itertuples():
                 if artifact_id not in artifacts_seen:
                     artifacts_seen.add(artifact_id)

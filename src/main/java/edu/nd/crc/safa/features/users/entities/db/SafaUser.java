@@ -46,5 +46,6 @@ public class SafaUser implements Serializable {
     public SafaUser(String email, String password) {
         this.email = email;
         this.password = password;
+        this.superuser = false;
     }
 }

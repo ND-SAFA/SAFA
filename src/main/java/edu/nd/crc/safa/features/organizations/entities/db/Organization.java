@@ -45,4 +45,11 @@ public class Organization {
 
     @Column
     private UUID fullOrgTeamId;
+
+    public Organization(String name, SafaUser owner, String paymentTier, boolean personalOrg) {
+        this.name = name;
+        this.owner = owner;
+        this.paymentTier = paymentTier;
+        this.personalOrg = personalOrg;
+    }
 }

@@ -8,7 +8,7 @@ INSERT INTO organization (name, owner_id, personal_org, full_org_team_id, paymen
 /*
  * Record personal orgs in safa_user table
  */
-ALTER TABLE safa_user ADD COLUMN personal_org_id BINARY(16) NOT NULL DEFAULT '';
+ALTER TABLE safa_user ADD COLUMN personal_org_id BINARY(16) DEFAULT NULL;
 
 CREATE TEMPORARY TABLE user_orgs AS
     SELECT o.id, su.user_id
@@ -29,7 +29,7 @@ DROP TABLE user_orgs;
  * Create teams for all organizations
  */
 INSERT INTO team (name, organization_id, full_org_team)
-    SELECT name, id, TRUE,
+    SELECT name, id, TRUE
     FROM organization;
 
 /*

@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -31,6 +33,7 @@ public class SafaUserService {
 
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
+    private final OrganizationService organizationService;
 
     // This exists solely so that it can be set to false during testing so that we can disable the check in that context
     private static boolean CHECK_USER_THREAD = true;
@@ -69,7 +72,12 @@ public class SafaUserService {
             throw new SafaError("Email already in use: " + email);
         }
 
-        safaUser = this.safaUserRepository.save(safaUser);
+        safaUser = this.safaUserRepository.save(safaUser);  // Save once so it gets an id
+
+        Organization personalOrg = organizationService.createNewOrganization(email, safaUser, "free", true);
+        safaUser.setPersonalOrgId(personalOrg.getId());
+        safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id
+
         return new UserIdentifierDTO(safaUser);
     }
 

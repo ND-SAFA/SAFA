@@ -69,10 +69,11 @@ public class Project implements Serializable {
     @ManyToOne
     private Team owningTeam;
 
-    public Project(String name, String description) {
+    public Project(String name, String description, Team owningTeam) {
         this.setName(name);
         this.setDescription(description);
         this.lastEdited = LocalDateTime.now();
+        this.owningTeam = owningTeam;
     }
 
     /**

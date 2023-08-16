@@ -38,4 +38,10 @@ public class Team {
     @Column
     private boolean fullOrgTeam;
 
+    public Team(String name, Organization organization, boolean fullOrgTeam) {
+        this.name = name;
+        this.organization = organization;
+        this.fullOrgTeam = fullOrgTeam;
+    }
+
 }

@@ -1,8 +1,8 @@
 /*
  * Create personal organizations
  */
-INSERT INTO organization (name, owner_id, personal_org, full_org_team_id, payment_tier, id)
-    SELECT email, user_id, TRUE, '', 'top_tier_replace_me', (SELECT UNHEX(REPLACE(UUID(), '-', '')))
+INSERT INTO organization (name, owner_id, personal_org, full_org_team_id, payment_tier)
+    SELECT email, user_id, TRUE, '', 'top_tier_replace_me'
     FROM safa_user;
 
 /*
@@ -28,8 +28,8 @@ DROP TABLE user_orgs;
 /*
  * Create teams for all organizations
  */
-INSERT INTO team (name, organization_id, full_org_team, id)
-    SELECT name, id, TRUE, (SELECT UNHEX(REPLACE(UUID(), '-', '')))
+INSERT INTO team (name, organization_id, full_org_team)
+    SELECT name, id, TRUE,
     FROM organization;
 
 /*
@@ -53,8 +53,8 @@ DROP TABLE org_teams;
 /*
  * Add users to their teams
  */
-INSERT INTO team_membership (user_id, team_id, role, id)
-    SELECT safa_user.user_id, team.id, 'OWNER', (SELECT UNHEX(REPLACE(UUID(), '-', '')))
+INSERT INTO team_membership (user_id, team_id, role)
+    SELECT safa_user.user_id, team.id, 'OWNER'
     FROM team
         INNER JOIN organization on team.organization_id = organization.id
         INNER JOIN safa_user on organization.owner_id = safa_user.user_id;

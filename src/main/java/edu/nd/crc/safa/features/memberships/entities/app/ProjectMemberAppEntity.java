@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.memberships.entities.app;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
@@ -19,7 +19,7 @@ public class ProjectMemberAppEntity implements IAppEntity {
     String email;
     ProjectRole role;
 
-    public ProjectMemberAppEntity(ProjectMembership projectMembership) {
+    public ProjectMemberAppEntity(UserProjectMembership projectMembership) {
         this.projectMembershipId = projectMembership.getMembershipId();
         this.email = projectMembership.getMember().getEmail();
         this.role = projectMembership.getRole();

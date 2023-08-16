@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -38,8 +38,8 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectMembershipId ID of membership being retrieved.
      * @return The project membership.
      */
-    public ProjectMembership getMembershipById(UUID projectMembershipId) {
-        Optional<ProjectMembership> projectMembershipQuery =
+    public UserProjectMembership getMembershipById(UUID projectMembershipId) {
+        Optional<UserProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isEmpty()) {
             throw new SafaError("Could not find membership with id: %s.", projectMembershipId);
@@ -63,18 +63,18 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param currentUser    The user performing the update.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
-     * @return {@link ProjectMembership} Updated project membership.
+     * @return {@link UserProjectMembership} Updated project membership.
      * @throws SafaError Throws error if given role is greater than the role
      *                   of the user issuing this request.
      */
-    public ProjectMembership addOrUpdateProjectMembership(Project project, SafaUser currentUser,
-                                                          String newMemberEmail,
-                                                          ProjectRole newMemberRole) throws SafaError {
+    public UserProjectMembership addOrUpdateProjectMembership(Project project, SafaUser currentUser,
+                                                              String newMemberEmail,
+                                                              ProjectRole newMemberRole) throws SafaError {
         // Step - Find member being added and the current member.
         SafaUser newMember = this.safaUserService.getUserByEmail(newMemberEmail);
 
         // Step - Assert that member being added has fewer permissions than current user.
-        List<ProjectMembership> projectMemberships = this.projectMembershipRepository.findByProject(project);
+        List<UserProjectMembership> projectMemberships = this.projectMembershipRepository.findByProject(project);
         if (projectMemberships.size() == 1
             && projectMemberships.get(0).getMember().getEmail().equals(newMemberEmail)) {
             throw new SafaError("Unable to edit permission of only member of project.");
@@ -85,18 +85,18 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         validateCurrentUserPermissions(newMemberRole, currentUser, projectMemberships);
 
         // Step - Create or update project membership
-        Optional<ProjectMembership> projectMembershipQuery =
+        Optional<UserProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findByProjectAndMember(project, newMember);
-        ProjectMembership updatedProjectMembership;
+        UserProjectMembership updatedProjectMembership;
         if (projectMembershipQuery.isPresent()) {
-            ProjectMembership existingProjectMembership = projectMembershipQuery.get();
+            UserProjectMembership existingProjectMembership = projectMembershipQuery.get();
             if (existingProjectMembership.getRole().equals(ProjectRole.OWNER) && nOwners == 1) {
                 throw new SafaError("Cannot edit role of last project owner.");
             }
             existingProjectMembership.setRole(newMemberRole);
             updatedProjectMembership = existingProjectMembership;
         } else {
-            updatedProjectMembership = new ProjectMembership(project, newMember, newMemberRole);
+            updatedProjectMembership = new UserProjectMembership(project, newMember, newMemberRole);
         }
 
         // Step - Save changes
@@ -111,7 +111,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param project The project whose members are retrieved.
      * @return List of project memberships relating members to projects.
      */
-    public List<ProjectMembership> getProjectMembers(Project project) {
+    public List<UserProjectMembership> getProjectMembers(Project project) {
         return this.projectMembershipRepository.findByProject(project);
     }
 
@@ -122,7 +122,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectRoles The project roles to match.
      * @return List of project memberships relating members to projects.
      */
-    public List<ProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
+    public List<UserProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
         return this.projectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
     }
 
@@ -133,7 +133,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectRole The project role to match.
      * @return List of project memberships relating members to projects.
      */
-    public List<ProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
+    public List<UserProjectMembership> getProjectMembersWithRole(Project project, ProjectRole projectRole) {
         return getProjectMembersWithRoles(project, List.of(projectRole));
     }
 
@@ -144,11 +144,11 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @param projectMembershipId ID of the membership linking user and project.
      * @return ProjectMembers The membership object identified by given id, or null if none found.
      */
-    public ProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
-        Optional<ProjectMembership> projectMembershipQuery =
+    public UserProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
+        Optional<UserProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isPresent()) {
-            ProjectMembership projectMembership = projectMembershipQuery.get();
+            UserProjectMembership projectMembership = projectMembershipQuery.get();
             this.projectMembershipRepository.delete(projectMembership);
             return projectMembership;
         }
@@ -157,15 +157,15 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
 
     private void validateCurrentUserPermissions(ProjectRole newMemberRole,
                                                 SafaUser currentUser,
-                                                List<ProjectMembership> projectMemberships) {
-        List<ProjectMembership> currentUserMembershipQuery = projectMemberships
+                                                List<UserProjectMembership> projectMemberships) {
+        List<UserProjectMembership> currentUserMembershipQuery = projectMemberships
             .stream()
             .filter(pm -> pm.getMember().equals(currentUser))
             .collect(Collectors.toList());
         if (currentUserMembershipQuery.isEmpty()) {
             throw new SafaError("%s is not a member on project.", currentUser.getEmail());
         }
-        ProjectMembership currentUserMembership = currentUserMembershipQuery.get(0);
+        UserProjectMembership currentUserMembership = currentUserMembershipQuery.get(0);
         if (newMemberRole.compareTo(currentUserMembership.getRole()) > 0) {
             throw new SafaError("Cannot add member with authorization greater that current user.");
         }

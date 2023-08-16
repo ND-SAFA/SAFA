@@ -29,13 +29,19 @@ public class SafaUser implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = ID_COLUMN)
-    UUID userId;
+    private UUID userId;
 
     @Column(name = "email", nullable = false, unique = true)
-    String email;
+    private String email;
 
     @Column(name = "password", nullable = false)
-    String password;
+    private String password;
+
+    @Column
+    private UUID personalOrgId;
+
+    @Column
+    private boolean superuser;
 
     public SafaUser(String email, String password) {
         this.email = email;

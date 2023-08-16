@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS team_membership
     FOREIGN KEY (team_id) REFERENCES team (id) ON DELETE CASCADE
 );
 
-RENAME TABLE project_membership TO user_project_membership;
+ALTER TABLE project_membership RENAME TO user_project_membership;
 
 CREATE TABLE IF NOT EXISTS team_project_membership
 (

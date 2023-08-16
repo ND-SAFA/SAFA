@@ -7,13 +7,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /**
@@ -33,12 +38,14 @@ public class Project implements Serializable {
     @GeneratedValue
     @Type(type = "uuid-char")
     @Column(name = "project_id")
-    UUID projectId;
+    private UUID projectId;
+
     /**
      * Name of project.
      */
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
+
     /**
      * Description of project.
      * Lob to support GitHub repository descriptions
@@ -47,16 +54,20 @@ public class Project implements Serializable {
     @Column(name = "description",
         nullable = false,
         columnDefinition = "mediumtext")
-    String description;
+    private String description;
 
     @Lob
     @Column(name = "specification",
-        nullable = true,
         columnDefinition = "mediumtext")
-    String specification;
+    private String specification;
 
     @Column(name = "last_edited")
     private LocalDateTime lastEdited;
+
+    @JoinColumn(name = "team_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne
+    private Team owningTeam;
 
     public Project(String name, String description) {
         this.setName(name);

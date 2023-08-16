@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -13,12 +13,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjectMembershipRepository extends CrudRepository<ProjectMembership, UUID> {
-    List<ProjectMembership> findByMember(SafaUser user);
+public interface ProjectMembershipRepository extends CrudRepository<UserProjectMembership, UUID> {
+    List<UserProjectMembership> findByMember(SafaUser user);
 
-    List<ProjectMembership> findByProject(Project project);
+    List<UserProjectMembership> findByProject(Project project);
 
-    Optional<ProjectMembership> findByProjectAndMember(Project project, SafaUser user);
+    Optional<UserProjectMembership> findByProjectAndMember(Project project, SafaUser user);
 
-    List<ProjectMembership> findByProjectAndRoleIn(Project project, List<ProjectRole> roles);
+    List<UserProjectMembership> findByProjectAndRoleIn(Project project, List<ProjectRole> roles);
 }

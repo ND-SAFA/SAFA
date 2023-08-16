@@ -8,7 +8,7 @@ import javax.servlet.http.Cookie;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -104,7 +104,7 @@ public class AuthorizationTestService {
         if (safaUserOptional.isEmpty()) {
             throw new SafaError("Could not find user with name: %s", username);
         }
-        Optional<ProjectMembership> projectMembershipOptional =
+        Optional<UserProjectMembership> projectMembershipOptional =
             this.serviceProvider.getProjectMembershipRepository().findByProjectAndMember(
                 project,
                 safaUserOptional.get());

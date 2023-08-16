@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -51,7 +51,7 @@ public class ProjectMembershipController extends BaseController {
      *
      * @param projectId The UUID of the project which the member is being added to.
      * @param request   The request containing project, member to add, and their given role.
-     * @return {@link ProjectMembership} Updated project membership.
+     * @return {@link UserProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
     public ProjectMemberAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
@@ -59,7 +59,7 @@ public class ProjectMembershipController extends BaseController {
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
-        ProjectMembership updatedProjectMembership = this.serviceProvider
+        UserProjectMembership updatedProjectMembership = this.serviceProvider
             .getMemberService()
             .addOrUpdateProjectMembership(project, user, request.getMemberEmail(), request.getProjectRole());
         this.serviceProvider
@@ -98,7 +98,7 @@ public class ProjectMembershipController extends BaseController {
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
         MemberService memberService = serviceProvider.getMemberService();
 
-        ProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
+        UserProjectMembership projectMembership = memberService.getMembershipById(projectMembershipId);
 
         // Step - Verify user has sufficient permissions
         // You can always remove yourself, and you can remove others if you have admin permissions
@@ -110,7 +110,7 @@ public class ProjectMembershipController extends BaseController {
 
         // Step - Verify last owner not being deleted.
         if (projectMembership.getRole() == ProjectRole.OWNER) {
-            List<ProjectMembership> projectMemberships =
+            List<UserProjectMembership> projectMemberships =
                 memberService.getProjectMembersWithRole(project, ProjectRole.OWNER);
             if (projectMemberships.size() == 1) {
                 throw new SafaError("Cannot delete last owner of project.");

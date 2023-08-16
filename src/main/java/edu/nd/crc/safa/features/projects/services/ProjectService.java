@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -65,7 +65,7 @@ public class ProjectService {
         return this.projectMembershipRepository
             .findByMember(user)
             .stream()
-            .map(ProjectMembership::getProject)
+            .map(UserProjectMembership::getProject)
             .map(project -> {
                 List<ProjectMemberAppEntity> members = this.projectMembershipRepository.findByProject(project)
                     .stream()
@@ -115,7 +115,7 @@ public class ProjectService {
      * @param user    The user to set as owner
      */
     public void setUserAsOwner(Project project, SafaUser user) {
-        ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);
+        UserProjectMembership projectMembership = new UserProjectMembership(project, user, ProjectRole.OWNER);
         this.projectMembershipRepository.save(projectMembership);
     }
 }

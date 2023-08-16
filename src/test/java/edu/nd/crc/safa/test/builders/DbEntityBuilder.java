@@ -25,7 +25,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -153,7 +153,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     public DbEntityBuilder newProject(String name, SafaUser owner) {
         Project project = new Project(name, "");
         this.projectRepository.save(project);
-        this.projectMembershipRepository.save(new ProjectMembership(project, owner, ProjectRole.OWNER));
+        this.projectMembershipRepository.save(new UserProjectMembership(project, owner, ProjectRole.OWNER));
         this.projects.put(name, project);
         this.versions.put(name, new Hashtable<>());
         this.artifactTypes.put(name, new Hashtable<>());

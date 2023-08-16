@@ -38,7 +38,7 @@ import org.hibernate.annotations.Type;
     })
 @Data
 @NoArgsConstructor
-public class ProjectMembership implements Serializable {
+public class UserProjectMembership implements Serializable {
 
     @Id
     @GeneratedValue
@@ -64,7 +64,7 @@ public class ProjectMembership implements Serializable {
     @Enumerated(EnumType.STRING)
     ProjectRole role;
 
-    public ProjectMembership(Project project, SafaUser member, ProjectRole role) {
+    public UserProjectMembership(Project project, SafaUser member, ProjectRole role) {
         this.project = project;
         this.member = member;
         this.role = role;

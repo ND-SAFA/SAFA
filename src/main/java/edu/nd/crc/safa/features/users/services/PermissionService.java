@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.users.services;
 import java.util.Optional;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -90,7 +90,7 @@ public class PermissionService {
     }
 
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {
-        Optional<ProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
+        Optional<UserProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
         return roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
     }
 

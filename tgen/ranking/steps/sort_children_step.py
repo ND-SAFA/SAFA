@@ -20,6 +20,7 @@ class SortChildren(AbstractPipelineStep[RankingArgs, RankingState]):
         if use_sorter:
             sorting_function = registered_sorters[args.sorter.lower()]
             parent_map = sorting_function(args.parent_ids, args.children_ids, args.artifact_map)
+            parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}
             state.sorted_parent2children = parent_map
         elif use_pre_ranked:
             state.sorted_parent2children = args.parent2children

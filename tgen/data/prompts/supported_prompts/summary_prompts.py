@@ -2,9 +2,13 @@ from tgen.data.prompts.artifact_prompt import ArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 
-CODE_SUMMARY = [Prompt("\n\n# Task\nProvide a paragraph summarizing the functionality of the code. "
-                       "Include what what system behavior it helps support, how it does so, and why it exists in the system. "
-                       "Assume you are writing to a novice developer.",
+CODE_SUMMARY = [Prompt("\n\n# Task\n"
+                       "Provide a detailed summarization of the code while answering the following questions:"
+                       "- What is the main functionality this code provides?"
+                       "- Why is this functionality important?"
+                       "- What is the purpose of this functionality in the content of a software system?"
+                       "Write the summary in an active voice. "
+                       "Assume your audience is familiar with software system this code belongs to.",
                        PromptResponseManager(response_tag="summary")),
                 ArtifactPrompt(include_id=False)]
 

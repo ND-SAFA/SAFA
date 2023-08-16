@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List
 
-from tgen.common.util.ranking_util import RankingUtil
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.steps.sort_children_step import SortChildren
@@ -37,8 +36,5 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         if self.args.export_dir is not None:
             os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
-        batched_ranked_children = self.state.ranked_children
-        parent2rankings = {parent: ranked_children for parent, ranked_children in zip(self.args.parent_ids, batched_ranked_children)}
-        parent2explanations = {s: e for s, e in zip(self.args.parent_ids, self.state.ranked_children_explanations)}
-        prediction_entries = RankingUtil.ranking_to_predictions(parent2rankings, parent2explanations=parent2explanations)
+        prediction_entries = self.state.children_entries
         return prediction_entries

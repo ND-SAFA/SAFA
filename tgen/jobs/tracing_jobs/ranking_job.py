@@ -37,7 +37,7 @@ class RankingJob(AbstractJob):
         assert dataset_creator is not None or (artifact_df is not None and layer_ids is not None), DATA_TOO_LITTLE_INPUTS
         assert dataset_creator is None or artifact_df is None, DATA_TOO_MANY_INPUTS
         self.dataset_creator = dataset_creator
-        self.select_top_predictions = select_top_predictions
+        self.select_top_predictions = True
         self.ranking_pipeline = ranking_pipeline
         self.artifact_df = artifact_df
         self.layer_ids = layer_ids

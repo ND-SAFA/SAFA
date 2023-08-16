@@ -3,6 +3,7 @@ from typing import Dict, List
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.deliminator_constants import DASH, NEW_LINE
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
@@ -14,6 +15,7 @@ RESPONSE_PROCESSING_STEPS = [
     lambda s: s.replace("ID:", ""),
     lambda s: s.split(",")
 ]
+MAX_SCORE = 10
 
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -28,15 +30,14 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the ranking pipeline.
         :return: None
         """
-        ranked_children, children_explanations = ProcessRankingResponses.process_ranked_artifacts(args.parent_ids,
-                                                                                                  state.ranking_responses.batch_responses,
-                                                                                                  state.sorted_parent2children)
-        state.ranked_children = ranked_children
-        state.ranked_children_explanations = children_explanations
+        children_entries = ProcessRankingResponses.process_ranked_artifacts(args.parent_ids,
+                                                                            state.ranking_responses.batch_responses,
+                                                                            state.sorted_parent2children)
+        state.children_entries = children_entries
 
     @staticmethod
     def process_ranked_artifacts(parent_ids: List[str], batch_responses: List[str], sorted_parent2children: Dict[str, List[str]]) -> \
-            List[List[str]]:
+            List[TracePredictionEntry]:
         """
         Reads the ranking responses and performs post-processing.
         :param parent_ids: The artifact IDs of the parents.
@@ -44,11 +45,9 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         :param add_missing: Whether to add missing artifact ids.
         :return: Ranked children for each source.
         """
-        ranked_children_list = [[] for _ in range(len(parent_ids))]
-        ranked_children_explanations = [None] * len(parent_ids)
         parent2index: Dict[str, int] = {p: i for i, p in enumerate(parent_ids)}
+        child_entries = []
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
-            parent_index = parent2index[parent_name]
             related_children = sorted_parent2children[parent_name]
 
             # Step - Parse and clean
@@ -69,20 +68,27 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                     artifact_score = float(e[SCORE_INDEX])
                     if artifact_score > 1:
                         parsed_entries.append((artifact_index, artifact_explanation, artifact_score))
-                except Exception as e:
-                    logger.exception(e)
+                except Exception as exception:
+                    logger.exception(exception)
                     logger.info(f"Unable to parse: {e}")
 
             # Step - Translate
             entry_pieces = sorted(parsed_entries, key=lambda e: (e[SCORE_INDEX], -e[ID_INDEX]), reverse=True)
-            artifact_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
-            artifact_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]
+            children_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
+            children_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]
+            children_scores = [e[SCORE_INDEX] / MAX_SCORE for e in entry_pieces]
 
             # Step - Store results
-            ranked_children_list[parent_index].extend(artifact_ids)
-            ranked_children_explanations[parent_index] = artifact_explanations
+            for c_id, c_explanation, c_score in zip(children_ids, children_explanations, children_scores):
+                child_entry = TracePredictionEntry(
+                    source=c_id,
+                    target=parent_name,
+                    score=c_score,
+                    explanation=c_explanation
+                )
+                child_entries.append(child_entry)
 
-        return ranked_children_list, ranked_children_explanations
+        return child_entries
 
     @staticmethod
     def remove_duplicate_ids(artifact_ids: List[str]):

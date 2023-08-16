@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "ARTIFACT_SUMMARY",
+          "artifact_reader": {
+            "project_path": "~/desktop/safa/datasets/roboflow-code"
+          },
+          "export_path": "~/desktop/safa/datasets/roboflow-code/code-summarized.csv"
+        }
+      ]
+    }
+  ]
+}

@@ -110,6 +110,10 @@ class RankingArgs(PipelineArgs):
     The header to put above all the software artifacts.
     """
     artifact_header: str = DEFAULT_ARTIFACT_HEADER
+    """
+    The maximum number of artifacts to consider in a context window. 
+    """
+    max_context_artifacts = 20
 
     def save(self, obj: Any, file_name: str) -> str:
         """

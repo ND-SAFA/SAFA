@@ -214,6 +214,7 @@ export const useDocuments = defineStore("documents", {
 
       await this.removeDocument("");
       await this.addDocument(document);
+      layoutStore.mode = GraphMode.tree;
     },
     /**
      * Creates and adds a new document for multiple types of artifacts.

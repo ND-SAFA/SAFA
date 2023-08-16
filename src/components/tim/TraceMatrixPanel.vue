@@ -12,24 +12,36 @@
     <panel-card>
       <flex-box align="center" justify="between" class="overflow-hidden">
         <div class="overflow-hidden" data-cy="text-selected-name">
-          <typography variant="caption" value="Parent Type" />
-          <typography
-            ellipsis
-            variant="subtitle"
-            el="h1"
-            class="q-my-none"
-            :value="targetType"
-          />
-          <typography variant="caption" value="Child Type" />
-          <typography
-            ellipsis
-            variant="subtitle"
-            el="h1"
-            class="q-my-none"
-            :value="sourceType"
-          />
-          <q-tooltip>{{ name }}</q-tooltip>
+          <typography variant="caption" value="Parent" />
+          <list-item
+            clickable
+            @click="selectionStore.selectArtifactLevel(targetType)"
+          >
+            <typography
+              ellipsis
+              variant="subtitle"
+              el="h1"
+              class="q-my-none"
+              :value="targetType"
+            />
+            <q-tooltip>{{ targetType }}</q-tooltip>
+          </list-item>
+          <typography variant="caption" value="Child" />
+          <list-item
+            clickable
+            @click="selectionStore.selectArtifactLevel(sourceType)"
+          >
+            <typography
+              ellipsis
+              variant="subtitle"
+              el="h1"
+              class="q-my-none"
+              :value="sourceType"
+            />
+            <q-tooltip>{{ sourceType }}</q-tooltip>
+          </list-item>
         </div>
+
         <flex-box column>
           <icon :id="targetIcon" size="sm" :color="targetColor" />
           <icon
@@ -66,6 +78,72 @@
         </flex-item>
       </flex-box>
     </panel-card>
+
+    <panel-card :title="targetArtifactsLabel">
+      <template #title-actions>
+        <text-button
+          text
+          label="View Parents"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfTypes([targetType])"
+        />
+      </template>
+      <list
+        v-if="targetArtifacts.length > 0"
+        :scroll-height="300"
+        data-cy="list-selected-parent-artifacts"
+      >
+        <list-item
+          v-for="artifact in targetArtifacts"
+          :key="artifact.id"
+          clickable
+          :action-cols="1"
+          data-cy="list-selected--parent-artifact-item"
+          @click="documentStore.addDocumentOfNeighborhood(artifact)"
+        >
+          <artifact-body-display display-title :artifact="artifact" />
+        </list-item>
+      </list>
+      <typography
+        v-else
+        l="1"
+        variant="caption"
+        value="There are no parent artifacts."
+      />
+    </panel-card>
+
+    <panel-card :title="sourceArtifactsLabel">
+      <template #title-actions>
+        <text-button
+          text
+          label="View Children"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfTypes([sourceType])"
+        />
+      </template>
+      <list
+        v-if="sourceArtifacts.length > 0"
+        :scroll-height="300"
+        data-cy="list-selected-child-artifacts"
+      >
+        <list-item
+          v-for="artifact in sourceArtifacts"
+          :key="artifact.id"
+          clickable
+          :action-cols="1"
+          data-cy="list-selected--child-artifact-item"
+          @click="documentStore.addDocumentOfNeighborhood(artifact)"
+        >
+          <artifact-body-display display-title :artifact="artifact" />
+        </list-item>
+      </list>
+      <typography
+        v-else
+        l="1"
+        variant="caption"
+        value="There are no child artifacts."
+      />
+    </panel-card>
   </details-panel>
 </template>
 
@@ -96,6 +174,9 @@ import {
   DetailsPanel,
   FlexBox,
   Separator,
+  ListItem,
+  ArtifactBodyDisplay,
+  List,
 } from "@/components/common";
 import FlexItem from "@/components/common/display/content/FlexItem.vue";
 import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
@@ -111,8 +192,6 @@ const sourceColor = computed(() => timStore.getTypeColor(sourceType.value));
 const targetType = computed(() => traceMatrix.value?.targetType || "");
 const targetIcon = computed(() => timStore.getTypeIcon(targetType.value));
 const targetColor = computed(() => timStore.getTypeColor(targetType.value));
-
-const name = computed(() => `"${sourceType.value}" to "${targetType.value}"`);
 
 const totalCount = computed(() => {
   const count = traceMatrix.value?.count || 0;
@@ -155,6 +234,24 @@ const traceCoverage = computed(() => {
     percentage: coverage,
   };
 });
+
+const sourceArtifacts = computed(() =>
+  artifactStore.getArtifactsByType(sourceType.value)
+);
+const sourceArtifactsLabel = computed(() =>
+  sourceArtifacts.value.length === 1
+    ? "1 Child Artifact"
+    : `${sourceArtifacts.value.length} Child Artifacts`
+);
+
+const targetArtifacts = computed(() =>
+  artifactStore.getArtifactsByType(targetType.value)
+);
+const targetArtifactsLabel = computed(() =>
+  targetArtifacts.value.length === 1
+    ? "1 Parent Artifact"
+    : `${targetArtifacts.value.length} Parent Artifacts`
+);
 
 /**
  * Switches to tree view and highlights this type matrix.

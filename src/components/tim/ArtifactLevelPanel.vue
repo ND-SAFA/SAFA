@@ -3,12 +3,6 @@
     <flex-box v-if="displayActions" b="2">
       <text-button
         text
-        label="View Artifacts"
-        icon="view-tree"
-        @click="documentStore.addDocumentOfTypes([name])"
-      />
-      <text-button
-        text
         label="Edit Type"
         icon="edit"
         @click="appStore.openDetailsPanel('saveArtifactLevel')"
@@ -109,6 +103,39 @@
         value="There are no child types."
       />
     </panel-card>
+
+    <panel-card :title="artifactsLabel">
+      <template #title-actions>
+        <text-button
+          text
+          label="View Artifacts"
+          icon="view-tree"
+          @click="documentStore.addDocumentOfTypes([name])"
+        />
+      </template>
+      <list
+        v-if="artifacts.length > 0"
+        :scroll-height="300"
+        data-cy="list-selected-artifacts"
+      >
+        <list-item
+          v-for="artifact in artifacts"
+          :key="artifact.id"
+          clickable
+          :action-cols="1"
+          data-cy="list-selected-artifact-item"
+          @click="documentStore.addDocumentOfNeighborhood(artifact)"
+        >
+          <artifact-body-display display-title :artifact="artifact" />
+        </list-item>
+      </list>
+      <typography
+        v-else
+        l="1"
+        variant="caption"
+        value="There are no artifacts."
+      />
+    </panel-card>
   </details-panel>
 </template>
 
@@ -129,6 +156,7 @@ import {
   selectionStore,
   appStore,
   permissionStore,
+  artifactStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -141,6 +169,7 @@ import {
   List,
   ListItem,
   IconButton,
+  ArtifactBodyDisplay,
 } from "@/components/common";
 
 const displayActions = computed(() => permissionStore.projectAllows("editor"));
@@ -169,4 +198,11 @@ const countDisplay = computed(() => {
 
   return count === 1 ? "1 Artifact" : `${count} Artifacts`;
 });
+
+const artifacts = computed(() => artifactStore.getArtifactsByType(name.value));
+const artifactsLabel = computed(() =>
+  artifacts.value.length === 1
+    ? "1 Artifact"
+    : `${artifacts.value.length} Artifacts`
+);
 </script>

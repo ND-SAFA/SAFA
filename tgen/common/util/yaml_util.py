@@ -1,5 +1,5 @@
 from enum import Enum, EnumMeta
-from typing import Dict
+from typing import Dict, Any
 
 from ruamel.yaml.nodes import Node
 from yaml.loader import SafeLoader
@@ -11,7 +11,13 @@ from tgen.constants.deliminator_constants import COLON
 
 class CustomLoader(SafeLoader):
 
-    def construct_custom(self, loader, node):
+    def construct_custom(self, _, node: Node) -> Any:
+        """
+        Constructs (mostly) any object that is not known to the yaml parser already
+        :param _: unused, left for api
+        :param node: The yaml node being parsed
+        :return: The created object
+        """
         class_path = node.tag.split(COLON)[-1]
         cls = ReflectionUtil.get_cls_from_path(class_path)
         if type(cls).__name__ == "function":
@@ -40,7 +46,13 @@ class CustomLoader(SafeLoader):
         if len(find_enum) > 0:
             return find_enum.pop()
 
-    def construct_object(self, node, deep=False):
+    def construct_object(self, node, deep=False) -> Any:
+        """
+        Overrides the normal yaml loader to make custom objects
+        :param node: The node being parsed
+        :param deep: Used in the yaml parser
+        :return: The constructed object
+        """
         if node.tag not in self.yaml_constructors:
             self.yaml_constructors[node.tag] = self.construct_custom
         return super().construct_object(node, deep)

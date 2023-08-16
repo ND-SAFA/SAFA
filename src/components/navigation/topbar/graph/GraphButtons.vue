@@ -64,7 +64,7 @@ const viewButtons = computed(() => [
     label: "Regenerate Layout",
     icon: "graph-refresh" as IconVariant,
     disabled:
-      layoutStore.isTableMode || permissionStore.projectAllows("editor"),
+      layoutStore.isTableMode || !permissionStore.projectAllows("editor"),
     dataCy: "button-nav-graph-refresh",
   },
 ]);

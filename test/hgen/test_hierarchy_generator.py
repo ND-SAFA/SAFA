@@ -5,16 +5,23 @@ from unittest.mock import MagicMock
 
 import mock
 
-from test.hgen.hgen_test_utils import get_test_hgen_args
 from tgen.common.util.dataframe_util import DataFrameUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
-from tgen.hgen.hgen_args import HGenState
-from tgen.hgen.hgen_util import get_initials
+from tgen.data.exporters.safa_exporter import SafaExporter
+from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.tdatasets.trace_dataset import TraceDataset
+from tgen.hgen.hgen_args import HGenState, HGenArgs
+from tgen.hgen.hgen_util import get_initials, save_dataset_checkpoint
 from tgen.hgen.steps.step_create_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
@@ -22,13 +29,17 @@ from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_HGEN_PATH, TEST_OUTPUT_DIR
 from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.testprojects.mocking.mock_libraries import mock_libraries
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
-
+import pandas as pd
 
 class TestHierarchyGenerator(BaseTest):
-    HGEN_ARGS = get_test_hgen_args()
+    HGEN_ARGS = HGenArgs(source_layer_id="C++ Code",
+                         target_type="Test User Story",
+                         dataset_creator_for_sources=PromptDatasetCreator(
+                             trace_dataset_creator=TraceDatasetCreator(DataFrameProjectReader(project_path=TEST_HGEN_PATH))))
     HGEN_STATE = HGenState()
 
     def test_run(self):
@@ -36,6 +47,30 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_generate_input_step()
         self.assert_generate_artifact_content_step()
         self.assert_create_dataset_step()
+        self.assert_save_dataset_checkpoint()
+
+    def assert_save_dataset_checkpoint(self):
+        def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):
+            self.assertSetEqual(set(dataset.artifact_df.index), set(orig_dataset.artifact_df.index))
+            self.assertEqual(len(dataset.trace_df), len(orig_dataset.trace_df))
+            for i, trace in orig_dataset.trace_df.itertuples():
+                self.assertIsNotNone(dataset.trace_df.get_link(source_id=trace[TraceKeys.SOURCE], target_id=trace[TraceKeys.TARGET]))
+            self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
+
+        export_path = TEST_OUTPUT_DIR
+        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.dataset, export_path, filename="dir", exporter_class=SafaExporter)
+        saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
+        assert_dataset(saved_safa_dataset, self.HGEN_STATE.dataset)
+        csv_save_path = save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
+        saved_csv_dataset = ArtifactDataFrame(pd.read_csv(csv_save_path))
+        self.assertSetEqual(set(saved_csv_dataset.index), set(self.HGEN_STATE.source_dataset.artifact_df.index))
+        dataframe_save_path = save_dataset_checkpoint(self.HGEN_STATE.original_dataset, export_path, filename="dir")
+        saved_dataframe_dataset = TraceDatasetCreator(DataFrameProjectReader(project_path=dataframe_save_path)).create()
+        assert_dataset(saved_dataframe_dataset, self.HGEN_STATE.original_dataset)
+        non_dataset = {"hello": "world"}
+        yaml_save_path = save_dataset_checkpoint(non_dataset, export_path, filename="non_dataset")
+        yaml_content = FileUtil.read_yaml(yaml_save_path)
+        self.assertDictEqual(non_dataset, yaml_content)
 
     def assert_initialize_dataset_step(self):
         orig_dataset = self.HGEN_ARGS.dataset_creator_for_sources.create()

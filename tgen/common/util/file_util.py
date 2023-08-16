@@ -11,6 +11,9 @@ from tgen.constants.deliminator_constants import F_SLASH
 
 
 class FileUtil:
+    JSON_EXT = "json"
+    CSV_EXT = "csv"
+    YAML_EXT = "yaml"
 
     @staticmethod
     def get_file_ext(path: str) -> str:
@@ -296,3 +299,14 @@ class FileUtil:
         output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
             yaml.dump(content, file)
+
+    @staticmethod
+    def add_ext(file_path: str, ext: str) -> str:
+        """
+        Adds a file ext to the path if it doesn't have it already
+        :param file_path: The path to the file
+        :param ext: The extension to include
+        :return: The filepath with the ext
+        """
+        full_path = os.path.splitext(file_path)[0] + os.path.extsep + ext
+        return full_path

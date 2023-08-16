@@ -138,9 +138,8 @@ import {
   layoutStore,
   documentStore,
   appStore,
-  sessionStore,
-  projectStore,
   timStore,
+  permissionStore,
 } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import {
@@ -150,7 +149,7 @@ import {
   Separator,
   IconButton,
 } from "@/components/common";
-import ArtifactNameDisplay from "@/components/artifact/display/ArtifactNameDisplay.vue";
+import { ArtifactNameDisplay } from "@/components/artifact";
 import { CyElement } from "../base";
 
 const props = defineProps<{
@@ -160,9 +159,7 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
-const displayEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const id = computed(() => props.artifact.id);
 

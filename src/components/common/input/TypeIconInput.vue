@@ -27,7 +27,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
 import { TypeIcons } from "@/util";
-import { artifactTypeApiStore, projectStore, sessionStore } from "@/hooks";
+import { artifactTypeApiStore, permissionStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
@@ -49,9 +49,7 @@ const iconOptions = computed(() =>
   })
 );
 
-const allowEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const icon = computed({
   get(): string {

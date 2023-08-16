@@ -22,7 +22,7 @@
         <template #actions>
           <flex-box justify="end">
             <icon-button
-              v-if="sessionStore.isEditor(opt)"
+              v-if="permissionStore.projectAllows('editor', opt)"
               small
               :tooltip="`Invite to ${opt.name}`"
               icon="invite"
@@ -30,7 +30,7 @@
               @click="projectInviteId = opt.projectId"
             />
             <icon-button
-              v-if="sessionStore.isEditor(opt)"
+              v-if="permissionStore.projectAllows('editor', opt)"
               small
               :tooltip="`Edit ${opt.name}`"
               icon="edit"
@@ -38,7 +38,7 @@
               @click="identifierSaveStore.selectIdentifier(opt, 'save')"
             />
             <icon-button
-              v-if="sessionStore.isOwner(opt)"
+              v-if="permissionStore.projectAllows('owner', opt)"
               small
               :tooltip="`Delete ${opt.name}`"
               icon="delete"
@@ -51,7 +51,7 @@
     </template>
     <template #after-options>
       <text-button
-        v-if="!appStore.isDemo"
+        v-if="permissionStore.organizationAllows('navigation')"
         text
         block
         label="Add Project"
@@ -80,10 +80,9 @@ export default {
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  appStore,
   getProjectApiStore,
   identifierSaveStore,
-  sessionStore,
+  permissionStore,
   useTheme,
 } from "@/hooks";
 import { FlexBox, IconButton, ListItem, TextButton } from "@/components/common";

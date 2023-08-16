@@ -82,7 +82,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
+import { appStore, layoutStore, permissionStore, projectStore } from "@/hooks";
 import { disableDrawMode, toggleDrawMode } from "@/cytoscape";
 import IconButton from "@/components/common/button/IconButton.vue";
 
@@ -95,8 +95,7 @@ const isTreeMode = computed(
 );
 const drawMode = computed(() => appStore.isCreateLinkEnabled);
 const display = computed(
-  () =>
-    projectStore.isProjectDefined && sessionStore.isEditor(projectStore.project)
+  () => projectStore.isProjectDefined && permissionStore.projectAllows("editor")
 );
 
 /**

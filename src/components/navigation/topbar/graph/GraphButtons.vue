@@ -27,13 +27,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { IconVariant } from "@/types";
-import {
-  appStore,
-  layoutApiStore,
-  layoutStore,
-  projectStore,
-  sessionStore,
-} from "@/hooks";
+import { layoutApiStore, layoutStore, permissionStore } from "@/hooks";
 import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, FlexBox, Separator } from "@/components/common";
 
@@ -70,9 +64,7 @@ const viewButtons = computed(() => [
     label: "Regenerate Layout",
     icon: "graph-refresh" as IconVariant,
     disabled:
-      layoutStore.isTableMode ||
-      appStore.isDemo ||
-      !sessionStore.isEditor(projectStore.project),
+      layoutStore.isTableMode || permissionStore.projectAllows("editor"),
     dataCy: "button-nav-graph-refresh",
   },
 ]);

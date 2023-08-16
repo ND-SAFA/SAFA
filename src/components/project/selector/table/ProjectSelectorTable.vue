@@ -3,8 +3,8 @@
     v-model:selected="selectedItems"
     :minimal="props.minimal"
     addable
-    :editable="sessionStore.isEditor"
-    :deletable="sessionStore.isOwner"
+    :editable="isEditable"
+    :deletable="isDeletable"
     :loading="getProjectApiStore.loading"
     :columns="columns"
     :rows="rows"
@@ -18,7 +18,7 @@
   >
     <template #cell-actions="{ row }">
       <icon-button
-        v-if="sessionStore.isEditor(row)"
+        v-if="isEditable(row)"
         :small="props.minimal"
         :tooltip="`Invite to ${row.name}`"
         icon="invite"
@@ -67,6 +67,7 @@ import {
   identifierSaveStore,
   logStore,
   memberApiStore,
+  permissionStore,
   sessionStore,
 } from "@/hooks";
 import { SelectorTable, IconButton } from "@/components/common";
@@ -129,9 +130,7 @@ function handleReload() {
  * @param project - The project to leave.
  */
 function handleLeave(project: IdentifierSchema) {
-  const member = project.members.find(
-    (member) => member.email === sessionStore.user?.email
-  );
+  const member = sessionStore.getProjectMember(project);
   const ownerCount = project.members.filter(
     (member) => member.role === ProjectRole.OWNER
   ).length;
@@ -141,6 +140,24 @@ function handleLeave(project: IdentifierSchema) {
   } else {
     memberApiStore.handleDelete(member);
   }
+}
+
+/**
+ * Whether the current user can edit the project.
+ * @param project - The project to check.
+ * @returns Whether the current user can edit the project.
+ */
+function isEditable(project: IdentifierSchema): boolean {
+  return permissionStore.projectAllows("editor", project);
+}
+
+/**
+ * Whether the current user can delete the project.
+ * @param project - The project to check.
+ * @returns Whether the current user can delete the project.
+ */
+function isDeletable(project: IdentifierSchema): boolean {
+  return permissionStore.projectAllows("owner", project);
 }
 
 /**

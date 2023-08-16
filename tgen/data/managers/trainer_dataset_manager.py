@@ -102,10 +102,13 @@ class TrainerDatasetManager(BaseObject):
         :return: TrainerDatasetManager with initialized data.
         """
         trainer_dataset_manager = TrainerDatasetManager()
-        for role, dataset in dataset_map.items():
-            assert role in trainer_dataset_manager._dataset_creators, f"Unknown dataset role {role}"
-            assert isinstance(dataset, iDataset), f"Unexpected type of dataset {type(dataset)}"
-            trainer_dataset_manager._datasets[role] = dataset
+        for role in DatasetRole:
+            if role not in dataset_map:
+                trainer_dataset_manager._datasets[role] = None
+            else:
+                dataset = dataset_map[role]
+                assert isinstance(dataset, iDataset), f"Unexpected type of dataset {type(dataset)}"
+                trainer_dataset_manager._datasets[role] = dataset
         return trainer_dataset_manager
 
     @overrides(BaseObject)

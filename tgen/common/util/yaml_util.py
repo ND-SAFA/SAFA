@@ -1,4 +1,7 @@
+from enum import Enum, EnumMeta
 from typing import Dict
+
+from ruamel.yaml.nodes import Node
 from yaml.loader import SafeLoader
 
 from tgen.common.util.file_util import FileUtil
@@ -11,6 +14,10 @@ class CustomLoader(SafeLoader):
     def construct_custom(self, loader, node):
         class_path = node.tag.split(COLON)[-1]
         cls = ReflectionUtil.get_cls_from_path(class_path)
+        if type(cls).__name__ == "function":
+            return cls
+        if isinstance(cls, EnumMeta):
+            return self._create_enum_from_meta(cls, node)
         data = cls.__new__(cls)
 
         if hasattr(data, '__setstate__'):
@@ -20,6 +27,18 @@ class CustomLoader(SafeLoader):
             state = self.construct_mapping(node)
             data.__dict__.update(state)
         return data
+
+    def _create_enum_from_meta(self, enum_meta: EnumMeta, node: Node) -> Enum:
+        """
+        Creates an enum from its meta obj
+        :param enum_meta: The meta obj for an enum
+        :param node: The yaml node containing the enum's value
+        :return: The enum with the value contained in the node
+        """
+        value = self.construct_object(node.value[0])
+        find_enum = [e for e in enum_meta if e.value == value]
+        if len(find_enum) > 0:
+            return find_enum.pop()
 
     def construct_object(self, node, deep=False):
         if node.tag not in self.yaml_constructors:

@@ -76,6 +76,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         layer_id = hgen_args.target_type
         if hgen_args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
             layer_id = f"{layer_id}_{uuid.uuid4()}"
+            hgen_args.target_type = layer_id
         return layer_id
 
     @staticmethod
@@ -99,7 +100,8 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
         tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
-                                 export_dir=os.path.join(hgen_state.export_dir, "ranking"))
+                                 export_dir=os.path.join(hgen_state.export_dir, "ranking"),
+                                 load_dir=os.path.join(hgen_args.load_dir, "ranking"))
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")

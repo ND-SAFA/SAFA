@@ -41,6 +41,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         if self.args.export_dir is not None:
             os.makedirs(self.args.export_dir, exist_ok=True)
+            self.state.export_dir = self.args.export_dir
         super().run()
         batched_ranked_children = self.state.ranked_children
         parent2rankings = {source: ranked_children for source, ranked_children in zip(self.args.parent_ids, batched_ranked_children)}

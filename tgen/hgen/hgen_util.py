@@ -54,6 +54,7 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
     filename = current_time_string if not filename else filename
     full_export_path = os.path.join(export_path, filename)
     if not isinstance(dataset, iDataset) and not isinstance(dataset, pd.DataFrame):
+        full_export_path = FileUtil.add_ext(full_export_path, FileUtil.YAML_EXT)
         FileUtil.write_yaml(dataset, full_export_path)
     else:
         if isinstance(dataset, PromptDataset) and dataset.trace_dataset is not None:
@@ -61,7 +62,7 @@ def save_dataset_checkpoint(dataset: Any, export_path: str = None,
         if exporter_class is None:
             exporter_class = DataFrameExporter if isinstance(dataset, TraceDataset) else CSVExporter
         if issubclass(exporter_class, CSVExporter):
-            full_export_path += CSVKeys.EXT
+            full_export_path = FileUtil.add_ext(full_export_path, FileUtil.CSV_EXT)
         exporter = exporter_class(export_path=full_export_path, dataset=dataset)
         exporter.export()
     logger.info(f"Dataset checkpoint saved to {full_export_path} ")

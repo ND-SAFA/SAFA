@@ -1,27 +1,30 @@
-import uuid
-from unittest import skip
 import os
 from unittest.mock import MagicMock
 
 import mock
+import pandas as pd
 
-from test.hgen.hgen_test_utils import get_test_hgen_args
+from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, get_generated_artifacts_response, HGenTestConstants, \
+    get_ranking_job_result
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.status import Status
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.common.util.file_util import FileUtil
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.data.exporters.safa_exporter import SafaExporter
+from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenState
-from tgen.hgen.hgen_util import get_initials
+from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.testprojects.mocking.mock_libraries import mock_libraries
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
@@ -36,6 +39,30 @@ class TestHierarchyGenerator(BaseTest):
         self.assert_generate_input_step()
         self.assert_generate_artifact_content_step()
         self.assert_create_dataset_step()
+        self.assert_save_dataset_checkpoint()
+
+    def assert_save_dataset_checkpoint(self):
+        def assert_dataset(dataset: TraceDataset, orig_dataset: TraceDataset):
+            self.assertSetEqual(set(dataset.artifact_df.index), set(orig_dataset.artifact_df.index))
+            self.assertEqual(len(dataset.trace_df), len(orig_dataset.trace_df))
+            for i, trace in orig_dataset.trace_df.itertuples():
+                self.assertIsNotNone(dataset.trace_df.get_link(source_id=trace[TraceKeys.SOURCE], target_id=trace[TraceKeys.TARGET]))
+            self.assertEqual(len(dataset.layer_df), len(orig_dataset.layer_df))
+
+        export_path = TEST_OUTPUT_DIR
+        safa_save_path = save_dataset_checkpoint(self.HGEN_STATE.dataset, export_path, filename="dir", exporter_class=SafaExporter)
+        saved_safa_dataset = TraceDatasetCreator(StructuredProjectReader(project_path=safa_save_path)).create()
+        assert_dataset(saved_safa_dataset, self.HGEN_STATE.dataset)
+        csv_save_path = save_dataset_checkpoint(self.HGEN_STATE.source_dataset, export_path, filename="artifacts")
+        saved_csv_dataset = ArtifactDataFrame(pd.read_csv(csv_save_path))
+        self.assertSetEqual(set(saved_csv_dataset.index), set(self.HGEN_STATE.source_dataset.artifact_df.index))
+        dataframe_save_path = save_dataset_checkpoint(self.HGEN_STATE.original_dataset, export_path, filename="dir")
+        saved_dataframe_dataset = TraceDatasetCreator(DataFrameProjectReader(project_path=dataframe_save_path)).create()
+        assert_dataset(saved_dataframe_dataset, self.HGEN_STATE.original_dataset)
+        non_dataset = {"hello": "world"}
+        yaml_save_path = save_dataset_checkpoint(non_dataset, export_path, filename="non_dataset")
+        yaml_content = FileUtil.read_yaml(yaml_save_path)
+        self.assertDictEqual(non_dataset, yaml_content)
 
     def assert_initialize_dataset_step(self):
         orig_dataset = self.HGEN_ARGS.dataset_creator_for_sources.create()
@@ -46,26 +73,16 @@ class TestHierarchyGenerator(BaseTest):
 
     @mock_libraries
     def assert_generate_input_step(self, anthropic_ai_manager: TestAIManager, openai_ai_manager: TestAIManager):
-        description = "A User story is a concise, informal description of a software feature or functionality, " \
-                      "written from the perspective of the end user"
-        example = "As a frequent traveler, I want to be able to filter hotel search results by distance " \
-                  "so that I can find accommodations close to my desired location."
-        format_ = "As a [type of user], I want to [action or goal] so that [reason or benefit]."
-        questions = "What are the main classes/functions in the code?\n" \
-                    "What are the inputs and outputs of the main functions?\n" \
-                    "Is there any user interface code and what does it do?"
-        anthropic_ai_manager.set_responses([PromptUtil.create_xml("questions", questions)])
-        openai_ai_manager.set_responses([f'{PromptUtil.create_xml("description", description)}'
-                                         f'{PromptUtil.create_xml("example", example)} '
-                                         f'{PromptUtil.create_xml("format", format_)}'])
+        anthropic_ai_manager.set_responses(HGenTestConstants.responses_inputs)
+        openai_ai_manager.set_responses(HGenTestConstants.open_ai_responses)
 
         step = GenerateInputsStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         path = step._get_inputs_save_path(target_type=self.HGEN_ARGS.target_type, source_type=self.HGEN_ARGS.source_type)
         self.assertTrue(os.path.exists(path))
-        self.assertEqual(self.HGEN_STATE.description_of_artifact, description)
-        self.assertEqual(self.HGEN_STATE.format_of_artifacts, format_)
-        self.assertEqual(self.HGEN_STATE.questions, questions.split("\n"))
+        self.assertEqual(self.HGEN_STATE.description_of_artifact, HGenTestConstants.description)
+        self.assertEqual(self.HGEN_STATE.format_of_artifacts, HGenTestConstants.format_)
+        self.assertEqual(self.HGEN_STATE.questions, HGenTestConstants.questions.split("\n"))
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
         self.assertEqual(openai_ai_manager.n_used, 1)
         self.assertEqual(anthropic_ai_manager.n_used, 1)
@@ -74,32 +91,20 @@ class TestHierarchyGenerator(BaseTest):
     @mock_anthropic
     def assert_generate_artifact_content_step(self, anthropic_ai_manager: TestAIManager):
         self.HGEN_ARGS.target_type = "User Story"
-        summary = "\nHere is a summary of the key technical details and design aspects of the system based on the provided code"
-        user_stories = ["As a player, I want to move around in a 3D world so that I can explore the environment.",
-                        "As a player, I want to place and remove blocks in the world so that I can modify the environment.",
-                        "As a player, I want to copy the color of blocks so that I can reuse colors while building."]
-        response = PromptUtil.create_xml("summary", summary)
-        for us in user_stories:
-            response += PromptUtil.create_xml("user-story", us)
-        anthropic_ai_manager.set_responses([response])
+        response = get_generated_artifacts_response()
+        anthropic_ai_manager.set_responses(response)
         step = GenerateArtifactContentStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
-        self.assertEqual(summary, self.HGEN_STATE.summary)
-        for i, us in enumerate(user_stories):
+        self.assertEqual(HGenTestConstants.summary, self.HGEN_STATE.summary)
+        for i, us in enumerate(HGenTestConstants.user_stories):
             self.assertEqual(us, self.HGEN_STATE.generated_artifact_content[i])
 
     @mock_anthropic
     @mock.patch.object(RankingJob, "run")
     def assert_create_dataset_step(self, anthropic_ai_manager: TestAIManager, ranking_mock: MagicMock):
-        names = [f"{i}" for i, _ in enumerate(self.HGEN_STATE.generated_artifact_content)]
-        expected_names = [f"{name} {get_initials(self.HGEN_ARGS.target_type)}" for name in names]
-        anthropic_ai_manager.set_responses([PromptUtil.create_xml("title", name) for name in names])
-        prediction_entries = [{"source": source, "target": target, "score": 0.8, "label": 1, "explanation": "explanation"}
-                              for target in expected_names
-                              for source in self.HGEN_STATE.source_dataset.artifact_df.index]
-        job_result = JobResult(status=Status.SUCCESS,
-                               body=TracePredictionOutput(prediction_entries=prediction_entries),
-                               job_id=uuid.uuid4())
+        names, expected_names, responses = get_name_responses(self.HGEN_STATE.generated_artifact_content)
+        anthropic_ai_manager.set_responses(responses)
+        job_result = get_ranking_job_result(expected_names, self.HGEN_STATE.source_dataset.artifact_df.index)
         ranking_mock.return_value = job_result
         step = CreateHGenDatasetStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)

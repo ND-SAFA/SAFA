@@ -82,3 +82,12 @@ class TestFileUtil(BaseTest):
         file_paths = FileUtil.get_all_paths(base_dir, lambda x: "2" in x)
         self.assertIn(os.path.join(base_dir, files[1]), file_paths)
         self.assertIn(os.path.join(nested_dir, files[1]), file_paths)
+
+    def test_add_ext(self):
+        originally_wrong_ext = "home/test.txt"
+        with_csv = FileUtil.add_ext(originally_wrong_ext, FileUtil.CSV_EXT)
+        self.assertEqual(with_csv, "home/test.csv")
+
+        with_no_ext = "home/test"
+        with_yaml = FileUtil.add_ext(with_no_ext, FileUtil.YAML_EXT)
+        self.assertEqual(with_yaml, "home/test.yaml")

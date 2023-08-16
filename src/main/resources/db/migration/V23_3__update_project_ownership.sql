@@ -26,3 +26,5 @@ DELETE FROM user_project_membership
     );
 
 DROP TABLE project_teams;
+
+ALTER TABLE project ADD FOREIGN KEY (team_id) REFERENCES team (id) ON DELETE CASCADE;

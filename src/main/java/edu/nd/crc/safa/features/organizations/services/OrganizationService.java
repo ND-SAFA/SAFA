@@ -1,8 +1,11 @@
 package edu.nd.crc.safa.features.organizations.services;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepository;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -32,5 +35,17 @@ public class OrganizationService {
         organization.setFullOrgTeamId(orgTeam.getId());
 
         return organizationRepo.save(organization);  // Save again to add the team ID
+    }
+
+    /**
+     * Gets the personal organization representing a given user
+     *
+     * @param user The user
+     * @return The personal org for that user
+     */
+    public Organization getPersonalOrganization(SafaUser user) {
+        UUID orgId = user.getPersonalOrgId();
+        return organizationRepo.findById(orgId)
+                .orElseThrow(() -> new SafaError("User does not have a personal organization"));
     }
 }

@@ -9,11 +9,14 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.services.TeamService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -33,6 +36,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserService safaUserService;
+    private final TeamService teamService;
 
     /**
      * Deletes given project and all related entities through cascade property.
@@ -78,44 +82,74 @@ public class ProjectService {
     }
 
     /**
-     * Sets authorized user as project owner and saves project.
+     * Creates a new project
      *
-     * @param project The project to set user as owner
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The team that owns the project
+     * @return The new project
      */
-    public void saveProjectWithCurrentUserAsOwner(Project project) {
-        SafaUser user = this.safaUserService.getCurrentUser();
-        saveProjectWithUserAsOwner(project, user);
+    public Project createProject(String name, String description, Team owner) {
+        Project project = new Project(name, description, owner);
+        return this.projectRepository.save(project);
     }
 
     /**
-     * Sets authorized user as project owner and saves project.
+     * Creates a new project
      *
-     * @param project The project to set user as owner
-     * @param user    The user to set as owner
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The user that owns the project
+     * @return The new project
      */
-    public void saveProjectWithUserAsOwner(Project project, SafaUser user) {
-        this.projectRepository.save(project);
-        this.setUserAsOwner(project, user);
+    public Project createProject(String name, String description, SafaUser owner) {
+        Team personalTeam = teamService.getPersonalTeam(owner);
+        return createProject(name, description, personalTeam);
     }
 
     /**
-     * The current authorized user to be an owner to given project.
+     * Creates a new project
      *
-     * @param project The project the current user will be owner in.
+     * @param name The name of the project
+     * @param description The description of the project
+     * @param owner The organization that owns the project
+     * @return The new project
      */
-    public void setCurrentUserAsOwner(Project project) {
-        SafaUser user = this.safaUserService.getCurrentUser();
-        setUserAsOwner(project, user);
+    public Project createProject(String name, String description, Organization owner) {
+        Team orgTeam = teamService.getFullOrganizationTeam(owner);
+        return createProject(name, description, orgTeam);
     }
 
     /**
-     * The authorized user to be an owner to given project.
+     * Creates a new project
      *
-     * @param project The project the current user will be owner in.
-     * @param user    The user to set as owner
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The user who will own the project
+     * @return The new project
      */
-    public void setUserAsOwner(Project project, SafaUser user) {
-        UserProjectMembership projectMembership = new UserProjectMembership(project, user, ProjectRole.OWNER);
-        this.projectMembershipRepository.save(projectMembership);
+    public Project createProject(ProjectAppEntity projectDefinition, SafaUser owner) {
+        return createProject(projectDefinition.getName(), projectDefinition.getDescription(), owner);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The organization who will own the project
+     * @return The new project
+     */
+    public Project createProject(ProjectAppEntity projectDefinition, Organization owner) {
+        return createProject(projectDefinition.getName(), projectDefinition.getDescription(), owner);
+    }
+
+    /**
+     * Creates a new project
+     *
+     * @param projectDefinition The definition of the project from the front end
+     * @param owner The team who will own the project
+     * @return The new project
+     */
+    public Project createProject(ProjectAppEntity projectDefinition, Team owner) {
+        return createProject(projectDefinition.getName(), projectDefinition.getDescription(), owner);
     }
 }

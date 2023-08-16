@@ -64,7 +64,7 @@ public class SafaUserService {
      * @param password Account password
      * @return {@link UserIdentifierDTO} representing created user
      */
-    public UserIdentifierDTO createUser(String email, String password) {
+    public SafaUser createUser(String email, String password) {
         String encodedPassword = this.passwordEncoder.encode(password);
         SafaUser safaUser = new SafaUser(email, encodedPassword);
 
@@ -78,7 +78,7 @@ public class SafaUserService {
         safaUser.setPersonalOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id
 
-        return new UserIdentifierDTO(safaUser);
+        return safaUser;
     }
 
     /**

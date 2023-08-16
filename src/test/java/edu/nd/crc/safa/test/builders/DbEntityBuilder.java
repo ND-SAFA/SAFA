@@ -151,8 +151,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     }
 
     public DbEntityBuilder newProject(String name, SafaUser owner) {
-        Project project = new Project(name, "");
-        this.projectRepository.save(project);
+        Project project = this.projectService.createProject(name, "", owner);
 
         // TODO keeping this for now, but it should be removed once we update how membership works
         this.projectMembershipRepository.save(new UserProjectMembership(project, owner, ProjectRole.OWNER));

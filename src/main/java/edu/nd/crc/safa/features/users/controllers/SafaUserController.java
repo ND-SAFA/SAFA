@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.users.controllers;
 
-import java.io.IOException;
 import java.util.Date;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -82,12 +81,11 @@ public class SafaUserController extends BaseController {
      * @return Created user entity
      */
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
-    public UserIdentifierDTO createNewUser(@RequestBody CreateAccountRequest newUser) throws IOException {
+    public UserIdentifierDTO createNewUser(@RequestBody CreateAccountRequest newUser) {
         // Step - Create user
-        UserIdentifierDTO newUserIdentifierDTO = this.serviceProvider
+        return new UserIdentifierDTO(this.serviceProvider
             .getSafaUserService()
-            .createUser(newUser.getEmail(), newUser.getPassword());
-        return newUserIdentifierDTO;
+            .createUser(newUser.getEmail(), newUser.getPassword()));
     }
 
     /**

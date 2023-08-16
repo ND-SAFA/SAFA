@@ -28,7 +28,7 @@ import org.hibernate.annotations.Type;
  * Joins each user to the project they are members in.
  */
 @Entity
-@Table(name = "project_membership",
+@Table(name = "user_project_membership",
     uniqueConstraints = {
         @UniqueConstraint(
             columnNames = {

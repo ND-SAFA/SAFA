@@ -95,7 +95,7 @@ class BaseObject(ABC):
                 obj_meta_list = experiment_params_list
             else:
                 obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_param_type)
-                if len(experimental_vars_for_param) > 0 and BaseObject._is_type(ExperimentalVariable([]), param_name=param_name,
+                if len(experimental_vars_for_param) > 0 and ReflectionUtil.is_type(ExperimentalVariable([]), param_name=param_name,
                                                                                 expected_type=expected_param_type):
                     for obj_meta in obj_meta_list:
                         obj_meta.init_params[param_name] = ExperimentalVariable(obj_meta.init_params[param_name],

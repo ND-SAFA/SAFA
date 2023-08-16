@@ -20,12 +20,12 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         super().__init__(args, EmbeddingRankingPipeline.steps)
 
-    def init_state(self) -> RankingState:
+    def state_class(self) -> RankingState:
         """
         Creates new ranking state.
         :return: The new state.
         """
-        return RankingState()
+        return RankingState
 
     def run(self) -> Dict[str, List[str]]:
         """

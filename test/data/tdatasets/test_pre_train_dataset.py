@@ -8,7 +8,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_VOCAB_FILE
 
-
 class TestPreTrainDataset(BaseTest):
 
     @patch.object(ModelManager, "get_tokenizer")

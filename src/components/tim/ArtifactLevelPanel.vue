@@ -126,10 +126,9 @@ import { computed } from "vue";
 import {
   timStore,
   documentStore,
-  projectStore,
   selectionStore,
-  sessionStore,
   appStore,
+  permissionStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -144,9 +143,7 @@ import {
   IconButton,
 } from "@/components/common";
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");

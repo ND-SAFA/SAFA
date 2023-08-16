@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema, ProjectRole, SessionSchema } from "@/types";
+import { IdentifierSchema, MembershipSchema, SessionSchema } from "@/types";
 import { createSession, createUser } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -50,36 +50,10 @@ export const useSession = defineStore("session", {
       this.user = createUser();
     },
     /**
-     * @return Whether the current user owns this project.
+     * @return This user's membership within a project.
      */
-    isOwner(project: IdentifierSchema): boolean {
-      const member = project.members.find(
-        (member) => member.email === this.userEmail
-      );
-
-      return !!member && member.role === ProjectRole.OWNER;
-    },
-    /**
-     * @return Whether the current user can administrate this project.
-     */
-    isAdmin(project: IdentifierSchema): boolean {
-      const member = project.members.find(
-        (member) => member.email === this.userEmail
-      );
-
-      return (
-        !!member && [ProjectRole.OWNER, ProjectRole.ADMIN].includes(member.role)
-      );
-    },
-    /**
-     * @return Whether the current user can edit this project.
-     */
-    isEditor(project: IdentifierSchema): boolean {
-      const member = project.members.find(
-        (member) => member.email === this.userEmail
-      );
-
-      return !!member && member.role !== ProjectRole.VIEWER;
+    getProjectMember(project: IdentifierSchema): MembershipSchema | undefined {
+      return project.members.find((member) => member.email === this.userEmail);
     },
   },
 });

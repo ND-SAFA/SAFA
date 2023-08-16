@@ -42,7 +42,7 @@ import {
   projectApiStore,
   getVersionApiStore,
   projectStore,
-  sessionStore,
+  permissionStore,
 } from "@/hooks";
 import { SelectorTable } from "@/components/common";
 import { CreateVersionModal } from "@/components/project/creator";
@@ -101,7 +101,7 @@ const rows = computed(() =>
 );
 
 const deletable = computed(
-  () => sessionStore.isEditor(props.project) && versions.value.length > 1
+  () => permissionStore.projectAllows("admin") && versions.value.length > 1
 );
 
 /**

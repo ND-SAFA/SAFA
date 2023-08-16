@@ -59,10 +59,9 @@ import {
   timStore,
   appStore,
   documentStore,
-  projectStore,
   selectionStore,
-  sessionStore,
   useTheme,
+  permissionStore,
 } from "@/hooks";
 import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
@@ -76,9 +75,7 @@ const props = defineProps<{
 
 const { darkMode } = useTheme();
 
-const displayEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const selected = computed(
   () => selectionStore.selectedArtifactLevelType === props.artifactType

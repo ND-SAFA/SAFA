@@ -83,9 +83,8 @@ import { computed } from "vue";
 import {
   artifactStore,
   documentStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
   subtreeStore,
   timStore,
 } from "@/hooks";
@@ -101,9 +100,7 @@ import {
 import FlexItem from "@/components/common/display/content/FlexItem.vue";
 import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 

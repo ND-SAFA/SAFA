@@ -28,20 +28,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
-import {
-  projectStore,
-  sessionStore,
-  timStore,
-  traceMatrixApiStore,
-} from "@/hooks";
-import { Typography, Chip } from "@/components/common/display";
-import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
+import { permissionStore, timStore, traceMatrixApiStore } from "@/hooks";
+import { Typography, Chip, AttributeChip } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
 
-const allowEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const allowedTypes = computed(() =>
   timStore.traceMatrices

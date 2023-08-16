@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" wrap t="2" class="settings-buttons">
+  <flex-box v-if="display" wrap t="2" class="settings-buttons">
     <q-btn-group flat>
       <text-button
         text
@@ -45,13 +45,13 @@ export default {
 import { computed } from "vue";
 import {
   identifierSaveStore,
+  permissionStore,
   projectApiStore,
   projectStore,
-  sessionStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 
 /**
  * Opens the edit modal.

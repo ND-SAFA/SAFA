@@ -115,9 +115,8 @@ import {
   artifactStore,
   attributesStore,
   deltaStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
   subtreeStore,
   timStore,
 } from "@/hooks";
@@ -149,9 +148,7 @@ const visibleTypes = ref<string[] | null>([]);
 const countType = ref<TraceCountTypes>(TraceCountTypes.all);
 const deltaTypes = ref<ArtifactDeltaState[] | null>([]);
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const loading = computed(() => appStore.isLoading > 0);
 const inDeltaView = computed(() => deltaStore.inDeltaView);

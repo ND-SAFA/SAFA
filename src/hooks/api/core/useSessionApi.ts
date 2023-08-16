@@ -12,7 +12,7 @@ import {
   setProjectApiStore,
   sessionStore,
   logStore,
-  appStore,
+  permissionStore,
 } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -142,7 +142,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
    * Logs in to the demo account and opens the demo project.
    */
   async function handleDemoLogin(): Promise<void> {
-    appStore.isDemo = true;
+    permissionStore.isDemo = true;
 
     await handleLogin(DEMO_ACCOUNT).then(() =>
       navigateTo(Routes.ARTIFACT, {
@@ -179,7 +179,7 @@ export const useSessionApi = defineStore("sessionApi", () => {
     sessionStore.user = await getCurrentUser();
 
     if (sessionStore.user.email === DEMO_ACCOUNT.email) {
-      appStore.isDemo = true;
+      permissionStore.isDemo = true;
     }
 
     await getProjectApiStore.handleReload({});

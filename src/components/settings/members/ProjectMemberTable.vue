@@ -65,6 +65,7 @@ import {
   logStore,
   memberApiStore,
   membersStore,
+  permissionStore,
   projectStore,
   sessionStore,
 } from "@/hooks";
@@ -84,7 +85,9 @@ const modalOpen = ref(false);
 
 const project = computed(() => projectStore.project);
 
-const isAdmin = computed(() => sessionStore.isAdmin(project.value));
+const isAdmin = computed(() =>
+  permissionStore.projectAllows("admin", project.value)
+);
 
 const rows = computed(() => membersStore.members);
 

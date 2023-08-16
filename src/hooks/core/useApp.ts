@@ -17,10 +17,6 @@ import logStore from "./useLog";
 export const useApp = defineStore("app", {
   state: () => ({
     /**
-     * Whether the app is in demo mode.
-     */
-    isDemo: false,
-    /**
      * Whether the app is currently loading, as a number of loading processes.
      */
     isLoading: 0,

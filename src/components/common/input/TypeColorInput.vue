@@ -27,12 +27,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactLevelInputProps } from "@/types";
 import { ThemeGradient } from "@/util";
-import {
-  artifactTypeApiStore,
-  projectStore,
-  sessionStore,
-  timStore,
-} from "@/hooks";
+import { artifactTypeApiStore, permissionStore, timStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 const props = defineProps<ArtifactLevelInputProps>();
@@ -58,9 +53,7 @@ const colorOptions = computed(() =>
   })
 );
 
-const allowEditing = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const allowEditing = computed(() => permissionStore.projectAllows("editor"));
 
 const color = computed({
   get(): string {

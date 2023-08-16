@@ -38,7 +38,7 @@
     </template>
     <template #after-options>
       <text-button
-        v-if="!appStore.isDemo"
+        v-if="permissionStore.projectAllows('admin')"
         text
         label="Add Version"
         icon="add"
@@ -70,11 +70,10 @@ import { computed, ref } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import {
-  appStore,
   getVersionApiStore,
+  permissionStore,
   projectApiStore,
   projectStore,
-  sessionStore,
   useTheme,
 } from "@/hooks";
 import { TextButton, ListItem, IconButton, FlexBox } from "@/components/common";
@@ -88,7 +87,7 @@ const allVersions = computed(() => getVersionApiStore.allVersions);
 const project = computed(() => projectStore.project);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);
 const deletable = computed(
-  () => sessionStore.isEditor(project.value) && allVersions.value.length > 1
+  () => permissionStore.projectAllows("admin") && allVersions.value.length > 1
 );
 
 /**

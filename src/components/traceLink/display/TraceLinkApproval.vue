@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="doDisplay" justify="between" class="width-max">
+  <flex-box v-if="display" justify="between" class="width-max">
     <flex-box align="center" justify="center">
       <text-button
         v-if="showUnreview"
@@ -57,7 +57,7 @@ export default {
 import { computed, ref } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
-import { projectStore, sessionStore, traceApiStore } from "@/hooks";
+import { permissionStore, traceApiStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
 const props = defineProps<{
@@ -77,7 +77,7 @@ const approveLoading = ref(false);
 const declineLoading = ref(false);
 const unreviewLoading = ref(false);
 
-const doDisplay = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 
 const showApprove = computed(() => linkStatus(props.trace).canBeApproved());
 const showDecline = computed(() => linkStatus(props.trace).canBeDeclined());

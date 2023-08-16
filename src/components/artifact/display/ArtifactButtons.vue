@@ -40,13 +40,12 @@ import { computed } from "vue";
 import {
   appStore,
   artifactApiStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const display = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

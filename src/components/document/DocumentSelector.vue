@@ -88,8 +88,7 @@ import {
   documentApiStore,
   documentSaveStore,
   documentStore,
-  projectStore,
-  sessionStore,
+  permissionStore,
   useTheme,
 } from "@/hooks";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
@@ -118,7 +117,7 @@ function canSave(doc = document.value): boolean {
   return (
     doc.name !== DEFAULT_VIEW_NAME &&
     !doc.documentId &&
-    sessionStore.isEditor(projectStore.project)
+    permissionStore.projectAllows("editor")
   );
 }
 
@@ -128,9 +127,7 @@ function canSave(doc = document.value): boolean {
  * @return Whether editing is allowed.
  */
 function canEdit(name = ""): boolean {
-  return (
-    name !== DEFAULT_VIEW_NAME && sessionStore.isEditor(projectStore.project)
-  );
+  return name !== DEFAULT_VIEW_NAME && permissionStore.projectAllows("editor");
 }
 
 /**

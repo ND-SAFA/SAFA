@@ -51,14 +51,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { appStore, projectStore, sessionStore } from "@/hooks";
+import { appStore, permissionStore } from "@/hooks";
 import { toggleDrawMode } from "@/cytoscape";
 import { FlexBox, IconButton, Separator } from "@/components/common";
 import { NodeDisplay } from "../display";
 
 const handleCloseMenu = inject<() => void>("menu-close");
 
-const display = computed(() => sessionStore.isEditor(projectStore.project));
+const display = computed(() => permissionStore.projectAllows("editor"));
 
 const drawMode = computed(() => appStore.isCreateLinkEnabled);
 </script>

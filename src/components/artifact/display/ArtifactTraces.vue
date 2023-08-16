@@ -109,9 +109,8 @@ import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
 import {
   appStore,
   artifactStore,
-  projectStore,
+  permissionStore,
   selectionStore,
-  sessionStore,
   subtreeStore,
   traceStore,
 } from "@/hooks";
@@ -125,9 +124,7 @@ import {
 } from "@/components/common";
 import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
-const displayActions = computed(() =>
-  sessionStore.isEditor(projectStore.project)
-);
+const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const artifact = computed(() => selectionStore.selectedArtifact);
 

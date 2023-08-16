@@ -1,8 +1,17 @@
 from typing import Dict
 
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
-from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, SUMMARY_TITLE
-from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
+from tgen.constants.tgen_constants import SUMMARY_TITLE
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.data.prompts.prompt_response_manager import PromptResponseManager
+from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -45,21 +54,27 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         target_names = state.sorted_parent2children[parent_id][:max_children]
         source_body = artifact_map[parent_id]
-        prompt_builder = RankingPromptBuilder(goal=args.ranking_goal,
-                                              instructions=args.ranking_instructions,
-                                              query=source_body,
-                                              query_tag=args.query_tag,
-                                              body_title=BODY_ARTIFACT_TITLE)
+        prompt_builder = PromptBuilder(prompts=[
+            Prompt(args.ranking_goal),
+            Prompt(f"\n<{args.query_tag}>{source_body}</{args.query_tag}>\n")
+        ])
+
         if state.project_summary is not None and len(state.project_summary) > 0:
             uses_specification = SUMMARY_TITLE in state.project_summary
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
-            prompt_builder.with_context(context_formatted)
+            prompt_builder.add_prompt(Prompt(context_formatted))
 
-        use_name = not StrUtil.is_uuid(target_names[0])
-        for target_index, target_artifact_name in enumerate(target_names):
-            kwargs = {}
-            if use_name:
-                kwargs["name"] = target_artifact_name
-            prompt_builder.with_artifact(target_index, artifact_map[target_artifact_name], **kwargs)
-        prompt = prompt_builder.get()
+        include_ids = not StrUtil.is_uuid(target_names[0])
+        prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.XML, include_ids=include_ids))
+
+        question_prompts = [QuestionPrompt(question=q, response_manager=PromptResponseManager(response_tag=tag)) for q, tag in
+                            args.ranking_questions]
+        prompt_builder.add_prompt(QuestionnairePrompt(question_prompts=question_prompts, instructions=args.ranking_instructions))
+
+        artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[a_id]}) for i, a_id in enumerate(target_names)]
+        prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,
+                                           artifacts=artifacts)
+        prompt = prompt_dict[PromptKeys.PROMPT]
+        state.prompt_builder = prompt_builder
+
         return prompt

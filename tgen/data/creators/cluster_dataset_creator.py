@@ -90,7 +90,7 @@ class ClusterDatasetCreator(AbstractDatasetCreator):
                                              ArtifactKeys.CONTENT: list(cluster_id_to_content.values()),
                                              ArtifactKeys.LAYER_ID: [self.layer_id for _ in cluster_id_to_content]})
         if self.summarizer:
-            new_artifact_df = self.summarizer.summarize_dataframe(new_artifact_df, col2summarize=ArtifactKeys.CONTENT.value)
+            new_artifact_df.summarize_content(self.summarizer)
         artifact_df = ArtifactDataFrame.concat(new_artifact_df, self.trace_dataset.artifact_df)
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: list(source_layers),
                                    LayerKeys.TARGET_TYPE: [self.layer_id for _ in source_layers]})

@@ -74,15 +74,15 @@ class BaseObject(ABC):
 
         obj_meta_list = [ObjectMeta()]
 
+        experiment_params_list_parent = []
         for param_name, variable in definition.items():
             expected_param_type = param_specs.param_types[param_name] if param_name in param_specs.param_types else None
-            param_value = cls._get_value_of_variable(variable, expected_param_type)
-
+            param_value, experimental_vars_for_param = cls._get_value_of_variable(variable, expected_param_type)
             if isinstance(param_value, ExperimentalVariable):
                 obj_meta_list[0].init_params[param_name] = param_value
                 experiment_params_list = []
                 for i, inner_variable in enumerate(param_value):
-                    inner_variable_value = cls._get_value_of_variable(inner_variable, expected_param_type)
+                    inner_variable_value = cls._get_value_of_variable(inner_variable, expected_param_type)[0]
 
                     children_experimental_vars = param_value.experimental_param2val[i] if param_value.experimental_param2val else {}
                     expanded_params = cls._add_param_values(obj_meta_list=obj_meta_list,
@@ -95,14 +95,21 @@ class BaseObject(ABC):
                 obj_meta_list = experiment_params_list
             else:
                 obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_param_type)
+                if len(experimental_vars_for_param) > 0 and BaseObject._is_type(ExperimentalVariable([]), param_name=param_name,
+                                                                                expected_type=expected_param_type):
+                    for obj_meta in obj_meta_list:
+                        obj_meta.init_params[param_name] = ExperimentalVariable(obj_meta.init_params[param_name],
+                                                                                experimental_vars_for_param)
         instances = []
         for obj_meta in obj_meta_list:
             obj_params = obj_meta.init_params
             new_obj = cls(**obj_params)
             instances.append(new_obj)
-        experimental_vars = [obj_meta.experimental_vars for obj_meta in obj_meta_list]
+        experimental_vars_for_param = [obj_meta.experimental_vars for obj_meta in obj_meta_list]
+        if experiment_params_list_parent:
+            experimental_vars_for_param.extend(experiment_params_list_parent)
         return instances.pop() if len(instances) == 1 else ExperimentalVariable(instances,
-                                                                                experimental_param_name_to_val=experimental_vars)
+                                                                                experimental_param_name_to_val=experimental_vars_for_param)
 
     @classmethod
     def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type] = None) -> Any:
@@ -112,6 +119,7 @@ class BaseObject(ABC):
         :param expected_type: the expected type for the value
         :return: the value
         """
+        experimental_vars = []
         if isinstance(variable, UndeterminedVariable):
             val = variable
         elif isinstance(variable, ExperimentalVariable):
@@ -125,21 +133,20 @@ class BaseObject(ABC):
                     expected_child_class = child_classes[0]
                     val = []
                     for v in variable.value:
-                        inner_value = cls._get_value_of_variable(v, expected_child_class)
+                        inner_value = cls._get_value_of_variable(v, expected_child_class)[0]
                         if isinstance(inner_value, ExperimentalVariable):  # single item turned t
-                            inner_values = [cls._get_value_of_variable(v2, expected_child_class) for v2 in inner_value.value]
+                            inner_values = [cls._get_value_of_variable(v2, expected_child_class)[0] for v2 in inner_value.value]
                             val.extend(inner_values)
+                            experimental_vars.extend(inner_value.experimental_param2val)
                         else:
                             val.append(inner_value)
-                    return val
                 else:
                     raise TypeError(f"Found more than possible types in class: {child_classes}")
             elif parent_class == "union":
                 list_type = [c for c in child_classes if hasattr(c, "_name") and c._name == "List"]
                 if len(list_type) == 0:
                     raise TypeError(f"Multivariable expected type must be some sort of list. Received: {child_classes}")
-                val = cls._get_value_of_variable(variable, list_type[0])
-                return val
+                val, experimental_vars = cls._get_value_of_variable(variable, list_type[0])
             else:
                 raise TypeError(f"Expected {expected_type} to be list or optional but received: {expected_type}.")
 
@@ -156,7 +163,7 @@ class BaseObject(ABC):
             val = variable
         if ReflectionUtil.is_instance_or_subclass(expected_type, Enum) and isinstance(val, str):
             val = get_enum_from_name(expected_type, val)
-        return val
+        return val, experimental_vars
 
     @classmethod
     def _make_child_object(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
@@ -180,7 +187,7 @@ class BaseObject(ABC):
         if ReflectionUtil.is_instance_or_subclass(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
-        params = {param_name: cls._get_value_of_variable(variable, expected_class)
+        params = {param_name: cls._get_value_of_variable(variable, expected_class)[0]
                   for param_name, variable in definition.items()}
         try:
             if expected_class in [Dict[str, str], Dict[str, float], Dict[str, int]]:
@@ -212,7 +219,7 @@ class BaseObject(ABC):
             cls._assert_type(param_value, expected_type, param_name)
         for obj_meta in obj_meta_list:
             meta_out = deepcopy(obj_meta)
-            inner_param_value = cls._get_value_of_variable(param_value, expected_type)
+            inner_param_value = cls._get_value_of_variable(param_value, expected_type)[0]
             inner_param_value = deepcopy(inner_param_value)
             meta_out.add_param(param_name, inner_param_value,
                                is_experimental=is_experimental,

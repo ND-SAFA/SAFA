@@ -69,7 +69,6 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
 
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT
-    experimental_vars: Dict = None
     deepspeed_path: str = None
     eager_load_data: bool = False
 

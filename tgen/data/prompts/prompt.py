@@ -36,14 +36,15 @@ class Prompt:
             prompt = f"{prompt}{SPACE}{expected_response}"
         return prompt
 
-    def format_value(self, *args: object, **kwargs: object) -> None:
+    def format_value(self, *args: object, **kwargs: object) -> str:
         """
         A replacement for the string format to allow the formatting of only selective fields
         :param args: Ordered params to format the prompt with
         :param kwargs: Key, value pairs to format the prompt with
-        :return: None
+        :return: The formatted value
         """
         self.value = StrUtil.format_selective(self.value, *args, **kwargs)
+        return self.value
 
     def parse_response(self, response: str) -> Dict[str, Any]:
         """

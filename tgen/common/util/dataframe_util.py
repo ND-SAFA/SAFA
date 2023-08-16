@@ -1,5 +1,6 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
+import numpy as np
 import pandas as pd
 
 
@@ -21,13 +22,11 @@ class DataFrameUtil:
         if column_translation is None or len(column_translation) == 0:
             column_translation = {col: col for col in df.columns}
 
+        column_translation = {k: v for k, v in column_translation.items() if k in df.columns}
         df = df[column_translation.keys()]
         df = df.rename(column_translation, axis=1)
         df = df[list(column_translation.values())]
 
-        df = df.dropna()
-        for df_col in df.select_dtypes(include=[float]).columns:
-            df[df_col] = df[df_col].astype(int)
         return df
 
     @staticmethod
@@ -99,3 +98,17 @@ class DataFrameUtil:
                 df_dict[col] = []
             df_dict[col].append(value)
         return df_dict
+
+    @staticmethod
+    def get_float_value(row: pd.Series, col_name: str) -> Optional[Any]:
+        """
+        Returns the column value if exists, otherwise None is returned.
+        :param row: The row in the dataframe.
+        :param col_name: The name of the column.
+        :return:
+        """
+        potential_value = row.get(col_name, None)
+        if potential_value is not None and not np.isnan(potential_value):
+            return potential_value
+        else:
+            return None

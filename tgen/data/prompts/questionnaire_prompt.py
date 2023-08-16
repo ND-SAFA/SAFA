@@ -3,7 +3,8 @@ from string import ascii_uppercase
 from typing import Any, Dict, List, Union
 
 from tgen.common.util.override import overrides
-from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.util.prompt_util import PromptUtil
+from tgen.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, COMMA, SPACE
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
@@ -14,14 +15,16 @@ class QuestionnairePrompt(Prompt):
     Contains a list of questions for the model to answer
     """
 
-    def __init__(self, question_prompts: Union[List[QuestionPrompt], Dict[int, QuestionPrompt]], instructions: str = EMPTY_STRING,
-                 response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase):
+    def __init__(self, question_prompts: Union[List[Prompt], Dict[int, Prompt]], instructions: str = EMPTY_STRING,
+                 response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase,
+                 use_multi_step_task_instructions: bool = False):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt
         :param question_prompts: The list of question prompts to include in the questionnaire
         :param instructions: Any instructions necessary with the questionnaire
         :param response_manager: Manages the responses from the prompt
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
+        :param use_multi_step_task_instructions: If True, uses default instructions for task involving multiple steps
         """
         if isinstance(question_prompts, Dict):
             starting_number = min(question_prompts.keys())
@@ -31,7 +34,20 @@ class QuestionnairePrompt(Prompt):
         self.use_bullets_for_enumeration = len(self.enumeration_chars) < len(self.question_prompts)
         if self.use_bullets_for_enumeration:
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.question_prompts]
+        if use_multi_step_task_instructions:
+            instructions = self._create_multi_step_task_instructions(enumeration_chars, question_prompts)
         super().__init__(instructions, response_manager=response_manager)
+
+    def get_response_tags_for_question(self, question_index: int) -> Union[str, List[str]]:
+        """
+        Gets the response tags for a given question number
+        :param question_index: The index of the question
+        :return: The response tag ids
+        """
+        tag_ids = self.question_prompts[question_index].response_manager.get_all_tag_ids()
+        if len(tag_ids) == 1:
+            return tag_ids[0]
+        return tag_ids
 
     @overrides(Prompt)
     def format_value(self, *args: object, **kwargs: object) -> None:
@@ -72,6 +88,21 @@ class QuestionnairePrompt(Prompt):
                                              for i, question in enumerate(self.question_prompts)])
         instructions = f"{self.value}{NEW_LINE}" if self.value else ""
         return f"{instructions}{formatted_questions}{NEW_LINE}"
+
+    @staticmethod
+    def _create_multi_step_task_instructions(enumeration_chars: List[str], question_prompts: List[Prompt]) -> str:
+        """
+        Creates the default instructions for a multi-step task
+        :param enumeration_chars: The enumeration chars being used
+        :param question_prompts: The prompts making up the questionnaire
+        :return: The instructions for a multi-step task
+        """
+        n_questions = len(question_prompts)
+        enumerations_for_task = f'{COMMA}{SPACE}'.join(enumeration_chars[:n_questions-1])
+        base_instructions = f"Below are {len(question_prompts)} steps to complete. " \
+                            f"Ensure that you answer {enumerations_for_task} and {enumeration_chars[n_questions-1]}"
+        instructions = [PromptUtil.format_as_markdown('TASKS:'), PromptUtil.format_as_markdown_italics(base_instructions)]
+        return f'{NEW_LINE}{NEW_LINE.join(instructions)}{NEW_LINE}'
 
     def __repr__(self) -> str:
         """

@@ -42,8 +42,8 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         errors = {
             "tp": 0,
             "tn": 0,
-            "fn": 0,
             "fp": 0,
+            "fn": 0
         }
         for label, pred in zip(y_true, y_pred):
             if label == pred:

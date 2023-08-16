@@ -22,18 +22,21 @@ class StructuredKeys:
         TARGET = "target"
         LABEL = "label"
         SCORE = "score"
+        EXPLANATION = "explanation"
 
-        @staticmethod
-        def get_cols() -> List["Trace"]:
+        @classmethod
+        def get_cols(cls) -> List["Trace"]:
             """
             :return: Returns the list of columns in trace dataframe.
             """
-            return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL, StructuredKeys.Trace.SCORE]
+            trace_columns = [trace_col for trace_col in StructuredKeys.Trace if trace_col != StructuredKeys.Trace.LINK_ID]
+            return trace_columns
 
     class Artifact(Enum):
         ID = "id"
         CONTENT = "content"
         LAYER_ID = "layer_id"
+        SUMMARY = "summary"
 
     class LayerMapping(Enum):
         SOURCE_TYPE = "source_type"

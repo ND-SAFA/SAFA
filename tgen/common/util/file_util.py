@@ -6,11 +6,14 @@ from typing import Any, Callable, Dict, IO, List, Tuple, Union
 
 import yaml
 
-from tgen.constants.deliminator_constants import F_SLASH
 from tgen.common.util.json_util import JsonUtil
+from tgen.constants.deliminator_constants import F_SLASH
 
 
 class FileUtil:
+    JSON_EXT = "json"
+    CSV_EXT = "csv"
+    YAML_EXT = "yaml"
 
     @staticmethod
     def get_file_ext(path: str) -> str:
@@ -41,7 +44,8 @@ class FileUtil:
         """
         try:
             with open(file_path) as file:
-                return file.read()
+                file_content = file.read()
+                return file_content
         except Exception as e:
             print(f"Failed reading file: {file_path}")
             raise e
@@ -96,7 +100,7 @@ class FileUtil:
             return {k: FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
         if isinstance(value, str):
             if "~" in value:
-                return os.path.expanduser(value)
+                value = os.path.expanduser(value)
             if replacements:
                 for k, v in replacements.items():
                     value = value.replace(k, v)
@@ -292,5 +296,17 @@ class FileUtil:
         :param content: The content of the file to create.
         :param output_file_path: The path to save the file to.
         """
+        output_file_path = os.path.expanduser(output_file_path)
         with open(output_file_path, 'w') as file:
             yaml.dump(content, file)
+
+    @staticmethod
+    def add_ext(file_path: str, ext: str) -> str:
+        """
+        Adds a file ext to the path if it doesn't have it already
+        :param file_path: The path to the file
+        :param ext: The extension to include
+        :return: The filepath with the ext
+        """
+        full_path = os.path.splitext(file_path)[0] + os.path.extsep + ext
+        return full_path

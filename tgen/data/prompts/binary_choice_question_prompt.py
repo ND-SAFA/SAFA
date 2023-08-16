@@ -13,7 +13,8 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
     RESPONSE_INSTRUCTIONS2 = "Enclose your choice inside of {}"
     RESPONSE_TAG = "choice"
 
-    def __init__(self, choices: List, question: str, response_tag: str = None, default_factory: Callable = None):
+    def __init__(self, choices: List, question: str, response_tag: str = None, default_factory: Callable = None,
+                 required: bool = False):
         """
         Initializes the prompt with the categories that a model can select
         :param choices: A list of the choices available to the model
@@ -28,5 +29,6 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
                                                  response_instructions_format=response_instructions,
                                                  expected_responses={response_tag: self.choices},
                                                  expected_response_type={response_tag: type(choices[0])},
+                                                 required_tag_ids=REQUIRE_ALL_TAGS if required else set(),
                                                  default_factory=default_factory)
         super().__init__(question=question, response_manager=response_manager)

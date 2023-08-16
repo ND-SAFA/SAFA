@@ -9,7 +9,7 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from tgen.server.api.api_definition import ApiDefinition
+from tgen.data.readers.definitions.api_definition import ApiDefinition
 
 
 class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
@@ -43,8 +43,7 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         trace_df = self.create_trace_df()
 
         if self.summarizer is not None:
-            artifact_df = self.summarizer.summarize_dataframe(artifact_df, col2summarize=StructuredKeys.Artifact.CONTENT.value,
-                                                              col2use4chunker=StructuredKeys.Artifact.LAYER_ID.value)
+            artifact_df.summarize_content(self.summarizer)
 
         return artifact_df, trace_df, layer_mapping_df
 

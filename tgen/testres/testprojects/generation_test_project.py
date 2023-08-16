@@ -20,7 +20,8 @@ class GenerationTestProject:
         {
             ArtifactKeys.ID.value: "s2",
             ArtifactKeys.CONTENT.value: "print('Hello, World!')",
-            SummarizeArtifactsJob.TYPE_KEY: "py"},
+            SummarizeArtifactsJob.TYPE_KEY: "py"
+        },
         {
             ArtifactKeys.ID.value: "s3",
             ArtifactKeys.CONTENT.value: "content3",

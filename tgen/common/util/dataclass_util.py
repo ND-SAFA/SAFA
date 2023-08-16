@@ -5,7 +5,7 @@ from typing import Dict
 
 def required_field(*, field_name: str, init=True, repr=True, hash=None, compare=True, metadata=None):
     """
-    Return an object to identify dataclass fields.
+    Return an object to identify required dataclass fields.
 
     field_name should correspond to the attribute name of the dataclass
     If init is True, the field will be a parameter to the class's __init__()
@@ -21,8 +21,10 @@ def required_field(*, field_name: str, init=True, repr=True, hash=None, compare=
 
 
 class RequiredField:
-
-    def __init__(self, field_name):
+    """
+    Represents a field that is required in a dataclss
+    """
+    def __init__(self, field_name: str):
         raise TypeError(f"{field_name} is required.")
 
 

@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
 from tgen.common.artifact import Artifact
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.ranking.common.trace_layer import TraceLayer
 from tgen.testres.test_data_manager import TestDataManager
@@ -93,3 +94,33 @@ class EntryCreator:
             for a_id, a_body in artifact_items:
                 artifacts.append(Artifact(id=id, content=a_body))
         return artifacts
+
+    @staticmethod
+    def create_trace_predictions(n_parents: int, n_children: int, scores: List[float] = None, labels: List[float] = None) -> List[
+        TracePredictionEntry]:
+        """
+        Creates trace
+        :param n_parents: The number of parents to create.
+        :param n_children: The number of children to create.
+        :param scores: The scores to assign to entries (in parent-children order)
+        :param labels: The labels to assign to entries (in parent-children order)
+        :return: List of trace predictions.
+        """
+        i = 0
+        entries = []
+        for p_id in range(n_parents):
+            for c_id in range(n_children):
+                entry = TracePredictionEntry(
+                    source=f"c{c_id}",
+                    target=f"p{p_id}",
+                    score=None,
+                    label=None,
+                    explanation=None
+                )
+                if scores:
+                    entry["score"] = scores[i]
+                if labels:
+                    entry["label"] = labels[i]
+                entries.append(entry)
+                i += 1
+        return entries

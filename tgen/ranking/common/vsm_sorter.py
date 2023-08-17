@@ -4,7 +4,6 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 
-from tgen.common.util.list_util import ListUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -75,8 +74,7 @@ def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: 
     parent2rankings = {}
     for parent_id in tqdm(parent_ids, desc="Performing Ranking Via Embeddings"):
         parent_embedding = encode(parent_id)
-        similarity_scores = cosine_similarity([parent_embedding], children_embeddings)[0]
-        scores = ListUtil.get_percentiles(similarity_scores)
+        scores = cosine_similarity([parent_embedding], children_embeddings)[0]
         sorted_artifact_ids = [a for s, a in sorted(zip(scores, child_ids), reverse=True, key=lambda k: k[0])]
         if return_scores:
             parent2rankings[parent_id] = (sorted_artifact_ids, scores)

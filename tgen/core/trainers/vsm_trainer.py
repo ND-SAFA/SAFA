@@ -139,7 +139,7 @@ class VSMTrainer(AbstractTrainer):
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
             prediction_entries = RankingUtil.select_predictions(prediction_entries)
-        metrics = RankingUtil.calculate_ranking_metrics(eval_dataset, prediction_entries)
+        metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
                                                         metrics=metrics)
         return trace_prediction_output

@@ -117,4 +117,4 @@ class RankingJob(AbstractJob):
     def optional_eval(dataset, predictions):
         if dataset is None:
             return
-        RankingUtil.calculate_ranking_metrics(dataset, predictions)
+        RankingUtil.evaluate_trace_predictions(dataset.trace_df, predictions)

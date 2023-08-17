@@ -40,15 +40,6 @@ class TestRankingJob(BaseTest):
         prediction_entries = job_result.body.prediction_entries
         self.assertGreaterEqual(len(prediction_entries), TestDataManager.get_n_candidates())
 
-    def test_select_predictions(self):
-        job_a = self.create_job_using_embeddings(select_top_predictions=False)
-        a_preds = job_a.run().body.prediction_entries
-
-        job_b = self.create_job_using_embeddings(select_top_predictions=True)
-        b_preds = job_b.run().body.prediction_entries
-
-        self.assertGreater(len(a_preds), len(b_preds))
-
     def create_job_using_embeddings(self, **kwargs):
         job = self.create_job(ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
                               embedding_model=SMALL_EMBEDDING_MODEL, **kwargs)

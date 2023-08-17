@@ -29,13 +29,3 @@ class DeltaState(State):
     # ------- STEP 4 ----------
     impact: str = None  # summary of the impact of the changes on the system
     final_summary: str = None  # Markdown version of the final change summary
-
-    def on_step_complete(self, step_name: str) -> None:
-        """
-        Performs all tasks required after step complete (i.e. saving)
-        :param step_name: The name of the step completed
-        :return: None
-        """
-        super().on_step_complete(step_name)
-        self.save(step_name)
-

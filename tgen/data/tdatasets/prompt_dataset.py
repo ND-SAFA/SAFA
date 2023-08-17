@@ -233,7 +233,7 @@ class PromptDataset(iDataset):
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
 
-    def as_creator(self, project_path: str, dataset_dirname: str):
+    def as_creator(self, project_path: str, dataset_dirname: str = None):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading

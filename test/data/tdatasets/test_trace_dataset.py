@@ -15,6 +15,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.api_test_project import ApiTestProject
@@ -268,3 +269,12 @@ class TestTraceDataset(BaseTraceTest):
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEqual(len(train_dataset), len(trainer_dataset))
+
+    def test_as_creator(self):
+        trace_dataset = self.get_trace_dataset()
+        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR)
+        recreated_dataset = creator.create()
+        self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
+        for i, link in trace_dataset.trace_df.itertuples():
+            self.assertIsNotNone(recreated_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
+                                                                                   target_id=link[TraceKeys.TARGET]))

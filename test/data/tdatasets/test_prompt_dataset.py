@@ -1,7 +1,6 @@
 import os
 from collections import Callable
 from typing import Dict, List
-from unittest import skip
 
 import mock
 import pandas as pd
@@ -13,11 +12,10 @@ from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.summarizer.summarizer import Summarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits
@@ -30,7 +28,6 @@ class TestResponse:
     id = "id_from_res"
 
 
-@skip
 class TestPromptDataset(BaseTest):
     DATASET_FAIL_MSG = "Dataset with param {} failed."
     EXCEEDS_TOKEN_LIMIT_ARTIFACT = "3"
@@ -47,6 +44,20 @@ class TestPromptDataset(BaseTest):
             return False
         return True
 
+    def test_as_creator(self):
+        datasets = self.get_prompt_datasets()
+        artifact_dataset = datasets["artifact"]
+        creator = artifact_dataset.as_creator(TEST_OUTPUT_DIR)
+        recreated_dataset = creator.create()
+        self.assertEqual(set(recreated_dataset.artifact_df.index), set(artifact_dataset.artifact_df.index))
+        trace_dataset = datasets["dataset"]
+        creator = trace_dataset.as_creator(TEST_OUTPUT_DIR)
+        recreated_dataset = creator.create()
+        self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
+        for i, link in trace_dataset.trace_dataset.trace_df.itertuples():
+            self.assertIsNotNone(recreated_dataset.trace_dataset.trace_df.get_link(source_id=link[TraceKeys.SOURCE],
+                                                                                   target_id=link[TraceKeys.TARGET]))
+
     @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
     @mock.patch.object(AbstractChunker, "exceeds_token_limit")
     def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):
@@ -56,23 +67,23 @@ class TestPromptDataset(BaseTest):
         artifact_prompt_dataset: PromptDataset = self.get_prompt_dataset_from_artifact_df()
 
         llm_manager = OpenAIManager(OpenAIArgs())
-        prompt = QuestionPrompt("Tell me about this artifact: {artifact}")
-        prompt_builder = PromptBuilder([prompt])
+        prompt = QuestionPrompt("Tell me about this artifact:")
+        prompt_builder = PromptBuilder([prompt, ArtifactPrompt()])
         prompts_df = artifact_prompt_dataset.get_prompt_dataframe(prompt_builder=prompt_builder,
                                                                   prompt_args=llm_manager.prompt_args)
 
-        for i, artifact_id in enumerate(artifact_prompt_dataset.artifact_df.index):
-            if TestPromptDataset.EXCEEDS_TOKEN_LIMIT_ARTIFACT in artifact_id:
-                prompt = prompts_df.get_row(i)[PromptKeys.PROMPT]
-                prompt_words = prompt.split()
-                self.assertLessEqual(len(prompt_words), token_limit)
         self.assertEqual(len(prompts_df), len(artifact_prompt_dataset.artifact_df))
 
+        prompt = QuestionPrompt("Tell me about these artifacts:")
+        prompt_builder = PromptBuilder([prompt, MultiArtifactPrompt(data_type=MultiArtifactPrompt.DataType.TRACES)])
         traces_prompt_dataset = self.get_dataset_with_trace_dataset()
-        prompts_df = traces_prompt_dataset._generate_prompts_entries_from_traces(prompt_builder,
-                                                                                 prompt_args=llm_manager.prompt_args,
-                                                                                 summarizer=Summarizer(llm_manager))
+        prompts_df = traces_prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=llm_manager.prompt_args)
         self.assertEqual(len(prompts_df), len(traces_prompt_dataset.trace_dataset.trace_df))
+
+        prompt = QuestionPrompt("Tell me about these artifacts:")
+        prompt_builder = PromptBuilder([prompt, MultiArtifactPrompt()])
+        prompts_df = traces_prompt_dataset.get_prompt_dataframe(prompt_builder,prompt_args=llm_manager.prompt_args)
+        self.assertEqual(len(prompts_df), 1)
 
     def test_to_dataframe(self):
         outputs = self.run_dataset_tests(
@@ -103,45 +114,6 @@ class TestPromptDataset(BaseTest):
                 self.assertEqual("id", file_id, msg=fail_msg)
             else:
                 self.assertEqual("id_from_res", file_id, msg=fail_msg)
-
-    def test_export_and_get_dataframe(self):
-        prompt = QuestionPrompt("Tell me about this artifact: ")
-        prompt2 = ArtifactPrompt(include_id=False)
-        prompt_builder = PromptBuilder([prompt, prompt2])
-        outputs = self.run_dataset_tests(
-            lambda dataset: dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder, OpenAIManager.prompt_args),
-                                                            TEST_OUTPUT_DIR),
-            ["id"]
-        )
-        dataset = self.get_dataset_from_prompt_df()
-        outputs["with_filename"] = dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder),
-                                                                   os.path.join(TEST_OUTPUT_DIR, "file.jsonl"))
-        outputs["no_output_path"] = dataset.export_prompt_dataframe(dataset.get_prompt_dataframe(prompt_builder))
-        expected_trace_dataset = PromptTestProject.get_trace_dataset_creator().create()
-        for type_, output in outputs.items():
-            fail_msg = self.DATASET_FAIL_MSG.format(type_)
-            export_path, should_delete = output
-            prompt_dataframe_json = JsonUtil.read_jsonl_file(export_path)
-            prompt_df = PromptDataFrame(prompt_dataframe_json)
-            if type_ == "artifact":
-                PromptTestProject.verify_prompts_artifacts_project(self, prompt_df, msg=fail_msg)
-            elif type_ == "dataset":
-                PromptTestProject.verify_prompts_safa_project_artifacts(self, prompt_df,
-                                                                        artifacts_df=expected_trace_dataset.artifact_df,
-                                                                        msg=fail_msg, )
-            else:
-                pos_links_df = DataFrameUtil.filter_df_by_row(expected_trace_dataset.trace_df,
-                                                              lambda row: row[TraceKeys.LABEL.value] == 1)
-                pos_links_df = TraceDataFrame(pos_links_df)
-                PromptTestProject.verify_prompts_safa_project_traces_for_generation(self,
-                                                                                    prompt_df,
-                                                                                    trace_df=pos_links_df,
-                                                                                    msg=fail_msg)
-            if type_ == "no_output_path":
-                self.assertTrue(should_delete, msg=fail_msg)
-                os.remove(export_path)
-            else:
-                self.assertFalse(should_delete, msg=fail_msg)
 
     @staticmethod
     def run_dataset_tests(func_to_test: Callable, expected_exceptions: List[str] = None):

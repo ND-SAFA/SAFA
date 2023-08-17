@@ -1,4 +1,3 @@
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.status import Status
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.delta.delta_args import DeltaArgs
@@ -16,7 +15,6 @@ class ProjectSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param state:  The delta summarizer state
         :return: None
         """
-        logger.log_with_title("STEP 1 - Generating Project Summary")
         original_artifacts = args.dataset.artifact_df
         summary_job = ProjectSummaryJob({a_id: original_artifacts.get_artifact(a_id)[ArtifactKeys.CONTENT]
                                          for a_id in original_artifacts.index})

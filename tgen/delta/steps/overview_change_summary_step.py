@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
@@ -24,6 +24,10 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
     UNKNOWN_CHANGE_TYPE_KEY = "other"
     IMPACT_TAG_ID: QuestionnairePrompt = SupportedPrompts.DIFF_SUMMARY_QUESTIONNAIRE.value.get_response_tags_for_question(-1)
 
+    OVERVIEW_TITLE = "Overview"
+    USER_LEVEL_SUMMARY_TITLE = "User-level Summary"
+    CHANGE_DETAILS_TITLE = "Change Details"
+
     def _run(self, args: DeltaArgs, state: DeltaState) -> None:
         """
         Creates the complete summary of all changes made to the project
@@ -40,8 +44,10 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
 
         low_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 1)
         user_level_summary = self._get_summary_from_output(state.change_summary_output, task_prompt, 2)
-        state.overview_section = [PromptUtil.format_as_markdown_header("Overview"), low_level_summary,
-                                  PromptUtil.format_as_markdown_header("User-level Summary"), user_level_summary]
+        state.overview_section = [PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.OVERVIEW_TITLE),
+                                  low_level_summary,
+                                  PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.USER_LEVEL_SUMMARY_TITLE),
+                                  user_level_summary]
 
         change_types = self._create_change_type_mapping(state.change_summary_output, task_prompt)
         state.change_details_section = self._create_change_details_section(change_types)
@@ -53,7 +59,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param change_types: The dictionary containing changes for each change type
         :return: The list of all parts of the change details summary
         """
-        change_details = [PromptUtil.format_as_markdown_header("Change Details")]
+        change_details = [PromptUtil.format_as_markdown_header(OverviewChangeSummaryStep.CHANGE_DETAILS_TITLE)]
         for change_type, changes in change_types.items():
             if len(changes) < 1:
                 continue
@@ -75,12 +81,16 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         groups = change_summary_output[group_tag]
         change_type_mapping = OrderedDict({ct.value.lower(): {} for ct in ChangeType.get_granular_change_type_categories()})
         change_type_mapping[self.UNKNOWN_CHANGE_TYPE_KEY] = {}
-        for filenames, change, types in zip(groups[filenames_tag], groups[change_tag], groups[type_tag]):
-            key = self._match_change_type(types, change_type_mapping)
+        for group in groups:
+            filenames = group[filenames_tag][0]
+            change = group[change_tag][0]
+            change_type = group[type_tag][0]
+            key = self._match_change_type(change_type, change_type_mapping)
             change_type_mapping[key][change.strip(NEW_LINE)] = filenames
         return change_type_mapping
 
-    def _create_diff_artifacts_df(self, state: DeltaState, include_impact: bool = False) -> ArtifactDataFrame:
+    @staticmethod
+    def _create_diff_artifacts_df(state: DeltaState, include_impact: bool = False) -> ArtifactDataFrame:
         """
         Creates a dataframe of artifacts representing the diff summary for each changed file
         :param state: The current state of the delta summarizer
@@ -89,11 +99,12 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         artifacts = {}
         for filenames, diff_info in state.diff_summaries.items():
             content = NEW_LINE + \
-                      EMPTY_STRING.join([self.ARTIFACT_CONTENT.format(name.upper(), val) for name, val in diff_info.items()
-                                         if (name != self.IMPACT_TAG_ID or include_impact)])
+                      EMPTY_STRING.join([OverviewChangeSummaryStep.ARTIFACT_CONTENT.format(name.upper(), val)
+                                         for name, val in diff_info.items()
+                                         if (name != OverviewChangeSummaryStep.IMPACT_TAG_ID or include_impact)])
             DataFrameUtil.append(artifacts, EnumDict({ArtifactKeys.ID: filenames,
                                                       ArtifactKeys.CONTENT: content,
-                                                      ArtifactKeys.LAYER_ID: self.LAYER_ID}))
+                                                      ArtifactKeys.LAYER_ID: OverviewChangeSummaryStep.LAYER_ID}))
         artifacts_df = ArtifactDataFrame(artifacts)
         return artifacts_df
 
@@ -121,7 +132,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         return output[0][task_prompt.id]
 
     @staticmethod
-    def _match_change_type(types, change_type_mapping) -> str:
+    def _match_change_type(types: List[str], change_type_mapping: Dict[str, Any]) -> str:
         """
         Attempts to match the change type produced by the model with known change types
         :param types: The change type produced by the model

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel-card :title="parentTitle">
+    <panel-card :title="parentTitle" collapsable>
       <template #title-actions>
         <text-button
           v-if="displayActions"
@@ -46,7 +46,7 @@
       />
     </panel-card>
 
-    <panel-card :title="childTitle">
+    <panel-card :title="childTitle" collapsable>
       <template #title-actions>
         <text-button
           v-if="displayActions"

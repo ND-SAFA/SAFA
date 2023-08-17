@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel-card :title="targetArtifactsLabel">
+    <panel-card :title="targetArtifactsLabel" collapsable>
       <template #title-actions>
         <text-button
           text
@@ -33,7 +33,7 @@
       />
     </panel-card>
 
-    <panel-card :title="sourceArtifactsLabel">
+    <panel-card :title="sourceArtifactsLabel" collapsable>
       <template #title-actions>
         <text-button
           text

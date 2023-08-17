@@ -16,17 +16,32 @@
             :value="props.title"
             ellipsis
           />
+          <slot name="title" />
         </flex-box>
-        <slot name="title-actions" />
+
+        <flex-box align="center">
+          <slot name="title-actions" />
+          <icon-button
+            v-if="props.collapsable"
+            small
+            tooltip="Toggle expanded"
+            :icon="expanded ? 'up' : 'down'"
+            @click="expanded = !expanded"
+          />
+        </flex-box>
       </flex-box>
-      <separator v-if="!props.minimal && !!props.title" b="2" />
+
+      <separator v-if="!props.minimal && !!props.title && expanded" b="2" />
+
       <typography
-        v-if="!props.minimal && !!props.subtitle"
+        v-if="!props.minimal && !!props.subtitle && expanded"
         el="p"
         b="4"
         :value="props.subtitle"
       />
-      <slot />
+
+      <slot v-if="expanded" />
+
       <q-card-actions v-if="!!slots.actions">
         <slot name="actions" />
       </q-card-actions>
@@ -44,7 +59,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, useSlots, withDefaults } from "vue";
+import { computed, ref, useSlots, withDefaults } from "vue";
 import { PanelCardProps } from "@/types";
 import {
   Typography,
@@ -52,6 +67,7 @@ import {
   Separator,
   FlexBox,
 } from "@/components/common/display";
+import IconButton from "@/components/common/button/IconButton.vue";
 
 const props = withDefaults(defineProps<PanelCardProps>(), {
   color: "primary",
@@ -63,6 +79,8 @@ const props = withDefaults(defineProps<PanelCardProps>(), {
 });
 
 const slots = useSlots();
+
+const expanded = ref(true);
 
 const color = computed(() => (props.minimal ? "transparent" : props.color));
 

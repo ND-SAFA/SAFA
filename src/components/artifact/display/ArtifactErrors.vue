@@ -1,5 +1,10 @@
 <template>
-  <panel-card v-if="doDisplay" title="Warnings" data-cy="artifact-warnings">
+  <panel-card
+    v-if="doDisplay"
+    title="Warnings"
+    data-cy="artifact-warnings"
+    collapsable
+  >
     <template #title-actions>
       <icon variant="warning" />
     </template>

@@ -10,7 +10,7 @@ CHILD_ID = "child_1"
 EXPLANATION = "EXPLANATION"
 SCORE = 4
 TEST_RESPONSE = "<query-summary>Query Summary.</query-summary>\n" \
-                f"<explanation>0 | SUMMARY | {EXPLANATION} | {SCORE}</explanation>"
+                f"<explanation>0 | {EXPLANATION} | {SCORE}</explanation>"
 
 
 class TestLLMRankingPipeline(BaseTest):
@@ -35,17 +35,20 @@ class TestLLMRankingPipeline(BaseTest):
         self.assertEqual(CHILD_ID, entry["source"])
         self.assertEqual(PARENT_ID, entry["target"])
         self.assertEqual(EXPLANATION, entry["explanation"])
-        self.assertEqual(1, entry["score"])  # top score because only ranking
+        self.assertEqual(.4, entry["score"])
 
     @staticmethod
     def create_args() -> RankingArgs:
         """
         Creates ranking arguments for pipeline.
         """
-        parent_artifact = {"id": PARENT_ID, "content": "content_1", "layer_id": "parent"}
-        child_artifact = {"id": CHILD_ID, "content": "content_2", "layer_id": "child"}
+        parent_type = "parent_type"
+        child_type = "child_type"
+        parent_artifact = {"id": PARENT_ID, "content": "content_1", "layer_id": parent_type}
+        child_artifact = {"id": CHILD_ID, "content": "content_2", "layer_id": child_type}
         parent_ids = [PARENT_ID]
         children_ids = [CHILD_ID]
         artifact_df = ArtifactDataFrame([parent_artifact, child_artifact])
-        args = RankingArgs(artifact_df=artifact_df, parent_ids=parent_ids, children_ids=children_ids)
+        args = RankingArgs(run_name=f"{child_type}2{parent_type}", artifact_df=artifact_df, parent_ids=parent_ids,
+                           children_ids=children_ids)
         return args

@@ -13,10 +13,10 @@ class TestProcessRankingResponsesStep(TestCase):
         ranked_children_global, children_explanations_global = ProcessRankingResponses.process_ranked_artifacts(
             parent_ids,
             ["<explanation>"
-             "0 | SUMMARY | EXPLANATION_1 | 1\n"
-             "1 | SUMMARY | EXPLANATION_2 | 2\n"
-             "2 | SUMMARY | EXPLANATION_3 | 3\n"
-             "3 | SUMMARY | EXPLANATION_4 | 4\n"
+             "0 | EXPLANATION_1 | 1\n"
+             "1 | EXPLANATION_2 | 2\n"
+             "2 | EXPLANATION_3 | 3\n"
+             "3 | EXPLANATION_4 | 4\n"
              "</explanation>"],
             {"parent": target_ids})
 

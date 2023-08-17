@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.common.util.ranking_util import RankingUtil
-from tgen.constants.ranking_constants import DEFAULT_THRESHOLD_SCORE
+from tgen.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS, DEFAULT_THRESHOLD_SCORE
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -24,8 +24,8 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: AbstractDatasetCreator = None, artifact_df: ArtifactDataFrame = None,
-                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM,
-                 select_top_predictions: bool = True, layer_ids: Tuple[str, str] = None, project_summary: str = None, **kwargs):
+                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
+                 select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, project_summary: str = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -38,7 +38,7 @@ class RankingJob(AbstractJob):
         assert dataset_creator is not None or (artifact_df is not None and layer_ids is not None), DATA_TOO_LITTLE_INPUTS
         assert dataset_creator is None or artifact_df is None, DATA_TOO_MANY_INPUTS
         self.dataset_creator = dataset_creator
-        self.select_top_predictions = True
+        self.select_top_predictions = select_top_predictions
         self.ranking_pipeline = ranking_pipeline
         self.artifact_df = artifact_df
         self.layer_ids = layer_ids

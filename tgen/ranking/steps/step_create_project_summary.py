@@ -1,6 +1,7 @@
 import os.path
 
 from tgen.common.util.logging.logger_manager import logger
+from tgen.constants.ranking_constants import PROJECT_SUMMARY_FILE_NAME
 from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -18,7 +19,6 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the pipeline.
         :return: None
         """
-        PROJECT_SUMMARY_FILE_NAME = f"project_summary.yaml"
         PROJECT_SUMMARY_PATH = args.get_path(PROJECT_SUMMARY_FILE_NAME)
 
         if PROJECT_SUMMARY_PATH is not None and os.path.exists(PROJECT_SUMMARY_PATH):

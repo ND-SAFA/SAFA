@@ -21,24 +21,23 @@ QUESTION1 = (
 )
 
 QUESTION2 = (
-    "Using the format below, provide the following information for each child:"
-    "\n    Format: ID | EXPLANATION | SCORE"
-    "\n    - For `ID` provide the ID of the child currently being processed."
-    "\n    - For `EXPLANATION` provide three complete sentences answering the questions in the order below:"
+    "Below is a reasoning exercise used to determine if each artifact is a child of the parent artifact. "
+    "As you work through each artifact, use your previous reasoning to reason further about the artifact. "
+    "Enclose each artifact's exercise within <artifact></artifact> starting with the artifact with ID 0. "
+    "Each exercise should have three separate tags: id, explanation, score. "
+    "First, provide the ID of the artifact being processed within <id></id>. "
+    "Second, within <explanation></explanation> provide three complete sentences answering the questions in the order below:"
     "\n        1. What is this functionality of the child artifact?"
     "\n        2. What is the goal of the child artifact's functionality?"
-    "\n        3. How does the child artifact affect the primary goal of the parent artifact? "
-    "Use your answer enclosed in <parent-summary></parent-summary to guide its importance."
-    "\n      Provide your explanation in the active voice and assume the reader is familiar with both the child and parent artifacts. "
-    "\n    - For `SCORE` provide a number from 1-10 representing how relevant the child's functionality is to the parent artifact's functionality. "
-    "Use the following guidelines to score the child artifact:"
-    "\n        * 10 = Child artifact performs a primary function of the parent artifact"
-    "\n        * 8 = Child artifact performs a supporting function of the parent artifact"
-    "\n        * 6 = Child artifact performs a relevant function to the parent artifact"
-    "\n        * 4 = Child artifact performs an indirect function related to parent artifact"
-    "\n        * 1 = Related to distant or unrelated functionality of parent artifact."
-    "\nIMPORTANT: Provide each child artifact's entry on a single line. Start with the artifact with ID 0. "
-    "Each entry has only three components and should follow the format: ID | EXPLANATION | SCORE. Please use `|` as the delimiter.",
+    "\n        3. How does the child artifact functionality affect the primary goal of the parent artifact? "
+    "Use your answer enclosed in <parent-summary></parent-summary> to understand the primary goal of the parent artifact."
+    "\nThird, within <score></score> provide a score from 1-10 representing how relevant the child's functionality is to the parent artifact's functionality. "
+    "Use the following guidelines to score the artifact:"
+    "\n        * 10 = Artifact performs a primary function of the parent artifact"
+    "\n        * 8 = Artifact performs a supporting function to the parent artifact"
+    "\n        * 6 = Artifact performs a relevant function to the parent artifact"
+    "\n        * 4 = Artifact performs an indirect function related to parent artifact"
+    "\n        * 1 = Related to distant or unrelated functionality of parent artifact.",
     "explanation"
 )
 DEFAULT_RANKING_QUESTIONS = [QUESTION1, QUESTION2]

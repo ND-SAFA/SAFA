@@ -65,12 +65,12 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def evaluate_trace_predictions(trace_df: TraceDataFrame, ranking_entries: List[TracePredictionEntry]):
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, selected_entries: List[TracePredictionEntry]) -> Dict:
         """
         Calculates ranking metrics for ranking predictions.
         :param trace_df: The trace data frame containing true labels.
-        :param ranking_entries: The ranking predictions.
-        :return:
+        :param selected_entries: The ranking predictions.
+        :return: The dictionary of metrics.
         """
         if trace_df is None:
             logger.info("Skipping evaluation, trace data frame is none.")
@@ -80,15 +80,21 @@ class RankingUtil:
             logger.info("Skipping evaluation, no labels found in trace data frame.")
             return
         all_link_ids = list(trace_df.index)
+        positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
+        negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
         predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
-                              entry in ranking_entries]
-        missing_ids = list(set(all_link_ids).difference(set(predicted_link_ids)))
-        ordered_link_ids = predicted_link_ids + missing_ids
+                              entry in selected_entries]
 
-        RankingUtil.log_missing_links(trace_df, missing_ids)
+        false_negative_ids = list(set(positive_link_ids).difference(set(predicted_link_ids)))
+        false_positive_ids = list(set(negative_link_ids).intersection(set(predicted_link_ids)))
 
-        scores = [entry[TraceKeys.SCORE.value] for entry in ranking_entries]
-        missing_scores = [0 for i in missing_ids]
+        RankingUtil.log_artifacts("False Negatives", trace_df, false_negative_ids)
+        RankingUtil.log_artifacts("False Positives", trace_df, false_positive_ids)
+
+        other_link_ids = set(all_link_ids).difference(predicted_link_ids)
+        ordered_link_ids = predicted_link_ids + list(other_link_ids)
+        scores = [entry[TraceKeys.SCORE.value] for entry in selected_entries]
+        missing_scores = [0 for i in other_link_ids]
         all_scores = scores + missing_scores
 
         metrics_manager = MetricsManager(trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
@@ -98,20 +104,21 @@ class RankingUtil:
         return metrics
 
     @staticmethod
-    def log_missing_links(trace_df: TraceDataFrame, missing_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
+    def log_artifacts(title: str, trace_df: TraceDataFrame, artifact_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
         """
         Logs the missing links (false negatives).
         :param trace_df: The trace data frame containing the missing links.
-        :param missing_ids: The IDs of the missing links.
+        :param artifact_ids: The IDs of the missing links.
         :param group_key: The key used to group missing ids (either by parent or child).
         :return: None
         """
         other_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
-        missing_links = [trace_df.get_link(t_id) for t_id in missing_ids]
-        missing_links = [t for t in missing_links if t[TraceKeys.LABEL] == 1]
+        missing_links = [trace_df.get_link(t_id) for t_id in artifact_ids]
         grouped_links = RankingUtil.group_trace_predictions(missing_links, group_key)
         grouped_links = {k: [v2[other_key] for v2 in v] for k, v in grouped_links.items()}
-        logger.log_with_title("Missing links", json.dumps(grouped_links, indent=1))
+        logger.log_title(title)
+        for group_key, group_items in grouped_links.items():
+            logger.info(f"{group_key}:{group_items}")
 
     @staticmethod
     def select_predictions(trace_predictions: List[TracePredictionEntry]) -> List[TracePredictionEntry]:

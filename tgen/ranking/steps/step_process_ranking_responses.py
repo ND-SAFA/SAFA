@@ -1,7 +1,7 @@
 from typing import Dict, List
 
+from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.deliminator_constants import DASH, NEW_LINE
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.ranking.ranking_args import RankingArgs
@@ -16,6 +16,16 @@ RESPONSE_PROCESSING_STEPS = [
     lambda s: s.split(",")
 ]
 MAX_SCORE = 10
+
+
+class ArtifactReasoning:
+
+    def __init__(self, artifact_dict: Dict):
+        JsonUtil.require_properties(artifact_dict, ["id", "explanation", "score"])
+        self.index = int(artifact_dict["id"][0].strip())
+        self.explanation = artifact_dict["explanation"][0].strip()
+        self.score = float(artifact_dict["score"][0].strip()) / MAX_SCORE
+        self.artifact_id = None
 
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -50,41 +60,22 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
             related_children = sorted_parent2children[parent_name]
 
-            # Step - Parse and clean
-            ID_INDEX = 0
-            EXPLANATION_INDEX = 1
-            SCORE_INDEX = 2
-
-            explanation = LLMResponseUtil.parse(prompt_response, "explanation")[0]
-            entries = explanation.split("\n")
-            entries = [e for e in entries if len(e) > 0]
-            entry_pieces = [e.split("|") for e in entries]
-            entry_pieces = [[e.strip() for e in entry] for entry in entry_pieces]
+            artifact_dicts = LLMResponseUtil.parse(prompt_response, "artifact", is_nested=True)
             parsed_entries = []
-            for e in entry_pieces:
-                try:
-                    artifact_index = int(e[ID_INDEX])
-                    artifact_explanation = e[EXPLANATION_INDEX]
-                    artifact_score = float(e[SCORE_INDEX])
-                    if artifact_score > 1:
-                        parsed_entries.append((artifact_index, artifact_explanation, artifact_score))
-                except Exception as exception:
-                    logger.exception(exception)
-                    logger.info(f"Unable to parse: {e}")
+            for a_parsed_dict in artifact_dicts:
+                a_reasoning = ArtifactReasoning(a_parsed_dict)
+                a_reasoning.artifact_id = related_children[a_reasoning.index]
+                parsed_entries.append(a_reasoning)
 
-            # Step - Translate
-            entry_pieces = sorted(parsed_entries, key=lambda e: (e[SCORE_INDEX], -e[ID_INDEX]), reverse=True)
-            children_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
-            children_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]
-            children_scores = [e[SCORE_INDEX] / MAX_SCORE for e in entry_pieces]
+            parsed_entries: List[ArtifactReasoning] = sorted(parsed_entries, key=lambda a: (a.score, -a.index), reverse=True)
 
             # Step - Store results
-            for c_id, c_explanation, c_score in zip(children_ids, children_explanations, children_scores):
+            for e in parsed_entries:
                 child_entry = TracePredictionEntry(
-                    source=c_id,
+                    source=e.artifact_id,
                     target=parent_name,
-                    score=c_score,
-                    explanation=c_explanation
+                    score=e.score,
+                    explanation=e.explanation
                 )
                 child_entries.append(child_entry)
 

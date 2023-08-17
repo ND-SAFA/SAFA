@@ -6,12 +6,12 @@
           "object_type": "RANKING",
           "ranking_pipeline": "LLM",
           "sorter": "embedding",
-          "export_dir": "~/desktop/safa/datasets/safa/test/checkpoints",
+          "export_dir": "[DATA_PATH]/[CURRENT_DATASET]/checkpoints",
           "dataset_creator": {
             "object_type": "TRACE",
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "~/desktop/safa/datasets/safa/test"
+              "project_path": "[DATA_PATH]/[CURRENT_DATASET]"
             }
           }
         }

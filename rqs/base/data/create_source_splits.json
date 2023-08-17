@@ -10,7 +10,7 @@
           "trace_dataset_creator": {
             "project_reader": {
               "object_type": "STRUCTURE",
-              "project_path": "[PROJECTPATH]"
+              "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
             }
           },
           "splits": [

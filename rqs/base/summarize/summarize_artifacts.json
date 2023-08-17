@@ -5,9 +5,9 @@
         {
           "object_type": "ARTIFACT_SUMMARY",
           "artifact_reader": {
-            "project_path": "~/desktop/safa/datasets/roboflow-code"
+            "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
           },
-          "export_path": "~/desktop/safa/datasets/roboflow-code/code-summarized.csv"
+          "export_path": "[OUTPUT_PATH]/[CURRENT_PROJECT]/summarized_artifacts.csv"
         }
       ]
     }

@@ -1,4 +1,3 @@
-from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import NEW_LINE
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt

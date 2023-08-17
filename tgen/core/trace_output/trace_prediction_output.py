@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 import numpy as np
@@ -11,7 +10,6 @@ from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 
 
-@dataclass
 class TracePredictionEntry(TypedDict):
     """
     A trace prediction for a pair of artifacts.

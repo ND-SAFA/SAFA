@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.ranking.steps.step_process_ranking_responses import ProcessRankingResponses
 
 
@@ -10,7 +11,7 @@ class TestProcessRankingResponsesStep(TestCase):
         """
         parent_ids = ["parent"]
         target_ids = ["1", "2", "3", "4"]
-        ranked_children_global, children_explanations_global = ProcessRankingResponses.process_ranked_artifacts(
+        trace_prediction_entries = ProcessRankingResponses.process_ranked_artifacts(
             parent_ids,
             ["<explanation>"
              "0 | EXPLANATION_1 | 1\n"
@@ -21,15 +22,7 @@ class TestProcessRankingResponsesStep(TestCase):
             {"parent": target_ids})
 
         # Test children ranked correctly
-        ranked_children = ranked_children_global[0]
-        self.assertEqual("4", ranked_children[0])
-        self.assertEqual("3", ranked_children[1])
-        self.assertEqual("2", ranked_children[2])
-        self.assertEqual("1", ranked_children[3])
-
-        # Test explanations parsed correctly
-        children_explanations = children_explanations_global[0]
-        self.assertEqual("EXPLANATION_4", children_explanations[0])
-        self.assertEqual("EXPLANATION_3", children_explanations[1])
-        self.assertEqual("EXPLANATION_2", children_explanations[2])
-        self.assertEqual("EXPLANATION_1", children_explanations[3])
+        for i in range(4, 1):
+            entry = trace_prediction_entries[i]
+            self.assertEqual(f"{i}", entry[TraceKeys.SOURCE.value])
+            self.assertEqual(f"EXPLANATION_{i + 1}", entry[TraceKeys.SOURCE.value])

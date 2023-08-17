@@ -90,10 +90,10 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: Returns map of artifact ids to content.
         """
         artifact_map = {}
-        for name, row in self.iterrows():
-            content = DataFrameUtil.get_optional_value(row, ArtifactKeys.SUMMARY.value)
+        for name, row in self.itertuples():
+            content = DataFrameUtil.get_optional_value(row, ArtifactKeys.SUMMARY)
             if content is None or len(content) == 0:
-                content = row[ArtifactKeys.CONTENT.value]
+                content = row[ArtifactKeys.CONTENT]
             artifact_map[name] = content
         return artifact_map
 

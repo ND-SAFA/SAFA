@@ -1,6 +1,7 @@
 import {
   ArtifactSchema,
   IconVariant,
+  IdentifierSchema,
   ThemeColor,
   TraceLinkSchema,
 } from "@/types";
@@ -188,6 +189,16 @@ export interface ExpandableProps {
 }
 
 /**
+ * Defines props for a component that can be opened.
+ */
+export interface OpenableProps {
+  /**
+   * Whether the component is open.
+   */
+  open: boolean;
+}
+
+/**
  * Defines props for a component that can display an error.
  */
 export interface ErrorMessageProps {
@@ -215,6 +226,16 @@ export interface TestableProps {
    * The testing selector to set.
    */
   dataCy?: string;
+}
+
+/**
+ * Defines props for a component that displays a project.
+ */
+export interface ProjectIdProps {
+  /**
+   * The project to display or edit.
+   */
+  project: IdentifierSchema;
 }
 
 /**

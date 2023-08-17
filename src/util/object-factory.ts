@@ -20,7 +20,7 @@ import {
   AttributeSchema,
   AttributeType,
   AttributeLayoutSchema,
-  ArtifactLevelSchema,
+  MatrixSchema,
   GeneratedMatrixSchema,
 } from "@/types";
 
@@ -283,7 +283,7 @@ export function createAttributeLayout(
  * @param model - If a custom model is used,
  */
 export function createGeneratedMatrix(
-  artifactLevels: ArtifactLevelSchema[],
+  artifactLevels: MatrixSchema[],
   method?: ModelType,
   model?: GenerationModelSchema
 ): GeneratedMatrixSchema {

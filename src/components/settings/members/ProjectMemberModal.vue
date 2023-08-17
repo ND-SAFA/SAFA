@@ -40,7 +40,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { MembershipSchema, ProjectRole } from "@/types";
+import { ProjectMemberModalProps, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
 import { memberApiStore } from "@/hooks";
 import {
@@ -51,12 +51,7 @@ import {
   TextButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  open: boolean;
-  projectId?: string;
-  member?: MembershipSchema;
-  email?: string | null;
-}>();
+const props = defineProps<ProjectMemberModalProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

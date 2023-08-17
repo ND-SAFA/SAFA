@@ -1,6 +1,11 @@
+import { ElementDefinition } from "cytoscape";
 import {
   ArtifactDeltaState,
   ArtifactProps,
+  ClassNameProps,
+  CytoCoreGraph,
+  StyleProps,
+  ThemeColor,
   TraceLinkSchema,
   TraceProps,
 } from "@/types";
@@ -167,6 +172,20 @@ export interface TimEdgeCytoElementData extends CytoEdgeData {
 export type TimEdgeCytoElement = CytoElement<TimEdgeCytoElementData>;
 
 /**
+ * The props for rendering a cytoscape graph.
+ */
+export interface CytoscapeProps extends ClassNameProps {
+  /**
+   * The id of this cytoscape graph.
+   */
+  id: string;
+  /**
+   * The graph configuration data.
+   */
+  graph: CytoCoreGraph;
+}
+
+/**
  * The props for rendering the TIM tree graph.
  */
 export interface TimTreeProps {
@@ -174,6 +193,50 @@ export interface TimTreeProps {
    * Whether the tree is visible.
    */
   visible: boolean;
+}
+
+/**
+ * The props for rendering a cytoscape element wrapper.
+ */
+export interface CyElementProps extends StyleProps {
+  /**
+   * The element to display.
+   */
+  definition: ElementDefinition;
+}
+
+/**
+ * The props for rendering the display of a cytoscape node.
+ */
+export interface NodeDisplayProps {
+  /**
+   * The type of node to display.
+   */
+  variant: "tim" | "artifact" | "footer" | "sidebar" | "menu";
+  /**
+   * The color of the node to display.
+   */
+  color: ThemeColor;
+  /**
+   * The title of the node to display above the separator.
+   */
+  title?: string;
+  /**
+   * The subtitle of the node to display below the separator.
+   */
+  subtitle?: string;
+  /**
+   * Whether to display a separator between the title and subtitle.
+   */
+  separator?: boolean;
+  /**
+   * The body content to display.
+   */
+  body?: string;
+  /**
+   * Whether the node is selected.
+   */
+  selected?: boolean;
 }
 
 /**
@@ -209,11 +272,51 @@ export interface ArtifactNodeDisplayProps extends ArtifactProps {
 }
 
 /**
- * The props for rendering a trace link on the graph.
+ * The props for rendering a trace link edge on the graph.
  */
 export interface TraceLinkProps extends TraceProps {
   /**
    * The artifact ids currently selected in view.
    */
   artifactsInView: string[];
+}
+
+/**
+ * The props for rendering an artifact type node on the graph.
+ */
+export interface TimNodeProps {
+  /**
+   * The artifact type to render.
+   */
+  artifactType: string;
+  /**
+   * The number of artifacts of this type.
+   */
+  count: number;
+  /**
+   * The icon to display for this artifact type.
+   */
+  icon?: string;
+}
+
+/**
+ * The props for rendering a trace matrix edge on the graph.
+ */
+export interface TimLinkProps {
+  /**
+   * The source artifact type to render.
+   */
+  sourceType: string;
+  /**
+   * The target artifact type to render.
+   */
+  targetType: string;
+  /**
+   * The number of trace links of this type.
+   */
+  count: number;
+  /**
+   * Whether this matrix contains generated links.
+   */
+  generated?: boolean;
 }

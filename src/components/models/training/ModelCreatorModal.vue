@@ -34,6 +34,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { OpenableProps } from "@/types";
 import { modelApiStore, modelSaveStore } from "@/hooks";
 import {
   Modal,
@@ -43,9 +44,7 @@ import {
   TextButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  open: boolean;
-}>();
+const props = defineProps<OpenableProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

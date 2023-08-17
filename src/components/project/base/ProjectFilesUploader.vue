@@ -48,16 +48,16 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, withDefaults } from "vue";
+import { ProjectIdentifierProps } from "@/types";
 import { createProjectApiStore, identifierSaveStore } from "@/hooks";
 import { SwitchInput, TextButton } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 const props = withDefaults(
-  defineProps<{
-    dataCyName?: string;
-    dataCyDescription?: string;
-  }>(),
+  defineProps<
+    Pick<ProjectIdentifierProps, "dataCyName" | "dataCyDescription">
+  >(),
   {
     dataCyName: "input-project-name",
     dataCyDescription: "input-project-description",

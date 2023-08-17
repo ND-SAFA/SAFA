@@ -51,14 +51,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { AuthenticationListItemProps } from "@/types";
 import { TextButton, FlexBox, Icon, ListItem } from "@/components/common";
 
-const props = defineProps<{
-  hasCredentials: boolean;
-  loading?: boolean;
-  title: string;
-  inactive?: boolean;
-}>();
+const props = defineProps<AuthenticationListItemProps>();
 
 const emit = defineEmits<{
   (e: "click"): void;

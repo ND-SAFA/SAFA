@@ -53,7 +53,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
+import {
+  GraphMode,
+  GraphElementType,
+  TimNodeCytoElement,
+  TimNodeProps,
+} from "@/types";
 import { sanitizeNodeId } from "@/util";
 import {
   timStore,
@@ -67,11 +72,7 @@ import { CyElement } from "@/components/graph/base";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, IconButton, Separator } from "@/components";
 
-const props = defineProps<{
-  artifactType: string;
-  count: number;
-  icon?: string;
-}>();
+const props = defineProps<TimNodeProps>();
 
 const { darkMode } = useTheme();
 

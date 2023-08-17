@@ -20,7 +20,7 @@ import {
   TraceLinkProps,
 } from "@/types";
 import { deltaStore, selectionStore, useTheme } from "@/hooks";
-import { CyElement } from "../base";
+import { CyElement } from "@/components/graph/base";
 
 const props = defineProps<TraceLinkProps>();
 

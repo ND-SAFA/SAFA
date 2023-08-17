@@ -28,13 +28,12 @@ export default {
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { OpenableProps } from "@/types";
 import { createVersionApiStore, projectStore } from "@/hooks";
 import { SwitchInput, PanelCard, TextButton } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
-const props = defineProps<{
-  open: boolean;
-}>();
+const props = defineProps<OpenableProps>();
 
 const files = ref<File[]>([]);
 const replaceAllArtifacts = ref(false);

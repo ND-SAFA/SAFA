@@ -36,7 +36,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { IdentifierSchema, VersionSchema } from "@/types";
+import { VersionSchema, VersionSelectorTableProps } from "@/types";
 import { actionsColumn, versionColumns } from "@/util";
 import {
   projectApiStore,
@@ -47,25 +47,7 @@ import {
 import { SelectorTable } from "@/components/common";
 import { CreateVersionModal } from "@/components/project/creator";
 
-const props = defineProps<{
-  /**
-   * The project to select a version from.
-   */
-  project: IdentifierSchema;
-  /**
-   * Whether this component is currently in view.
-   * The content will be reloaded when opened.
-   */
-  open: boolean;
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-  /**
-   * If true, the current version will be hidden.
-   */
-  hideCurrentVersion?: boolean;
-}>();
+const props = defineProps<VersionSelectorTableProps>();
 
 const emit = defineEmits<{
   /**

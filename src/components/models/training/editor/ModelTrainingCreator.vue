@@ -40,7 +40,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { GenerationModelSchema } from "@/types";
+import { GenerationModelProps } from "@/types";
 import { trainingTabOptions } from "@/util";
 import { TabList, TextButton, PanelCard } from "@/components/common";
 import {
@@ -50,9 +50,7 @@ import {
   ModelKeywordsStep,
 } from "./steps";
 
-const props = defineProps<{
-  model: GenerationModelSchema;
-}>();
+const props = defineProps<GenerationModelProps>();
 
 const tabs = trainingTabOptions();
 

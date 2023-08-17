@@ -1,8 +1,4 @@
-import {
-  ArtifactLevelSchema,
-  ModelType,
-  GenerationModelSchema,
-} from "@/types/domain";
+import { MatrixSchema, ModelType, GenerationModelSchema } from "@/types/domain";
 
 /**
  * Defines a trace matrix generation request.
@@ -19,5 +15,5 @@ export interface GeneratedMatrixSchema {
   /**
    * The artifact levels to trace with method.
    */
-  artifactLevels: ArtifactLevelSchema[];
+  artifactLevels: MatrixSchema[];
 }

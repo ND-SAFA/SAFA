@@ -43,15 +43,12 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
+import { CreateVersionModalProps, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { createVersionApiStore, projectStore } from "@/hooks";
 import { Modal, TextButton, FlexBox } from "@/components/common";
 
-const props = defineProps<{
-  open: boolean;
-  project?: IdentifierSchema;
-}>();
+const props = defineProps<CreateVersionModalProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

@@ -25,3 +25,29 @@ export interface NavOption {
    */
   path: string | { path: string; query: URLQuery };
 }
+
+/**
+ * The props for displaying an authenticated page.
+ */
+export interface PrivatePageProps {
+  /**
+   * Whether to display in full window mode.
+   */
+  fullWindow?: boolean;
+  /**
+   * Whether a cytoscape graph is being displayed.
+   */
+  graph?: boolean;
+  /**
+   * The page title to display.
+   */
+  title?: string;
+  /**
+   * The page subtitle to display.
+   */
+  subtitle?: string;
+  /**
+   * Whether to display a back button to the project graph.
+   */
+  backToProject?: boolean;
+}

@@ -30,20 +30,18 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ArtifactLevelSchema, ModelType } from "@/types";
+import { MatrixSchema, ModelType, OpenableProps } from "@/types";
 import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "../save";
 
-const props = defineProps<{
-  open: boolean;
-}>();
+const props = defineProps<OpenableProps>();
 
 const emit = defineEmits<{
   (e: "submit"): void;
 }>();
 
-const createEmptyArtifactLevel = (): ArtifactLevelSchema[] => [
+const createEmptyArtifactLevel = (): MatrixSchema[] => [
   { source: "", target: "" },
 ];
 
@@ -53,7 +51,7 @@ const matrices = ref(createEmptyArtifactLevel());
 
 const areMatricesValid = computed(() =>
   matrices.value
-    .map((matrix: ArtifactLevelSchema) => !!matrix.source && !!matrix.target)
+    .map((matrix: MatrixSchema) => !!matrix.source && !!matrix.target)
     .reduce((acc: boolean, cur: boolean) => acc && cur, true)
 );
 

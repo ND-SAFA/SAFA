@@ -26,7 +26,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { GenerationModelSchema } from "@/types";
+import { GenerationModelProps } from "@/types";
 import {
   ENABLED_FEATURES,
   EXAMPLE_TRAINING_STEPS,
@@ -36,9 +36,7 @@ import { Typography } from "@/components/common";
 import ModelTrainingStep from "./ModelTrainingStep.vue";
 import ModelTrainingCreator from "./ModelTrainingCreator.vue";
 
-const props = defineProps<{
-  model: GenerationModelSchema;
-}>();
+const props = defineProps<GenerationModelProps>();
 
 const baseTimestamp = timestampToDisplay(new Date(Date.now()).toISOString());
 

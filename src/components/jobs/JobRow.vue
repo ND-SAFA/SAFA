@@ -83,7 +83,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { JobSchema, StepperStep } from "@/types";
+import { JobRowProps, JobSchema, StepperStep } from "@/types";
 import { jobStatus } from "@/util";
 import {
   getVersionApiStore,
@@ -102,20 +102,7 @@ import {
   Chip,
 } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * Props passed in from the quasar table.
-   */
-  quasarProps: Record<string, unknown>;
-  /**
-   * The job to render.
-   */
-  job: JobSchema;
-  /**
-   * Whether the row is expanded.
-   */
-  expanded: boolean;
-}>();
+const props = defineProps<JobRowProps>();
 
 const emit = defineEmits<{
   (e: "update:expanded", expanded: boolean): void;

@@ -3,10 +3,10 @@
     v-if="artifactLikeMode"
     clickable
     display-title
-    :artifact="props.option"
+    :artifact="props.option as ArtifactSchema"
     data-cy="text-artifact-search-item"
   />
-  <list-item v-else clickable :title="props.option" />
+  <list-item v-else clickable :title="props.option as string" />
 </template>
 
 <script lang="ts">
@@ -20,16 +20,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactSchema, SearchOptionProps } from "@/types";
 import { searchStore } from "@/hooks";
 import { ListItem, ArtifactBodyDisplay } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * The option to display, either an artifact or artifact type.
-   */
-  option: ArtifactSchema | string;
-}>();
+const props = defineProps<SearchOptionProps>();
 
 const artifactLikeMode = computed(() => searchStore.artifactLikeMode);
 </script>

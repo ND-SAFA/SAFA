@@ -21,12 +21,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { AuthenticationListItemProps } from "@/types";
 import { integrationsStore, jiraApiStore } from "@/hooks";
 import AuthenticationListItem from "./AuthenticationListItem.vue";
 
-const props = defineProps<{
-  inactive?: boolean;
-}>();
+const props = defineProps<Pick<AuthenticationListItemProps, "inactive">>();
 
 const emit = defineEmits<{
   (e: "click"): void;

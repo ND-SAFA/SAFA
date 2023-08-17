@@ -43,7 +43,7 @@ export enum ModelShareType {
 /**
  * Describes a matrix of artifacts.
  */
-export interface ArtifactLevelSchema {
+export interface MatrixSchema {
   /**
    * The source artifact type.
    */
@@ -135,6 +135,6 @@ export interface TrainingStepSchema {
     /**
      * The trace matrices being used for training.
      */
-    levels: ArtifactLevelSchema[];
+    levels: MatrixSchema[];
   }[];
 }

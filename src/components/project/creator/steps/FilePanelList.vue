@@ -41,6 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { FilePanelProps } from "@/types";
 import { projectSaveStore } from "@/hooks";
 import {
   TextButton,
@@ -50,9 +51,7 @@ import {
 } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
-const props = defineProps<{
-  variant: "artifact" | "trace";
-}>();
+const props = defineProps<Pick<FilePanelProps, "variant">>();
 
 const emit = defineEmits<{
   (e: "validate", isValid: boolean): void;

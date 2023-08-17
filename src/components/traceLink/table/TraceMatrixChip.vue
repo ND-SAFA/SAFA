@@ -36,14 +36,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ApprovalType, ArtifactSchema, TraceType } from "@/types";
+import { ApprovalType, TraceMatrixChipProps, TraceType } from "@/types";
 import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
 import { Typography, IconButton, Icon, Chip } from "@/components/common";
 
-const props = defineProps<{
-  source: ArtifactSchema;
-  target: ArtifactSchema;
-}>();
+const props = defineProps<TraceMatrixChipProps>();
 
 const direction = computed(() =>
   subtreeStore.getRelationship(props.source.id, props.target.id)

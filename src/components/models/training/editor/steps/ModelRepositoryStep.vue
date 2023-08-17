@@ -26,15 +26,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { GenerationModelSchema } from "@/types";
 import {
   Typography,
   UnderConstructionAlert,
   TextButton,
   SelectInput,
 } from "@/components/common";
-
-defineProps<{
-  model: GenerationModelSchema;
-}>();
 </script>

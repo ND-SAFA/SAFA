@@ -1,14 +1,5 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <flex-box v-if="displayActions" b="2">
-      <text-button
-        text
-        label="View Artifacts"
-        icon="view-tree"
-        @click="handleViewLevel"
-      />
-    </flex-box>
-
     <panel-card>
       <flex-box align="center" justify="between" class="overflow-hidden">
         <div class="overflow-hidden" data-cy="text-selected-name">
@@ -54,13 +45,19 @@
           <icon :id="sourceIcon" size="sm" :color="sourceColor" />
         </flex-box>
       </flex-box>
+    </panel-card>
 
-      <separator b="2" t="1" />
-
+    <panel-card :title="traceLabel">
+      <template #title-actions>
+        <text-button
+          text
+          label="View Artifacts"
+          icon="view-tree"
+          @click="handleViewLevel"
+        />
+      </template>
       <flex-box>
         <flex-item parts="6">
-          <typography variant="caption" value="Total Trace Links" />
-          <typography el="p" :value="totalCount" />
           <typography variant="caption" value="Generated Trace Links" />
           <typography el="p" :value="generatedCount" />
           <typography variant="caption" value="Approved Trace Links" />
@@ -173,15 +170,12 @@ import {
   Icon,
   DetailsPanel,
   FlexBox,
-  Separator,
   ListItem,
   ArtifactBodyDisplay,
   List,
   FlexItem,
   AttributeChip,
 } from "@/components/common";
-
-const displayActions = computed(() => permissionStore.projectAllows("editor"));
 
 const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
 
@@ -193,23 +187,15 @@ const targetType = computed(() => traceMatrix.value?.targetType || "");
 const targetIcon = computed(() => timStore.getTypeIcon(targetType.value));
 const targetColor = computed(() => timStore.getTypeColor(targetType.value));
 
-const totalCount = computed(() => {
+const traceLabel = computed(() => {
   const count = traceMatrix.value?.count || 0;
 
-  return count === 1 ? "1 Link" : `${count} Links`;
+  return count === 1 ? "1 Trace Link" : `${count} Trace Links`;
 });
 
-const generatedCount = computed(() => {
-  const count = traceMatrix.value?.generatedCount || 0;
+const generatedCount = computed(() => traceMatrix.value?.generatedCount || 0);
 
-  return count === 1 ? "1 Link" : `${count} Links`;
-});
-
-const approvedCount = computed(() => {
-  const count = traceMatrix.value?.approvedCount || 0;
-
-  return count === 1 ? "1 Link" : `${count} Links`;
-});
+const approvedCount = computed(() => traceMatrix.value?.approvedCount || 0);
 
 /**
  * Calculate the percentage of child artifacts of this type

@@ -24,16 +24,12 @@
 
       <separator b="2" />
 
-      <typography variant="caption" value="Details" />
-      <typography el="p" :value="countDisplay" />
+      <typography variant="caption" value="Artifacts" />
+      <typography el="p" :value="artifactCount" />
     </panel-card>
 
-    <panel-card :title="parentLabel">
-      <list
-        v-if="parentCount > 0"
-        :scroll-height="300"
-        data-cy="list-selected-parents"
-      >
+    <panel-card v-if="parentCount > 0" :title="parentLabel">
+      <list :scroll-height="300" data-cy="list-selected-parents">
         <list-item
           v-for="parent in parentTypes"
           :key="parent.typeId"
@@ -58,20 +54,10 @@
           </template>
         </list-item>
       </list>
-      <typography
-        v-else
-        l="1"
-        variant="caption"
-        value="There are no parent types."
-      />
     </panel-card>
 
-    <panel-card :title="childLabel">
-      <list
-        v-if="childCount > 0"
-        :scroll-height="300"
-        data-cy="list-selected-children"
-      >
+    <panel-card v-if="childCount > 0" :title="childLabel">
+      <list :scroll-height="300" data-cy="list-selected-children">
         <list-item
           v-for="child in childTypes"
           :key="child.typeId"
@@ -96,15 +82,9 @@
           </template>
         </list-item>
       </list>
-      <typography
-        v-else
-        l="1"
-        variant="caption"
-        value="There are no child types."
-      />
     </panel-card>
 
-    <panel-card :title="artifactsLabel">
+    <panel-card v-if="artifacts.length > 0" :title="artifactsLabel">
       <template #title-actions>
         <text-button
           text
@@ -113,11 +93,7 @@
           @click="documentStore.addDocumentOfTypes([name])"
         />
       </template>
-      <list
-        v-if="artifacts.length > 0"
-        :scroll-height="300"
-        data-cy="list-selected-artifacts"
-      >
+      <list :scroll-height="300" data-cy="list-selected-artifacts">
         <list-item
           v-for="artifact in artifacts"
           :key="artifact.id"
@@ -129,12 +105,6 @@
           <artifact-body-display display-title :artifact="artifact" />
         </list-item>
       </list>
-      <typography
-        v-else
-        l="1"
-        variant="caption"
-        value="There are no artifacts."
-      />
     </panel-card>
   </details-panel>
 </template>
@@ -193,11 +163,7 @@ const childLabel = computed(() =>
   childCount.value === 1 ? "1 Child Type" : `${childCount.value} Child Types`
 );
 
-const countDisplay = computed(() => {
-  const count = artifactLevel.value?.count || 0;
-
-  return count === 1 ? "1 Artifact" : `${count} Artifacts`;
-});
+const artifactCount = computed(() => artifactLevel.value?.count || 0);
 
 const artifacts = computed(() => artifactStore.getArtifactsByType(name.value));
 const artifactsLabel = computed(() =>

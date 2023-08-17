@@ -1,6 +1,8 @@
+import os
 import random
 from collections import Counter
 from copy import deepcopy
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Tuple
 
 import networkx as nx
@@ -10,6 +12,7 @@ import torch
 from datasets import Dataset
 from tqdm import tqdm
 
+from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
@@ -383,15 +386,18 @@ class TraceDataset(iDataset):
             tracing_types.append((parent_type, child_type))
         return tracing_types
 
-    def as_creator(self, project_path: str):
+    def as_creator(self, project_path: str, dataset_dirname: str = None):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading
+        :param dataset_dirname: The directory that the dataset will be saved to
         :return: The dataset creator
         """
         from tgen.data.exporters.safa_exporter import SafaExporter
         from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
         from tgen.data.readers.structured_project_reader import StructuredProjectReader
+        dataset_dirname = DateTimeUtil.now_as_string() if not dataset_dirname else dataset_dirname
+        project_path = os.path.join(project_path, dataset_dirname)
         SafaExporter(project_path, dataset=self).export()
         return TraceDatasetCreator(project_reader=StructuredProjectReader(project_path=project_path))
 

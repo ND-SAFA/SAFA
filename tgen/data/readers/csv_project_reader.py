@@ -31,8 +31,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :param project_path: Path to data file containing entity entries.
         :param overrides: Parameters to override in the project creator.
         """
-        super().__init__(overrides)
-        self.project_path = project_path
+        super().__init__(overrides, project_path)
         self.overrides["allowed_orphans"] = NO_CHECK
 
     def read_project(self, n_threads: int = 1) -> TraceDataFramesTypes:
@@ -40,11 +39,11 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame
         """
-        logger.info(f"Reading file: {self.project_path}")
-        entity_df = pd.read_csv(self.project_path)
+        logger.info(f"Reading file: {self.get_project_path()}")
+        entity_df = pd.read_csv(self.get_project_path())
         trace_df_entries = []
         artifact_df_entries = {}
-        project_name = os.path.basename(self.project_path)
+        project_name = os.path.basename(self.get_project_path())
 
         def read_artifact(row_batches):
             for row_index in row_batches:
@@ -83,7 +82,7 @@ class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         :return: Returns the file name of the csv file.
         """
-        return FileUtil.get_file_name(self.project_path)
+        return FileUtil.get_file_name(self.get_project_path())
 
     @staticmethod
     def should_generate_negative_links() -> bool:

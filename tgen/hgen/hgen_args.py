@@ -33,7 +33,6 @@ DEFAULT_MAX_TOKENS_SMALL = 2000
 
 @dataclass
 class HGenState(State):
-    export_path: str = None  # Path to output of current run
     """
     Step 1 - Dataset Construction
     """
@@ -52,14 +51,14 @@ class HGenState(State):
     """
     generated_artifact_content: List[str] = None  # The content generated from the questionnaire.
     summary: str = None  # The summary of all the source artifacts.
-    generation_questionnaire: QuestionnairePrompt = None
 
     """
     Optional Step - Refine 1
     """
-    refinement_number: int = 1  # The current refinement step
-    refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
-    # The questionnaire containing all the artifacts.
+    # refinement_number: int = 1  # The current refinement step
+    # refinement_questionnaire: QuestionnairePrompt = SupportedPrompts.HGEN_REFINE_QUESTIONNAIRE.value
+    # # The questionnaire containing all the artifacts.
+
     refined_content: List[str] = None  # The refined output.
 
     """

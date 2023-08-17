@@ -26,7 +26,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         summary_questionnaire = GenerateArtifactContentStep.construct_questionnaire_for_summary(state)
 
         source_layer_only_dataset = state.source_dataset
-        export_path = os.path.join(state.export_dir, "artifact_gen_response.yaml") if state.export_path else None
+        export_path = os.path.join(state.export_dir, "artifact_gen_response.yaml") if state.export_dir else None
 
         task_prompt = QuestionPrompt(TASK_INSTRUCTIONS,
                                      response_manager=PromptResponseManager(

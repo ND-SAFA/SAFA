@@ -66,7 +66,7 @@ class State(BaseObject):
         try:
             save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name)
             from tgen.data.tdatasets.idataset import iDataset
-            as_dict = {k: (v.as_creator(self._get_path_to_state_checkpoint(self.export_dir))
+            as_dict = {k: (v.as_creator(self._get_path_to_state_checkpoint(self.export_dir), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
             YamlUtil.write(as_dict, save_path)
             logger.info(f"Saved state to {save_path}")
@@ -108,11 +108,12 @@ class State(BaseObject):
         :param param_specs: Specifies the expected types
         :return: The value as correct type or raises exception
         """
-        expected_param_type = param_specs.param_types[name]
-        if isinstance(val, AbstractDatasetCreator) and not ReflectionUtil.is_type(val, expected_param_type, name):
+        expected_param_type = param_specs.param_types.get(name)
+        if isinstance(val, AbstractDatasetCreator) and not ReflectionUtil.is_type(val, expected_param_type, name,
+                                                                                  print_on_error=False):
             val = val.create()
         if not ReflectionUtil.is_type(val, expected_param_type, name):
-            raise TypeError(f"Expected {name} to be {expected_param_type}")
+            raise TypeError(f"Expected {name} to be {expected_param_type} but was type {type(val)}")
         return val
 
     @staticmethod

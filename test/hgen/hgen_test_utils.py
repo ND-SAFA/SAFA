@@ -25,7 +25,7 @@ class HGenTestConstants:
     open_ai_responses = [f'{PromptUtil.create_xml("description", description)}'
                          f'{PromptUtil.create_xml("example", example)} '
                          f'{PromptUtil.create_xml("format", format_)}']
-    summary = "\nHere is a summary of the key technical details and design aspects of the system based on the provided code"
+    summary = "Here is a summary of the key technical details and design aspects of the system based on the provided code"
 
     user_stories = ["As a player, I want to move around in a 3D world so that I can explore the environment.",
                     "As a player, I want to place and remove blocks in the world so that I can modify the environment.",

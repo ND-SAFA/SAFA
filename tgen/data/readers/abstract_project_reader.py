@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 from typing import Dict, Generic, Optional, Tuple, Type, TypeVar
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
+from tgen.scripts.modules.script_definition import ScriptDefinition, ENV_REPLACEMENT_VARIABLES
 
 ProjectData = TypeVar("ProjectData")
 TraceDataFramesTypes = Tuple[ArtifactDataFrame, TraceDataFrame, LayerDataFrame]
@@ -17,13 +19,26 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
     Defines interface for objects responsible for reading projects.
     """
 
-    def __init__(self, overrides: dict = None):
+    def __init__(self, overrides: dict = None, project_path: str = None):
         """
         Initialized project reader with overrides.
         :param overrides: The overrides to apply to project creator.
         """
+        self.project_path = project_path
         self.overrides = overrides if overrides else {}
         self.summarizer: Optional[Summarizer] = None
+        self.__processed_project_path = False
+
+    def get_project_path(self) -> str:
+        """
+        Gets the project path for the reader
+        :return: the project path
+        """
+        if not self.__processed_project_path:
+            self.project_path = FileUtil.expand_paths_in_dictionary(self.project_path,
+                                                                    ScriptDefinition.get_env_replacements(ENV_REPLACEMENT_VARIABLES))
+            self.__processed_project_path = True
+        return self.project_path
 
     @abstractmethod
     def read_project(self) -> ProjectData:

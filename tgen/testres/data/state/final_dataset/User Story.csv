@@ -1,0 +1,12 @@
+id,content,layer_id,summary
+Player move around 3D world US,"As a player, I want to move around a 3D block world so that I can explore the environment.",User Story,
+Place and remove blocks US,"As a player, I want to place and remove blocks in the world so that I can build structures and modify the terrain.",User Story,
+Assign colors to blocks US,"As a player, I want to assign colors to blocks so that I can customize the appearance of my structures.",User Story,
+Copy colors from blocks US,"As a player, I want to copy colors from existing blocks so that I can match colors easily when building.",User Story,
+Access game menus US,"As a player, I want to open menus to access options like saving, loading, and quitting the game.",User Story,
+Display current FPS US,"As a player, I want the game to display my current FPS so that I can monitor performance.",User Story,
+Show debug hitboxes US,"As a developer, I want the game to provide debug options like showing hitboxes so that I can test and troubleshoot issues.",User Story,
+Log errors with stack traces US,"As a developer, I want the game to log errors and exceptions with stack traces so that I can debug crashes and unexpected behavior.",User Story,
+Use shaders textures rendering US,"As a developer, I want the code to use shaders and textures so that I can render detailed 3D graphics efficiently.",User Story,
+Reusable UI components US,"As a developer, I want reusable UI components so that I can build interfaces more easily.",User Story,
+Chunks divide world efficiently US,"As a developer, I want the world divided into chunks so that I can manage a large world efficiently.",User Story,

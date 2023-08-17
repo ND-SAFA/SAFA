@@ -233,18 +233,20 @@ class PromptDataset(iDataset):
         """
         return not (self.artifact_df is None and self.trace_dataset is None)
 
-    def as_creator(self, project_path: str):
+    def as_creator(self, project_path: str, dataset_dirname: str):
         """
         Converts the dataset into a creator that can remake it
         :param project_path: The path to save the dataset at for reloading
+        :param dataset_dirname: The directory that the dataset will be saved to
         :return: The dataset creator
         """
         from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
         if self.trace_dataset is not None:
-            return PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path))
+            return PromptDatasetCreator(trace_dataset_creator=self.trace_dataset.as_creator(project_path, dataset_dirname))
         elif self.artifact_df is not None:
             from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-            TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path)
+            creator = TraceDataset(self.artifact_df, TraceDataFrame(), LayerDataFrame()).as_creator(project_path, dataset_dirname)
+            project_path = creator.project_reader.project_path
             return PromptDatasetCreator(project_reader=ArtifactProjectReader(project_path=project_path))
         elif self.prompt_df is not None:
             raise NotImplementedError("Cannot get creator for prompt dataset with only prompt df")

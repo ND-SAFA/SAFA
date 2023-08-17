@@ -1,0 +1,83 @@
+_checkpoint_dir: state_checkpoints
+completed_steps: !!set
+  CreateHGenDatasetStep: null
+  GenerateArtifactContentStep: null
+  GenerateInputsStep: null
+  InitializeDatasetStep: null
+dataset: !!python/object:tgen.data.creators.trace_dataset_creator.TraceDatasetCreator
+  allowed_missing_sources: -1
+  allowed_missing_targets: -1
+  allowed_orphans: -1
+  artifact_df: null
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  layer_mapping_df: null
+  linked_artifact_ids: null
+  orphan_artifact_ids: null
+  project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    _definition: null
+    conversions: {}
+    definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+    overrides: {}
+    project_path: "[ROOT_PATH]/testres/data/state/final_dataset"
+    summarizer: null
+  remove_orphans: false
+  trace_df: null
+description_of_artifact: A User story is a concise, informal description of a software
+  feature or functionality, written from the perspective of the end user
+export_dir: "[ROOT_PATH]/testres/output"
+format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
+  or benefit].
+generated_artifact_content:
+- As a player, I want to move around in a 3D world so that I can explore the environment.
+- As a player, I want to place and remove blocks in the world so that I can modify the environment.
+- As a player, I want to copy the color of blocks so that I can reuse colors while building.
+original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: false
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: "[ROOT_PATH]/testres/data/state/original_dataset"
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+questions:
+- What are the main classes/functions in the code?
+- What are the inputs and outputs of the main functions?
+- Is there any user interface code and what does it do?
+source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: false
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: "[ROOT_PATH]/testres/data/state/source_dataset"
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+summary: "Here is a summary of the key technical details and design aspects of the system based on the provided code"

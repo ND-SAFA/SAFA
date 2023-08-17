@@ -13,7 +13,7 @@ from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_p
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
-class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
+class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
     def run(self, args: HGenArgs, state: HGenState) -> None:
         """
@@ -23,7 +23,7 @@ class GenerateArtifactContent(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         logger.info(f"Generating {args.target_type}s\n")
-        summary_questionnaire = GenerateArtifactContent.construct_questionnaire_for_summary(state)
+        summary_questionnaire = GenerateArtifactContentStep.construct_questionnaire_for_summary(state)
 
         source_layer_only_dataset = state.source_dataset
         export_path = os.path.join(state.export_path, "artifact_gen_response.yaml") if state.export_path else None

@@ -47,12 +47,11 @@ def mock_ai(libraries: Union[str, List[str]], func=None):
 def run_with_patches(patches: List[str], ai_managers, runnable: Callable, *args, **kwargs):
     assert len(patches) > 0, f"No methods to patch."
     patch_name = patches[0]
-    ai_manager = ai_managers[0]
     if len(patches) == 1:
         with patch(patch_name) as other_func:
-            other_func.side_effect = ai_manager
+            other_func.side_effect = ai_managers[-1]
             runnable(ai_managers, *args, **kwargs)
     else:
         with patch(patch_name) as other_func:
-            other_func.side_effect = ai_manager
+            other_func.side_effect = ai_managers[0]
             run_with_patches(patches[1:], ai_managers, runnable, *args, **kwargs)

@@ -177,9 +177,9 @@ import {
   ListItem,
   ArtifactBodyDisplay,
   List,
+  FlexItem,
+  AttributeChip,
 } from "@/components/common";
-import FlexItem from "@/components/common/display/content/FlexItem.vue";
-import AttributeChip from "@/components/common/display/chip/AttributeChip.vue";
 
 const displayActions = computed(() => permissionStore.projectAllows("editor"));
 

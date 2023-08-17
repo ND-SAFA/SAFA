@@ -113,7 +113,7 @@ const title = computed(() => {
 
 const width = computed(() => {
   if (smallWindow.value) {
-    return 400;
+    return 500;
   } else if (
     openState.value === "displayArtifactLevel" ||
     openState.value === "displayTraceMatrix" ||
@@ -128,7 +128,7 @@ const width = computed(() => {
   ) {
     return 800;
   } else {
-    return 400;
+    return 500;
   }
 });
 

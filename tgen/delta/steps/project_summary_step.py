@@ -1,5 +1,5 @@
 from tgen.common.util.status import Status
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
@@ -15,7 +15,7 @@ class ProjectSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param state:  The delta summarizer state
         :return: None
         """
-        original_artifacts = args.dataset.artifact_df
+        original_artifacts = ArtifactDataFrame(args.dataset.artifact_df.dropna())
         summary_job = ProjectSummaryJob({a_id: original_artifacts.get_artifact(a_id)[ArtifactKeys.CONTENT]
                                          for a_id in original_artifacts.index})
         job_res = summary_job.run()

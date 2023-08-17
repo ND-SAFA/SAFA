@@ -8,7 +8,7 @@ const singleMatchRowCount = 1 + 2 + 1 + 2;
 
 describe("Trace Link Approval", () => {
   before(() => {
-    cy.initProject();
+    cy.initProject(true, true);
   });
 
   beforeEach(() => {

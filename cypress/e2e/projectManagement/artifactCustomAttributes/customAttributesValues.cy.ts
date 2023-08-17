@@ -35,7 +35,9 @@ describe("Custom Attributes Values", () => {
 
       cy.inputText(
         DataCy.selectedPanelAttributeInputPrefix + customAttribute.key,
-        testValue
+        testValue,
+        false,
+        true
       );
 
       cy.clickButton(DataCy.artifactSaveSubmitButton);

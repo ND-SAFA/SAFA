@@ -1,4 +1,4 @@
-import { DataIds } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 describe("Artifact Subtree", () => {
   before(() => {
@@ -38,7 +38,7 @@ describe("Artifact Subtree", () => {
       // Open the right click menu on the selected node, click to hide subtree.
       cy.getNode("F11")
         .rightclick()
-        .get(DataIds.rightClickHideSubtree)
+        .getCy(DataCy.rightClickToggleSubtree)
         .should("be.visible")
         .then(($el) => $el.click());
 
@@ -54,7 +54,7 @@ describe("Artifact Subtree", () => {
       // Open the right click menu on the selected node, click to hide subtree.
       cy.getNode("F11")
         .rightclick()
-        .get(DataIds.rightClickHideSubtree)
+        .getCy(DataCy.rightClickToggleSubtree)
         .should("be.visible")
         .then(($el) => $el.click());
 
@@ -64,7 +64,7 @@ describe("Artifact Subtree", () => {
       // Open the right click menu on the selected node, click to show subtree.
       cy.getNode("F11")
         .rightclick()
-        .get(DataIds.rightClickShowSubtree)
+        .getCy(DataCy.rightClickToggleSubtree)
         .should("be.visible")
         .then(($el) => $el.click());
 
@@ -81,7 +81,7 @@ describe("Artifact Subtree", () => {
         // Open the right click menu on the selected node, click to hide subtree.
         cy.getNode("F11")
           .rightclick()
-          .get(DataIds.rightClickHideSubtree)
+          .getCy(DataCy.rightClickToggleSubtree)
           .should("be.visible")
           .then(($el) => $el.click());
 

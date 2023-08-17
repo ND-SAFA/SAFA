@@ -269,8 +269,12 @@ declare namespace Cypress {
      * The user will remain logged in on the job status page.
      *
      * @param waitForComplete - Defaults to true. Whether to wait for the creation job to complete.
+     * @param generateData - Defaults to false. Whether to generate data for the project.
      */
-    initProject(waitForComplete?: boolean): Chainable<void>;
+    initProject(
+      waitForComplete?: boolean,
+      generateData?: boolean
+    ): Chainable<void>;
 
     /**
      * Clears the DB of existing project versions, and creates 1 new revision version.

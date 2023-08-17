@@ -12,6 +12,7 @@
       :artifact="props.artifact"
       is-header
       class="cy-node-artifact-name"
+      data-cy="tree-node-name"
     />
     <separator
       v-if="showDelta"

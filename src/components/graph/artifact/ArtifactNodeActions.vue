@@ -17,12 +17,14 @@
         v-if="showHiddenChildren && hasSubtree"
         tooltip="Show subtree"
         icon="group-open-all"
+        data-cy="button-toggle-subtree"
         @click="subtreeStore.showSubtree(id)"
       />
       <icon-button
         v-else-if="hasSubtree"
         tooltip="Hide subtree"
         icon="group-close-all"
+        data-cy="button-toggle-subtree"
         @click="subtreeStore.hideSubtree(id)"
       />
 

@@ -1,2 +1,2 @@
-export { default as miniProjectFiles } from "./files.json";
-export { default as miniProjectFilesMap } from "./fileMap";
+export { default as genProjectFiles } from "./files.json";
+export { default as genProjectFilesMap } from "./fileMap";

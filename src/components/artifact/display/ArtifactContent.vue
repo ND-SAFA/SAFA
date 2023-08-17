@@ -6,6 +6,8 @@
       display-type
       display-tooltip
       is-header
+      data-cy-name="text-selected-name"
+      data-cy-type="text-selected-type"
     />
 
     <separator b="2" t="1" />

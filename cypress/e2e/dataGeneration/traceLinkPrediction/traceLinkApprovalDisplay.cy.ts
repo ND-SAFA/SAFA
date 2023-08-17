@@ -2,7 +2,7 @@ import { DataCy } from "@/fixtures";
 
 describe("Trace Link Approval Display", () => {
   before(() => {
-    cy.initProject();
+    cy.initProject(true, true);
   });
 
   beforeEach(() => {

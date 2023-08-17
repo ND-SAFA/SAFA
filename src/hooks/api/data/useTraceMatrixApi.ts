@@ -20,7 +20,7 @@ export const useTraceMatrixApi = defineStore("traceMatrixApi", () => {
     await traceMatrixApi.handleRequest(
       async () => {
         await createTraceMatrix(
-          projectStore.projectId,
+          projectStore.versionId,
           sourceTypeName,
           targetTypeName
         );
@@ -48,7 +48,7 @@ export const useTraceMatrixApi = defineStore("traceMatrixApi", () => {
     await traceMatrixApi.handleRequest(
       async () => {
         await deleteTraceMatrix(
-          projectStore.projectId,
+          projectStore.versionId,
           sourceTypeName,
           targetTypeName
         );

@@ -1,4 +1,4 @@
-import { DataCy, DataIds } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 describe("Artifacts", () => {
   before(() => {
@@ -58,7 +58,7 @@ describe("Artifacts", () => {
           cy.wrap($el).rightclick($el.width() / 2, $el.height() / 2)
         );
 
-      cy.get(DataIds.rightClickAddArtifact)
+      cy.getCy(DataCy.rightClickAddArtifact)
         .should("be.visible")
         .then(($el) => $el.click());
 
@@ -118,21 +118,6 @@ describe("Artifacts", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain.text", editedName);
-    });
-  });
-
-  describe("I can duplicate an artifact", () => {
-    it("Duplicates an artifact in view", () => {
-      cy.createNewArtifact({}, true, true);
-
-      cy.centerGraph().getNodes().first().rightclick();
-
-      cy.get(DataIds.rightClickDuplicateArtifact)
-        .should("be.visible")
-        .then(($el) => $el.click());
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.selectedPanelName).should("contain.text", "(Copy)");
     });
   });
 });

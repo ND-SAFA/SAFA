@@ -25,7 +25,7 @@ describe("Documents", () => {
         .should("be.visible");
 
       // Assert that the document cant be named default.
-      cy.createDocument({ name: "Default" })
+      cy.createDocument({ name: "All Artifacts" })
         .getCy(DataCy.documentSaveButton)
         .should("be.disabled");
 
@@ -166,7 +166,7 @@ describe("Documents", () => {
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
-      cy.openDocumentSelector().clickButtonWithName("Default");
+      cy.openDocumentSelector().clickButtonWithName("All Artifacts");
 
       cy.waitForProjectLoad();
       cy.getNodes().should("have.length.above", 1);

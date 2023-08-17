@@ -40,7 +40,7 @@ export default {
 import { computed } from "vue";
 import {
   ArtifactCytoElement,
-  ArtifactSchema,
+  ArtifactNodeProps,
   CytoCore,
   GraphElementType,
   GraphMode,
@@ -59,10 +59,7 @@ import ArtifactNodeActions from "./ArtifactNodeActions.vue";
 import ArtifactNodeFooter from "./ArtifactNodeFooter.vue";
 import ArtifactNodeDisplay from "./ArtifactNodeDisplay.vue";
 
-const props = defineProps<{
-  artifactsInView: string[];
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<ArtifactNodeProps>();
 
 const { darkMode } = useTheme();
 

@@ -69,7 +69,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactNodeDisplayProps } from "@/types";
 import {
   subtreeStore,
   documentStore,
@@ -79,12 +79,7 @@ import {
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Separator, IconButton } from "@/components/common";
 
-const props = defineProps<{
-  color: string;
-  selected: boolean;
-  hiddenChildren: string[];
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<Omit<ArtifactNodeDisplayProps, "deltaColor">>();
 
 const displayEditing = computed(() => permissionStore.projectAllows("editor"));
 

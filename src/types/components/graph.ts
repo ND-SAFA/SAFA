@@ -1,4 +1,9 @@
-import { ArtifactDeltaState, TraceLinkSchema } from "@/types";
+import {
+  ArtifactDeltaState,
+  ArtifactProps,
+  TraceLinkSchema,
+  TraceProps,
+} from "@/types";
 
 /**
  * Enumerates the modes of the project graph.
@@ -160,3 +165,55 @@ export interface TimEdgeCytoElementData extends CytoEdgeData {
  * Defines a tim edge in cytoscape.
  */
 export type TimEdgeCytoElement = CytoElement<TimEdgeCytoElementData>;
+
+/**
+ * The props for rendering the TIM tree graph.
+ */
+export interface TimTreeProps {
+  /**
+   * Whether the tree is visible.
+   */
+  visible: boolean;
+}
+
+/**
+ * The props for rendering an artifact node on the graph.
+ */
+export interface ArtifactNodeProps extends ArtifactProps {
+  /**
+   * The artifact ids currently selected in view.
+   */
+  artifactsInView: string[];
+}
+
+/**
+ * The props for rendering artifact node display panels on the graph.
+ */
+export interface ArtifactNodeDisplayProps extends ArtifactProps {
+  /**
+   * The color of the artifact node.
+   */
+  color: string;
+  /**
+   * The color of the artifact node in delta state.
+   */
+  deltaColor: string;
+  /**
+   * Whether the artifact is selected.
+   */
+  selected: boolean;
+  /**
+   * The ids of the artifact's hidden children.
+   */
+  hiddenChildren: string[];
+}
+
+/**
+ * The props for rendering a trace link on the graph.
+ */
+export interface TraceLinkProps extends TraceProps {
+  /**
+   * The artifact ids currently selected in view.
+   */
+  artifactsInView: string[];
+}

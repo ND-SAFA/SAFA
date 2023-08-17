@@ -47,20 +47,11 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { CodeDiff } from "v-code-diff";
-import { ChangedArtifact } from "@/types";
+import { ArtifactDeltaDiffProps } from "@/types";
 import { isArtifact, isModifiedArtifact, splitIntoLines } from "@/util";
 import { Modal } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * Whether the modal is open.
-   */
-  open: boolean;
-  /**
-   * The changed artifact to display.
-   */
-  delta: ChangedArtifact;
-}>();
+const props = defineProps<ArtifactDeltaDiffProps>();
 
 const emit = defineEmits<{
   (e: "close"): void;

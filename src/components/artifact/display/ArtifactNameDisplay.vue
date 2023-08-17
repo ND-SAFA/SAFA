@@ -42,41 +42,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactNameDisplayProps } from "@/types";
 import { timStore } from "@/hooks";
-import { FlexBox, Typography } from "../../common/display/content";
-import { AttributeChip } from "../../common/display/chip";
+import { FlexBox, Typography, AttributeChip } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * The artifact to display.
-   */
-  artifact: ArtifactSchema;
-  /**
-   * Whether to display the artifact type.
-   */
-  displayType?: boolean;
-  /**
-   * Whether to display the artifact name in a tooltip.
-   */
-  displayTooltip?: boolean;
-  /**
-   * Whether to display the name as a header.
-   */
-  isHeader?: boolean;
-  /**
-   * Testing selector for the name.
-   */
-  dataCyName?: string;
-  /**
-   * Testing selector for the type.
-   */
-  dataCyType?: string;
-  /**
-   * The alignment of the name.
-   */
-  align?: "center" | "left" | "right";
-}>();
+const props = defineProps<ArtifactNameDisplayProps>();
 
 const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 const isCode = computed(() => props.artifact.isCode);

@@ -1,4 +1,9 @@
-import { IconVariant, ThemeColor } from "@/types";
+import {
+  ArtifactSchema,
+  IconVariant,
+  ThemeColor,
+  TraceLinkSchema,
+} from "@/types";
 
 /**
  * The possible increments for spacing.
@@ -210,4 +215,24 @@ export interface TestableProps {
    * The testing selector to set.
    */
   dataCy?: string;
+}
+
+/**
+ * Defines props for a component that displays an artifact.
+ */
+export interface ArtifactProps {
+  /**
+   * The artifact to display or edit.
+   */
+  artifact: ArtifactSchema;
+}
+
+/**
+ * Defines props for a component that displays a trace link.
+ */
+export interface TraceProps {
+  /**
+   * The trace link to display or edit.
+   */
+  trace: TraceLinkSchema;
 }

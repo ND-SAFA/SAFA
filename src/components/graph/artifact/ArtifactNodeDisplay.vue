@@ -32,18 +32,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactNodeDisplayProps } from "@/types";
 import { deltaStore, selectionStore, documentStore } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { Separator } from "@/components/common";
 import { ArtifactNameDisplay } from "@/components/artifact";
 
-const props = defineProps<{
-  selected: boolean;
-  color: string;
-  deltaColor: string;
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<Omit<ArtifactNodeDisplayProps, "hiddenChildren">>();
 
 const id = computed(() => props.artifact.id);
 const showDelta = computed(() => deltaStore.inDeltaView);

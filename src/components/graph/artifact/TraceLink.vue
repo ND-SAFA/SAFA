@@ -17,15 +17,12 @@ import {
   GraphElementType,
   GraphMode,
   TraceCytoElement,
-  TraceLinkSchema,
+  TraceLinkProps,
 } from "@/types";
 import { deltaStore, selectionStore, useTheme } from "@/hooks";
 import { CyElement } from "../base";
 
-const props = defineProps<{
-  artifactsInView: string[];
-  trace: TraceLinkSchema;
-}>();
+const props = defineProps<TraceLinkProps>();
 
 const { darkMode } = useTheme();
 

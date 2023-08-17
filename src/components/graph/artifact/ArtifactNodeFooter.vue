@@ -35,18 +35,13 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactNodeDisplayProps } from "@/types";
 import { getEnumColor } from "@/util";
 import { deltaStore, subtreeStore } from "@/hooks";
 import { NodeDisplay } from "@/components/graph/display";
 import { FlexBox, Icon, Typography, Separator } from "@/components/common";
 
-const props = defineProps<{
-  color: string;
-  selected: boolean;
-  hiddenChildren: string[];
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<Omit<ArtifactNodeDisplayProps, "deltaColor">>();
 
 const id = computed(() => props.artifact.id);
 

@@ -87,7 +87,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { AttributeSchema } from "@/types";
+import { AttributeProps } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeApiStore, attributeSaveStore } from "@/hooks";
 import {
@@ -98,15 +98,14 @@ import {
   MultiselectInput,
 } from "@/components/common";
 
-const props = defineProps<{
-  attribute?: AttributeSchema;
-}>();
+const props = defineProps<AttributeProps>();
 
 const emit = defineEmits<{
   (e: "save"): void;
 }>();
 
 const typeOptions = attributeTypeOptions();
+
 const store = ref(attributeSaveStore(props.attribute?.key || ""));
 
 const isUpdate = computed(() => store.value.isUpdate);

@@ -23,5 +23,5 @@ import {
   ArtifactLevelContent,
   ArtifactLevelTraces,
   ArtifactLevelArtifacts,
-} from "@/components/tim/display";
+} from "@/components/artifactType/display";
 </script>

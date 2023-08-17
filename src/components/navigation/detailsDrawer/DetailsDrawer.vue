@@ -67,9 +67,9 @@ import {
 } from "@/components/traceLink/panels";
 import {
   ArtifactLevelPanel,
-  TraceMatrixPanel,
   SaveArtifactLevelPanel,
-} from "@/components/tim";
+} from "@/components/artifactType";
+import { TraceMatrixPanel } from "@/components/traceMatrix";
 
 const { smallWindow } = useScreen();
 

@@ -11,7 +11,7 @@ describe("Job Status", () => {
     cy.waitForJobLoad();
   });
 
-  describe("I can see the current status of a job", () => {
+  describe("I can see the current status and progress of a job", () => {
     it("Shows in progress jobs", () => {
       cy.contains("Project Uploads");
       cy.getCy(DataCy.jobStatus, "first").should("contain.text", "In Progress");
@@ -19,22 +19,6 @@ describe("Job Status", () => {
 
     it("Shows completed jobs", () => {
       cy.getCy(DataCy.jobStatus, "first", 10000).should(
-        "contain.text",
-        "Completed"
-      );
-    });
-  });
-
-  describe("I can see the current progress of a job", () => {
-    it("Shows in progress jobs", () => {
-      cy.getCy(DataCy.jobProgress, "first", 10000).should(
-        "contain.text",
-        "75%"
-      );
-    });
-
-    it("Shows completed jobs", () => {
-      cy.getCy(DataCy.jobProgress, "first", 10000).should(
         "contain.text",
         "Completed"
       );

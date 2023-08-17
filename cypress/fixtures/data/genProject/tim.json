@@ -18,7 +18,9 @@
     {
       "sourceType": "Design",
       "targetType": "Requirement",
-      "fileName": "Design2Requirement.csv"
+      "fileName": "Design2Requirement.csv",
+      "generateLinks": true,
+      "generationMethod": "VSM"
     },
     {
       "sourceType": "Requirement",

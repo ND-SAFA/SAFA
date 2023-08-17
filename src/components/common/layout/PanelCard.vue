@@ -2,7 +2,7 @@
   <div :class="containerClassName">
     <q-card flat :class="className">
       <flex-box v-if="!props.minimal" align="center" justify="between">
-        <flex-box align="center">
+        <flex-box align="center" class="overflow-hidden">
           <icon
             v-if="!!props.icon"
             :variant="props.icon"
@@ -19,7 +19,10 @@
           <slot name="title" />
         </flex-box>
 
-        <flex-box align="center">
+        <flex-box
+          v-if="props.collapsable || !!slots['title-actions']"
+          align="center"
+        >
           <slot name="title-actions" />
           <icon-button
             v-if="props.collapsable"
@@ -31,7 +34,10 @@
         </flex-box>
       </flex-box>
 
-      <separator v-if="!props.minimal && !!props.title && expanded" b="2" />
+      <separator
+        v-if="!props.minimal && (!!props.title || !!slots.title) && expanded"
+        b="2"
+      />
 
       <typography
         v-if="!props.minimal && !!props.subtitle && expanded"

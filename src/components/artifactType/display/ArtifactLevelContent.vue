@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <flex-box align="center" justify="between">
+    <template #title>
       <typography
         ellipsis
         variant="subtitle"
@@ -9,10 +9,11 @@
         data-cy="text-selected-name"
       />
       <q-tooltip>{{ name }}</q-tooltip>
-      <icon :id="iconId" size="md" :color="iconColor" />
-    </flex-box>
+    </template>
 
-    <separator b="2" />
+    <template #title-actions>
+      <icon :id="iconId" size="md" :color="iconColor" />
+    </template>
 
     <typography variant="caption" value="Artifacts" />
     <typography el="p" :value="artifactCount" />
@@ -31,13 +32,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { timStore, selectionStore } from "@/hooks";
-import {
-  PanelCard,
-  Typography,
-  Icon,
-  FlexBox,
-  Separator,
-} from "@/components/common";
+import { PanelCard, Typography, Icon } from "@/components/common";
 
 const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");

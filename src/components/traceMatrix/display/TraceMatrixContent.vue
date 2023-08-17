@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <flex-box align="center" justify="between" class="overflow-hidden">
+    <template #title>
       <div class="overflow-hidden" data-cy="text-selected-name">
         <typography variant="caption" value="Parent" />
         <list-item
@@ -31,7 +31,9 @@
           <q-tooltip>{{ sourceType }}</q-tooltip>
         </list-item>
       </div>
+    </template>
 
+    <template #title-actions>
       <flex-box column>
         <icon :id="targetIcon" size="sm" :color="targetColor" />
         <icon
@@ -43,7 +45,7 @@
         />
         <icon :id="sourceIcon" size="sm" :color="sourceColor" />
       </flex-box>
-    </flex-box>
+    </template>
   </panel-card>
 </template>
 

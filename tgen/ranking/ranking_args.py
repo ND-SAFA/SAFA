@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
+from tgen.constants.ranking_constants import DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_SUMMARY_DEFAULT
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame

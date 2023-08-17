@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
+from tgen.constants.ranking_constants import DEFAULT_MIN_RANKING_SCORE, TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -127,8 +127,32 @@ class RankingUtil:
         :param top_n: Whether to convert scores to classification labels.
         :return: List of selected predictions.
         """
-        final_predictions = [e for e in trace_predictions if e["score"] >= 0.6]
-        return final_predictions
+        children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
+        predictions = []
+
+        for child, trace_predictions in children2entry.items():
+            sorted_entries = sorted(trace_predictions, key=lambda e: e[TraceKeys.SCORE.value], reverse=True)
+            if top_n is not None:
+                selected_entries = sorted_entries[:top_n]
+            else:
+                t1_preds, t2_preds, t3_preds = [], [], []
+
+                t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE.value] >= TIER_ONE_THRESHOLD]
+                t2_preds = [s for s in sorted_entries if TIER_TWO_THRESHOLD <= s[TraceKeys.SCORE.value] < TIER_ONE_THRESHOLD]
+                t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
+                if len(t1_preds) > 0:
+                    selected_entries = t1_preds
+                elif len(t2_preds):
+                    selected_entries = t2_preds
+                else:
+                    selected_entries = t3_preds
+
+            predictions.extend(selected_entries)
+
+        if top_n:
+            for p in predictions:
+                p[TraceKeys.SCORE.value] = 1
+        return predictions
 
     @staticmethod
     def group_trace_predictions(predictions: List[TracePredictionEntry], key_id: str):

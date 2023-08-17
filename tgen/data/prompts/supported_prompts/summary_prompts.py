@@ -6,7 +6,7 @@ CODE_SUMMARY = [Prompt("\n\n# Task\n"
                        "Provide a detailed summarization of the code while answering the following questions:"
                        "- What is the main functionality this code provides?"
                        "- Why is this functionality important?"
-                       "- What is the purpose of this functionality in the content of a software system?"
+                       "- What is the purpose of this functionality in the context of a software system?"
                        "Write the summary in an active voice. "
                        "Assume your audience is familiar with software system this code belongs to.",
                        PromptResponseManager(response_tag="summary")),

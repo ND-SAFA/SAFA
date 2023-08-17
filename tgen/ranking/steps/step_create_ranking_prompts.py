@@ -2,7 +2,7 @@ from typing import Dict
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
-from tgen.constants.tgen_constants import SUMMARY_TITLE
+from tgen.constants.ranking_constants import SUMMARY_TITLE
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt

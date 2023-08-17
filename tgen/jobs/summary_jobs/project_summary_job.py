@@ -3,7 +3,7 @@ from typing import Dict, TypedDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
+from tgen.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, SUMMARY_TITLE
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob

@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 from tgen.common.util.ranking_util import RankingUtil
+from tgen.constants.ranking_constants import DEFAULT_THRESHOLD_SCORE
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -103,15 +104,13 @@ class RankingJob(AbstractJob):
         predicted_entries = pipeline.run()
         self.project_summary = pipeline.state.project_summary
         for entry in predicted_entries:
-            trace_id = TraceDataFrame.generate_link_id(entry["source"], entry["target"])
+            trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
             trace_entry = self.dataset.trace_df.loc[trace_id]
             label = trace_entry[TraceKeys.LABEL.value]
-            entry["label"] = label
+            entry[TraceKeys.LABEL.value] = label
 
         if self.select_top_predictions:
-            predicted_entries = RankingUtil.select_predictions(predicted_entries,
-                                                               parent_threshold=pipeline_args.parent_primary_threshold,
-                                                               min_threshold=pipeline_args.parent_min_threshold)
+            predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE.value] >= DEFAULT_THRESHOLD_SCORE]
         return predicted_entries
 
     @staticmethod

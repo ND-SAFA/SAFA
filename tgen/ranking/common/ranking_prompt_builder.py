@@ -1,7 +1,7 @@
 from typing import Any, List, Optional
 
 from tgen.constants.deliminator_constants import NEW_LINE, TAB
-from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
+from tgen.constants.ranking_constants import DEFAULT_QUERY_TAG
 
 DEFAULT_BODY_TITLE = "# Software Artifacts\n"
 

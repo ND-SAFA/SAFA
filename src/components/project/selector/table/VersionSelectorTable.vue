@@ -2,7 +2,7 @@
   <selector-table
     v-model:selected="selectedItems"
     :minimal="props.minimal"
-    addable
+    :addable="addable"
     :deletable="deletable"
     :loading="getVersionApiStore.getLoading"
     :columns="columns"
@@ -82,8 +82,14 @@ const rows = computed(() =>
     : versions.value
 );
 
+const addable = computed(() =>
+  permissionStore.projectAllows("admin", props.project)
+);
+
 const deletable = computed(
-  () => permissionStore.projectAllows("admin") && versions.value.length > 1
+  () =>
+    permissionStore.projectAllows("admin", props.project) &&
+    versions.value.length > 1
 );
 
 /**

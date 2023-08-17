@@ -4,6 +4,7 @@
     :style="style"
     :data-cy="dataCy"
     :data-cy-name="props.artifact.name"
+    :data-cy-children="hiddenChildren.length"
     @add="handleAdd"
   >
     <artifact-node-display

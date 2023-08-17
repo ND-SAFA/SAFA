@@ -4,9 +4,7 @@ const inviteUser = Cypress.env("inviteUser");
 
 describe("Project Members Display", () => {
   before(() => {
-    cy.initEmptyProject();
-    cy.getCy(DataCy.appLoading).should("not.exist");
-    cy.openProjectSettings();
+    cy.initEmptyProject().initProjectVersion(false).openProjectSettings();
 
     cy.projectAddNewMember(inviteUser.email, "Admin");
   });

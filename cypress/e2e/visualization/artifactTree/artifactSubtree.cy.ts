@@ -36,11 +36,7 @@ describe("Artifact Subtree", () => {
       cy.getNode("F17").should("be.visible");
 
       // Open the right click menu on the selected node, click to hide subtree.
-      cy.getNode("F11")
-        .rightclick()
-        .getCy(DataCy.rightClickToggleSubtree)
-        .should("be.visible")
-        .then(($el) => $el.click());
+      cy.getNode("F11").click().clickButton(DataCy.rightClickToggleSubtree);
 
       // Assert that subtree is hidden.
       cy.getNode("F17").should("not.be.visible");
@@ -52,11 +48,7 @@ describe("Artifact Subtree", () => {
       cy.centerGraph();
 
       // Open the right click menu on the selected node, click to hide subtree.
-      cy.getNode("F11")
-        .rightclick()
-        .getCy(DataCy.rightClickToggleSubtree)
-        .should("be.visible")
-        .then(($el) => $el.click());
+      cy.getNode("F11").click().clickButton(DataCy.rightClickToggleSubtree);
 
       // Assert that subtree is hidden.
       cy.getNode("F17").should("not.be.visible");
@@ -75,21 +67,13 @@ describe("Artifact Subtree", () => {
 
   describe("I can see how many children are hidden below a parent artifact", () => {
     it("Shows the number of hidden children", () => {
-      it("Hides the subtree below an artifact", () => {
-        cy.centerGraph();
+      cy.centerGraph();
 
-        // Open the right click menu on the selected node, click to hide subtree.
-        cy.getNode("F11")
-          .rightclick()
-          .getCy(DataCy.rightClickToggleSubtree)
-          .should("be.visible")
-          .then(($el) => $el.click());
+      // Open the right click menu on the selected node, click to hide subtree.
+      cy.getNode("F11").click().clickButton(DataCy.rightClickToggleSubtree);
 
-        // Assert that hidden children has correct count.
-        cy.getNode("F11").within(() => {
-          cy.get("text").should("contain", "6 Hidden");
-        });
-      });
+      // Assert that hidden children has correct count.
+      cy.getNode("F11").should("have.attr", "data-cy-children", "6");
     });
   });
 });

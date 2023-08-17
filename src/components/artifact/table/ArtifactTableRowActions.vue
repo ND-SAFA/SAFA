@@ -45,7 +45,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactSchema, GraphMode } from "@/types";
+import { ArtifactProps, GraphMode } from "@/types";
 import {
   appStore,
   artifactApiStore,
@@ -55,9 +55,7 @@ import {
 } from "@/hooks";
 import { FlexBox, IconButton } from "@/components/common";
 
-const props = defineProps<{
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<ArtifactProps>();
 
 /**
  * Opens the edit artifact window.

@@ -57,40 +57,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ThemeColor } from "@/types";
+import { NodeDisplayProps } from "@/types";
 import { timStore } from "@/hooks";
 import { Separator, Typography, Icon, FlexBox } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * The type of node to display.
-   */
-  variant: "tim" | "artifact" | "footer" | "sidebar" | "menu";
-  /**
-   * The color of the node to display.
-   */
-  color: ThemeColor | string;
-  /**
-   * The title of the node to display above the separator.
-   */
-  title?: string;
-  /**
-   * The subtitle of the node to display below the separator.
-   */
-  subtitle?: string;
-  /**
-   * Whether to display a separator between the title and subtitle.
-   */
-  separator?: boolean;
-  /**
-   * The body content to display.
-   */
-  body?: string;
-  /**
-   * Whether the node is selected.
-   */
-  selected?: boolean;
-}>();
+const props = defineProps<NodeDisplayProps>();
 
 const emit = defineEmits<{
   (event: "click"): void;

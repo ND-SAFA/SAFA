@@ -12,19 +12,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { DeltaType } from "@/types";
+import { ArtifactDeltaButtonProps } from "@/types";
 import { ListItem } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * The changed entity name.
-   */
-  name: string;
-  /**
-   * The type of change delta for this entity.
-   */
-  deltaType: DeltaType;
-}>();
+const props = defineProps<ArtifactDeltaButtonProps>();
 
 const emit = defineEmits<{
   (e: "click"): void;

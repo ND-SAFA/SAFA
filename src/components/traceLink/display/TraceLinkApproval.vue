@@ -55,15 +55,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { TraceLinkSchema } from "@/types";
+import { TraceLinkApprovalProps } from "@/types";
 import { linkStatus } from "@/util";
 import { permissionStore, traceApiStore } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
-const props = defineProps<{
-  trace: TraceLinkSchema;
-  deletable?: boolean;
-}>();
+const props = defineProps<TraceLinkApprovalProps>();
 
 const emit = defineEmits<{
   (e: "approve"): void;

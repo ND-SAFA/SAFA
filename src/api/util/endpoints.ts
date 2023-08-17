@@ -84,8 +84,8 @@ export enum Endpoint {
   deleteArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
 
   // Trace Matrices
-  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
-  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
+  createTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
+  deleteTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",

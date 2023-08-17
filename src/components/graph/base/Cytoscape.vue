@@ -19,15 +19,11 @@ export default {
 <script setup lang="ts">
 import { ref, provide, onMounted, onBeforeUnmount, computed } from "vue";
 import cytoscape, { EventObject } from "cytoscape";
-import { CytoCore, CytoCoreGraph, CytoEvent } from "@/types";
+import { CytoCore, CytoEvent, CytoscapeProps } from "@/types";
 import { logStore } from "@/hooks";
 import CyContextMenu from "./CyContextMenu.vue";
 
-const props = defineProps<{
-  id: string;
-  graph: CytoCoreGraph;
-  class?: string;
-}>();
+const props = defineProps<CytoscapeProps>();
 
 const emit = defineEmits<{
   (e: "click", event: EventObject): void;

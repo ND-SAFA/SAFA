@@ -59,7 +59,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MembershipSchema, ProjectRole } from "@/types";
+import { MembershipSchema, MinimalProps, ProjectRole } from "@/types";
 import { membersColumns } from "@/util";
 import {
   logStore,
@@ -72,12 +72,7 @@ import {
 import { PanelCard, SelectorTable, IconButton } from "@/components/common";
 import ProjectMemberModal from "./ProjectMemberModal.vue";
 
-const props = defineProps<{
-  /**
-   * Whether the table should be displayed minimally.
-   */
-  minimal?: boolean;
-}>();
+const props = defineProps<MinimalProps>();
 
 const editedMember = ref<MembershipSchema>();
 const addedMember = ref<string | null>(null);

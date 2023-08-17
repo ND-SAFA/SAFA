@@ -34,7 +34,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { StepperStep } from "@/types";
+import { IntegrationsStepperProps, StepperStep } from "@/types";
 import {
   createProjectApiStore,
   integrationsApiStore,
@@ -48,9 +48,7 @@ import {
 import { AuthenticationSelector } from "./authentication";
 import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 
-const props = defineProps<{
-  type: "create" | "connect";
-}>();
+const props = defineProps<IntegrationsStepperProps>();
 
 const emit = defineEmits<{
   (e: "submit"): void;

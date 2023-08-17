@@ -35,7 +35,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { GenerationModelSchema } from "@/types";
+import { GenerationModelProps } from "@/types";
 import {
   Typography,
   SelectInput,
@@ -43,8 +43,5 @@ import {
   TextButton,
 } from "@/components/common";
 
-const props = defineProps<{
-  model: GenerationModelSchema;
-  generated?: boolean;
-}>();
+const props = defineProps<GenerationModelProps>();
 </script>

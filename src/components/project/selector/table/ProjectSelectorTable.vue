@@ -56,7 +56,11 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IdentifierSchema, ProjectRole } from "@/types";
+import {
+  IdentifierSchema,
+  ProjectRole,
+  ProjectSelectorTableProps,
+} from "@/types";
 import {
   actionsColumn,
   projectExpandedColumns,
@@ -73,17 +77,7 @@ import {
 import { SelectorTable, IconButton } from "@/components/common";
 import { ProjectMemberModal } from "@/components/settings";
 
-const props = defineProps<{
-  /**
-   * Whether this component is currently in view.
-   * The content will be reloaded when opened.
-   */
-  open: boolean;
-  /**
-   * Whether to display minimal information.
-   */
-  minimal?: boolean;
-}>();
+const props = defineProps<ProjectSelectorTableProps>();
 
 const emit = defineEmits<{
   /**

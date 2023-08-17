@@ -3,8 +3,8 @@ import { DataCy } from "@/fixtures";
 Cypress.Commands.add("fillTraceLinkFields", (source = "", target = "") => {
   cy.inputText(
     DataCy.traceSaveSourceInput,
-    `${source}{downArrow}{enter}`
-  ).inputText(DataCy.traceSaveTargetInput, `${target}{downArrow}{enter}`);
+    `${source}{downArrow}{enter}{esc}`
+  ).inputText(DataCy.traceSaveTargetInput, `${target}{downArrow}{enter}{esc}`);
 });
 
 Cypress.Commands.add("createNewTraceLink", (source = "", target = "", save) => {

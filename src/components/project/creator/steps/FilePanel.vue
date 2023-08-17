@@ -114,7 +114,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { CreatorFilePanel } from "@/types";
+import { FilePanelProps } from "@/types";
 import { getIcon } from "@/util";
 import { parseApiStore, projectSaveStore } from "@/hooks";
 import {
@@ -132,13 +132,7 @@ import {
   AttributeChip,
 } from "@/components/common";
 
-const props = defineProps<{
-  panel: CreatorFilePanel;
-  index: number;
-  variant: "artifact" | "trace";
-  label: string;
-  newLabel: string;
-}>();
+const props = defineProps<FilePanelProps>();
 
 const errorMessage = computed(() => {
   if (!props.panel.name) {

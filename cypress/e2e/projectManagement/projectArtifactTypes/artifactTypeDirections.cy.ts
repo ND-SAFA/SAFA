@@ -53,7 +53,7 @@ describe("Artifact Type Directions", () => {
 
       cy.getCy(DataCy.traceSaveDirectionsChip).each((el) => {
         cy.wrap(el).within(() => {
-          cy.get("i").click();
+          cy.get("i").click({ multiple: true });
         });
       });
 

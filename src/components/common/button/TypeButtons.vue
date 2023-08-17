@@ -40,22 +40,11 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ArtifactTypeSchema } from "@/types";
+import { ArtifactTypeSchema, TypeButtonProps } from "@/types";
 import { timStore } from "@/hooks";
 import { IconButton, Separator } from "@/components/common";
 
-const props = defineProps<{
-  /**
-   * Whether the buttons are visible by default.
-   * @default false
-   */
-  defaultVisible?: boolean;
-  /**
-   * Which type buttons are not active.
-   * Defaults to all buttons being active.
-   */
-  hiddenTypes: string[];
-}>();
+const props = defineProps<TypeButtonProps>();
 
 const emit = defineEmits<{
   /**

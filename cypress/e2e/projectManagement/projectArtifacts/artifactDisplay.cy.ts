@@ -27,7 +27,6 @@ describe("Artifact Display", () => {
       cy.getNodes(true).within(() => {
         cy.getCy(DataCy.treeNodeName).should("contain", artifact.name);
         cy.getCy(DataCy.treeNodeType).should("contain", artifactType);
-        cy.getCy(DataCy.treeNodeBody).should("contain", artifact.body);
       });
     });
   });
@@ -57,7 +56,7 @@ describe("Artifact Display", () => {
         });
 
       // Affirm link is visible and close.
-      cy.getCy(DataCy.traceSourceButton).should("be.visible").click();
+      cy.getCy(DataCy.selectedPanelTraceSource).should("be.visible").click();
 
       // Affirm viewing parent artifact.
       cy.getCy(DataCy.selectedPanelParentItem)
@@ -102,7 +101,7 @@ describe("Artifact Display", () => {
         });
 
       // Affirm link is visible and close.
-      cy.getCy(DataCy.traceTargetButton).should("be.visible").click();
+      cy.getCy(DataCy.selectedPanelTraceTarget).should("be.visible").click();
 
       // Affirm viewing created child artifact.
       cy.getCy(DataCy.selectedPanelChildItem)

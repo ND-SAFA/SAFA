@@ -34,16 +34,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ArtifactSchema } from "@/types";
+import { ArtifactProps } from "@/types";
 import { FlexBox, Typography } from "@/components/common";
 import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
-const props = defineProps<{
-  /**
-   * The artifact to display.
-   */
-  artifact: ArtifactSchema;
-}>();
+const props = defineProps<ArtifactProps>();
 
 const showSummary = computed(() => !!props.artifact.summary);
 const isCode = computed(() => props.artifact.isCode);

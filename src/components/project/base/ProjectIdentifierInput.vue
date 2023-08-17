@@ -26,21 +26,14 @@ export default {
 
 <script setup lang="ts">
 import { withDefaults } from "vue";
+import { ProjectIdentifierProps } from "@/types";
 import { useVModel } from "@/hooks";
 import { TextInput } from "@/components/common";
 
-const props = withDefaults(
-  defineProps<{
-    name: string;
-    description: string;
-    dataCyName?: string;
-    dataCyDescription?: string;
-  }>(),
-  {
-    dataCyName: "input-project-name",
-    dataCyDescription: "input-project-description",
-  }
-);
+const props = withDefaults(defineProps<ProjectIdentifierProps>(), {
+  dataCyName: "input-project-name",
+  dataCyDescription: "input-project-description",
+});
 
 defineEmits<{
   (e: "update:name", name: string): void;

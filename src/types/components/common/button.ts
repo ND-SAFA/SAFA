@@ -97,3 +97,19 @@ export interface TextButtonProps
    */
   hideLabel?: boolean;
 }
+
+/**
+ * The props for the artifact type button group component.
+ */
+export interface TypeButtonProps {
+  /**
+   * Whether the buttons are visible by default.
+   * @default false
+   */
+  defaultVisible?: boolean;
+  /**
+   * Which type buttons are not active.
+   * Defaults to all buttons being active.
+   */
+  hiddenTypes: string[];
+}

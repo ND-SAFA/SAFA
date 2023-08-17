@@ -40,3 +40,29 @@ export interface CreatorFilePanel {
   generateMethod?: ModelType;
   traces?: TraceLinkSchema[];
 }
+
+/**
+ * The props for displaying a file upload panel.
+ */
+export interface FilePanelProps {
+  /**
+   * The panel being edited.
+   */
+  panel: CreatorFilePanel;
+  /**
+   * The panel index.
+   */
+  index: number;
+  /**
+   * The type of data being created.
+   */
+  variant: "artifact" | "trace";
+  /**
+   * The label for the type of panel.
+   */
+  label: string;
+  /**
+   * The panel's label to display over the panel name.
+   */
+  newLabel: string;
+}

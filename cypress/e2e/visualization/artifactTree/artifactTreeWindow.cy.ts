@@ -1,4 +1,4 @@
-import { DataCy, DataIds, Routes } from "@/fixtures";
+import { DataCy, Routes } from "@/fixtures";
 
 describe("Artifact Tree Window", () => {
   before(() => {
@@ -23,7 +23,7 @@ describe("Artifact Tree Window", () => {
         .getNodes()
         .first()
         .rightclick()
-        .get(DataIds.rightClickAddArtifact)
+        .getCy(DataCy.rightClickAddArtifact)
         .should("be.visible");
     });
   });
@@ -45,7 +45,7 @@ describe("Artifact Tree Window", () => {
         .getNodes()
         .first()
         .rightclick()
-        .get(DataIds.rightClickAddArtifact)
+        .getCy(DataCy.rightClickAddArtifact)
         .should("be.visible");
     });
   });
@@ -63,7 +63,7 @@ describe("Artifact Tree Window", () => {
         .getNodes()
         .first()
         .rightclick()
-        .get(DataIds.rightClickAddArtifact)
+        .getCy(DataCy.rightClickAddArtifact)
         .should("be.visible");
     });
   });

@@ -57,13 +57,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TrainingStepSchema } from "@/types";
+import { ModelTrainingStepProps } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { Typography, FlexBox, Chip } from "@/components/common";
 
-const props = defineProps<{
-  step: TrainingStepSchema;
-}>();
+const props = defineProps<ModelTrainingStepProps>();
 
 const stepName = computed(
   () =>

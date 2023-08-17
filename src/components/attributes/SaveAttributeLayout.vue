@@ -70,7 +70,7 @@ export default {
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { AttributeSchema, AttributeLayoutSchema } from "@/types";
+import { AttributeSchema, AttributeLayoutProps } from "@/types";
 import { attributeApiStore, attributeLayoutSaveStore } from "@/hooks";
 import {
   AttributeGrid,
@@ -83,9 +83,7 @@ import {
   TextInput,
 } from "@/components/common";
 
-const props = defineProps<{
-  layout?: AttributeLayoutSchema;
-}>();
+const props = defineProps<AttributeLayoutProps>();
 
 const emit = defineEmits<{
   (e: "save", layoutId: string): void;

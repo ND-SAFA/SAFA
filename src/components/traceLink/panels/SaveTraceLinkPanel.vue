@@ -43,7 +43,7 @@
       >
         <type-direction-input
           v-for="type in artifactTypes"
-          :key="type.id"
+          :key="type.typeId"
           :artifact-type="type"
         />
       </expansion-item>

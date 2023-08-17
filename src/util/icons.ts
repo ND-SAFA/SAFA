@@ -8,14 +8,17 @@ export const TypeIcons = [
   "mdi-hazard-lights",
   "mdi-pine-tree-fire",
   "mdi-alpha-a-box",
-
   "mdi-text-box-multiple",
-  "mdi-file-code",
-  "mdi-file-image",
+  "mdi-code-braces-box",
+  "mdi-drawing-box",
   "mdi-folder",
   "mdi-file-table",
   "mdi-database",
   "mdi-application-cog",
+  "mdi-account-box-multiple",
+  "mdi-book-lock",
+  "mdi-message",
+  "mdi-book-open",
 ];
 
 /**

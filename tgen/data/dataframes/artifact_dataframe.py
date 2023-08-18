@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Type
 
 from tgen.common.artifact import Artifact
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
 from tgen.constants.deliminator_constants import EMPTY_STRING
@@ -89,8 +90,10 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :return: Returns map of artifact ids to content.
         """
         artifact_map = {}
-        for name, row in self.iterrows():
-            content = row[ArtifactKeys.CONTENT.value]
+        for name, row in self.itertuples():
+            content = DataFrameUtil.get_optional_value(row, ArtifactKeys.SUMMARY)
+            if content is None or len(content) == 0:
+                content = row[ArtifactKeys.CONTENT]
             artifact_map[name] = content
         return artifact_map
 

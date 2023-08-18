@@ -76,7 +76,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
                                                   perform_work,
                                                   n_threads=OPENAI_MAX_THREADS,
                                                   max_attempts=OPENAI_MAX_ATTEMPTS,
-                                                  collect_as_list=True)
+                                                  collect_results=True)
 
         return Res(choices=choices)
 

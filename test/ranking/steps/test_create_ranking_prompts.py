@@ -1,6 +1,7 @@
 from typing import List
 
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
+from tgen.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.ranking.steps.step_create_ranking_prompts import CreateRankingPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_data_manager import TestDataManager
@@ -15,10 +16,10 @@ class TestCreateRankingPrompts(BaseTest):
 
     def test_no_project_summary_included(self):
         prompt = self.run_step()
-        self.assertNotIn("# Project Specification", prompt)
+        self.assertNotIn(f"# {PROJECT_SUMMARY_HEADER}", prompt)
 
     def test_project_summary_included(self):
-        project_summary = "# Project Specification\nthis is a project summary"
+        project_summary = f"# {PROJECT_SUMMARY_HEADER}\nthis is a project summary"
         prompt = self.run_step(project_summary=project_summary)
         self.assertIn(project_summary, prompt)
 
@@ -50,7 +51,7 @@ class TestCreateRankingPrompts(BaseTest):
         step = CreateRankingPrompts()
         step.run(args, state)
         self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.ranking_prompts))
-        self.assertIsNotNone(state.prompt_builder)
+        self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.prompt_builders))
         prompt = state.ranking_prompts[0]
         return prompt
 

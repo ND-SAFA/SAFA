@@ -1,11 +1,7 @@
-import math
-import random
-import re
-import uuid
 from unittest import mock
 from unittest.mock import MagicMock
 
-from test.hgen.hgen_test_utils import get_generated_artifacts_response, get_all_responses, HGenTestConstants, get_ranking_job_result
+from test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_ranking_job_result
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
@@ -52,13 +48,13 @@ class TestMultiLayerHGenJob(BaseJobTest):
                                                                                                ==
                                                                                                self.args.source_layer_id)
         self.ranking_calls = 0
-        expected_user_story_names, anthropic_responses = get_all_responses( target_type=self.args.target_type)
+        expected_user_story_names, anthropic_responses = get_all_responses(target_type=self.args.target_type)
 
         requirements = ["This is a requirement for a user story.", "This is another requirement for some user stories."]
         design_document = ["Here is the final, top level design document"]
         expected_requirements_names, responses = get_all_responses(content=requirements, target_type=self.higher_levels[0])
         anthropic_responses.extend(responses)
-        expected_design_doc_name, responses = get_all_responses(content=design_document,  target_type=self.higher_levels[1])
+        expected_design_doc_name, responses = get_all_responses(content=design_document, target_type=self.higher_levels[1])
         anthropic_responses.extend(responses)
 
         anthropic_ai_manager.set_responses(anthropic_responses)

@@ -9,14 +9,18 @@ class PromptUtil:
     """
 
     @staticmethod
-    def create_xml(tag_name: str, tag_content: str = EMPTY_STRING) -> str:
+    def create_xml(tag_name: str, tag_content: str = EMPTY_STRING, prefix: str = None, suffix: str = None) -> str:
         """
         Creates xml as follows: <[tag_name]>tag_content</[tag_name]>
         :param tag_name: The name of the tag
         :param tag_content: The content inside of the tag
+        :param prefix: The prefix to add to the final string.
+        :param suffix: The suffix to append to the final string.
         :return: The formatted xml
         """
-        return f"<{tag_name}>{tag_content}</{tag_name}>"
+        prefix = prefix if prefix else ""
+        suffix = suffix if suffix else ""
+        return f"{prefix}<{tag_name}>{tag_content}</{tag_name}>{suffix}"
 
     @staticmethod
     def format_as_markdown_italics(original_string: str) -> str:

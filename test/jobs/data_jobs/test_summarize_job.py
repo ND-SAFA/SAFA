@@ -26,7 +26,12 @@ class TestSummarizeJob(BaseJobTest):
         """
         Tests that job is completed succesfully.
         """
-        ai_manager.mock_summarization()
+        ai_manager.set_responses([
+            "Summary of java class",
+            "Summary of python class",
+            "Summary of unknown type",
+            "Summary of natural language"
+        ])
         self._test_run_success()
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult):

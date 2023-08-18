@@ -10,6 +10,7 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
+from tgen.common.util.random_util import RandomUtil
 from tgen.constants import environment_constants
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -43,6 +44,7 @@ class BaseTest(TestCase):
     def setUpClass(cls):
         super(BaseTest, cls).setUpClass()
         environment_constants.IS_TEST = True
+        RandomUtil.set_seed(42)
         if BaseTest.configure_logging:
             config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
             LoggerManager.configure_logger(config)

@@ -25,7 +25,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/safa/datasets/paper/test"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             }
           }

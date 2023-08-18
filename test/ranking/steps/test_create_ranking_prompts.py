@@ -16,7 +16,7 @@ class TestCreateRankingPrompts(BaseTest):
 
     def test_no_project_summary_included(self):
         prompt = self.run_step()
-        self.assertNotIn("# Project Specification", prompt)
+        self.assertNotIn(f"# {PROJECT_SUMMARY_HEADER}", prompt)
 
     def test_project_summary_included(self):
         project_summary = f"# {PROJECT_SUMMARY_HEADER}\nthis is a project summary"
@@ -51,7 +51,7 @@ class TestCreateRankingPrompts(BaseTest):
         step = CreateRankingPrompts()
         step.run(args, state)
         self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.ranking_prompts))
-        self.assertIsNotNone(state.prompt_builder)
+        self.assertEqual(len(self.DEFAULT_PARENT_IDS), len(state.prompt_builders))
         prompt = state.ranking_prompts[0]
         return prompt
 

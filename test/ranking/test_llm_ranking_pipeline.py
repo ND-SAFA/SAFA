@@ -1,4 +1,7 @@
+from tgen.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_PARENT_SUMMARY_TAG, \
+    RANKING_SCORE_TAG
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.testres.base_tests.base_test import BaseTest
@@ -9,8 +12,14 @@ PARENT_ID = "parent_1"
 CHILD_ID = "child_1"
 EXPLANATION = "EXPLANATION"
 SCORE = 4
-TEST_RESPONSE = "<query-summary>Query Summary.</query-summary>\n" \
-                f"<explanation>0 | {EXPLANATION} | {SCORE}</explanation>"
+TEST_RESPONSE = (
+    f"<{RANKING_PARENT_SUMMARY_TAG}>Parent Summary.</{RANKING_PARENT_SUMMARY_TAG}>\n"
+    f"<{RANKING_ARTIFACT_TAG}>"
+    f"<{RANKING_ID_TAG}>0</{RANKING_ID_TAG}>"
+    f"<{RANKING_EXPLANATION_TAG}>{EXPLANATION}</{RANKING_EXPLANATION_TAG}>"
+    f"<{RANKING_SCORE_TAG}>{SCORE}</{RANKING_SCORE_TAG}>"
+    f"</{RANKING_ARTIFACT_TAG}>"
+)
 
 
 class TestLLMRankingPipeline(BaseTest):
@@ -32,10 +41,10 @@ class TestLLMRankingPipeline(BaseTest):
         prediction_entries = pipeline.run()
         self.assertEqual(1, len(prediction_entries))
         entry = prediction_entries[0]
-        self.assertEqual(CHILD_ID, entry["source"])
-        self.assertEqual(PARENT_ID, entry["target"])
-        self.assertEqual(EXPLANATION, entry["explanation"])
-        self.assertEqual(.4, entry["score"])
+        self.assertEqual(CHILD_ID, entry[TraceKeys.SOURCE.value])
+        self.assertEqual(PARENT_ID, entry[TraceKeys.TARGET.value])
+        self.assertEqual(EXPLANATION, entry[TraceKeys.EXPLANATION.value])
+        self.assertEqual(.4, entry[TraceKeys.SCORE.value])
 
     @staticmethod
     def create_args() -> RankingArgs:

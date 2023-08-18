@@ -27,7 +27,8 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
     def run(self, args: ArgType, state: State) -> None:
         self.process_ranking_prompts(args, state)
 
-    def process_ranking_prompts(self, args: RankingArgs, state: RankingState) -> List[TracePredictionEntry]:
+    @staticmethod
+    def process_ranking_prompts(args: RankingArgs, state: RankingState) -> List[TracePredictionEntry]:
         """
         Reads the ranking responses and performs post-processing.
         :param args: The ranking pipeline arguments.

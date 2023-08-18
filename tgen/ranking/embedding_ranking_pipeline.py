@@ -1,6 +1,7 @@
 import os
-from typing import Dict, List
+from typing import List
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.ranking.common.vsm_sorter import embedding_sorter
 from tgen.ranking.ranking_args import RankingArgs
@@ -27,7 +28,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState()
 
-    def run(self) -> Dict[str, List[str]]:
+    def run(self) -> List[TracePredictionEntry]:
         """
 
         :return: List of parents mapped to their ranked children.

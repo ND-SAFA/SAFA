@@ -1,14 +1,14 @@
 from typing import Dict
 
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
-from tgen.constants.ranking_constants import SUMMARY_TITLE
+from tgen.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 from tgen.data.prompts.question_prompt import QuestionPrompt
 from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.models.llm.anthropic_manager import AnthropicManager
@@ -56,11 +56,11 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         source_body = artifact_map[parent_id]
         prompt_builder = PromptBuilder(prompts=[
             Prompt(args.ranking_goal),
-            Prompt(f"\n<{args.query_tag}>{source_body}</{args.query_tag}>\n")
+            Prompt(PromptUtil.create_xml(args.query_tag, source_body, prefix="\n", suffix="\n")),
         ])
 
         if state.project_summary is not None and len(state.project_summary) > 0:
-            uses_specification = SUMMARY_TITLE in state.project_summary
+            uses_specification = PROJECT_SUMMARY_HEADER in state.project_summary
             context_formatted = state.project_summary if uses_specification else f"# Project Summary\n{state.project_summary}"
             prompt_builder.add_prompt(Prompt(context_formatted))
 
@@ -68,7 +68,7 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=args.artifact_header,
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML, include_ids=include_ids))
 
-        question_prompts = [QuestionPrompt(question=q, response_manager=PromptResponseManager(response_tag=tag)) for q, tag in
+        question_prompts = [QuestionPrompt(question=q, response_manager=rm) for q, rm in
                             args.ranking_questions]
         prompt_builder.add_prompt(QuestionnairePrompt(question_prompts=question_prompts, instructions=args.ranking_instructions))
 
@@ -76,6 +76,6 @@ class CreateRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_dict = prompt_builder.build(model_format_args=AnthropicManager.prompt_args,
                                            artifacts=artifacts)
         prompt = prompt_dict[PromptKeys.PROMPT]
-        state.prompt_builder = prompt_builder
+        state.prompt_builders.append(prompt_builder)
 
         return prompt

@@ -6,10 +6,10 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.ranking_constants import DEFAULT_COMPLETION_TOKENS, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
-    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, DEFAULT_SUMMARY_TOKENS, GENERATE_SUMMARY_DEFAULT
+    DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, DEFAULT_SUMMARY_TOKENS, GENERATE_SUMMARY_DEFAULT, RANKING_PARENT_TAG
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
-    DEFAULT_RANKING_QUERY_TAG, DEFAULT_RANKING_QUESTIONS
+    DEFAULT_RANKING_QUESTIONS
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
@@ -65,7 +65,7 @@ class RankingArgs(PipelineArgs):
     ranking_goal: str = DEFAULT_RANKING_GOAL
     ranking_instructions: str = DEFAULT_RANKING_INSTRUCTIONS
     ranking_questions: List[Tuple] = None
-    query_tag: str = DEFAULT_RANKING_QUERY_TAG
+    query_tag: str = RANKING_PARENT_TAG
     artifact_header: str = DEFAULT_ARTIFACT_HEADER
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
 

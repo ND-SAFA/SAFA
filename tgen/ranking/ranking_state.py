@@ -26,4 +26,4 @@ class RankingState(State):
     export_path: str = None
 
     # Prompt building and parsing
-    prompt_builder: PromptBuilder = None
+    prompt_builders: List[PromptBuilder] = field(default_factory=list, repr=False)

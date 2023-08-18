@@ -223,9 +223,9 @@ class ReflectionUtil:
     @staticmethod
     def get_cls_from_path(class_path: str) -> Optional[Type]:
         """
-        Gets the class type from a relative path to the class
+        Gets the class type from a relative path to the class if it exists, else returns None
         :param class_path: The path to the class in the following format tgen.modulePath.className
-        :return: The class
+        :return: The class or None if it does not exist
         """
         try:
             spit_path = class_path.split(PERIOD)

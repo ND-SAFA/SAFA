@@ -65,7 +65,6 @@ class State(BaseObject):
 
         try:
             save_path = self._get_path_to_state_checkpoint(self.export_dir, step_name)
-            from tgen.data.tdatasets.idataset import iDataset
             as_dict = {k: (v.as_creator(self._get_path_to_state_checkpoint(self.export_dir), k)
                            if isinstance(v, PromptDataset) or isinstance(v, TraceDataset) else v) for k, v in vars(self).items()}
             YamlUtil.write(as_dict, save_path)

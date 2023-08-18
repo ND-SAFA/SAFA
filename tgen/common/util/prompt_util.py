@@ -40,7 +40,7 @@ class PromptUtil:
     @staticmethod
     def format_as_bullet_point(original_string: str, level: int = 1) -> str:
         """
-        Formats the string as markdown header
+        Formats the string as markdown bullet
         :param original_string: The string to format
         :param level: The level of the bullet point
         :return: The string formatted as markdown

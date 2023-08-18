@@ -1,5 +1,12 @@
 # SAFA Front-End
 
+# Build Status
+
+| Branch | Status |
+|--------|--------|
+| dev    | [![dev](https://github.com/ND-SAFA/fend/actions/workflows/main.yaml/badge.svg?branch=development)](https://github.com/ND-SAFA/fend/actions/workflows/main.yaml) |
+| prod   | [![prod](https://github.com/ND-SAFA/fend/actions/workflows/main.yaml/badge.svg?branch=production)](https://github.com/ND-SAFA/fend/actions/workflows/main.yaml) |
+
 ## Getting Started
 
 To see the basic requirements of developing on the front-end, see the [Front-End Basic Requirements](https://www.notion.so/nd-safa/Front-End-Basic-Requirements-3cbf39015ca54fc5a93c9ba252cf95e2).

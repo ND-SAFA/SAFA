@@ -7,7 +7,6 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/jackofclubs",
-              "load_dir": "[OUTPUT_PATH]/hgen/jackofclubs/CHECKPOINT 2",
               "source_layer_id": "C++ Code",
               "target_type": "User Story",
               "dataset_creator_for_sources": {
@@ -20,7 +19,6 @@
             }
           },
           "target_types": [
-            "Epic Title"
           ]
         }
       ]

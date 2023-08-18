@@ -6,34 +6,37 @@ from tgen.constants.deliminator_constants import UNDERSCORE
 SEP_SYM = UNDERSCORE
 
 
-def get_enum_from_name(enum_class: Type, enum_name: str) -> Enum:
-    """
-    Gets the enum
-    :param enum_class: the enum class
-    :param enum_name: the name of the specific enum to retrieve
-    :return: the enum
-    """
-    enum_name = enum_name.upper()
-    if SEP_SYM not in enum_name:
-        for e in enum_class:
-            name_removed_sep = "".join(e.name.split(SEP_SYM))
-            if name_removed_sep == enum_name:
-                return e
-    try:
-        return enum_class[enum_name]
-    except:
-        raise ValueError("%s does not have value: %s" % (enum_class, enum_name))
+class EnumUtil:
 
+    @staticmethod
+    def get_enum_from_name(enum_class: Type, enum_name: str) -> Enum:
+        """
+        Gets the enum
+        :param enum_class: the enum class
+        :param enum_name: the name of the specific enum to retrieve
+        :return: the enum
+        """
+        enum_name = enum_name.upper()
+        if SEP_SYM not in enum_name:
+            for e in enum_class:
+                name_removed_sep = "".join(e.name.split(SEP_SYM))
+                if name_removed_sep == enum_name:
+                    return e
+        try:
+            return enum_class[enum_name]
+        except:
+            raise ValueError("%s does not have value: %s" % (enum_class, enum_name))
 
-def to_string(item: Union[Enum, str]) -> str:
-    """
-    Converts enum to string if item is an enum
-    :param item: The item as a string or enum
-    :return: The item as a string
-    """
-    if isinstance(item, Enum):
-        item = item.value
-    return item
+    @staticmethod
+    def to_string(item: Union[Enum, str]) -> str:
+        """
+        Converts enum to string if item is an enum
+        :param item: The item as a string or enum
+        :return: The item as a string
+        """
+        if isinstance(item, Enum):
+            item = item.value
+        return item
 
 
 class FunctionalWrapper:
@@ -65,7 +68,7 @@ class EnumDict(OrderedDict):
         Dictionary that accepts enum or enum value as key
         :param dict_: A dictionary containing enum or enum value as key
         """
-        dict_ = [(to_string(key), val) for key, val in dict_.items()] if dict_ is not None else []
+        dict_ = [(EnumUtil.to_string(key), val) for key, val in dict_.items()] if dict_ is not None else []
         super().__init__(dict_)
 
     def get(self, key: Union[str, Enum], default: Any = None) -> Any:
@@ -75,7 +78,7 @@ class EnumDict(OrderedDict):
         :param default: default value to return
         :return: The value if it exists else default
         """
-        return super().get(to_string(key), default)
+        return super().get(EnumUtil.to_string(key), default)
 
     def __contains__(self, item: Union[str, Enum]) -> bool:
         """
@@ -83,7 +86,7 @@ class EnumDict(OrderedDict):
         :param item: Dictionary key as enum or str
         :return: True if item in dictionary else False
         """
-        return super().__contains__(to_string(item))
+        return super().__contains__(EnumUtil.to_string(item))
 
     def __getitem__(self, item: Union[str, Enum]) -> Any:
         """
@@ -91,7 +94,7 @@ class EnumDict(OrderedDict):
         :param item: Dictionary key as enum or str
         :return: The dictionary item
         """
-        return super().__getitem__(to_string(item))
+        return super().__getitem__(EnumUtil.to_string(item))
 
     def __setitem__(self, key: Union[str, Enum], value: Any) -> None:
         """
@@ -100,4 +103,4 @@ class EnumDict(OrderedDict):
         :param value: Value to set the key
         :return: None
         """
-        return super().__setitem__(to_string(key), value)
+        return super().__setitem__(EnumUtil.to_string(key), value)

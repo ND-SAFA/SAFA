@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Tuple, Type
 
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.ranking.ranking_args import RankingArgs
@@ -26,16 +26,22 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         super().__init__(args, LLMRankingPipeline.steps)
 
-    def init_state(self) -> RankingState:
+    def state_class(self) -> Type:
         """
-        Creates new ranking state.
-        :return: The new state.
+        Gets the class used for the pipeline state.
+        :return: the state class
         """
-        return RankingState()
+        return RankingState
 
-    def run(self) -> List[Dict]:
+    def run(self) -> Tuple[Dict, Dict]:
+        """
+        Runs the pipeline to rank the artifacts
+        :return: a dictionary mapping the parent to its child rankings
+        and a dictionary mapping parent to the explanations for its links
+        """
         if self.args.export_dir is not None:
             os.makedirs(self.args.export_dir, exist_ok=True)
+            self.state.export_dir = self.args.export_dir
         super().run()
         batched_ranked_children = self.state.ranked_children
         parent2rankings = {source: ranked_children for source, ranked_children in zip(self.args.parent_ids, batched_ranked_children)}

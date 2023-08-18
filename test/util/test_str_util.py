@@ -18,3 +18,6 @@ class TestStrUtil(BaseTest):
     def test_is_uuid(self):
         self.assertTrue(StrUtil.is_uuid(str(uuid.uuid4())))
         self.assertFalse(StrUtil.is_uuid("hello world"))
+
+    def test_snake_case_to_pascal_case(self):
+        self.assertEqual("SnakeCase", StrUtil.snake_case_to_pascal_case("snake_case"))

@@ -1,6 +1,8 @@
 import re
 import uuid
 
+from tgen.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE
+
 
 class StrUtil:
 
@@ -36,3 +38,12 @@ class StrUtil:
             return str(uuid_obj) == input_string
         except ValueError:
             return False
+
+    @staticmethod
+    def snake_case_to_pascal_case(snake_case: str) -> str:
+        """
+        Converts a snake case string to pascal
+        :param snake_case: String as snake case
+        :return: The string as pascal case
+        """
+        return EMPTY_STRING.join([word.capitalize() for word in snake_case.split(UNDERSCORE)])

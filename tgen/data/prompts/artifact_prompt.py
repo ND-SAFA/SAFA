@@ -15,7 +15,6 @@ class ArtifactPrompt(Prompt):
     --- Examples ---
     Please rank the following children based on the parent artifact: <artifact></artifact>
     """
-
     DEFAULT_XML_TAGS = {"artifact": ["id", "body"]}
 
     class BuildMethod(Enum):

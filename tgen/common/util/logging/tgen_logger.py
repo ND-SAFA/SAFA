@@ -1,5 +1,7 @@
 from logging import Logger
 
+from tgen.constants.deliminator_constants import EMPTY_STRING
+
 
 class TGenLogger(Logger):
     """
@@ -7,7 +9,7 @@ class TGenLogger(Logger):
     """
     DEFAULT_TITLE_LENGTH = 100
 
-    def log_with_title(self, title: str, message: str) -> None:
+    def log_with_title(self, title: str, message: str = EMPTY_STRING) -> None:
         """
         Logs the message with a title
         :param title: The title to the message

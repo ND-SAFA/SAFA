@@ -14,13 +14,13 @@ class PreTrainProjectReader(AbstractProjectReader[List]):
 
     DELIMINATOR = NEW_LINE
 
-    def __init__(self, data_path: str):
+    def __init__(self, project_path: str):
         """
         Constructs pre-training reader targeted at path to folder.
-        :param data_path: Path to folder containing pre-training files.
+        :param project_path: Path to folder containing pre-training files.
         """
         super().__init__()
-        self.base_path, self.file_name = os.path.split(data_path)
+        self.base_path, self.file_name = os.path.split(project_path)
 
     def read_project(self) -> List:
         """

@@ -9,7 +9,8 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 
 class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
-    def run(self, args: RankingArgs, state: RankingState) -> None:
+
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
         Sets the pipeline to either NO SUMMARY, MANUAL SUMMARY, or GENERATED SUMMARY.
         If NO SUMMARY, summary is set to None
@@ -21,7 +22,7 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         project_summary_export_path = args.get_path("project_summary.txt")
 
-        if project_summary_export_path is not None:
+        if project_summary_export_path is not None and os.path.exists(project_summary_export_path):
             summary = FileUtil.read_file(os.path.expanduser(project_summary_export_path))
         elif args.project_summary is not None and len(args.project_summary) > 0:  # MANUAL SUMMARY
             logger.info("Project summary included in original request.")

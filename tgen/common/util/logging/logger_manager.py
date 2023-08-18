@@ -7,7 +7,6 @@ from typing import Any, Optional
 from huggingface_hub.utils import logging as hf_logging
 
 from tgen.constants.logging_constants import LOG_FORMAT
-from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.tgen_logger import TGenLogger
 
@@ -35,7 +34,7 @@ class LoggerManager:
         file_handler = None
         if logger_config.output_dir:
             log_filepath = os.path.join(logger_config.output_dir, logger_config.log_filename)
-            FileUtil.create_dir_safely(dirname(log_filepath))
+            os.makedirs(dirname(log_filepath), exist_ok=True)
             file_handler = logging.FileHandler(log_filepath)
             handlers.append(file_handler)
 

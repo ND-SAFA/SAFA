@@ -30,10 +30,11 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
         return [word[i:j] for i, j in zip(split_start, split_end)]
 
     @staticmethod
-    def _separate_deliminated_word(word: str, deliminator: str = UNDERSCORE) -> List[str]:
+    def separate_deliminated_word(word: str, deliminator: str = UNDERSCORE) -> List[str]:
         """
         Splits a deliminated word (e.g. snake_case)
         :param word: the word to split
+        :param deliminator: The deliminator used to join the words
         :return: the split up word
         """
         return word.split(deliminator)
@@ -59,6 +60,5 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
         separated_word_list = word_list
         for deliminator in self.deliminators:
             separated_word_list = self._perform_on_word_list(separated_word_list,
-                                                             lambda word: self._separate_deliminated_word(word,
-                                                                                                          deliminator))
+                                                             lambda word: self.separate_deliminated_word(word, deliminator))
         return self._perform_on_word_list(separated_word_list, self.separate_camel_case_word)

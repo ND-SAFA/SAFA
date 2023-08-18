@@ -17,7 +17,7 @@ RESPONSE_PROCESSING_STEPS = [
 
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
-    def run(self, args: ArgType, state: State) -> None:
+    def _run(self, args: ArgType, state: State) -> None:
         self.process_ranking_prompts(args, state)
 
     @staticmethod

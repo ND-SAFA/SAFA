@@ -9,14 +9,14 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class InitializeDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Gets the original source datasets used for the generation
         :param args: The arguments and current state of HGEN.
         :param state: The state of HGEN.
         :return: The original dataset and a dataset with only the source layer
         """
-        export_path = state.export_path
+        export_path = state.export_dir
         original_dataset_complete = args.dataset_creator_for_sources.create() if args.dataset_for_sources is None \
             else args.dataset_for_sources
         save_dataset_checkpoint(original_dataset_complete, export_path, filename="initial_dataset_with_sources")

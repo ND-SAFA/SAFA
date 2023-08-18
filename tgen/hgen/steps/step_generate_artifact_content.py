@@ -15,7 +15,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates the content for the new artifacts.
         :param args: HGEN configuration.
@@ -26,7 +26,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
         summary_questionnaire = GenerateArtifactContentStep.construct_questionnaire_for_summary(state)
 
         source_layer_only_dataset = state.source_dataset
-        export_path = os.path.join(state.export_path, "artifact_gen_response.yaml") if state.export_path else None
+        export_path = os.path.join(state.export_dir, "artifact_gen_response.yaml") if state.export_dir else None
 
         task_prompt = QuestionPrompt(TASK_INSTRUCTIONS,
                                      response_manager=PromptResponseManager(
@@ -41,7 +41,7 @@ class GenerateArtifactContentStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                                            combine_summary_and_task_prompts=True)
         task_prompt = prompt_builder.get_prompt(-1)
         if args.system_summary:
-            overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown('Overview of System:')}"
+            overview_of_system_prompt = Prompt(f"{PromptUtil.format_as_markdown_header('Overview of System:')}"
                                                f"{NEW_LINE}{args.system_summary}")
             prompt_builder.add_prompt(overview_of_system_prompt, 1)
         generation_predictions = get_predictions(prompt_builder,

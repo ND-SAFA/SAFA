@@ -1,17 +1,12 @@
 import os.path
 
-from tgen.common.util.file_util import FileUtil
+from tgen.common.util.file_util import FileUtil, CODE_EXTENSIONS
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.chunkers.dummy_code_chunker import DummyCodeChunker
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.data.chunkers.python_chunker import PythonChunker
-
-CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
-                   "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
-                   "PL", "R"]
-
 
 class SupportedChunker(SupportedEnum):
     PY = PythonChunker
@@ -46,9 +41,9 @@ class SupportedChunker(SupportedEnum):
         if tmp[-1]:
             ext = tmp[-1].replace(os.extsep, EMPTY_STRING)
         ext = ext.upper()
-        if ext in CODE_EXTENSIONS:
-            return SupportedChunker.CODE
         try:
             return SupportedChunker[ext]
         except KeyError:
+            if ext in CODE_EXTENSIONS:
+                return SupportedChunker.CODE
             return SupportedChunker.NL

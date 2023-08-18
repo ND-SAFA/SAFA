@@ -219,6 +219,29 @@ class AbstractProjectDataFrame(pd.DataFrame):
             return self.remove_duplicate_indices().to_dict(orient, into, index)
         return super().to_dict(orient, into, index)
 
+    def update_value(self, column2update: Union[str, Enum], id2update: str, new_value: Any) -> None:
+        """
+        Updates a value in a column
+        :param column2update: The name of the column to update
+        :param id2update: The id of the row being updated
+        :param new_value: The new value to update it to
+        :return: None
+        """
+        if not isinstance(column2update, str):
+            column2update = column2update.value
+        self.loc[self[self.index.name] == id2update, column2update] = new_value
+
+    def update_values(self, column2update: Union[str, Enum], ids2update: List[str], new_values: List[Any]) -> None:
+        """
+         Updates the values of the corresponding ids in a column
+         :param column2update: The name of the column to update
+         :param ids2update: The list of ids of the rows being updated
+         :param new_values: The list of new values to update it to
+         :return: None
+         """
+        for id_, val in zip(ids2update, new_values):
+            self.update_value(column2update, id_, val)
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """
         Sets an item for the dataframe

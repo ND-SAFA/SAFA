@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 import pandas as pd
 
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
@@ -13,7 +13,6 @@ class SummarizeArtifactsJob(AbstractJob):
     """
     Handles summarization of artifacts
     """
-    TYPE_KEY = "type"
 
     def __init__(self, artifacts: List[Dict], summarizer: Summarizer = None, job_args: JobArgs = None, **kwargs):
         """
@@ -26,7 +25,7 @@ class SummarizeArtifactsJob(AbstractJob):
         if summarizer is None:
             summarizer = Summarizer(**kwargs)
         self.artifacts = artifacts
-        self.artifact_df = pd.DataFrame(self.artifacts).set_index(ArtifactKeys.ID.value)
+        self.artifact_df = ArtifactDataFrame(pd.DataFrame(self.artifacts))
         self.summarizer = summarizer
 
     def _run(self) -> Dict[Any, str]:
@@ -34,7 +33,5 @@ class SummarizeArtifactsJob(AbstractJob):
         Performs the summarization of all artifacts and returns the summaries as the new artifact content
         :return: The job result containing all artifacts mapped to their summarized content
         """
-        self.artifact_df[ArtifactKeys.SUMMARY.value] = self.summarizer.summarize_dataframe(self.artifact_df,
-                                                                                           ArtifactKeys.CONTENT.value,
-                                                                                           self.TYPE_KEY)
+        self.artifact_df.summarize_content(self.summarizer)
         return self.artifact_df.to_dict(orient='index')

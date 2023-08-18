@@ -1,8 +1,10 @@
 from typing import Dict, List
 
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.deliminator_constants import DASH, NEW_LINE
+from tgen.common.util.json_util import JsonUtil
+from tgen.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+    RANKING_MAX_SCORE, RANKING_SCORE_TAG
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep, ArgType
@@ -10,10 +12,15 @@ from tgen.state.state import State
 
 ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 
-RESPONSE_PROCESSING_STEPS = [
-    lambda s: s.replace("ID:", ""),
-    lambda s: s.split(",")
-]
+
+class ArtifactReasoning:
+
+    def __init__(self, artifact_dict: Dict):
+        JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value, RANKING_EXPLANATION_TAG, RANKING_SCORE_TAG])
+        self.index = artifact_dict[RANKING_ID_TAG][0]
+        self.explanation = artifact_dict[RANKING_EXPLANATION_TAG][0].strip()
+        self.score = artifact_dict[RANKING_SCORE_TAG][0] / RANKING_MAX_SCORE
+        self.artifact_id = None
 
 
 class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -21,69 +28,44 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
         self.process_ranking_prompts(args, state)
 
     @staticmethod
-    def process_ranking_prompts(args: RankingArgs, state: RankingState) -> None:
-        """
-        Sets processed prompts in store.
-        :param args: The arguments of the ranking pipeline.
-        :param state: The state of the ranking pipeline.
-        :return: None
-        """
-        ranked_children, children_explanations = ProcessRankingResponses.process_ranked_artifacts(args.parent_ids,
-                                                                                                  state.ranking_responses.batch_responses,
-                                                                                                  state.sorted_parent2children)
-        state.ranked_children = ranked_children
-        state.ranked_children_explanations = children_explanations
-
-    @staticmethod
-    def process_ranked_artifacts(parent_ids: List[str], batch_responses: List[str], sorted_parent2children: Dict[str, List[str]]) -> \
-            List[List[str]]:
+    def process_ranking_prompts(args: RankingArgs, state: RankingState) -> List[TracePredictionEntry]:
         """
         Reads the ranking responses and performs post-processing.
-        :param parent_ids: The artifact IDs of the parents.
+        :param args: The ranking pipeline arguments.
         :param state: The ranking pipeline state.
-        :param add_missing: Whether to add missing artifact ids.
         :return: Ranked children for each source.
         """
-        ranked_children_list = [[] for _ in range(len(parent_ids))]
-        ranked_children_explanations = [None] * len(parent_ids)
+        parent_ids = args.parent_ids
+        batch_responses = state.ranking_responses.batch_responses
+        sorted_parent2children = state.sorted_parent2children
         parent2index: Dict[str, int] = {p: i for i, p in enumerate(parent_ids)}
+        child_entries = []
         for parent_name, prompt_response in zip(parent_ids, batch_responses):
-            parent_index = parent2index[parent_name]
             related_children = sorted_parent2children[parent_name]
-
-            # Step - Parse and clean
-            ID_INDEX = 0
-            SUMMARY_INDEX = 1
-            EXPLANATION_INDEX = 2
-            SCORE_INDEX = 3
-
-            explanation = LLMResponseUtil.parse(prompt_response, "explanation")[0]
-            entries = explanation.split("\n")
-            entries = [e for e in entries if len(e) > 0]
-            entry_pieces = [e.split("|") for e in entries]
-            entry_pieces = [[e.strip() for e in entry] for entry in entry_pieces]
+            parent_index = parent2index[parent_name]
+            r = state.prompt_builders[parent_index].parse_responses(prompt_response)
+            prompt_id = state.prompt_builders[parent_index].get_all_prompts()[-1].id
+            parsed_tags = r[prompt_id]
+            artifact_dicts = parsed_tags[RANKING_ARTIFACT_TAG]
             parsed_entries = []
-            for e in entry_pieces:
-                try:
-                    artifact_index = int(e[ID_INDEX])
-                    artifact_summary = e[SUMMARY_INDEX]
-                    artifact_explanation = e[EXPLANATION_INDEX]
-                    artifact_score = float(e[SCORE_INDEX])
-                    parsed_entries.append((artifact_index, artifact_summary, artifact_explanation, artifact_score))
-                except Exception as e:
-                    logger.exception(e)
-                    logger.info(f"Unable to parse: {e}")
+            for a_parsed_dict in artifact_dicts:
+                a_reasoning = ArtifactReasoning(a_parsed_dict)
+                a_reasoning.artifact_id = related_children[a_reasoning.index]
+                parsed_entries.append(a_reasoning)
 
-            # Step - Translate
-            entry_pieces = sorted(parsed_entries, key=lambda e: (e[SCORE_INDEX], -e[ID_INDEX]), reverse=True)
-            artifact_ids = [related_children[e[ID_INDEX]] for e in entry_pieces]
-            artifact_explanations = [e[EXPLANATION_INDEX] for e in entry_pieces]
+            parsed_entries: List[ArtifactReasoning] = sorted(parsed_entries, key=lambda a: (a.score, -a.index), reverse=True)
 
             # Step - Store results
-            ranked_children_list[parent_index].extend(artifact_ids)
-            ranked_children_explanations[parent_index] = artifact_explanations
-
-        return ranked_children_list, ranked_children_explanations
+            for e in parsed_entries:
+                child_entry = TracePredictionEntry(
+                    source=e.artifact_id,
+                    target=parent_name,
+                    score=e.score,
+                    explanation=e.explanation
+                )
+                child_entries.append(child_entry)
+        state.children_entries = child_entries
+        return child_entries
 
     @staticmethod
     def remove_duplicate_ids(artifact_ids: List[str]):
@@ -99,20 +81,3 @@ class ProcessRankingResponses(AbstractPipelineStep[RankingArgs, RankingState]):
                 new_list.append(artifact_id)
                 seen.add(artifact_id)
         return new_list
-
-    @staticmethod
-    def read_explanations(explanations: str, index_translations: List[str]) -> Dict[str, str]:
-        """
-        Reads trace link explanations.
-        :param explanations: Reads the trace links explanations.
-        :param index_translations: The names to use instead of indices.
-        :return: Dictionary mapping artifact index to explanation
-        """
-        elements = explanations.split(NEW_LINE)
-        elements = [e.strip() for e in elements]
-        elements = [e for e in elements if len(e) > 0]
-        elements = [e.split(DASH) for e in elements]
-        elements = {e[0].strip(): e[1].strip() for e in elements}
-        elements = {int(a_id): e for a_id, e in elements.items()}
-        elements = {index_translations[a_id]: e for a_id, e in elements.items()}
-        return elements

@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PROJECT_SUMMARY",
+          "artifact_reader": {
+            "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+          },
+          "export_path": "[OUTPUT_PATH]/project-summaries/[CURRENT_PROJECT].txt"
+        }
+      ]
+    }
+  ]
+}

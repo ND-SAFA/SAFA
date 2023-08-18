@@ -21,7 +21,7 @@ class TestPromptResponseManager(BaseTest):
 
         prm_parent_child = self.get_parent_child_tag_prm()
         parsed_response = prm_parent_child.parse_response("<tag1><tag2>2!</tag2><tag3>hello!</tag3><tag3>world</tag3></tag1>")
-        self.assertEqual(parsed_response, {"parent": {"c1": [2], "c2": ["hello", "world"]}})
+        self.assertEqual(parsed_response, {"parent": [{"c1": [2], "c2": ["hello", "world"]}]})
 
         # missing critical
         try:
@@ -37,7 +37,7 @@ class TestPromptResponseManager(BaseTest):
 
         # missing non-critical
         parsed_response_missing = prm_parent_child.parse_response("<tag1><tag2>2!</tag2></tag1>")
-        self.assertEqual(parsed_response_missing, {"parent": {"c1": [2], "c2": [self.EXPECTED_FAIL_VAl]}})
+        self.assertEqual(parsed_response_missing, {"parent": [{"c1": [2], "c2": [self.EXPECTED_FAIL_VAl]}]})
 
         prm_single = self.get_single_tag_prm()
         parsed_response = prm_single.parse_response("<tag1>1, 2</tag1>")
@@ -58,12 +58,12 @@ class TestPromptResponseManager(BaseTest):
 
         prm_parent_child = self.get_parent_child_tag_prm()
         formatted_response = prm_parent_child._format_response({"parent": {"c1": "2!", "c2": "hello!"}})
-        self.assertEqual(formatted_response, {"parent": {"c1": [2], "c2": ["hello"]}})
+        self.assertEqual(formatted_response, {"parent": [{"c1": [2], "c2": ["hello"]}]})
 
         # Not correct type
         prm_parent_child.required_tag_ids.remove("c1")
         formatted_response_bad = prm_parent_child._format_response({"parent": {"c1": "two!", "c2": "hello!"}})
-        self.assertEqual(formatted_response_bad, {"parent": {"c1": [self.EXPECTED_FAIL_VAl], "c2": ["hello"]}})
+        self.assertEqual(formatted_response_bad, {"parent": [{"c1": [self.EXPECTED_FAIL_VAl], "c2": ["hello"]}]})
 
         prm_single = self.get_single_tag_prm()
         formatted_response = prm_single._format_response({"tag1": "1, 2"})

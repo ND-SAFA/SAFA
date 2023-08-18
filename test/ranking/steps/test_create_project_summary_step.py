@@ -1,7 +1,5 @@
-import os
-
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
-from tgen.common.util.file_util import FileUtil
+from tgen.constants.ranking_constants import PROJECT_SUMMARY_FILE_NAME
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
@@ -36,10 +34,11 @@ class TestCreateProjectSummary(BaseTest):
         self.assert_result(args, state, step)
 
     def test_read_project_summary(self):
-        project_summary_path = os.path.join(TEST_OUTPUT_DIR, "project_summary.txt")
-        FileUtil.write(self.PROJECT_SUMMARY, project_summary_path)
-
+        """
+        Tests ability to read a project summary from a file.
+        """
         args, state = RankingPipelineTest.create_ranking_structures(export_dir=TEST_OUTPUT_DIR)
+        args.save(self.PROJECT_SUMMARY, PROJECT_SUMMARY_FILE_NAME)
         step = CreateProjectSummary()
         self.assert_result(args, state, step)
 

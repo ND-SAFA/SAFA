@@ -117,3 +117,10 @@ class TraceDataFrame(AbstractProjectDataFrame):
         label_counts = self[TraceKeys.LABEL].value_counts()
         n_label = label_counts.get(label, 0)
         return n_label
+
+    def get_links_with_label(self, label: int):
+        """
+        :param label: Either 0 or 1.
+        :return: Returns links with given label.
+        """
+        return [t for t_id, t in self.itertuples() if t[TraceKeys.LABEL] == label]

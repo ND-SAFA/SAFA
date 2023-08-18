@@ -4,14 +4,14 @@
       "jobs": [
         {
           "object_type": "LLM",
-          "data_output_path": "[DATA_PATH]/open_ai/lhp/heating",
+          "data_output_path": "[DATA_PATH]/[CURRENT_PROJECT]",
           "task": "PREDICT",
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             },
             "val_dataset_creator": {

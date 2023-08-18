@@ -12,14 +12,14 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/final-pl/drone"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             },
             "eval_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "~/desktop/hgen/final/natural-language/[CURRENT_PROJECT]"
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
               }
             }
           }

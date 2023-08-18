@@ -1,7 +1,8 @@
 import os
-from typing import Dict, List
+from typing import List
 
-from tgen.common.util.ranking_util import RankingUtil
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
+from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.ranking.common.vsm_sorter import embedding_sorter
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
@@ -27,7 +28,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         """
         return RankingState
 
-    def run(self) -> Dict[str, List[str]]:
+    def run(self) -> List[TracePredictionEntry]:
         """
 
         :return: List of parents mapped to their ranked children.
@@ -36,6 +37,14 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
             os.makedirs(self.args.export_dir, exist_ok=True)
         super().run()
         parent2rankings = embedding_sorter(self.args.parent_ids, self.args.children_ids, self.args.artifact_map,
-                                           return_scores=False, model_name=self.args.embedding_model)
-        prediction_entries = RankingUtil.ranking_to_predictions(parent2rankings)
+                                           return_scores=True, model_name=self.args.embedding_model)
+        prediction_entries = []
+        for parent, parent_payload in parent2rankings.items():
+            for child, score in zip(*parent_payload):
+                entry = {
+                    TraceKeys.TARGET.value: parent,
+                    TraceKeys.SOURCE.value: child,
+                    TraceKeys.SCORE.value: score
+                }
+                prediction_entries.append(entry)
         return prediction_entries

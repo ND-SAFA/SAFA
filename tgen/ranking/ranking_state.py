@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.state.state import State
@@ -19,12 +20,10 @@ class RankingState(State):
     # Ranking
     ranking_responses: Optional[GenerationResponse] = field(default=None, repr=False)
     ranking_prompts: Optional[List[str]] = field(default=None, repr=False)  # the prompts given to the models
-
-    ranked_children: Optional[List[List[str]]] = field(default=None, repr=False)
-    ranked_children_explanations: Optional[List[List[str]]] = field(default=None, repr=False)
+    children_entries: List[TracePredictionEntry] = field(default=None, repr=False)
 
     # IO
     export_path: str = None
 
     # Prompt building and parsing
-    prompt_builder: PromptBuilder = None
+    prompt_builders: List[PromptBuilder] = field(default_factory=list, repr=False)

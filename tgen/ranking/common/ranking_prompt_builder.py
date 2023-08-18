@@ -1,9 +1,9 @@
 from typing import Any, List, Optional
 
 from tgen.constants.deliminator_constants import NEW_LINE, TAB
-from tgen.constants.tgen_constants import DEFAULT_QUERY_TAG
+from tgen.constants.ranking_constants import RANKING_PARENT_TAG
 
-DEFAULT_BODY_TITLE = "# Software Artifacts\n---\n"
+DEFAULT_BODY_TITLE = "# Software Artifacts\n"
 
 
 def builder_method(func):
@@ -23,7 +23,7 @@ def builder_method(func):
 class RankingPromptBuilder:
 
     def __init__(self, goal: str = "", query: str = "", instructions: str = "",
-                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n", query_tag: str = DEFAULT_QUERY_TAG):
+                 body_title: str = DEFAULT_BODY_TITLE, section_delimiter: str = "\n\n\n", query_tag: str = RANKING_PARENT_TAG):
         """
         Builder for prompts with tasks.
         """

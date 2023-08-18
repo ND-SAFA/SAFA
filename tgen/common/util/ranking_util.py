@@ -3,11 +3,9 @@ from typing import Dict, List
 
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.tgen_constants import DEFAULT_MIN_RANKING_SCORE, DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_THRESHOLD
+from tgen.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 
@@ -29,7 +27,7 @@ class RankingUtil:
             if isinstance(ranked_children, tuple):
                 ranked_children, children_scores = ranked_children
             else:
-                children_scores = RankingUtil.assign_scores_to_targets(len(ranked_children))
+                children_scores = ListUtil.create_step_list(len(ranked_children))
 
             explanations = parent2explanations[parent_id] if parent2explanations else None
             target_predicted_entries = RankingUtil.create_ranking_predictions(parent_id, ranked_children, scores=children_scores,
@@ -67,89 +65,87 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def assign_scores_to_targets(n_items: int, min_score=DEFAULT_MIN_RANKING_SCORE) -> List[float]:
-        """
-        Assigns scores to ranked targets from 1 to min score incrementing linearly.
-        :param n_items: The number of items to assign scores for.
-        :param min_score: The score of the last ranked artifact.
-        :return: List of scores.
-        """
-        return ListUtil.create_step_list(n_items, min_score=min_score)
-
-    @staticmethod
-    def calculate_ranking_metrics(dataset: TraceDataset, ranking_entries: List[TracePredictionEntry]):
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, selected_entries: List[TracePredictionEntry]) -> Dict:
         """
         Calculates ranking metrics for ranking predictions.
-        :param dataset: The original dataset used to fill any filtered out links.
-        :param ranking_entries: The ranking predictions.
-        :return:
+        :param trace_df: The trace data frame containing true labels.
+        :param selected_entries: The ranking predictions.
+        :return: The dictionary of metrics.
         """
-        if dataset.trace_df is None:
+        if trace_df is None:
+            logger.info("Skipping evaluation, trace data frame is none.")
             return
-        n_labels = len(dataset.trace_df[TraceKeys.LABEL].unique())
-        if n_labels > 1:
-            all_link_ids = list(dataset.trace_df.index)
-            predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
-                                  entry in
-                                  ranking_entries]
-            missing_ids = list(set(all_link_ids).difference(set(predicted_link_ids)))
-            ordered_link_ids = predicted_link_ids + missing_ids
+        n_labels = len(trace_df[TraceKeys.LABEL].unique())
+        if n_labels == 0:
+            logger.info("Skipping evaluation, no labels found in trace data frame.")
+            return
+        all_link_ids = list(trace_df.index)
+        positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
+        negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
+        predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
+                              entry in selected_entries]
 
-            missing_links = [dataset.trace_df.get_link(t_id) for t_id in missing_ids]
-            missing_links = [t for t in missing_links if t[TraceKeys.LABEL] == 1]
-            missing_links = [{"parent": t[TraceKeys.TARGET],
-                              "child": t[TraceKeys.SOURCE]} for t in missing_links if t[TraceKeys.LABEL] == 1]
-            logger.log_with_title("Missing links", json.dumps(missing_links))
+        false_negative_ids = list(set(positive_link_ids).difference(set(predicted_link_ids)))
+        false_positive_ids = list(set(negative_link_ids).intersection(set(predicted_link_ids)))
 
-            scores = [entry["score"] for entry in ranking_entries]
-            missing_scores = [0 for i in missing_ids]
-            all_scores = scores + missing_scores
+        RankingUtil.log_artifacts("False Negatives", trace_df, false_negative_ids)
+        RankingUtil.log_artifacts("False Positives", trace_df, false_positive_ids)
 
-            metrics_manager = MetricsManager(dataset.trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
-            metric_names = list(SupportedTraceMetric.get_keys())
-            metrics = metrics_manager.eval(metric_names)
-            logger.log_with_title("Ranking Metrics", json.dumps(metrics))
-            return metrics
+        other_link_ids = set(all_link_ids).difference(predicted_link_ids)
+        ordered_link_ids = predicted_link_ids + list(other_link_ids)
+        scores = [entry[TraceKeys.SCORE.value] for entry in selected_entries]
+        missing_scores = [0 for i in other_link_ids]
+        all_scores = scores + missing_scores
+
+        metrics_manager = MetricsManager(trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
+        metric_names = list(SupportedTraceMetric.get_keys())
+        metrics = metrics_manager.eval(metric_names)
+        logger.log_with_title("Ranking Metrics", json.dumps(metrics))
+        return metrics
 
     @staticmethod
-    def select_predictions(trace_predictions: List[TracePredictionEntry],
-                           parent_threshold: float = DEFAULT_PARENT_THRESHOLD,
-                           min_threshold: float = DEFAULT_PARENT_MIN_THRESHOLD,
-                           top_n: int = None) -> List[TracePredictionEntry]:
+    def log_artifacts(title: str, trace_df: TraceDataFrame, artifact_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
+        """
+        Logs the missing links (false negatives).
+        :param trace_df: The trace data frame containing the missing links.
+        :param artifact_ids: The IDs of the missing links.
+        :param group_key: The key used to group missing ids (either by parent or child).
+        :return: None
+        """
+        other_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
+        missing_links = [trace_df.get_link(t_id) for t_id in artifact_ids]
+        grouped_links = RankingUtil.group_trace_predictions(missing_links, group_key)
+        grouped_links = {k: [v2[other_key] for v2 in v] for k, v in grouped_links.items()}
+        logger.log_title(title)
+        for group_key, group_items in grouped_links.items():
+            logger.info(f"{group_key}:{group_items}")
+
+    @staticmethod
+    def select_predictions(trace_predictions: List[TracePredictionEntry]) -> List[TracePredictionEntry]:
         """
         Selects the top parents per child.
         :param trace_predictions: The trace predictions.
-        :param parent_threshold: The minimum percentile for a child to be linked to a parent.
-        :param min_threshold: The minimum threshold to consider the top prediction, if fall under parent threshold.
-        :param top_n: Whether to convert scores to classification labels.
         :return: List of selected predictions.
         """
         children2entry = RankingUtil.group_trace_predictions(trace_predictions, TraceKeys.SOURCE.value)
         predictions = []
 
-        for child, trace_predictions in children2entry.items():
-            sorted_entries = sorted(trace_predictions, key=lambda e: e[StructuredKeys.SCORE], reverse=True)
-            if top_n is not None:
-                selected_entries = sorted_entries[:top_n]
-            else:
-                selected_entries = []
-                t1_preds, t2_preds, t3_preds = [], [], []
+        for child, child_predictions in children2entry.items():
+            sorted_entries = sorted(child_predictions, key=lambda e: e[TraceKeys.SCORE.value], reverse=True)
+            t1_preds, t2_preds, t3_preds = [], [], []
 
-                t1_preds = [s for s in sorted_entries if s[StructuredKeys.SCORE] >= 0.8]
-                t2_preds = [s for s in sorted_entries if 0.7 <= s[StructuredKeys.SCORE] < 0.8]
-                t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
-                if len(t1_preds) > 0:
-                    selected_entries = t1_preds
-                elif len(t2_preds):
-                    selected_entries = t2_preds
-                else:
-                    selected_entries = t3_preds
+            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE.value] >= TIER_ONE_THRESHOLD]
+            t2_preds = [s for s in sorted_entries if TIER_TWO_THRESHOLD <= s[TraceKeys.SCORE.value] < TIER_ONE_THRESHOLD]
+            t3_preds = t3_preds if len(t1_preds) + len(t2_preds) > 0 else sorted_entries[:1]
+            if len(t1_preds) > 0:
+                selected_entries = t1_preds
+            elif len(t2_preds):
+                selected_entries = t2_preds
+            else:
+                selected_entries = t3_preds
 
             predictions.extend(selected_entries)
 
-        if top_n:
-            for p in predictions:
-                p["score"] = 1
         return predictions
 
     @staticmethod

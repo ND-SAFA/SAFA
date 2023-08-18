@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, List, Optional
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -100,7 +101,7 @@ class DataFrameUtil:
         return df_dict
 
     @staticmethod
-    def get_float_value(row: pd.Series, col_name: str) -> Optional[Any]:
+    def get_optional_value(row: pd.Series, col_name: Union[str, Enum]) -> Optional[Any]:
         """
         Returns the column value if exists, otherwise None is returned.
         :param row: The row in the dataframe.
@@ -108,7 +109,11 @@ class DataFrameUtil:
         :return:
         """
         potential_value = row.get(col_name, None)
-        if potential_value is not None and not np.isnan(potential_value):
+        if potential_value is not None:
+            if isinstance(potential_value, float):
+                if np.isnan(potential_value):
+                    return None
+                return potential_value
             return potential_value
         else:
             return None

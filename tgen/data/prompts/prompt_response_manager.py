@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Set, Type, Union, Tuple
+from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
 import bs4
 
@@ -164,10 +164,7 @@ class PromptResponseManager:
                 formatted_val = val
                 if isinstance(val, dict):
                     formatted_val = self._format_response(val)
-                    if len(values) > 1:
-                        formatted_values.append(formatted_val)
-                    else:
-                        formatted_values = formatted_val
+                    formatted_values.append(formatted_val)
                 else:
                     try:
                         formatted_val = self._format_value(tag, formatted_val)

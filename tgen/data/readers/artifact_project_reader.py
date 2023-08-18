@@ -18,7 +18,7 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         :param project_path: Path to the project.
         :param conversions: Column definitions available to project.
         """
-        super().__init__(overrides)
+        super().__init__(overrides, project_path)
         self.structured_project_reader = StructuredProjectReader(project_path, conversions)
 
     def read_project(self) -> ArtifactDataFrame:

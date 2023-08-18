@@ -7,9 +7,8 @@ import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
-from tgen.common.util import enum_util
+from tgen.common.util.enum_util import EnumDict, EnumUtil
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
 
@@ -227,7 +226,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param value: The value to set
         :return: None
         """
-        super().__setitem__(enum_util.to_string(key), value)
+        super().__setitem__(EnumUtil.to_string(key), value)
 
     def __getitem__(self, item: Any) -> Any:
         """
@@ -235,7 +234,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param item: The item to get
         :return: The item
         """
-        item = enum_util.to_string(item)
+        item = EnumUtil.to_string(item)
         return super().__getitem__(item)
 
     def __contains__(self, item: Any) -> bool:
@@ -244,7 +243,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param item: The item to check if it is in the dataframe
         :return: True if item in dataframe else False
         """
-        return enum_util.to_string(item) in self.index
+        return EnumUtil.to_string(item) in self.index
 
     def __deepcopy__(self, memodict={}) -> "AbstractProjectDataFrame":
         """

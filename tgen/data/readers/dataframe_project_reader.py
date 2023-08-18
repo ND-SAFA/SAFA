@@ -23,8 +23,7 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         :param layer_df_filename: Name of file containing layer dataframe
         :param overrides: The overrides to apply to project creator.
         """
-        super().__init__(overrides)
-        self.project_path = project_path
+        super().__init__(overrides, project_path)
         self.filename_to_dataframe_cls = {artifact_df_filename: ArtifactDataFrame,
                                           trace_df_filename: TraceDataFrame,
                                           layer_df_filename: LayerDataFrame}
@@ -37,7 +36,7 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         dataframes = []
         for filename, dataframe_cls in self.filename_to_dataframe_cls.items():
             params = {"index_col": 0} if dataframe_cls.index_name() is None else {}
-            df: pd.DataFrame = pd.read_csv(os.path.join(self.project_path, filename), **params)
+            df: pd.DataFrame = pd.read_csv(os.path.join(self.get_project_path(), filename), **params)
             df = dataframe_cls(df)
             if isinstance(df, ArtifactDataFrame) and self.summarizer:
                 df.summarize_content(self.summarizer)
@@ -49,4 +48,4 @@ class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Returns the name of the project
         :return: The name of the project
         """
-        return os.path.dirname(self.project_path)
+        return os.path.dirname(self.get_project_path())

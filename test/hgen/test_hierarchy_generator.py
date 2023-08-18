@@ -1,5 +1,4 @@
 import os
-import uuid
 from unittest.mock import MagicMock
 
 import mock
@@ -9,8 +8,6 @@ from test.hgen.hgen_test_utils import get_test_hgen_args, get_name_responses, ge
     get_ranking_job_result
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.status import Status
-from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerKeys
@@ -20,12 +17,11 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenState
-from tgen.hgen.hgen_util import get_initials, save_dataset_checkpoint
-from tgen.hgen.steps.step_create_dataset import CreateHGenDatasetStep
+from tgen.hgen.hgen_util import save_dataset_checkpoint
+from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
 from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
-from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

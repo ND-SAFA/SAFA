@@ -99,8 +99,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         def thread_work(payload):
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            anthropic_client = get_client()
-            local_response = anthropic_client.completion(**prompt_params)
+            local_response = get_client().completion(**prompt_params)
             global_responses[index] = local_response
 
         ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),

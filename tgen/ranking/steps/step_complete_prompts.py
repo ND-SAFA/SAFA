@@ -10,7 +10,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
 
-    def run(self, args: RankingArgs, state: RankingState) -> None:
+    def _run(self, args: RankingArgs, state: RankingState) -> None:
         """
         Completes the ranking prompts.
         :param args: The pipeline arguments / configuration.

@@ -1,4 +1,4 @@
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
@@ -29,4 +29,6 @@ class BaseTraceTest(BaseTest):
                 trace_df.at[index, TraceKeys.LABEL.value] = 1
             else:
                 negative_link_ids.append(index)
-        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df, layer_df=LayerDataFrame())
+        return TraceDataset(artifact_df=artifacts_df, trace_df=trace_df,
+                            layer_df=LayerDataFrame({LayerKeys.SOURCE_TYPE: ["source_1", "source_2"],
+                                                     LayerKeys.TARGET_TYPE: ["target_1", "target_2"]}))

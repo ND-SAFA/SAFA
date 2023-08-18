@@ -17,16 +17,15 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         Creates reader for project at path and column definitions given.
         :param project_path: Path to the project.
         """
-        super().__init__()
+        super().__init__(project_path=project_path)
         assert FileUtil.get_file_ext(project_path) == self.FILE_EXT, f"Expected project path to be a {self.FILE_EXT} file"
-        self.project_path = project_path
 
     def read_project(self) -> PromptDataFrame:
         """
         Reads project data from files.
         :return: Returns the data frames containing the project artifacts.
         """
-        prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.project_path))
+        prompt_df = PromptDataFrame(JsonUtil.read_jsonl_file(self.get_project_path()))
         if self.summarizer is not None:
             prompt_df[PromptKeys.PROMPT.value] = self.summarizer.summarize_dataframe(prompt_df, PromptKeys.PROMPT.value)
         return prompt_df
@@ -36,4 +35,4 @@ class PromptProjectReader(AbstractProjectReader[PromptDataFrame]):
         Gets the name of the project being read.
         :return:  Returns the name of the project being read.
         """
-        return FileUtil.get_file_name(self.project_path)
+        return FileUtil.get_file_name(self.get_project_path())

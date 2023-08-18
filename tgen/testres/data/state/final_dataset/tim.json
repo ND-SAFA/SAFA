@@ -1,0 +1,19 @@
+{
+    "artifacts": [
+        {
+            "type": "User Story",
+            "fileName": "User Story.csv"
+        },
+        {
+            "type": "C++ Code",
+            "fileName": "C++ Code.csv"
+        }
+    ],
+    "traces": [
+        {
+            "fileName": "C++ Code2User Story.json",
+            "sourceType": "C++ Code",
+            "targetType": "User Story"
+        }
+    ]
+}

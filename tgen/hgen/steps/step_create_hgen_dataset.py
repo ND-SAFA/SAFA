@@ -6,6 +6,7 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.status import Status
+from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
@@ -23,7 +24,7 @@ from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
 
-    def run(self, args: HGenArgs, state: HGenState) -> None:
+    def _run(self, args: HGenArgs, state: HGenState) -> None:
         """
         Creates a dataset containing original artifacts, generated upper level artifacts, and trace links between them.
         :param state: The current state of hgen at this point in time
@@ -31,7 +32,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :return: None
         """
         proj_path = os.path.join(args.load_dir, SAVE_DATASET_DIRNAME)
-        export_path = state.export_path
+        export_path = state.export_dir
 
         if os.path.exists(proj_path):
             dataset = TraceDatasetCreator(DataFrameProjectReader(proj_path)).create()
@@ -64,9 +65,6 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             final_layer_df = LayerDataFrame.concat(original_layer_df, new_layer_df) if original_layer_df is not None else new_layer_df
 
             dataset = TraceDataset(combined_artifact_df, final_trace_df, final_layer_df)
-
-        save_path = save_dataset_checkpoint(dataset, export_path, filename=SAVE_DATASET_DIRNAME)
-        save_dataset_checkpoint(dataset, save_path, filename="safa", exporter_class=SafaExporter)
         state.dataset = dataset
 
     @staticmethod
@@ -79,6 +77,7 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         layer_id = hgen_args.target_type
         if hgen_args.target_type in original_dataset_complete.artifact_df[ArtifactKeys.LAYER_ID].values:
             layer_id = f"{layer_id}_{uuid.uuid4()}"
+            hgen_args.target_type = layer_id
         return layer_id
 
     @staticmethod
@@ -101,7 +100,9 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         logger.info(f"Predicting links between {hgen_args.target_type} and {hgen_args.source_layer_id}\n")
         tracing_layers = (hgen_args.target_type, hgen_args.source_layer_id)  # parent, child
-        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary)
+        tracing_job = RankingJob(artifact_df=artifact_df, layer_ids=tracing_layers, project_summary=hgen_state.summary,
+                                 export_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_state.export_dir),
+                                 load_dir=CreateHGenDatasetStep._get_ranking_dir(hgen_args.load_dir))
         result = tracing_job.run()
         if result.status != Status.SUCCESS:
             raise Exception(f"Trace link generation failed: {result.body}")
@@ -116,3 +117,12 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
             })
             DataFrameUtil.append(traces, link)
         return TraceDataFrame(traces)
+
+    @staticmethod
+    def _get_ranking_dir(directory: str) -> str:
+        """
+        Get the directory for ranking job
+        :param directory: The main directory used by hgen
+        :return: The full path
+        """
+        return os.path.join(directory, "ranking") if directory else EMPTY_STRING

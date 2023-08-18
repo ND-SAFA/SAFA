@@ -31,4 +31,4 @@ jobs:
           python -m unittest discover -s test
         env:
           DEPLOYMENT: test
-          ROOT_PATH: /home/runner/work/tgen/tgen
+          ROOT_PATH: /home/runner/work/tgen/tgen/tgen

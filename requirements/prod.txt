@@ -4,6 +4,7 @@ comment-parser==1.2.4
 chinese-whispers==0.5
 cdlib==0.2.6
 datasets==2.12.0
+deepspeed==0.8.2
 GitPython==3.1.31
 huggingface-hub==0.11.1
 javac-parser==1.0.0
@@ -14,7 +15,6 @@ numpy==1.23.0
 nltk==3.8.1
 openai==0.27.4
 pandas==2.0.0
-pydantic==2.2.1
 python-dotenv==0.21.1
 PyGithub==1.58.0
 scikit-learn==1.0.2
@@ -28,7 +28,7 @@ tqdm==4.64.1
 transformers==4.26.1
 typeguard==2.13.3
 typing==3.7.4.3
-typing_extensions==4.6.1
+typing_extensions==4.4.0
 wandb==0.13.10
 whitenoise==6.4.0
 itypes==1.2.0

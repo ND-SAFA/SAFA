@@ -3,6 +3,7 @@ from typing import Dict, TypedDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
+from tgen.constants.model_constants import get_best_default_llm_manager
 from tgen.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, PROJECT_SUMMARY_HEADER
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.prompts.prompt import Prompt
@@ -12,7 +13,6 @@ from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 
 GOAL = (
@@ -77,7 +77,7 @@ class ProjectSummaryJob(AbstractJob):
             artifact_reader.set_summarizer(summarizer)
             artifact_map = artifact_reader.read_project().to_map()
         if llm_manager is None:
-            llm_manager = SupportedLLMManager.ANTHROPIC.value()
+            llm_manager = get_best_default_llm_manager()
         self.llm_manager: AbstractLLMManager = llm_manager
         self.artifact_map = artifact_map
         self.n_tokens = n_tokens

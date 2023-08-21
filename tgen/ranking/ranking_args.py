@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
+from tgen.constants.model_constants import get_best_default_llm_manager
 from tgen.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_COMPLETION_TOKENS, DEFAULT_MAX_CONTEXT_ARTIFACTS, \
     DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
@@ -13,7 +14,6 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
     DEFAULT_RANKING_QUESTIONS
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
@@ -119,4 +119,4 @@ class RankingArgs(PipelineArgs):
         if self.ranking_questions is None:
             self.ranking_questions = DEFAULT_RANKING_QUESTIONS
         if self.llm_manager is None:
-            self.llm_manager = SupportedLLMManager.ANTHROPIC.value()
+            self.llm_manager = get_best_default_llm_manager()

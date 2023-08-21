@@ -1,15 +1,19 @@
 from enum import Enum, EnumMeta
 from typing import Any, Dict
 
-from ruamel.yaml.nodes import Node
+import collections
+from yaml.nodes import Node, MappingNode
+from yaml.constructor import ConstructorError
 from yaml.loader import SafeLoader
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.constants.deliminator_constants import COLON
+from tqdm import tqdm
 
 
 class CustomLoader(SafeLoader):
+    __top_level_reached = False
 
     def construct_custom(self, _, node: Node) -> Any:
         """
@@ -56,6 +60,41 @@ class CustomLoader(SafeLoader):
         if node.tag not in self.yaml_constructors:
             self.yaml_constructors[node.tag] = self.construct_custom
         return super().construct_object(node, deep)
+
+    def construct_mapping(self, node, deep=False):
+        """
+        Overwritten to allow tqdm on top level
+        :param node: Yaml Node
+        :param deep: from yaml API
+        :return: The constructed mapping
+        """
+        if not self.__top_level_reached:
+            return self._run_top_level(node, deep)
+        return super().construct_mapping(node, deep)
+
+    def _run_top_level(self, node, deep=False) -> Dict:
+        """
+        Copied from BaseConstructor to allow tqdm
+        :param node: Yaml Node
+        :param deep: from yaml API
+        :return: The constructed mapping for top level
+        """
+        self.__top_level_reached = True
+        if isinstance(node, MappingNode):
+            self.flatten_mapping(node)
+        if not isinstance(node, MappingNode):
+            raise ConstructorError(None, None,
+                                   "expected a mapping node, but found %s" % node.id,
+                                   node.start_mark)
+        mapping = {}
+        for key_node, value_node in tqdm(node.value, desc="Loading objects from yaml"):
+            key = self.construct_object(key_node, deep=deep)
+            if not isinstance(key, collections.abc.Hashable):
+                raise ConstructorError("while constructing a mapping", node.start_mark,
+                                       "found unhashable key", key_node.start_mark)
+            value = self.construct_object(value_node, deep=deep)
+            mapping[key] = value
+        return mapping
 
 
 class YamlUtil:

@@ -10,30 +10,30 @@ class GenerationTestProject:
     """
     ARTIFACTS = [
         {
-            ArtifactKeys.ID.value: "s1",
+            ArtifactKeys.ID.value: "file.java",
             ArtifactKeys.CONTENT.value: "public class HelloWorld { "
                                         "public static void main(String[] args) "
                                         "{ String message = \"Hello, World!\"; "
                                         "System.out.println(message);}}",
-            SummarizeArtifactsJob.TYPE_KEY: "java"
+            ArtifactKeys.LAYER_ID.value: "java"
         },
         {
-            ArtifactKeys.ID.value: "s2",
+            ArtifactKeys.ID.value: "file.py",
             ArtifactKeys.CONTENT.value: "print('Hello, World!')",
-            SummarizeArtifactsJob.TYPE_KEY: "py"
+            ArtifactKeys.LAYER_ID.value: "py"
         },
         {
             ArtifactKeys.ID.value: "s3",
             ArtifactKeys.CONTENT.value: "content3",
-            SummarizeArtifactsJob.TYPE_KEY: "unknown"
+            ArtifactKeys.LAYER_ID.value: "unknown"
         },
         {
             ArtifactKeys.ID.value: "s4",
             ArtifactKeys.CONTENT.value: "content4",
-            SummarizeArtifactsJob.TYPE_KEY: "nl"
+            ArtifactKeys.LAYER_ID.value: "nl"
         }
     ]
-    ARTIFACT_MAP = {"s1": 0, "s2": 1, "s3": 2, "s4": 3}
+    ARTIFACT_MAP = {"file.java": 0, "file.py": 1, "s3": 2, "s4": 3}
 
     @staticmethod
     def get_artifact(artifact_id: str):

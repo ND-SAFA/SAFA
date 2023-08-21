@@ -13,7 +13,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjectMembershipRepository extends CrudRepository<UserProjectMembership, UUID> {
+public interface UserProjectMembershipRepository extends CrudRepository<UserProjectMembership, UUID> {
     List<UserProjectMembership> findByMember(SafaUser user);
 
     List<UserProjectMembership> findByProject(Project project);

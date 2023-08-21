@@ -118,7 +118,7 @@ public class ProjectMembershipController extends BaseController {
         }
 
         // Step - Delete membership
-        this.serviceProvider.getProjectMembershipRepository().delete(projectMembership);
+        this.serviceProvider.getUserProjectMembershipRepository().delete(projectMembership);
 
         // Step - Broadcast change
         this.serviceProvider

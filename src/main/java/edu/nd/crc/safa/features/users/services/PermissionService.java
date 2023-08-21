@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
-import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -19,13 +19,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class PermissionService {
     private final String PERMISSION_ERROR = "User does not have %s permissions for this project";
-    private final ProjectMembershipRepository projectMembershipRepository;
+    private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final SafaUserService safaUserService;
 
     @Autowired
-    public PermissionService(ProjectMembershipRepository projectMembershipRepository,
+    public PermissionService(UserProjectMembershipRepository userProjectMembershipRepository,
                              SafaUserService safaUserService) {
-        this.projectMembershipRepository = projectMembershipRepository;
+        this.userProjectMembershipRepository = userProjectMembershipRepository;
         this.safaUserService = safaUserService;
     }
 
@@ -90,7 +90,7 @@ public class PermissionService {
     }
 
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {
-        Optional<UserProjectMembership> roleQuery = this.projectMembershipRepository.findByProjectAndMember(project, user);
+        Optional<UserProjectMembership> roleQuery = this.userProjectMembershipRepository.findByProjectAndMember(project, user);
         return roleQuery.filter(projectMembership -> projectMembership.getRole().compareTo(role) >= 0).isPresent();
     }
 

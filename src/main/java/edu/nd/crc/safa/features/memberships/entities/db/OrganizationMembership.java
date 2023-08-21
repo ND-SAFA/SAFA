@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.organizations.entities.db;
+package edu.nd.crc.safa.features.memberships.entities.db;
 
 import java.util.UUID;
 import javax.persistence.Column;
@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Getter;
@@ -20,11 +22,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "team_membership")
+@Table(name = "org_membership")
 @Getter
 @Setter
 @NoArgsConstructor
-public class TeamMembership {
+public class OrganizationMembership {
 
     @Id
     @GeneratedValue
@@ -36,12 +38,12 @@ public class TeamMembership {
     @ManyToOne
     private SafaUser user;
 
-    @JoinColumn(name = "team_id")
+    @JoinColumn(name = "org_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
-    private Team team;
+    private Organization organization;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private TeamRole role;
+    private OrganizationRole role;
 }

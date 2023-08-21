@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
-import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -30,7 +30,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
 
     SafaUserRepository safaUserRepository;
     SafaUserService safaUserService;
-    ProjectMembershipRepository projectMembershipRepository;
+    UserProjectMembershipRepository userProjectMembershipRepository;
 
     /**
      * Retrieve project membership with given id. Throws error if not found.
@@ -40,7 +40,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      */
     public UserProjectMembership getMembershipById(UUID projectMembershipId) {
         Optional<UserProjectMembership> projectMembershipQuery =
-            this.projectMembershipRepository.findById(projectMembershipId);
+            this.userProjectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isEmpty()) {
             throw new SafaError("Could not find membership with id: %s.", projectMembershipId);
         }
@@ -50,7 +50,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
     @Override
     public List<ProjectMemberAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         Project project = projectVersion.getProject();
-        return this.projectMembershipRepository.findByProject(project)
+        return this.userProjectMembershipRepository.findByProject(project)
             .stream()
             .map(ProjectMemberAppEntity::new)
             .collect(Collectors.toList());
@@ -74,7 +74,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         SafaUser newMember = this.safaUserService.getUserByEmail(newMemberEmail);
 
         // Step - Assert that member being added has fewer permissions than current user.
-        List<UserProjectMembership> projectMemberships = this.projectMembershipRepository.findByProject(project);
+        List<UserProjectMembership> projectMemberships = this.userProjectMembershipRepository.findByProject(project);
         if (projectMemberships.size() == 1
             && projectMemberships.get(0).getMember().getEmail().equals(newMemberEmail)) {
             throw new SafaError("Unable to edit permission of only member of project.");
@@ -86,7 +86,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
 
         // Step - Create or update project membership
         Optional<UserProjectMembership> projectMembershipQuery =
-            this.projectMembershipRepository.findByProjectAndMember(project, newMember);
+            this.userProjectMembershipRepository.findByProjectAndMember(project, newMember);
         UserProjectMembership updatedProjectMembership;
         if (projectMembershipQuery.isPresent()) {
             UserProjectMembership existingProjectMembership = projectMembershipQuery.get();
@@ -100,7 +100,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         }
 
         // Step - Save changes
-        this.projectMembershipRepository.save(updatedProjectMembership);
+        this.userProjectMembershipRepository.save(updatedProjectMembership);
 
         return updatedProjectMembership;
     }
@@ -112,7 +112,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @return List of project memberships relating members to projects.
      */
     public List<UserProjectMembership> getProjectMembers(Project project) {
-        return this.projectMembershipRepository.findByProject(project);
+        return this.userProjectMembershipRepository.findByProject(project);
     }
 
     /**
@@ -123,7 +123,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      * @return List of project memberships relating members to projects.
      */
     public List<UserProjectMembership> getProjectMembersWithRoles(Project project, List<ProjectRole> projectRoles) {
-        return this.projectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
+        return this.userProjectMembershipRepository.findByProjectAndRoleIn(project, projectRoles);
     }
 
     /**
@@ -146,10 +146,10 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
      */
     public UserProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
         Optional<UserProjectMembership> projectMembershipQuery =
-            this.projectMembershipRepository.findById(projectMembershipId);
+            this.userProjectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isPresent()) {
             UserProjectMembership projectMembership = projectMembershipQuery.get();
-            this.projectMembershipRepository.delete(projectMembership);
+            this.userProjectMembershipRepository.delete(projectMembership);
             return projectMembership;
         }
         return null;

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
-import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
+import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.organizations.services.TeamService;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final ProjectMembershipRepository projectMembershipRepository;
+    private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final SafaUserService safaUserService;
     private final TeamService teamService;
 
@@ -66,12 +66,12 @@ public class ProjectService {
      * @return List of projects where given user has access to.
      */
     public List<ProjectIdAppEntity> getProjectsForUser(SafaUser user) {
-        return this.projectMembershipRepository
+        return this.userProjectMembershipRepository
             .findByMember(user)
             .stream()
             .map(UserProjectMembership::getProject)
             .map(project -> {
-                List<ProjectMemberAppEntity> members = this.projectMembershipRepository.findByProject(project)
+                List<ProjectMemberAppEntity> members = this.userProjectMembershipRepository.findByProject(project)
                     .stream()
                     .map(ProjectMemberAppEntity::new)
                     .collect(Collectors.toList());

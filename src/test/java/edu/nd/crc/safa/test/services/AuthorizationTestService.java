@@ -105,7 +105,7 @@ public class AuthorizationTestService {
             throw new SafaError("Could not find user with name: %s", username);
         }
         Optional<UserProjectMembership> projectMembershipOptional =
-            this.serviceProvider.getProjectMembershipRepository().findByProjectAndMember(
+            this.serviceProvider.getUserProjectMembershipRepository().findByProjectAndMember(
                 project,
                 safaUserOptional.get());
         if (projectMembershipOptional.isEmpty()) {

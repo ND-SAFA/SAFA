@@ -113,11 +113,12 @@ class RankingUtil:
         :param group_key: The key used to group missing ids (either by parent or child).
         :return: None
         """
-        other_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
+        artifact_id_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
+
         missing_links = [trace_map[t_id] for t_id in artifact_ids]
         grouped_links = RankingUtil.group_trace_predictions(missing_links, group_key)
-        grouped_links = {k: [f"{v2[other_key]}: ({v2[TraceKeys.SCORE.value]}) :{v2[TraceKeys.EXPLANATION.value]}" for v2 in v]
-                         for k, v in grouped_links.items()}
+        grouped_links = {g: [RankingUtil.format_link(link, artifact_id_key) for link in g_links] for g, g_links in
+                         grouped_links.items()}
         logger.log_title(title)
         for group_key, group_items in grouped_links.items():
             logger.info(f"{group_key}:{group_items}")
@@ -164,3 +165,16 @@ class RankingUtil:
                 children2entry[child_id] = []
             children2entry[child_id].append(entry)
         return children2entry
+
+    @staticmethod
+    def format_link(a: Dict, artifact_id_key: str):
+        """
+        Formats the artifact with its score and explanation if it exists.
+        :param a: The artifact to format.
+        :param artifact_id_key: The key to get the id of the artifact to display.
+        :return: Formatted string.
+        """
+        a_id = a[artifact_id_key]
+        a_score = a.get(TraceKeys.SCORE.value, "")
+        a_explanation = a.get(TraceKeys.EXPLANATION.value, "")
+        return f"{a_id}: ({a_score}) :{a_explanation}"

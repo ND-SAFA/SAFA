@@ -46,4 +46,10 @@ public class TeamMembership {
     @Column
     @Enumerated(EnumType.STRING)
     private TeamRole role;
+
+    public TeamMembership(SafaUser user, Team team, TeamRole role) {
+        this.user = user;
+        this.team = team;
+        this.role = role;
+    }
 }

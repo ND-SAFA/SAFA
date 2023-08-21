@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from tgen.common.util.dataclass_util import required_field
@@ -71,7 +71,7 @@ class RankingArgs(PipelineArgs):
     query_tag: str = RANKING_PARENT_TAG
     artifact_header: str = DEFAULT_ARTIFACT_HEADER
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
-    llm_manager: AbstractLLMManager = None
+    llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager)
 
     def save(self, obj: Any, file_name: str) -> str:
         """
@@ -118,5 +118,3 @@ class RankingArgs(PipelineArgs):
         self.artifact_map = self.artifact_df.to_map()
         if self.ranking_questions is None:
             self.ranking_questions = DEFAULT_RANKING_QUESTIONS
-        if self.llm_manager is None:
-            self.llm_manager = get_best_default_llm_manager()

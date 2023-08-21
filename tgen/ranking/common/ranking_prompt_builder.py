@@ -1,5 +1,6 @@
 from typing import Any, List, Optional
 
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.constants.deliminator_constants import NEW_LINE, TAB
 from tgen.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, RANKING_PARENT_TAG
 
@@ -21,7 +22,8 @@ def builder_method(func):
 class RankingPromptBuilder:
 
     def __init__(self, goal: str = "", query: str = "", instructions: str = "",
-                 body_title: str = f"# {DEFAULT_ARTIFACT_HEADER}", section_delimiter: str = "\n\n\n",
+                 body_title: str = PromptUtil.format_as_markdown_header(DEFAULT_ARTIFACT_HEADER),
+                 section_delimiter: str = NEW_LINE * 3,
                  query_tag: str = RANKING_PARENT_TAG):
         """
         Builder for prompts with tasks.

@@ -3,9 +3,8 @@ import importlib
 import traceback
 import typing
 from enum import Enum
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Optional, Type
 
-from pydantic.class_validators import Optional
 from typeguard import check_type
 
 from tgen.common.util.str_util import StrUtil

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
@@ -13,10 +14,14 @@ import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class PermissionService {
+
+    private final OrganizationMembershipService orgMembershipService;
 
     /**
      * Returns whether the user has the given permission within the given project.
@@ -150,7 +155,7 @@ public class PermissionService {
      * @return The list of roles the user has associated with that organization
      */
     public List<OrganizationRole> getUserRoles(SafaUser user, Organization organization) {
-        return List.of(OrganizationRole.NONE);
+        return orgMembershipService.getUserRoles(user, organization);
     }
 
 }

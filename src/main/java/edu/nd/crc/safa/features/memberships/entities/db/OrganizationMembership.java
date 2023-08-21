@@ -46,4 +46,10 @@ public class OrganizationMembership {
     @Column
     @Enumerated(EnumType.STRING)
     private OrganizationRole role;
+
+    public OrganizationMembership(SafaUser user, Organization organization, OrganizationRole role) {
+        this.user = user;
+        this.organization = organization;
+        this.role = role;
+    }
 }

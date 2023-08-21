@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Type, Tuple
 
 from tgen.common.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -18,6 +18,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
     """
 
     OPTIONAL_COLUMNS = [StructuredKeys.Artifact.SUMMARY.value]
+    _SUMMARY_DEFAULT = None
 
     @overrides(AbstractProjectDataFrame)
     def process_data(self) -> None:
@@ -27,7 +28,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         super().process_data()
         if not self.empty and StructuredKeys.Artifact.SUMMARY.value not in self.columns:
-            self[StructuredKeys.Artifact.SUMMARY.value] = [EMPTY_STRING for _ in self.index]
+            self[StructuredKeys.Artifact.SUMMARY.value] = [self._SUMMARY_DEFAULT for _ in self.index]
 
     @classmethod
     def index_name(cls) -> str:
@@ -54,10 +55,8 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param summary: The summary of the artifact body
         :return: The newly added artifact
         """
-        row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content,
-                       ArtifactKeys.LAYER_ID: layer_id}
-        if summary:
-            row_as_dict[ArtifactKeys.SUMMARY] = summary
+        row_as_dict = {ArtifactKeys.ID: artifact_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
+                       ArtifactKeys.SUMMARY: summary if summary else self._SUMMARY_DEFAULT}
         return self.add_new_row(row_as_dict)
 
     def get_artifact(self, artifact_id: Any) -> EnumDict:
@@ -130,6 +129,27 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param summarizer: The summarizer to use
         :return: The summaries
         """
-        summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
-        self[ArtifactKeys.SUMMARY.value] = summaries
-        return summaries
+        if self[ArtifactKeys.SUMMARY.value].isna().any():
+            missing_all = self[ArtifactKeys.SUMMARY].isna().all()
+            if missing_all:
+                summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
+                self[ArtifactKeys.SUMMARY] = summaries
+            else:
+                ids, content = self._find_missing_summaries()
+                summaries = summarizer.summarize_bulk(bodies=content, filenames=ids)
+                self.update_values(ArtifactKeys.SUMMARY, ids, summaries)
+        return self[ArtifactKeys.SUMMARY]
+
+    def _find_missing_summaries(self) -> Tuple[List, List]:
+        """
+        Finds artifacts that are missing summaries
+        :return: The ids and content of the missing summaries
+        """
+        ids = []
+        content = []
+        for i, artifact in self.itertuples():
+            if not artifact[ArtifactKeys.SUMMARY]:
+                ids.append(i)
+                content.append(artifact[ArtifactKeys.CONTENT])
+        return ids, content
+

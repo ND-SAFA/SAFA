@@ -9,7 +9,12 @@ from yaml.loader import Loader, SafeLoader
 
 from tgen.common.util.json_util import JsonUtil
 import pickle
-from tgen.constants.deliminator_constants import F_SLASH
+from tgen.constants.deliminator_constants import F_SLASH, EMPTY_STRING
+
+CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
+                   "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",
+                   "PL", "R", "PY", "JAVA"]
+
 
 class FileUtil:
     JSON_EXT = "json"
@@ -334,3 +339,20 @@ class FileUtil:
         """
         full_path = os.path.splitext(file_path)[0] + os.path.extsep + ext
         return full_path
+
+    @staticmethod
+    def is_code(path_or_ext: str) -> bool:
+        """
+        Determines if a file is a code file based on the ext
+        :param path_or_ext: The ext of the file or the full path
+        :return: The summary to use
+        """
+        if not isinstance(path_or_ext, str):
+            path_or_ext = str(path_or_ext)
+        tmp = os.path.splitext(path_or_ext)
+        if tmp[-1]:
+            path_or_ext = tmp[-1].replace(os.extsep, EMPTY_STRING)
+        path_or_ext = path_or_ext.upper()
+        if path_or_ext in CODE_EXTENSIONS:
+            return True
+        return False

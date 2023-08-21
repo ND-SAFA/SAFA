@@ -3,6 +3,8 @@ package edu.nd.crc.safa.features.organizations.entities.db;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -40,5 +42,6 @@ public class TeamMembership {
     private Team team;
 
     @Column
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private TeamRole role;
 }

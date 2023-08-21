@@ -3,7 +3,7 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
 import org.json.JSONObject;

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.test.features.memberships.errors;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
 import org.json.JSONObject;

@@ -2,7 +2,7 @@ package edu.nd.crc.safa.test.features.memberships.permissions;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.AbstractSharingTest;
 
 import org.json.JSONObject;

@@ -3,8 +3,8 @@ package edu.nd.crc.safa.features.memberships.entities.app;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

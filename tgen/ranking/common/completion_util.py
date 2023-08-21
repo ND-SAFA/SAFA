@@ -1,5 +1,7 @@
 from typing import List
 
+from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_task import LLMCompletionType
 
@@ -14,11 +16,16 @@ def complete_prompts(prompts: List[str], max_tokens: int = 400, temperature: flo
     :return: Responses.
     """
     manager = AnthropicManager()
+    built_prompts = []
+    for p in prompts:
+        prompt_builder = PromptBuilder(prompts=[Prompt(p)])
+        built_p = prompt_builder.build(manager.prompt_args)
+        built_prompts.append(built_p)
     params = {
-        "prompt": [f"\n\nHuman: {p}\n\nAssistant:" for p in prompts],
-        "max_tokens_to_sample": max_tokens,
-        "temperature": temperature,
+        "prompt": built_prompts,
         **kwargs,
     }
+    manager.llm_args.set_max_tokens(max_tokens)
+    manager.llm_args.temperature = temperature
     batch_response = manager.make_completion_request(LLMCompletionType.GENERATION, **params)
     return batch_response

@@ -115,7 +115,7 @@ class RankingUtil:
         other_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
         missing_links = [trace_df.get_link(t_id) for t_id in artifact_ids]
         grouped_links = RankingUtil.group_trace_predictions(missing_links, group_key)
-        grouped_links = {k: [v2[other_key] for v2 in v] for k, v in grouped_links.items()}
+        grouped_links = {k: [f"{v2[other_key]}: {v2[TraceKeys.EXPLANATION.value]}" for v2 in v] for k, v in grouped_links.items()}
         logger.log_title(title)
         for group_key, group_items in grouped_links.items():
             logger.info(f"{group_key}:{group_items}")

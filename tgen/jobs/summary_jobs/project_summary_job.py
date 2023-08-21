@@ -11,36 +11,38 @@ from tgen.ranking.common.completion_util import complete_prompts
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 
 GOAL = (
-    "# Task\nBelow is the set of software artifacts of a software system. "
-    f"The goal is to read through all the artifacts and create a {PROJECT_SUMMARY_HEADER.lower()}. "
-    "This document should provide all the necessary context to hand off to another company that may continue the project."
+    "# Goal\nBelow is the set of software artifacts of a software system. "
+    f"The goal is to read through all the artifacts and create a thorough document "
+    f"providing all the necessary details to hand off the project to another company."
 )
 INSTRUCTIONS_GOAL = (
     f"# Task\n"
-    f"Below are instructions for creating a {PROJECT_SUMMARY_HEADER.lower()}. "
-    "Exclude details that are generally applicable across systems. "
-    "Focus on details that are specific to the design and behavior of this system. "
+    f"Below are instructions for creating the document. "
+    "Include as much detail as you can. Ignore details that are generally applicable across systems. "
     f"Write the document in markdown and start the document with the header '# {PROJECT_SUMMARY_HEADER}'."
     "\n\nInstructions: "
 )
 OVERVIEW = "Create a sub-section called `Overview` describing the main purpose of the system."
-ENTITIES = "Create a sub-section called `Entities`. Define all the major entities in the system and how they interact with each other."
+ENTITIES = "Create a sub-section called `Entities`. Define all the major entities in the system."
 FEATURES = "Create a sub-section called `Features` outlining the major features of the system. "
 MAJOR_COMPONENTS = (
     "Create a sub-section called `Modules`. "
-    "In this high level section enumerate all the major modules in the system. "
-    "Then, create sub-sections for each module in the system. "
-    "For each module, describe:"
-    "\n    - The functionality the module provides."
+    "In this high level section enumerate all the major modules in the system and give a brief descriptions of what they do for the system."
+)
+COMPONENTS = (
+    "Under `Modules`, create sub-sections for each module in the system. "
+    "For each module, create a detailed report that describes:"
+    "\n    - The functionality the module."
     "\n    - The value of the module to the overall system."
-    "\n    - The software artifacts it uses to achieve the desired functionality/value of the module."
-    "\n    - A description highlighting the differences to other similar modules in the system."
+    "\n    - The software artifacts that work to implement the functionality of the module"
+    "\n    - The differences to other similar modules in the system."
 )
 DATA_FLOW = (
-    "Create a sub-section called `Data Flow` and describe the dependencies between major sub-systems and components. "
-    "Highlight how they interact to accomplish the listed features."
+    "Create a sub-section called `Summary` and write a paragraph describing how "
+    "the system fulfills all of its features (outlined in `Features`) using its components. "
+    "Describe the interactions between modules and how data flows between them."
 )
-TASKS_DEFINITIONS = [OVERVIEW, ENTITIES, FEATURES, MAJOR_COMPONENTS, DATA_FLOW]
+TASKS_DEFINITIONS = [OVERVIEW, ENTITIES, FEATURES, MAJOR_COMPONENTS, COMPONENTS, DATA_FLOW]
 FORMAT = "\n\nEnclose your response in <summary></summary>."
 TASKS = "".join([f"\n{i + 1}. {t}" for i, t in enumerate(TASKS_DEFINITIONS)])
 INSTRUCTIONS = INSTRUCTIONS_GOAL + TASKS + FORMAT
@@ -83,7 +85,8 @@ class ProjectSummaryJob(AbstractJob):
                                               body_title=BODY_ARTIFACT_TITLE)
         artifact_ids = self.artifact_map.keys()
         for target_artifact_name in artifact_ids:
-            prompt_builder.with_artifact(target_artifact_name, self.artifact_map[target_artifact_name])
+            artifact_content = self.artifact_map[target_artifact_name]
+            prompt_builder.with_artifact(target_artifact_name, artifact_content, separator="\n")
         prompt = prompt_builder.get()
         generation_response = complete_prompts([prompt], max_tokens=self.n_tokens, temperature=0)
         summary_response = generation_response.batch_responses[0]

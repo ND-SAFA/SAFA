@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Tuple, Union
 
+from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.ranking_util import RankingUtil
 from tgen.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS, DEFAULT_THRESHOLD_SCORE
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
@@ -80,6 +81,7 @@ class RankingJob(AbstractJob):
             assert self.layer_ids is not None
             artifact_df = self.artifact_df
             tracing_types = [self.layer_ids]
+        artifact_df = ArtifactDataFrame(artifact_df.dropna())
         return tracing_types, artifact_df, dataset
 
     def trace_layer(self, artifact_df: ArtifactDataFrame, types_to_trace: Tuple[str, str]):
@@ -93,8 +95,10 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(artifact_df.get_type(parent_type).index)
         children_ids = list(artifact_df.get_type(child_type).index)
+        run_name = f"{child_type}2{parent_type}"
+        logger.info(f"Starting to trace: {run_name}")
 
-        pipeline_args = RankingArgs(run_name=f"{child_type}2{parent_type}",
+        pipeline_args = RankingArgs(run_name=run_name,
                                     artifact_df=artifact_df,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,

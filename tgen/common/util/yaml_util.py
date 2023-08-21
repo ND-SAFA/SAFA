@@ -1,5 +1,5 @@
 from enum import Enum, EnumMeta
-from typing import Dict, Any
+from typing import Any, Dict
 
 from ruamel.yaml.nodes import Node
 from yaml.loader import SafeLoader
@@ -20,7 +20,7 @@ class CustomLoader(SafeLoader):
         """
         class_path = node.tag.split(COLON)[-1]
         cls = ReflectionUtil.get_cls_from_path(class_path)
-        if type(cls).__name__ == "function":
+        if type(cls).__name__ in ["function", "builtin_function_or_method"] or "builtins" in class_path:
             return cls
         if isinstance(cls, EnumMeta):
             return self._create_enum_from_meta(cls, node)

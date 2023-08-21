@@ -1,8 +1,10 @@
+import os.path
 from typing import Any, Dict, List
 
 import pandas as pd
 
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
@@ -17,7 +19,8 @@ class SummarizeArtifactsJob(AbstractJob):
     TYPE_KEY = "type"
 
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
-                 summarizer: Summarizer = None, export_path: str = None, job_args: JobArgs = None, **kwargs):
+                 summarizer: Summarizer = None, project_summary_path: str = None, export_path: str = None, job_args: JobArgs = None,
+                 **kwargs):
         """
         Summarizes a given dataset using the given summarizer
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
@@ -30,6 +33,9 @@ class SummarizeArtifactsJob(AbstractJob):
             artifacts = artifact_df.to_artifacts()
         artifacts = [EnumDict(a) for a in artifacts]
         super().__init__(job_args)
+        if project_summary_path:
+            project_summary = FileUtil.read_file(os.path.expanduser(project_summary_path))
+            kwargs["project_summary"] = project_summary
         if summarizer is None:
             summarizer = Summarizer(**kwargs)
         self.artifacts = artifacts
@@ -47,4 +53,5 @@ class SummarizeArtifactsJob(AbstractJob):
                                                                                            col2use4chunker=ArtifactKeys.ID.value)
         if self.export_path:
             self.artifact_df.to_csv(self.export_path)
+        print("\n", self.artifact_df.iloc[0][ArtifactKeys.SUMMARY.value], "\n")
         return self.artifact_df.to_dict(orient='index')

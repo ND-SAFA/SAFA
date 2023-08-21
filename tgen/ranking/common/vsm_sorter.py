@@ -6,13 +6,11 @@ from tqdm import tqdm
 
 from tgen.common.util.status import Status
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.readers.fake_project_reader import FakeProjectReader
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
@@ -62,14 +60,14 @@ def vsm_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[s
 
 
 def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: Dict[str, str],
-                     model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False) -> Dict[str, str]:
+                     model_name=DEFAULT_EMBEDDING_MODEL, return_scores: bool = False, return_cache: bool = False) -> Dict[str, str]:
     model = SentenceTransformer(model_name)
     cache = {}
 
     def encode(artifact_id: str):
         if artifact_id not in cache:
             a_body = artifact_map[artifact_id]
-            a_embedding = model.encode([a_body])[0]
+            a_embedding = model.encode([a_body])[0].tolist()
             cache[artifact_id] = a_embedding
         return cache[artifact_id]
 
@@ -84,6 +82,8 @@ def embedding_sorter(parent_ids: List[str], child_ids: List[str], artifact_map: 
             parent2rankings[parent_id] = (sorted_artifact_ids, scores)
         else:
             parent2rankings[parent_id] = sorted_artifact_ids
+    if return_cache:
+        return parent2rankings, cache
     return parent2rankings
 
 

@@ -3,14 +3,15 @@ from tgen.data.prompts.prompt import Prompt
 from tgen.data.prompts.prompt_response_manager import PromptResponseManager
 
 CODE_SUMMARY = [Prompt("\n\n# Task\n"
-                       "Provide a detailed summarization of the code while answering the following questions:"
-                       "- What is the main functionality this code provides?"
-                       "- Why is this functionality important?"
-                       "- What is the purpose of this functionality in the context of a software system?"
-                       "Write the summary in an active voice. "
-                       "Assume your audience is familiar with software system this code belongs to.",
+                       "1. Provide a list of answers about the following questions about the code:"
+                       "\n- What are the inputs/outputs of this code?"
+                       "\n- What is the code doing?"
+                       "\nUse `# Project Specification` to guide your context of the system. Enclose your answer in <notes></notes>"
+                       "\n\n2. Write a polished summary of the code in one cohesive, detailed. paragraph."
+                       "Write in an active voice and assume your audience is familiar with software system this code belongs to."
+                       "\n\n",
                        PromptResponseManager(response_tag="summary")),
-                ArtifactPrompt(include_id=False)]
+                ArtifactPrompt(include_id=False, prompt_start="# Code\n")]
 
 NL_SUMMARY = [
     Prompt("Summarize the following, focusing on the high-level usage.\n", PromptResponseManager(response_tag="summary")),

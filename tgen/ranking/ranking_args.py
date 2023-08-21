@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.ranking_constants import DEFAULT_COMPLETION_TOKENS, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
+from tgen.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_COMPLETION_TOKENS, DEFAULT_MAX_CONTEXT_ARTIFACTS, \
+    DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_THRESHOLD, \
     DEFAULT_RANKING_MODEL, DEFAULT_SORTING_ALGORITHM, DEFAULT_SUMMARY_TOKENS, GENERATE_SUMMARY_DEFAULT, RANKING_PARENT_TAG
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -13,8 +14,6 @@ from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_
     DEFAULT_RANKING_QUESTIONS
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
-
-DEFAULT_ARTIFACT_HEADER = "\n# Software Artifacts\n"
 
 
 @dataclass

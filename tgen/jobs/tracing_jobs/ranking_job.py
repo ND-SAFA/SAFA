@@ -106,11 +106,12 @@ class RankingJob(AbstractJob):
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         predicted_entries = pipeline.run()
         self.project_summary = pipeline.state.project_summary
-        for entry in predicted_entries:
-            trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
-            trace_entry = self.dataset.trace_df.loc[trace_id]
-            label = trace_entry[TraceKeys.LABEL.value]
-            entry[TraceKeys.LABEL.value] = label
+        if self.dataset is not None and self.dataset.trace_df is not None:
+            for entry in predicted_entries:
+                trace_id = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value])
+                trace_entry = self.dataset.trace_df.loc[trace_id]
+                label = trace_entry[TraceKeys.LABEL.value]
+                entry[TraceKeys.LABEL.value] = label
 
         if self.select_top_predictions:
             predicted_entries = [e for e in predicted_entries if e[TraceKeys.SCORE.value] >= DEFAULT_THRESHOLD_SCORE]
@@ -118,6 +119,6 @@ class RankingJob(AbstractJob):
 
     @staticmethod
     def optional_eval(dataset, predictions):
-        if dataset is None:
+        if dataset is None or dataset.trace_df is None or len(dataset.trace_df.get_links_with_label(1)) == 0:
             return
         RankingUtil.evaluate_trace_predictions(dataset.trace_df, predictions)

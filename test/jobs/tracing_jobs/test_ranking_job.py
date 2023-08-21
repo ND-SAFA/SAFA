@@ -33,7 +33,7 @@ class TestRankingJob(BaseTest):
         job_result = job.run()
         self.assertEqual(Status.SUCCESS, job_result.status)
         prediction_entries = job_result.body.prediction_entries
-        self.assertGreaterEqual(len(prediction_entries), TestDataManager.get_n_candidates())
+        self.assertEqual(len(prediction_entries), TestDataManager.get_n_candidates())
 
     def create_job_using_embeddings(self, **kwargs):
         job = self.create_job(ranking_pipeline=SupportedRankingPipelines.EMBEDDING,

@@ -18,6 +18,8 @@ class StrUtil:
         if not args and not kwargs:
             return string
         formatting_fields = re.findall(r'\{(\w*)\}', string)
+        if not formatting_fields:
+            return string
         updated_args = [arg for arg in args]
         for i, field in enumerate(formatting_fields):
             if kwargs and field not in kwargs:

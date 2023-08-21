@@ -1,15 +1,14 @@
+import builtins
+import importlib
 import traceback
 import typing
 from enum import Enum
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List, Optional, Type
 
-from pydantic.class_validators import Optional
 from typeguard import check_type
 
 from tgen.common.util.str_util import StrUtil
-from tgen.constants.deliminator_constants import PERIOD, UNDERSCORE, EMPTY_STRING
-import importlib
-
+from tgen.constants.deliminator_constants import PERIOD, UNDERSCORE
 from tgen.variables.undetermined_variable import UndeterminedVariable
 
 
@@ -230,7 +229,7 @@ class ReflectionUtil:
         try:
             spit_path = class_path.split(PERIOD)
             module_path, class_name = PERIOD.join(spit_path[:-1]), spit_path[-1]
-            module = importlib.import_module(module_path)
+            module = builtins if "builtins" in class_path else importlib.import_module(module_path)
             if not hasattr(module, class_name):
                 outer_class_name = StrUtil.snake_case_to_pascal_case(spit_path[-2])
                 module = getattr(module, outer_class_name)

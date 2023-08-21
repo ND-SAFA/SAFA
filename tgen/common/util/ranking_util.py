@@ -65,11 +65,11 @@ class RankingUtil:
         return predicted_entries
 
     @staticmethod
-    def evaluate_trace_predictions(trace_df: TraceDataFrame, selected_entries: List[TracePredictionEntry]) -> Dict:
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[TracePredictionEntry]) -> Dict:
         """
         Calculates ranking metrics for ranking predictions.
         :param trace_df: The trace data frame containing true labels.
-        :param selected_entries: The ranking predictions.
+        :param predicted_entries: The ranking predictions.
         :return: The dictionary of metrics.
         """
         if trace_df is None:
@@ -83,17 +83,18 @@ class RankingUtil:
         positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
         negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
         predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE.value], entry[TraceKeys.TARGET.value]) for
-                              entry in selected_entries]
+                              entry in predicted_entries]
+        predicted_t_map = {t_id: t for t_id, t in zip(predicted_link_ids, predicted_entries)}
 
         false_negative_ids = list(set(positive_link_ids).difference(set(predicted_link_ids)))
         false_positive_ids = list(set(negative_link_ids).intersection(set(predicted_link_ids)))
 
-        RankingUtil.log_artifacts("False Negatives", trace_df, false_negative_ids)
-        RankingUtil.log_artifacts("False Positives", trace_df, false_positive_ids)
+        RankingUtil.log_artifacts("False Negatives", trace_df.to_map(), false_negative_ids)
+        RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
 
         other_link_ids = set(all_link_ids).difference(predicted_link_ids)
         ordered_link_ids = predicted_link_ids + list(other_link_ids)
-        scores = [entry[TraceKeys.SCORE.value] for entry in selected_entries]
+        scores = [entry[TraceKeys.SCORE.value] for entry in predicted_entries]
         missing_scores = [0 for i in other_link_ids]
         all_scores = scores + missing_scores
 
@@ -104,7 +105,7 @@ class RankingUtil:
         return metrics
 
     @staticmethod
-    def log_artifacts(title: str, trace_df: TraceDataFrame, artifact_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
+    def log_artifacts(title: str, trace_map: Dict, artifact_ids: List[str], group_key: str = TraceKeys.TARGET.value) -> None:
         """
         Logs the missing links (false negatives).
         :param trace_df: The trace data frame containing the missing links.
@@ -112,10 +113,12 @@ class RankingUtil:
         :param group_key: The key used to group missing ids (either by parent or child).
         :return: None
         """
-        other_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
-        missing_links = [trace_df.get_link(t_id) for t_id in artifact_ids]
+        artifact_id_key = TraceKeys.SOURCE.value if group_key == TraceKeys.TARGET.value else TraceKeys.TARGET.value
+
+        missing_links = [trace_map[t_id] for t_id in artifact_ids]
         grouped_links = RankingUtil.group_trace_predictions(missing_links, group_key)
-        grouped_links = {k: [v2[other_key] for v2 in v] for k, v in grouped_links.items()}
+        grouped_links = {g: [RankingUtil.format_link(link, artifact_id_key) for link in g_links] for g, g_links in
+                         grouped_links.items()}
         logger.log_title(title)
         for group_key, group_items in grouped_links.items():
             logger.info(f"{group_key}:{group_items}")
@@ -162,3 +165,16 @@ class RankingUtil:
                 children2entry[child_id] = []
             children2entry[child_id].append(entry)
         return children2entry
+
+    @staticmethod
+    def format_link(a: Dict, artifact_id_key: str):
+        """
+        Formats the artifact with its score and explanation if it exists.
+        :param a: The artifact to format.
+        :param artifact_id_key: The key to get the id of the artifact to display.
+        :return: Formatted string.
+        """
+        a_id = a[artifact_id_key]
+        a_score = a.get(TraceKeys.SCORE.value, "")
+        a_explanation = a.get(TraceKeys.EXPLANATION.value, "")
+        return f"{a_id}: ({a_score}) :{a_explanation}"

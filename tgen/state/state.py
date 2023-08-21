@@ -2,7 +2,7 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import List, Any
+from typing import Any, List
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
@@ -88,6 +88,7 @@ class State(BaseObject):
             for step in steps:
                 path = cls._get_path_to_state_checkpoint(load_dir, step)
                 if os.path.exists(path):
+                    logger.info(f"Reading step state: {path}")
                     param_specs = ParamSpecs.create_from_method(cls.__init__)
                     attrs = {name: cls._check_type(name, val, param_specs) for name, val in YamlUtil.read(path).items()}
                     obj = cls(**attrs)
@@ -95,7 +96,7 @@ class State(BaseObject):
                     return obj
             raise FileNotFoundError(f"Unable to find a previous state to load from {load_dir}")
         except Exception as e:
-            logger.exception("Could not reload state. Creating new instance.")
+            logger.exception(f"Could not reload state of step: {step}. Creating new instance.")
             return cls()
 
     @classmethod

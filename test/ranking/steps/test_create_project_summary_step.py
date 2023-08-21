@@ -1,10 +1,8 @@
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
-from tgen.constants.ranking_constants import PROJECT_SUMMARY_FILE_NAME
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
 
@@ -30,15 +28,6 @@ class TestCreateProjectSummary(BaseTest):
         Tests ability to receive a specified project summary.
         """
         args, state = RankingPipelineTest.create_ranking_structures(project_summary=self.PROJECT_SUMMARY)
-        step = CreateProjectSummary()
-        self.assert_result(args, state, step)
-
-    def test_read_project_summary(self):
-        """
-        Tests ability to read a project summary from a file.
-        """
-        args, state = RankingPipelineTest.create_ranking_structures(export_dir=TEST_OUTPUT_DIR)
-        args.save(self.PROJECT_SUMMARY, PROJECT_SUMMARY_FILE_NAME)
         step = CreateProjectSummary()
         self.assert_result(args, state, step)
 

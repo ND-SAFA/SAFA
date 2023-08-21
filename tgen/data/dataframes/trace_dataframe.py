@@ -124,3 +124,13 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: Returns links with given label.
         """
         return [t for t_id, t in self.itertuples() if t[TraceKeys.LABEL] == label]
+
+    def to_map(self) -> Dict:
+        """
+        Creates a map of ID to trace link.
+        :return: Mapping of trace links.
+        """
+        t_map = {}
+        for i, row in self.itertuples():
+            t_map[i] = row
+        return t_map

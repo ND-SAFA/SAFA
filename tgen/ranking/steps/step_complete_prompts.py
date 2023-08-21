@@ -1,5 +1,6 @@
+from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.ranking.common.completion_util import complete_prompts
+from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
@@ -25,11 +26,11 @@ class CompleteRankingPrompts(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The ranking store.
         :return: None
         """
-        kwargs = {}
+        kwargs = {PromptKeys.PROMPT.value: state.ranking_prompts}
         if args.ranking_llm_model:
             kwargs["model"] = args.ranking_llm_model
-        batch_response = complete_prompts(state.ranking_prompts,
-                                          temperature=0,
-                                          max_tokens=args.n_completion_tokens,
-                                          **kwargs)
+        args.llm_manager.llm_args.set_max_tokens(args.n_completion_tokens)
+        args.llm_manager.llm_args.temperature = 0
+        batch_response = args.llm_manager.make_completion_request(LLMCompletionType.GENERATION, **kwargs)
+
         return batch_response

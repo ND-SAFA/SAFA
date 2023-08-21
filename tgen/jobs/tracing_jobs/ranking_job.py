@@ -81,7 +81,6 @@ class RankingJob(AbstractJob):
             assert self.layer_ids is not None
             artifact_df = self.artifact_df
             tracing_types = [self.layer_ids]
-        artifact_df = ArtifactDataFrame(artifact_df.dropna())
         return tracing_types, artifact_df, dataset
 
     def trace_layer(self, artifact_df: ArtifactDataFrame, types_to_trace: Tuple[str, str]):

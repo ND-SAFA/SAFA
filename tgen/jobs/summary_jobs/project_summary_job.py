@@ -4,10 +4,15 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, PROJECT_SUMMARY_HEADER
+from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.prompts.prompt import Prompt
+from tgen.data.prompts.prompt_builder import PromptBuilder
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.data.summarizer.summarizer import Summarizer
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.ranking.common.completion_util import complete_prompts
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.llm_task import LLMCompletionType
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.ranking.common.ranking_prompt_builder import RankingPromptBuilder
 
 GOAL = (
@@ -58,6 +63,7 @@ class ProjectSummaryResponse(TypedDict):
 class ProjectSummaryJob(AbstractJob):
     def __init__(self, artifact_map: Dict[str, str] = None,
                  artifact_reader: ArtifactProjectReader = None,
+                 llm_manager: AbstractLLMManager = None,
                  n_tokens: int = DEFAULT_SUMMARY_TOKENS, export_path: str = None):
         """
         Generates a system specification document for containing all artifacts.
@@ -70,6 +76,9 @@ class ProjectSummaryJob(AbstractJob):
             summarizer = Summarizer()
             artifact_reader.set_summarizer(summarizer)
             artifact_map = artifact_reader.read_project().to_map()
+        if llm_manager is None:
+            llm_manager = SupportedLLMManager.ANTHROPIC.value()
+        self.llm_manager: AbstractLLMManager = llm_manager
         self.artifact_map = artifact_map
         self.n_tokens = n_tokens
         self.export_path = export_path
@@ -80,15 +89,24 @@ class ProjectSummaryJob(AbstractJob):
         :return: System summary.
         """
         logger.log_title("Creating project specification.")
-        prompt_builder = RankingPromptBuilder(goal=GOAL,
-                                              instructions=INSTRUCTIONS,
-                                              body_title=BODY_ARTIFACT_TITLE)
+
+        # TODO: Replace ranking prompt builder with actual prompt builder
+        ranking_prompt_builder = RankingPromptBuilder(goal=GOAL,
+                                                      instructions=INSTRUCTIONS,
+                                                      body_title=BODY_ARTIFACT_TITLE)
         artifact_ids = self.artifact_map.keys()
         for target_artifact_name in artifact_ids:
             artifact_content = self.artifact_map[target_artifact_name]
-            prompt_builder.with_artifact(target_artifact_name, artifact_content, separator="\n")
-        prompt = prompt_builder.get()
-        generation_response = complete_prompts([prompt], max_tokens=self.n_tokens, temperature=0)
+            ranking_prompt_builder.with_artifact(target_artifact_name, artifact_content, separator="\n")
+        prompt = ranking_prompt_builder.get()
+
+        prompt_builder = PromptBuilder(prompts=[Prompt(prompt)])
+        prompt = prompt_builder.build(self.llm_manager.prompt_args)[PromptKeys.PROMPT]
+
+        self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
+        self.llm_manager.llm_args.temperature = 0
+        kwargs = {PromptKeys.PROMPT.value: [prompt]}
+        generation_response = self.llm_manager.make_completion_request(LLMCompletionType.GENERATION, **kwargs)
         summary_response = generation_response.batch_responses[0]
         summary_tag_query = LLMResponseUtil.parse(summary_response, "summary")
         if len(summary_tag_query) == 0:

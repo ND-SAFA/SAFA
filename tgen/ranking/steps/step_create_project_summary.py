@@ -27,7 +27,8 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
             logger.info("Skipping project summary.")
             summary = None
         else:  # GENERATED SUMMARY
-            summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens)
+            summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens,
+                                            llm_manager=args.llm_manager)
             response: ProjectSummaryResponse = summary_job.run().body
             summary = response["summary"]
         state.project_summary = summary

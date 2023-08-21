@@ -2,8 +2,7 @@ import gc
 from typing import Dict, List, Optional, Type
 
 from torch.nn.parameter import Parameter
-from transformers import AutoConfig, PretrainedConfig
-from transformers.modeling_utils import PreTrainedModel
+from transformers import AutoConfig, PreTrainedModel, PretrainedConfig
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 

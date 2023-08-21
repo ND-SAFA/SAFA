@@ -12,6 +12,8 @@ from tgen.constants.ranking_constants import DEFAULT_ARTIFACT_HEADER, DEFAULT_CO
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.prompts.supported_prompts.default_ranking_prompts import DEFAULT_RANKING_GOAL, DEFAULT_RANKING_INSTRUCTIONS, \
     DEFAULT_RANKING_QUESTIONS
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.supported_llm_manager import SupportedLLMManager
 from tgen.ranking.common.vsm_sorter import DEFAULT_EMBEDDING_MODEL
 from tgen.state.pipeline.pipeline_args import PipelineArgs
 
@@ -47,6 +49,7 @@ class RankingArgs(PipelineArgs):
     - query_tag: The tag used to encapsulate the parent or query string.
     - artifact_header: The header to put above all the software artifacts.
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
+    - llm_manager: A custom llm manager to use throughout the pipeline.
     """
     run_name: str = "default_run"
     export_dir: str = None
@@ -68,6 +71,7 @@ class RankingArgs(PipelineArgs):
     query_tag: str = RANKING_PARENT_TAG
     artifact_header: str = DEFAULT_ARTIFACT_HEADER
     max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
+    llm_manager: AbstractLLMManager = None
 
     def save(self, obj: Any, file_name: str) -> str:
         """
@@ -114,3 +118,5 @@ class RankingArgs(PipelineArgs):
         self.artifact_map = self.artifact_df.to_map()
         if self.ranking_questions is None:
             self.ranking_questions = DEFAULT_RANKING_QUESTIONS
+        if self.llm_manager is None:
+            self.llm_manager = SupportedLLMManager.ANTHROPIC.value()

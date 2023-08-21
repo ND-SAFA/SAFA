@@ -6,13 +6,11 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.status import Status
-from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -125,4 +123,4 @@ class CreateHGenDatasetStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param directory: The main directory used by hgen
         :return: The full path
         """
-        return os.path.join(directory, "ranking") if directory else EMPTY_STRING
+        return os.path.join(directory, "ranking") if directory else None

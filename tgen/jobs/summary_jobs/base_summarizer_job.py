@@ -16,7 +16,7 @@ class BaseSummarizerJob(AbstractJob, ABC):
     def __init__(self, artifacts: List[Dict] = None, artifact_reader: ArtifactProjectReader = None,
                  project_summary_path: str = None, job_args: JobArgs = None, **kwargs):
         """
-        Summarizes a given dataset using the given summarizer
+        Responsible for setting up project summary and artifact summarization jobs
         :param artifacts: A dictionary mapping artifact id to a dictionary containing its content and type (e.g. java, py, nl)
         :param job_args: The arguments to the job.
         """

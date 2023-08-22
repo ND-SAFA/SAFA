@@ -244,7 +244,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
 
     def drop_nan_indices(self) -> pd.DataFrame:
         """
-        Drops all columns containing NaN in a required column
+        Drops all columns containing NaN in the index
         :return: A copy of the dataframe without the cols with NaN
         """
         return self.__class__(self[self.index.notnull()])

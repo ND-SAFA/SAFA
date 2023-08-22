@@ -39,7 +39,6 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
         args = self.create_summarizer_args()
         dataset = Summarizer(args).summarize()
         artifacts_df = dataset.artifact_df
-        logger.debug("\n", artifacts_df.iloc[0][ArtifactKeys.SUMMARY.value], "\n")
         artifacts = artifacts_df.to_dict(orient='index')
         summary = dataset.project_summary if self.include_project_summary else None
         return SummaryResponse(summary=summary, artifacts=artifacts)

@@ -4,7 +4,7 @@ import pandas as pd
 
 from tgen.common.util.json_util import JsonUtil
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 
 class JsonEntityFormat(AbstractEntityFormat):
@@ -13,7 +13,7 @@ class JsonEntityFormat(AbstractEntityFormat):
     """
 
     @classmethod
-    def _parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
+    def _parse(cls, data_path: str, summarizer: ArtifactsSummarizer = None, **params) -> pd.DataFrame:
         """
         Parses a JSON file into DataFrame of entities.
         :param data_path: The path to the data to parse

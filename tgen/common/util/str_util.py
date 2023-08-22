@@ -1,7 +1,7 @@
 import re
 import uuid
 
-from tgen.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE
 
 
 class StrUtil:

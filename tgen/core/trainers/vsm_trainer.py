@@ -11,8 +11,8 @@ from sklearn.metrics import pairwise_distances
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.ranking_util import RankingUtil
-from tgen.constants.other_constants import VSM_THRESHOLD_DEFAULT
-from tgen.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.constants.other_constants import VSM_THRESHOLD_DEFAULT
+from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry, TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput

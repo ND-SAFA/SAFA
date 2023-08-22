@@ -1,7 +1,7 @@
 import os
 from typing import Iterable
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob

@@ -1,11 +1,8 @@
-import uuid
-
 import mock
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.status import Status
-from tgen.constants.deliminator_constants import SPACE
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame, LayerKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
@@ -17,11 +14,10 @@ from tgen.delta.steps.impact_analysis_step import ImpactAnalysisStep
 from tgen.delta.steps.individual_diff_summary_step import IndividualDiffSummaryStep
 from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryStep
 from tgen.delta.steps.project_summary_step import ProjectSummaryStep
-from tgen.jobs.components.job_result import JobResult
-from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob
+from tgen.summarizer.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 added_file = "new_file.py"
 modified_file = "existing_file.py"
@@ -104,9 +100,9 @@ class TestProjectSummaryStep(BaseTest):
         self.assertEqual("These files relate to the same new functionality.", groups[0]["change"])
         self.assertIn(deleted_file, groups[1]["filenames"])
         self.assertIn("Removed functionality", groups[1]["type"])
-        self.assertEqual( "This file is the only one related to this change.", groups[1]["change"])
+        self.assertEqual("This file is the only one related to this change.", groups[1]["change"])
         self.assertEqual("This is a technical summary.", self.DELTA_STATE.change_summary_output["low-level-summary"][0])
-        self.assertEqual( "This is a user-focused summary.", self.DELTA_STATE.change_summary_output["user-level-summary"][0])
+        self.assertEqual("This is a user-focused summary.", self.DELTA_STATE.change_summary_output["user-level-summary"][0])
 
         self.assertIsNotNone(self.DELTA_STATE.change_details_section)
 
@@ -177,23 +173,10 @@ class TestProjectSummaryStep(BaseTest):
         self.assertNotIn(ChangeType.DEPENDENCIES_IMPORTS.value, modified_summary)
         self.assertNotIn(ChangeType.RENAMED.value, modified_summary)
 
-    @mock.patch.object(ProjectSummaryJob, "run")
+    @mock.patch.object(ProjectSummarizer, "summarize")
     def assert_project_summary_step(self, project_summary_mock: mock.MagicMock):
         summary = "This is a project summary."
-        summary_response = {"summary": summary}
-
-        project_summary_mock.return_value = JobResult(status=Status.FAILURE,
-                                                      job_id=uuid.uuid4(),
-                                                      body="exception")
-        try:
-            ProjectSummaryStep().run(self.DELTA_ARGS, self.DELTA_STATE)
-            self.fail("exception should be thrown when job fails")
-        except AssertionError:
-            pass
-
-        project_summary_mock.return_value = JobResult(status=Status.SUCCESS,
-                                                      job_id=uuid.uuid4(),
-                                                      body=summary_response)
+        project_summary_mock.return_value = summary
         ProjectSummaryStep().run(self.DELTA_ARGS, self.DELTA_STATE)
         self.assertEqual(self.DELTA_STATE.project_summary, summary)
 

@@ -1,25 +1,25 @@
 from typing import Dict, List
 
-from tgen.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject
-from tgen.testres.testprojects.mocking.mock_openai import mock_openai
-from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -41,7 +41,7 @@ class TestPromptDatasetCreator(BaseTest):
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
         llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=Summarizer(llm_manager, code_or_exceeds_limit_only=False))
+                                                          summarizer=ArtifactsSummarizer(llm_manager, code_or_exceeds_limit_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -67,8 +67,8 @@ class TestPromptDatasetCreator(BaseTest):
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
         llm_manager = self.create_llm_manager()
         dataset_creator: PromptDatasetCreator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
-                                                                                summarizer=Summarizer(llm_manager,
-                                                                                                      code_or_exceeds_limit_only=False))
+                                                                                summarizer=ArtifactsSummarizer(llm_manager,
+                                                                                                               code_or_exceeds_limit_only=False))
         artifact_entries = self.get_expected_bodies()
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=artifact_entries)
 

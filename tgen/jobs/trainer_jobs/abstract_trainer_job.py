@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional, Type, Union
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask

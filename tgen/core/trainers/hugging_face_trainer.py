@@ -9,7 +9,7 @@ from transformers.trainer_utils import PredictionOutput
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.override import overrides
-from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion

@@ -7,6 +7,7 @@
           "starting_hgen_job": {
             "hgen_args": {
               "export_dir": "[OUTPUT_PATH]/hgen/jackofclubs",
+               "load_dir": "[OUTPUT_PATH]/hgen/jackofclubs/43e48065-c847-4f4b-be19-9573696381b0",
               "source_layer_id": "C++ Code",
               "target_type": "User Story",
               "dataset_creator_for_sources": {

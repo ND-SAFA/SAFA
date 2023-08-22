@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from unittest import TestCase
 
-from tgen.constants.deliminator_constants import COMMA
+from tgen.common.constants.deliminator_constants import COMMA
 from tgen.data.github.gtraces.glink_finder import GLinkTarget
 from tgen.data.github.gtraces.glink_store import GLinkStore
 from tgen.testres.testprojects.github_test_project import GithubTestProject

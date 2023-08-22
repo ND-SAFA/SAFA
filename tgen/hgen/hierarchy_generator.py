@@ -6,7 +6,8 @@ from typing import Type
 from tgen.common.util.base_object import BaseObject
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenArgs, HGenState
+from tgen.hgen.hgen_args import HGenArgs
+from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint, SAVE_DATASET_DIRNAME
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep

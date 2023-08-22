@@ -2,6 +2,9 @@ import inspect
 from dataclasses import dataclass, field, MISSING, Field
 from typing import Dict
 
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.tdatasets.idataset import iDataset
+
 
 def required_field(*, field_name: str, init=True, repr=True, hash=None, compare=True, metadata=None):
     """
@@ -60,3 +63,16 @@ class DataclassUtil:
             else:
                 raise Exception("Unrecognized training arg: " + arg_name)
         return super_args
+
+    @staticmethod
+    def post_initialize_datasets(dataset: iDataset = None, dataset_creator: AbstractDatasetCreator = None) -> iDataset:
+        """
+        Ensures that a dataset is either supplied or created
+        :param dataset: The dataset
+        :param dataset_creator: The creator to make the dataset
+        :return: The created dataset
+        """
+        if not dataset:
+            assert dataset_creator, "Must supply either a dataset or a creator to make one."
+            dataset = dataset_creator.create()
+        return dataset

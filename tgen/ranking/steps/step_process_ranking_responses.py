@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from tgen.common.util.json_util import JsonUtil
-from tgen.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
+from tgen.common.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, \
     RANKING_MAX_SCORE, RANKING_SCORE_TAG
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
@@ -16,6 +16,10 @@ ID_PROCESSING_STEPS = [lambda f: f.replace("ID:", ""), lambda f: f.strip()]
 class ArtifactReasoning:
 
     def __init__(self, artifact_dict: Dict):
+        """
+        Stores the reasoning of the LLM for each artifact
+        :param artifact_dict: Contains the reasoning of the LLM for each artifact
+        """
         JsonUtil.require_properties(artifact_dict, [ArtifactKeys.ID.value, RANKING_EXPLANATION_TAG, RANKING_SCORE_TAG])
         self.index = artifact_dict[RANKING_ID_TAG][0]
         self.explanation = artifact_dict[RANKING_EXPLANATION_TAG][0].strip()

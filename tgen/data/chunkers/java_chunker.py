@@ -2,10 +2,10 @@ from typing import List, Type
 
 import javalang
 import javalang.ast
-from javalang.tree import Declaration, Import, PackageDeclaration, SwitchStatement
+from javalang.tree import Declaration, Import, PackageDeclaration
 from javalang import tree as javatree
 
-from tgen.constants.deliminator_constants import NEW_LINE, SEMI_COLON, BRACKET_OPEN, BRACKET_CLOSE
+from tgen.common.constants.deliminator_constants import NEW_LINE, SEMI_COLON, BRACKET_OPEN, BRACKET_CLOSE
 from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 

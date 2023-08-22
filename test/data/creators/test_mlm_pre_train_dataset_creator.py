@@ -1,6 +1,6 @@
 import os
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.testres.base_tests.base_test import BaseTest

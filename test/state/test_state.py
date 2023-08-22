@@ -7,7 +7,7 @@ from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenState
+from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
 from tgen.state.state import State

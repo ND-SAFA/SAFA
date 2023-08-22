@@ -1,4 +1,4 @@
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager

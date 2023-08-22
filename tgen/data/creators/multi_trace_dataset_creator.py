@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.constants.dataset_constants import REMOVE_ORPHANS_DEFAULT
+from tgen.common.constants.dataset_constants import REMOVE_ORPHANS_DEFAULT
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner

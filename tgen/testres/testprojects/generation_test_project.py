@@ -1,7 +1,6 @@
 from typing import List
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.jobs.data_jobs.summarize_artifacts_job import SummarizeArtifactsJob
 
 
 class GenerationTestProject:

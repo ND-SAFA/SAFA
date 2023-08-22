@@ -11,7 +11,7 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.logging.logger_manager import LoggerManager
 from tgen.common.util.random_util import RandomUtil
-from tgen.constants import environment_constants
+from tgen.common.constants import environment_constants
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner

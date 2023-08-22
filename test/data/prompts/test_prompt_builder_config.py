@@ -1,11 +1,11 @@
 from typing import List, Union
 
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
 

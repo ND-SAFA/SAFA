@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 import pandas as pd
 
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 
 class AbstractEntityFormat(ABC):
@@ -11,7 +11,7 @@ class AbstractEntityFormat(ABC):
     """
 
     @classmethod
-    def parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
+    def parse(cls, data_path: str, summarizer: ArtifactsSummarizer = None, **params) -> pd.DataFrame:
         """
         Parses a data into DataFrame of entities.
         :param data_path: The path to the data to parse
@@ -22,7 +22,7 @@ class AbstractEntityFormat(ABC):
 
     @classmethod
     @abstractmethod
-    def _parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
+    def _parse(cls, data_path: str, summarizer: ArtifactsSummarizer = None, **params) -> pd.DataFrame:
         """
         Parses a data into DataFrame of entities.
         :param data_path: The path to the data to parse

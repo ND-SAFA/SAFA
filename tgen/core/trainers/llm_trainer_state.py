@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from tgen.common.util.dataclass_util import required_field
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.state.state import State
@@ -30,7 +30,7 @@ class LLMTrainerState(State):
     """
     :param summarizer: The summarizer to use for shortening artifacts over the token limit.
     """
-    summarizer: Summarizer = None
+    summarizer: ArtifactsSummarizer = None
     """
     :param completion_type: The type of completion (either generation or completion)
     """
@@ -38,5 +38,4 @@ class LLMTrainerState(State):
 
     def __post_init__(self):
         if self.summarizer is None:
-            self.summarizer = Summarizer(self.llm_manager, model_name=self.llm_manager.llm_args.model,
-                                         code_or_exceeds_limit_only=False)
+            self.summarizer = ArtifactsSummarizer(self.llm_manager, code_or_exceeds_limit_only=False)

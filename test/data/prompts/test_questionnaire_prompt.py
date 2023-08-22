@@ -1,8 +1,8 @@
-from tgen.constants.deliminator_constants import NEW_LINE
-from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
-from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
 

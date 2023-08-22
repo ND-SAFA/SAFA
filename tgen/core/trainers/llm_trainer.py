@@ -12,8 +12,8 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_LABEL, CLASSIFICATION_SCORES, CURRENT_LABELS, \
     REVERSE_CATEGORIES
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
@@ -118,7 +118,8 @@ class LLMTrainer(AbstractTrainer):
         :param prompt_builder: The builder responsible for building the prompts
         :return: The generation output.
         """
-        return TracePredictionOutput(predictions=[prompt_builder.parse_responses(r) for r in responses])  #
+        return TracePredictionOutput(predictions=[prompt_builder.parse_responses(r) for r in responses],
+                                     original_response=responses)  #
 
     def _create_classification_output(self, res: ClassificationResponse, dataset: PromptDataset, prompt_builder: PromptBuilder):
         """

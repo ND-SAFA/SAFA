@@ -6,12 +6,10 @@ import pandas as pd
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.dataset_constants import EXCLUDED_FILES
-from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.common.constants.dataset_constants import EXCLUDED_FILES
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 
 class FolderEntityFormat(AbstractEntityFormat):
@@ -21,7 +19,7 @@ class FolderEntityFormat(AbstractEntityFormat):
     """
 
     @classmethod
-    def _parse(cls, data_path: str, summarizer: Summarizer = None, **params) -> pd.DataFrame:
+    def _parse(cls, data_path: str, summarizer: ArtifactsSummarizer = None, **params) -> pd.DataFrame:
         """
         Parses a data into DataFrame of entities.
         :param data_path: The path to the data to parse
@@ -55,7 +53,7 @@ class FolderEntityFormat(AbstractEntityFormat):
 
     @staticmethod
     def read_files_as_artifacts(file_paths: List[str], base_path: str, use_file_name: bool = True,
-                                with_extension: bool = True, summarizer: Summarizer = None) -> pd.DataFrame:
+                                with_extension: bool = True, summarizer: ArtifactsSummarizer = None) -> pd.DataFrame:
         """
         Reads file at each path and creates artifact with name
         :param file_paths: List of paths to file to read as artifacts

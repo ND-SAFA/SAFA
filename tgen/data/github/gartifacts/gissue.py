@@ -5,7 +5,7 @@ from github import Issue
 
 from tgen.common.util.date_time_util import DateTimeUtil
 from tgen.common.util.override import overrides
-from tgen.constants.deliminator_constants import SPACE
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 

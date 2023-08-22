@@ -4,10 +4,10 @@ from tgen.common.artifact import Artifact
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 ArtifactKeys = StructuredKeys.Artifact
 
@@ -123,7 +123,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body
 
-    def summarize_content(self, summarizer: Summarizer) -> List[str]:
+    def summarize_content(self, summarizer: ArtifactsSummarizer) -> List[str]:
         """
         Summarizes the content in the artifact df
         :param summarizer: The summarizer to use

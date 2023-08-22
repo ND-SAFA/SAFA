@@ -6,7 +6,7 @@ from typing import Any, Callable, List, Union
 from tqdm import tqdm
 
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.threading_constants import THREAD_SLEEP
+from tgen.common.constants.threading_constants import THREAD_SLEEP
 
 
 class ThreadUtil:

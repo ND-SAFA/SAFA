@@ -1,9 +1,9 @@
 import os
 from typing import Dict, Optional, Union
 
-from tgen.constants.deliminator_constants import COMMA, UNDERSCORE, EMPTY_STRING, F_SLASH
-from tgen.constants.experiment_constants import BASE_EXPERIMENT_NAME
-from tgen.constants.script_constants import EXPERIMENTAL_VARS_IGNORE
+from tgen.common.constants.deliminator_constants import COMMA, UNDERSCORE, EMPTY_STRING, F_SLASH
+from tgen.common.constants.experiment_constants import BASE_EXPERIMENT_NAME
+from tgen.common.constants.script_constants import EXPERIMENTAL_VARS_IGNORE
 
 GROUP_EXCLUDE = ["random_seed"]
 

@@ -19,8 +19,8 @@ from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.paths.paths import TEST_HGEN_PATH
-from tgen.testres.testprojects.mocking.mock_libraries import mock_libraries
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_libraries import mock_libraries
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestMultiLayerHGenJob(BaseJobTest):

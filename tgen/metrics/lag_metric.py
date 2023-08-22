@@ -3,7 +3,7 @@ from typing import Dict, List
 import datasets
 import numpy as np
 
-from tgen.constants.metric_constants import THRESHOLD_DEFAULT
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 

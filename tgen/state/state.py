@@ -10,7 +10,7 @@ from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.yaml_util import YamlUtil
-from tgen.constants.deliminator_constants import DASH, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.data.tdatasets.prompt_dataset import PromptDataset

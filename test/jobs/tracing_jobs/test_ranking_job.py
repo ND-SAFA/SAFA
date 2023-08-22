@@ -1,5 +1,5 @@
 from tgen.common.util.status import Status
-from tgen.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.ranking.supported_ranking_pipelines import SupportedRankingPipelines

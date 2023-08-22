@@ -1,5 +1,5 @@
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
 from tgen.testres.base_tests.base_test import BaseTest
 
 

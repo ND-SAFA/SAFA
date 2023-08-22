@@ -2,13 +2,13 @@ from typing import Dict, List
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import NEW_LINE, DASH, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import NEW_LINE, DASH, EMPTY_STRING
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs

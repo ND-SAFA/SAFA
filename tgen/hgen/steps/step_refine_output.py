@@ -1,11 +1,12 @@
 import os
 from typing import List
 
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import get_prompt_builder_for_generation, create_artifact_df_from_generated_artifacts, get_predictions
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.common.util.logging.logger_manager import logger

@@ -2,8 +2,8 @@ from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
 from tgen.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
-from tgen.testres.testprojects.mocking.mock_openai import mock_openai
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.structured_test_project import StructuredTestProject
 
 

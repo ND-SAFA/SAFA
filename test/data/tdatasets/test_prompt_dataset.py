@@ -1,21 +1,17 @@
-import os
 from collections import Callable
 from typing import Dict, List
 
 import mock
 import pandas as pd
 
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
+from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
-from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.data.dataframes.trace_dataframe import TraceKeys
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.llm.token_limits import ModelTokenLimits

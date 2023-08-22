@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Type, Union
 
 from tgen.common.util.base_object import BaseObject
-from tgen.constants.open_ai_constants import TEMPERATURE_DEFAULT
+from tgen.common.constants.open_ai_constants import TEMPERATURE_DEFAULT
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.models.llm.llm_task import LLMCompletionType

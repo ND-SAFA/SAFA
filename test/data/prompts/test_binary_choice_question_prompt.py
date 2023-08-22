@@ -1,4 +1,4 @@
-from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
 

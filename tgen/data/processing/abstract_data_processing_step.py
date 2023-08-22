@@ -6,7 +6,7 @@ from typing import List, Type
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
-from tgen.constants.deliminator_constants import SPACE
+from tgen.common.constants.deliminator_constants import SPACE
 
 
 class ProcessingOrder(enum.Enum):

@@ -8,7 +8,7 @@ from yaml.loader import SafeLoader
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.constants.deliminator_constants import COLON
+from tgen.common.constants.deliminator_constants import COLON
 from tqdm import tqdm
 
 

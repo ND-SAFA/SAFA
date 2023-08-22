@@ -1,12 +1,12 @@
-from tgen.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_PARENT_SUMMARY_TAG, \
+from tgen.common.constants.ranking_constants import RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_PARENT_SUMMARY_TAG, \
     RANKING_SCORE_TAG
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys
 from tgen.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 PARENT_ID = "parent_1"
 CHILD_ID = "child_1"
@@ -32,8 +32,9 @@ class TestLLMRankingPipeline(BaseTest):
         """
         Tests that pipeline correctly constructs the ranked predictions.
         """
+        ai_manager.mock_summarization()
         ai_manager.set_responses([
-            "<summary>project_summary</summary>",
+            "<document>project_summary</document>",
             TEST_RESPONSE
         ])
         args = self.create_args()

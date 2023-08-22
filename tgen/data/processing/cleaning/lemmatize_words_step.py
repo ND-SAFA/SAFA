@@ -2,7 +2,7 @@ from typing import List
 
 from nltk import PorterStemmer
 
-from tgen.constants.deliminator_constants import SPACE
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

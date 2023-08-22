@@ -4,7 +4,7 @@ from typing import Set
 
 import tiktoken
 
-from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, TOKENS_2_WORDS_CONVERSION
+from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, TOKENS_2_WORDS_CONVERSION
 from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 
 

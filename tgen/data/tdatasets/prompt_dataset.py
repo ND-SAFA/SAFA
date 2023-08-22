@@ -8,15 +8,14 @@ from tqdm import tqdm
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceKeys, TraceDataFrame
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -32,7 +31,8 @@ class PromptDataset(iDataset):
     __SAVE_FILENAME = "prompt_dataframe_checkpoint.csv"
 
     def __init__(self, prompt_df: PromptDataFrame = None, artifact_df: ArtifactDataFrame = None,
-                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None):
+                 trace_dataset: TraceDataset = None, project_file_id: str = None, data_export_path: str = None,
+                 project_summary: str = None):
         """
         Initializes the dataset with necessary artifact/trace information and generator for the prompts
         :param prompt_df: The prompt dataframe
@@ -46,7 +46,7 @@ class PromptDataset(iDataset):
         self.trace_dataset = trace_dataset
         self.project_file_id = project_file_id
         self.data_export_path = data_export_path
-        self.__summarized_artifacts = {}
+        self.project_summary = project_summary
 
     def to_hf_dataset(self, model_generator: ModelManager) -> Any:
         """
@@ -96,7 +96,7 @@ class PromptDataset(iDataset):
         return export_path, should_delete
 
     def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_builder: PromptBuilder = None,
-                            summarizer: Summarizer = None) -> str:
+                            summarizer: ArtifactsSummarizer = None) -> str:
         """
         Gets the project file id used by open_ai
         :param llm_manager: The manager of the model that will use the prompts dataset
@@ -115,7 +115,7 @@ class PromptDataset(iDataset):
         return self.project_file_id
 
     def get_prompt_dataframe(self, prompt_builder: PromptBuilder = None, prompt_args: PromptArgs = None,
-                             summarizer: Summarizer = None) -> PromptDataFrame:
+                             summarizer: ArtifactsSummarizer = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_args: The arguments for properly formatting the prompt
@@ -201,7 +201,7 @@ class PromptDataset(iDataset):
         return [prompt_entry]
 
     def _generate_prompts_dataframe_without_artifacts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs,
-                                                      summarizer: Summarizer = None) -> List:
+                                                      summarizer: ArtifactsSummarizer = None) -> List:
         """
         Builds the prompt in the format for generation model without artifacts or traces.
         :param prompt_builder: The generator of prompts for the dataset

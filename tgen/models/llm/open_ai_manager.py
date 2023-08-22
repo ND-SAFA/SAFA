@@ -5,10 +5,10 @@ from openai.openai_object import OpenAIObject
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
-from tgen.constants.open_ai_constants import OPENAI_MAX_ATTEMPTS, OPENAI_MAX_THREADS
+from tgen.common.constants.environment_constants import IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG
+from tgen.common.constants.open_ai_constants import OPENAI_MAX_ATTEMPTS, OPENAI_MAX_THREADS
 from tgen.core.args.open_ai_args import OpenAIArgs, OpenAIParams
-from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType

@@ -10,18 +10,18 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.testprojects.mocking.mock_openai import mock_openai
-from tgen.testres.testprojects.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.test_open_ai_responses import FINE_TUNE_REQUEST, FINE_TUNE_RESPONSE_DICT
+from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 
 Res = namedtuple("Res", ["id"])

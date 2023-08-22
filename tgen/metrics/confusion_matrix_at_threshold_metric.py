@@ -2,7 +2,7 @@ from typing import Dict
 
 import datasets
 
-from tgen.constants.metric_constants import THRESHOLD_DEFAULT
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

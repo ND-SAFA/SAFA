@@ -1,15 +1,14 @@
 from tgen.common.util.enum_util import EnumDict
-from tgen.constants.deliminator_constants import SPACE, NEW_LINE
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
-from tgen.data.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
-from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.select_question_prompt import SelectQuestionPrompt
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.testres.base_tests.base_test import BaseTest
 

@@ -1,7 +1,7 @@
 from test.data.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
-from tgen.data.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
 

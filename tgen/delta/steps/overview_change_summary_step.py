@@ -4,11 +4,11 @@ from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, SPACE, COMMA
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING, SPACE, COMMA
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
-from tgen.data.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState

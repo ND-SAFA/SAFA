@@ -3,8 +3,8 @@ import uuid
 from os.path import dirname
 from typing import List
 
-from tgen.constants.dataset_constants import BLOCK_SIZE_DEFAULT
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.dataset_constants import BLOCK_SIZE_DEFAULT
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader

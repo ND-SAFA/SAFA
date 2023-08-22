@@ -6,7 +6,7 @@ from typing import List, Type, Union
 import math
 
 from tgen.common.util.override import overrides
-from tgen.constants.deliminator_constants import TAB
+from tgen.common.constants.deliminator_constants import TAB
 from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
 from tgen.data.chunkers.chunked_node import ChunkedNode
 

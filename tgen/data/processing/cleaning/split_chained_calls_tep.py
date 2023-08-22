@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.constants.deliminator_constants import SPACE, PERIOD
+from tgen.common.constants.deliminator_constants import SPACE, PERIOD
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

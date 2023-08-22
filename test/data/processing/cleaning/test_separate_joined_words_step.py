@@ -1,4 +1,4 @@
-from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 

@@ -3,8 +3,8 @@ from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.ranking.steps.step_create_project_summary import CreateProjectSummary
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestCreateProjectSummary(BaseTest):
@@ -18,6 +18,7 @@ class TestCreateProjectSummary(BaseTest):
         """
         Tests the generation of a project summary.
         """
+        ai_manager.mock_summarization()
         ai_manager.set_responses([self.PROJECT_SUMMARY])
         args, state = RankingPipelineTest.create_ranking_structures()
         step = CreateProjectSummary()

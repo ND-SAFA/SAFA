@@ -4,14 +4,14 @@ import os
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.testres.testprojects.mocking.mock_openai import mock_openai
-from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestPromptProjectReader(BaseTest):
@@ -40,7 +40,7 @@ class TestPromptProjectReader(BaseTest):
         ai_manager.mock_summarization()
         project_reader = self.get_project_reader()
         llm_manager = OpenAIManager(OpenAIArgs())
-        project_reader.set_summarizer(Summarizer(llm_manager, code_or_exceeds_limit_only=False))
+        project_reader.set_summarizer(ArtifactsSummarizer(llm_manager, code_or_exceeds_limit_only=False))
         prompts_df = project_reader.read_project()
         expected_prompts = []
         with open(self.PROJECT_PATH) as file:

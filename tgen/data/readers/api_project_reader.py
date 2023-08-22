@@ -3,7 +3,7 @@ from typing import Dict
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.constants.dataset_constants import NO_CHECK
+from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame

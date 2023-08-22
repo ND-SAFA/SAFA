@@ -2,8 +2,8 @@ import os
 from typing import Dict
 
 from tgen.common.util.json_util import JsonUtil
-from tgen.constants.dataset_constants import NO_CHECK
-from tgen.constants.deliminator_constants import PERIOD
+from tgen.common.constants.dataset_constants import NO_CHECK
+from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition

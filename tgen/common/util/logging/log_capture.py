@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 
 global tqdm_log_capture
 

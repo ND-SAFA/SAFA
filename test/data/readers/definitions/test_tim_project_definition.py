@@ -2,7 +2,7 @@ from copy import deepcopy
 from unittest.mock import patch
 
 from tgen.common.util.json_util import JsonUtil
-from tgen.constants.dataset_constants import NO_CHECK
+from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.data.keys.safa_keys import SafaKeys
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.definitions.tim_project_definition import TimProjectDefinition

@@ -3,7 +3,7 @@ from typing import List
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.status import Status
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs

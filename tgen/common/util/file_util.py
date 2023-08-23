@@ -9,7 +9,7 @@ from yaml.loader import Loader, SafeLoader
 
 from tgen.common.util.json_util import JsonUtil
 import pickle
-from tgen.constants.deliminator_constants import F_SLASH, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import F_SLASH, EMPTY_STRING
 
 CODE_EXTENSIONS = ["CPP", "SH", "C", "HPP", "JS", "CS", "RB", "PHP",
                    "SWIFT", "M", "GO", "RS", "KT", "TS", "HTML", "CSS",

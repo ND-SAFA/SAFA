@@ -8,9 +8,9 @@ from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
+from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     NO_CHECK, REMOVE_ORPHANS_DEFAULT
-from tgen.constants.deliminator_constants import COMMA, NEW_LINE
+from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame

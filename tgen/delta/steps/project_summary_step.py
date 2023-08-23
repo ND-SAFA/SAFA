@@ -1,9 +1,9 @@
-from tgen.common.util.status import Status
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
-from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
 class ProjectSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
@@ -15,10 +15,6 @@ class ProjectSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         :param state:  The delta summarizer state
         :return: None
         """
-        original_artifacts = ArtifactDataFrame(args.dataset.artifact_df.dropna())
-        summary_job = ProjectSummaryJob({a_id: original_artifacts.get_artifact(a_id)[ArtifactKeys.CONTENT]
-                                         for a_id in original_artifacts.index})
-        job_res = summary_job.run()
-        assert job_res.status == Status.SUCCESS, "Project summary job failed"
-        summary_res: ProjectSummaryResponse = job_res.body
-        state.project_summary = summary_res["summary"]
+        summarizer = ProjectSummarizer(SummarizerArgs(dataset=PromptDataset(trace_dataset=args.dataset)))
+        summary = summarizer.summarize()
+        state.project_summary = summary

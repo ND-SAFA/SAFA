@@ -9,7 +9,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_config import LoggerConfig
 from tgen.common.util.status import Status
-from tgen.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
+from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.keys.structure_keys import StructuredKeys

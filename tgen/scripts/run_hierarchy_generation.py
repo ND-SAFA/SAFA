@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.llm.open_ai_manager import OpenAIManager
 
@@ -17,7 +17,7 @@ from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.jobs.hgen_jobs.hgen_job import HGenJob
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         os.path.join(data_path, "dr_onboard_autonomy_summarizations")
     hgen_llm_manager = OpenAIManager(OpenAIArgs())
     tgen_llm_manager = OpenAIManager(OpenAIArgs())
-    summarizer = Summarizer(hgen_llm_manager) if DO_SUMMARIZE else None
+    summarizer = ArtifactsSummarizer(hgen_llm_manager) if DO_SUMMARIZE else None
     export_path = os.path.join(output_path, "hgen", "dr_onboard_autonomy")
 
     if USE_DATASET_CREATOR_FOR_SOURCES:

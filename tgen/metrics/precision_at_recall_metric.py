@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from tgen.constants.metric_constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.common.util.logging.logger_manager import logger
 

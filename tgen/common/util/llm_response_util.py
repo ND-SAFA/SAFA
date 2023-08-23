@@ -28,7 +28,8 @@ class LLMResponseUtil:
             if is_nested:
                 content = [LLMResponseUtil._parse_children(tag) for tag in tags]
             else:
-                content = [tag.contents[0] for tag in tags]
+                content = [tag.contents[0] for tag in tags if len(tag.contents) > 0]
+            assert content
         except Exception:
             error = f"Unable to parse {tag_name}"
             logger.exception(error)

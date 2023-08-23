@@ -1,5 +1,5 @@
 from test.ranking.steps.ranking_pipeline_util import RankingPipelineTest
-from tgen.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.ranking.steps.sort_children_step import SortChildren
 from tgen.testres.base_tests.base_test import BaseTest
 

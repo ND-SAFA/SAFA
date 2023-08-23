@@ -2,8 +2,8 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
-from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask

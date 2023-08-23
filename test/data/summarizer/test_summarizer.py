@@ -2,24 +2,18 @@ import os
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import NEW_LINE, SPACE, TAB
-from tgen.constants.open_ai_constants import MAX_TOKENS_BUFFER, OPEN_AI_MODEL_DEFAULT
+from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
-from tgen.data.chunkers.python_chunker import PythonChunker
-from tgen.data.chunkers.supported_chunker import SupportedChunker
 from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.prompts.prompt_args import PromptArgs
-from tgen.data.summarizer.summarizer import Summarizer
-from tgen.data.summarizer.summary_types import SummaryTypes
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from tgen.summarizer.summary_types import SummaryTypes
 from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.models.llm.token_limits import ModelTokenLimits, TokenLimitCalculator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
-from tgen.testres.testprojects.mocking.mock_openai import mock_openai
-from tgen.testres.testprojects.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestSummarizer(BaseTest):
@@ -73,8 +67,7 @@ class TestSummarizer(BaseTest):
         # data
         nl_content = "Hello, this is a short text."
         contents = [nl_content, self.CODE_CONTENT]
-        model_name = "gpt-3.5-turbo"
-        summarizer = self.get_summarizer(model_name=model_name, code_or_exceeds_limit_only=False)
+        summarizer = self.get_summarizer(code_or_exceeds_limit_only=False)
 
         response_manager.set_responses([lambda prompt: self.get_response(prompt, SummaryTypes.NL_BASE, NL_SUMMARY),
                                         lambda prompt: self.get_response(prompt, SummaryTypes.CODE_BASE, PL_SUMMARY)])
@@ -97,7 +90,7 @@ class TestSummarizer(BaseTest):
         TEXTS = [TEXT_1, TEXT_2]
         SUMMARY_1 = "SUMMARY_1"
         response_manager.set_responses([
-            PromptUtil.create_xml(Summarizer.SUMMARY_TAG, SUMMARY_1)  # The re-summarization of the artifact.
+            PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, SUMMARY_1)  # The re-summarization of the artifact.
         ])
         summaries = summarizer.summarize_bulk(bodies=TEXTS, filenames=["file.py", "unknown"])
 
@@ -105,10 +98,10 @@ class TestSummarizer(BaseTest):
         self.assertEqual(summaries[1], TEXT_2)  # shouldn't have summarized
 
     def get_summarizer(self, **kwargs):
-        internal_kwargs = {"model_name": self.MODEL_NAME, "code_or_exceeds_limit_only": False}
+        internal_kwargs = {"code_or_exceeds_limit_only": False}
         internal_kwargs.update(kwargs)
         llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = Summarizer(llm_manager, **internal_kwargs)
+        summarizer = ArtifactsSummarizer(llm_manager, **internal_kwargs)
         return summarizer
 
     @staticmethod
@@ -132,4 +125,4 @@ class TestSummarizer(BaseTest):
     def get_response(prompt: str, summary_type: SummaryTypes, expected_summary: str):
         if summary_type.value[0].value not in prompt:
             return "fail"
-        return PromptUtil.create_xml(Summarizer.SUMMARY_TAG, expected_summary)
+        return PromptUtil.create_xml(ArtifactsSummarizer.SUMMARY_TAG, expected_summary)

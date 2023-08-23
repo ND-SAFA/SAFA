@@ -4,8 +4,8 @@ from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.delta_args import DeltaArgs

@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from tgen.constants.deliminator_constants import NEW_LINE
+from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.entity.entity_reader import EntityReader

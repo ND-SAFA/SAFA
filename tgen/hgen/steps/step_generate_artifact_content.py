@@ -2,14 +2,15 @@ import os
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_response_manager import PromptResponseManager
-from tgen.data.prompts.question_prompt import QuestionPrompt
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
-from tgen.hgen.hgen_args import HGenArgs, HGenState, PredictionStep
-from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation, parse_generated_artifacts
+from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.hgen_prompts import SUMMARY_INSTRUCTIONS, TASK_INSTRUCTIONS
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.hgen_state import HGenState
+from tgen.hgen.hgen_util import convert_spaces_to_dashes, get_predictions, get_prompt_builder_for_generation
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 
 

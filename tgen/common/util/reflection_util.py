@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Type
 from typeguard import check_type
 
 from tgen.common.util.str_util import StrUtil
-from tgen.constants.deliminator_constants import PERIOD, UNDERSCORE
+from tgen.common.constants.deliminator_constants import PERIOD, UNDERSCORE
 from tgen.variables.undetermined_variable import UndeterminedVariable
 
 

@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, List
 
-from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 

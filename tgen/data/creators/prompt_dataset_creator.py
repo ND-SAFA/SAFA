@@ -1,10 +1,10 @@
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.common.util.file_util import FileUtil
 
@@ -16,7 +16,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
     """
 
     def __init__(self, project_reader: AbstractProjectReader = None, trace_dataset_creator: TraceDatasetCreator = None,
-                 data_export_path: str = None, project_file_id: str = None, summarizer: Summarizer = None):
+                 data_export_path: str = None, project_file_id: str = None, summarizer: ArtifactsSummarizer = None):
         """
         Initializes creator with entities extracted from reader.
         :param data_export_path: The path to where data files will be saved if specified.May be to a directory or specific file
@@ -57,7 +57,7 @@ class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):
             return self.project_file_id
         return EMPTY_STRING
 
-    def set_summarizers(self, summarizer: Summarizer) -> None:
+    def set_summarizers(self, summarizer: ArtifactsSummarizer) -> None:
         """
         Sets summarizers for project readers
         :param summarizer: The summarizer to use

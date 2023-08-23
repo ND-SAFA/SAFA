@@ -4,8 +4,8 @@ from typing import Union
 from transformers.data.data_collator import DataCollatorForLanguageModeling
 
 from tgen.common.util.override import overrides
-from tgen.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
-from tgen.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.constants.dataset_constants import MLM_PROBABILITY_DEFAULT
+from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput

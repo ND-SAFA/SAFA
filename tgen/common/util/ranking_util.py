@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
+from tgen.common.constants.ranking_constants import TIER_ONE_THRESHOLD, TIER_TWO_THRESHOLD
 from tgen.core.trace_output.trace_prediction_output import TracePredictionEntry
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame, TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager

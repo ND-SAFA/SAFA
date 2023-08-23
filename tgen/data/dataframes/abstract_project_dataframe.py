@@ -242,6 +242,13 @@ class AbstractProjectDataFrame(pd.DataFrame):
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
 
+    def drop_nan_indices(self) -> pd.DataFrame:
+        """
+        Drops all columns containing NaN in the index
+        :return: A copy of the dataframe without the cols with NaN
+        """
+        return self.__class__(self[self.index.notnull()])
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """
         Sets an item for the dataframe

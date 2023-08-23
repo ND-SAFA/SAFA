@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
-from tgen.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy

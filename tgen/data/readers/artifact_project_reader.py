@@ -3,7 +3,7 @@ from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 
 class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
@@ -34,7 +34,7 @@ class ArtifactProjectReader(AbstractProjectReader[ArtifactDataFrame]):
         return artifact_df
 
     @overrides(AbstractProjectReader)
-    def set_summarizer(self, summarizer: Summarizer) -> None:
+    def set_summarizer(self, summarizer: ArtifactsSummarizer) -> None:
         """
         Sets the summarizer used to summarize content read by the reader
         :param summarizer: The summarizer to use

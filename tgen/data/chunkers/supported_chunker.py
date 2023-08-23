@@ -2,7 +2,7 @@ import os.path
 
 from tgen.common.util.file_util import FileUtil, CODE_EXTENSIONS
 from tgen.common.util.supported_enum import SupportedEnum
-from tgen.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.chunkers.dummy_code_chunker import DummyCodeChunker
 from tgen.data.chunkers.java_chunker import JavaChunker
 from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker

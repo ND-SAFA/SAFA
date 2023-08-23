@@ -5,13 +5,14 @@ from yaml.constructor import SafeConstructor
 
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.path_constants import INPUTS_FOR_GENERATION_PATH
-from tgen.data.prompts.prompt import Prompt
-from tgen.data.prompts.prompt_builder import PromptBuilder
-from tgen.data.prompts.questionnaire_prompt import QuestionnairePrompt
-from tgen.data.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.hgen.hgen_args import HGenState, HGenArgs, PredictionStep
+from tgen.hgen.hgen_args import HGenArgs, PredictionStep
+from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import parse_generated_artifacts, get_predictions, convert_spaces_to_dashes
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
 import bs4

@@ -1,8 +1,10 @@
 from tgen.common.util.logging.logger_manager import logger
-from tgen.jobs.summary_jobs.project_summary_job import ProjectSummaryJob, ProjectSummaryResponse
+from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.ranking.ranking_args import RankingArgs
 from tgen.ranking.ranking_state import RankingState
 from tgen.state.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.summarizer.project_summarizer import ProjectSummarizer
+from tgen.summarizer.summarizer_args import SummarizerArgs
 
 
 class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
@@ -27,8 +29,8 @@ class CreateProjectSummary(AbstractPipelineStep[RankingArgs, RankingState]):
             logger.info("Skipping project summary.")
             summary = None
         else:  # GENERATED SUMMARY
-            summary_job = ProjectSummaryJob(artifact_map=args.artifact_map, n_tokens=args.n_summary_tokens,
-                                            llm_manager=args.llm_manager)
-            response: ProjectSummaryResponse = summary_job.run().body
-            summary = response["summary"]
+            summarizer = ProjectSummarizer(SummarizerArgs(dataset=PromptDataset(artifact_df=args.artifact_df),
+                                                           llm_manager_for_project_summary=args.llm_manager),
+                                            n_tokens=args.n_summary_tokens)
+            summary = summarizer.summarize()
         state.project_summary = summary

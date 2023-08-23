@@ -2,7 +2,7 @@ import json
 import os
 import random
 
-from tgen.constants.experiment_constants import OUTPUT_FILENAME
+from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.jobs.supported_job_type import SupportedJobType

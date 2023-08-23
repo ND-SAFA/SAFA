@@ -16,7 +16,7 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.hgen.hgen_args import HGenState
+from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hgen_util import save_dataset_checkpoint
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
 from tgen.hgen.steps.step_generate_artifact_content import GenerateArtifactContentStep
@@ -25,9 +25,9 @@ from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.testres.testprojects.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.testprojects.mocking.mock_libraries import mock_libraries
-from tgen.testres.testprojects.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
+from tgen.testres.mocking.mock_libraries import mock_libraries
+from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestHierarchyGenerator(BaseTest):

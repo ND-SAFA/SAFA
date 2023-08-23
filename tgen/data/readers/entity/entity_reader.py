@@ -6,11 +6,10 @@ import pandas as pd
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.logging.logger_manager import logger
-from tgen.constants.deliminator_constants import EMPTY_STRING
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 
 EntityType = TypeVar("EntityType")
 
@@ -33,7 +32,7 @@ class EntityReader(Generic[EntityType]):
         self.conversions: Dict[str, Dict] = conversions
         self.entity_type = None
 
-    def read_entities(self, summarizer: Summarizer = None) -> pd.DataFrame:
+    def read_entities(self, summarizer: ArtifactsSummarizer = None) -> pd.DataFrame:
         """
         Reads original entities and applies any column conversion defined in definition.
         :return: DataFrame containing processed entities.

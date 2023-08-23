@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Dict, Union
 
-from tgen.common.util.dataclass_util import required_field
+from tgen.common.util.dataclass_util import required_field, DataclassUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.json_util import JsonUtil
-from tgen.constants.model_constants import get_best_default_llm_manager
+from tgen.common.constants.model_constants import get_best_default_llm_manager
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
@@ -45,9 +45,8 @@ class DeltaArgs(PipelineArgs):
         Handles any standardization steps after initialization
         :return: None
         """
-        if not self.dataset:
-            assert self.dataset_creator is not None, "Must supply either a dataset or a creator to make one"
-            self.dataset = self.dataset_creator.create()
+        self.dataset: TraceDataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
+        self.dataset.artifact_df = self.dataset.artifact_df.drop_nan_indices()
         if isinstance(self.change_type_to_diffs, str):
             self.change_type_to_diffs = JsonUtil.read_json_file(self.change_type_to_diffs)
         self.change_type_to_diffs = EnumDict(self.change_type_to_diffs)

@@ -4,16 +4,16 @@ import anthropic
 
 from tgen.common.util.logging.logger_manager import logger
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.constants import environment_constants
-from tgen.constants.anthropic_constants import ANTHROPIC_MAX_RE_ATTEMPTS, ANTHROPIC_MAX_THREADS
-from tgen.constants.deliminator_constants import EMPTY_STRING
-from tgen.constants.environment_constants import ANTHROPIC_KEY
+from tgen.common.constants import environment_constants
+from tgen.common.constants.anthropic_constants import ANTHROPIC_MAX_RE_ATTEMPTS, ANTHROPIC_MAX_THREADS
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.environment_constants import ANTHROPIC_KEY
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
-from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.testres.testprojects.mocking.mock_anthropic import MockAnthropicClient
+from tgen.testres.mocking.mock_anthropic import MockAnthropicClient
 
 
 class AnthropicResponse(TypedDict):

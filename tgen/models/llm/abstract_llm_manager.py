@@ -4,7 +4,7 @@ from typing import Dict, Generic, Type, TypeVar
 from tgen.common.util.base_object import BaseObject
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.data.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 

@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Callable, Dict, OrderedDict, Type, Union
 
-from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 
 SEP_SYM = UNDERSCORE
 

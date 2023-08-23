@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.constants.deliminator_constants import UNDERSCORE
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 
 
 class DataKey:

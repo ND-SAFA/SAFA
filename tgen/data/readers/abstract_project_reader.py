@@ -7,7 +7,7 @@ from tgen.common.util.override import overrides
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.summarizer.summarizer import Summarizer
+from tgen.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from tgen.scripts.modules.script_definition import ScriptDefinition, ENV_REPLACEMENT_VARIABLES
 
 ProjectData = TypeVar("ProjectData")
@@ -26,7 +26,7 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
         """
         self.project_path = project_path
         self.overrides = overrides if overrides else {}
-        self.summarizer: Optional[Summarizer] = None
+        self.summarizer: Optional[ArtifactsSummarizer] = None
         self.__processed_project_path = False
 
     def get_project_path(self) -> str:
@@ -68,7 +68,7 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
         """
         return self.overrides
 
-    def set_summarizer(self, summarizer: Summarizer):
+    def set_summarizer(self, summarizer: ArtifactsSummarizer):
         """
         Sets the summarizer used to summarize content read by the reader
         :param summarizer: The summarizer to use

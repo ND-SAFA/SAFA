@@ -2,7 +2,7 @@ import json
 import threading
 from typing import Any, Callable, Dict, Optional
 
-from celery import Task, current_task, shared_task
+from celery import Task, shared_task
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
@@ -86,53 +86,63 @@ def async_endpoint(serializer, pre_process: PreProcessType = None, post_process:
 
         @endpoint(serializer)
         @shared_task(*args, **kwargs, name=func.__name__, bind=True)
-        def task_endpoint(self, *task_args, **task_kwargs):
+        def task_endpoint(self: Task, *task_args, **task_kwargs):
             """
             Constructs an task endpoint who will queue a job performing function being wrapped.
             :param task_args: Positional arguments.
             :param task_kwargs: Keyword arguments.
             :return: JsonResponse containing function output as body.
             """
-            state = endpoint_preprocess()
+            local_state = endpoint_preprocess()
 
             for p in pre_process:
                 p_state = p(*task_args, **task_kwargs)
                 assert isinstance(p_state, dict), "Expected pre-processing output to be a dictionary."
-                state.update(p_state)
+                local_state.update(p_state)
 
             result = {}
-            state["is_running"] = True
+            local_state["is_running"] = True
+            local_state["success"] = True
+
+            def write_logs():
+                log_capture = local_state["log_capture"]
+                is_successful = local_state["success"]
+                if not is_successful:
+                    raise local_state["exception"]
+                logs = log_capture.get_logs()
+                self.update_state(state="PROGRESS", meta={'logs': logs})
 
             def run_job():
-                data, *other_args = task_args
-                s = serializer(data=data)
-                s.is_valid(raise_exception=True)
-                serialized_data = s.save()
-                response = func(serialized_data, *other_args, **task_kwargs)
-                response_str = json.dumps(response, cls=NpEncoder)
-                response_dict = json.loads(response_str)
-                result.update(response_dict)
-                state["is_running"] = False
+                try:
+                    data, *other_args = task_args
+                    s = serializer(data=data)
+                    s.is_valid(raise_exception=True)
+                    serialized_data = s.save()
+                    response = func(serialized_data, *other_args, **task_kwargs)
+                    response_str = json.dumps(response, cls=NpEncoder)
+                    response_dict = json.loads(response_str)
+                    result.update(response_dict)
+                    local_state["is_running"] = False
+                except Exception as e:
+                    logger.exception(e)
+                    local_state["is_running"] = False
+                    local_state["success"] = False
+                    local_state["exception"] = e
 
-            logger.info(f"Beginning job: {current_task.request.id}")
             thread = threading.Thread(target=run_job)
             thread.start()
 
-            def write_logs():
-                log_capture = state["log_capture"]
-                logs = log_capture.get_logs()
-                current_task.update_state(state='PROGRESS', meta={'logs': logs})
-
-            while state["is_running"]:
+            while local_state["is_running"]:
                 write_logs()
                 threading.Event().wait(5)
             thread.join()
 
-            endpoint_postprocess(state, result)
+            endpoint_postprocess(local_state, result)
             for post in post_process:
-                post(state, result)
-            write_logs()
+                post(local_state, result)
 
+            write_logs()
+            logger.info("Exiting. Bye Bye.")
             return result
 
         assert func is not None, "Expected function to be defined."

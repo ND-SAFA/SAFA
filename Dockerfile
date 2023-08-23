@@ -20,7 +20,7 @@ WORKDIR /app
 RUN python3 api/manage.py collectstatic --noinput
 
 ### COPy
-RUN cat /app/tgen/ranking/__init__.py
+ADD load.py /app/
 
 # Finalize
 EXPOSE 80

@@ -2,6 +2,7 @@ from typing import Dict, List, TypedDict
 
 from rest_framework import serializers
 
+from api.constants.api_constants import MEDIUM_LENGTH, TEXT_LENGTH
 from api.endpoints.summarize.summarize_serializer import SummaryArtifactSerializer
 
 
@@ -19,8 +20,9 @@ class HGenSerializer(serializers.Serializer):
     artifacts = SummaryArtifactSerializer(help_text="List of artifacts to generate parent artifacts from.", many=True)
     targetTypes = serializers.ListSerializer(
         help_text="List of target types to generate.",
-        child=serializers.CharField(max_length=1028, help_text="The types of artifacts to generate."))
-    summary = serializers.CharField(max_length=100000, help_text="Pre-generated project summary.", required=False, allow_null=True,
+        child=serializers.CharField(max_length=MEDIUM_LENGTH, help_text="The types of artifacts to generate."))
+    summary = serializers.CharField(max_length=TEXT_LENGTH, help_text="Pre-generated project summary.", required=False,
+                                    allow_null=True,
                                     allow_blank=False)
 
     def create(self, validated_data):

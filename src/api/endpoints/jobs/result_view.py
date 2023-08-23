@@ -1,12 +1,16 @@
-from typing import TypedDict
+from typing import Tuple, TypedDict
 
+from celery import states
 from celery.result import AsyncResult
 from django.http import JsonResponse
 from rest_framework import serializers
 
+from api.constants.api_constants import MEDIUM_LENGTH
+from api.constants.celery_status import CeleryStatus
 from api.endpoints.base.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.base.views.endpoint import endpoint
-from tgen.common.util.status import Status
+from tgen.common.util.json_util import NpEncoder
+from tgen.common.util.logging.logger_manager import logger
 
 
 class ResultPayload(TypedDict):
@@ -14,21 +18,28 @@ class ResultPayload(TypedDict):
 
 
 class ResultSerializer(AbstractSerializer[ResultPayload]):
-    task_id = serializers.CharField(max_length=1028, help_text="ID of task.")
+    task_id = serializers.CharField(max_length=MEDIUM_LENGTH, help_text="ID of task.")
 
 
-def get_task_status(result):
+def get_task_status(result: AsyncResult.status) -> Tuple[CeleryStatus, str]:
+    """
+    Returns the current status of the celery result along with human readable message.
+    :param result: The task result.
+    :return: Task status and message.
+    """
     status = result.status
-    if status == "SUCCESS":
-        return Status.SUCCESS, "Task finished successfully"
-    elif status == "FAILURE":
-        return Status.FAILURE, result.traceback
-    elif status == "PENDING":
-        return Status.NOT_STARTED, "Task is still pending"
-    elif status in ["STARTED", "PROGRESS"]:
-        return Status.IN_PROGRESS, "Task is still running"
+    if status == states.SUCCESS:
+        return CeleryStatus.SUCCESS, "Task finished successfully."
+    elif status == states.FAILURE:
+        return CeleryStatus.FAILURE, result.traceback
+    elif status == states.PENDING:
+        return CeleryStatus.NOT_STARTED, "Task is pending."
+    elif status in [states.STARTED, "PROGRESS"]:
+        return CeleryStatus.IN_PROGRESS, "Task is in progress."
+    elif status in [states.FAILURE, states.REVOKED, states.REJECTED, states.IGNORED]:
+        return CeleryStatus.FAILURE, "Task has failed."
     else:
-        raise Exception(f"Status is unknown:{result.status}")
+        raise Exception(f"CeleryStatus is unknown:{result.status}")
 
 
 def try_get_logs(async_result: AsyncResult):
@@ -39,13 +50,24 @@ def try_get_logs(async_result: AsyncResult):
 
 
 @endpoint(ResultSerializer)
+def cancel_job(payload: ResultPayload):
+    task_id = payload["task_id"]
+    logger.info(f"Cancelling and deleting task: {task_id}")
+    result = AsyncResult(task_id)
+    res = result.revoke(signal="KILL", terminate=True)
+    result.forget()
+    return JsonResponse({"status": CeleryStatus.REVOKED, "message": res, "logs": []}, encoder=NpEncoder)
+
+
+@endpoint(ResultSerializer)
 def get_status(payload: ResultPayload):
     task_id = payload["task_id"]
     result = AsyncResult(task_id)
     results_obj = result.result
     logs = try_get_logs(results_obj)
     status, message = get_task_status(result)
-    return JsonResponse({"status": status, "message": message, "logs": logs})
+    status_dict = {"status": status, "message": message, "logs": logs}
+    return JsonResponse(status_dict, encoder=NpEncoder)
 
 
 @endpoint(ResultSerializer)

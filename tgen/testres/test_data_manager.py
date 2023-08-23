@@ -137,7 +137,7 @@ class TestDataManager:
         layers = [TraceLayer(**params) for params in TestDataManager.get_path(TestDataManager.Keys.LAYERS)]
         links = [TracePredictionEntry(**params) for params in TestDataManager.get_path(TestDataManager.Keys.TRACES)]
         api_definition = ApiDefinition(
-            artifact_layers=TestDataManager.get_path(TestDataManager.Keys.ARTIFACTS),
+            artifacts=TestDataManager.get_path(TestDataManager.Keys.ARTIFACTS),
             layers=layers,
             true_links=links
         )

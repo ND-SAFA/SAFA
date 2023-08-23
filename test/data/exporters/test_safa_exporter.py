@@ -62,7 +62,7 @@ class TestSafaExporter(BaseTest):
             "score": score,
             "explanation": explanation
         }]
-        api_definition = ApiDefinition(artifact_layers=artifact_layers, layers=layers, true_links=true_links)
+        api_definition = ApiDefinition(artifacts=artifact_layers, layers=layers, true_links=true_links)
         api_project_reader = ApiProjectReader(api_definition=api_definition)
         trace_dataset_creator = TraceDatasetCreator(project_reader=api_project_reader)
         safa_exporter = SafaExporter(TEST_OUTPUT_DIR, dataset_creator=trace_dataset_creator)

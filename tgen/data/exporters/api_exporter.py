@@ -45,7 +45,7 @@ class ApiExporter(AbstractDatasetExporter):
             layers.append(TraceLayer(parent=parent_type, child=child_type))
 
         definition = ApiDefinition(layers=layers,
-                                   artifact_layers=self.generated_layers,
+                                   artifacts=self.generated_layers,
                                    true_links=self.true_links)
         if self.export_path:
             JsonUtil.save_to_json_file(definition, self.export_path)

@@ -1,7 +1,6 @@
 from typing import Any, Dict, List
 
-from tgen.common.util.logging.logger_manager import logger
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys, ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.base_summarizer_job import BaseSummarizerJob
@@ -47,5 +46,5 @@ class SummarizeArtifactsJob(BaseSummarizerJob):
             dataset = Summarizer(args).summarize()
             artifacts_df = dataset.artifact_df
             summary = dataset.project_summary if self.include_project_summary else None
-        artifacts = artifacts_df.to_dict(orient='index')
+        artifacts = artifacts_df.reset_index().to_dict(orient='records')
         return SummaryResponse(summary=summary, artifacts=artifacts)

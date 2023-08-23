@@ -1,10 +1,10 @@
 from typing import Dict
 
+from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.constants.dataset_constants import NO_CHECK
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame, ArtifactKeys
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
@@ -62,10 +62,7 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Creates artifact data frame containing all layers of api definition.
         :return: Artifact data frame.
         """
-        global_artifact_map = {}
-        for artifact_type, artifact_map in self.api_definition.artifact_layers.items():
-            global_artifact_map = self.add_artifact_layer(artifact_map, artifact_type, global_artifact_map)
-        return ArtifactDataFrame(global_artifact_map)
+        return ArtifactDataFrame(self.api_definition.artifacts)
 
     def create_layer_df(self) -> LayerDataFrame:
         """
@@ -102,9 +99,9 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         """
         for t_id, t_body in artifact_layer.items():
             artifact_map = DataFrameUtil.append(artifact_map, EnumDict({
-                StructuredKeys.Artifact.ID: t_id,
-                StructuredKeys.Artifact.CONTENT: t_body,
-                StructuredKeys.Artifact.LAYER_ID: layer_id
+                ArtifactKeys.ID: t_id,
+                ArtifactKeys.CONTENT: t_body,
+                ArtifactKeys.LAYER_ID: layer_id
             }))
         return artifact_map
 

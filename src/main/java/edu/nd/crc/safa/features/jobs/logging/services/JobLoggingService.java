@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.PermissionService;
+import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class JobLoggingService {
 
     private JobService jobService;
 
-    private PermissionService permissionService;
+    private PermissionCheckerService permissionCheckerService;
 
     /**
      * Get all logs for a job step. This does not check if the step number is valid
@@ -173,7 +173,7 @@ public class JobLoggingService {
         try {
             JobDbEntity job = jobService.getJobById(id);
 
-            if (permissionService.hasViewPermission(job, user)) {
+            if (permissionCheckerService.hasViewPermission(job, user)) {
                 return job;
             }
 

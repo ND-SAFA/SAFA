@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.PermissionService;
+import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,14 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectMembershipController extends BaseController {
 
-    private final PermissionService permissionService;
+    private final PermissionCheckerService permissionCheckerService;
 
     @Autowired
     public ProjectMembershipController(ResourceBuilder resourceBuilder,
                                        ServiceProvider serviceProvider,
-                                       PermissionService permissionService) {
+                                       PermissionCheckerService permissionCheckerService) {
         super(resourceBuilder, serviceProvider);
-        this.permissionService = permissionService;
+        this.permissionCheckerService = permissionCheckerService;
     }
 
     /**
@@ -105,7 +105,7 @@ public class ProjectMembershipController extends BaseController {
         Project project = projectMembership.getProject();
         SafaUser user = serviceProvider.getSafaUserService().getCurrentUser();
         if (!projectMembership.getMember().equals(user)) {
-            permissionService.requireAdminPermission(project, user);
+            permissionCheckerService.requireAdminPermission(project, user);
         }
 
         // Step - Verify last owner not being deleted.

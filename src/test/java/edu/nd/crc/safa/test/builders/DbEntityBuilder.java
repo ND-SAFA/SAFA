@@ -25,9 +25,7 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
-import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
-import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -152,9 +150,6 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public DbEntityBuilder newProject(String name, SafaUser owner) {
         Project project = this.projectService.createProject(name, "", owner);
-
-        // TODO keeping this for now, but it should be removed once we update how membership works
-        this.userProjectMembershipRepository.save(new UserProjectMembership(project, owner, ProjectRole.OWNER));
 
         this.projects.put(name, project);
         this.versions.put(name, new Hashtable<>());

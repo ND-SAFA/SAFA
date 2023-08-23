@@ -8,6 +8,7 @@ import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -31,10 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController extends BaseController {
 
+    private final ProjectMembershipService projectMembershipService;
+
     @Autowired
     public ProjectController(ResourceBuilder resourceBuilder,
-                             ServiceProvider serviceProvider) {
+                             ServiceProvider serviceProvider,
+                             ProjectMembershipService projectMembershipService) {
         super(resourceBuilder, serviceProvider);
+        this.projectMembershipService = projectMembershipService;
     }
 
     /**
@@ -82,7 +87,8 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
     public List<ProjectIdAppEntity> getUserProjects() {
-        return this.serviceProvider.getProjectService().getProjectsForCurrentUser();
+        SafaUser user = this.serviceProvider.getSafaUserService().getCurrentUser();
+        return projectMembershipService.getProjectIdAppEntitiesForUser(user);
     }
 
     /**

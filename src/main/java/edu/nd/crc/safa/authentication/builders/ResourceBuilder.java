@@ -6,7 +6,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.PermissionService;
+import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class ResourceBuilder {
     private final ProjectRepository projectRepository;
     private final ProjectVersionRepository projectVersionRepository;
-    private final PermissionService permissionService;
+    private final PermissionCheckerService permissionCheckerService;
 
     Project project;
     ProjectVersion projectVersion;
@@ -29,12 +29,12 @@ public class ResourceBuilder {
     @Autowired
     public ResourceBuilder(ProjectRepository projectRepository,
                            ProjectVersionRepository projectVersionRepository,
-                           PermissionService permissionService) {
+                           PermissionCheckerService permissionCheckerService) {
         this.project = null;
         this.projectVersion = null;
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
-        this.permissionService = permissionService;
+        this.permissionCheckerService = permissionCheckerService;
     }
 
     public ResourceBuilder fetchProject(UUID projectId) throws SafaError {
@@ -59,52 +59,52 @@ public class ResourceBuilder {
     }
 
     public Project withOwnProject() throws SafaError {
-        this.permissionService.requireOwnerPermission(project);
+        this.permissionCheckerService.requireOwnerPermission(project);
         return this.project;
     }
 
     public Project withOwnProjectAs(SafaUser user) throws SafaError {
-        this.permissionService.requireOwnerPermission(project, user);
+        this.permissionCheckerService.requireOwnerPermission(project, user);
         return this.project;
     }
 
     public Project withViewProject() throws SafaError {
-        this.permissionService.requireViewPermission(project);
+        this.permissionCheckerService.requireViewPermission(project);
         return this.project;
     }
 
     public Project withViewProjectAs(SafaUser user) throws SafaError {
-        this.permissionService.requireViewPermission(project, user);
+        this.permissionCheckerService.requireViewPermission(project, user);
         return this.project;
     }
 
     public Project withEditProject() {
-        this.permissionService.requireEditPermission(project);
+        this.permissionCheckerService.requireEditPermission(project);
         return this.project;
     }
 
     public Project withEditProjectAs(SafaUser user) {
-        this.permissionService.requireEditPermission(project, user);
+        this.permissionCheckerService.requireEditPermission(project, user);
         return this.project;
     }
 
     public ProjectVersion withViewVersion() {
-        this.permissionService.requireViewPermission(projectVersion.getProject());
+        this.permissionCheckerService.requireViewPermission(projectVersion.getProject());
         return projectVersion;
     }
 
     public ProjectVersion withViewVersionAs(SafaUser user) {
-        this.permissionService.requireViewPermission(projectVersion.getProject(), user);
+        this.permissionCheckerService.requireViewPermission(projectVersion.getProject(), user);
         return projectVersion;
     }
 
     public ProjectVersion withEditVersion() {
-        this.permissionService.requireEditPermission(projectVersion.getProject());
+        this.permissionCheckerService.requireEditPermission(projectVersion.getProject());
         return projectVersion;
     }
 
     public ProjectVersion withEditVersionAs(SafaUser user) {
-        this.permissionService.requireEditPermission(projectVersion.getProject(), user);
+        this.permissionCheckerService.requireEditPermission(projectVersion.getProject(), user);
         return projectVersion;
     }
 }

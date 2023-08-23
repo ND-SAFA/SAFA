@@ -15,4 +15,6 @@ public interface TeamMembershipRepository extends CrudRepository<TeamMembership,
     List<TeamMembership> findByUserAndTeam(SafaUser user, Team team);
 
     Optional<TeamMembership> findByUserAndTeamAndRole(SafaUser user, Team team, TeamRole role);
+
+    List<TeamMembership> findByUser(SafaUser user);
 }

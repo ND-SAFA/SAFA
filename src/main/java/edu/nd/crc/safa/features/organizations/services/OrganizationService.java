@@ -2,8 +2,12 @@ package edu.nd.crc.safa.features.organizations.services;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
+import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.organizations.entities.db.TeamRole;
 import edu.nd.crc.safa.features.organizations.repositories.OrganizationRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -17,6 +21,8 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepo;
     private final TeamService teamService;
+    private final TeamMembershipService teamMembershipService;
+    private final OrganizationMembershipService organizationMembershipService;
 
     /**
      * Create a new organization. This will also create a new team for the organization.
@@ -33,8 +39,12 @@ public class OrganizationService {
 
         Team orgTeam = teamService.createNewTeam(name, organization, true);
         organization.setFullOrgTeamId(orgTeam.getId());
+        organization = organizationRepo.save(organization);  // Save again to add the team ID
 
-        return organizationRepo.save(organization);  // Save again to add the team ID
+        teamMembershipService.addUserRole(owner, orgTeam, TeamRole.ADMIN);
+        organizationMembershipService.addUserRole(owner, organization, OrganizationRole.ADMIN);
+
+        return organization;
     }
 
     /**

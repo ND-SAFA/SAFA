@@ -17,14 +17,14 @@ import org.springframework.stereotype.Service;
  * Provides api for adding members and verifying status within project.
  */
 @Service
-public class PermissionService {
+public class PermissionCheckerService {
     private final String PERMISSION_ERROR = "User does not have %s permissions for this project";
     private final UserProjectMembershipRepository userProjectMembershipRepository;
     private final SafaUserService safaUserService;
 
     @Autowired
-    public PermissionService(UserProjectMembershipRepository userProjectMembershipRepository,
-                             SafaUserService safaUserService) {
+    public PermissionCheckerService(UserProjectMembershipRepository userProjectMembershipRepository,
+                                    SafaUserService safaUserService) {
         this.userProjectMembershipRepository = userProjectMembershipRepository;
         this.safaUserService = safaUserService;
     }

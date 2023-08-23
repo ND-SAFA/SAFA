@@ -1,16 +1,21 @@
 package edu.nd.crc.safa.features.memberships.services;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.TeamProjectMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.UserProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.TeamProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
@@ -20,8 +25,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProjectMembershipService {
 
+    private final ProjectService projectService;
     private final TeamProjectMembershipRepository teamProjectMembershipRepo;
     private final UserProjectMembershipRepository userProjectMembershipRepo;
+    private final TeamMembershipService teamMembershipService;
 
     /**
      * Applies a role to a user within a project. If the user already has this
@@ -33,7 +40,7 @@ public class ProjectMembershipService {
      */
     public void addUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<UserProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByUserAndProjectAndRole(user, project, role);
+                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
         if (membershipOptional.isEmpty()) {
             UserProjectMembership newMembership = new UserProjectMembership(project, user, role);
@@ -51,7 +58,7 @@ public class ProjectMembershipService {
      */
     public void removeUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<UserProjectMembership> membershipOptional =
-                userProjectMembershipRepo.findByUserAndProjectAndRole(user, project, role);
+                userProjectMembershipRepo.findByMemberAndProjectAndRole(user, project, role);
 
         membershipOptional.ifPresent(userProjectMembershipRepo::delete);
     }
@@ -101,5 +108,66 @@ public class ProjectMembershipService {
                 teamProjectMembershipRepo.findByTeamAndProject(team, project);
 
         membershipOptional.ifPresent(teamProjectMembershipRepo::delete);
+    }
+
+    /**
+     * Returns list of projects owned or shared with current user.
+     *
+     * @param user The user to get projects for
+     * @return List of projects where given user has access to.
+     */
+    public List<ProjectIdAppEntity> getProjectIdAppEntitiesForUser(SafaUser user) {
+        return getProjectsForUser(user).stream()
+                .map(project -> {
+                    List<ProjectMemberAppEntity> members = this.userProjectMembershipRepo.findByProject(project)
+                            .stream()
+                            .map(ProjectMemberAppEntity::new)
+                            .collect(Collectors.toList());
+                    return new ProjectIdAppEntity(project, members);
+                })
+                .sorted(Comparator.comparing(ProjectIdAppEntity::getLastEdited).reversed())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns list of projects owned or shared with the given user.
+     *
+     * @param user The user to get projects for
+     * @return List of projects where the given user has access to.
+     */
+    public List<Project> getProjectsForUser(SafaUser user) {
+        List<Project> projects = new ArrayList<>();
+
+        this.userProjectMembershipRepo.findByMember(user)
+                .stream()
+                .map(UserProjectMembership::getProject)
+                .forEach(projects::add);
+
+        teamMembershipService.getUserTeams(user)
+                .stream()
+                .flatMap(team -> this.getProjectsForTeam(team).stream())
+                .forEach(projects::add);
+
+        return projects;
+    }
+
+    /**
+     * Returns list of projects owned or shared with a team.
+     *
+     * @param team The team to get projects for
+     * @return List of projects where the given team has access to.
+     */
+    public List<Project> getProjectsForTeam(Team team) {
+        List<Project> projects = new ArrayList<>();
+
+        this.teamProjectMembershipRepo.findByTeam(team)
+                .stream()
+                .map(TeamProjectMembership::getProject)
+                .forEach(projects::add);
+
+        projects.addAll(this.projectService.getProjectsOwnedByTeam(team));
+
+        return projects;
+
     }
 }

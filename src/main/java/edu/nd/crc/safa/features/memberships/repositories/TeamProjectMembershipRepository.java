@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.memberships.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeamProjectMembershipRepository extends CrudRepository<TeamProjectMembership, UUID> {
     Optional<TeamProjectMembership> findByTeamAndProject(Team team, Project project);
+
+    List<TeamProjectMembership> findByTeam(Team team);
 }

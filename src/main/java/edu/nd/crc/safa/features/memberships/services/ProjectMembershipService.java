@@ -39,6 +39,7 @@ public class ProjectMembershipService {
      * @param user The user to get the new role
      * @param project The project the role applies to
      * @param role The role
+     * @return The new membership representing the role, or the old one if it already existed
      */
     public UserProjectMembership addUserRole(SafaUser user, Project project, ProjectRole role) {
         Optional<UserProjectMembership> membershipOptional =
@@ -85,6 +86,7 @@ public class ProjectMembershipService {
      *
      * @param team The team to share the project with.
      * @param project The project to share.
+     * @return The new membership, or the old one if it already existed
      */
     public TeamProjectMembership addTeamToProject(Team team, Project project) {
         Optional<TeamProjectMembership> membershipOptional =
